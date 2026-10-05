@@ -89,6 +89,13 @@ add_library(bob_math STATIC
     ${BOB_TREE}/math/matrix.cpp)
 target_link_libraries(bob_math PUBLIC SharedMathIncludes rowan_math BobIncludes)
 
+# --- shared shell: install detection (T111, REQ-DETECT-01/02/03) -------------
+# Pure C++, no game deps — each game exe embeds it and validates the install
+# dir before entering game code. No skip-validation API by design.
+add_library(rowan_shell STATIC shell/detect.cpp shell/manifests.cpp)
+target_include_directories(rowan_shell PUBLIC shell)
+target_link_libraries(rowan_shell PUBLIC RowanDefaults)
+
 # --- shared native compat: migalley's io_compat (T103 resolver) ---------------
 # _findfirst/_findnext (FNM_CASEFOLD) + fopen_ci (component-wise case-insensitive
 # resolve) — proven code, no symlink aliases needed.
@@ -240,3 +247,13 @@ add_test(NAME bob_bfields_tests COMMAND bob_bfields_tests)
 set_tests_properties(bob_bfields_tests PROPERTIES
     TIMEOUT 60
     ENVIRONMENT "LD_LIBRARY_PATH=${SYSROOT}/usr/lib/i386-linux-gnu:${SYSROOT}/lib")
+
+add_executable(shell_detect_tests
+    tests/unit/main.cpp
+    tests/unit/test_shell_detect.cpp)
+target_include_directories(shell_detect_tests PRIVATE tests shell)
+target_link_libraries(shell_detect_tests PRIVATE rowan_shell RowanDefaults)
+
+add_test(NAME shell_detect_tests COMMAND shell_detect_tests)
+set_tests_properties(shell_detect_tests PROPERTIES
+    TIMEOUT 30)
