@@ -124,6 +124,23 @@ REGISTER_TEST(test_bob_trig) {
     CHECK_NEAR(s, 0, 2); CHECK_NEAR(c, -0x8000, 4);
     a = (Angles)0x4000; ml.high_sin_cos(a, s, c);
     CHECK_NEAR(s, 0x8000, 4); CHECK_NEAR(c, 0, 2);
+
+    // non-cardinal: interpolation layer is live (bb=ang&63 != 0). Half a
+    // table step (0x0020) must land strictly between the aligned endpoints
+    // and differ from the base-index raw lookup — pinned after defect-proof
+    // showed a dead-interpolation mutant could pass undetected.
+    a = (Angles)0x0020; ml.high_sin_cos(a, s, c);
+    ANGLES a0 = (Angles)0x0000, a1 = (Angles)0x0040;
+    SWord s0, c0, s1, c1;
+    ml.high_sin_cos(a0, s0, c0); ml.high_sin_cos(a1, s1, c1);
+    CHECK(s > s0 && s < s1);
+    CHECK(s != s0);
+    // cos is flat at its peak near 0 — strict-between only holds mid-quadrant
+    a = (Angles)0x2020; ml.high_sin_cos(a, s, c);
+    a0 = (Angles)0x2000; a1 = (Angles)0x2040;
+    ml.high_sin_cos(a0, s0, c0); ml.high_sin_cos(a1, s1, c1);
+    CHECK(c < c0 && c > c1);
+    CHECK(s > s0 && s < s1);
 }
 
 // FT042: vector::magnitude() swap bug — when |c| is the largest component the
