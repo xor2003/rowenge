@@ -33,7 +33,21 @@ grep -rhoE '#include[[:space:]]+"[^"/\\]+"' "$PORTED" \
     fi
   done
 
-# 3) generated headers missing from the ported tree, repaired from bob_src.
+# 3) Windows-style #include "..\dir\file.h" spellings: on POSIX the backslash
+#    is literal, so create links with those exact names pointing at the real
+#    file (resolved relative to the including source's directory).
+grep -rhoE '#include[[:space:]]+"\.\.\\[^"]+"' "$PORTED" \
+    --include='*.cpp' --include='*.h' -r 2>/dev/null |
+  sed -E 's/#include[[:space:]]+"([^"]+)"/\1/' | LC_ALL=C sort -u |
+  while IFS= read -r inc; do
+    [ -e "$OUT/$inc" ] && continue
+    # "..\mfc\resource.h" -> real relative path "mfc/resource.h"
+    rel=$(printf '%s' "$inc" | sed -E 's|^\.\.\\||; s|\\|/|g')
+    match=$(find "$PORTED" -type f -ipath "*/$rel" | head -1)
+    if [ -n "$match" ]; then ln -sf "$match" "$OUT/$inc"; fi
+  done
+
+# 5) generated headers missing from the ported tree, repaired from bob_src.
 #    UIDVALS.G has a Makebf bug: a stray ^Z truncates 'UI_56=0x27fd,' and the
 #    include guard's #endif appears mid-file with an orphan #endif at the end.
 python3 - "$ORIG_H/UIDVALS.G" "$OUT/uidvals.g" <<'EOF'
@@ -50,7 +64,7 @@ EOF
 #    (FILES.G includes it when F_SOUNDS is undefined). Copy verbatim.
 cp "$ORIG_H/F_SOUNDS.G" "$OUT/F_SOUNDS.G"
 
-# 5) BFREFS.G: another Fmake2-generated list used by bfields/globrefs.cpp
+# 6) BFREFS.G: another Fmake2-generated list used by bfields/globrefs.cpp
 # BFREFS.G was written over a longer older version: a ^Z EOF marker sits after
 # the complete table (NULL};) with stale tail fragments behind it. Truncate at
 # the first ^Z — stripping bytes leaves orphaned list fragments that don't parse.

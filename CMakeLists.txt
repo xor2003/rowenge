@@ -110,6 +110,9 @@ add_library(bob_3d STATIC
     ${BOB_TREE}/3d/world.cpp)
 target_link_libraries(bob_3d PUBLIC BobIncludes)
 target_compile_definitions(bob_3d PUBLIC ROWAN_USE_MIG_CSTRING)
+# -ffunction-sections lets test executables --gc-sections away the monolithic
+# game-code bodies (AirStruc/World deps) and keep only the leaf math they call.
+target_compile_options(bob_3d PRIVATE -ffunction-sections)
 
 # -ffunction/-fdata-sections: lets leaf tests --gc-sections-link only the
 # functions under test instead of stubbing the entire un-migrated call graph.
@@ -145,9 +148,19 @@ target_link_libraries(mig_runner PRIVATE RowanDefaults)
 
 add_executable(bob_leaf_tests
     tests/unit/main.cpp
-    tests/unit/test_bob_mathasm.cpp)
+    tests/unit/test_bob_mathasm.cpp
+    tests/unit/test_bob_matrix.cpp
+    tests/unit/test_bob_shapelayout.cpp
+    tests/unit/test_bob_collision.cpp
+    # collided.cpp linked directly (not via bob_3d): the test only needs
+    # GroundHeight/RayHit*; -ffunction-sections + --gc-sections drops the
+    # monolith's game-code bodies and their AirStruc/World dependencies.
+    ${BOB_TREE}/3d/collided.cpp
+    tests/bob/stub_globals.cpp)   # Timer_Code + no-op globals for static-init
 target_include_directories(bob_leaf_tests PRIVATE tests)
+target_compile_options(bob_leaf_tests PRIVATE -ffunction-sections)
 target_link_libraries(bob_leaf_tests PRIVATE bob_math BobIncludes)
+target_link_options(bob_leaf_tests PRIVATE -Wl,--gc-sections)
 
 add_test(NAME bob_leaf_tests COMMAND bob_leaf_tests)
 set_tests_properties(bob_leaf_tests PROPERTIES
@@ -174,7 +187,15 @@ set_tests_properties(bob_files_tests PROPERTIES
 add_executable(bob_bfields_tests
     tests/unit/main.cpp
     tests/bob/test_bob_bfields.cpp
-    tests/bob/stub_globals.cpp)
+    tests/bob/test_bob_savebin.cpp
+    tests/bob/stub_globals.cpp
+    tests/bob/test_bob_packages_stubs.cpp   # dead-path refs from packages.cpp
+    tests/bob/test_bob_nodedata_stub.cpp    # Node_Data blob (ctor unlinked)
+    # packages.cpp linked directly (not via a missman lib): SquadListRef ops +
+    # SquadList::squadsizes for Profile::DecodePackage's squad-list insert;
+    # gc-sections drops the rest of the monolith's game-code bodies.
+    ${BOB_TREE}/missman/packages.cpp)
+target_compile_options(bob_bfields_tests PRIVATE -ffunction-sections)
 target_include_directories(bob_bfields_tests PRIVATE tests)
 target_link_directories(bob_bfields_tests PRIVATE
     ${SYSROOT}/usr/lib/i386-linux-gnu)

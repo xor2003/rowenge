@@ -15,6 +15,8 @@
 
 // replace_extention lives at fileman.cpp:946, extern'd here (fileman.h has no decl)
 void replace_extention(string &path, string from, string to);
+// fopen_ci: component-wise case-insensitive path resolve (rowan_io_compat)
+extern "C" FILE* fopen_ci(const char* path, const char* mode);
 
 static char testdir[256];
 static int made_dir = 0;
@@ -105,6 +107,51 @@ REGISTER_TEST(replace_extention_swaps_when_target_exists)
     // fopen_ci resolves pilot1.x8 -> PILOT1.X8 on disk; note the function
     // also lowercases path in place (faithful side effect, Windows-safe).
     CHECK(strstr(pathbuf, ".x8") != nullptr);
+}
+
+// T107 family 4: fopen_ci resolves each path component case-insensitively
+// against the real filesystem — the semantic every fileman open relies on.
+REGISTER_TEST(fopen_ci_resolves_mixed_case)
+{
+    make_fixture_dir();
+    // wrong case on file component: pilot1.X8 on disk is PILOT1.X8
+    std::string p = std::string(testdir) + "/pilot1.X8";
+    FILE* f = fopen_ci(p.c_str(), "rb");
+    CHECK(f != nullptr);
+    if (f) { char buf[8] = {0}; fread(buf, 1, 6, f); CHECK_STREQ(buf, "x8data"); fclose(f); }
+    // wrong case on extension too
+    p = std::string(testdir) + "/PILOT1.x8";
+    f = fopen_ci(p.c_str(), "rb");
+    CHECK(f != nullptr); if (f) fclose(f);
+    // all-lower file opened via upper pattern
+    p = std::string(testdir) + "/B26ENG.X8";
+    f = fopen_ci(p.c_str(), "rb");
+    CHECK(f != nullptr); if (f) fclose(f);
+}
+
+REGISTER_TEST(fopen_ci_missing_returns_null)
+{
+    make_fixture_dir();
+    std::string p = std::string(testdir) + "/nosuchfile.x8";
+    CHECK(fopen_ci(p.c_str(), "rb") == nullptr);
+    CHECK(fopen_ci("/nonexistent_dir_xyz/file.x8", "rb") == nullptr);
+    CHECK(fopen_ci("", "rb") == nullptr);
+}
+
+REGISTER_TEST(fopen_ci_nested_component_case)
+{
+    // two-level case mismatch: dir and file both differ from on-disk case
+    char nd[256];
+    strcpy(nd, "/tmp/bobfiles_nest_XXXXXX");
+    CHECK(mkdtemp(nd) != nullptr);
+    std::string realdir = std::string(nd) + "/MiXeDDir";
+    CHECK(mkdir(realdir.c_str(), 0755) == 0);
+    FILE* f = fopen((realdir + "/WeApOn.BF").c_str(), "wb");
+    CHECK(f != nullptr); fputs("bf", f); fclose(f);
+    std::string ask = std::string(nd) + "/mixeddir/WEAPON.bf";
+    f = fopen_ci(ask.c_str(), "rb");
+    CHECK(f != nullptr);
+    if (f) { char buf[4] = {0}; fread(buf, 1, 2, f); CHECK_STREQ(buf, "bf"); fclose(f); }
 }
 
 REGISTER_TEST(replace_extention_keeps_path_when_missing)

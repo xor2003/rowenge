@@ -5,6 +5,8 @@
 // defect, not a test bug.
 #include "../harness.h"
 #include "DOSDefs.h"
+#include "myangles.h"
+#include "mymath.h"
 #include "mathasm.h"
 #include "myvector.h"
 
@@ -87,6 +89,41 @@ REGISTER_TEST(test_bob_mathasm_misc) {
     SETPREC(2); CHECK_EQ(GETPREC(), 2);     // exercises the RERUN fpu_cw fix
     SETPREC(3); CHECK_EQ(GETPREC(), 3);
     SETFPCW(saved);
+}
+
+// T107 family 1 extension: MathLib trig on real math.cpp code. arctan is the
+// heading convention: atan2(dx,dy) * 65536/2pi — 0 = +y (north), +x = east.
+REGISTER_TEST(test_bob_trig) {
+    MathLib ml;
+
+    CHECK_EQ(+ml.arctan(0, 1),   0x0000);      // north
+    CHECK_EQ(+ml.arctan(1, 0),   0x4000);      // east  (90deg)
+    CHECK_EQ(+ml.arctan(0, -1),  0x8000);      // south (180deg)
+    CHECK_EQ(+ml.arctan(-1, 0),  0xC000);      // west  (270deg)
+    CHECK_NEAR(+ml.arctan(1, 1), 0x2000, 2);   // 45deg (rounding of FPATan)
+    CHECK_NEAR(+ml.arctan(-1, 1), 0xE000, 2);  // -45deg wraps to 315deg
+
+    // quadrant symmetry: arctan(-dx,dy) = 0x10000 - arctan(dx,dy)
+    CHECK_EQ((UWord)(+ml.arctan(-4, 3)),
+             (UWord)(0x10000 - (UWord)(+ml.arctan(4, 3))));
+
+    // Cos_ArcSin: live arcsin (high_arc_sin/cos are DeadCode in BoB) —
+    // table lookup; domain is [0,256] (8-bit fraction *of 256*), not 255.
+    CHECK_EQ(ml.Cos_ArcSin(0),    0x7fff);          // cos(0)=1.0
+    CHECK_EQ(ml.Cos_ArcSin(256),  0);               // cos(90deg)=0
+    CHECK_EQ(ml.Cos_ArcSin(255),  0x0b4d);          // pinned table edge value
+    CHECK(ml.Cos_ArcSin(64)  < ml.Cos_ArcSin(0));   // monotone decreasing
+    CHECK(ml.Cos_ArcSin(128) < ml.Cos_ArcSin(64));
+    CHECK(ml.Cos_ArcSin(256) <= ml.Cos_ArcSin(128));
+
+    // high_sin_cos at cardinal angles (interpolated layer over sin_cos table)
+    ANGLES a; SWord s, c;
+    a = (Angles)0x0000; ml.high_sin_cos(a, s, c);
+    CHECK_EQ(s, 0); CHECK_EQ(c, 0x7fff);        // sin=0, cos=+1
+    a = (Angles)(SWord)0x8000; ml.high_sin_cos(a, s, c);
+    CHECK_NEAR(s, 0, 2); CHECK_NEAR(c, -0x8000, 4);
+    a = (Angles)0x4000; ml.high_sin_cos(a, s, c);
+    CHECK_NEAR(s, 0x8000, 4); CHECK_NEAR(c, 0, 2);
 }
 
 // FT042: vector::magnitude() swap bug — when |c| is the largest component the
