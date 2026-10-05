@@ -1,0 +1,14 @@
+# Edition manifest (T008) — claimed supported editions, signatures, notes
+# Format: game <TAB> edition <TAB> source media <TAB> signature file(s) [size, sha256] <TAB> status/notes
+BOB	retail-CD	BATTLE_OF_BRITAIN.7z (sha256 0196e958…)	bob_retail.exe [sha256 9869a829…, UPX+SafeDisc]	installed under runtime/wineprefix/drive_c/bob; crashes (SafeDisc) — use crack for runtime evidence
+BOB	retail-crack	same as retail	bob_crack.exe [sha256 3ed1a13a…]	runs under Wine; primary BoB behavior oracle today
+BOB	BDG-community	bob_setup.exe Inno repack (sha256 9242f0fc…); BDG patches bob_v098/v099.rar in bob_src	bob.exe [sha256 b3e692f9…] + bdg.txt [sha256 ac4ff580…, VERSION=3]	BDG-patched build; frontend crashes under Wine (known); needs real mfc120.dll + OCX registration
+BOB	demo	battle-of-britain/game/demo/ + demo.txt on MiG CD	demo install	limited content; useful for public CI fixtures (check redistribution)
+MIG	retail-CD	Mig Alley_v1_1.7z (sha256 32ec9c9c…) + game/cd + game/iso	Mplaynow.exe, mig.exe, MSS32.DLL, SMACKW32.DLL	installed to runtime/migprefix by Wine SETUP.EXE; native port runs from this tree
+MIG	v1.23-official	mig-alley/patches/Patch v1.23	patch archive	official patch; apply to retail baseline
+MIG	BDG-0.85F	mig-alley/patches/BDG_MiGAlley_0.85F	patch archive	community build variant
+MIG	KeybMan2	mig-alley/patches/KeybMan2_MiG_085_B	patch archive	keyboard-manager mod
+# Ambiguity rules (REQ-DETECT-02): retail vs BDG trees share most data files —
+# detection must key on signature exes (bob.exe/bob_retail/bob_crack + bdg.txt
+# presence) not data alone; mixed trees (BDG data + retail exe, partial
+# patches) are diagnosed and not launched.
