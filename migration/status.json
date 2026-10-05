@@ -1,46 +1,156 @@
 {
-  "milestone": "M0",
+  "milestone": "M1",
   "status": "PASS_WITH_FINDINGS",
-  "date": "2026-10-05",
-  "owner_directives": [
-    "no SDL3, no 64-bit migration (not planned)",
-    "migrate all alive game code; maximize test coverage",
-    "multiplayer code migrates+links; functional acceptance separate",
-    "migalley confirmed fully working; BoB engine = newer lineage with open defects, migalley = older lineage with fixes"
-  ],
-  "tasks": {
-    "T001": {"status": "PASS", "evidence": ["migration/baseline-manifest.md", "migration/file-manifest-*.tsv"], "note": "3 repos pinned at clean HEADs; 6 archives hashed; i686-w64-mingw32 MISSING (blocks Wine PE-runner fallback)"},
-    "T002": {"status": "PASS", "evidence": ["ctest unit_tests: 1575 checks 0 failures", "smoke_xvfb pass 40.78s"]},
-    "T003": {"status": "PASS", "evidence": ["menu probe screenshots", "owner confirmation"], "note": "MiG fully working incl. flight per owner; REQ-JOURNEY acceptance still required as gate"},
-    "T004": {"status": "PASS", "evidence": ["migration/routine-map.tsv (484 shared paths, 15 equal headers)", "mig-orig-to-ported.tsv", "bob-orig-to-ported.tsv", "mig-vs-bob-paths.tsv"], "note": "corrected bob_src root (SRC/) + locale join bug; tool at tools/compare/compare_sources.sh"},
-    "T005": {"status": "PASS", "evidence": ["migration/rstar-survey.md"], "finding": "r* controls are OCX/ActiveX (COleControl x14, property pages, COleControlModule x15); de-OLE at source level recommended; ~20-30d inside M3; conventional bounded Win32 surface"},
-    "T006": {"status": "PASS", "evidence": ["migration/lib3d-inventory.md"], "finding": "lib3d = pure D3D7 immediate mode; MiG shim reuse REJECTED (different level); no software path; recommend fresh port of internals on migalley Vulkan backend"},
-    "T007": {"status": "PASS", "evidence": ["migration/audio-inventory.md"], "finding": "BoB audio = Miles AIL API (winmiles/digdrvr/sample/music.cpp); NO DirectMusic; migalley SDL_mixer adapter is direct donor"},
-    "T008": {"status": "PASS", "evidence": ["migration/editions.tsv"], "note": "8 editions catalogued with signature hashes; mixed-tree rules recorded"},
-    "T009": {"status": "PASS", "finding": "width debt ~10x heavier in BoB: SLong/ULong 1073 vs 10999; casts 252 vs 2088; packed files 2 vs 12; fread/fwrite 4 vs 76 — mark-only, no migration planned"},
-    "T010": {"status": "PASS", "evidence": ["migration/capability-ledger.md"]},
-    "T011": {"status": "PASS", "evidence": ["this file"]}
+  "date": "2026-10-06",
+  "supersedes": "M0 (2026-10-05 PASS_WITH_FINDINGS)",
+  "repos": {
+    "rowan-engine": {
+      "head": "fe3961d",
+      "tree": "clean"
+    },
+    "bob-flight-sim": {
+      "branch": "rowan-port",
+      "head": "0054cdc",
+      "tree": "clean"
+    },
+    "migalley": {
+      "branch": "rowan-transfers",
+      "head": "818ae4f",
+      "tree": "clean"
+    },
+    "specs": {
+      "head": "469f056",
+      "tree": "dirty:1files"
+    }
   },
-  "blockers": [
-    {"id": "M0-B1", "item": "i686-w64-mingw32 toolchain missing", "impact": "Wine PE test-runner fallback (plan Day-8) cannot be built", "mitigation": "install mingw-w64 OR go straight to native leaf tests (preferred)"}
-  ],
+  "tasks": {
+    "T101": {
+      "status": "PASS",
+      "evidence": [
+        "tests/unit/main.cpp exit codes 0/1/2",
+        "defect_proof zero-tests check"
+      ]
+    },
+    "T102": {
+      "status": "PASS",
+      "evidence": [
+        "bob_math lib + bob_leaf_tests",
+        "FT011 GETPREC/SETFPCW fixes"
+      ]
+    },
+    "T103": {
+      "status": "PASS",
+      "evidence": [
+        "bob_files_tests 32c/10t",
+        "fopen_ci real fs, no symlinks",
+        "FT013-FT022"
+      ]
+    },
+    "T104": {
+      "status": "PASS",
+      "evidence": [
+        "bob_3d + bob_bfields + movecode targets",
+        "bob_bfields_tests 224c/4t baseline",
+        "FT023-FT039"
+      ]
+    },
+    "T105": {
+      "status": "PASS",
+      "evidence": [
+        "PE runner 6/6 under Wine",
+        "FT040/41"
+      ]
+    },
+    "T105b": {
+      "status": "PASS",
+      "evidence": [
+        "lint.sh full run EXIT=0: 42 TUs clang-check 0 errors, cppcheck unix32 0 errors",
+        "FT042-FT056, 2 deferred behavior decisions (sagmove, migland tabPos)"
+      ]
+    },
+    "T106": {
+      "status": "PASS",
+      "evidence": [
+        "tests/common/{canonical.h,runner.cpp}",
+        "6/6 families bit-identical + 3x deterministic",
+        "caught FT057 dist3"
+      ]
+    },
+    "T107": {
+      "status": "PASS",
+      "evidence": [
+        "bob_leaf_tests 174c/16t, bob_files_tests 32c/10t, bob_bfields_tests 258c/8t = 464 checks 0 failures",
+        "six families incl. DecodePackage base-90 chain",
+        "caught FT058/FT059"
+      ]
+    },
+    "T108": {
+      "status": "PASS",
+      "evidence": [
+        "routine-level compare: 35 shared MathLib -> 18 identical / 5 divergent",
+        "FT060 SHDIVSIN divisor sign (intercept canon: 554/524 recs)",
+        "FT061 dividend trunc32 both sides",
+        "EQUIVALENT-DIVERGENT: HighArcTan, Intercept, HighIntercept, high_sin_cos"
+      ]
+    },
+    "T109": {
+      "status": "PASS",
+      "evidence": [
+        "tools/test/defect_proof.sh: 6/6 family mutations detected, self-checks pass",
+        "proof found + closed high_sin_cos interpolation coverage gap"
+      ]
+    },
+    "T110": {
+      "status": "PASS",
+      "evidence": [
+        "this file"
+      ]
+    }
+  },
+  "test_inventory": {
+    "native": {
+      "bob_leaf_tests": "174 checks/16 tests",
+      "bob_files_tests": "32/10",
+      "bob_bfields_tests": "258/8",
+      "total": "464 checks, 0 failures"
+    },
+    "canon": {
+      "families": [
+        "sincos_full(exhaustive 2^16)",
+        "atan2",
+        "dist2",
+        "dist3",
+        "rndseq",
+        "intercept"
+      ],
+      "result": "6/6 bit-identical, 3x deterministic each"
+    },
+    "wine_pe": "6/6",
+    "lint": "EXIT=0 (42 TUs clang-check + cppcheck, 0 errors)"
+  },
+  "defect_ledger": {
+    "fixed": "FT011, FT013-FT041 (native port defects), FT042-FT056 (lint batch), FT057 dist3, FT058 fopen_ci empty-path, FT059 GroundHeight, FT060 SHDIVSIN divisor sign, FT061 SHDIVSIN dividend truncation",
+    "deferred_behavior_decisions": [
+      "sagmove.cpp integer-overflow AI-visibility expressions (fix would activate never-playtested logic)",
+      "migland.cpp tabPos pointer-vs-value (fix would activate dead terrain-thinning writes)"
+    ],
+    "audits": [
+      "FT-AUDIT-migmath: mig MATH.CPP quirk sweep \u2014 nothing transferable"
+    ]
+  },
   "key_findings": [
-    "BoB frontend de-OLE route defined: dialogs call generated CWnd IDispatch wrappers; stub can implement wrapper API surface directly",
-    "Renderer route defined: port lib3d.cpp internals (D3D7 immediate mode) onto migalley's Vulkan backend machinery; keep lib3d.h API",
-    "Audio route defined: reuse migalley AIL->SDL_mixer adapter; BoB uses same Miles API",
-    "Only 15/484 shared paths have identical content (all headers) — per-routine evidence required as planned",
-    "MiG proven-good: 1575 checks + smoke pass; direct ./unit_tests needs sysroot LD_LIBRARY_PATH (use ctest/launcher env)"
+    "Canon gate caught 3 real shipped-vs-port divergences: dist3 FISTP truncation (bob), SHDIVSIN unsigned divisor (bob \u2014 wrong Range half the hemisphere), SHDIVSIN 64-bit dividend (both \u2014 canon-invisible shared divergence)",
+    "SHDIVSIN is live at 5 BoB sites (HighIntercept, joystick axis scaling, persons7 range)",
+    "DecodePackage fully exercised: base-90 Sq/Rd round-trip + pItem empty-world seed via asm-label extern",
+    "ShapeDesc pack(1)=45B stride confirmed CORRECT shipped layout (not ABI defect)",
+    "18/35 shared MathLib routines byte-normalized identical; all 5 divergences classified (2 fixed, 3 equivalent-by-evidence)"
   ],
-  "next_bounded_experiments": [
-    "M1-T1: harden test harness (nonzero exit, zero-test detection, NaN handling, fixed seeds, timeouts)",
-    "M1-T2: native BoB leaf compile — math/ -> files -> shapes -> bfields -> movecode; wire into shared test runner",
-    "M1-T3: borrow migalley AIL adapter vs BoB AIL call census; gap list",
-    "M1-T4: de-OLE spike — host one BoB dialog (CRButton via wrapper) on extended stub"
+  "blockers": [],
+  "resolved_blockers": [
+    {
+      "id": "M0-B1",
+      "resolution": "native leaf tests preferred path succeeded; PE runner built+green under Wine without MinGW need"
+    }
   ],
-  "spec_artifacts": {
-    "constitution": "specs/constitution.md",
-    "spec": "specs/rowan-shared-engine/spec.md",
-    "plan": "specs/rowan-shared-engine/plan.md",
-    "tasks": "specs/rowan-shared-engine/tasks.md"
-  }
+  "next": "M2: shared shell + migalley executable (REQ-LAUNCH-01/02, REQ-DETECT-02/03, REQ-LIFE-01); M3 BoB waves 2-3 per tasks.md"
 }
