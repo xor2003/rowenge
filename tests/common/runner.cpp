@@ -13,6 +13,8 @@
 //   3 dist2   in:{i32 dx,i32 dy}    out: dist
 //   4 dist3   in:{i32 dx,i32 dy,i32 dz}  out: dist
 //   5 rndseq  in:{u32 count}        out: rnd() sequence      (stateful PRNG check)
+//   6 intercept in:{i32 dx,dy,dz}   out: HighArcTan + Intercept + HighIntercept
+//                                 (dx==0&&dz==0 excluded: shipped 0/0 FPE)
 //
 // Determinism: output depends only on fixture bytes + the routine under test.
 // No clocks, no environment, no locale-sensitive formatting.
@@ -47,7 +49,7 @@ struct InVec3   { int32_t dx, dy, dz; };
 struct InRnd    { uint32_t count; };
 #pragma pack(pop)
 
-enum Family { F_SINCOS=1, F_ATAN2, F_DIST2, F_DIST3, F_RNDSEQ };
+enum Family { F_SINCOS=1, F_ATAN2, F_DIST2, F_DIST3, F_RNDSEQ, F_INTERCEPT };
 
 struct FamilyEnt { const char* name; Family id; size_t recsz; };
 static const FamilyEnt FAMILIES[] = {
@@ -56,6 +58,7 @@ static const FamilyEnt FAMILIES[] = {
     {"dist2",  F_DIST2,  sizeof(InVec2)},
     {"dist3",  F_DIST3,  sizeof(InVec3)},
     {"rndseq", F_RNDSEQ, sizeof(InRnd)},
+    {"intercept", F_INTERCEPT, sizeof(InVec3)},
     {nullptr,  (Family)0, 0},
 };
 
@@ -115,6 +118,24 @@ static std::vector<uint8_t> gen_payload(Family fam, uint32_t n, uint32_t seed) {
     case F_RNDSEQ:
         put_u32(4096);                                  // one long sequence
         for (i += 1; i < n; ++i) put_u32(r.range(1, 256));
+        break;
+    case F_INTERCEPT:
+        // NB: dx==0 && dz==0 excluded — HighArcTan does SHDIVUNS(0,16,0),
+        // a shipped 0/0 FPE on both sides (not a data-comparable case).
+        put_v3(1,0,0); put_v3(0,1,0); put_v3(0,0,1);    // axes
+        put_v3(1,1,1); put_v3(-1,-1,-1);
+        put_v3(1,-1,1); put_v3(-1,1,-1);
+        put_v3(0x8000,0x8000,0x8000);                   // equal deltas (dx==dy branch)
+        put_v3(0x8000,0x8001,0x8000);                   // near-equal boundaries
+        put_v3(0x8000,0x7fff,0x8000);
+        put_v3(0x400000,0x400000,-0x400000);
+        put_v3(0x7fffffff,1,0x7fffffff);                // range overflow edge
+        for (i += 12; i < n; ++i) {
+            int32_t x, z;
+            do { x = r.range(-2000000, 2000000);
+                 z = r.range(-2000000, 2000000); } while (x == 0 && z == 0);
+            put_v3(x, r.range(-2000000, 2000000), z);
+        }
         break;
     default: break;
     }
@@ -219,6 +240,24 @@ static int do_run(const char* file) {
                 // free function where present.
                 e.field_u32("r", (uint32_t)ml.rnd());
             }
+            break;
+        }
+        case F_INTERCEPT: {
+            auto* v = (const InVec3*)p;
+            e.field_i32("dx", v->dx); e.field_i32("dy", v->dy);
+            e.field_i32("dz", v->dz);
+            ANGLES harc = ml.HighArcTan(v->dx, v->dz);
+            e.field_i16("harc", (int16_t)+harc);
+            SLong ir; ANGLES ih, ip;
+            ml.Intercept(v->dx, v->dy, v->dz, ir, ih, ip);
+            e.field_i32("ir", ir);
+            e.field_i16("ihdg", (int16_t)+ih);
+            e.field_i16("ipitch", (int16_t)+ip);
+            SLong hr; ANGLES hh, hp;
+            ml.HighIntercept(v->dx, v->dy, v->dz, hr, hh, hp);
+            e.field_i32("hr", hr);
+            e.field_i16("hhdg", (int16_t)+hh);
+            e.field_i16("hpitch", (int16_t)+hp);
             break;
         }
         default: break;

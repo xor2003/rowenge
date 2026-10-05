@@ -8,3 +8,4 @@ rndseq	rndseq	5	4	0x5EED	fixed count	one 4096-draw MathLib::rnd() sequence + 3 s
 # Regenerate any fixture with: bob_runner --gen <file> <family> <records> [seed]
 # (generator lives in tests/common/runner.cpp; --gen is identical in both runners)
 # Equivalence gate: tools/compare/canon_run.sh <bob_runner> <mig_runner> <fixture>
+intercept	intercept	6	12	0x5EED	fixed count	axes/equal-delta/boundary/overflow edges + rng vec3; exercises HighArcTan+Intercept+HighIntercept incl. SHDIVSIN negative-divisor + high-bit-dividend paths (dx==0&&dz==0 excluded: shipped 0/0 FPE)
