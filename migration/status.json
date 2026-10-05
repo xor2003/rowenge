@@ -1,11 +1,11 @@
 {
-  "milestone": "M1",
+  "milestone": "M2",
   "status": "PASS_WITH_FINDINGS",
   "date": "2026-10-06",
-  "supersedes": "M0 (2026-10-05 PASS_WITH_FINDINGS)",
+  "supersedes": "M1 (2026-10-06 PASS_WITH_FINDINGS)",
   "repos": {
     "rowan-engine": {
-      "head": "fe3961d",
+      "head": "46dcd3e",
       "tree": "clean"
     },
     "bob-flight-sim": {
@@ -15,96 +15,60 @@
     },
     "migalley": {
       "branch": "rowan-transfers",
-      "head": "818ae4f",
+      "head": "19e3d93",
       "tree": "clean"
     },
     "specs": {
-      "head": "469f056",
-      "tree": "dirty:1files"
+      "head": "TBD",
+      "tree": "pending commit"
     }
   },
   "tasks": {
-    "T101": {
+    "T101-T110": {
+      "status": "PASS",
+      "evidence": ["see M1 status.json supersedes"]
+    },
+    "T110a": {
       "status": "PASS",
       "evidence": [
-        "tests/unit/main.cpp exit codes 0/1/2",
-        "defect_proof zero-tests check"
+        "shared/math/ single MathLib TU compiled under both header envs (rowan_math + mig_runner)",
+        "6/6 canon hashes unchanged post-merge, 464 native checks green",
+        "matrix.{h,cpp} per-game boundary documented"
       ]
     },
-    "T102": {
+    "T111": {
       "status": "PASS",
       "evidence": [
-        "bob_math lib + bob_leaf_tests",
-        "FT011 GETPREC/SETFPCW fixes"
+        "shell/detect.{h,cpp}+manifests.cpp: multi-file path+size fingerprints, case-insensitive",
+        "shell_detect_tests 166c/10t: valid/case/incomplete/wrong-size/not-a-game/tie-ambiguous/mixed",
+        "real installs: mig->retail-compat, bob->BDG-community"
       ]
     },
-    "T103": {
+    "T112": {
       "status": "PASS",
       "evidence": [
-        "bob_files_tests 32c/10t",
-        "fopen_ci real fs, no symlinks",
-        "FT013-FT022"
+        "shell sources compiled into MigAlley exe (REQ-LAUNCH-02 self-contained)",
+        "main() gate: detect_install -> chdir -> InitInstance; argv[1] or CWD",
+        "bad dirs exit 2 + diagnostics; valid install reaches frontend (InitInstance->MIG_RC->dialog create)"
       ]
     },
-    "T104": {
+    "T113": {
       "status": "PASS",
       "evidence": [
-        "bob_3d + bob_bfields + movecode targets",
-        "bob_bfields_tests 224c/4t baseline",
-        "FT023-FT039"
+        "validation unconditional in main(), no bypass flag (REQ-DETECT-03)",
+        "bob install dir rejected: INCOMPLETE w/ itemized missing + wrong-size list"
       ]
     },
-    "T105": {
+    "T114": {
       "status": "PASS",
       "evidence": [
-        "PE runner 6/6 under Wine",
-        "FT040/41"
+        "tests/lifecycle_xvfb.sh PASS: 3x gate-reject + 5 xvfb launches",
+        "fds=44 every cycle, RSS ~119MB flat, maps 715-719 jitter (<16), zero survivors"
       ]
     },
-    "T105b": {
+    "T115": {
       "status": "PASS",
-      "evidence": [
-        "lint.sh full run EXIT=0: 42 TUs clang-check 0 errors, cppcheck unix32 0 errors",
-        "FT042-FT056, 2 deferred behavior decisions (sagmove, migland tabPos)"
-      ]
-    },
-    "T106": {
-      "status": "PASS",
-      "evidence": [
-        "tests/common/{canonical.h,runner.cpp}",
-        "6/6 families bit-identical + 3x deterministic",
-        "caught FT057 dist3"
-      ]
-    },
-    "T107": {
-      "status": "PASS",
-      "evidence": [
-        "bob_leaf_tests 174c/16t, bob_files_tests 32c/10t, bob_bfields_tests 258c/8t = 464 checks 0 failures",
-        "six families incl. DecodePackage base-90 chain",
-        "caught FT058/FT059"
-      ]
-    },
-    "T108": {
-      "status": "PASS",
-      "evidence": [
-        "routine-level compare: 35 shared MathLib -> 18 identical / 5 divergent",
-        "FT060 SHDIVSIN divisor sign (intercept canon: 554/524 recs)",
-        "FT061 dividend trunc32 both sides",
-        "EQUIVALENT-DIVERGENT: HighArcTan, Intercept, HighIntercept, high_sin_cos"
-      ]
-    },
-    "T109": {
-      "status": "PASS",
-      "evidence": [
-        "tools/test/defect_proof.sh: 6/6 family mutations detected, self-checks pass",
-        "proof found + closed high_sin_cos interpolation coverage gap"
-      ]
-    },
-    "T110": {
-      "status": "PASS",
-      "evidence": [
-        "this file"
-      ]
+      "evidence": ["this file"]
     }
   },
   "test_inventory": {
@@ -112,7 +76,8 @@
       "bob_leaf_tests": "174 checks/16 tests",
       "bob_files_tests": "32/10",
       "bob_bfields_tests": "258/8",
-      "total": "464 checks, 0 failures"
+      "shell_detect_tests": "166/10",
+      "total": "630 checks, 0 failures"
     },
     "canon": {
       "families": [
@@ -123,34 +88,33 @@
         "rndseq",
         "intercept"
       ],
-      "result": "6/6 bit-identical, 3x deterministic each"
+      "result": "6/6 bit-identical, 3x deterministic each — post-merge runs the SAME math.cpp under both header envs"
     },
-    "wine_pe": "6/6",
-    "lint": "EXIT=0 (42 TUs clang-check + cppcheck, 0 errors)"
+    "integration": {
+      "lifecycle_xvfb": "PASS 5 launches, resources stable, no survivors",
+      "gate_reject": "3/3 exit 2 + diagnostic",
+      "wine_pe": "6/6"
+    },
+    "lint": "shared math.cpp clean; detect.cpp clang-check clean"
   },
   "defect_ledger": {
-    "fixed": "FT011, FT013-FT041 (native port defects), FT042-FT056 (lint batch), FT057 dist3, FT058 fopen_ci empty-path, FT059 GroundHeight, FT060 SHDIVSIN divisor sign, FT061 SHDIVSIN dividend truncation",
+    "fixed": "FT011..FT061 (see M1) — no new defects; T111 test caught arg-eval-order bug in detect_install (uninit n) before any evidence claim",
     "deferred_behavior_decisions": [
       "sagmove.cpp integer-overflow AI-visibility expressions (fix would activate never-playtested logic)",
       "migland.cpp tabPos pointer-vs-value (fix would activate dead terrain-thinning writes)"
     ],
     "audits": [
-      "FT-AUDIT-migmath: mig MATH.CPP quirk sweep \u2014 nothing transferable"
+      "FT-AUDIT-migmath: mig MATH.CPP quirk sweep — nothing transferable"
     ]
   },
   "key_findings": [
-    "Canon gate caught 3 real shipped-vs-port divergences: dist3 FISTP truncation (bob), SHDIVSIN unsigned divisor (bob \u2014 wrong Range half the hemisphere), SHDIVSIN 64-bit dividend (both \u2014 canon-invisible shared divergence)",
-    "SHDIVSIN is live at 5 BoB sites (HighIntercept, joystick axis scaling, persons7 range)",
-    "DecodePackage fully exercised: base-90 Sq/Rd round-trip + pItem empty-world seed via asm-label extern",
-    "ShapeDesc pack(1)=45B stride confirmed CORRECT shipped layout (not ABI defect)",
-    "18/35 shared MathLib routines byte-normalized identical; all 5 divergences classified (2 fixed, 3 equivalent-by-evidence)"
+    "migalley is now a self-contained gated executable: unconditional manifest validation precedes game code (REQ-DETECT-03), reaches frontend on 32-bit SDL2 without Wine (REQ-LAUNCH-01/02)",
+    "edition granularity: mig rows collapse to retail-compat (all patches share CD data; patch-volatile exes excluded from identity); bob retail vs BDG disjoint via bdg.txt+mfc120.dll+bob.exe",
+    "BATTLE.DIR collides case-insensitively across games (mig 331/bob 323) — true merged installs impossible; mixed dirs resolve per-game via only_game candidacy",
+    "lifecycle: fds exactly stable, maps jitter is allocator noise not growth",
+    "REQ-LIFE-01 evidence is mig-side only until bob exe exists (M3)"
   ],
   "blockers": [],
-  "resolved_blockers": [
-    {
-      "id": "M0-B1",
-      "resolution": "native leaf tests preferred path succeeded; PE runner built+green under Wine without MinGW need"
-    }
-  ],
-  "next": "M2: shared shell + migalley executable (REQ-LAUNCH-01/02, REQ-DETECT-02/03, REQ-LIFE-01); M3 BoB waves 2-3 per tasks.md"
+  "resolved_blockers": [],
+  "next": "M3: BoB waves 2-3 (REQ-PORT-01/02/03, REQ-JOURNEY-01/02, REQ-SAVE-01) — bob executable embedding the same shell"
 }
