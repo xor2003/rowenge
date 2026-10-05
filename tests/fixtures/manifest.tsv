@@ -1,0 +1,10 @@
+id	family	family_id	records	seed	params	description
+sincos_full	sincos	1	65536	-	sequential sweep	exhaustive ANGLES domain (all 2^16 angles); each REC emits sin,cos from high_sin_cos (covers sin_cos table + interpolation)
+atan2	atan2	2	512	0x5EED	edge+rng	11 edge records (origin, axes, diagonal, INT32 extremes) + 501 rng pairs in +-4M
+dist2	dist2	3	256	0x5EED	edge+rng	3 edges (origin, 3-4-5, INT32 max) + 253 rng pairs
+dist3	dist3	4	256	0x5EED	edge+rng	3 edges (origin, 3-4-12, INT32 max) + 253 rng triples
+rndseq	rndseq	5	4	0x5EED	fixed count	one 4096-draw MathLib::rnd() sequence + 3 short sequences; PRNG state lineage check
+
+# Regenerate any fixture with: bob_runner --gen <file> <family> <records> [seed]
+# (generator lives in tests/common/runner.cpp; --gen is identical in both runners)
+# Equivalence gate: tools/compare/canon_run.sh <bob_runner> <mig_runner> <fixture>

@@ -128,6 +128,21 @@ target_compile_definitions(bob_movecode PUBLIC ROWAN_USE_MIG_CSTRING)
 # --- tests -------------------------------------------------------------------
 enable_testing()
 
+# T106 canonical runners — one shared source (tests/common/runner.cpp), two
+# thin executables, one per game tree. Standalone per owner directive: no
+# whole-project builds — mig_runner compiles just mig's Math/MATH.CPP.
+add_executable(bob_runner tests/common/runner.cpp)
+target_include_directories(bob_runner PRIVATE tests/common)
+target_compile_definitions(bob_runner PRIVATE ROWAN_GAME_BOB)
+target_link_libraries(bob_runner PRIVATE bob_math BobIncludes)
+
+add_executable(mig_runner
+    tests/common/runner.cpp
+    ${MIG_TREE}/Math/MATH.CPP)
+target_include_directories(mig_runner PRIVATE tests/common ${MIG_TREE}/H)
+target_compile_definitions(mig_runner PRIVATE ROWAN_GAME_MIG)
+target_link_libraries(mig_runner PRIVATE RowanDefaults)
+
 add_executable(bob_leaf_tests
     tests/unit/main.cpp
     tests/unit/test_bob_mathasm.cpp)
