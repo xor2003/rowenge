@@ -41,6 +41,18 @@ add_custom_command(
     COMMENT "Generating BoB include overlay")
 add_custom_target(bob_overlay DEPENDS ${BOB_OVERLAY}/.stamp)
 
+# mig include overlay: per-spelling resolution into MIG_TREE/H plus
+# shared-math redirection (uppercase spellings -> shared/math/*) so one
+# declaration set serves both the shared TU and mig's transitive includes.
+set(MIG_OVERLAY ${CMAKE_BINARY_DIR}/mig_inc_overlay)
+add_custom_command(
+    OUTPUT ${MIG_OVERLAY}/.stamp
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/build/make_mig_overlay.sh ${MIG_OVERLAY}
+    COMMAND ${CMAKE_COMMAND} -E touch ${MIG_OVERLAY}/.stamp
+    DEPENDS ${CMAKE_SOURCE_DIR}/tools/build/make_mig_overlay.sh
+    COMMENT "Generating mig include overlay")
+add_custom_target(mig_overlay DEPENDS ${MIG_OVERLAY}/.stamp)
+
 add_library(BobIncludes INTERFACE)
 add_dependencies(BobIncludes bob_overlay)
 target_include_directories(BobIncludes INTERFACE
@@ -53,14 +65,29 @@ target_include_directories(BobIncludes INTERFACE
     ${SYSROOT}/usr/include/i386-linux-gnu)
 target_link_libraries(BobIncludes INTERFACE RowanDefaults)
 
+# --- shared math library (REQ-DEDUP-01, user directive): ONE implementation
+# for both games. shared/math/* is BoB base (ABI-safe 2-byte ANGLES — packed
+# structs HP/SaveDataLoad embed it) + mig-compat grafts (public sin_cos,
+# int& Intercept/HighIntercept forwarding overloads). mig-only routines were
+# dead in BOTH trees (no callers either side) — not migrated.
+# matrix.h/matrix.cpp stay per-game: SetViewParams/body2screen take
+# game-specific Window types — an interface boundary, not a defect.
+# Canon gate still compiles the shared TU once per game environment, so
+# header-env divergence (DOSDEFS types, packing) remains observable.
+add_library(SharedMathIncludes INTERFACE)
+target_include_directories(SharedMathIncludes INTERFACE ${CMAKE_SOURCE_DIR}/shared/math)
+
+add_library(rowan_math STATIC shared/math/math.cpp)
+target_link_libraries(rowan_math PUBLIC SharedMathIncludes BobIncludes)
+
 # --- BoB leaf libraries: wave 1 ------------------------------------------------
-# math/: _math.cpp math.cpp matrix.cpp (mathu.cpp is a unity-build manifest,
-# MATRASM.ASM is Watcom asm — functions live ported in h/mathasm.h).
+# math/: _math.cpp + matrix.cpp (BoB's own math.cpp replaced by shared TU;
+# mathu.cpp is a unity-build manifest, MATRASM.ASM is Watcom asm — functions
+# live ported in mathasm.h).
 add_library(bob_math STATIC
     ${BOB_TREE}/math/_math.cpp
-    ${BOB_TREE}/math/math.cpp
     ${BOB_TREE}/math/matrix.cpp)
-target_link_libraries(bob_math PUBLIC BobIncludes)
+target_link_libraries(bob_math PUBLIC SharedMathIncludes rowan_math BobIncludes)
 
 # --- shared native compat: migalley's io_compat (T103 resolver) ---------------
 # _findfirst/_findnext (FNM_CASEFOLD) + fopen_ci (component-wise case-insensitive
@@ -137,12 +164,18 @@ enable_testing()
 add_executable(bob_runner tests/common/runner.cpp)
 target_include_directories(bob_runner PRIVATE tests/common)
 target_compile_definitions(bob_runner PRIVATE ROWAN_GAME_BOB)
-target_link_libraries(bob_runner PRIVATE bob_math BobIncludes)
+target_link_libraries(bob_runner PRIVATE SharedMathIncludes bob_math BobIncludes)
 
+# One implementation, two environments: mig_runner compiles the SAME shared
+# TU under mig's header env via the mig overlay (resolves every spelling to
+# MIG_TREE/H except shared-math names, which redirect to shared/math/* — one
+# ANGLES/MathLib decl set, no redefinition clash). The gate now detects
+# header-env divergence rather than impl drift.
 add_executable(mig_runner
     tests/common/runner.cpp
-    ${MIG_TREE}/Math/MATH.CPP)
-target_include_directories(mig_runner PRIVATE tests/common ${MIG_TREE}/H)
+    shared/math/math.cpp)
+add_dependencies(mig_runner mig_overlay)
+target_include_directories(mig_runner PRIVATE tests/common ${MIG_OVERLAY} ${MIG_TREE}/H)
 target_compile_definitions(mig_runner PRIVATE ROWAN_GAME_MIG)
 target_link_libraries(mig_runner PRIVATE RowanDefaults)
 
@@ -159,7 +192,7 @@ add_executable(bob_leaf_tests
     tests/bob/stub_globals.cpp)   # Timer_Code + no-op globals for static-init
 target_include_directories(bob_leaf_tests PRIVATE tests)
 target_compile_options(bob_leaf_tests PRIVATE -ffunction-sections)
-target_link_libraries(bob_leaf_tests PRIVATE bob_math BobIncludes)
+target_link_libraries(bob_leaf_tests PRIVATE SharedMathIncludes bob_math BobIncludes)
 target_link_options(bob_leaf_tests PRIVATE -Wl,--gc-sections)
 
 add_test(NAME bob_leaf_tests COMMAND bob_leaf_tests)
@@ -174,7 +207,7 @@ add_executable(bob_files_tests
 target_include_directories(bob_files_tests PRIVATE tests)
 target_link_directories(bob_files_tests PRIVATE
     ${SYSROOT}/usr/lib/i386-linux-gnu)
-target_link_libraries(bob_files_tests PRIVATE bob_files bob_math BobIncludes
+target_link_libraries(bob_files_tests PRIVATE SharedMathIncludes bob_files bob_math BobIncludes
     SDL2 pthread)
 
 add_test(NAME bob_files_tests COMMAND bob_files_tests)
@@ -200,7 +233,7 @@ target_include_directories(bob_bfields_tests PRIVATE tests)
 target_link_directories(bob_bfields_tests PRIVATE
     ${SYSROOT}/usr/lib/i386-linux-gnu)
 target_link_options(bob_bfields_tests PRIVATE -Wl,--gc-sections)
-target_link_libraries(bob_bfields_tests PRIVATE bob_bfields bob_math BobIncludes
+target_link_libraries(bob_bfields_tests PRIVATE SharedMathIncludes bob_bfields bob_math BobIncludes
     SDL2 pthread)
 
 add_test(NAME bob_bfields_tests COMMAND bob_bfields_tests)
