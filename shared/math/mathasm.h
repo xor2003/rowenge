@@ -211,7 +211,7 @@ extern	Bool	BITRESET(void*,ULong);
 		modify exact	[al]			\
 		value	[al]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    BITRESET
@@ -273,7 +273,7 @@ extern	ULong	BITRESETI(ULong,ULong);
 		modify exact	[eax]			\
 		value	[eax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    BITRESETI
@@ -326,7 +326,7 @@ extern	Bool	BITSET(void*,ULong);
 		value	[al]					\
 
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 */
 //-----------------------------------------------------------------------------
 // Procedure    BITSET
@@ -372,7 +372,7 @@ extern	ULong	BITSETI(ULong,ULong);
 		value	[eax]					\
 
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    BITSETI
@@ -426,7 +426,7 @@ extern	Bool	BITTEST(const void*,ULong);
 		value	[al]					\
 
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    BITTEST
@@ -469,7 +469,7 @@ extern	Bool	BITTESTI(int,ULong);
 		value	[al]					\
 
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    BITTESTI
@@ -521,7 +521,7 @@ extern	Bool	BITCOMP(void*,ULong);
 		modify exact [al]				\
 		value	[al]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    BITCOMP
@@ -564,7 +564,7 @@ extern	ULong	BITCOMPI(ULong,ULong);
 		value	[eax]					\
 
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    BITCOMPI
@@ -642,7 +642,7 @@ extern	ULong	BITSCANLOWEST(ULong bits,ULong errcode);
 		modify exact	[edx]			\
 		value	[edx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    BITSCANLOWEST
@@ -678,7 +678,7 @@ extern	ULong	BITSCANHIGHEST(ULong bits,ULong errcode);
 		modify exact [edx]				\
 		value	[edx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    BITSCANHIGHEST
@@ -730,7 +730,7 @@ extern	ULong MULSHUNS (ULong,ULong,UByte);
 		modify	exact [edx eax]			\
 		value	[eax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    MULSHUNS
@@ -772,7 +772,7 @@ extern	SLong	MULSHSIN (SLong,SLong,UByte);
 		modify	exact [edx eax]		\
 		value	[eax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    MULSHSIN
@@ -821,7 +821,7 @@ extern	ULong SHDIVUNS (ULong,UByte,ULong);
 		modify	[ebx edx eax]	   		\
 		value	[eax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    SHDIVUNS
@@ -880,7 +880,7 @@ extern	ULong SHDIVSIN (SLong,UByte,ULong);
 		modify	[ebx edx eax]	   		\
 		value	[eax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    SHDIVSIN
@@ -934,7 +934,7 @@ extern	ULong	MULDIVUNS (ULong,ULong,ULong);
 		modify	[edx eax]			\
 		value	[eax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    MULDIVUNS
@@ -976,7 +976,7 @@ extern	SLong	MULDIVSIN (SLong,SLong,SLong);
 		modify	[edx eax]			\
 		value	[eax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 //-----------------------------------------------------------------------------
 // Procedure    MULDIVSIN
@@ -1020,7 +1020,7 @@ extern	SWord	mathlib_w_getsign(SWord);
 		modify	exact	[dx]	\
 		value	[dx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    mathlib_w_getsign
@@ -1056,7 +1056,7 @@ extern	SWord	mathlib_w_applysign(SWord,SWord);
 		modify exact	[ax]		\
 		value	[ax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    mathlib_w_applysign
@@ -1097,7 +1097,7 @@ extern	SLong	mathlib_l_getsign(SLong);
 		modify	exact	[edx]	\
 		value	[edx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    mathlib_l_getsign
@@ -1135,7 +1135,7 @@ extern	SLong	mathlib_l_applysign(SLong,SLong);
 		modify exact	[eax]		\
 		value	[eax]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 		*/
 //-----------------------------------------------------------------------------
 // Procedure    mathlib_l_applysign
@@ -1167,7 +1167,7 @@ extern	SLong	mathlib_l_applysign(SLong,SLong);
 #endif
 */
 
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 #include <float.h>
 inline void SETPREC(int p)
 {
@@ -1249,7 +1249,7 @@ inline void SETFPCW(UWord w)
 extern	void repmovsd(void* s,void* d,int len);
 #pragma aux repmovsd="rep movsd" parm [esi][edi][ecx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 inline void repmovsd(void *s,void *d,int len)
 {
     __asm
@@ -1265,7 +1265,7 @@ inline void repmovsd(void *s,void *d,int len)
 #endif
 */
 /*
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 inline double SQUARE_ROOT(double w)
 {
 	register double v;

@@ -36,7 +36,7 @@ extern	SLong	LMulDiv(SLong, SLong, SLong);
 				value	[eax]
 
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 */
 inline SLong LMulDiv( SLong num, SLong num2, SLong num3 )
 {
@@ -66,7 +66,7 @@ extern	SLong	MakeSign(SLong );
 				parm	[eax]\
 				value	[edx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 */
 inline SLong MakeSign(SLong num)
 {
@@ -95,7 +95,7 @@ extern	void	SDLongAdd(sdlong&, sdlong& );
 				parm	[esi] [edi]\
 				modify	[eax edx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 inline void SDLongAdd(sdlong& num, sdlong& num2)
 {
 	__asm
@@ -121,7 +121,7 @@ extern	void	SDLongSub(sdlong&, sdlong& );
 				parm	[esi] [edi]\
 				modify	[eax edx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 inline  void SDLongSub(sdlong& num1, sdlong& num2)
 {
 	__asm
@@ -208,7 +208,7 @@ extern	void	SDLongMul(sdlong&, sdlong& );
 				parm	[esi] [edi]	\
 				modify	[eax ebx ecx edx]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 inline void SDLongMul(sdlong& num1, sdlong& num2)
 {
@@ -304,7 +304,7 @@ extern	void	SDLongAbs(sdlong&);
 //
 //
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 inline void SDLongAbs(sdlong& num)
 {
@@ -360,7 +360,7 @@ extern	void	SDLongSHL(sdlong&,SLong );
 //
 //
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 inline void SDLongSHL(sdlong& num1,SLong num2 )
 {
@@ -402,7 +402,7 @@ extern	void	SDLongSHR(sdlong&,SLong );
 //  cmp [esi],0
 //	setl	al
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 inline	void	SDLongSHR(sdlong& num1,SLong num2)
 {
 	__asm
@@ -441,7 +441,7 @@ extern	SLong	SDLongSGN(sdlong&);
 				//	sete	al
 				//
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 
 inline SLong SDLongSGN(sdlong& num)
 {
@@ -480,7 +480,7 @@ extern	Bool	SDLong2Long(sdlong&);
 				modify	[eax ebx edx]	\
 				value	[al]
 #else
-#if defined(__MSVC__) && !defined(__GNUC__)
+#ifdef __MSVC__
 inline	Bool	SDLong2Long(sdlong& num)
 {
 	UByte retval;
