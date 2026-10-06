@@ -316,6 +316,12 @@ struct IDirect3DVertexBuffer7 {
     IDirect3DVertexBuffer7() : refCnt(1),data(0),size(0),fvf(0),caps(0),locked(false) {}
     ~IDirect3DVertexBuffer7() { free(data); }
 
+    // First three virtuals = IUnknown layout (see ddraw.h header note).
+    virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
+        { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK; }
+    virtual ULONG AddRef() { return ++refCnt; }
+    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
+
     HRESULT Init(LPD3DVERTEXBUFFERDESC d) {
         if(!d) return DDERR_INVALIDPARAMS;
         fvf=d->dwFVF; caps=d->dwCaps;
@@ -326,8 +332,6 @@ struct IDirect3DVertexBuffer7 {
         data=(BYTE*)calloc(1,size);
         return data?D3D_OK:DDERR_OUTOFMEMORY;
     }
-    ULONG AddRef() { return ++refCnt; }
-    ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
     HRESULT Lock(DWORD, LPVOID* ppv, LPDWORD pdwSize) {
         if(!ppv) return DDERR_INVALIDPARAMS;
         locked=true; *ppv=data;
@@ -377,11 +381,12 @@ struct IDirect3DDevice7 {
         memset(lights,0,sizeof(lights));
         memset(lightEnabled,0,sizeof(lightEnabled));
     }
-    ULONG AddRef() { return ++refCnt; }
-    ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
-    HRESULT QueryInterface(REFIID, LPVOID* ppv) {
+    // First three virtuals = IUnknown layout (see ddraw.h header note).
+    virtual HRESULT QueryInterface(REFIID, LPVOID* ppv) {
         if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK;
     }
+    virtual ULONG AddRef() { return ++refCnt; }
+    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
 
     HRESULT SetRenderState(D3DRENDERSTATETYPE s, DWORD v)
         { if((DWORD)s<256)renderStates[s]=v; return D3D_OK; }
@@ -528,15 +533,23 @@ inline HRESULT IDirect3DDevice7::GetCaps(LPD3DDEVICEDESC7 d) {
 struct IDirect3D7 {
     ULONG refCnt;
     IDirect3D7() : refCnt(1) {}
-    ULONG AddRef() { return ++refCnt; }
-    ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
+    // First three virtuals = IUnknown layout (see ddraw.h header note).
+    virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
+        { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK; }
+    virtual ULONG AddRef() { return ++refCnt; }
+    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
 
-    // Yields the synthetic TnL-HAL device, then an RGB fallback — same
-    // preference order lib3d expects (TnL-HAL wins when offered first).
+    // Yields HAL, then TnL-HAL, then RGB — real DX7 enumeration order.
+    // BoB's lib3d is compiled with NO_HARD_TNL so it selects the plain
+    // IID_IDirect3DHALDevice entry; the TnL offer stays for call sites
+    // (and any future consumer) built without that define.
     HRESULT EnumDevices(LPD3DENUMDEVICESCALLBACK7 cb, LPVOID ctx) {
         if(!cb) return DDERR_INVALIDPARAMS;
         IDirect3DDevice7 probe; D3DDEVICEDESC7 desc;
-        probe.GetCaps(&desc); desc.deviceGUID=IID_IDirect3DTnLHalDevice;
+        probe.GetCaps(&desc); desc.deviceGUID=IID_IDirect3DHALDevice;
+        if(cb((LPSTR)"Direct3D HAL",(LPSTR)"Rowan Native HAL",&desc,ctx)!=D3DENUMRET_OK)
+            return D3D_OK;
+        desc.deviceGUID=IID_IDirect3DTnLHalDevice;
         if(cb((LPSTR)"Direct3D T&L HAL",(LPSTR)"Rowan Native TnL",&desc,ctx)!=D3DENUMRET_OK)
             return D3D_OK;
         desc.deviceGUID=IID_IDirect3DRGBDevice;
@@ -565,9 +578,6 @@ struct IDirect3D7 {
         *out=vb; return D3D_OK;
     }
     HRESULT EvictManagedTextures() { return D3D_OK; }
-    HRESULT QueryInterface(REFIID, LPVOID* ppv) {
-        if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK;
-    }
 };
 
 #endif // ROWAN_COMPAT_D3D_H

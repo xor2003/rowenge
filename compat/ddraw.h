@@ -17,12 +17,19 @@
 #include <stdlib.h>
 
 // --- Emulated interface objects --------------------------------------------------
+// COM ABI: QueryInterface/AddRef/Release are the first three virtual
+// members (in that order) in every interface below.  GCC's i386 vtable
+// then lines up 1:1 with IUnknownVtbl, so lib3d's IUnknown* paths
+// (getRefCount, DeRefAndNULL, IUnknownPtrRef) reach the real refcount
+// code through the vptr — exactly like a true COM lpVtbl call.
 struct IDirectDrawPalette {
     PALETTEENTRY entries[256];
     ULONG refCnt;
     IDirectDrawPalette() : refCnt(1) {}
-    ULONG AddRef() { return ++refCnt; }
-    ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
+        { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return DD_OK; }
+    virtual ULONG AddRef() { return ++refCnt; }
+    virtual ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
     HRESULT GetEntries(DWORD f,DWORD n,DWORD c,PALETTEENTRY* e)
         { if(!e) return DDERR_INVALIDPARAMS; memcpy(e,entries+f,c*sizeof(PALETTEENTRY)); return DD_OK; }
     HRESULT SetEntries(DWORD f,DWORD n,DWORD c,PALETTEENTRY* e)
@@ -32,8 +39,10 @@ struct IDirectDrawPalette {
 struct IDirectDrawClipper {
     ULONG refCnt;
     IDirectDrawClipper() : refCnt(1) {}
-    ULONG AddRef() { return ++refCnt; }
-    ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
+        { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return DD_OK; }
+    virtual ULONG AddRef() { return ++refCnt; }
+    virtual ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
     HRESULT SetHWnd(DWORD, HWND) { return DD_OK; }
     HRESULT SetClipList(void*,DWORD) { return DD_OK; }
 };
@@ -42,8 +51,10 @@ struct IDirectDrawGammaControl {
     ULONG refCnt;
     DDGAMMARAMP ramp;
     IDirectDrawGammaControl() : refCnt(1) { memset(&ramp,0,sizeof(ramp)); }
-    ULONG AddRef() { return ++refCnt; }
-    ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
+        { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return DD_OK; }
+    virtual ULONG AddRef() { return ++refCnt; }
+    virtual ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
     HRESULT GetGammaRamp(DWORD, LPVOID r)
         { if(r)memcpy(r,&ramp,sizeof(ramp)); return DD_OK; }
     HRESULT SetGammaRamp(DWORD, LPVOID r)
@@ -61,7 +72,8 @@ struct IDirectDrawSurface7 {
 
     IDirectDrawSurface7() : pal(0),clip(0),attached(0),attachedFrom(0),refCnt(1),pixels(0)
         { memset(&desc,0,sizeof(desc)); desc.dwSize=sizeof(desc); }
-    ~IDirectDrawSurface7() { free(pixels); if(pal) pal->Release(); if(clip) clip->Release(); }
+    ~IDirectDrawSurface7() { free(pixels); if(pal) pal->Release(); if(clip) clip->Release();
+                             if(attached){attached->attachedFrom=0;attached->Release();} }
 
     static DWORD PitchFor(DWORD w, DWORD bpp) { return ((w*bpp/8)+3)&~3; }
 
@@ -79,13 +91,13 @@ struct IDirectDrawSurface7 {
         return DD_OK;
     }
 
-    ULONG AddRef() { return ++refCnt; }
-    ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
-    HRESULT QueryInterface(REFIID riid, LPVOID* ppv) {
+    virtual HRESULT QueryInterface(REFIID riid, LPVOID* ppv) {
         if(!ppv)return DDERR_INVALIDPARAMS;
         if(riid==IID_IDirectDrawGammaControl){*ppv=new IDirectDrawGammaControl;return DD_OK;}
         *ppv=this; AddRef(); return DD_OK;
     }
+    virtual ULONG AddRef() { return ++refCnt; }
+    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
 
     HRESULT Lock(LPRECT, LPDDSURFACEDESC2 lpDdsd, DWORD, HANDLE) {
         if(!lpDdsd) return DDERR_INVALIDPARAMS;
@@ -172,13 +184,13 @@ inline ULONG RowanSurf7Release(LPDIRECTDRAWSURFACE7 s) { return s?s->Release():0
 struct IDirectDraw7 {
     ULONG refCnt;
     IDirectDraw7() : refCnt(1) {}
-    ULONG AddRef() { return ++refCnt; }
-    ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
-    HRESULT QueryInterface(REFIID riid, LPVOID* ppv) {
+    virtual HRESULT QueryInterface(REFIID riid, LPVOID* ppv) {
         if(!ppv) return DDERR_INVALIDPARAMS;
         if(riid==IID_IDirect3D7){ *ppv=new IDirect3D7; return DD_OK; }
         *ppv=this; AddRef(); return DD_OK;
     }
+    virtual ULONG AddRef() { return ++refCnt; }
+    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
     HRESULT SetCooperativeLevel(HWND,DWORD) { return DD_OK; }
     HRESULT SetDisplayMode(DWORD,DWORD,DWORD,DWORD,DWORD) { return DD_OK; }
     HRESULT RestoreDisplayMode() { return DD_OK; }
@@ -208,6 +220,19 @@ struct IDirectDraw7 {
         if(hr!=DD_OK){s->Release();return hr;}
         *out=s;
         if(d->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) s->desc.ddsCaps.dwCaps|=DDSCAPS_FRONTBUFFER;
+        // COMPLEX|FLIP with DDSD_BACKBUFFERCOUNT: DD attaches that many
+        // back buffers atomically — lib3d then finds them via
+        // GetAttachedSurface(DDSCAPS_BACKBUFFER).
+        if((d->dwFlags&DDSD_BACKBUFFERCOUNT) && d->dwBackBufferCount>0) {
+            DDSURFACEDESC2 bd=*d;
+            bd.dwFlags&=~DDSD_BACKBUFFERCOUNT;
+            bd.ddsCaps.dwCaps&=~(DDSCAPS_PRIMARYSURFACE|DDSCAPS_COMPLEX|DDSCAPS_FLIP);
+            bd.ddsCaps.dwCaps|=DDSCAPS_BACKBUFFER;
+            IDirectDrawSurface7* b=new IDirectDrawSurface7;
+            hr=b->Alloc(&bd);
+            if(hr!=DD_OK){b->Release();s->Release();*out=0;return hr;}
+            s->attached=b; b->attachedFrom=s;   // attachment holds b's ref
+        }
         return DD_OK;
     }
     HRESULT GetCaps(LPDDCAPS hal, LPDDCAPS) {
