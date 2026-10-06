@@ -94,6 +94,27 @@ REGISTER_TEST(test_bob_matrix_transform) {
     CHECK(scale > 0 && scale <= 34);
     CHECK_NEAR((double)(x >> (16 - scale)) / (double)(1 << 24), 1.0, 0.02);
 
+    // stage-2 overflow window: shipped asm reads dword [BodyXl+2] (bits
+    // 16..47 of the 64-bit product); a >>32 port misses bodies in
+    // [2^31,2^32) and returns a sign-flipped low dword with no rescale.
+    // x=32767 sits one below the stage-1 threshold; a hand-built row
+    // pushes Body past 2^31.
+    std::memset(&m, 0, sizeof(m));
+    m.L11 = 32767; m.L12 = 100;
+    x = 32767; y = 32767; z = 0;
+    scale = mx.transform(&m, x, y, z);
+    CHECK_EQ(scale, 1);                    // buggy version rescales to 0
+    CHECK_EQ(x, 1076952989);               // buggy version sign-flips
+
+    // 64-bit accumulate: three near-max products sum past 2^31 — an
+    // int32 sum wraps negative before widening. Expected: Body =
+    // 2*(32767*32767 + 32767*100 + 32767*32767) = 4301258556; slice
+    // (>>16) = 65616 -> bsr 16 -> rescale 2 -> x = 1075314639.
+    m.L13 = 32767; x = y = z = 32767;
+    scale = mx.transform(&m, x, y, z);
+    CHECK_EQ(scale, 2);
+    CHECK_EQ(x, 1075314639);
+
     // degenerate all-zero input must not trap
     x = y = z = 0;
     scale = mx.transform(&m, x, y, z);
