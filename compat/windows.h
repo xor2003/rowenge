@@ -38,6 +38,10 @@ typedef void* HINSTANCE;   // matches dinput_stub.h (identical re-typedef is leg
 
 
 // --- Win32 sync/input: pthread-backed CRITICAL_SECTION (process-local mutex) ---
+// Guarded: identical block also lives in migalley/H/WIN32_COMPAT.H — first
+// include wins (identical definitions either way).
+#ifndef ROWAN_CS_IMPL
+#define ROWAN_CS_IMPL
 #include <pthread.h>
 struct CRITICAL_SECTION { pthread_mutex_t m; };
 typedef CRITICAL_SECTION* LPCRITICAL_SECTION;
@@ -49,6 +53,7 @@ inline void InitializeCriticalSection(LPCRITICAL_SECTION c) {
 inline void DeleteCriticalSection(LPCRITICAL_SECTION c) { pthread_mutex_destroy(&c->m); }
 inline void EnterCriticalSection(LPCRITICAL_SECTION c)  { pthread_mutex_lock(&c->m); }
 inline void LeaveCriticalSection(LPCRITICAL_SECTION c)  { pthread_mutex_unlock(&c->m); }
+#endif /* ROWAN_CS_IMPL */
 
 // --- Bitmap compression constants (BITMAPINFOHEADER.biCompression) ---
 #ifndef BI_RGB
