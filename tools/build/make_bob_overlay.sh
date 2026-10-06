@@ -42,6 +42,10 @@ if [ -n "$MIG_H" ]; then
   [ -f "$MIG_H/dsound_stub.h" ] && ln -sf "$MIG_H/dsound_stub.h" "$OUT/dsound.h"
 fi
 
+# compat/d3dtypes.h pulls the real DX7 SDK type universe via <d3d7_sdk.h>;
+# point that spelling at BoB's vendored copy of the Microsoft header.
+ln -sf "$PORTED/h/vs2005/d3dtypes.h" "$OUT/d3d7_sdk.h"
+
 # Header search dirs:
 #   PRIMARY — BoB's own headers, mfc/ BEFORE h/: the mfc/*.h files are
 #     5-line forwarders that define the *_INCLUDED guard macros BoB code
