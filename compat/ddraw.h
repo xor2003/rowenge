@@ -9,6 +9,11 @@
 // record state and report success so driver/mode enumeration is live.
 #ifndef ROWAN_COMPAT_DDRAW_H
 #define ROWAN_COMPAT_DDRAW_H
+
+// BoB TUs sit under a global pack(1) (dosdefs.h); the port-layer
+// COM classes/DD structs must keep natural alignment so every TU
+// agrees on member offsets (ODR) — T123 BoBFrag OOB via CREdtBt.
+#pragma pack(push,8)
 #include "d3dtypes.h"
 #include "d3d.h"
 #define ROWAN_DDRAW_STUB 1
@@ -137,11 +142,14 @@ struct IDirectDrawSurface7 {
         a->AddRef(); attached=a; a->attachedFrom=this;
         return DD_OK;
     }
-    HRESULT GetAttachedSurface(LPDDSCAPS2, LPDIRECTDRAWSURFACE7* out) {
+    HRESULT GetAttachedSurface(LPDDSCAPS2 caps, LPDIRECTDRAWSURFACE7* out) {
         if(!out) return DDERR_INVALIDPARAMS;
-        *out = attached;
-        if(attached) attached->AddRef(); else return DDERR_GENERIC;
-        return DD_OK;
+        // DD returns the attached surface only when it carries every
+        // requested cap bit (MIPMAP chain walk vs BACKBUFFER flip chain).
+        if(attached && (!caps || (attached->desc.ddsCaps.dwCaps & caps->dwCaps)==caps->dwCaps)){
+            *out = attached; attached->AddRef(); return DD_OK;
+        }
+        *out = 0; return DDERR_GENERIC;
     }
     HRESULT DeleteAttachedSurface(DWORD, LPDIRECTDRAWSURFACE7 a) {
         if(attached==a){attached->Release();attached=0;a->attachedFrom=0;}
@@ -161,13 +169,31 @@ struct IDirectDrawSurface7 {
             return DD_OK;
         }
         if(!src) return DD_OK;
-        DWORD w=src->desc.dwWidth*bpp, h=src->desc.dwHeight;
-        if(w>desc.dwWidth*bpp) w=desc.dwWidth*bpp;
-        if(h>desc.dwHeight) h=desc.dwHeight;
         LONG dx=dst?dst->left:0, dy=dst?dst->top:0;
         LONG sx=srcr?srcr->left:0, sy=srcr?srcr->top:0;
-        BlitRect((BYTE*)desc.lpSurface+dy*desc.lPitch+dx*bpp,desc.lPitch,
-                 (BYTE*)src->desc.lpSurface+sy*src->desc.lPitch+sx*bpp,src->desc.lPitch,w,h);
+        DWORD srcW=srcr?(DWORD)(srcr->right-srcr->left):src->desc.dwWidth;
+        DWORD srcH=srcr?(DWORD)(srcr->bottom-srcr->top):src->desc.dwHeight;
+        DWORD dstW=dst?(DWORD)(dst->right-dst->left):desc.dwWidth;
+        DWORD dstH=dst?(DWORD)(dst->bottom-dst->top):desc.dwHeight;
+        if(dstW>desc.dwWidth-(DWORD)dx) dstW=desc.dwWidth-(DWORD)dx;
+        if(dstH>desc.dwHeight-(DWORD)dy) dstH=desc.dwHeight-(DWORD)dy;
+        if(srcW>src->desc.dwWidth-(DWORD)sx) srcW=src->desc.dwWidth-(DWORD)sx;
+        if(srcH>src->desc.dwHeight-(DWORD)sy) srcH=src->desc.dwHeight-(DWORD)sy;
+        BYTE* db=(BYTE*)desc.lpSurface+dy*desc.lPitch+dx*bpp;
+        const BYTE* sb=(const BYTE*)src->desc.lpSurface+sy*src->desc.lPitch+sx*bpp;
+        if(srcW==dstW && srcH==dstH) {
+            BlitRect(db,desc.lPitch,sb,src->desc.lPitch,srcW*bpp,srcH);
+        } else if(srcW && srcH) {
+            // DD stretches mismatched blits — mips need it (nearest is fine
+            // for our malloc surfaces; real DD box-filters).
+            for(DWORD y=0;y<dstH;y++){
+                const BYTE* srow=sb+(y*srcH/dstH)*src->desc.lPitch;
+                BYTE* drow=db+y*desc.lPitch;
+                for(DWORD x=0;x<dstW;x++){
+                    memcpy(drow+x*bpp,srow+(x*srcW/dstW)*bpp,bpp);
+                }
+            }
+        }
         if(IsPrimary()) RowanDDPresent(this);
         return DD_OK;
     }
@@ -298,6 +324,27 @@ struct IDirectDraw7 {
             if(hr!=DD_OK){b->Release();s->Release();*out=0;return hr;}
             s->attached=b; b->attachedFrom=s;   // attachment holds b's ref
         }
+        // COMPLEX|MIPMAP with DDSD_MIPMAPCOUNT: DD atomically attaches a
+        // chain of (count-1) mip levels below the top, each half size —
+        // lib3d walks it via GetAttachedSurface(DDSCAPS_MIPMAP).
+        if((dd.ddsCaps.dwCaps & (DDSCAPS_COMPLEX|DDSCAPS_MIPMAP))==(DDSCAPS_COMPLEX|DDSCAPS_MIPMAP)
+           && (dd.dwFlags&DDSD_MIPMAPCOUNT) && dd.dwMipMapCount>1) {
+            IDirectDrawSurface7* prev=s;
+            for(DWORD lv=1; lv<dd.dwMipMapCount; lv++) {
+                DDSURFACEDESC2 md=dd;
+                md.dwWidth  = dd.dwWidth  ? (dd.dwWidth  >> lv ? dd.dwWidth  >> lv : 1) : 1;
+                md.dwHeight = dd.dwHeight ? (dd.dwHeight >> lv ? dd.dwHeight >> lv : 1) : 1;
+                if(md.dwWidth==0) md.dwWidth=1; if(md.dwHeight==0) md.dwHeight=1;
+                md.dwMipMapCount=0;
+                md.ddsCaps.dwCaps&=~DDSCAPS_COMPLEX;
+                md.ddsCaps.dwCaps2|=DDSCAPS2_MIPMAPSUBLEVEL;
+                IDirectDrawSurface7* m=new IDirectDrawSurface7;
+                hr=m->Alloc(&md);
+                if(hr!=DD_OK){m->Release();s->Release();*out=0;return hr;}
+                prev->attached=m; m->attachedFrom=prev;   // chain holds ref
+                prev=m;
+            }
+        }
         return DD_OK;
     }
     HRESULT GetCaps(LPDDCAPS hal, LPDDCAPS) {
@@ -372,4 +419,5 @@ inline HRESULT DirectDrawCreateEx(GUID*, LPVOID* ppv, REFIID, IUnknown*) {
 // IDirectDrawSurface7 above.
 #include "d3dsoft.h"
 
+#pragma pack(pop)
 #endif // ROWAN_COMPAT_DDRAW_H

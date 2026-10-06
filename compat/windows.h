@@ -5,6 +5,11 @@
 #ifndef ROWAN_COMPAT_WINDOWS_H
 #define ROWAN_COMPAT_WINDOWS_H
 
+// BoB TUs sit under a global pack(1) (dosdefs.h); the port-layer
+// COM classes/DD structs must keep natural alignment so every TU
+// agrees on member offsets (ODR) — T123 BoBFrag OOB via CREdtBt.
+#pragma pack(push,8)
+
 // C++-style COM IUnknown for headers that call ->Release() (BoB uses the
 // member-call form; migalley's C lpVtbl stub is suppressed via its own guard).
 #ifndef __IUnknown_INTERFACE_DEFINED__
@@ -101,4 +106,5 @@ inline void* operator new[](size_t n, const char* file, int line) {
 }
 #endif
 
+#pragma pack(pop)
 #endif // ROWAN_COMPAT_WINDOWS_H

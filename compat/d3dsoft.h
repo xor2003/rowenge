@@ -11,6 +11,11 @@
 #ifndef ROWAN_COMPAT_D3DSOFT_H
 #define ROWAN_COMPAT_D3DSOFT_H
 
+// BoB TUs sit under a global pack(1) (dosdefs.h); the port-layer
+// COM classes/DD structs must keep natural alignment so every TU
+// agrees on member offsets (ODR) — T123 BoBFrag OOB via CREdtBt.
+#pragma pack(push,8)
+
 #ifndef DDCKEY_SRCBLT
 #define DDCKEY_SRCBLT   0x00000008   // ddraw.h color-key flag (source blt key)
 #endif
@@ -577,4 +582,5 @@ inline HRESULT IDirect3DDevice7::DrawIndexedPrimitiveVB(D3DPRIMITIVETYPE pt,
     Rast7::EmitPrim(*rast,pt,dv,ni);
     return D3D_OK;
 }
+#pragma pack(pop)
 #endif // ROWAN_COMPAT_D3DSOFT_H

@@ -8,6 +8,11 @@
 // lib3d.h/lib3d.cpp needs is appended afterwards.
 #ifndef ROWAN_COMPAT_D3DTYPES_H
 #define ROWAN_COMPAT_D3DTYPES_H
+
+// BoB TUs sit under a global pack(1) (dosdefs.h); the port-layer
+// COM classes/DD structs must keep natural alignment so every TU
+// agrees on member offsets (ODR) — T123 BoBFrag OOB via CREdtBt.
+#pragma pack(push,8)
 #include <stdint.h>
 #include "WIN32_COMPAT.H" // DWORD, WORD, BYTE, BOOL, HRESULT, GUID
 
@@ -612,4 +617,5 @@ typedef HRESULT (WINAPI *LPDDENUMSURFACESCALLBACK7)(LPDIRECTDRAWSURFACE7, LPDDSU
 #define IID_IDirectDrawGammaControl_DEFINED
 DEFINE_GUID(IID_IDirectDrawGammaControl, 0x1860d94e,0x41ed,0x11d0,0x97,0xa8,0x00,0x00,0xc0,0x3f,0xd8,0x00);
 #endif
+#pragma pack(pop)
 #endif // ROWAN_COMPAT_D3DTYPES_H

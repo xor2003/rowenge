@@ -27,19 +27,72 @@ SHADOW_DIRS=("$@")
 
 # 0) mig-H precedence (optional second arg): the ported BoB tree still ships
 #    the generated OLE wrapper headers (h/rbutton.h etc.) but sources must
-#    see mig's ported widget declarations. Link ONLY the widget set (mig/H
+#    see mig's ported widget declarations. Link ONLY the port surface (mig/H
 #    has ~259 same-named headers — linking all of it would shadow BoB's own).
+#
+#    These are emitted as pack-pinning WRAPPERS, not symlinks. Mig's port
+#    classes are compiled at MIXED packing: every widget .CPP sits under
+#    pack(1) (RDIALOG.H pulls GLOBDEFS->DOSDEFS before the widget header),
+#    while MFC_stub.h/DLGITEM.H are included BEFORE that pragma and so are
+#    natural. BoB TUs must see each class exactly as its implementation TU
+#    does — an include-order slip in one TU is an ODR layout split.
+#    (The real killer at T123: H/<name> are stale OLE IDispatch stubs,
+#    132-byte CREdtBt, while MFC/<name> are the ported classes the linked
+#    code implements, 149-byte CREdtBt — ctor writes past BoBFrag's end.)
+#
+#    Targets: MFC/<name> when it exists (the ported impl header), else H/
+#    (RTICKBOX.H/RTITLE.H live only in H/ and ARE the real defs there).
+pin_hdr() { # pin_hdr <pack-level> <overlay-name> <real-header-path>
+  # rm first: a stale symlink with this name would make > clobber the REAL
+  # header it points at (bit us once — destroyed 16 mig headers).
+  rm -f "$OUT/$2"
+  # BoB's mfc/<w>.h forwarders pre-define the same <w>_INCLUDED guard the
+  # MFC/ impl headers test — under the forwarder chain the guard arrives
+  # defined and the real class is skipped entirely (incomplete-type errors).
+  # #undef the target's own guard macro so the class always parses.
+  local g
+  g=$(sed -n -E 's/^#ifndef[[:space:]]+([A-Za-z_0-9]*_INCLUDED_?).*/\1/p;
+                 s/^#if[[:space:]]+!defined\(([A-Za-z_0-9]*_INCLUDED_?)\).*/\1/p' \
+        "$3" | head -1)
+  {
+    printf '#pragma pack(push,%s) /* T123: pin port class to impl-TU packing */\n' "$1"
+    [ -n "$g" ] && printf '#undef %s /* T123: bob forwarder pre-defines this guard */\n' "$g"
+    printf '#include "%s"\n' "$3"
+    printf '#pragma pack(pop)\n'
+  } > "$OUT/$2"
+}
 if [ -n "$MIG_H" ]; then
+  MIG_H="$(cd "$MIG_H" && pwd)"
+  MIG_MFC="$(cd "$MIG_H/../MFC" && pwd)"
+  # Widget classes — impl TUs see them at pack(1) (post-DOSDEFS).
   for b in RBUTTON.H RCOMBO.H REDIT.H REDTBT.H RJOYCFG.H RLISTBOX.H \
            RRADIO.H RSCRLBAR.H RSPINBUT.H RSPLTBAR.H RSTATIC.H RTABS.H \
            RTICKBOX.H RTITLE.H; do
-    f="$MIG_H/$b"
-    [ -f "$f" ] || continue
-    ln -sf "$f" "$OUT/$b"
-    ln -sf "$f" "$OUT/$(echo "$b" | tr 'A-Z' 'a-z')"
+    if   [ -f "$MIG_MFC/$b" ]; then f="$MIG_MFC/$b"
+    elif [ -f "$MIG_H/$b"   ]; then f="$MIG_H/$b"
+    else continue; fi
+    pin_hdr 1 "$b" "$f"
+    pin_hdr 1 "$(echo "$b" | tr 'A-Z' 'a-z')" "$f"
   done
+  # Port classes impl TUs see at NATURAL packing (included before the
+  # DOSDEFS pack-1 pragma) — pin 8 makes layout include-order-proof.
+  for b in MFC_stub.h WIN32_COMPAT.H DLGITEM.H MigCstring.h io_compat.h \
+           timeapi.h CSTRING.H dinput_stub.h dplay_stub.h dsound_stub.h; do
+    [ -f "$MIG_H/$b" ] || continue
+    pin_hdr 8 "$b" "$MIG_H/$b"
+  done
+  # FILES.H/fileman classes — FILEMAN.CPP compiles them under DOSDEFS
+  # pack(1).
+  pin_hdr 1 FILES.H "$MIG_H/FILES.H"
+  # lowercase spellings some TUs use (skips anything that could shadow a
+  # system header — cstring.h in particular stays unwrapped).
+  pin_hdr 1 files.h "$MIG_H/FILES.H"
+  pin_hdr 8 dlgitem.h "$MIG_H/DLGITEM.H"
+  pin_hdr 8 win32_compat.h "$MIG_H/WIN32_COMPAT.H"
+  pin_hdr 8 mfc_stub.h "$MIG_H/MFC_stub.h"
+  pin_hdr 8 migcstring.h "$MIG_H/MigCstring.h"
   # BoB sources say <dsound.h>; mig's surface is dsound_stub.h
-  [ -f "$MIG_H/dsound_stub.h" ] && ln -sf "$MIG_H/dsound_stub.h" "$OUT/dsound.h"
+  [ -f "$MIG_H/dsound_stub.h" ] && pin_hdr 8 dsound.h "$MIG_H/dsound_stub.h"
 fi
 
 # compat/d3dtypes.h pulls the real DX7 SDK type universe via <d3d7_sdk.h>;

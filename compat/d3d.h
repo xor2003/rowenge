@@ -6,6 +6,11 @@
 // lib3d's driver selection runs the same code paths as on hardware.
 #ifndef ROWAN_COMPAT_D3D_H
 #define ROWAN_COMPAT_D3D_H
+
+// BoB TUs sit under a global pack(1) (dosdefs.h); the port-layer
+// COM classes/DD structs must keep natural alignment so every TU
+// agrees on member offsets (ODR) — T123 BoBFrag OOB via CREdtBt.
+#pragma pack(push,8)
 #include "d3dtypes.h"
 
 #include <string.h>
@@ -615,4 +620,5 @@ struct IDirect3D7 {
     HRESULT EvictManagedTextures() { return D3D_OK; }
 };
 
+#pragma pack(pop)
 #endif // ROWAN_COMPAT_D3D_H
