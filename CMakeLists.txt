@@ -35,7 +35,7 @@ endif()
 # --- generated include overlay (case aliases + repaired generated headers) --
 add_custom_command(
     OUTPUT ${BOB_OVERLAY}/.stamp
-    COMMAND ${CMAKE_SOURCE_DIR}/tools/build/make_bob_overlay.sh ${BOB_OVERLAY}
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/build/make_bob_overlay.sh ${BOB_OVERLAY} "" ${CMAKE_SOURCE_DIR}/compat
     COMMAND ${CMAKE_COMMAND} -E touch ${BOB_OVERLAY}/.stamp
     DEPENDS ${CMAKE_SOURCE_DIR}/tools/build/make_bob_overlay.sh
     COMMENT "Generating BoB include overlay")
@@ -204,6 +204,22 @@ target_link_options(bob_leaf_tests PRIVATE -Wl,--gc-sections)
 
 add_test(NAME bob_leaf_tests COMMAND bob_leaf_tests)
 set_tests_properties(bob_leaf_tests PROPERTIES
+    TIMEOUT 60
+    ENVIRONMENT "LD_LIBRARY_PATH=${SYSROOT}/usr/lib/i386-linux-gnu")
+
+# bob_port_tests: leaf tests against the PORTED bob-flight-sim headers
+# themselves (BobIncludes only, no SharedMathIncludes). Shared-math tests
+# cover the shared header; these cases pin the overlay-resolved h/mathasm.h
+# that bob_game TUs actually compile — a divergence here (e.g. SHDIVSIN's
+# dividend) would silently ship wrong arithmetic.
+add_executable(bob_port_tests
+    tests/unit/main.cpp
+    tests/unit/test_bob_mathasm_port.cpp)
+target_include_directories(bob_port_tests PRIVATE tests)
+target_link_libraries(bob_port_tests PRIVATE BobIncludes)
+
+add_test(NAME bob_port_tests COMMAND bob_port_tests)
+set_tests_properties(bob_port_tests PROPERTIES
     TIMEOUT 60
     ENVIRONMENT "LD_LIBRARY_PATH=${SYSROOT}/usr/lib/i386-linux-gnu")
 
