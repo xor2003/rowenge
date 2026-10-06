@@ -465,6 +465,14 @@ inline void DecodeVert(DWORD fvf,const BYTE* p,Vert& v){
 static_assert(sizeof(Rast7::State)<=sizeof(((IDirect3DDevice7*)0)->rastMem),
               "Rast7::State outgrew IDirect3DDevice7::rastMem — bump the buffer");
 
+inline HRESULT IDirect3D7::CreateDevice(REFCLSID, LPDIRECTDRAWSURFACE7 surf,
+                                        LPDIRECT3DDEVICE7* out) {
+    if(!out) return DDERR_INVALIDPARAMS;
+    IDirect3DDevice7* dev=new IDirect3DDevice7;
+    dev->renderTarget=surf; RowanSurf7AddRef(surf);
+    *out=dev; return D3D_OK;
+}
+
 inline HRESULT IDirect3DDevice7::SetTexture(DWORD s, LPDIRECTDRAWSURFACE7 t) {
     if(s<8){RowanSurf7AddRef(t);RowanSurf7Release(textures[s]);textures[s]=t;}
     return D3D_OK;

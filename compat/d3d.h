@@ -606,10 +606,10 @@ struct IDirect3D7 {
         f.dwZBufferBitDepth=32; cb(&f,ctx);
         return D3D_OK;
     }
-    HRESULT CreateDevice(REFCLSID, LPDIRECTDRAWSURFACE7, LPDIRECT3DDEVICE7* out) {
-        if(!out) return DDERR_INVALIDPARAMS;
-        *out=new IDirect3DDevice7; return D3D_OK;
-    }
+    // DX7: the device renders to the surface handed to CreateDevice;
+    // SetRenderTarget is only needed for later render-target switches.
+    // (BoB fullscreen lib3d never calls SetRenderTarget — T123 gray frame.)
+    HRESULT CreateDevice(REFCLSID, LPDIRECTDRAWSURFACE7 surf, LPDIRECT3DDEVICE7* out);
     HRESULT CreateVertexBuffer(LPD3DVERTEXBUFFERDESC d, LPDIRECT3DVERTEXBUFFER7* out, DWORD) {
         if(!d||!out) return DDERR_INVALIDPARAMS;
         IDirect3DVertexBuffer7* vb=new IDirect3DVertexBuffer7;
