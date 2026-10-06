@@ -31,12 +31,14 @@ static const FileSig MIG_SIGS[] = {
     { "Mig.exe",      -1 },
 };
 
+// filelist.txt is deliberately absent from both bob rows: the ported
+// fileman truncates it to a 0-byte "used files" dump on every startup —
+// it is generated state, not install identity.
 static const FileSig BOB_RETAIL_SIGS[] = {
     { "BOBLICENCE.txt", 10990 },
     { "BATTLE.DIR",     323 },
     { "COMMON.DIR",     526 },
     { "DIR.DIR",        128 },
-    { "filelist.txt",   1138 },
     { "cardbase.rc",    7720 },
     { "bob.exe",        -1 },
 };
@@ -46,7 +48,6 @@ static const FileSig BOB_BDG_SIGS[] = {
     { "BATTLE.DIR",     323 },
     { "COMMON.DIR",     526 },
     { "DIR.DIR",        128 },
-    { "filelist.txt",   1138 },
     { "cardbase.rc",    7720 },
     { "bdg.txt",        2862 },
     { "mfc120.dll",     4424344 },

@@ -45,7 +45,9 @@ static void make_bob_bdg(const std::string& d)
 {
     mkfile(d, "BOBLICENCE.txt", 10990); mkfile(d, "BATTLE.DIR", 323);
     mkfile(d, "COMMON.DIR", 526);  mkfile(d, "DIR.DIR", 128);
-    mkfile(d, "filelist.txt", 1138);   mkfile(d, "cardbase.rc", 7720);
+    // filelist.txt is game-generated (fileman truncates it each launch) —
+    // a 0-byte leftover must not affect detection.
+    mkfile(d, "filelist.txt", 0);      mkfile(d, "cardbase.rc", 7720);
     mkfile(d, "bdg.txt", 2862);    mkfile(d, "mfc120.dll", 4424344);
     mkfile(d, "bob.exe", 830464);
 }
@@ -92,7 +94,7 @@ REGISTER_TEST(detect_bob_retail_ok)
     std::string d = tmp_root("bob_ret");
     mkfile(d, "BOBLICENCE.txt", 10990); mkfile(d, "BATTLE.DIR", 323);
     mkfile(d, "COMMON.DIR", 526);  mkfile(d, "DIR.DIR", 128);
-    mkfile(d, "filelist.txt", 1138);   mkfile(d, "cardbase.rc", 7720);
+    mkfile(d, "filelist.txt", 0);      mkfile(d, "cardbase.rc", 7720);
     mkfile(d, "bob.exe", 2785792);  // retail binary — any size accepted
     auto r = detect_install(d.c_str());
     CHECK_EQ((int)r.verdict, (int)Verdict::OK);
