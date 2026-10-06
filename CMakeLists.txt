@@ -223,6 +223,20 @@ set_tests_properties(bob_port_tests PROPERTIES
     TIMEOUT 60
     ENVIRONMENT "LD_LIBRARY_PATH=${SYSROOT}/usr/lib/i386-linux-gnu")
 
+# bob_ddraw_tests: T123 software-DX7 pipeline — real malloc-backed surfaces,
+# Clear, DrawPrimitive{,Indexed}{,VB}, z-buffer, texture stages, blending,
+# culling, and the Flip -> present hook.
+add_executable(bob_ddraw_tests
+    tests/unit/main.cpp
+    tests/unit/test_bob_ddraw.cpp)
+target_include_directories(bob_ddraw_tests PRIVATE tests)
+target_link_libraries(bob_ddraw_tests PRIVATE BobIncludes)
+
+add_test(NAME bob_ddraw_tests COMMAND bob_ddraw_tests)
+set_tests_properties(bob_ddraw_tests PROPERTIES
+    TIMEOUT 60
+    ENVIRONMENT "LD_LIBRARY_PATH=${SYSROOT}/usr/lib/i386-linux-gnu")
+
 add_executable(bob_files_tests
     tests/unit/main.cpp
     tests/bob/test_bob_files.cpp

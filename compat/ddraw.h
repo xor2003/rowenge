@@ -61,6 +61,23 @@ struct IDirectDrawGammaControl {
         { if(r)memcpy(&ramp,r,sizeof(ramp)); return DD_OK; }
 };
 
+// Present bridge: fired after Flip and after Blts targeting a primary/front
+// surface.  The compat layer is windowing-toolkit agnostic — the host
+// (MFC_stub) installs a hook that uploads the primary's pixels to the game
+// window.  Weak storage so every includer shares one pointer and TUs that
+// never install a hook still link.
+struct IDirectDrawSurface7;
+extern "C" {
+#if defined(__GNUC__)
+__attribute__((weak)) void (*RowanDDPresentHook)(IDirectDrawSurface7*) = 0;
+#else
+extern void (*RowanDDPresentHook)(IDirectDrawSurface7*);
+#endif
+}
+static inline void RowanDDPresent(IDirectDrawSurface7* s) {
+    if(RowanDDPresentHook) RowanDDPresentHook(s);
+}
+
 struct IDirectDrawSurface7 {
     DDSURFACEDESC2      desc;
     IDirectDrawPalette* pal;
@@ -69,9 +86,11 @@ struct IDirectDrawSurface7 {
     IDirectDrawSurface7* attachedFrom;
     ULONG   refCnt;
     BYTE*   pixels;
+    DDCOLORKEY ckey;
+    DWORD    ckeyFlags;
 
-    IDirectDrawSurface7() : pal(0),clip(0),attached(0),attachedFrom(0),refCnt(1),pixels(0)
-        { memset(&desc,0,sizeof(desc)); desc.dwSize=sizeof(desc); }
+    IDirectDrawSurface7() : pal(0),clip(0),attached(0),attachedFrom(0),refCnt(1),pixels(0),ckeyFlags(0)
+        { memset(&desc,0,sizeof(desc)); desc.dwSize=sizeof(desc); memset(&ckey,0,sizeof(ckey)); }
     ~IDirectDrawSurface7() { free(pixels); if(pal) pal->Release(); if(clip) clip->Release();
                              if(attached){attached->attachedFrom=0;attached->Release();} }
 
@@ -149,6 +168,7 @@ struct IDirectDrawSurface7 {
         LONG sx=srcr?srcr->left:0, sy=srcr?srcr->top:0;
         BlitRect((BYTE*)desc.lpSurface+dy*desc.lPitch+dx*bpp,desc.lPitch,
                  (BYTE*)src->desc.lpSurface+sy*src->desc.lPitch+sx*bpp,src->desc.lPitch,w,h);
+        if(IsPrimary()) RowanDDPresent(this);
         return DD_OK;
     }
     HRESULT BltFast(DWORD x,DWORD y,LPDIRECTDRAWSURFACE7 src,LPRECT,DWORD){
@@ -157,9 +177,25 @@ struct IDirectDrawSurface7 {
         DWORD w=src->desc.dwWidth*bpp,h=src->desc.dwHeight;
         BlitRect((BYTE*)desc.lpSurface+y*desc.lPitch+x*bpp,desc.lPitch,
                  (BYTE*)src->desc.lpSurface,src->desc.lPitch,w,h);
+        if(IsPrimary()) RowanDDPresent(this);
         return DD_OK;
     }
-    HRESULT Flip(LPDIRECTDRAWSURFACE7, DWORD) { return DD_OK; }
+    bool IsPrimary() const
+        { return (desc.ddsCaps.dwCaps&(DDSCAPS_PRIMARYSURFACE|DDSCAPS_FRONTBUFFER))!=0; }
+    // Real flip: pull the attached back buffer's pixels forward, then tell
+    // the host to present.  Called on the primary in a FLIP|COMPLEX chain.
+    HRESULT Flip(LPDIRECTDRAWSURFACE7, DWORD) {
+        if(attached && attached->desc.lpSurface && desc.lpSurface){
+            DWORD bpp=desc.ddpfPixelFormat.dwRGBBitCount/8; if(!bpp)bpp=2;
+            DWORD w=desc.dwWidth*bpp;
+            DWORD sw=attached->desc.dwWidth*bpp; if(sw<w)w=sw;
+            DWORD h=desc.dwHeight; if(attached->desc.dwHeight<h)h=attached->desc.dwHeight;
+            BlitRect((BYTE*)desc.lpSurface,desc.lPitch,
+                     (BYTE*)attached->desc.lpSurface,attached->desc.lPitch,w,h);
+        }
+        if(IsPrimary()) RowanDDPresent(this);
+        return DD_OK;
+    }
 
     HRESULT SetPalette(LPDIRECTDRAWPALETTE p) {
         if(p) p->AddRef(); if(pal) pal->Release(); pal=p; return DD_OK;
@@ -173,17 +209,22 @@ struct IDirectDrawSurface7 {
     HRESULT PageUnlock(DWORD) { return DD_OK; }
     HRESULT IsLost() { return DD_OK; }
     HRESULT Restore() { return DD_OK; }
-    HRESULT SetColorKey(DWORD, DDCOLORKEY*) { return DD_OK; }
+    HRESULT SetColorKey(DWORD f, DDCOLORKEY* k) {
+        ckeyFlags=f; if(k) ckey=*k; return DD_OK;
+    }
 };
 
 // Definitions for the refcount helpers d3d.h's device declared while
 // IDirectDrawSurface7 was still incomplete.
-inline ULONG RowanSurf7AddRef(LPDIRECTDRAWSURFACE7 s) { return s?s->AddRef():0; }
-inline ULONG RowanSurf7Release(LPDIRECTDRAWSURFACE7 s) { return s?s->Release():0; }
+static inline ULONG RowanSurf7AddRef(LPDIRECTDRAWSURFACE7 s) { return s?s->AddRef():0; }
+static inline ULONG RowanSurf7Release(LPDIRECTDRAWSURFACE7 s) { return s?s->Release():0; }
 
 struct IDirectDraw7 {
     ULONG refCnt;
-    IDirectDraw7() : refCnt(1) {}
+    DWORD modeW, modeH, modeBPP;
+    HWND  hwnd;
+    DWORD coopFlags;
+    IDirectDraw7() : refCnt(1),modeW(640),modeH(480),modeBPP(16),hwnd(0),coopFlags(0) {}
     virtual HRESULT QueryInterface(REFIID riid, LPVOID* ppv) {
         if(!ppv) return DDERR_INVALIDPARAMS;
         if(riid==IID_IDirect3D7){ *ppv=new IDirect3D7; return DD_OK; }
@@ -191,9 +232,16 @@ struct IDirectDraw7 {
     }
     virtual ULONG AddRef() { return ++refCnt; }
     virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
-    HRESULT SetCooperativeLevel(HWND,DWORD) { return DD_OK; }
-    HRESULT SetDisplayMode(DWORD,DWORD,DWORD,DWORD,DWORD) { return DD_OK; }
+    HRESULT SetCooperativeLevel(HWND h,DWORD f) { hwnd=h; coopFlags=f; return DD_OK; }
+    HRESULT SetDisplayMode(DWORD w,DWORD h,DWORD bpp,DWORD,DWORD)
+        { modeW=w; modeH=h; modeBPP=bpp; return DD_OK; }
     HRESULT RestoreDisplayMode() { return DD_OK; }
+    void FillModeFormat(DDPIXELFORMAT& pf) const {
+        memset(&pf,0,sizeof(pf)); pf.dwSize=sizeof(pf); pf.dwFlags=DDPF_RGB;
+        pf.dwRGBBitCount=modeBPP;
+        if(modeBPP==32){pf.dwRBitMask=0x00ff0000;pf.dwGBitMask=0x0000ff00;pf.dwBBitMask=0x000000ff;}
+        else          {pf.dwRBitMask=0xf800;pf.dwGBitMask=0x07e0;pf.dwBBitMask=0x001f;}
+    }
     // Static mode list — the resolutions the game was authored for.
     HRESULT EnumDisplayModes(DWORD, LPDDSURFACEDESC2, LPVOID ctx, LPDDENUMMODESCALLBACK2 cb) {
         if(!cb) return DDERR_INVALIDPARAMS;
@@ -215,8 +263,23 @@ struct IDirectDraw7 {
     }
     HRESULT CreateSurface(LPDDSURFACEDESC2 d, LPDIRECTDRAWSURFACE7* out, IUnknown*) {
         if(!d||!out) return DDERR_INVALIDPARAMS;
+        // The game creates the primary with DDSD_CAPS only — inherit
+        // dimensions/format from the current display mode.
+        DDSURFACEDESC2 dd=*d;
+        if(!(dd.dwFlags&DDSD_WIDTH))  { dd.dwWidth=modeW;  dd.dwFlags|=DDSD_WIDTH; }
+        if(!(dd.dwFlags&DDSD_HEIGHT)) { dd.dwHeight=modeH; dd.dwFlags|=DDSD_HEIGHT; }
+        if(!(dd.dwFlags&DDSD_PIXELFORMAT) ||
+            (!dd.ddpfPixelFormat.dwRGBBitCount && !dd.ddpfPixelFormat.dwZBufferBitDepth)) {
+            if(dd.ddsCaps.dwCaps&DDSCAPS_ZBUFFER){
+                memset(&dd.ddpfPixelFormat,0,sizeof(dd.ddpfPixelFormat));
+                dd.ddpfPixelFormat.dwSize=sizeof(DDPIXELFORMAT);
+                dd.ddpfPixelFormat.dwFlags=DDPF_ZBUFFER;
+                dd.ddpfPixelFormat.dwZBufferBitDepth=16;
+            } else FillModeFormat(dd.ddpfPixelFormat);
+            dd.dwFlags|=DDSD_PIXELFORMAT;
+        }
         IDirectDrawSurface7* s=new IDirectDrawSurface7;
-        HRESULT hr=s->Alloc(d);
+        HRESULT hr=s->Alloc(&dd);
         if(hr!=DD_OK){s->Release();return hr;}
         *out=s;
         if(d->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) s->desc.ddsCaps.dwCaps|=DDSCAPS_FRONTBUFFER;
@@ -224,7 +287,9 @@ struct IDirectDraw7 {
         // back buffers atomically — lib3d then finds them via
         // GetAttachedSurface(DDSCAPS_BACKBUFFER).
         if((d->dwFlags&DDSD_BACKBUFFERCOUNT) && d->dwBackBufferCount>0) {
-            DDSURFACEDESC2 bd=*d;
+            // Copy the PATCHED desc (dd), not *d: the back buffer needs the
+            // inherited mode dimensions + pixel format too.
+            DDSURFACEDESC2 bd=dd;
             bd.dwFlags&=~DDSD_BACKBUFFERCOUNT;
             bd.ddsCaps.dwCaps&=~(DDSCAPS_PRIMARYSURFACE|DDSCAPS_COMPLEX|DDSCAPS_FLIP);
             bd.ddsCaps.dwCaps|=DDSCAPS_BACKBUFFER;
@@ -267,9 +332,8 @@ struct IDirectDraw7 {
     HRESULT GetDisplayMode(LPDDSURFACEDESC2 d) {
         if(!d) return DDERR_INVALIDPARAMS;
         memset(d,0,sizeof(*d)); d->dwSize=sizeof(*d);
-        d->dwWidth=640; d->dwHeight=480;
-        d->ddpfPixelFormat.dwSize=sizeof(DDPIXELFORMAT);
-        d->ddpfPixelFormat.dwFlags=DDPF_RGB; d->ddpfPixelFormat.dwRGBBitCount=16;
+        d->dwWidth=modeW; d->dwHeight=modeH;
+        FillModeFormat(d->ddpfPixelFormat);
         return DD_OK;
     }
     HRESULT GetFourCCCodes(LPDWORD n, LPDWORD c) { if(n)*n=0; return DD_OK; }
@@ -303,4 +367,9 @@ inline HRESULT DirectDrawCreateEx(GUID*, LPVOID* ppv, REFIID, IUnknown*) {
     if(!ppv) return DDERR_INVALIDPARAMS;
     *ppv=new IDirectDraw7; return DD_OK;
 }
+
+// The software rasterizer + out-of-line device members — needs the complete
+// IDirectDrawSurface7 above.
+#include "d3dsoft.h"
+
 #endif // ROWAN_COMPAT_DDRAW_H

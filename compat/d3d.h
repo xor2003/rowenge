@@ -10,6 +10,8 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
+#include <alloca.h>
 
 // Missing-name aliases used by lib3d.h
 typedef D3DDEVICEDESC7* LPD3DDEVICEDESC7;
@@ -271,10 +273,8 @@ typedef D3DDEVICEDESC7* LPD3DDEVICEDESC7;
 #define D3DVTXPCAPS_POSITIONALLIGHTS    0x00000010L
 #define D3DVTXPCAPS_LOCALVIEWER         0x00000020L
 
-// State-block capture bits
-#define D3DSBT_ALL          1
-#define D3DSBT_PIXELSTATE   2
-#define D3DSBT_VERTEXSTATE  3
+// State-block capture bits come from d3dtypes.h's D3DSTATEBLOCKTYPE enum
+// (D3DSBT_ALL/_PIXELSTATE/_VERTEXSTATE).
 
 // DX7 device IIDs (real SDK values; DEFINE_GUID emits static const per TU,
 // and lib3d compares device GUIDs by value)
@@ -349,14 +349,13 @@ struct IDirect3DVertexBuffer7 {
     HRESULT ProcessVertices(DWORD,DWORD,DWORD,LPDIRECT3DVERTEXBUFFER7,DWORD,LPDIRECT3DDEVICE7,DWORD){return D3D_OK;}
 };
 
-// Surfaces are incomplete here (ddraw.h pulls this header) — refcount them
-// through free helpers defined in ddraw.h once the struct is complete.
-inline ULONG RowanSurf7AddRef(LPDIRECTDRAWSURFACE7);
-inline ULONG RowanSurf7Release(LPDIRECTDRAWSURFACE7);
+// Rasterizer state lives in d3dsoft.h (needs the complete surface type).
+namespace Rast7 { struct State; }
+
 
 // The device records render/texture-stage state and hands back real values
-// for everything the game reads; draw calls are validated no-ops until the
-// Vulkan backend lands (mirroring mig's open flight-3D issue).
+// for everything the game reads; draw calls rasterize for real through the
+// Rast7 software pipeline defined in d3dsoft.h.
 struct IDirect3DDevice7 {
     ULONG        refCnt;
     DWORD        renderStates[256];
@@ -370,8 +369,13 @@ struct IDirect3DDevice7 {
     BOOL         lightEnabled[8];
     bool         inScene;
     DWORD        stateBlockCount;
+    Rast7::State* rast;
+    // Rast7::State is incomplete here; embed its storage so no destructor is
+    // needed (State is POD — d3dsoft.h static_asserts the fit).
+    BYTE         rastMem[4096];
 
-    IDirect3DDevice7() : refCnt(1),renderTarget(0),inScene(false),stateBlockCount(0) {
+    IDirect3DDevice7() : refCnt(1),renderTarget(0),inScene(false),
+                         stateBlockCount(0),rast(0) {
         memset(renderStates,0,sizeof(renderStates));
         memset(stageStates,0,sizeof(stageStates));
         memset(textures,0,sizeof(textures));
@@ -380,8 +384,43 @@ struct IDirect3DDevice7 {
         memset(&material,0,sizeof(material));
         memset(lights,0,sizeof(lights));
         memset(lightEnabled,0,sizeof(lightEnabled));
+        // DX7 render-state defaults (the ones the pipeline consults).
+        renderStates[D3DRENDERSTATE_ZFUNC]=D3DCMP_LESSEQUAL;
+        renderStates[D3DRENDERSTATE_ZWRITEENABLE]=TRUE;
+        renderStates[D3DRENDERSTATE_CULLMODE]=D3DCULL_CCW;
+        renderStates[D3DRENDERSTATE_SRCBLEND]=D3DBLEND_ONE;
+        renderStates[D3DRENDERSTATE_DESTBLEND]=D3DBLEND_ZERO;
+        renderStates[D3DRENDERSTATE_TEXTUREPERSPECTIVE]=TRUE;
+        renderStates[D3DRENDERSTATE_SHADEMODE]=D3DSHADE_GOURAUD;
+        renderStates[D3DRENDERSTATE_ALPHAFUNC]=D3DCMP_ALWAYS;
+        renderStates[D3DRENDERSTATE_TEXTUREFACTOR]=0xffffffff;
+        renderStates[D3DRENDERSTATE_FILLMODE]=D3DFILL_SOLID;
+        renderStates[D3DRENDERSTATE_DITHERENABLE]=TRUE;
+        renderStates[D3DRENDERSTATE_CLIPPING]=TRUE;
+        renderStates[D3DRENDERSTATE_LIGHTING]=TRUE;
+        // Stage-state defaults: stage0 modulates, others disabled; args and
+        // addressing match the DX7 spec.
+        for(int i=0;i<8;i++){
+            stageStates[i][D3DTSS_COLOROP]= i==0?D3DTOP_MODULATE:D3DTOP_DISABLE;
+            stageStates[i][D3DTSS_ALPHAOP]= i==0?D3DTOP_SELECTARG1:D3DTOP_DISABLE;
+            stageStates[i][D3DTSS_COLORARG1]=D3DTA_TEXTURE;
+            stageStates[i][D3DTSS_COLORARG2]=D3DTA_CURRENT;
+            stageStates[i][D3DTSS_ALPHAARG1]=D3DTA_TEXTURE;
+            stageStates[i][D3DTSS_ALPHAARG2]=D3DTA_CURRENT;
+            stageStates[i][D3DTSS_TEXCOORDINDEX]=i;
+            stageStates[i][D3DTSS_ADDRESS]=D3DTADDRESS_WRAP;
+            stageStates[i][D3DTSS_ADDRESSU]=D3DTADDRESS_WRAP;
+            stageStates[i][D3DTSS_ADDRESSV]=D3DTADDRESS_WRAP;
+            stageStates[i][D3DTSS_MAGFILTER]=D3DTFG_POINT;
+            stageStates[i][D3DTSS_MINFILTER]=D3DTFG_POINT;
+            stageStates[i][D3DTSS_MIPFILTER]=D3DTFP_NONE;
+            stageStates[i][D3DTSS_TEXTURETRANSFORMFLAGS]=D3DTTFF_DISABLE;
+        }
     }
-    // First three virtuals = IUnknown layout (see ddraw.h header note).
+    // Defined out-of-line in d3dsoft.h (needs the complete
+    // IDirectDrawSurface7 from ddraw.h).
+    void SyncRast();
+   // First three virtuals = IUnknown layout (see ddraw.h header note).
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv) {
         if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK;
     }
@@ -396,14 +435,12 @@ struct IDirect3DDevice7 {
         { if(s<8&&(DWORD)t<64)stageStates[s][t]=v; return D3D_OK; }
     HRESULT GetTextureStageState(DWORD s, D3DTEXTURESTAGESTATETYPE t, LPDWORD v)
         { if(v)*v=(s<8&&(DWORD)t<64)?stageStates[s][t]:0; return D3D_OK; }
-    HRESULT SetTexture(DWORD s, LPDIRECTDRAWSURFACE7 t)
-        { if(s<8){RowanSurf7AddRef(t);RowanSurf7Release(textures[s]);textures[s]=t;} return D3D_OK; }
-    HRESULT GetTexture(DWORD s, LPDIRECTDRAWSURFACE7* t)
-        { if(!t)return DDERR_INVALIDPARAMS; *t=(s<8)?textures[s]:0; RowanSurf7AddRef(*t); return D3D_OK; }
+    HRESULT SetTexture(DWORD s, LPDIRECTDRAWSURFACE7 t);   // in d3dsoft.h
+    HRESULT GetTexture(DWORD s, LPDIRECTDRAWSURFACE7* t);  // in d3dsoft.h
 
-    HRESULT BeginScene() { inScene=true; return D3D_OK; }
+    HRESULT BeginScene() { inScene=true; SyncRast(); return D3D_OK; }
     HRESULT EndScene()   { inScene=false; return D3D_OK; }
-    HRESULT Clear(DWORD,LPD3DRECT,DWORD,D3DCOLOR,D3DVALUE,DWORD) { return D3D_OK; }
+    HRESULT Clear(DWORD nRect,LPD3DRECT rects,DWORD flags,D3DCOLOR col,D3DVALUE z,DWORD);
 
     HRESULT SetTransform(D3DTRANSFORMSTATETYPE s, LPD3DMATRIX m)
         { if((DWORD)s<16&&m)transforms[s]=*m; return D3D_OK; }
@@ -424,14 +461,8 @@ struct IDirect3DDevice7 {
     HRESULT GetLightEnable(DWORD i, BOOL* e)
         { if(i<8&&e)*e=lightEnabled[i]; return D3D_OK; }
 
-    HRESULT SetRenderTarget(LPDIRECTDRAWSURFACE7 t, DWORD) {
-        RowanSurf7AddRef(t); RowanSurf7Release(renderTarget);
-        renderTarget=t; return D3D_OK;
-    }
-    HRESULT GetRenderTarget(LPDIRECTDRAWSURFACE7* t) {
-        if(!t)return DDERR_INVALIDPARAMS;
-        *t=renderTarget; RowanSurf7AddRef(*t); return D3D_OK;
-    }
+    HRESULT SetRenderTarget(LPDIRECTDRAWSURFACE7 t, DWORD);  // in d3dsoft.h
+    HRESULT GetRenderTarget(LPDIRECTDRAWSURFACE7* t);        // in d3dsoft.h
 
     HRESULT CreateStateBlock(D3DSTATEBLOCKTYPE, LPDWORD tok)
         { if(tok)*tok=++stateBlockCount; return D3D_OK; }
@@ -445,10 +476,14 @@ struct IDirect3DDevice7 {
     HRESULT ValidateDevice(LPDWORD passes) { if(passes)*passes=1; return D3D_OK; }
     HRESULT GetCaps(LPD3DDEVICEDESC7 d);
 
-    HRESULT DrawPrimitive(D3DPRIMITIVETYPE,DWORD,LPVOID,DWORD,DWORD){return D3D_OK;}
-    HRESULT DrawIndexedPrimitive(D3DPRIMITIVETYPE,DWORD,LPVOID,DWORD,LPWORD,DWORD,DWORD){return D3D_OK;}
-    HRESULT DrawPrimitiveVB(D3DPRIMITIVETYPE,LPDIRECT3DVERTEXBUFFER7,DWORD,DWORD,DWORD){return D3D_OK;}
-    HRESULT DrawIndexedPrimitiveVB(D3DPRIMITIVETYPE,LPDIRECT3DVERTEXBUFFER7,DWORD,DWORD,LPWORD,DWORD,DWORD){return D3D_OK;}
+    // --- rasterized draw entry points (defined in d3dsoft.h) -------------
+    HRESULT DrawPrimitive(D3DPRIMITIVETYPE pt,DWORD fvf,LPVOID verts,DWORD n,DWORD);
+    HRESULT DrawIndexedPrimitive(D3DPRIMITIVETYPE pt,DWORD fvf,LPVOID verts,DWORD nv,
+                                 LPWORD idx,DWORD ni,DWORD);
+    HRESULT DrawPrimitiveVB(D3DPRIMITIVETYPE pt,LPDIRECT3DVERTEXBUFFER7 vb,
+                            DWORD start,DWORD n,DWORD);
+    HRESULT DrawIndexedPrimitiveVB(D3DPRIMITIVETYPE pt,LPDIRECT3DVERTEXBUFFER7 vb,
+                                   DWORD start,DWORD nv,LPWORD idx,DWORD ni,DWORD);
     HRESULT DrawPrimitiveStrided(D3DPRIMITIVETYPE,DWORD,void*,DWORD,DWORD){return D3D_OK;}
     HRESULT DrawIndexedPrimitiveStrided(D3DPRIMITIVETYPE,DWORD,void*,DWORD,LPWORD,DWORD,DWORD){return D3D_OK;}
     HRESULT ComputeSphereVisibility(LPD3DVECTOR,LPD3DVALUE,DWORD,DWORD,LPDWORD){return D3D_OK;}
