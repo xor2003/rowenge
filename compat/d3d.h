@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <alloca.h>
+#include <map>
 
 // Missing-name aliases used by lib3d.h
 typedef D3DDEVICEDESC7* LPD3DDEVICEDESC7;
@@ -357,6 +358,12 @@ struct IDirect3DVertexBuffer7 {
 // Rasterizer state lives in d3dsoft.h (needs the complete surface type).
 namespace Rast7 { struct State; }
 
+// Recorded device state for Begin/End and Create state blocks (d3dsoft.h).
+struct RowanSBlock {
+    DWORD rs[256]; DWORD ss[8][64]; LPDIRECTDRAWSURFACE7 tex[8];
+    BYTE rsM[32], ssM[64]; BYTE texM;   // capture masks (bit per state)
+};
+
 
 // The device records render/texture-stage state and hands back real values
 // for everything the game reads; draw calls rasterize for real through the
@@ -374,13 +381,16 @@ struct IDirect3DDevice7 {
     BOOL         lightEnabled[8];
     bool         inScene;
     DWORD        stateBlockCount;
+    std::map<DWORD,RowanSBlock*> sblocks;
+    bool         sbRec;
+    BYTE         recRS[32], recSS[64], recTex;
     Rast7::State* rast;
     // Rast7::State is incomplete here; embed its storage so no destructor is
     // needed (State is POD — d3dsoft.h static_asserts the fit).
     BYTE         rastMem[4096];
 
     IDirect3DDevice7() : refCnt(1),renderTarget(0),inScene(false),
-                         stateBlockCount(0),rast(0) {
+                         stateBlockCount(0),sbRec(false),rast(0) {
         memset(renderStates,0,sizeof(renderStates));
         memset(stageStates,0,sizeof(stageStates));
         memset(textures,0,sizeof(textures));
@@ -389,6 +399,9 @@ struct IDirect3DDevice7 {
         memset(&material,0,sizeof(material));
         memset(lights,0,sizeof(lights));
         memset(lightEnabled,0,sizeof(lightEnabled));
+        memset(recRS,0,sizeof(recRS));
+        memset(recSS,0,sizeof(recSS));
+        recTex=0;
         // DX7 render-state defaults (the ones the pipeline consults).
         renderStates[D3DRENDERSTATE_ZFUNC]=D3DCMP_LESSEQUAL;
         renderStates[D3DRENDERSTATE_ZWRITEENABLE]=TRUE;
@@ -432,12 +445,22 @@ struct IDirect3DDevice7 {
     virtual ULONG AddRef() { return ++refCnt; }
     virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
 
-    HRESULT SetRenderState(D3DRENDERSTATETYPE s, DWORD v)
-        { if((DWORD)s<256)renderStates[s]=v; return D3D_OK; }
+    HRESULT SetRenderState(D3DRENDERSTATETYPE s, DWORD v) {
+        if((DWORD)s<256) {
+            renderStates[s]=v;
+            if(sbRec) recRS[s>>3]|=(BYTE)(1<<(s&7));
+        }
+        return D3D_OK;
+    }
     HRESULT GetRenderState(D3DRENDERSTATETYPE s, LPDWORD v)
         { if(v)*v=(DWORD)s<256?renderStates[s]:0; return D3D_OK; }
-    HRESULT SetTextureStageState(DWORD s, D3DTEXTURESTAGESTATETYPE t, DWORD v)
-        { if(s<8&&(DWORD)t<64)stageStates[s][t]=v; return D3D_OK; }
+    HRESULT SetTextureStageState(DWORD s, D3DTEXTURESTAGESTATETYPE t, DWORD v) {
+        if(s<8&&(DWORD)t<64) {
+            stageStates[s][t]=v;
+            if(sbRec) recSS[(s*64+t)>>3]|=(BYTE)(1<<((s*64+t)&7));
+        }
+        return D3D_OK;
+    }
     HRESULT GetTextureStageState(DWORD s, D3DTEXTURESTAGESTATETYPE t, LPDWORD v)
         { if(v)*v=(s<8&&(DWORD)t<64)?stageStates[s][t]:0; return D3D_OK; }
     HRESULT SetTexture(DWORD s, LPDIRECTDRAWSURFACE7 t);   // in d3dsoft.h
@@ -469,13 +492,13 @@ struct IDirect3DDevice7 {
     HRESULT SetRenderTarget(LPDIRECTDRAWSURFACE7 t, DWORD);  // in d3dsoft.h
     HRESULT GetRenderTarget(LPDIRECTDRAWSURFACE7* t);        // in d3dsoft.h
 
-    HRESULT CreateStateBlock(D3DSTATEBLOCKTYPE, LPDWORD tok)
-        { if(tok)*tok=++stateBlockCount; return D3D_OK; }
-    HRESULT ApplyStateBlock(DWORD) { return D3D_OK; }
-    HRESULT DeleteStateBlock(DWORD) { return D3D_OK; }
-    HRESULT CaptureStateBlock(DWORD) { return D3D_OK; }
-    HRESULT BeginStateBlock() { return D3D_OK; }
-    HRESULT EndStateBlock(LPDWORD t) { if(t)*t=++stateBlockCount; return D3D_OK; }
+    // State blocks record/restore device state for real (d3dsoft.h).
+    HRESULT CreateStateBlock(D3DSTATEBLOCKTYPE, LPDWORD tok);
+    HRESULT ApplyStateBlock(DWORD tok);
+    HRESULT DeleteStateBlock(DWORD tok);
+    HRESULT CaptureStateBlock(DWORD tok);
+    HRESULT BeginStateBlock();
+    HRESULT EndStateBlock(LPDWORD t);
 
     HRESULT EnumTextureFormats(LPD3DENUMPIXELFORMATSCALLBACK cb, LPVOID ctx);
     HRESULT ValidateDevice(LPDWORD passes) { if(passes)*passes=1; return D3D_OK; }

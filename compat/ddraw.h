@@ -83,6 +83,12 @@ static inline void RowanDDPresent(IDirectDrawSurface7* s) {
     if(RowanDDPresentHook) RowanDDPresentHook(s);
 }
 
+// Format-converting blit path — defined in d3dsoft.h (needs Pack/Unpack/ReadPx).
+// Real DD converts pixel formats on blit; the memcpy path is same-format only.
+HRESULT RowanBltFormat(IDirectDrawSurface7* dst, LPRECT dstR,
+                       IDirectDrawSurface7* src, LPRECT srcR,
+                       DWORD flags, LPDDBLTFX fx);
+
 struct IDirectDrawSurface7 {
     DDSURFACEDESC2      desc;
     IDirectDrawPalette* pal;
@@ -179,6 +185,18 @@ struct IDirectDrawSurface7 {
         if(dstH>desc.dwHeight-(DWORD)dy) dstH=desc.dwHeight-(DWORD)dy;
         if(srcW>src->desc.dwWidth-(DWORD)sx) srcW=src->desc.dwWidth-(DWORD)sx;
         if(srcH>src->desc.dwHeight-(DWORD)sy) srcH=src->desc.dwHeight-(DWORD)sy;
+        // Different pixel formats need real conversion (8bpp HUD/font sheets
+        // -> 16bpp frame is the common case: raw memcpy paints index bytes).
+        const DDPIXELFORMAT& spf=src->desc.ddpfPixelFormat;
+        const DDPIXELFORMAT& dpf=desc.ddpfPixelFormat;
+        if(spf.dwRGBBitCount!=dpf.dwRGBBitCount || spf.dwRBitMask!=dpf.dwRBitMask ||
+           spf.dwGBitMask!=dpf.dwGBitMask || spf.dwBBitMask!=dpf.dwBBitMask ||
+           spf.dwRGBAlphaBitMask!=dpf.dwRGBAlphaBitMask ||
+           ((spf.dwFlags^dpf.dwFlags)&DDPF_PALETTEINDEXED8)){
+            HRESULT r=RowanBltFormat(this,dst,src,srcr,flags,fx);
+            if(IsPrimary()) RowanDDPresent(this);
+            return r;
+        }
         BYTE* db=(BYTE*)desc.lpSurface+dy*desc.lPitch+dx*bpp;
         const BYTE* sb=(const BYTE*)src->desc.lpSurface+sy*src->desc.lPitch+sx*bpp;
         if(srcW==dstW && srcH==dstH) {
@@ -197,8 +215,21 @@ struct IDirectDrawSurface7 {
         if(IsPrimary()) RowanDDPresent(this);
         return DD_OK;
     }
-    HRESULT BltFast(DWORD x,DWORD y,LPDIRECTDRAWSURFACE7 src,LPRECT,DWORD){
+    HRESULT BltFast(DWORD x,DWORD y,LPDIRECTDRAWSURFACE7 src,LPRECT r,DWORD fl){
         if(!src) return DD_OK;
+        const DDPIXELFORMAT& spf=src->desc.ddpfPixelFormat;
+        const DDPIXELFORMAT& dpf=desc.ddpfPixelFormat;
+        if(spf.dwRGBBitCount!=dpf.dwRGBBitCount || spf.dwRBitMask!=dpf.dwRBitMask ||
+           spf.dwGBitMask!=dpf.dwGBitMask || spf.dwBBitMask!=dpf.dwBBitMask ||
+           spf.dwRGBAlphaBitMask!=dpf.dwRGBAlphaBitMask ||
+           ((spf.dwFlags^dpf.dwFlags)&DDPF_PALETTEINDEXED8)){
+            RECT d={ (LONG)x,(LONG)y,
+                     (LONG)x+(r?r->right-r->left:(LONG)src->desc.dwWidth),
+                     (LONG)y+(r?r->bottom-r->top:(LONG)src->desc.dwHeight) };
+            HRESULT hr=RowanBltFormat(this,&d,src,r,fl,0);
+            if(IsPrimary()) RowanDDPresent(this);
+            return hr;
+        }
         DWORD bpp=desc.ddpfPixelFormat.dwRGBBitCount/8; if(!bpp)bpp=2;
         DWORD w=src->desc.dwWidth*bpp,h=src->desc.dwHeight;
         BlitRect((BYTE*)desc.lpSurface+y*desc.lPitch+x*bpp,desc.lPitch,

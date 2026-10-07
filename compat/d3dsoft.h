@@ -474,7 +474,10 @@ inline HRESULT IDirect3D7::CreateDevice(REFCLSID, LPDIRECTDRAWSURFACE7 surf,
 }
 
 inline HRESULT IDirect3DDevice7::SetTexture(DWORD s, LPDIRECTDRAWSURFACE7 t) {
-    if(s<8){RowanSurf7AddRef(t);RowanSurf7Release(textures[s]);textures[s]=t;}
+    if(s<8){
+        RowanSurf7AddRef(t);RowanSurf7Release(textures[s]);textures[s]=t;
+        if(sbRec) recTex|=(BYTE)(1<<s);
+    }
     return D3D_OK;
 }
 inline HRESULT IDirect3DDevice7::GetTexture(DWORD s, LPDIRECTDRAWSURFACE7* t) {
@@ -488,6 +491,108 @@ inline HRESULT IDirect3DDevice7::SetRenderTarget(LPDIRECTDRAWSURFACE7 t, DWORD) 
 inline HRESULT IDirect3DDevice7::GetRenderTarget(LPDIRECTDRAWSURFACE7* t) {
     if(!t)return DDERR_INVALIDPARAMS;
     *t=renderTarget; RowanSurf7AddRef(*t); return D3D_OK;
+}
+
+// ---- state blocks ----------------------------------------------------------
+// PIXELSTATE captures the DX7 pixel render states (D3DHAL list), every
+// texture-stage state, and the bound textures.  VERTEXSTATE captures the
+// remaining render states only (transforms/lights/material are not tracked).
+static const DWORD RowanPixRS[] = {
+    7,8,9,10,14,15,16,19,20,23,24,25,26,27,33,36,37,38,40,47,
+    52,53,54,55,56,57,58,59,60,128,129,130,131,132,133,134,135 };
+inline void RowanSBlockFill(RowanSBlock* b, DWORD st, const RowanSBlock* cur) {
+    memcpy(b,cur,sizeof(*b));
+    memset(b->rsM,0,sizeof(b->rsM));
+    memset(b->ssM,0,sizeof(b->ssM));
+    b->texM=0;
+    if(st==D3DSBT_ALL || st==D3DSBT_PIXELSTATE) {
+        for(unsigned i=0;i<sizeof(RowanPixRS)/sizeof(*RowanPixRS);i++)
+            b->rsM[RowanPixRS[i]>>3]|=(BYTE)(1<<(RowanPixRS[i]&7));
+        memset(b->ssM,0xff,sizeof(b->ssM));
+        b->texM=0xff;
+    }
+    if(st==D3DSBT_ALL || st==D3DSBT_VERTEXSTATE) {
+        BYTE pix[32]; memset(pix,0,sizeof(pix));
+        for(unsigned i=0;i<sizeof(RowanPixRS)/sizeof(*RowanPixRS);i++)
+            pix[RowanPixRS[i]>>3]|=(BYTE)(1<<(RowanPixRS[i]&7));
+        if(st==D3DSBT_ALL)
+            memset(b->rsM,0xff,sizeof(b->rsM));
+        else
+            for(int i=0;i<32;i++) b->rsM[i]=(BYTE)~pix[i];
+    }
+}
+inline HRESULT IDirect3DDevice7::CreateStateBlock(D3DSTATEBLOCKTYPE st, LPDWORD tok) {
+    if(!tok) return DDERR_INVALIDPARAMS;
+    if(st!=D3DSBT_ALL && st!=D3DSBT_PIXELSTATE && st!=D3DSBT_VERTEXSTATE)
+        return DDERR_INVALIDPARAMS;
+    RowanSBlock* b=new RowanSBlock;
+    RowanSBlock cur;
+    memcpy(cur.rs,renderStates,sizeof(cur.rs));
+    memcpy(cur.ss,stageStates,sizeof(cur.ss));
+    memcpy(cur.tex,textures,sizeof(cur.tex));
+    RowanSBlockFill(b,st,&cur);
+    for(int i=0;i<8;i++) RowanSurf7AddRef(b->tex[i]);
+    DWORD t=++stateBlockCount;
+    sblocks[t]=b; *tok=t;
+    return D3D_OK;
+}
+inline HRESULT IDirect3DDevice7::ApplyStateBlock(DWORD tok) {
+    std::map<DWORD,RowanSBlock*>::iterator it=sblocks.find(tok);
+    if(it==sblocks.end()) return DDERR_INVALIDPARAMS;
+    RowanSBlock* b=it->second;
+    for(int i=0;i<256;i++)
+        if(b->rsM[i>>3]&(BYTE)(1<<(i&7))) renderStates[i]=b->rs[i];
+    for(int s=0;s<8;s++) for(int i=0;i<64;i++)
+        if(b->ssM[(s*64+i)>>3]&(BYTE)(1<<((s*64+i)&7))) stageStates[s][i]=b->ss[s][i];
+    for(int s=0;s<8;s++) if(b->texM&(BYTE)(1<<s)) {
+        RowanSurf7AddRef(b->tex[s]); RowanSurf7Release(textures[s]);
+        textures[s]=b->tex[s];
+    }
+    return D3D_OK;
+}
+inline HRESULT IDirect3DDevice7::CaptureStateBlock(DWORD tok) {
+    std::map<DWORD,RowanSBlock*>::iterator it=sblocks.find(tok);
+    if(it==sblocks.end()) return DDERR_INVALIDPARAMS;
+    RowanSBlock* b=it->second;
+    for(int i=0;i<256;i++)
+        if(b->rsM[i>>3]&(BYTE)(1<<(i&7))) b->rs[i]=renderStates[i];
+    for(int s=0;s<8;s++) for(int i=0;i<64;i++)
+        if(b->ssM[(s*64+i)>>3]&(BYTE)(1<<((s*64+i)&7))) b->ss[s][i]=stageStates[s][i];
+    for(int s=0;s<8;s++) if(b->texM&(BYTE)(1<<s)) {
+        RowanSurf7AddRef(textures[s]); RowanSurf7Release(b->tex[s]);
+        b->tex[s]=textures[s];
+    }
+    return D3D_OK;
+}
+inline HRESULT IDirect3DDevice7::DeleteStateBlock(DWORD tok) {
+    std::map<DWORD,RowanSBlock*>::iterator it=sblocks.find(tok);
+    if(it==sblocks.end()) return DDERR_INVALIDPARAMS;
+    RowanSBlock* b=it->second;
+    for(int i=0;i<8;i++) RowanSurf7Release(b->tex[i]);
+    delete b; sblocks.erase(it);
+    return D3D_OK;
+}
+inline HRESULT IDirect3DDevice7::BeginStateBlock() {
+    if(sbRec) return DDERR_GENERIC;
+    sbRec=true;
+    memset(recRS,0,sizeof(recRS)); memset(recSS,0,sizeof(recSS)); recTex=0;
+    return D3D_OK;
+}
+inline HRESULT IDirect3DDevice7::EndStateBlock(LPDWORD t) {
+    if(!sbRec) return DDERR_GENERIC;
+    sbRec=false;
+    RowanSBlock* b=new RowanSBlock;
+    memcpy(b->rs,renderStates,sizeof(b->rs));
+    memcpy(b->ss,stageStates,sizeof(b->ss));
+    memcpy(b->tex,textures,sizeof(b->tex));
+    memcpy(b->rsM,recRS,sizeof(b->rsM));
+    memcpy(b->ssM,recSS,sizeof(b->ssM));
+    b->texM=recTex;
+    for(int i=0;i<8;i++) RowanSurf7AddRef(b->tex[i]);
+    DWORD tok=++stateBlockCount;
+    sblocks[tok]=b;
+    if(t) *t=tok;
+    return D3D_OK;
 }
 
 inline void IDirect3DDevice7::SyncRast() {
@@ -589,6 +694,53 @@ inline HRESULT IDirect3DDevice7::DrawIndexedPrimitiveVB(D3DPRIMITIVETYPE pt,
         Rast7::DecodeVert(vb->fvf,vb->data+(start+idx[i])*stride,dv[i]);
     Rast7::EmitPrim(*rast,pt,dv,ni);
     return D3D_OK;
+}
+
+// --- format-converting blit (ddraw.h Blt/BltFast delegate here) -------------
+// Real DD converts pixel formats during Blt; the fast path in ddraw.h only
+// handles identical formats. Nearest-neighbour for stretches (mip upload and
+// HUD sheets both take this path). Source colour-keyed blits compare the raw
+// source pixel, same as the hardware.
+inline HRESULT RowanBltFormat(IDirectDrawSurface7* dst, LPRECT dstR,
+                              IDirectDrawSurface7* src, LPRECT srcR,
+                              DWORD flags, LPDDBLTFX fx) {
+    if(!dst||!src||!dst->desc.lpSurface||!src->desc.lpSurface) return DD_OK;
+    LONG dx=dstR?dstR->left:0, dy=dstR?dstR->top:0;
+    LONG sx0=srcR?srcR->left:0, sy0=srcR?srcR->top:0;
+    DWORD srcW=srcR?(DWORD)(srcR->right-srcR->left):src->desc.dwWidth;
+    DWORD srcH=srcR?(DWORD)(srcR->bottom-srcR->top):src->desc.dwHeight;
+    DWORD dstW=dstR?(DWORD)(dstR->right-dstR->left):dst->desc.dwWidth;
+    DWORD dstH=dstR?(DWORD)(dstR->bottom-dstR->top):dst->desc.dwHeight;
+    if(!srcW||!srcH||!dstW||!dstH) return DD_OK;
+    Rast7::PixFmt sf,df;
+    Rast7::DecodePF(src->desc.ddpfPixelFormat,sf);
+    Rast7::DecodePF(dst->desc.ddpfPixelFormat,df);
+    Rast7::Surf ss{src,sf,sf.bits};
+    DWORD klo=0,khi=0; bool keyed=false;
+    if(flags&DDBLT_KEYSRCOVERRIDE && fx){
+        klo=fx->ddckSrcColorkey.dwColorSpaceLowValue;
+        khi=fx->ddckSrcColorkey.dwColorSpaceHighValue; keyed=true;
+    } else if((flags&DDBLT_KEYSRC) && (src->ckeyFlags&DDCKEY_SRCBLT)){
+        klo=src->ckey.dwColorSpaceLowValue; khi=src->ckey.dwColorSpaceHighValue;
+        keyed=true;
+    }
+    DWORD sbits=src->desc.ddpfPixelFormat.dwRGBBitCount?src->desc.ddpfPixelFormat.dwRGBBitCount:32;
+    DWORD smask=sbits>=32?0xffffffffu:((1u<<sbits)-1);
+    for(DWORD y=0;y<dstH;y++){
+        LONG ddy=dy+(LONG)y; if(ddy<0||ddy>=(LONG)dst->desc.dwHeight) continue;
+        DWORD sy=(DWORD)sy0+y*srcH/dstH;
+        if(sy>=src->desc.dwHeight) continue;
+        for(DWORD x=0;x<dstW;x++){
+            LONG ddx=dx+(LONG)x; if(ddx<0||ddx>=(LONG)dst->desc.dwWidth) continue;
+            DWORD sx=(DWORD)sx0+x*srcW/dstW;
+            if(sx>=src->desc.dwWidth) continue;
+            DWORD raw=Rast7::ReadPx(src,sx,sy);
+            if(keyed){DWORD v=raw&smask;if(v>=klo&&v<=khi)continue;}
+            DWORD c=Rast7::UnpackPx(ss,raw);
+            Rast7::WritePx(dst,(DWORD)ddx,(DWORD)ddy,Rast7::Pack(c,df));
+        }
+    }
+    return DD_OK;
 }
 #pragma pack(pop)
 #endif // ROWAN_COMPAT_D3DSOFT_H
