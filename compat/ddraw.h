@@ -33,8 +33,8 @@ struct IDirectDrawPalette {
     IDirectDrawPalette() : refCnt(1) {}
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
         { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return DD_OK; }
-    virtual ULONG AddRef() { return ++refCnt; }
-    virtual ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
+    virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }
     HRESULT GetEntries(DWORD f,DWORD n,DWORD c,PALETTEENTRY* e)
         { if(!e) return DDERR_INVALIDPARAMS; memcpy(e,entries+f,c*sizeof(PALETTEENTRY)); return DD_OK; }
     HRESULT SetEntries(DWORD f,DWORD n,DWORD c,PALETTEENTRY* e)
@@ -46,8 +46,8 @@ struct IDirectDrawClipper {
     IDirectDrawClipper() : refCnt(1) {}
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
         { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return DD_OK; }
-    virtual ULONG AddRef() { return ++refCnt; }
-    virtual ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
+    virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }
     HRESULT SetHWnd(DWORD, HWND) { return DD_OK; }
     HRESULT SetClipList(void*,DWORD) { return DD_OK; }
 };
@@ -58,8 +58,8 @@ struct IDirectDrawGammaControl {
     IDirectDrawGammaControl() : refCnt(1) { memset(&ramp,0,sizeof(ramp)); }
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
         { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return DD_OK; }
-    virtual ULONG AddRef() { return ++refCnt; }
-    virtual ULONG Release() { if (--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
+    virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }
     HRESULT GetGammaRamp(DWORD, LPVOID r)
         { if(r)memcpy(r,&ramp,sizeof(ramp)); return DD_OK; }
     HRESULT SetGammaRamp(DWORD, LPVOID r)
@@ -72,6 +72,59 @@ struct IDirectDrawGammaControl {
 // window.  Weak storage so every includer shares one pointer and TUs that
 // never install a hook still link.
 struct IDirectDrawSurface7;
+
+// Clip a source-rect->dest-rect blit against both surfaces.  dst coords may
+// be negative (partially off-screen HUD text) or arrive wrapped as huge
+// DWORDs; the old code turned those into memcpy()s outside the malloc'd
+// pixel buffers — glibc then died in unlink_chunk with "corrupted
+// double-linked list".  Adjusts src proportionally so stretched blits keep
+// their mapping.  Returns false when the blit is fully clipped.
+inline bool RowanClipBlt(LONG& sx, LONG& sy, LONG& dx, LONG& dy,
+                         DWORD& sw, DWORD& sh, DWORD& dw, DWORD& dh,
+                         DWORD srcW, DWORD srcH, DWORD dstLimW, DWORD dstLimH)
+{
+    if (!sw || !sh || !dw || !dh) return false;
+    // src rect into [0,srcW]x[0,srcH]; dst shifts by the scaled offset
+    if (sx < 0) {
+        LONG o = -sx;
+        LONG od = (LONG)((long long)o * dw / sw);
+        sx = 0;
+        sw = sw > (DWORD)o ? sw - o : 0;
+        dx += od;
+        dw = dw > (DWORD)od ? dw - od : 0;
+    }
+    if (sy < 0) {
+        LONG o = -sy;
+        LONG od = (LONG)((long long)o * dh / sh);
+        sy = 0;
+        sh = sh > (DWORD)o ? sh - o : 0;
+        dy += od;
+        dh = dh > (DWORD)od ? dh - od : 0;
+    }
+    if (sx > (LONG)srcW) sw = 0; else if (sx + (LONG)sw > (LONG)srcW) sw = srcW - (DWORD)sx;
+    if (sy > (LONG)srcH) sh = 0; else if (sy + (LONG)sh > (LONG)srcH) sh = srcH - (DWORD)sy;
+    if (!sw || !sh || !dw || !dh) return false;
+    // dst rect into [0,dstLimW]x[0,dstLimH]; src shifts by the scaled offset
+    if (dx < 0) {
+        LONG o = -dx;
+        LONG os = (LONG)((long long)o * sw / dw);
+        dx = 0;
+        dw = dw > (DWORD)o ? dw - o : 0;
+        sx += os;
+        sw = sw > (DWORD)os ? sw - os : 0;
+    }
+    if (dy < 0) {
+        LONG o = -dy;
+        LONG os = (LONG)((long long)o * sh / dh);
+        dy = 0;
+        dh = dh > (DWORD)o ? dh - o : 0;
+        sy += os;
+        sh = sh > (DWORD)os ? sh - os : 0;
+    }
+    if (dx > (LONG)dstLimW) dw = 0; else if (dx + (LONG)dw > (LONG)dstLimW) dw = dstLimW - (DWORD)dx;
+    if (dy > (LONG)dstLimH) dh = 0; else if (dy + (LONG)dh > (LONG)dstLimH) dh = dstLimH - (DWORD)dy;
+    return sw && sh && dw && dh;
+}
 extern "C" {
 #if defined(__GNUC__)
 __attribute__((weak)) void (*RowanDDPresentHook)(IDirectDrawSurface7*) = 0;
@@ -113,6 +166,10 @@ struct IDirectDrawSurface7 {
         if (!bpp) bpp = desc.ddpfPixelFormat.dwZBufferBitDepth;
         if (!bpp) bpp = 16;
         if (!desc.lPitch) desc.lPitch = PitchFor(desc.dwWidth?desc.dwWidth:1,bpp);
+        // DX7 treats lpSurface as output-only on create — a stale garbage
+        // pointer in the caller's desc must not become our backing store.
+        if (desc.lpSurface && desc.lpSurface != pixels)
+            desc.lpSurface = 0;
         if (!desc.lpSurface) {
             pixels=(BYTE*)calloc(1, (size_t)desc.lPitch*(desc.dwHeight?desc.dwHeight:1)+16);
             if(!pixels) return DDERR_OUTOFMEMORY;
@@ -126,15 +183,15 @@ struct IDirectDrawSurface7 {
         if(riid==IID_IDirectDrawGammaControl){*ppv=new IDirectDrawGammaControl;return DD_OK;}
         *ppv=this; AddRef(); return DD_OK;
     }
-    virtual ULONG AddRef() { return ++refCnt; }
-    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
+    virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }
 
     HRESULT Lock(LPRECT, LPDDSURFACEDESC2 lpDdsd, DWORD, HANDLE) {
         if(!lpDdsd) return DDERR_INVALIDPARAMS;
         *lpDdsd = desc; lpDdsd->dwSize = sizeof(*lpDdsd);
         return DD_OK;
     }
-    HRESULT Unlock(LPRECT) { return DD_OK; }
+    HRESULT Unlock(LPRECT) { if(IsPrimary()) RowanDDPresent(this); return DD_OK; }
 
     HRESULT GetSurfaceDesc(LPDDSURFACEDESC2 lpDdsd) {
         if(!lpDdsd) return DDERR_INVALIDPARAMS;
@@ -181,10 +238,9 @@ struct IDirectDrawSurface7 {
         DWORD srcH=srcr?(DWORD)(srcr->bottom-srcr->top):src->desc.dwHeight;
         DWORD dstW=dst?(DWORD)(dst->right-dst->left):desc.dwWidth;
         DWORD dstH=dst?(DWORD)(dst->bottom-dst->top):desc.dwHeight;
-        if(dstW>desc.dwWidth-(DWORD)dx) dstW=desc.dwWidth-(DWORD)dx;
-        if(dstH>desc.dwHeight-(DWORD)dy) dstH=desc.dwHeight-(DWORD)dy;
-        if(srcW>src->desc.dwWidth-(DWORD)sx) srcW=src->desc.dwWidth-(DWORD)sx;
-        if(srcH>src->desc.dwHeight-(DWORD)sy) srcH=src->desc.dwHeight-(DWORD)sy;
+        if(!RowanClipBlt(sx,sy,dx,dy,srcW,srcH,dstW,dstH,
+                         src->desc.dwWidth,src->desc.dwHeight,
+                         desc.dwWidth,desc.dwHeight)) return DD_OK;
         // Different pixel formats need real conversion (8bpp HUD/font sheets
         // -> 16bpp frame is the common case: raw memcpy paints index bytes).
         const DDPIXELFORMAT& spf=src->desc.ddpfPixelFormat;
@@ -231,9 +287,18 @@ struct IDirectDrawSurface7 {
             return hr;
         }
         DWORD bpp=desc.ddpfPixelFormat.dwRGBBitCount/8; if(!bpp)bpp=2;
-        DWORD w=src->desc.dwWidth*bpp,h=src->desc.dwHeight;
-        BlitRect((BYTE*)desc.lpSurface+y*desc.lPitch+x*bpp,desc.lPitch,
-                 (BYTE*)src->desc.lpSurface,src->desc.lPitch,w,h);
+        // x/y are DWORDs in the API, but callers hand us wrapped negatives
+        // for partially off-screen blits — clip like real DD does.
+        LONG dx=(LONG)x, dy=(LONG)y;
+        LONG sx=r?r->left:0, sy=r?r->top:0;
+        DWORD w=r?(DWORD)(r->right-r->left):src->desc.dwWidth;
+        DWORD h=r?(DWORD)(r->bottom-r->top):src->desc.dwHeight;
+        if(!RowanClipBlt(sx,sy,dx,dy,w,h,w,h,
+                         src->desc.dwWidth,src->desc.dwHeight,
+                         desc.dwWidth,desc.dwHeight)) return DD_OK;
+        BlitRect((BYTE*)desc.lpSurface+dy*desc.lPitch+dx*bpp,desc.lPitch,
+                 (BYTE*)src->desc.lpSurface+sy*src->desc.lPitch+sx*bpp,
+                 src->desc.lPitch,w*bpp,h);
         if(IsPrimary()) RowanDDPresent(this);
         return DD_OK;
     }
@@ -287,8 +352,8 @@ struct IDirectDraw7 {
         if(riid==IID_IDirect3D7){ *ppv=new IDirect3D7; return DD_OK; }
         *ppv=this; AddRef(); return DD_OK;
     }
-    virtual ULONG AddRef() { return ++refCnt; }
-    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
+    virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }
     HRESULT SetCooperativeLevel(HWND h,DWORD f) { hwnd=h; coopFlags=f; return DD_OK; }
     HRESULT SetDisplayMode(DWORD w,DWORD h,DWORD bpp,DWORD,DWORD)
         { modeW=w; modeH=h; modeBPP=bpp; return DD_OK; }
@@ -380,7 +445,10 @@ struct IDirectDraw7 {
     }
     HRESULT GetCaps(LPDDCAPS hal, LPDDCAPS) {
         if(hal){ memset(hal,0,sizeof(*hal)); hal->dwSize=sizeof(*hal);
-                 hal->dwCaps=DDCAPS_3D|DDCAPS_BLT|DDCAPS_GDI;
+                 // BLTFOURCC tells lib3d our Blt converts pixel formats, so
+                 // it skips PerformSlowCopy — which drops destination alpha
+                 // bits (ARGB4444 textures loaded fully transparent).
+                 hal->dwCaps=DDCAPS_3D|DDCAPS_BLT|DDCAPS_GDI|DDCAPS_BLTFOURCC|DDCAPS_BLTSTRETCH;
                  hal->dwVidMemTotal=64*1024*1024; hal->dwVidMemFree=48*1024*1024; }
         return DD_OK;
     }

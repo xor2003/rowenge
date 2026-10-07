@@ -311,6 +311,7 @@ typedef IDirect3DVertexBuffer7* LPDIRECT3DVERTEXBUFFER7;
 
 // Vertex buffers are real malloc'd stores — Lock/Unlock hand the game
 // working memory so VB upload paths execute for real.
+namespace Rast7 { inline DWORD FvfStride(DWORD f); }   // defined in d3dsoft.h
 struct IDirect3DVertexBuffer7 {
     ULONG  refCnt;
     BYTE*  data;
@@ -325,14 +326,17 @@ struct IDirect3DVertexBuffer7 {
     // First three virtuals = IUnknown layout (see ddraw.h header note).
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
         { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK; }
-    virtual ULONG AddRef() { return ++refCnt; }
-    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
+    virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }
 
     HRESULT Init(LPD3DVERTEXBUFFERDESC d) {
         if(!d) return DDERR_INVALIDPARAMS;
         fvf=d->dwFVF; caps=d->dwCaps;
-        static const DWORD szTL=sizeof(D3DTLVERTEX), szV=sizeof(D3DVERTEX);
-        DWORD vsz = (fvf & D3DFVF_XYZRHW) ? szTL : szV;
+        // Real FVF stride (extra texcoords/specular widen the record beyond
+        // bare D3DTLVERTEX) — sizing by sizeof(D3DTLVERTEX) under-allocated
+        // and the game's Lock()-fill overflowed the chunk.
+        DWORD vsz = Rast7::FvfStride(fvf);
+        if (!vsz) vsz = sizeof(D3DVERTEX);
         DWORD nt  = d->dwNumVertices ? d->dwNumVertices : 1;
         size = vsz*nt;
         data=(BYTE*)calloc(1,size);
@@ -348,7 +352,8 @@ struct IDirect3DVertexBuffer7 {
     HRESULT GetVertexBufferDesc(LPD3DVERTEXBUFFERDESC d) {
         if(!d) return DDERR_INVALIDPARAMS;
         d->dwSize=sizeof(*d); d->dwCaps=caps; d->dwFVF=fvf;
-        d->dwNumVertices=size/((fvf&D3DFVF_XYZRHW)?sizeof(D3DTLVERTEX):sizeof(D3DVERTEX));
+        DWORD st=Rast7::FvfStride(fvf); if(!st)st=1;
+        d->dwNumVertices=size/st;
         return D3D_OK;
     }
     HRESULT Optimize(LPDIRECT3DDEVICE7,DWORD) { return D3D_OK; }
@@ -442,8 +447,8 @@ struct IDirect3DDevice7 {
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv) {
         if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK;
     }
-    virtual ULONG AddRef() { return ++refCnt; }
-    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
+    virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }
 
     HRESULT SetRenderState(D3DRENDERSTATETYPE s, DWORD v) {
         if((DWORD)s<256) {
@@ -599,8 +604,8 @@ struct IDirect3D7 {
     // First three virtuals = IUnknown layout (see ddraw.h header note).
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
         { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK; }
-    virtual ULONG AddRef() { return ++refCnt; }
-    virtual ULONG Release() { if(--refCnt==0){delete this;return 0;} return refCnt; }
+    virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
+    virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }
 
     // Yields HAL, then TnL-HAL, then RGB — real DX7 enumeration order.
     // BoB's lib3d is compiled with NO_HARD_TNL so it selects the plain
