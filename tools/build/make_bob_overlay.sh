@@ -25,6 +25,15 @@ mkdir -p "$OUT"
 # vs2005 copy; strings.h stays the system header).
 SHADOW_DIRS=("$@")
 
+# CMake passes an empty "" placeholder for the optional mig_h arg; ninja
+# re-parses the command string and the empty arg is eaten, so a shadow dir
+# lands in $2 instead. A real mig_h dir always has an MFC sibling — when it
+# doesn't, the arg was really a shadow dir; move it back.
+if [ -n "$MIG_H" ] && [ ! -d "$MIG_H/../MFC" ]; then
+  SHADOW_DIRS=("$MIG_H" "${SHADOW_DIRS[@]}")
+  MIG_H=
+fi
+
 # 0) mig-H precedence (optional second arg): the ported BoB tree still ships
 #    the generated OLE wrapper headers (h/rbutton.h etc.) but sources must
 #    see mig's ported widget declarations. Link ONLY the port surface (mig/H
