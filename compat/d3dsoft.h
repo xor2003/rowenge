@@ -20,6 +20,23 @@
 #define DDCKEY_SRCBLT   0x00000008   // ddraw.h color-key flag (source blt key)
 #endif
 
+#include <time.h>
+#ifdef __SSE2__
+#include <emmintrin.h>
+#endif                            // clock() for ROWAN_PERF counters
+
+// Vulkan backend entry points — defined in d3dvk.h (included after this
+// header by ddraw.h); the software path calls them so a compiled-in backend
+// can take draws, and they collapse to no-ops/false when it isn't.
+struct IDirectDrawSurface7;
+namespace Rast7 { struct State; struct Vert; }
+bool RowanVkDraw(const Rast7::State&,D3DPRIMITIVETYPE,const Rast7::Vert*,DWORD);
+bool RowanVkClear(IDirectDrawSurface7*,IDirectDrawSurface7*,int,DWORD,
+                  LPD3DRECT,DWORD,D3DCOLOR,float);
+void RowanVkReadSync(IDirectDrawSurface7*);
+void RowanVkWriteSync(IDirectDrawSurface7*);
+void RowanVkEndFrame();
+
 namespace Rast7 {
 
 struct PixFmt {                      // unpack/pack a surface pixel via masks
@@ -34,41 +51,49 @@ inline void DecodePF(const DDPIXELFORMAT& p, PixFmt& f){
     f.rS=lowbit(f.rM); f.gS=lowbit(f.gM); f.bS=lowbit(f.bM); f.aS=lowbit(f.aM);
     f.rW=nbits(f.rM);  f.gW=nbits(f.gM);  f.bW=nbits(f.bM);  f.aW=nbits(f.aM);
 }
-inline DWORD scaleUp(DWORD v,int w){ if(!w)return 255; v&=((1u<<w)-1);
+// Force-inline the whole per-pixel path: on i386 GCC declines to inline
+// these (size heuristics), leaving 6-10 nested calls + state reloads per
+// pixel, which is the dominant render cost.
+#if defined(__GNUC__)
+#define R7INLINE inline __attribute__((always_inline))
+#else
+#define R7INLINE inline
+#endif
+R7INLINE DWORD scaleUp(DWORD v,int w){ if(!w)return 255; v&=((1u<<w)-1);
     return w>=8 ? (v>>(w-8)) : (v*255)/((1u<<w)-1); }
-inline DWORD scaleDn(DWORD v,int w){ if(!w)return 0;
+R7INLINE DWORD scaleDn(DWORD v,int w){ if(!w)return 0;
     return w>=8 ? (v<<(w-8)) : (v*((1u<<w)-1)+127)/255; }
-inline DWORD Unpack(DWORD px, const PixFmt& f){ // -> 0xAARRGGBB
+R7INLINE DWORD Unpack(DWORD px, const PixFmt& f){ // -> 0xAARRGGBB
     return (scaleUp(px&f.rM? (px&f.rM)>>f.rS:0, f.rW)<<16)
          | (scaleUp(px&f.gM? (px&f.gM)>>f.gS:0, f.gW)<<8)
          | (scaleUp(px&f.bM? (px&f.bM)>>f.bS:0, f.bW))
          | ((f.aM? scaleUp((px&f.aM)>>f.aS,f.aW):255)<<24);
 }
-inline DWORD Pack(DWORD c, const PixFmt& f){
+R7INLINE DWORD Pack(DWORD c, const PixFmt& f){
     return (scaleDn((c>>16)&255,f.rW)<<f.rS)|(scaleDn((c>>8)&255,f.gW)<<f.gS)
          | (scaleDn(c&255,f.bW)<<f.bS)|((f.aM?scaleDn((c>>24)&255,f.aW):0)<<f.aS);
 }
-inline DWORD ReadPx(const IDirectDrawSurface7* s,DWORD x,DWORD y){
+R7INLINE DWORD ReadPx(const IDirectDrawSurface7* s,DWORD x,DWORD y){
     const BYTE*p=(const BYTE*)s->desc.lpSurface+y*s->desc.lPitch;
     DWORD b=s->desc.ddpfPixelFormat.dwRGBBitCount? s->desc.ddpfPixelFormat.dwRGBBitCount:32;
     return b==16?((const uint16_t*)p)[x]: b==8?p[x]:((const DWORD*)p)[x];
 }
-inline void WritePx(IDirectDrawSurface7* s,DWORD x,DWORD y,DWORD v){
+R7INLINE void WritePx(IDirectDrawSurface7* s,DWORD x,DWORD y,DWORD v){
     BYTE*p=(BYTE*)s->desc.lpSurface+y*s->desc.lPitch;
     DWORD b=s->desc.ddpfPixelFormat.dwRGBBitCount? s->desc.ddpfPixelFormat.dwRGBBitCount:32;
     if(b==16)((uint16_t*)p)[x]=(uint16_t)v; else if(b==8)p[x]=(uint8_t)v; else ((DWORD*)p)[x]=v;
 }
 // z-buffer access — the z surface's ZBufferBitDepth drives width.
-inline int ZBits(const IDirectDrawSurface7* z){
+R7INLINE int ZBits(const IDirectDrawSurface7* z){
     DWORD d=z->desc.ddpfPixelFormat.dwZBufferBitDepth;
     if(!d)d=z->desc.ddpfPixelFormat.dwRGBBitCount; return d?(int)d:16;
 }
-inline DWORD ReadZ(const IDirectDrawSurface7* z,DWORD x,DWORD y){
+R7INLINE DWORD ReadZ(const IDirectDrawSurface7* z,DWORD x,DWORD y){
     const BYTE*p=(const BYTE*)z->desc.lpSurface+y*z->desc.lPitch;
     return ZBits(z)>=32?((const DWORD*)p)[x]: ZBits(z)>=24?((const DWORD*)p)[x]&0xffffff
          :((const uint16_t*)p)[x];
 }
-inline void WriteZ(IDirectDrawSurface7* z,DWORD x,DWORD y,DWORD v){
+R7INLINE void WriteZ(IDirectDrawSurface7* z,DWORD x,DWORD y,DWORD v){
     BYTE*p=(BYTE*)z->desc.lpSurface+y*z->desc.lPitch;
     if(ZBits(z)>=32)((DWORD*)p)[x]=v;
     else if(ZBits(z)>=24)memcpy(p+x*3,&v,3);   // 24-bit: don't trample the next texel
@@ -83,6 +108,70 @@ struct Vert {                        // decoded TLVERTEX-family vertex
 
 struct Surf { IDirectDrawSurface7* s; PixFmt f; DWORD bpp; };
 
+// --- resolved pixel environment ---------------------------------------------
+// SyncRast copies every per-pixel-invariant field of State into PixEnv once
+// per draw call.  The scan loops run off a local copy plus __restrict surface
+// pointers, so GCC can hoist the env loads out of the pixel loop (surface
+// stores would otherwise force every State/env field to be reloaded per
+// pixel).  Semantics are unchanged — same states, same evaluation order.
+// Per-format texel/dest unpack LUT — scaleUp's exact channel math baked once
+// per PixFmt so the pixel loop trades ~4 integer divides per texel for one
+// indexed load.  Cached process-wide: the table is shared by every device/
+// stage that meets the same format.  Only <=16bpp needs it (32bpp channels
+// are 8-bit wide, so scaleUp's divide compiles away anyway).
+struct FmtLut {
+    PixFmt key;
+    DWORD c[4][256];                     // per-channel ARGB contributions
+    FmtLut* next;
+    bool Match(const PixFmt& f) const {
+        return key.bits==f.bits&&key.rM==f.rM&&key.gM==f.gM&&key.bM==f.bM
+              &&key.aM==f.aM;
+    }
+};
+inline const FmtLut* GetFmtLut(const PixFmt& f){
+    if(f.bits!=16&&f.bits!=8)return 0;
+    static FmtLut* head=0;               // single render thread; built once
+    for(FmtLut* p=head;p;p=p->next)if(p->Match(f))return p;
+    FmtLut* p=(FmtLut*)malloc(sizeof(FmtLut));
+    p->key=f;
+    const DWORD ms[4]={f.rM,f.gM,f.bM,f.aM}; const int ss[4]={f.rS,f.gS,f.bS,f.aS};
+    const int ws[4]={f.rW,f.gW,f.bW,f.aW}; const int sh[4]={16,8,0,24};
+    for(int k=0;k<4;k++){
+        DWORD lim=ms[k]?(ms[k]>>ss[k]):0;
+        for(DWORD i=0;i<=lim;i++)
+            p->c[k][i]=(ms[k]?scaleUp(i,ws[k]):(k==3?255:0))<<sh[k];
+    }
+    p->next=head; head=p; return p;
+}
+R7INLINE DWORD UnpackL(const FmtLut* L,DWORD raw){
+    const PixFmt& f=L->key;
+    return L->c[0][(raw&f.rM)>>f.rS]|L->c[1][(raw&f.gM)>>f.gS]
+          |L->c[2][(raw&f.bM)>>f.bS]|L->c[3][(raw&f.aM)>>f.aS];
+}
+
+struct PixEnv {
+    IDirectDrawSurface7* rt; PixFmt rtf;
+    BYTE* rtSurf; int rtPitch,rtBpp; const FmtLut* rtLut;
+    IDirectDrawSurface7* zb; int zbits;
+    BYTE* zbSurf; int zbPitch;
+    DWORD ze,zwe,zfn,zbias;
+    DWORD persp,spec,ablend,ckey,fog;
+    DWORD fogTMode,fogVMode,fogCol;
+    float fogStart,fogEnd;
+    DWORD sb,db,tf;
+    int nStage; DWORD fast;
+    struct TS {
+        IDirectDrawSurface7* s; PixFmt f;
+        const BYTE* surf; int pitch,bpp,w,h;
+        const PALETTEENTRY* pal;          // 8bpp palettized -> live entries
+        const FmtLut* lut;                // <=16bpp unpalettized -> channel luts
+        DWORD addr,bilin;
+        DWORD cop,aop,ca1,ca2,aa1,aa2,tci;
+        DWORD wMask,hMask;      // pow2 wrap masks (0 when not pow2)
+        DWORD wPow2,hPow2;
+    } ts[3];
+};
+
 struct State {
     IDirectDrawSurface7* rt; PixFmt rtf;
     IDirectDrawSurface7* zb; int zbits;
@@ -90,39 +179,148 @@ struct State {
     DWORD rs[256]; DWORD ss[8][64];
     DWORD fogCol; float fogStart,fogEnd;
     DWORD clipX0,clipY0,clipX1,clipY1;
+    PixEnv env;
 };
+// Truncation-based floor: (int)f truncs toward 0, subtract 1 when the result
+// overshot (negative non-integer).  floorf() is a real call on i386 and runs
+// per texel.
+R7INLINE int IFloor(float f){int i=(int)f; return i-((float)i>f);}
+inline void BuildEnv(const State& st,PixEnv& e){
+    e.rt=st.rt; e.rtf=st.rtf;
+    e.rtSurf=(BYTE*)(st.rt?st.rt->desc.lpSurface:0);
+    e.rtPitch=st.rt?(int)st.rt->desc.lPitch:0;
+    e.rtBpp=st.rt?(int)(st.rt->desc.ddpfPixelFormat.dwRGBBitCount
+                ?st.rt->desc.ddpfPixelFormat.dwRGBBitCount:32):32;
+    e.rtLut=GetFmtLut(st.rtf);
+    e.zb=st.zb; e.zbits=st.zbits;
+    e.zbSurf=(BYTE*)(st.zb?st.zb->desc.lpSurface:0);
+    e.zbPitch=st.zb?(int)st.zb->desc.lPitch:0;
+    e.ze=st.rs[D3DRENDERSTATE_ZENABLE];
+    e.zwe=st.rs[D3DRENDERSTATE_ZWRITEENABLE];
+    e.zfn=st.rs[D3DRENDERSTATE_ZFUNC]; if(!e.zfn)e.zfn=D3DCMP_LESSEQUAL;
+    e.zbias=st.rs[D3DRENDERSTATE_ZBIAS];
+    e.persp=st.rs[D3DRENDERSTATE_TEXTUREPERSPECTIVE];
+    e.spec=st.rs[D3DRENDERSTATE_SPECULARENABLE];
+    e.ablend=st.rs[D3DRENDERSTATE_ALPHABLENDENABLE];
+    e.ckey=st.rs[D3DRENDERSTATE_COLORKEYENABLE];
+    e.fog=st.rs[D3DRENDERSTATE_FOGENABLE];
+    e.fogTMode=st.rs[D3DRENDERSTATE_FOGTABLEMODE];
+    e.fogVMode=st.rs[D3DRENDERSTATE_FOGVERTEXMODE];
+    e.fogCol=st.fogCol; e.fogStart=st.fogStart; e.fogEnd=st.fogEnd;
+    e.sb=st.rs[D3DRENDERSTATE_SRCBLEND]; if(!e.sb)e.sb=D3DBLEND_ONE;
+    e.db=st.rs[D3DRENDERSTATE_DESTBLEND];
+    e.tf=st.rs[D3DRENDERSTATE_TEXTUREFACTOR];
+    e.nStage=0;
+    for(int i=0;i<3;i++){
+        DWORD cop=st.ss[i][D3DTSS_COLOROP],aop=st.ss[i][D3DTSS_ALPHAOP];
+        if(cop==D3DTOP_DISABLE&&aop==D3DTOP_DISABLE)break;
+        PixEnv::TS& t=e.ts[e.nStage++];
+        t.s=st.tex[i].s; t.f=st.tex[i].f;
+        DWORD addr=st.ss[i][D3DTSS_ADDRESS]; if(!addr)addr=D3DTADDRESS_WRAP;
+        t.addr=addr;
+        t.bilin=st.ss[i][D3DTSS_MAGFILTER]==D3DTFG_LINEAR
+              ||st.ss[i][D3DTSS_MINFILTER]==D3DTFG_LINEAR
+              ||st.ss[i][D3DTSS_MAGFILTER]==D3DTFG_ANISOTROPIC
+              ||st.ss[i][D3DTSS_MINFILTER]==D3DTFG_ANISOTROPIC;
+        t.tci=st.ss[i][D3DTSS_TEXCOORDINDEX]&3; if(t.tci>2)t.tci=2;
+        t.cop=cop; t.aop=aop;
+        t.ca1=st.ss[i][D3DTSS_COLORARG1]; t.ca2=st.ss[i][D3DTSS_COLORARG2];
+        t.aa1=st.ss[i][D3DTSS_ALPHAARG1]; t.aa2=st.ss[i][D3DTSS_ALPHAARG2];
+        DWORD W=t.s?t.s->desc.dwWidth:1, H=t.s?t.s->desc.dwHeight:1;
+        t.wPow2=(W&(W-1))==0; t.hPow2=(H&(H-1))==0;
+        t.wMask=W-1; t.hMask=H-1;
+        t.surf=(const BYTE*)(t.s?t.s->desc.lpSurface:0);
+        t.pitch=t.s?(int)t.s->desc.lPitch:0;
+        t.w=(int)W; t.h=(int)H;
+        t.bpp=t.s?(int)(t.s->desc.ddpfPixelFormat.dwRGBBitCount
+                 ?t.s->desc.ddpfPixelFormat.dwRGBBitCount:32):32;
+        t.pal=(t.bpp==8&&t.s&&t.s->pal)?t.s->pal->entries:0;
+        t.lut=(t.bpp==8&&t.pal)?0:GetFmtLut(t.f);
+    }
+    // Dominant-config flag: 16bpp target + either no stages or a single
+    // MODULATE stage over a pow2 WRAP bilinear 16bpp texture, with no
+    // blend/fog/specular/key work.  PixFast handles that combination with
+    // bit-identical results; anything else takes the general pipeline.
+    e.fast=0;
+    if(e.rtBpp==16&&e.rtf.rM==0xf800&&e.rtf.gM==0x07e0&&e.rtf.bM==0x001f
+       &&!e.ablend&&!e.fog&&!e.spec&&!e.ckey){
+        if(e.nStage==0)e.fast=1;
+        else if(e.nStage==1){
+            const PixEnv::TS& t=e.ts[0];
+            if(t.s&&t.surf&&t.bpp==16&&t.f.rM==0xf800&&t.f.gM==0x07e0
+               &&t.f.bM==0x001f&&t.bilin&&t.tci==0
+               &&t.addr==D3DTADDRESS_WRAP&&t.wPow2&&t.hPow2
+               &&t.cop==D3DTOP_MODULATE&&t.ca1==D3DTA_TEXTURE
+               &&t.ca2==D3DTA_DIFFUSE
+               &&(t.aop==D3DTOP_DISABLE
+                  ||(t.aop==D3DTOP_SELECTARG1
+                     &&(t.aa1==D3DTA_DIFFUSE||t.aa1==D3DTA_TEXTURE))))
+                e.fast=(t.aa1==D3DTA_TEXTURE)?2:1;
+        }
+    }
+#ifdef ROWAN_PERF_TRACE
+    {static bool once=false; if(!once){once=true;
+      const PixEnv::TS&t=e.ts[0];
+      fprintf(stderr,"[env] fast=%u nStage=%d rtBpp=%d rM=%lx t.s=%p bpp=%d lut=%p bilin=%u tci=%u addr=%u wP=%u hP=%u cop=%u ca1=%lx ca2=%lx aop=%u aa1=%lx persp=%u ze=%u\n",
+      e.fast,e.nStage,e.rtBpp,(unsigned long)e.rtf.rM,(void*)t.s,t.bpp,(void*)t.lut,t.bilin,t.tci,t.addr,t.wPow2,t.hPow2,t.cop,(unsigned long)t.ca1,(unsigned long)t.ca2,t.aop,(unsigned long)t.aa1,e.persp,e.ze);}}
+#endif
+}
 
 // --- texture sampling -------------------------------------------------------
 // 8bpp surfaces are palettized: the index means nothing until SetPalette's
 // entries resolve it.
-inline DWORD UnpackPx(const Surf& t,DWORD raw){
+R7INLINE DWORD UnpackPx(const Surf& t,DWORD raw){
     if(t.s->desc.ddpfPixelFormat.dwRGBBitCount==8 && t.s->pal){
         const PALETTEENTRY& e=t.s->pal->entries[raw&255];
         return 0xff000000u|((DWORD)e.peRed<<16)|((DWORD)e.peGreen<<8)|e.peBlue;
     }
     return Unpack(raw,t.f);
 }
-inline DWORD SampleTex(const Surf& t,float u,float v,DWORD addrMode,bool bilinear){
-    if(!t.s||!t.s->desc.lpSurface)return 0xffffffff;
-    int W=(int)t.s->desc.dwWidth,H=(int)t.s->desc.dwHeight;
+// Wrap-modes resolved per axis; pow2 sizes use masks, the rest keep the
+// original modulo path.  Same results, no integer divide.
+R7INLINE int WrapC(int c,int m,DWORD pow2,DWORD mask,DWORD addr){
+    if(addr==D3DTADDRESS_CLAMP){return c<0?0:c>=m?m-1:c;}
+    if(addr==D3DTADDRESS_MIRROR){int p=2*m;c=((c%p)+p)%p;return c>=m?p-1-c:c;}
+    if(pow2)return c&(int)mask;                            // WRAP default
+    int r=c%m; return r<0?r+m:r;
+}
+R7INLINE DWORD UnpackPxS(IDirectDrawSurface7* s,const PixFmt& f,DWORD raw){
+    if(s->desc.ddpfPixelFormat.dwRGBBitCount==8 && s->pal){
+        const PALETTEENTRY& e=s->pal->entries[raw&255];
+        return 0xff000000u|((DWORD)e.peRed<<16)|((DWORD)e.peGreen<<8)|e.peBlue;
+    }
+    return Unpack(raw,f);
+}
+// Fetch+unpack one texel through the cached stage addressing.  For palettized
+// 8bpp the live palette resolves the index; <=16bpp unpalettized goes through
+// the per-format LUT (identical values to Unpack()); 32bpp unpacks inline.
+R7INLINE DWORD FetchT(const PixEnv::TS& t,int x,int y){
+    const BYTE* r=t.surf+y*t.pitch;
+    DWORD raw=t.bpp==16?(DWORD)((const uint16_t*)r)[x]
+            :t.bpp==8?(DWORD)r[x]:((const DWORD*)r)[x];
+    if(t.lut)return UnpackL(t.lut,raw);
+    if(t.pal){const PALETTEENTRY& p=t.pal[raw&255];
+        return 0xff000000u|((DWORD)p.peRed<<16)|((DWORD)p.peGreen<<8)|p.peBlue;}
+    return Unpack(raw,t.f);
+}
+R7INLINE DWORD SampleTexE(const PixEnv::TS& t,float u,float v){
+    if(!t.surf)return 0xffffffff;
+    int W=t.w,H=t.h;
     // Point sampling takes floor(u*W); the -0.5 shift is only for the
     // bilinear weight basis (texel centers at (i+0.5)/W).
-    float fx=bilinear? u*W-0.5f : u*W;
-    float fy=bilinear? v*H-0.5f : v*H;
-    int x0=(int)floorf(fx), y0=(int)floorf(fy);
-    auto wrap=[&](int c,int m)->int{
-        if(addrMode==D3DTADDRESS_CLAMP){return c<0?0:c>=m?m-1:c;}
-        if(addrMode==D3DTADDRESS_MIRROR){int p=2*m;c=((c%p)+p)%p;return c>=m?p-1-c:c;}
-        int r=c%m; return r<0?r+m:r;                       // WRAP default
-    };
-    DWORD xA=(DWORD)wrap(x0,W), yA=(DWORD)wrap(y0,H);
-    DWORD c00=UnpackPx(t,ReadPx(t.s,xA,yA));
-    if(!bilinear)return c00;
-    DWORD xB=(DWORD)wrap(x0+1,W), yB=(DWORD)wrap(y0+1,H);
-    DWORD c10=UnpackPx(t,ReadPx(t.s,xB,yA)),
-          c01=UnpackPx(t,ReadPx(t.s,xA,yB)),
-          c11=UnpackPx(t,ReadPx(t.s,xB,yB));
-    int wx=(int)((fx-floorf(fx))*256), wy=(int)((fy-floorf(fy))*256);
+    float fx=t.bilin? u*W-0.5f : u*W;
+    float fy=t.bilin? v*H-0.5f : v*H;
+    int x0=IFloor(fx), y0=IFloor(fy);
+    DWORD xA=(DWORD)WrapC(x0,W,t.wPow2,t.wMask,t.addr),
+          yA=(DWORD)WrapC(y0,H,t.hPow2,t.hMask,t.addr);
+    DWORD c00=FetchT(t,xA,yA);
+    if(!t.bilin)return c00;
+    DWORD xB=(DWORD)WrapC(x0+1,W,t.wPow2,t.wMask,t.addr),
+          yB=(DWORD)WrapC(y0+1,H,t.hPow2,t.hMask,t.addr);
+    DWORD c10=FetchT(t,xB,yA),
+          c01=FetchT(t,xA,yB),
+          c11=FetchT(t,xB,yB);
+    int wx=(int)((fx-(float)x0)*256), wy=(int)((fy-(float)y0)*256);
     DWORD out=0;
     for(int i=0;i<4;i++){
         DWORD s0=(c00>>(i*8))&255,s1=(c10>>(i*8))&255,s2=(c01>>(i*8))&255,s3=(c11>>(i*8))&255;
@@ -133,7 +331,7 @@ inline DWORD SampleTex(const Surf& t,float u,float v,DWORD addrMode,bool bilinea
 }
 // --- DX7 texture-stage evaluation -------------------------------------------
 struct StageRes { DWORD col, alp; };
-inline DWORD Arg(DWORD ta,DWORD tex,DWORD cur,DWORD dif,DWORD tfac){
+R7INLINE DWORD Arg(DWORD ta,DWORD tex,DWORD cur,DWORD dif,DWORD tfac){
     switch(ta&D3DTA_SELECTMASK){
         case D3DTA_DIFFUSE: return dif;
         case D3DTA_TEXTURE: return tex;
@@ -142,12 +340,12 @@ inline DWORD Arg(DWORD ta,DWORD tex,DWORD cur,DWORD dif,DWORD tfac){
         default:            return cur;
     }
 }
-inline DWORD Complement(DWORD ta,DWORD v){ return (ta&D3DTA_COMPLEMENT)?v^0x00ffffff:v; }
-inline DWORD AlphaRep (DWORD ta,DWORD v){
+R7INLINE DWORD Complement(DWORD ta,DWORD v){ return (ta&D3DTA_COMPLEMENT)?v^0x00ffffff:v; }
+R7INLINE DWORD AlphaRep (DWORD ta,DWORD v){
     if(ta&D3DTA_ALPHAREPLICATE){DWORD a=v>>24;return a|a<<8|a<<16;}
     return v;
 }
-inline DWORD BlendOp(DWORD op,DWORD a1,DWORD a2){
+R7INLINE DWORD BlendOp(DWORD op,DWORD a1,DWORD a2){
     int r=(a1>>16)&255,g=(a1>>8)&255,b=a1&255,r2=(a2>>16)&255,g2=(a2>>8)&255,b2=a2&255,R,G,B;
     switch(op){
         case D3DTOP_SELECTARG1: R=r;G=g;B=b;break;
@@ -161,7 +359,7 @@ inline DWORD BlendOp(DWORD op,DWORD a1,DWORD a2){
     if(R<0)R=0;if(R>255)R=255;if(G<0)G=0;if(G>255)G=255;if(B<0)B=0;if(B>255)B=255;
     return (R<<16)|(G<<8)|B;
 }
-inline DWORD BlendOpAlpha(DWORD op,DWORD a1,DWORD a2){
+R7INLINE DWORD BlendOpAlpha(DWORD op,DWORD a1,DWORD a2){
     int a=(a1>>24)&255,b=(a2>>24)&255,R;
     switch(op){
         case D3DTOP_SELECTARG1: R=a;break;
@@ -172,51 +370,46 @@ inline DWORD BlendOpAlpha(DWORD op,DWORD a1,DWORD a2){
     }
     return (DWORD)(R<0?0:R>255?255:R)<<24;
 }
-inline StageRes EvalStages(const State& st,const Vert& pv){
+R7INLINE StageRes EvalStagesE(const PixEnv& e,const Vert& pv){
     DWORD cur=pv.col;
     DWORD dif=pv.col;
-    DWORD tf=st.rs[D3DRENDERSTATE_TEXTUREFACTOR];
-    for(int i=0;i<3;i++){
-        DWORD cop=st.ss[i][D3DTSS_COLOROP];
-        DWORD aop=st.ss[i][D3DTSS_ALPHAOP];
-        if(cop==D3DTOP_DISABLE&&aop==D3DTOP_DISABLE)break;
+    DWORD tf=e.tf;
+    for(int i=0;i<e.nStage;i++){
+        const PixEnv::TS& t=e.ts[i];
+        DWORD cop=t.cop;
+        DWORD aop=t.aop;
         DWORD texC=0xffffffff;
-        if(st.tex[i].s){
-            DWORD addr=st.ss[i][D3DTSS_ADDRESS]; if(!addr)addr=D3DTADDRESS_WRAP;
-            bool bilin = st.ss[i][D3DTSS_MAGFILTER]==D3DTFG_LINEAR
-                      || st.ss[i][D3DTSS_MINFILTER]==D3DTFG_LINEAR
-                      || st.ss[i][D3DTSS_MAGFILTER]==D3DTFG_ANISOTROPIC
-                      || st.ss[i][D3DTSS_MINFILTER]==D3DTFG_ANISOTROPIC;
-            int ti=(int)(st.ss[i][D3DTSS_TEXCOORDINDEX]&3); if(ti>2)ti=2;
-            texC=SampleTex(st.tex[i],pv.u[ti],pv.v[ti],addr,bilin);
+        if(t.s){
+#ifdef BENCH_NOTEX
+            texC=0xff808080;
+#else
+            texC=SampleTexE(t,pv.u[t.tci],pv.v[t.tci]);
+#endif
             // Source color key: keyed texels come out transparent.  The key
             // range applies to the unpacked RGB (matches how real drivers
             // key on the texel value for a single-color key).
-            if(st.rs[D3DRENDERSTATE_COLORKEYENABLE] &&
-               (st.tex[i].s->ckeyFlags&DDCKEY_SRCBLT)){
-                DWORD lo=st.tex[i].s->ckey.dwColorSpaceLowValue&0xffffff;
-                DWORD hi=st.tex[i].s->ckey.dwColorSpaceHighValue&0xffffff;
+            if(e.ckey && (t.s->ckeyFlags&DDCKEY_SRCBLT)){
+                DWORD lo=t.s->ckey.dwColorSpaceLowValue&0xffffff;
+                DWORD hi=t.s->ckey.dwColorSpaceHighValue&0xffffff;
                 if((texC&0xffffff)>=lo&&(texC&0xffffff)<=hi)texC&=0x00ffffff;
             }
         }
         if(cop==D3DTOP_BLENDTEXTUREALPHA){
             DWORD tA=(texC>>24)&255;
-            DWORD a1=Arg(st.ss[i][D3DTSS_COLORARG1],texC,cur,dif,tf);
-            DWORD a2=Arg(st.ss[i][D3DTSS_COLORARG2],texC,cur,dif,tf);
+            DWORD a1=Arg(t.ca1,texC,cur,dif,tf);
+            DWORD a2=Arg(t.ca2,texC,cur,dif,tf);
             DWORD lo=((a1&0xffffff)*(255-tA)+(a2&0xffffff)*tA)/255;
             cur=(cur&0xff000000)|(lo&0xffffff);
         } else if(cop!=D3DTOP_DISABLE){
-            DWORD a1=AlphaRep(st.ss[i][D3DTSS_COLORARG1],
-                       Complement(st.ss[i][D3DTSS_COLORARG1],
-                       Arg(st.ss[i][D3DTSS_COLORARG1],texC,cur,dif,tf)));
-            DWORD a2=AlphaRep(st.ss[i][D3DTSS_COLORARG2],
-                       Complement(st.ss[i][D3DTSS_COLORARG2],
-                       Arg(st.ss[i][D3DTSS_COLORARG2],texC,cur,dif,tf)));
+            DWORD a1=AlphaRep(t.ca1,Complement(t.ca1,
+                       Arg(t.ca1,texC,cur,dif,tf)));
+            DWORD a2=AlphaRep(t.ca2,Complement(t.ca2,
+                       Arg(t.ca2,texC,cur,dif,tf)));
             cur=(cur&0xff000000)|BlendOp(cop,a1,a2);
         }
         if(aop!=D3DTOP_DISABLE){
-            DWORD a1=Arg(st.ss[i][D3DTSS_ALPHAARG1],texC,cur,dif,tf);
-            DWORD a2=Arg(st.ss[i][D3DTSS_ALPHAARG2],texC,cur,dif,tf);
+            DWORD a1=Arg(t.aa1,texC,cur,dif,tf);
+            DWORD a2=Arg(t.aa2,texC,cur,dif,tf);
             cur=(cur&0x00ffffff)|BlendOpAlpha(aop,a1,a2);
         }
     }
@@ -224,13 +417,13 @@ inline StageRes EvalStages(const State& st,const Vert& pv){
 }
 
 // --- z / blend / fog ---------------------------------------------------------
-inline bool ZTest(DWORD fn,DWORD nv,DWORD ov){
+R7INLINE bool ZTest(DWORD fn,DWORD nv,DWORD ov){
     switch(fn){case D3DCMP_NEVER:return false;case D3DCMP_LESS:return nv<ov;
         case D3DCMP_EQUAL:return nv==ov;case D3DCMP_LESSEQUAL:return nv<=ov;
         case D3DCMP_GREATER:return nv>ov;case D3DCMP_NOTEQUAL:return nv!=ov;
         case D3DCMP_GREATEREQUAL:return nv>=ov;default:return true;}
 }
-inline DWORD BlendChan(DWORD src,DWORD dst,DWORD blend,int sh){
+R7INLINE DWORD BlendChan(DWORD src,DWORD dst,DWORD blend,int sh){
     DWORD s=(src>>sh)&255,d=(dst>>sh)&255;
     switch(blend){
         case D3DBLEND_ZERO:          return 0;
@@ -253,7 +446,7 @@ inline DWORD BlendChan(DWORD src,DWORD dst,DWORD blend,int sh){
 enum { IC_Z, IC_RHW, IC_CR, IC_CG, IC_CB, IC_CA,
        IC_SR, IC_SG, IC_SB, IC_SA,
        IC_U0, IC_V0, IC_U1, IC_V1, IC_U2, IC_V2, IC_N };
-inline void Pack(const Vert& v,float* c,bool persp){
+R7INLINE void Pack(const Vert& v,float* c,bool persp){
     float w=v.rhw!=0?v.rhw:1.0f;                 // persp stores u*rhw
     c[IC_Z]=v.z; c[IC_RHW]=v.rhw;
     c[IC_CR]=(v.col>>16)&255; c[IC_CG]=(v.col>>8)&255;
@@ -263,26 +456,107 @@ inline void Pack(const Vert& v,float* c,bool persp){
     for(int i=0;i<3;i++){c[IC_U0+i*2]=persp?v.u[i]*w:v.u[i];
                          c[IC_V0+i*2]=persp?v.v[i]*w:v.v[i];}
 }
-inline void Pixel(const State& st,DWORD x,DWORD y,const float* c){
+// Fast kernel for the dominant in-flight state: 565 target, z-buffered,
+// either untextured or one MODULATE(diffuse,texture) stage over a pow2 WRAP
+// bilinear 16bpp texture, no blend/fog/spec/key.  Every step reproduces the
+// general pipeline's exact arithmetic for that state (same z math, same
+// bilinear weights, same r*r2/255 modulate, same 565 down-pack).
+R7INLINE void PixFast(const PixEnv& e,DWORD x,DWORD y,const float* c){
+    // --- z test/write: identical block to the general path ------------------
+    if(e.ze&&e.zb){
+        BYTE* __restrict zrow=e.zbSurf+y*e.zbPitch;
+        DWORD zmax=(e.zbits>=32)?0xffffffffu:(e.zbits>=24?0xffffffu:0xffffu);
+        DWORD nz;
+        if(e.ze==D3DZB_USEW){
+            float w=c[IC_RHW]>1e-20f?1.0f/c[IC_RHW]:3.402823466e38f;
+            if(!(w>0.0f))w=3.402823466e38f;
+            memcpy(&nz,&w,4);
+            if(e.zbits<32)nz>>=(32-e.zbits);
+        } else {
+            float zf=c[IC_Z]<0?0:c[IC_Z]>1?1:c[IC_Z];
+            nz=(DWORD)(zf*zmax)+(e.zbias<<(e.zbits-8>0?e.zbits-8:0));
+        }
+        DWORD ov=e.zbits>=32?((const DWORD*)zrow)[x]
+               :e.zbits>=24?((const DWORD*)zrow)[x]&0xffffff
+               :((const uint16_t*)zrow)[x];
+        if(!ZTest(e.zfn,nz,ov))return;
+        if(e.zwe){
+            if(e.zbits>=32)((DWORD*)zrow)[x]=nz;
+            else if(e.zbits>=24)memcpy(zrow+x*3,&nz,3);
+            else ((uint16_t*)zrow)[x]=(uint16_t)nz;
+        }
+    }
+    int R=(int)c[IC_CR],G=(int)c[IC_CG],B=(int)c[IC_CB],A=(int)c[IC_CA];
+    DWORD dif=((A<0?0:A>255?255:A)<<24)|((R<0?0:R>255?255:R)<<16)
+             |((G<0?0:G>255?255:G)<<8)|(B<0?0:B>255?255:B);
+    DWORD out=dif;
+    if(e.nStage){
+        const PixEnv::TS& t=e.ts[0];
+        float w=e.persp?(c[IC_RHW]!=0?1.0f/c[IC_RHW]:1.0f):1.0f;
+        float u=e.persp?c[IC_U0]*w:c[IC_U0];
+        float v=e.persp?c[IC_V0]*w:c[IC_V0];
+        float fx=u*t.w-0.5f, fy=v*t.h-0.5f;
+        int x0=IFloor(fx), y0=IFloor(fy);
+        int xA=x0&(int)t.wMask, xB=(x0+1)&(int)t.wMask;
+        int yA=y0&(int)t.hMask, yB=(y0+1)&(int)t.hMask;
+        const uint16_t* r0=(const uint16_t*)(t.surf+yA*t.pitch);
+        const uint16_t* r1=(const uint16_t*)(t.surf+yB*t.pitch);
+        // 565 -> ARGB: scaleUp(5)=v*255/31, scaleUp(6)=v*255/63 (constant
+        // divisors -> magic multiplies, no table loads).
+        DWORD p00=r0[xA],p10=r0[xB],p01=r1[xA],p11=r1[xB];
+        DWORD c00=0xff000000|((((p00>>11)&31)*255/31)<<16)
+               |((((p00>>5)&63)*255/63)<<8)|((p00&31)*255/31);
+        DWORD c10=0xff000000|((((p10>>11)&31)*255/31)<<16)
+               |((((p10>>5)&63)*255/63)<<8)|((p10&31)*255/31);
+        DWORD c01=0xff000000|((((p01>>11)&31)*255/31)<<16)
+               |((((p01>>5)&63)*255/63)<<8)|((p01&31)*255/31);
+        DWORD c11=0xff000000|((((p11>>11)&31)*255/31)<<16)
+               |((((p11>>5)&63)*255/63)<<8)|((p11&31)*255/31);
+        int wx=(int)((fx-(float)x0)*256), wy=(int)((fy-(float)y0)*256);
+        DWORD tex=0;
+        for(int i=0;i<4;i++){
+            DWORD s0=(c00>>(i*8))&255,s1=(c10>>(i*8))&255,
+                  s2=(c01>>(i*8))&255,s3=(c11>>(i*8))&255;
+            DWORD v0=(s0*(256-wx)+s1*wx)>>8, v1=(s2*(256-wx)+s3*wx)>>8;
+            tex|=(((v0*(256-wy)+v1*wy)>>8))<<(i*8);
+        }
+        // MODULATE color = tex*dif per channel /255; alpha per the alpha op.
+        DWORD a=(e.fast==2)?(tex>>24):(dif>>24);
+        int r=((tex>>16)&255)*((dif>>16)&255)/255;
+        int g=((tex>>8)&255)*((dif>>8)&255)/255;
+        int b=(tex&255)*(dif&255)/255;
+        out=((DWORD)a<<24)|((DWORD)r<<16)|((DWORD)g<<8)|(DWORD)b;
+    }
+    // 565 down-pack: scaleDn(v,5)<<11 | scaleDn(v,6)<<5 | scaleDn(v,5)
+    uint16_t px=(uint16_t)(((((out>>16)&255)*31+127)/255<<11)
+                |((((out>>8)&255)*63+127)/255<<5)
+                |(((out&255)*31+127)/255));
+    ((uint16_t*)(e.rtSurf+y*e.rtPitch))[x]=px;
+}
+R7INLINE void PixE(const PixEnv& e,DWORD x,DWORD y,const float* c){
+    if(e.fast){PixFast(e,x,y,c);return;}
     Vert pv;
     pv.z=c[IC_Z]; pv.rhw=c[IC_RHW];
-    float w=pv.rhw!=0?1.0f/pv.rhw:1.0f;
-    bool persp=st.rs[D3DRENDERSTATE_TEXTUREPERSPECTIVE]!=0;
-    for(int i=0;i<3;i++){pv.u[i]=persp?c[IC_U0+i*2]*w:c[IC_U0+i*2];
-                         pv.v[i]=persp?c[IC_V0+i*2]*w:c[IC_V0+i*2];}
+    float w=e.persp?(pv.rhw!=0?1.0f/pv.rhw:1.0f):1.0f;
+    for(int i=0;i<3;i++){pv.u[i]=e.persp?c[IC_U0+i*2]*w:c[IC_U0+i*2];
+                         pv.v[i]=e.persp?c[IC_V0+i*2]*w:c[IC_V0+i*2];}
     int R=(int)c[IC_CR],G=(int)c[IC_CG],B=(int)c[IC_CB],A=(int)c[IC_CA];
     pv.col=((A<0?0:A>255?255:A)<<24)|((R<0?0:R>255?255:R)<<16)
           |((G<0?0:G>255?255:G)<<8)|(B<0?0:B>255?255:B);
-    int sR=(int)c[IC_SR],sG=(int)c[IC_SG],sB=(int)c[IC_SB],sA=(int)c[IC_SA];
-    pv.spec=((sA<0?0:sA>255?255:sA)<<24)|((sR<0?0:sR>255?255:sR)<<16)
-           |((sG<0?0:sG>255?255:sG)<<8)|(sB<0?0:sB>255?255:sB);
+    // specular channels only feed SPECULARENABLE and vertex-fog — skip the
+    // clamp+repack when neither is live (the common terrain path).
+    if(e.spec||e.fog){
+        int sR=(int)c[IC_SR],sG=(int)c[IC_SG],sB=(int)c[IC_SB],sA=(int)c[IC_SA];
+        pv.spec=((sA<0?0:sA>255?255:sA)<<24)|((sR<0?0:sR>255?255:sR)<<16)
+               |((sG<0?0:sG>255?255:sG)<<8)|(sB<0?0:sB>255?255:sB);
+    } else pv.spec=0;
 
     // z test (against the attached z surface; z values 0..1 scaled to width)
-    DWORD ze=st.rs[D3DRENDERSTATE_ZENABLE];
-    if(ze&&st.zb){
-        DWORD zmax=(st.zbits>=32)?0xffffffffu:(st.zbits>=24?0xffffffu:0xffffu);
+    if(e.ze&&e.zb){
+        BYTE* __restrict zrow=e.zbSurf+y*e.zbPitch;
+        DWORD zmax=(e.zbits>=32)?0xffffffffu:(e.zbits>=24?0xffffffu:0xffffu);
         DWORD nz;
-        if(ze==D3DZB_USEW){
+        if(e.ze==D3DZB_USEW){
             // W-buffer: depth is view-space w (= 1/rhw), not clip z.  The
             // interpolated rhw inverted gives the true plane depth at the
             // pixel — nearer means smaller w.  Positive float bit patterns
@@ -291,13 +565,14 @@ inline void Pixel(const State& st,DWORD x,DWORD y,const float* c){
             float w=pv.rhw>1e-20f?1.0f/pv.rhw:3.402823466e38f;
             if(!(w>0.0f))w=3.402823466e38f;      // NaN/negative -> far
             memcpy(&nz,&w,4);
-            if(st.zbits<32)nz>>=(32-st.zbits);
+            if(e.zbits<32)nz>>=(32-e.zbits);
         } else {
             float zf=pv.z<0?0:pv.z>1?1:pv.z;
-            nz=(DWORD)(zf*zmax)+(st.rs[D3DRENDERSTATE_ZBIAS]<<(st.zbits-8>0?st.zbits-8:0));
+            nz=(DWORD)(zf*zmax)+(e.zbias<<(e.zbits-8>0?e.zbits-8:0));
         }
-        DWORD fn=st.rs[D3DRENDERSTATE_ZFUNC]; if(!fn)fn=D3DCMP_LESSEQUAL;
-        DWORD ov=ReadZ(st.zb,x,y);
+        DWORD ov=e.zbits>=32?((const DWORD*)zrow)[x]
+               :e.zbits>=24?((const DWORD*)zrow)[x]&0xffffff
+               :((const uint16_t*)zrow)[x];
         static const char* probeP=getenv("ROWAN_PIX");
         static int ppx=-1,ppy=-1;
         if(probeP&&ppx<0)sscanf(probeP,"%d,%d",&ppx,&ppy);
@@ -305,11 +580,14 @@ inline void Pixel(const State& st,DWORD x,DWORD y,const float* c){
             float wf; memcpy(&wf,&nz,4);
             float of; memcpy(&of,&ov,4);
             fprintf(stderr,"[PIX] tex0=%p w=%g ov=%g fn=%u zwe=%u %s\n",
-                (void*)(st.tex[0].s),wf,of,(unsigned)fn,
-                (unsigned)st.rs[D3DRENDERSTATE_ZWRITEENABLE],
-                ZTest(fn,nz,ov)?"PASS":"FAIL");}
-        if(!ZTest(fn,nz,ov))return;
-        if(st.rs[D3DRENDERSTATE_ZWRITEENABLE])WriteZ(st.zb,x,y,nz);
+                (void*)(e.nStage?e.ts[0].s:0),wf,of,(unsigned)e.zfn,
+                (unsigned)e.zwe,ZTest(e.zfn,nz,ov)?"PASS":"FAIL");}
+        if(!ZTest(e.zfn,nz,ov))return;
+        if(e.zwe){
+            if(e.zbits>=32)((DWORD*)zrow)[x]=nz;
+            else if(e.zbits>=24)memcpy(zrow+x*3,&nz,3);
+            else ((uint16_t*)zrow)[x]=(uint16_t)nz;
+        }
     }
     else {
         static const char* probeP0=getenv("ROWAN_PIX");
@@ -317,12 +595,17 @@ inline void Pixel(const State& st,DWORD x,DWORD y,const float* c){
         if(probeP0&&ppx0<0)sscanf(probeP0,"%d,%d",&ppx0,&ppy0);
         if(probeP0&&(int)x==ppx0&&(int)y==ppy0)
             fprintf(stderr,"[PIX] tex0=%p NO-ZTEST ze=%u zb=%p\n",
-                (void*)(st.tex[0].s),(unsigned)ze,(void*)st.zb);
+                (void*)(e.nStage?e.ts[0].s:0),(unsigned)e.ze,(void*)e.zb);
     }
-    StageRes sr=EvalStages(st,pv);
+    StageRes sr;
+#ifdef BENCH_NOSTAGE
+    sr.col=pv.col; sr.alp=pv.col>>24;
+#else
+    sr=EvalStagesE(e,pv);
+#endif
     DWORD out=sr.col;
     // specular add (post-texture, DX7 SPECULARENABLE)
-    if(st.rs[D3DRENDERSTATE_SPECULARENABLE]){
+    if(e.spec){
         int a=out>>24;
         int r=((out>>16)&255)+((pv.spec>>16)&255);
         int g=((out>>8)&255)+((pv.spec>>8)&255);
@@ -330,17 +613,16 @@ inline void Pixel(const State& st,DWORD x,DWORD y,const float* c){
         out=(DWORD)a<<24|(DWORD)(r>255?255:r)<<16|(DWORD)(g>255?255:g)<<8|(DWORD)(b>255?255:b);
     }
     // fog: vertex fog factor lives in specular alpha; table fog derives from z
-    if(st.rs[D3DRENDERSTATE_FOGENABLE]){
+    if(e.fog){
         float f=-1;
-        if(st.rs[D3DRENDERSTATE_FOGTABLEMODE]==D3DFOG_LINEAR){
-            float fs,stE; memcpy(&fs,&st.rs[D3DRENDERSTATE_FOGSTART],4);
-            memcpy(&stE,&st.rs[D3DRENDERSTATE_FOGEND],4);
+        if(e.fogTMode==D3DFOG_LINEAR){
+            float fs=e.fogStart,stE=e.fogEnd;
             f=(stE-fs)!=0?(stE-pv.z)/(stE-fs):0;
-        } else if(st.rs[D3DRENDERSTATE_FOGVERTEXMODE]==D3DFOG_LINEAR)
+        } else if(e.fogVMode==D3DFOG_LINEAR)
             f=((pv.spec>>24)&255)/255.0f;
         if(f>=0){
             if(f>1)f=1;
-            DWORD fc=st.fogCol;
+            DWORD fc=e.fogCol;
             int fr=(fc>>16)&255,fg=(fc>>8)&255,fb=fc&255;
             int a=out>>24;
             int r=(int)(f*((out>>16)&255)+(1-f)*fr);
@@ -349,19 +631,25 @@ inline void Pixel(const State& st,DWORD x,DWORD y,const float* c){
             out=(DWORD)a<<24|(DWORD)r<<16|(DWORD)g<<8|(DWORD)b;
         }
     }
-    if(st.rs[D3DRENDERSTATE_ALPHABLENDENABLE]){
-        DWORD dst=Unpack(ReadPx(st.rt,x,y),st.rtf);
-        DWORD sb=st.rs[D3DRENDERSTATE_SRCBLEND],db=st.rs[D3DRENDERSTATE_DESTBLEND];
-        if(!sb)sb=D3DBLEND_ONE;
+    // __restrict on the row pointer: stores through it cannot alias the env
+    // or the interpolant array, so all env fields stay hoisted in the loop.
+    BYTE* __restrict rrow=e.rtSurf+y*e.rtPitch;
+    DWORD rbpp=e.rtBpp;
+    DWORD packed=Pack(out,e.rtf);
+    if(e.ablend){
+        DWORD raw=rbpp==16?((const uint16_t*)rrow)[x]:rbpp==8?rrow[x]:((const DWORD*)rrow)[x];
+        DWORD dst=e.rtLut?UnpackL(e.rtLut,raw):Unpack(raw,e.rtf);
         DWORD res=0;
         for(int i=0;i<4;i++){
             DWORD sc=(out>>(i*8))&255,dc=(dst>>(i*8))&255;
-            DWORD r=(sc*BlendChan(out,dst,sb,i*8)+dc*BlendChan(out,dst,db,i*8))/255;
+            DWORD r=(sc*BlendChan(out,dst,e.sb,i*8)+dc*BlendChan(out,dst,e.db,i*8))/255;
             res|=(r>255?255:r)<<(i*8);
         }
-        out=(out&0xff000000)|res;           // keep src alpha in pixel write
+        packed=Pack((out&0xff000000)|res,e.rtf);   // keep src alpha in pixel write
     }
-    WritePx(st.rt,x,y,Pack(out,st.rtf));
+    if(rbpp==16)((uint16_t*)rrow)[x]=(uint16_t)packed;
+    else if(rbpp==8)rrow[x]=(uint8_t)packed;
+    else ((DWORD*)rrow)[x]=packed;
 }
 
 // --- scan converter ----------------------------------------------------------
@@ -414,20 +702,79 @@ inline void DrawTri(const State& st,const Vert A,const Vert B,const Vert C){
     // half-space edge functions E(P)=(p2.x-p1.x)*(P.y-p1.y)-(p2.y-p1.y)*(P.x-p1.x)
     // for directed edges B->C, C->A, A->B; interior iff all >=0 (winding-signed)
     float sgn=d>0?1.f:-1.f;
+    static const bool perf=getenv("ROWAN_PERF")!=0;
+    static uint64_t pTris=0,pScan=0,pCov=0; static double pT0=0;
+    // Half-space edge functions evaluated once per bbox corner then stepped
+    // in y across rows.  Per row the covered x-range is solved analytically —
+    // each edge contributes a lower bound (dwx>0) or upper bound (dwx<0) to
+    // the pixel-centre coverage test — so the scan never iterates an
+    // uncovered pixel.  Double precision keeps the bounds numerically at
+    // least as accurate as the float per-pixel evaluation this replaces.
+    const double sgnD=sgn;
+    const double dwx0=(B.y-C.y)*sgnD, dwy0=(C.x-B.x)*sgnD;
+    const double dwx1=(C.y-A.y)*sgnD, dwy1=(A.x-C.x)*sgnD;
+    const double dwx2=(A.y-B.y)*sgnD, dwy2=(B.x-A.x)*sgnD;
+    const double px0=ix0+0.5;
+    double rw0=((C.x-B.x)*(iy0+0.5-B.y)-(C.y-B.y)*(px0-B.x))*sgnD;
+    double rw1=((A.x-C.x)*(iy0+0.5-C.y)-(A.y-C.y)*(px0-C.x))*sgnD;
+    double rw2=((B.x-A.x)*(iy0+0.5-A.y)-(B.y-A.y)*(px0-A.x))*sgnD;
+    const PixEnv& e=st.env;
     float cur[IC_N];
     for(int y=iy0;y<=iy1;y++){
         float py=y+0.5f;
-        for(int i=0;i<IC_N;i++)
-            cur[i]=c0[i]+dx[i]*(ix0+0.5f-A.x)+dy[i]*(py-A.y);
-        for(int x=ix0;x<=ix1;x++){
-            float px=x+0.5f;
-            float w0=((C.x-B.x)*(py-B.y)-(C.y-B.y)*(px-B.x))*sgn;
-            float w1=((A.x-C.x)*(py-C.y)-(A.y-C.y)*(px-C.x))*sgn;
-            float w2=((B.x-A.x)*(py-A.y)-(B.y-A.y)*(px-A.x))*sgn;
-            if(w0>=0&&w1>=0&&w2>=0)Pixel(st,x,y,cur);
-            for(int i=0;i<IC_N;i++)cur[i]+=dx[i];
+        // w_i(x) = w_i + dwx_i*(x-ix0) >= 0  ->  x >= ix0 - w_i/dwx_i (dwx>0)
+        double lo=ix0, hi=ix1;
+        if(dwx0>0){double b=ix0-rw0/dwx0;if(b>lo)lo=b;}
+        else if(dwx0<0){double b=ix0-rw0/dwx0;if(b<hi)hi=b;}
+        else if(rw0<0)goto nrow;
+        if(dwx1>0){double b=ix0-rw1/dwx1;if(b>lo)lo=b;}
+        else if(dwx1<0){double b=ix0-rw1/dwx1;if(b<hi)hi=b;}
+        else if(rw1<0)goto nrow;
+        if(dwx2>0){double b=ix0-rw2/dwx2;if(b>lo)lo=b;}
+        else if(dwx2<0){double b=ix0-rw2/dwx2;if(b<hi)hi=b;}
+        else if(rw2<0)goto nrow;
+        if(lo<ix0)lo=ix0; if(hi>ix1)hi=ix1;
+        if(lo<=hi){
+            int xs=(int)ceil(lo), xe=(int)floor(hi);
+            for(int i=0;i<IC_N;i++)
+                cur[i]=c0[i]+dx[i]*(xs+0.5f-A.x)+dy[i]*(py-A.y);
+#ifdef BENCH_TSC
+            static uint64_t tPix=0,tInt=0,tN=0; static double tt0=0;
+#endif
+            for(int x=xs;x<=xe;x++){
+#ifdef BENCH_TSC
+                uint64_t t0=__builtin_ia32_rdtsc();
+                PixE(e,x,y,cur);
+                uint64_t t1=__builtin_ia32_rdtsc();
+                for(int i=0;i<IC_N;i++)cur[i]+=dx[i];
+                tPix+=t1-t0; tInt+=__builtin_ia32_rdtsc()-t1; tN++;
+                double tw=double(clock())/CLOCKS_PER_SEC;
+                if(tw-tt0>5){fprintf(stderr,"[tsc] pix=%llu int=%llu n=%llu -> %llu cyc/px (%llu interp)\n",
+                  (unsigned long long)tPix,(unsigned long long)tInt,(unsigned long long)tN,
+                  (unsigned long long)(tPix/tN),(unsigned long long)(tInt/tN));
+                  tPix=tInt=tN=0;tt0=tw;}
+#else
+                PixE(e,x,y,cur);if(perf)pCov++;
+#ifdef __SSE2__
+                {_mm_storeu_ps(cur+0,_mm_add_ps(_mm_loadu_ps(cur+0),_mm_loadu_ps(dx+0)));
+                 _mm_storeu_ps(cur+4,_mm_add_ps(_mm_loadu_ps(cur+4),_mm_loadu_ps(dx+4)));
+                 _mm_storeu_ps(cur+8,_mm_add_ps(_mm_loadu_ps(cur+8),_mm_loadu_ps(dx+8)));
+                 _mm_storeu_ps(cur+12,_mm_add_ps(_mm_loadu_ps(cur+12),_mm_loadu_ps(dx+12)));
+                 cur[16]+=dx[16];}
+#else
+                for(int i=0;i<IC_N;i++)cur[i]+=dx[i];
+#endif
+                if(perf)pScan++;
+#endif
+            }
         }
+nrow:
+        rw0+=dwy0;rw1+=dwy1;rw2+=dwy2;
     }
+    if(perf){pTris++;double t=double(clock())/CLOCKS_PER_SEC;
+        if(t-pT0>5.0){fprintf(stderr,"[perf] tris=%llu scan=%llu cov=%llu (%.1fM scanned/s)\n",
+            (unsigned long long)pTris,(unsigned long long)pScan,(unsigned long long)pCov,
+            pScan/(t-pT0)/1e6);pTris=pScan=pCov=0;pT0=t;}}
 }
 inline void DrawLine(const State& st,const Vert&A,const Vert&B){
     if(!st.rt||!st.rt->desc.lpSurface)return;
@@ -443,13 +790,16 @@ inline void DrawLine(const State& st,const Vert&A,const Vert&B){
     float fx=(B.x-A.x)/steps,fy=(B.y-A.y)/steps;
     for(int i=0;i<=steps;i++){
         if(x>=0&&y>=0&&x<(int)st.rt->desc.dwWidth&&y<(int)st.rt->desc.dwHeight)
-            Pixel(st,x,y,c);
+            PixE(st.env,x,y,c);
         for(int j=0;j<IC_N;j++)c[j]+=cb[j];
         x=(int)(A.x+0.5f+fx*i); y=(int)(A.y+0.5f+fy*i);
     }
 }
 
 inline void EmitPrim(const State& st,D3DPRIMITIVETYPE pt,const Vert* v,DWORD n){
+    if(RowanVkDraw(st,pt,v,n)) return;          // GPU path handled the batch
+    RowanVkReadSync(st.rt);                     // land GPU content for software
+    RowanVkReadSync(st.zb);                     //   and the depth values
     static const char* dumpR=getenv("ROWAN_DUMP");
     if(dumpR&&n>=3&&pt>=4){
         int x0=0,y0=0,x1=0,y1=0;
@@ -498,8 +848,10 @@ inline void EmitPrim(const State& st,D3DPRIMITIVETYPE pt,const Vert* v,DWORD n){
     else if(pt==D3DPT_POINTLIST){for(DWORD i=0;i<n;i++){
         int x=(int)(v[i].x+0.5f),y=(int)(v[i].y+0.5f);
         if(st.rt&&x>=0&&y>=0&&x<(int)st.rt->desc.dwWidth&&y<(int)st.rt->desc.dwHeight){
-            float c[IC_N]; Pack(v[i],c,false); Pixel(st,x,y,c);
+            float c[IC_N]; Pack(v[i],c,false); PixE(st.env,x,y,c);
         }}}
+    RowanVkWriteSync(st.rt);                    // CPU drew to the target
+    RowanVkWriteSync(st.zb);                    //   and possibly the zbuffer
 }
 
 // --- FVF decode --------------------------------------------------------------
@@ -561,6 +913,7 @@ inline HRESULT IDirect3D7::CreateDevice(REFCLSID, LPDIRECTDRAWSURFACE7 surf,
 inline HRESULT IDirect3DDevice7::SetTexture(DWORD s, LPDIRECTDRAWSURFACE7 t) {
     if(s<8){
         RowanSurf7AddRef(t);RowanSurf7Release(textures[s]);textures[s]=t;
+        rastStamp++;
         if(sbRec) recTex|=(BYTE)(1<<s);
     }
     return D3D_OK;
@@ -571,7 +924,7 @@ inline HRESULT IDirect3DDevice7::GetTexture(DWORD s, LPDIRECTDRAWSURFACE7* t) {
 }
 inline HRESULT IDirect3DDevice7::SetRenderTarget(LPDIRECTDRAWSURFACE7 t, DWORD) {
     RowanSurf7AddRef(t); RowanSurf7Release(renderTarget);
-    renderTarget=t; return D3D_OK;
+    renderTarget=t; rastStamp++; return D3D_OK;
 }
 inline HRESULT IDirect3DDevice7::GetRenderTarget(LPDIRECTDRAWSURFACE7* t) {
     if(!t)return DDERR_INVALIDPARAMS;
@@ -633,6 +986,7 @@ inline HRESULT IDirect3DDevice7::ApplyStateBlock(DWORD tok) {
         RowanSurf7AddRef(b->tex[s]); RowanSurf7Release(textures[s]);
         textures[s]=b->tex[s];
     }
+    rastStamp++;
     return D3D_OK;
 }
 inline HRESULT IDirect3DDevice7::CaptureStateBlock(DWORD tok) {
@@ -681,14 +1035,20 @@ inline HRESULT IDirect3DDevice7::EndStateBlock(LPDWORD t) {
 }
 
 inline void IDirect3DDevice7::SyncRast() {
+    // Skip the ~3.6KB state copy + env rebuild when nothing that the pipeline
+    // consults has changed (draw calls per poly make this the common case).
+    IDirectDrawSurface7* att=renderTarget?renderTarget->attached:0;
+    if(rast&&rastSynced==rastStamp&&rast->rt==renderTarget
+        &&rast->zb==(att&&(att->desc.ddsCaps.dwCaps&DDSCAPS_ZBUFFER)?att:0))
+        return;
+    rastSynced=rastStamp;
     if(!rast){rast=(Rast7::State*)rastMem;memset(rast,0,sizeof(*rast));}
     rast->rt=renderTarget;
     rast->zb=0; rast->zbits=16;
     if(renderTarget){
         Rast7::DecodePF(renderTarget->desc.ddpfPixelFormat,rast->rtf);
-        IDirectDrawSurface7* a=renderTarget->attached;
-        if(a && (a->desc.ddsCaps.dwCaps&DDSCAPS_ZBUFFER)){
-            rast->zb=a; rast->zbits=Rast7::ZBits(a);
+        if(att && (att->desc.ddsCaps.dwCaps&DDSCAPS_ZBUFFER)){
+            rast->zb=att; rast->zbits=Rast7::ZBits(att);
         }
     }
     memcpy(rast->rs,renderStates,sizeof(rast->rs));
@@ -703,6 +1063,11 @@ inline void IDirect3DDevice7::SyncRast() {
     rast->fogCol=renderStates[D3DRENDERSTATE_FOGCOLOR];
     memcpy(&rast->fogStart,&renderStates[D3DRENDERSTATE_FOGSTART],4);
     memcpy(&rast->fogEnd,&renderStates[D3DRENDERSTATE_FOGEND],4);
+    Rast7::BuildEnv(*rast,rast->env);
+}
+
+inline HRESULT IDirect3DDevice7::EndScene() {
+    inScene=false; RowanVkEndFrame(); return D3D_OK;
 }
 
 inline HRESULT IDirect3DDevice7::Clear(DWORD nRect,LPD3DRECT rects,DWORD flags,
@@ -712,6 +1077,10 @@ inline HRESULT IDirect3DDevice7::Clear(DWORD nRect,LPD3DRECT rects,DWORD flags,
     IDirectDrawSurface7* zb=0; int zbits=16;
     IDirectDrawSurface7* a=renderTarget->attached;
     if(a&&(a->desc.ddsCaps.dwCaps&DDSCAPS_ZBUFFER)){zb=a;zbits=Rast7::ZBits(a);}
+    if(RowanVkClear(renderTarget,zb,zbits,nRect,rects,flags,col,(float)z))
+        return D3D_OK;
+    RowanVkReadSync(renderTarget);      // land GPU content before CPU writes
+    RowanVkReadSync(zb);                //   (rect clears may preserve depth)
     DWORD nv=nRect?nRect:1;
     D3DRECT full={0,0,(LONG)renderTarget->desc.dwWidth,(LONG)renderTarget->desc.dwHeight};
     LONG sw=(LONG)renderTarget->desc.dwWidth, sh=(LONG)renderTarget->desc.dwHeight;
@@ -744,6 +1113,8 @@ inline HRESULT IDirect3DDevice7::Clear(DWORD nRect,LPD3DRECT rects,DWORD flags,
                     Rast7::WriteZ(zb,x,y,nz);
         }
     }
+    if(flags&D3DCLEAR_TARGET) RowanVkWriteSync(renderTarget);
+    if((flags&D3DCLEAR_ZBUFFER)&&zb) RowanVkWriteSync(zb);
     return D3D_OK;
 }
 

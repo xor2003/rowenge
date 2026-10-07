@@ -142,6 +142,15 @@ HRESULT RowanBltFormat(IDirectDrawSurface7* dst, LPRECT dstR,
                        IDirectDrawSurface7* src, LPRECT srcR,
                        DWORD flags, LPDDBLTFX fx);
 
+// Vulkan backend sync hooks (defined in d3dvk.h, included after d3dsoft.h;
+// no-ops when the backend isn't compiled in):
+//   ReadSync(s)  — land pending GPU rendering into s->lpSurface before the CPU reads it
+//   WriteSync(s) — mark s's CPU copy newer than any GPU image (bumps cpuGen)
+//   SurfaceGone  — release backend resources keyed on s
+void RowanVkReadSync(IDirectDrawSurface7*);
+void RowanVkWriteSync(IDirectDrawSurface7*);
+void RowanVkSurfaceGone(IDirectDrawSurface7*);
+
 struct IDirectDrawSurface7 {
     DDSURFACEDESC2      desc;
     IDirectDrawPalette* pal;
@@ -152,10 +161,12 @@ struct IDirectDrawSurface7 {
     BYTE*   pixels;
     DDCOLORKEY ckey;
     DWORD    ckeyFlags;
+    DWORD    cpuGen;    // bumped on every CPU-side write (Vulkan upload key)
 
-    IDirectDrawSurface7() : pal(0),clip(0),attached(0),attachedFrom(0),refCnt(1),pixels(0),ckeyFlags(0)
+    IDirectDrawSurface7() : pal(0),clip(0),attached(0),attachedFrom(0),refCnt(1),pixels(0),ckeyFlags(0),cpuGen(0)
         { memset(&desc,0,sizeof(desc)); desc.dwSize=sizeof(desc); memset(&ckey,0,sizeof(ckey)); }
-    ~IDirectDrawSurface7() { free(pixels); if(pal) pal->Release(); if(clip) clip->Release();
+    ~IDirectDrawSurface7() { RowanVkSurfaceGone(this);
+                             free(pixels); if(pal) pal->Release(); if(clip) clip->Release();
                              if(attached){attached->attachedFrom=0;attached->Release();} }
 
     static DWORD PitchFor(DWORD w, DWORD bpp) { return ((w*bpp/8)+3)&~3; }
@@ -174,6 +185,7 @@ struct IDirectDrawSurface7 {
             pixels=(BYTE*)calloc(1, (size_t)desc.lPitch*(desc.dwHeight?desc.dwHeight:1)+16);
             if(!pixels) return DDERR_OUTOFMEMORY;
             desc.lpSurface = pixels;
+            cpuGen++;
         }
         return DD_OK;
     }
@@ -188,10 +200,12 @@ struct IDirectDrawSurface7 {
 
     HRESULT Lock(LPRECT, LPDDSURFACEDESC2 lpDdsd, DWORD, HANDLE) {
         if(!lpDdsd) return DDERR_INVALIDPARAMS;
+        RowanVkReadSync(this);          // caller may read lpSurface
         *lpDdsd = desc; lpDdsd->dwSize = sizeof(*lpDdsd);
         return DD_OK;
     }
-    HRESULT Unlock(LPRECT) { if(IsPrimary()) RowanDDPresent(this); return DD_OK; }
+    HRESULT Unlock(LPRECT) { RowanVkWriteSync(this);
+                             if(IsPrimary()) RowanDDPresent(this); return DD_OK; }
 
     HRESULT GetSurfaceDesc(LPDDSURFACEDESC2 lpDdsd) {
         if(!lpDdsd) return DDERR_INVALIDPARAMS;
@@ -223,12 +237,14 @@ struct IDirectDrawSurface7 {
         for(DWORD y=0;y<h;y++) memcpy(dst+y*dpitch, src+y*spitch, w);
     }
     HRESULT Blt(LPRECT dst, LPDIRECTDRAWSURFACE7 src, LPRECT srcr, DWORD flags, LPDDBLTFX fx) {
+        RowanVkReadSync(this); RowanVkReadSync(src);
         DWORD bpp=desc.ddpfPixelFormat.dwRGBBitCount/8; if(!bpp)bpp=2;
         if((flags & DDBLT_COLORFILL) && fx){
             BYTE*p=(BYTE*)desc.lpSurface;
             for(DWORD y=0;y<desc.dwHeight;y++)
                 for(DWORD x=0;x<desc.dwWidth*bpp;x+=bpp)
                     memcpy(p+y*desc.lPitch+x,&fx->dwFillColor,bpp<4?bpp:4);
+            RowanVkWriteSync(this);
             return DD_OK;
         }
         if(!src) return DD_OK;
@@ -250,6 +266,7 @@ struct IDirectDrawSurface7 {
            spf.dwRGBAlphaBitMask!=dpf.dwRGBAlphaBitMask ||
            ((spf.dwFlags^dpf.dwFlags)&DDPF_PALETTEINDEXED8)){
             HRESULT r=RowanBltFormat(this,dst,src,srcr,flags,fx);
+            RowanVkWriteSync(this);
             if(IsPrimary()) RowanDDPresent(this);
             return r;
         }
@@ -268,11 +285,13 @@ struct IDirectDrawSurface7 {
                 }
             }
         }
+        RowanVkWriteSync(this);
         if(IsPrimary()) RowanDDPresent(this);
         return DD_OK;
     }
     HRESULT BltFast(DWORD x,DWORD y,LPDIRECTDRAWSURFACE7 src,LPRECT r,DWORD fl){
         if(!src) return DD_OK;
+        RowanVkReadSync(this); RowanVkReadSync(src);
         const DDPIXELFORMAT& spf=src->desc.ddpfPixelFormat;
         const DDPIXELFORMAT& dpf=desc.ddpfPixelFormat;
         if(spf.dwRGBBitCount!=dpf.dwRGBBitCount || spf.dwRBitMask!=dpf.dwRBitMask ||
@@ -283,6 +302,7 @@ struct IDirectDrawSurface7 {
                      (LONG)x+(r?r->right-r->left:(LONG)src->desc.dwWidth),
                      (LONG)y+(r?r->bottom-r->top:(LONG)src->desc.dwHeight) };
             HRESULT hr=RowanBltFormat(this,&d,src,r,fl,0);
+            RowanVkWriteSync(this);
             if(IsPrimary()) RowanDDPresent(this);
             return hr;
         }
@@ -299,6 +319,7 @@ struct IDirectDrawSurface7 {
         BlitRect((BYTE*)desc.lpSurface+dy*desc.lPitch+dx*bpp,desc.lPitch,
                  (BYTE*)src->desc.lpSurface+sy*src->desc.lPitch+sx*bpp,
                  src->desc.lPitch,w*bpp,h);
+        RowanVkWriteSync(this);
         if(IsPrimary()) RowanDDPresent(this);
         return DD_OK;
     }
@@ -307,6 +328,7 @@ struct IDirectDrawSurface7 {
     // Real flip: pull the attached back buffer's pixels forward, then tell
     // the host to present.  Called on the primary in a FLIP|COMPLEX chain.
     HRESULT Flip(LPDIRECTDRAWSURFACE7, DWORD) {
+        RowanVkReadSync(this); RowanVkReadSync(attached);
         if(attached && attached->desc.lpSurface && desc.lpSurface){
             DWORD bpp=desc.ddpfPixelFormat.dwRGBBitCount/8; if(!bpp)bpp=2;
             DWORD w=desc.dwWidth*bpp;
@@ -314,12 +336,14 @@ struct IDirectDrawSurface7 {
             DWORD h=desc.dwHeight; if(attached->desc.dwHeight<h)h=attached->desc.dwHeight;
             BlitRect((BYTE*)desc.lpSurface,desc.lPitch,
                      (BYTE*)attached->desc.lpSurface,attached->desc.lPitch,w,h);
+            RowanVkWriteSync(this);
         }
         if(IsPrimary()) RowanDDPresent(this);
         return DD_OK;
     }
 
     HRESULT SetPalette(LPDIRECTDRAWPALETTE p) {
+        RowanVkWriteSync(this);         // palette drives texture unpack
         if(p) p->AddRef(); if(pal) pal->Release(); pal=p; return DD_OK;
     }
     HRESULT SetClipper(LPDIRECTDRAWCLIPPER c) {
@@ -332,6 +356,7 @@ struct IDirectDrawSurface7 {
     HRESULT IsLost() { return DD_OK; }
     HRESULT Restore() { return DD_OK; }
     HRESULT SetColorKey(DWORD f, DDCOLORKEY* k) {
+        RowanVkWriteSync(this);         // key feeds texture-stage eval
         ckeyFlags=f; if(k) ckey=*k; return DD_OK;
     }
 };
@@ -517,6 +542,8 @@ inline HRESULT DirectDrawCreateEx(GUID*, LPVOID* ppv, REFIID, IUnknown*) {
 // The software rasterizer + out-of-line device members — needs the complete
 // IDirectDrawSurface7 above.
 #include "d3dsoft.h"
+// Vulkan backend (runtime-loaded; software path stays the fallback).
+#include "d3dvk.h"
 
 #pragma pack(pop)
 #endif // ROWAN_COMPAT_DDRAW_H

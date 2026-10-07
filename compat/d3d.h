@@ -392,10 +392,13 @@ struct IDirect3DDevice7 {
     Rast7::State* rast;
     // Rast7::State is incomplete here; embed its storage so no destructor is
     // needed (State is POD — d3dsoft.h static_asserts the fit).
-    BYTE         rastMem[4096];
+    BYTE         rastMem[8192];
+    DWORD        rastStamp;                  // bumped by every state write
+    DWORD        rastSynced;                 // stamp of last SyncRast
 
     IDirect3DDevice7() : refCnt(1),renderTarget(0),inScene(false),
-                         stateBlockCount(0),sbRec(false),rast(0) {
+                         stateBlockCount(0),sbRec(false),rast(0),
+                         rastStamp(1),rastSynced(0) {
         memset(renderStates,0,sizeof(renderStates));
         memset(stageStates,0,sizeof(stageStates));
         memset(textures,0,sizeof(textures));
@@ -452,7 +455,7 @@ struct IDirect3DDevice7 {
 
     HRESULT SetRenderState(D3DRENDERSTATETYPE s, DWORD v) {
         if((DWORD)s<256) {
-            renderStates[s]=v;
+            renderStates[s]=v; rastStamp++;
             if(sbRec) recRS[s>>3]|=(BYTE)(1<<(s&7));
         }
         return D3D_OK;
@@ -461,7 +464,7 @@ struct IDirect3DDevice7 {
         { if(v)*v=(DWORD)s<256?renderStates[s]:0; return D3D_OK; }
     HRESULT SetTextureStageState(DWORD s, D3DTEXTURESTAGESTATETYPE t, DWORD v) {
         if(s<8&&(DWORD)t<64) {
-            stageStates[s][t]=v;
+            stageStates[s][t]=v; rastStamp++;
             if(sbRec) recSS[(s*64+t)>>3]|=(BYTE)(1<<((s*64+t)&7));
         }
         return D3D_OK;
@@ -472,7 +475,7 @@ struct IDirect3DDevice7 {
     HRESULT GetTexture(DWORD s, LPDIRECTDRAWSURFACE7* t);  // in d3dsoft.h
 
     HRESULT BeginScene() { inScene=true; SyncRast(); return D3D_OK; }
-    HRESULT EndScene()   { inScene=false; return D3D_OK; }
+    HRESULT EndScene();   // in d3dsoft.h — submits the vk frame too
     HRESULT Clear(DWORD nRect,LPD3DRECT rects,DWORD flags,D3DCOLOR col,D3DVALUE z,DWORD);
 
     HRESULT SetTransform(D3DTRANSFORMSTATETYPE s, LPD3DMATRIX m)

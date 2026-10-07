@@ -26,6 +26,9 @@ target_compile_options(RowanDefaults INTERFACE
     -fpermissive -Wno-narrowing
     -Wno-enum-compare)
 target_link_options(RowanDefaults INTERFACE -m32)
+# d3dvk.h dlopens libvulkan at runtime — every binary that compiles the
+# compat layer needs -ldl (a no-op stub on glibc>=2.34).
+target_link_libraries(RowanDefaults INTERFACE ${CMAKE_DL_LIBS})
 if(ROWAN_SANITIZERS)
     target_compile_options(RowanDefaults INTERFACE
         -fsanitize=address,undefined -fno-omit-frame-pointer)
@@ -61,6 +64,7 @@ target_include_directories(BobIncludes INTERFACE
     ${BOB_TREE}/lib3d
     ${CMAKE_SOURCE_DIR}/compat
     ${MIG_TREE}/H
+    ${SYSROOT}/usr/include
     ${SYSROOT}/usr/include/SDL2
     ${SYSROOT}/usr/include/i386-linux-gnu)
 target_link_libraries(BobIncludes INTERFACE RowanDefaults)
