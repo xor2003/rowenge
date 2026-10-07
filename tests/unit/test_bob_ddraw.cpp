@@ -137,6 +137,26 @@ REGISTER_TEST(test_bob_ddraw_flat_triangle) {
     CHECK_EQ(*Px(f.back,2,2),0);                  // outside bbox
 }
 
+// --- edge coverage: fan tri anchored far from the diagonal (A.x!=A.y) ---------
+// Regression for the w2 half-space bug: the A->B edge test used (px-A.y)
+// instead of (px-A.x), shifting the edge anchor to (A.y,A.y).  Triangles whose
+// first vertex had x==y rendered fine while cockpit polys deep in the frame
+// lost a triangular slice along that edge (missing instrument panel).
+REGISTER_TEST(test_bob_ddraw_edge_coverage) {
+    Frame f;
+    CHECK(f.Init(64,64,16));
+    f.dev->Clear(0,0,D3DCLEAR_TARGET,0,1.0f,0);
+    f.dev->SetRenderState(D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
+    // Same shape as the BoB instrument-panel fan, scaled: fan apex low-left,
+    // interior point (10,30) sits between the A->B edge and the fan centroid.
+    D3DTLVERTEX fan[5]={TL(4,56,0.5f,1,0xffff0000),TL(4,8,0.5f,1,0xffff0000),
+                        TL(60,20,0.5f,1,0xffff0000),TL(64,26,0.5f,1,0xffff0000),
+                        TL(20,56,0.5f,1,0xffff0000)};
+    CHECK_EQ(DrawTris(f.dev,D3DPT_TRIANGLEFAN,fan,5),D3D_OK);
+    CHECK_EQ(*Px(f.back,10,30),0xf800);           // inside first fan tri
+    CHECK_EQ(*Px(f.back,10,58),0);                // below the fan
+}
+
 // --- culling: CW winding culled under D3DCULL_CW ------------------------------
 REGISTER_TEST(test_bob_ddraw_cull) {
     Frame f;

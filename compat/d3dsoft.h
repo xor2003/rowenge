@@ -281,11 +281,43 @@ inline void Pixel(const State& st,DWORD x,DWORD y,const float* c){
     DWORD ze=st.rs[D3DRENDERSTATE_ZENABLE];
     if(ze&&st.zb){
         DWORD zmax=(st.zbits>=32)?0xffffffffu:(st.zbits>=24?0xffffffu:0xffffu);
-        float zf=pv.z<0?0:pv.z>1?1:pv.z;
-        DWORD nz=(DWORD)(zf*zmax)+(st.rs[D3DRENDERSTATE_ZBIAS]<<(st.zbits-8>0?st.zbits-8:0));
+        DWORD nz;
+        if(ze==D3DZB_USEW){
+            // W-buffer: depth is view-space w (= 1/rhw), not clip z.  The
+            // interpolated rhw inverted gives the true plane depth at the
+            // pixel — nearer means smaller w.  Positive float bit patterns
+            // order-preserve as unsigned ints, and truncating the low bits
+            // still preserves order for narrower buffers.
+            float w=pv.rhw>1e-20f?1.0f/pv.rhw:3.402823466e38f;
+            if(!(w>0.0f))w=3.402823466e38f;      // NaN/negative -> far
+            memcpy(&nz,&w,4);
+            if(st.zbits<32)nz>>=(32-st.zbits);
+        } else {
+            float zf=pv.z<0?0:pv.z>1?1:pv.z;
+            nz=(DWORD)(zf*zmax)+(st.rs[D3DRENDERSTATE_ZBIAS]<<(st.zbits-8>0?st.zbits-8:0));
+        }
         DWORD fn=st.rs[D3DRENDERSTATE_ZFUNC]; if(!fn)fn=D3DCMP_LESSEQUAL;
-        if(!ZTest(fn,nz,ReadZ(st.zb,x,y)))return;
+        DWORD ov=ReadZ(st.zb,x,y);
+        static const char* probeP=getenv("ROWAN_PIX");
+        static int ppx=-1,ppy=-1;
+        if(probeP&&ppx<0)sscanf(probeP,"%d,%d",&ppx,&ppy);
+        if(probeP&&(int)x==ppx&&(int)y==ppy){
+            float wf; memcpy(&wf,&nz,4);
+            float of; memcpy(&of,&ov,4);
+            fprintf(stderr,"[PIX] tex0=%p w=%g ov=%g fn=%u zwe=%u %s\n",
+                (void*)(st.tex[0].s),wf,of,(unsigned)fn,
+                (unsigned)st.rs[D3DRENDERSTATE_ZWRITEENABLE],
+                ZTest(fn,nz,ov)?"PASS":"FAIL");}
+        if(!ZTest(fn,nz,ov))return;
         if(st.rs[D3DRENDERSTATE_ZWRITEENABLE])WriteZ(st.zb,x,y,nz);
+    }
+    else {
+        static const char* probeP0=getenv("ROWAN_PIX");
+        static int ppx0=-1,ppy0=-1;
+        if(probeP0&&ppx0<0)sscanf(probeP0,"%d,%d",&ppx0,&ppy0);
+        if(probeP0&&(int)x==ppx0&&(int)y==ppy0)
+            fprintf(stderr,"[PIX] tex0=%p NO-ZTEST ze=%u zb=%p\n",
+                (void*)(st.tex[0].s),(unsigned)ze,(void*)st.zb);
     }
     StageRes sr=EvalStages(st,pv);
     DWORD out=sr.col;
@@ -335,9 +367,11 @@ inline void Pixel(const State& st,DWORD x,DWORD y,const float* c){
 // --- scan converter ----------------------------------------------------------
 inline bool CullWinding(const State& st,const Vert&v0,const Vert&v1,const Vert&v2){
     DWORD cm=st.rs[D3DRENDERSTATE_CULLMODE];
-    if(cm==D3DCULL_NONE||cm==0)return false;
-    // Screen space is y-down: visually-clockwise windings have positive
-    // signed area.  DX7 culls those under D3DCULL_CW, negative under CCW.
+    static const int nocull=getenv("ROWAN_NOCULL")?1:0;
+    if(nocull||cm==D3DCULL_NONE||cm==0)return false;
+    // Screen space is y-down: a positive signed area e appears clockwise
+    // on the raster surface.  DX7 judges winding in screen space, so
+    // D3DCULL_CW culls e>0 faces and D3DCULL_CCW culls e<0 faces.
     float e=(v1.x-v0.x)*(v2.y-v0.y)-(v2.x-v0.x)*(v1.y-v0.y);
     return cm==D3DCULL_CW ? e>0 : e<0;
 }
@@ -355,6 +389,22 @@ inline void DrawTri(const State& st,const Vert A,const Vert B,const Vert C){
         dy[i]=((B.x-A.x)*(c2[i]-c0[i])-(C.x-A.x)*(c1[i]-c0[i]))*ia;
     }
     DWORD W=st.rt->desc.dwWidth,H=st.rt->desc.dwHeight;
+    static const char* probeT=getenv("ROWAN_PIX");
+    static int tpx=-1,tpy=-1;
+    if(probeT&&tpx<0)sscanf(probeT,"%d,%d",&tpx,&tpy);
+    float bx0=A.x<B.x?(A.x<C.x?A.x:C.x):(B.x<C.x?B.x:C.x);
+    float bx1=A.x>B.x?(A.x>C.x?A.x:C.x):(B.x>C.x?B.x:C.x);
+    float by0=A.y<B.y?(A.y<C.y?A.y:C.y):(B.y<C.y?B.y:C.y);
+    float by1=A.y>B.y?(A.y>C.y?A.y:C.y):(B.y>C.y?B.y:C.y);
+    if(probeT&&tpx>=bx0-2&&tpx<=bx1+2&&tpy>=by0-2&&tpy<=by1+2){
+        float px=tpx+0.5f,py=tpy+0.5f;
+        float sgn=d>0?1.f:-1.f;
+        float w0=((C.x-B.x)*(py-B.y)-(C.y-B.y)*(px-B.x))*sgn;
+        float w1=((A.x-C.x)*(py-C.y)-(A.y-C.y)*(px-C.x))*sgn;
+        float w2=((B.x-A.x)*(py-A.y)-(B.y-A.y)*(px-A.x))*sgn;
+        fprintf(stderr,"[TRI] tex0=%p A(%g,%g) B(%g,%g) C(%g,%g) d=%g W=%u H=%u w0=%g w1=%g w2=%g %s\n",
+            (void*)st.tex[0].s,A.x,A.y,B.x,B.y,C.x,C.y,d,(unsigned)W,(unsigned)H,w0,w1,w2,
+            (w0>=0&&w1>=0&&w2>=0)?"COVER":"miss");}
     float x0=A.x<B.x?(A.x<C.x?A.x:C.x):(B.x<C.x?B.x:C.x);
     float x1=A.x>B.x?(A.x>C.x?A.x:C.x):(B.x>C.x?B.x:C.x);
     float y0=A.y<B.y?(A.y<C.y?A.y:C.y):(B.y<C.y?B.y:C.y);
@@ -373,7 +423,7 @@ inline void DrawTri(const State& st,const Vert A,const Vert B,const Vert C){
             float px=x+0.5f;
             float w0=((C.x-B.x)*(py-B.y)-(C.y-B.y)*(px-B.x))*sgn;
             float w1=((A.x-C.x)*(py-C.y)-(A.y-C.y)*(px-C.x))*sgn;
-            float w2=((B.x-A.x)*(py-A.y)-(B.y-A.y)*(px-A.y))*sgn;
+            float w2=((B.x-A.x)*(py-A.y)-(B.y-A.y)*(px-A.x))*sgn;
             if(w0>=0&&w1>=0&&w2>=0)Pixel(st,x,y,cur);
             for(int i=0;i<IC_N;i++)cur[i]+=dx[i];
         }
@@ -400,6 +450,41 @@ inline void DrawLine(const State& st,const Vert&A,const Vert&B){
 }
 
 inline void EmitPrim(const State& st,D3DPRIMITIVETYPE pt,const Vert* v,DWORD n){
+    static const char* dumpR=getenv("ROWAN_DUMP");
+    if(dumpR&&n>=3&&pt>=4){
+        int x0=0,y0=0,x1=0,y1=0;
+        if(sscanf(dumpR,"%d,%d,%d,%d",&x0,&y0,&x1,&y1)==4){
+            float mnx=1e30f,mny=1e30f,mxx=-1e30f,mxy=-1e30f;
+            for(DWORD i=0;i<n;i++){
+                if(v[i].x<mnx)mnx=v[i].x; if(v[i].x>mxx)mxx=v[i].x;
+                if(v[i].y<mny)mny=v[i].y; if(v[i].y>mxy)mxy=v[i].y;}
+            if(mxx>x0&&mnx<x1&&mxy>y0&&mny<y1){
+                IDirectDrawSurface7*t=st.tex[0].s;
+                fprintf(stderr,"[PRIM] pt=%d n=%d x[%d..%d] y[%d..%d] cm=%u zb=%p tex0=%p %ux%u/%u col0=%08lx spec0=%08lx rhw0=%g z0=%g cop=%u ca1=%x ca2=%x aop=%u aa1=%x aa2=%x ablend=%u",
+                    (int)pt,(int)n,(int)mnx,(int)mxx,(int)mny,(int)mxy,
+                    (unsigned)st.rs[D3DRENDERSTATE_CULLMODE],st.zb,t,
+                    t?(unsigned)t->desc.dwWidth:0,t?(unsigned)t->desc.dwHeight:0,
+                    t?(unsigned)t->desc.ddpfPixelFormat.dwRGBBitCount:0,
+                    (unsigned long)v[0].col,(unsigned long)v[0].spec,v[0].rhw,v[0].z,
+                    (unsigned)st.ss[0][D3DTSS_COLOROP],
+                    (unsigned)st.ss[0][D3DTSS_COLORARG1],
+                    (unsigned)st.ss[0][D3DTSS_COLORARG2],
+                    (unsigned)st.ss[0][D3DTSS_ALPHAOP],
+                    (unsigned)st.ss[0][D3DTSS_ALPHAARG1],
+                    (unsigned)st.ss[0][D3DTSS_ALPHAARG2],
+                    (unsigned)st.rs[D3DRENDERSTATE_ALPHABLENDENABLE]);
+                fprintf(stderr," rt=%p ze=%u zwe=%u zfn=%u",
+                    (void*)st.rt,
+                    (unsigned)st.rs[D3DRENDERSTATE_ZENABLE],
+                    (unsigned)st.rs[D3DRENDERSTATE_ZWRITEENABLE],
+                    (unsigned)st.rs[D3DRENDERSTATE_ZFUNC]);
+                if(getenv("ROWAN_DUMPV"))
+                    for(DWORD i=0;i<n;i++)
+                        fprintf(stderr," v%u(%g,%g r%g z%g u%g v%g)",i,v[i].x,v[i].y,v[i].rhw,v[i].z,v[i].u[0],v[i].v[0]);
+                fprintf(stderr,"\n");
+            }
+        }
+    }
     if(pt==D3DPT_TRIANGLELIST){for(DWORD i=2;i<n;i+=3)
         if(!CullWinding(st,v[i-2],v[i-1],v[i]))DrawTri(st,v[i-2],v[i-1],v[i]);}
     else if(pt==D3DPT_TRIANGLESTRIP){for(DWORD i=2;i<n;i++){
@@ -641,9 +726,19 @@ inline HRESULT IDirect3DDevice7::Clear(DWORD nRect,LPD3DRECT rects,DWORD flags,
                     Rast7::WritePx(renderTarget,x,y,px);
         }
         if((flags&D3DCLEAR_ZBUFFER)&&zb&&zb->desc.lpSurface){
-            DWORD zmax=(zbits>=32)?0xffffffffu:(zbits>=24?0xffffffu:0xffffu);
-            float zf=z<0?0:z>1?1:z;
-            DWORD nz=(DWORD)(zf*zmax);
+            DWORD nz;
+            if(renderStates[D3DRENDERSTATE_ZENABLE]==D3DZB_USEW){
+                // W-buffer stores float bit patterns (see Pixel()); the
+                // far sentinel scales FLT_MAX by the requested depth so
+                // z=1 still clears to "farther than anything drawable".
+                float w=z<0?0.0f:(z>=1?3.402823466e38f:3.402823466e38f*z);
+                memcpy(&nz,&w,4);
+                if(zbits<32)nz>>=(32-zbits);
+            } else {
+                DWORD zmax=(zbits>=32)?0xffffffffu:(zbits>=24?0xffffffu:0xffffu);
+                float zf=z<0?0:z>1?1:z;
+                nz=(DWORD)(zf*zmax);
+            }
             for(LONG y=r.y1;y<r.y2;y++)
                 for(LONG x=r.x1;x<r.x2;x++)
                     Rast7::WriteZ(zb,x,y,nz);
