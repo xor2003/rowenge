@@ -189,7 +189,10 @@ struct Dev {
             if(v2!=o.v2)return v2<o.v2; return sc<o.sc; } };
     std::map<SetKey,VkDescriptorSet> sets;
 };
-static Dev D;
+// Leaked on purpose: the render thread can still be inside TexFor()/Draw() when
+// exit() runs static destructors, so destroying D's maps there is a use-after-free.
+// () is load-bearing: it zero-initializes the POD members like static storage did.
+static Dev& D = *new Dev();
 static std::mutex vkMutex;
 
 // --- small helpers -------------------------------------------------------------

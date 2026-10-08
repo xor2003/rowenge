@@ -22,8 +22,7 @@ set(BOB_OVERLAY ${CMAKE_BINARY_DIR}/bob_inc_overlay)
 add_library(RowanDefaults INTERFACE)
 target_compile_options(RowanDefaults INTERFACE
     -m32 -fms-extensions -fno-delete-null-pointer-checks
-    # BoB raw port needs MSVC permissiveness until sites are cleaned (T108):
-    -fpermissive -Wno-narrowing
+    -Wno-narrowing
     -Wno-enum-compare)
 target_link_options(RowanDefaults INTERFACE -m32)
 # d3dvk.h dlopens libvulkan at runtime — every binary that compiles the

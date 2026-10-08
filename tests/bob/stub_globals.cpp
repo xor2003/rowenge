@@ -45,3 +45,22 @@ void shapestuff::UnLoadRequiredShapes() {}
 // T104: bfields static-init references the frame-time singleton. The real
 // definition lives in unlinked game code; TimerCode is a trivial value type.
 TimerCode Timer_Code;
+
+// T105: dinput_stub.h's inline IDI_* vtable thunks emit GUID/RowanDI
+// references in every TU that includes it (fileman/winfile pull it via the
+// windows chain). The real definitions live in migalley Hardware/dinput_stub.cpp
+// which is not linked here; these stubs only need to resolve, never run.
+#include "dinput_stub.h"
+const GUID IID_IDirectInputDeviceA = {
+    0x5944e680, 0xc92e, 0x11cf,
+    {0xbf, 0x8b, 0x00, 0xaa, 0x00, 0x6c, 0xe2, 0x14}
+};
+const GUID IID_IDirectInputDevice2A = {
+    0x5944e682, 0xc92e, 0x11cf,
+    {0xbf, 0x8b, 0x00, 0xaa, 0x00, 0x6c, 0xe2, 0x14}
+};
+const GUID IID_IDirectInputA = { 0x89521360, 0xaa8a, 0x11cf, { 0xbf, 0xc7, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00 } };
+HRESULT IDirectInputA::EnumDevices(DWORD, LPDIENUMDEVICESCALLBACK, LPVOID, DWORD) { return DI_OK; }
+void RowanDISetKeyNotify(HANDLE) {}
+void RowanDIKeyWatchEnsure() {}
+DWORD RowanDIKeyDrain(DIDEVICEOBJECTDATA*, DWORD, bool) { return 0; }
