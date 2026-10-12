@@ -11,7 +11,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)            # strict c++17 (glibc keeps M_PI etc. h
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(ROWAN_SANITIZERS "Build with ASan + UBSan" OFF)
-option(ROWAN_64BIT "Build native 64-bit (drops -m32)" OFF)
+# 64-bit is canonical; 32-bit (-DROWAN_64BIT=OFF) is a deprecated diagnostic.
+option(ROWAN_64BIT "Build native 64-bit (drops -m32)" ON)
 
 # Unified repo layout: engine/ + migalley/ + bob/ under one root.
 # ROWAN_SYSROOT locates the extracted .deb sysroot (not committed;
@@ -37,6 +38,7 @@ if(ROWAN_64BIT)
         -Wno-narrowing -Wno-enum-compare
         -Wpointer-to-int-cast -Wint-to-pointer-cast -Wformat)
 else()
+    message(DEPRECATION "32-bit engine build is deprecated; use ROWAN_64BIT=ON (default)")
     target_compile_options(RowanDefaults INTERFACE
         -m32 -fms-extensions -fno-delete-null-pointer-checks
         -Wno-narrowing

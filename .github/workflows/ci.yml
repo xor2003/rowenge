@@ -16,8 +16,42 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build (32-bit) + smoke test
+  build64:
+    name: Build (64-bit) + smoke test
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build pkg-config g++ \
+            libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev \
+            libvulkan-dev libopenal-dev nlohmann-json3-dev \
+            xvfb xdotool imagemagick
+
+      - name: Configure
+        run: |
+          PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig \
+          cmake -S migalley -B build64 -G Ninja \
+            -DCMAKE_CXX_FLAGS=-I/usr/include/x86_64-linux-gnu
+
+      - name: Build
+        run: cmake --build build64 -j"$(nproc)"
+
+      # smoke_xvfb exits 77 without the retail game data -> CTest "skipped"
+      - name: Test
+        run: ctest --test-dir build64 --output-on-failure
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: MigAlley-linux64
+          path: build64/MigAlley/MigAlley
+
+  build32:
+    name: Build (32-bit, deprecated baseline) + smoke test
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +71,7 @@ jobs:
       - name: Configure
         run: |
           PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig \
-          cmake -S migalley -B build -G Ninja \
+          cmake -S migalley -B build -G Ninja -DROWAN_64BIT=OFF \
             -DCMAKE_CXX_FLAGS=-I/usr/include/i386-linux-gnu
 
       - name: Build
@@ -54,7 +88,7 @@ jobs:
           path: build/MigAlley/MigAlley
 
   sanitizers:
-    name: Build with ASan + UBSan
+    name: Build with ASan + UBSan (32-bit)
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -72,6 +106,7 @@ jobs:
         run: |
           PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig \
           cmake -S migalley -B build-san -G Ninja -DMIG_SANITIZERS=ON \
+            -DROWAN_64BIT=OFF \
             -DCMAKE_CXX_FLAGS=-I/usr/include/i386-linux-gnu
 
       - name: Build
@@ -103,7 +138,7 @@ jobs:
       - name: Configure (compile database only)
         run: |
           PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig \
-          cmake -S migalley -B build -G Ninja \
+          cmake -S migalley -B build -G Ninja -DROWAN_64BIT=OFF \
             -DCMAKE_CXX_FLAGS=-I/usr/include/i386-linux-gnu
 
       - name: Determine changed files

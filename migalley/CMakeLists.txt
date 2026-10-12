@@ -20,7 +20,9 @@ endif()
 
 option(MIG_SANITIZERS "Build with AddressSanitizer + UBSan (GCC, 32-bit)" OFF)
 option(MIG_LINT "Run cppcheck during the build" OFF)
-option(ROWAN_64BIT "Build native 64-bit (drops -m32; needs amd64 deps)" OFF)
+# 64-bit is the canonical build.  32-bit (-DROWAN_64BIT=OFF) is deprecated:
+# kept only as a diagnostic baseline while LP64 migration issues surface.
+option(ROWAN_64BIT "Build native 64-bit (drops -m32; needs amd64 deps)" ON)
 
 # Unified repo layout: this tree lives at <repo>/migalley with siblings
 # <repo>/engine (rowan shared compat) and <repo>/bob (bob-flight-sim).
@@ -42,6 +44,13 @@ endif()
 # -------------------------------------------------------------------
 # Dependencies via pkg-config (ensures 32-bit libs are found)
 # -------------------------------------------------------------------
+# The sysroot ships .pc files for deps not installed system-wide
+# (SDL2_ttf/vulkan/openal on this box) — put it on pkg-config's path
+# so a bare `cmake -B build64` configures without env setup.
+if(IS_DIRECTORY "${ROWAN_SYSROOT}")
+    file(GLOB _pc_dirs "${ROWAN_SYSROOT}/usr/lib/*/pkgconfig")
+    set(ENV{PKG_CONFIG_PATH} "${_pc_dirs};${ROWAN_SYSROOT}/usr/lib/pkgconfig;$ENV{PKG_CONFIG_PATH}")
+endif()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SDL2 REQUIRED sdl2)
 pkg_check_modules(SDL2TTF REQUIRED SDL2_ttf)
@@ -67,6 +76,10 @@ if(NOT MSVC)
             -static-libstdc++ -static-libgcc)
     else()
         # Force 32-bit build on GCC/Clang, and disable enum comparison warnings
+        message(DEPRECATION
+            "32-bit build is deprecated — the canonical target is native 64-bit "
+            "(ROWAN_64BIT=ON, the default). 32-bit remains only as an LP64 "
+            "diagnostic baseline.")
         message(STATUS "Forcing 32-bit build: adding -m32 to CMAKE_CXX_FLAGS")
         target_compile_options(ProjectDefaults INTERFACE
             -m32 -fms-extensions -Wno-enum-compare -fno-delete-null-pointer-checks
