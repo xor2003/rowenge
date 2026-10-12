@@ -791,6 +791,28 @@ void CRListBox::SetColumnWidth(short index, long width)
         if (index >= (int)data.colWidths.size()) {
             data.colWidths.resize(index + 1, 100);
         }
+        if (width < 0) {
+            // RERUN: original OCX semantic — a negative width pins the
+            // column's right edge at |width| px from the list origin.
+            width = -width;
+            for (int i = 0; i < index; ++i)
+                width -= data.colWidths[i];
+            if (width < 0) width = 0;
+        } else if (m_hWnd) {
+            // RERUN: original OCX semantic — positive widths are character
+            // units scaled by the row font height (width*tmHeight)/16.
+            CDC dc(this);
+            CFont* pOldFont = nullptr;
+            CWnd* pParent = GetParent();
+            if (pParent) {
+                CFont* pGlobalFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, abs(data.fontNum));
+                if (pGlobalFont) pOldFont = dc.SelectObject(pGlobalFont);
+            }
+            TEXTMETRIC tm;
+            if (dc.GetTextMetrics(&tm) && tm.tmHeight > 0)
+                width = (width * tm.tmHeight) / 16;
+            if (pOldFont) dc.SelectObject(pOldFont);
+        }
         data.colWidths[index] = width;
     }
 }
