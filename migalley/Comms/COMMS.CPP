@@ -198,10 +198,8 @@ void DPlay::ExitDirectPlay ()
 Bool DPlay::UIMultiPlayInit ()
 {
 	Lobbied=FALSE;
-#if 0
 	if (!CreateDPlayInterface())
 		return FALSE;
-#endif
 	return TRUE;
 }
 
