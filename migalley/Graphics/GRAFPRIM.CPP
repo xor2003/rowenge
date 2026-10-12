@@ -921,7 +921,7 @@ extern "C" void XASM_TFImageHoriline1(Vertex* right, Vertex* left, uint16_t* scr
         }
 
         // Transparency test
-        uint8_t mask = TransparencyData[intensVal];
+        uint8_t mask = TransparencyData[intensVal + TOFF];
         mask >>= TSHIFT;
         if (mask & 0x01) {
             uint16_t color = palette_table[texel];
@@ -982,7 +982,7 @@ extern "C" void XASM_AImageHoriline1(Vertex* right, Vertex* left, uint16_t* scre
         }
 
         // Transparency test
-        uint8_t gate = TransparencyData[static_cast<uint32_t>(intensVal)];
+        uint8_t gate = TransparencyData[static_cast<uint32_t>(intensVal) + TOFF];
         gate >>= TSHIFT;
         if (gate & 0x01) {
             uint8_t texel = image[texIndex];
@@ -1389,7 +1389,7 @@ extern "C" void XASM_TFImageHoriline4(Vertex* right, Vertex* left, uint16_t* scr
         }
 
         // Transparency test
-        uint8_t mask = TransparencyData[intensVal];
+        uint8_t mask = TransparencyData[intensVal + TOFF];
         mask >>= TSHIFT;
 
         if ((mask & 0x01) != 0) {
@@ -1467,7 +1467,7 @@ extern "C" void XASM_AImageHoriline4(Vertex* right, Vertex* left, uint16_t* scre
         }
 
         // Transparency test
-        uint8_t mask = TransparencyData[intensVal];
+        uint8_t mask = TransparencyData[intensVal + TOFF];
         mask >>= TSHIFT;
 
         if ((mask & 0x01) != 0) {
