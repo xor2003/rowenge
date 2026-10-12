@@ -96,14 +96,50 @@ inline void* Grid_Base::operator new( size_t, void* inplaceaddress )
 }
 
 
-void Grid_Base::makeGridAt( void* &dataarea, ULong& datasize ) // the second parameter is ignored...
+void Grid_Base::makeGridAt( void* &dataarea, ULong& datasize )
 {
-	makeGridAt( dataarea );
+	//File image is [int type][header][packed data]. The original code
+	//placement-newed the grid over the blob: the 4-byte tag slot stood
+	//in for the vptr and 'long' members were 4 bytes. On 64-bit the
+	//vptr is 8 bytes so the overlay is impossible: form a real object
+	//on fresh storage, copy the payload after the vptr, and relocate
+	//the caller's pointer (fileman frees the original buffer).
+	int tag = *(int*) dataarea;
+	ULong need = 0;
+	switch (tag)
+	{
+	case TYPE_BIT:	need = sizeof(Grid_Bit);	break;
+	case TYPE_BYTE:	need = sizeof(Grid_Byte);	break;
+	case TYPE_WORD:	need = sizeof(Grid_Word);	break;
+	case TYPE_LONG:	need = sizeof(Grid_Long);	break;
+	default:
+		// the memory area is not a grid...
+		return;
+	}
+	char* mem = new char[need];
+	Grid_Base* g;
+	switch (tag)
+	{
+	case TYPE_BIT:	g = new (mem) Grid_Bit( 0 );	break;
+	case TYPE_BYTE:	g = new (mem) Grid_Byte( 0 );	break;
+	case TYPE_WORD:	g = new (mem) Grid_Word( 0 );	break;
+	default:		g = new (mem) Grid_Long( 0 );	break;
+	}
+	ULong payload = datasize - sizeof(int);
+	ULong room = need - sizeof(void*);
+	if (payload > room)
+		payload = room;
+	memcpy( (char*)g + sizeof(void*), (const char*)dataarea + sizeof(int), payload );
+	dataarea = g;
+	datasize = need;
 }
 
 void Grid_Base::makeGridAt( void* dataarea )
 {
-	long *type = (long*) dataarea;
+	//No size through this entry point: form a valid empty object in
+	//place. Only dead/legacy callers land here - the fileman path
+	//always uses the reference overload.
+	int *type = (int*) dataarea;
 	switch (*type)
 	{
 	case TYPE_BIT:
@@ -119,7 +155,6 @@ void Grid_Base::makeGridAt( void* dataarea )
 		new (dataarea) Grid_Long( 0 );
 		break;
 	default:
-		// the memory area is not a grid...
 		break;
 	}
 }
@@ -132,7 +167,7 @@ void Grid_Base::makeGridAt( void* dataarea )
 //////////////////////////////////////////////////////////////////////////
 Grid_Bit::Grid_Bit()
 {
-	long *t = &header[0][0]; // the start of header
+	int *t = &header[0][0]; // the start of header
 	// basic constructor - set all values to 0 and all headers to run consecutivley up..
 	{
 	for ( int i = 0; i< 10*10; i++ )
@@ -146,9 +181,9 @@ bool Grid_Bit::compareBlock(long a, long b)
 {
 	if ( a==b )
 		return true;
-	long *t1 = (long*)&data[a][0][0]; // the start of the data
-	long *t2 = (long*)&data[b][0][0];
-	long *e = t1+(64*8/4);
+	int *t1 = (int*)&data[a][0][0]; // the start of the data
+	int *t2 = (int*)&data[b][0][0];
+	int *e = t1+(64*8/4);
 	while ( t1 < e )
 		if ( *t1++ != *t2++ )
 			return false;
@@ -181,12 +216,12 @@ bool Grid_Bit::save(const char *filename )
 		return false; // it hasn't worked 4 some reason...
 	}
 	// write the type
-	long type = TYPE_BIT;
+	int type = TYPE_BIT;
 	fwrite( &type, 4, 1, fp );
 
 	// first build a temporary header...
-	long temp[10*10];
-	long *hdSt = &header[0][0];
+	int temp[10*10];
+	int *hdSt = &header[0][0];
 	{
 		for (int i = 0; i < 10 * 10; i++)
 		{
@@ -199,7 +234,7 @@ bool Grid_Bit::save(const char *filename )
 			}
 		}
 	}
-	long newHd[10*10];
+	int newHd[10*10];
 	for (int i = 0; i<10 * 10; i++)
 		newHd[i] = 0;
 	int nextFree = 0;
@@ -231,7 +266,7 @@ bool Grid_Bit::save(const char *filename )
 //////////////////////////////////////////////////////////////////////////
 Grid_Byte::Grid_Byte()
 {
-	long *t = &header[0][0]; // the start of header
+	int *t = &header[0][0]; // the start of header
 	// basic constructor - set all values to 0 and all headers to run consecutivley up..
 	{
 	for ( int i = 0; i< 80*80; i++ )
@@ -281,13 +316,13 @@ bool Grid_Byte::load(const char *filename )
 		return false; // it hasn't worked 4 some reason...
 	}
 	// read the type
-	long type;
+	int type;
 	fread( &type, 4, 1, fp );
 	if ( type != TYPE_BYTE )
 		{fclose(fp);return false;}
 
 	// load into a temporary header
-	long* temp = new long[80*80];
+	int* temp = new int[80*80];
 	fread( temp, 4, 80*80, fp );
 
 	// now load the data
@@ -314,12 +349,12 @@ bool Grid_Byte::save(const char *filename )
 		return false; // it hasn't worked 4 some reason...
 	}
 	// write the type
-	long type = TYPE_BYTE;
+	int type = TYPE_BYTE;
 	fwrite( &type, 4, 1, fp );
 
 	// first build a temporary header...
-	long* temp = new long[80 * 80];
-	long *hdSt = &header[0][0];
+	int* temp = new int[80 * 80];
+	int *hdSt = &header[0][0];
 	{
 		for (int i = 0; i < 80 * 80; i++)
 		{
@@ -332,7 +367,7 @@ bool Grid_Byte::save(const char *filename )
 			}
 		}
 	}
-	long* newHd = new long[80 * 80];
+	int* newHd = new int[80 * 80];
 	for (int i = 0; i<80 * 80; i++)
 		newHd[i] = 0;
 	int nextFree = 0;
@@ -366,7 +401,7 @@ bool Grid_Byte::save(const char *filename )
 //////////////////////////////////////////////////////////////////////////
 Grid_Word::Grid_Word()
 {
-	long *t = &header[0][0]; // the start of header
+	int *t = &header[0][0]; // the start of header
 	// basic constructor - set all values to 0 and all headers to run consecutivley up..
 	{
 	for ( int i = 0; i< 80*80; i++ )
@@ -406,12 +441,12 @@ bool Grid_Word::save(const char *filename )
 		return false; // it hasn't worked 4 some reason...
 	}
 	// write the type
-	long type = TYPE_WORD;
+	int type = TYPE_WORD;
 	fwrite( &type, 4, 1, fp );
 
 	// first build a temporary header...
-	long* temp = new long[80 * 80];
-	long *hdSt = &header[0][0];
+	int* temp = new int[80 * 80];
+	int *hdSt = &header[0][0];
 	{
 		for (int i = 0; i < 80 * 80; i++)
 		{
@@ -424,7 +459,7 @@ bool Grid_Word::save(const char *filename )
 			}
 		}
 	}
-	long* newHd = new long[80 * 80];
+	int* newHd = new int[80 * 80];
 	for (int i = 0; i<80 * 80; i++)
 		newHd[i] = 0;
 	int nextFree = 0;
@@ -457,7 +492,7 @@ bool Grid_Word::save(const char *filename )
 //////////////////////////////////////////////////////////////////////////
 Grid_Long::Grid_Long()
 {
-	long *t = &header[0][0]; // the start of header
+	int *t = &header[0][0]; // the start of header
 	// basic constructor - set all values to 0 and all headers to run consecutivley up..
 	{
 	for ( int i = 0; i< 80*80; i++ )
@@ -517,12 +552,12 @@ bool Grid_Long::save(const char *filename )
 		return false; // it hasn't worked 4 some reason...
 	}
 	// write the type
-	long type = TYPE_LONG;
+	int type = TYPE_LONG;
 	fwrite( &type, 4, 1, fp );
 
 	// first build a temporary header...
-	long* temp = new long[80 * 80];
-	long *hdSt = &header[0][0];
+	int* temp = new int[80 * 80];
+	int *hdSt = &header[0][0];
 	{
 		for (int i = 0; i < 80 * 80; i++)
 		{
@@ -536,7 +571,7 @@ bool Grid_Long::save(const char *filename )
 			}
 		}
 	}
-	long* newHd = new long[80 * 80];
+	int* newHd = new int[80 * 80];
 	for (int i = 0; i<80 * 80; i++)
 		newHd[i] = 0;
 	int nextFree = 0;
@@ -583,8 +618,12 @@ Grid_Base* loadGrid(const char* filename )
 	fread( theGrid, 1, fsize, fp );
 	fclose( fp );
 
-	Grid_Base::makeGridAt( theGrid );
-	return (Grid_Base*)theGrid;
+	ULong datasize = fsize;
+	void* p = theGrid;
+	Grid_Base::makeGridAt( p, datasize );
+	if ( p != theGrid )
+		delete[] theGrid;
+	return (Grid_Base*)p;
 }
 
 //stuff for within the game so that there is no conflicts on the grids...

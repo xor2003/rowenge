@@ -590,7 +590,10 @@ public:
 
 #define NUM_PALETTES	8
 
-typedef enum HMATRIX {MATRIX_PROJECTION,MATRIX_VIEWER,MATRIX_OBJECT} HMATRIX;
+//HMATRIX must hold real R3DMATRIX pointers (callers cast matrix addresses
+//through it), so it is pointer-sized; the sentinel values double as handles.
+typedef uintptr_t HMATRIX;
+enum {MATRIX_PROJECTION,MATRIX_VIEWER,MATRIX_OBJECT};
 typedef enum HAXIS {AXIS_PITCH,AXIS_HEADING,AXIS_ROLL} HAXIS;
 typedef enum LIGHTFLAG
 {

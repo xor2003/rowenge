@@ -115,7 +115,7 @@ class Grid_Byte_File
 class Grid_Bit : public Grid_Base
 {
 private:
-	long header[10][10];							// pointer offsets to an 10x10 subgrid of the data
+	int header[10][10];							// pointer offsets to an 10x10 subgrid of the data
 	char data[10*10][64][8];							// 10x10 blocks of data... = 10x64 = 640x640 total grid size
 	inline bool compareBlock( long a, long b );
 
@@ -136,7 +136,7 @@ public:
 class Grid_Byte : public Grid_Base
 {
 private:
-	long header[80][80];
+	int header[80][80];
 	UByte data[(80*80)][8][8];
 	inline bool compareBlock( long a, long b );
 	inline void copyBlock( long from, long to );
@@ -157,7 +157,7 @@ public:
 class Grid_Word : public Grid_Base
 {
 private:
-	long header[80][80];
+	int header[80][80];
 	UWord data[(80*80)][8][8];
 	inline bool compareBlock( long a, long b );
 
@@ -178,8 +178,8 @@ public:
 class Grid_Long : public Grid_Base
 {
 private:
-	long header[80][80];
-	long data[(80*80)][8][8];
+	int header[80][80];
+	int data[(80*80)][8][8];
 	inline bool compareBlock( long a, long b ); 
 
 public:

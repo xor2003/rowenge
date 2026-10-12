@@ -1289,9 +1289,39 @@ void	QuickDef::MakeTeamPlayMission(int index)
 // Description:	Translation that occurs when the file is reloaded
 //				Fix up pointers to internal strings
 ////////////////////////////////////////////////////////////////////////
+//On-disk image of QuickDef/QuickFields as written by the 32-bit tool.
+//Pointers serialise as 32-bit slots, so sizeof differs from the runtime
+//struct on 64-bit hosts: index the blob with these, then convert.
+#pragma pack(push,1)
+struct	QuickFieldsDisk
+{
+	UByte	actype;
+	UByte	flights;
+	UByte	skill;
+	int	alt;
+	int	descID;
+	UByte	duty;
+	ULong	dialog;
+};
+struct	QuickDefDisk
+{
+	FixString		titlename,missionname,missiondesc;
+	QuickFieldsDisk	line[2][8][4];
+	char	plside,plwave,plgrp,plac;
+	UWord	currmissnum,altmissnum;
+	char	weather,	time;
+	FixString	targtypeIDs[4];
+	UniqueID	targets[4][4];
+	UniqueID	target;
+	ULong	parent;
+};
+#pragma pack(pop)
+static_assert(sizeof(QuickFieldsDisk)==16,"QuickFields disk stride");
+static_assert(sizeof(QuickDefDisk)==1134,"QuickDef disk stride");
+
 void	QuickDef::trans(void* &dataarea,ULong& datasize)
 {
-	QuickDef* qd=(QuickDef*)dataarea;
+	QuickDefDisk* qd=(QuickDefDisk*)dataarea;
 	int i;
 	for (i=0;qd[i].titlename;i++)	{}
 	if (qd[i].missiondesc)
@@ -1321,8 +1351,40 @@ const QuickDef	QuickDef::QuickMissionArray::operator[](int index)const
 #else
 	fileblock fb(FIL_QUICKMISSION_DATA,trans);
 #endif
-	QuickDef* qd=(QuickDef*)fb.getdata();
-	return	(qd[index]);
+	QuickDefDisk* qd=(QuickDefDisk*)fb.getdata();
+	const QuickDefDisk& s=qd[index];
+	QuickDef r;
+	r.titlename=s.titlename;
+	r.missionname=s.missionname;
+	r.missiondesc=s.missiondesc;
+	for (int a=0;a<2;a++)
+		for (int b=0;b<8;b++)
+			for (int c=0;c<4;c++)
+			{
+				QuickFields& d=r.line[a][b][c];
+				const QuickFieldsDisk& f=s.line[a][b][c];
+				d.actype=f.actype;
+				d.flights=f.flights;
+				d.skill=f.skill;
+				d.alt=f.alt;
+				d.descID=f.descID;
+				d.duty=f.duty;
+				d.dialog=NULL;
+			}
+	r.plside=s.plside;
+	r.plwave=s.plwave;
+	r.plgrp=s.plgrp;
+	r.plac=s.plac;
+	r.currmissnum=s.currmissnum;
+	r.altmissnum=s.altmissnum;
+	r.weather=s.weather;
+	r.time=s.time;
+	for (int i=0;i<4;i++)
+		r.targtypeIDs[i]=s.targtypeIDs[i];
+	memcpy(r.targets,s.targets,sizeof(r.targets));
+	r.target=s.target;
+	r.parent=NULL;
+	return	(r);
 }
 ////////////////////////////////////////////////////////////////////////
 //

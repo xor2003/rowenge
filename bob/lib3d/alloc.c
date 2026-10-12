@@ -29,8 +29,8 @@ static alloc_hdr_t *root=0UL;
 
 char *AllocSetToAlignment(char *c)
 {
-	unsigned int i=(uintptr_t)c;
-	i=(i+ALIGN_BYTES-1)&-ALIGN_BYTES;
+	uintptr_t i=(uintptr_t)c;
+	i=(i+ALIGN_BYTES-1)&~(uintptr_t)(ALIGN_BYTES-1);
 	return (char* )i;
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

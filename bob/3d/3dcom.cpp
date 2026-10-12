@@ -2368,8 +2368,8 @@ void shape::dogunsight(UByte *& instr_ptr)
 
 	R3DVALUE		screenx,screeny,screenz;					//RJS 07Feb00
 	R3DMATRIX		omat,vomat;
-	HMATRIX			matptr=HMATRIX(SLong(&omat));
-	HMATRIX			vmatptr=HMATRIX(SLong(&vomat));
+	HMATRIX			matptr=HMATRIX(uintptr_t(&omat));
+	HMATRIX			vmatptr=HMATRIX(uintptr_t(&vomat));
 
 	Float			zscale, testPointX,testPointY;
 	Float			ddx, ddy, ddxscaled, ddfrac;
