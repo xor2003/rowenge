@@ -77,6 +77,10 @@ questions about this file may be asked at http://www.simhq.com/
 #include	"WORLDINC.H"
 #include	"POLYGON.H"
 #include	"FONTS.H"
+#include	<map>
+#include	<vector>
+#include	<cstdlib>
+#include	<cstring>
 #pragma warning (disable: 4701)
 #ifdef	__MSVC__
 
@@ -632,6 +636,212 @@ inline SWord ASM_GetTransparency()
     return Trns3DEnabled;
 }
 
+// Software bilinear filtering (RGB565). The retail game's D3D path rendered
+// with bilinear filtering + smooth shading; the software rasterizer only
+// point-sampled and screen-door dithered, which is why textures/shades look
+// speckled by comparison. These helpers reproduce the filtered look in the
+// span drawers. ROWAN_NOFILTER=1 restores the original point-sampled path.
+static int g_swFilter = -1;
+static inline bool sw_filter()
+{
+    if (g_swFilter < 0) g_swFilter = getenv("ROWAN_NOFILTER") ? 0 : 1;
+    return g_swFilter != 0;
+}
+
+static inline uint16_t lerp565(uint16_t a, uint16_t b, uint32_t t)	// t in [0,256]
+{
+    uint32_t it = 256u - t;
+    // Per-channel: the packed rb = (a&F81F)*it + ... trick can't be used —
+    // the red sum's low bits survive the >>8 and land inside blue's field.
+    uint32_t r  = (((a >> 11) * it) + ((b >> 11) * t)) >> 8;
+    uint32_t g  = ((((a >> 5) & 63) * it) + (((b >> 5) & 63) * t)) >> 8;
+    uint32_t bl = (((a & 31) * it) + ((b & 31) * t)) >> 8;
+    return static_cast<uint16_t>((r << 11) | (g << 5) | bl);
+}
+
+
+// Texture coords are 16.16 fixed point; xm/ym are integer wraps (w-1, h-1)
+// and lshift = log2(row stride) = 16 - imageyshift.
+struct BilUV {
+    uint32_t i00, i10, i01, i11;
+    uint32_t uf, vf;
+};
+
+static inline void biluv(int ix, int iy, uint32_t xm, uint32_t ym, int lshift, BilUV& b)
+{
+    uint32_t u0 = (static_cast<uint32_t>(ix) >> 16) & xm;
+    uint32_t v0 = (static_cast<uint32_t>(iy) >> 16) & ym;
+    uint32_t u1 = (u0 + 1) & xm;
+    uint32_t v1 = (v0 + 1) & ym;
+    uint32_t r0 = v0 << lshift;
+    uint32_t r1 = v1 << lshift;
+    b.i00 = r0 + u0;  b.i10 = r0 + u1;
+    b.i01 = r1 + u0;  b.i11 = r1 + u1;
+    b.uf = (static_cast<uint32_t>(ix) >> 8) & 0xFFu;
+    b.vf = (static_cast<uint32_t>(iy) >> 8) & 0xFFu;
+}
+
+static inline uint16_t bil4(uint16_t c00, uint16_t c10,
+                            uint16_t c01, uint16_t c11, const BilUV& b)
+{
+    return lerp565(lerp565(c00, c10, b.uf),
+                   lerp565(c01, c11, b.uf), b.vf);
+}
+
+// RGB manhattan-ish distance between two 565 colours (r/b weighted x2)
+static inline int dist565(uint16_t a, uint16_t c)
+{
+    int dr = ((a >> 11) & 31) - ((c >> 11) & 31);
+    int dg = ((a >> 5) & 63) - ((c >> 5) & 63);
+    int db = (a & 31) - (c & 31);
+    if (dr < 0) dr = -dr;
+    if (dg < 0) dg = -dg;
+    if (db < 0) db = -db;
+    return dr * 2 + dg + db * 2;
+}
+
+// Average of three RGB565 colours (per-channel; used to substitute a
+// rejected outlier tap)
+static inline uint16_t avg3_565(uint16_t a, uint16_t b, uint16_t c)
+{
+    uint32_t r  = ((a >> 11) & 31) + ((b >> 11) & 31) + ((c >> 11) & 31);
+    uint32_t g  = ((a >> 5) & 63) + ((b >> 5) & 63) + ((c >> 5) & 63);
+    uint32_t bl = (a & 31) + (b & 31) + (c & 31);
+    return static_cast<uint16_t>(((r / 3) << 11) | ((g / 3) << 5) | (bl / 3));
+}
+
+// High local contrast across the 4 bilinear taps => baked speckle/stipple
+// or a real texel edge (cockpit atlas grain, masked-shape borders).
+// Bilinear would smear each speck into a 2x2 blob; the original point
+// sample kept them sparse. When one tap is the odd one out (3+1), reject
+// it and blend the agreeing majority; on a genuine 2+2 split edge, return
+// the truncated-texel colour — exactly what the unfiltered path wrote.
+static inline uint16_t bil_despeckle(uint16_t c00, uint16_t c10,
+                                     uint16_t c01, uint16_t c11,
+                                     const BilUV& b)
+{
+    const int T = 40;   // gradient steps sit below this; specks above
+    int d01 = dist565(c00, c10), d02 = dist565(c00, c01),
+        d03 = dist565(c00, c11), d12 = dist565(c10, c01),
+        d13 = dist565(c10, c11), d23 = dist565(c01, c11);
+    int mx = d01;
+    if (d02 > mx) mx = d02;
+    if (d03 > mx) mx = d03;
+    if (d12 > mx) mx = d12;
+    if (d13 > mx) mx = d13;
+    if (d23 > mx) mx = d23;
+    if (mx <= T)
+        return bil4(c00, c10, c01, c11, b);
+    // the odd-one-out carries the largest summed distance to the others
+    int s0 = d01 + d02 + d03, s1 = d01 + d12 + d13,
+        s2 = d02 + d12 + d23, s3 = d03 + d13 + d23;
+    if (s0 > s1 && s0 > s2 && s0 > s3)
+        return bil4(avg3_565(c10, c01, c11), c10, c01, c11, b);
+    if (s1 > s0 && s1 > s2 && s1 > s3)
+        return bil4(c00, avg3_565(c00, c01, c11), c01, c11, b);
+    if (s2 > s0 && s2 > s1 && s2 > s3)
+        return bil4(c00, c10, avg3_565(c00, c10, c11), c11, b);
+    if (s3 > s0 && s3 > s1 && s3 > s2)
+        return bil4(c00, c10, c01, avg3_565(c00, c10, c01), b);
+    return c00;      // even split (edge / checkerboard) -> point sample
+}
+
+// 4-tap bilinear of a paletted texture -> RGB565
+static inline uint16_t bil_color(const uint8_t* img, const BilUV& b)
+{
+    uint16_t c00 = palette_table[img[b.i00]], c10 = palette_table[img[b.i10]],
+             c01 = palette_table[img[b.i01]], c11 = palette_table[img[b.i11]];
+    return bil_despeckle(c00, c10, c01, c11, b);
+}
+
+// 4-tap bilinear of a raw byte channel (alpha), 0..256 scale output
+static inline uint32_t bil_byte(const uint8_t* img, const BilUV& b)
+{
+    uint32_t t = (img[b.i00] * (256u - b.uf) + img[b.i10] * b.uf) >> 8;
+    uint32_t s = (img[b.i01] * (256u - b.uf) + img[b.i11] * b.uf) >> 8;
+    return (t * (256u - b.vf) + s * b.vf) >> 8;
+}
+
+// Index-space mipmap chain cache (nearest-2x downsample — safe for
+// paletted data since it never averages indices). Reproduces the D3D
+// mip-map effect that killed minification speckle in the retail game.
+struct MipChain {
+    uint32_t w, h;
+    uint32_t sig;
+    std::vector<std::vector<uint8_t>> lv;
+};
+
+static const uint8_t* mip_data(const uint8_t* src, uint32_t xm, uint32_t ym,
+                               int lod)
+{
+    static std::map<const uint8_t*, MipChain> cache;
+    const uint32_t w = xm + 1, h = ym + 1;
+    const uint32_t sig = src[0] ^ (src[w * h / 2] << 8) ^ (src[w * h - 1] << 16);
+    MipChain& c = cache[src];
+    if (c.w != w || c.h != h || c.sig != sig || c.lv.empty()) {
+        c.w = w; c.h = h; c.sig = sig; c.lv.clear();
+        uint32_t cw = w, ch = h;
+        const uint8_t* prev = src;
+        while (cw > 1 && ch > 1) {
+            uint32_t nw = cw >> 1, nh = ch >> 1;
+            std::vector<uint8_t> lv(nw * nh);
+            for (uint32_t y = 0; y < nh; ++y)
+                for (uint32_t x = 0; x < nw; ++x)
+                    lv[y * nw + x] = prev[(y * 2) * cw + x * 2];
+            c.lv.push_back(std::move(lv));
+            prev = c.lv.back().data();
+            cw = nw; ch = nh;
+        }
+    }
+    if (lod <= 0)               return src;
+    if ((size_t)lod > c.lv.size()) lod = (int)c.lv.size();
+    return c.lv[lod - 1].data();
+}
+
+// Per-span filtered texture context: mip-space coords/masks adjusted by
+// the span's texel step (affine => LOD is constant across the span).
+struct FTex {
+    const uint8_t* img;
+    uint32_t xm, ym;
+    int lshift;
+    int ix, iy, dx, dy;
+    int lod;
+};
+
+
+static int g_swMip = -1;
+
+static inline bool sw_mip()
+{
+    if (g_swMip < 0)
+        g_swMip = getenv("ROWAN_NOMIP") ? 0 : 1;
+    return g_swMip != 0;
+}
+
+static inline FTex ftex(const uint8_t* img, uint32_t xmask, uint32_t ymask,
+                        uint8_t yshift, int IX, int IY, int DIX, int DIY)
+{
+    FTex t;
+    int lod = 0;
+    if (sw_mip()) {
+        long st = std::labs(DIX) > std::labs(DIY) ? std::labs(DIX) : std::labs(DIY);
+        st >>= 16;
+        while (st > 1) { st >>= 1; ++lod; }
+    }
+    const uint32_t w = (xmask >> 16) + 1, h = (ymask >> 16) + 1;
+    int maxlod = 0;
+    while ((w >> (maxlod + 1)) >= 1 && (h >> (maxlod + 1)) >= 1) ++maxlod;
+    if (lod > maxlod) lod = maxlod;
+    t.img    = mip_data(img, xmask >> 16, ymask >> 16, lod);
+    t.xm     = (xmask >> 16) >> lod;
+    t.ym     = (ymask >> 16) >> lod;
+    t.lshift = (16 - yshift) - lod;
+    t.ix     = IX >> lod;  t.iy = IY >> lod;
+    t.dx     = DIX >> lod; t.dy = DIY >> lod;
+    t.lod    = lod;
+    return t;
+}
+
 // Now the XASM replacement routines
 extern "C" void XASM_PlainHoriLine1(Vertex* right, Vertex* left,
                                     uint16_t* screenBase)
@@ -667,15 +877,24 @@ extern "C" void XASM_GouraudHoriLine1(Vertex* right, Vertex* left,
     const uint16_t* HorizonFade16 = reinterpret_cast<const uint16_t*>(HorizonFadeData);
     const uint16_t* LandFade16    = reinterpret_cast<const uint16_t*>(LandFadeData);
     uint16_t jitter = LandFade16[left->sy & 0xFFu];
+    const bool filt = sw_filter();
 
     for (int cx = width; cx > 0; --cx, ++dst) {
-        // Shade calculation
-        int shade = (INTENS + jitter) >> 16;
-        if (shade > 0xF) shade = 0xF;
-        if (shade < 0)   shade = 0;
-
-        // Lookup horizon fade color
-        uint16_t color = HorizonFade16[shade];
+        uint16_t color;
+        if (filt) {
+            // Smooth shade: lerp adjacent fade entries by the intensity
+            // fraction (D3D-equivalent) instead of the jitter dither.
+            int s = INTENS >> 16;
+            uint32_t sf = (static_cast<uint32_t>(INTENS) >> 8) & 0xFFu;
+            if (s < 0)   { s = 0; sf = 0; }
+            if (s > 14)  { s = 14; sf = 256; }
+            color = lerp565(HorizonFade16[s], HorizonFade16[s + 1], sf);
+        } else {
+            int shade = (INTENS + jitter) >> 16;
+            if (shade > 0xF) shade = 0xF;
+            if (shade < 0)   shade = 0;
+            color = HorizonFade16[shade];
+        }
 
         // Write pixel
         *dst = color;
@@ -715,42 +934,51 @@ extern "C" void XASM_ImageHoriLine1(Vertex* right, Vertex* left, uint16_t* scree
     uint32_t xmask = colour_data.imagexmask;
     uint32_t ymask = colour_data.imageymask;
     uint8_t yshift = colour_data.imageyshift;
+    const bool filt = sw_filter();
 
     if (!horizontal) {
         int DIY = dy / width;
+        FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
 
         // General loop
         for (int cx = width; cx > 0; --cx, ++dst) {
-            uint32_t ebx = IX & xmask;
+            if (filt) {
+                BilUV b;
+                biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+                *dst = bil_color(t.img, b);
+                t.ix += t.dx; t.iy += t.dy;
+            } else {
+                uint32_t ebx = IX & xmask;
+                uint32_t eax = IY & ymask;
+                eax >>= yshift;
+                uint8_t texel = image[(ebx >> 16) + eax];
+                *dst = palette_table[texel];
+            }
             IX += DIX;
-
-            uint32_t eax = IY & ymask;
-            eax >>= yshift;
-
-            int texIndex = (ebx >> 16) + eax;
-            uint8_t texel = image[texIndex];
-
             IY += DIY;
-
-            // Palette lookup
-            uint16_t color = palette_table[texel];
-            *dst = color;
         }
     } else {
-        // Horizontal case
+        // Horizontal case: v is constant across the span
+        int vfix = IY;
         IY &= ymask;
         IY >>= yshift;
-        image += IY;
+        const uint8_t* rowimg = image + IY;
         int step = DIX;
+        FTex t = ftex(image, xmask, ymask, yshift, IX, vfix, step, 0);
 
         for (int cx = width; cx > 0; --cx, ++dst) {
-            uint32_t ebx = IX & xmask;
+            if (filt) {
+                BilUV b;
+                biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+                *dst = bil_color(t.img, b);
+                t.ix += t.dx;
+            } else {
+                uint32_t ebx = IX & xmask;
+                ebx >>= 16;
+                uint8_t texel = rowimg[ebx];
+                *dst = palette_table[texel];
+            }
             IX += step;
-            ebx >>= 16;
-
-            uint8_t texel = image[ebx];
-            uint16_t color = palette_table[texel];
-            *dst = color;
         }
     }
 }
@@ -778,21 +1006,45 @@ extern "C" void XASM_MImageHoriLine1(Vertex* right, Vertex* left, uint16_t* scre
     uint32_t xmask = colour_data.imagexmask;
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift = colour_data.imageyshift;
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
 
     for (int cx = width; cx > 0; --cx, ++dst) {
-        // Masked texture coords
-        uint32_t ebx = IX & xmask;
-        uint32_t eax = IY & ymask;
-        ebx >>= 16;
-        eax >>= yshift;
+        if (filt) {
+            // Mask test on the nearest tap (matches the original's
+            // shape exactly; baked FE-dither interiors must not turn
+            // into coverage fractions). Bilinear the colour only,
+            // substituting FE taps with the nearest visible colour.
+            uint32_t nu = (t.ix >> 16) & t.xm;
+            uint32_t nv = (t.iy >> 16) & t.ym;
+            uint8_t near = t.img[nu + (nv << t.lshift)];
+            if (near != 0xFE) {
+                BilUV b;
+                biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+                uint8_t t00 = t.img[b.i00], t10 = t.img[b.i10],
+                        t01 = t.img[b.i01], t11 = t.img[b.i11];
+                if (t00 == 0xFE) t00 = near;
+                if (t10 == 0xFE) t10 = near;
+                if (t01 == 0xFE) t01 = near;
+                if (t11 == 0xFE) t11 = near;
+                uint16_t c00 = palette_table[t00], c10 = palette_table[t10],
+                         c01 = palette_table[t01], c11 = palette_table[t11];
+                *dst = bil_despeckle(c00, c10, c01, c11, b);
+            }
+            t.ix += t.dx; t.iy += t.dy;
+        } else {
+            // Masked texture coords
+            uint32_t ebx = IX & xmask;
+            uint32_t eax = IY & ymask;
+            ebx >>= 16;
+            eax >>= yshift;
 
-        int texIndex = ebx + eax;
-        uint8_t texel = image[texIndex];
+            uint8_t texel = image[ebx + eax];
 
-        // Transparency check
-        if (texel != 0xFE) {
-            uint16_t color = palette_table[texel];
-            *dst = color;
+            // Transparency check
+            if (texel != 0xFE) {
+                *dst = palette_table[texel];
+            }
         }
 
         // Advance coords
@@ -830,27 +1082,47 @@ extern "C" void XASM_SImageHoriLine1(Vertex* right, Vertex* left, uint16_t* scre
 
     // Jitter seed from LandFadeData[(left->sy & 0xFF)]
     const uint16_t* LandFade16    = reinterpret_cast<const uint16_t*>(LandFadeData);
-    const uint16_t* HorizonFade16 = reinterpret_cast<const uint16_t*>(HorizonFadeData); // not used here, but for reference
     uint16_t jitter = LandFade16[left->sy & 0xFFu];
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
 
     // Main loop
     for (int cx = width; cx > 0; --cx, ++dst) {
-        // Masked texture coords -> texel index
-        uint32_t ebx = static_cast<uint32_t>(IX) & xmask;
-        uint32_t eax = static_cast<uint32_t>(IY) & ymask;
-        ebx >>= 16;
-        eax >>= yshift;
+        uint16_t color;
+        if (filt) {
+            // Bilinear texel + smooth fog shade (D3D-equivalent)
+            int s = INTENS >> 16;
+            uint32_t sf = (static_cast<uint32_t>(INTENS) >> 8) & 0xFFu;
+            if (s < 0)  { s = 0; sf = 0; }
+            if (s > 14) { s = 14; sf = 256; }
+            BilUV b;
+            biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+            uint16_t c00 = lerp565(LandFade16[(t.img[b.i00] << 4) | s],
+                                   LandFade16[(t.img[b.i00] << 4) | (s + 1)], sf);
+            uint16_t c10 = lerp565(LandFade16[(t.img[b.i10] << 4) | s],
+                                   LandFade16[(t.img[b.i10] << 4) | (s + 1)], sf);
+            uint16_t c01 = lerp565(LandFade16[(t.img[b.i01] << 4) | s],
+                                   LandFade16[(t.img[b.i01] << 4) | (s + 1)], sf);
+            uint16_t c11 = lerp565(LandFade16[(t.img[b.i11] << 4) | s],
+                                   LandFade16[(t.img[b.i11] << 4) | (s + 1)], sf);
+            color = bil_despeckle(c00, c10, c01, c11, b);
+            t.ix += t.dx; t.iy += t.dy;
+        } else {
+            // Masked texture coords -> texel index
+            uint32_t ebx = static_cast<uint32_t>(IX) & xmask;
+            uint32_t eax = static_cast<uint32_t>(IY) & ymask;
+            ebx >>= 16;
+            eax >>= yshift;
 
-        uint8_t texel = image[ebx + eax];
+            uint8_t texel = image[ebx + eax];
 
-        // Shade = (INTENS + jitter) >> 16, clamped to 0..15
-        int shade = (INTENS + static_cast<int>(jitter)) >> 16;
-        if (shade > 0xF) shade = 0xF;
-        if (shade < 0)   shade = 0;
+            // Shade = (INTENS + jitter) >> 16, clamped to 0..15
+            int shade = (INTENS + static_cast<int>(jitter)) >> 16;
+            if (shade > 0xF) shade = 0xF;
+            if (shade < 0)   shade = 0;
 
-        // Fade index and color from LandFadeData (word table)
-        uint32_t fadeIndex = (static_cast<uint32_t>(texel) << 4) | static_cast<uint32_t>(shade);
-        uint16_t color = LandFade16[fadeIndex];
+            color = LandFade16[(static_cast<uint32_t>(texel) << 4) | static_cast<uint32_t>(shade)];
+        }
 
         *dst = color;
 
@@ -894,10 +1166,34 @@ extern "C" void XASM_TFImageHoriline1(Vertex* right, Vertex* left, uint16_t* scr
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift= colour_data.imageyshift;
 
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
+
     for (int cx = width; cx > 0; --cx, ++dst) {
-        // Masked coords
+        // Masked coords (sampled pre-advance, matching the original loop)
         uint32_t ebx = static_cast<uint32_t>(IX) & xmask;
         uint32_t eax = static_cast<uint32_t>(IY) & ymask;
+
+        // Intensity value -> coverage row (0..7)
+        int intensVal = (INTENS >> 14) & 0x78;
+        if (intensVal > 0x38) intensVal = 0x38;
+        INTENS += DINTENS;
+
+        if (filt) {
+            // Real alpha blend: coverage fraction = row/7 approx.
+            uint32_t a = (static_cast<uint32_t>(intensVal) * 255u) / 56u;
+            if (a) {
+                BilUV b;
+                biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+                uint16_t s = bil_color(t.img, b);
+                if (a >= 255) *dst = s;
+                else          *dst = lerp565(*dst, s, a);
+            }
+            t.ix += t.dx; t.iy += t.dy;
+            IX += DIX;
+            IY += DIY;
+            continue;
+        }
 
         IX += DIX;
         IY += DIY;
@@ -905,11 +1201,6 @@ extern "C" void XASM_TFImageHoriline1(Vertex* right, Vertex* left, uint16_t* scr
         ebx >>= 16;
         eax >>= yshift;
         uint8_t texel = image[ebx + eax];
-
-        // Intensity value
-        int intensVal = (INTENS >> 14) & 0x78;
-        if (intensVal > 0x38) intensVal = 0x38;
-        INTENS += DINTENS;
 
         // Transparency cycling
         uint8_t t = static_cast<uint8_t>(TSHIFT + 1);
@@ -942,10 +1233,6 @@ extern "C" void XASM_AImageHoriline1(Vertex* right, Vertex* left, uint16_t* scre
 
     uint16_t* dst = screenBase + leftX;
 
-    // Transparency cycling
-    uint8_t TSHIFT = FUP[leftX & 0x07];
-    uint8_t TOFF   = static_cast<uint8_t>(left->sy) & 0x07;
-
     // Texture coordinates and signed deltas
     int IX  = left->ix;
     int IY  = left->iy;
@@ -957,39 +1244,63 @@ extern "C" void XASM_AImageHoriline1(Vertex* right, Vertex* left, uint16_t* scre
     uint32_t xmask = colour_data.imagexmask;
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift = colour_data.imageyshift;
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
+    // Alpha bilinear at the colour LOD: smooth gradients (e.g. DIRT7's
+    // dirt film) stay soft, while the atlas's sparse sub-threshold alpha
+    // specks blend *down* toward invisible instead of being smeared into
+    // threshold-crossing blobs by a deep mip.
+    FTex ta;
+    if (alpha && filt) {
+        ta = t;
+        int alod = t.lod;
+        const uint32_t aw = (xmask >> 16), ah = (ymask >> 16);
+        int maxl = 0;
+        while (((aw >> (maxl + 1)) >= 1) && ((ah >> (maxl + 1)) >= 1)) ++maxl;
+        if (alod > maxl) alod = maxl;
+        ta.img    = mip_data(alpha, aw, ah, alod);
+        ta.xm     = aw >> alod;  ta.ym = ah >> alod;
+        ta.lshift = (16 - yshift) - alod;
+        ta.ix = IX >> alod;  ta.iy = IY >> alod;
+        ta.dx = DIX >> alod; ta.dy = DIY >> alod;
+    }
 
     for (int cx = width; cx > 0; --cx, ++dst) {
-        // Masked coords -> texel index
-        uint32_t xIndex = static_cast<uint32_t>(IX) & xmask;   xIndex >>= 16;
-        uint32_t yIndex = static_cast<uint32_t>(IY) & ymask;   yIndex >>= yshift;
-        int texIndex = static_cast<int>(xIndex + yIndex);
+        uint32_t a;
+        uint16_t s;
+        if (filt) {
+            // Bilinear colour + bilinear alpha, blended over dest
+            BilUV b;
+            biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+            s = bil_color(t.img, b);
+            t.ix += t.dx; t.iy += t.dy;
+            a = 0;
+            if (alpha) {
+                BilUV ba;
+                biluv(ta.ix, ta.iy, ta.xm, ta.ym, ta.lshift, ba);
+                a = bil_byte(ta.img, ba);
+                ta.ix += ta.dx; ta.iy += ta.dy;
+            }
+        } else {
+            // Masked coords -> texel index
+            uint32_t xIndex = static_cast<uint32_t>(IX) & xmask;   xIndex >>= 16;
+            uint32_t yIndex = static_cast<uint32_t>(IY) & ymask;   yIndex >>= yshift;
+            int texIndex = static_cast<int>(xIndex + yIndex);
+            a = alpha ? alpha[texIndex] : 0;
+            s = palette_table[image[texIndex]];
+        }
 
         // Advance coords
         IX += DIX;
         IY += DIY;
 
-        // Alpha gating: treat alpha as byte per texel (safer than dword in the port)
-        uint8_t alphaByte = alpha ? alpha[texIndex] : 0;
-        int intensVal = (alphaByte >> 2) & 0x38;  // matches ASM bucketization
-
-        // Cycle TSHIFT/TOFF
-        uint8_t t = static_cast<uint8_t>(TSHIFT + 1);
-        if (t & 0x08) {
-            TOFF   = static_cast<uint8_t>((TOFF + 1) & 0x07);
-            TSHIFT = 0;
-        } else {
-            TSHIFT = t;
-        }
-
-        // Transparency test
-        uint8_t gate = TransparencyData[static_cast<uint32_t>(intensVal) + TOFF];
-        gate >>= TSHIFT;
-        if (gate & 0x01) {
-            uint8_t texel = image[texIndex];
-            uint16_t color = palette_table[texel];
-            *dst = color;
-        }
-        // else: transparent, skip write
+        // Per-texel alpha -> real translucency (RGB565), matching the
+        // hardware path; the original software drawer screen-doored this.
+        // a<32 mirrors the original bucket-0 cutoff (alpha>>5 == 0 -> never
+        // drawn) so the atlas's faint sub-speckle stays invisible.
+        if (a < 32) continue;
+        if (a >= 255) { *dst = s; continue; }       // fully opaque
+        *dst = lerp565(*dst, s, a);
     }
 }
 
@@ -1023,21 +1334,44 @@ extern "C" void XASM_CImageHoriLine1(Vertex* right, Vertex* left, uint16_t* scre
 
     // Jitter seed (ASM seeds from a fade table; for CImage1 use sky)
     uint16_t jitter = SkyFade16[left->sy & 0xFFu];
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
 
     for (int cx = width; cx > 0; --cx, ++dst) {
-        // Masked coords -> texel index
-        uint32_t xIndex = static_cast<uint32_t>(IX) & xmask;   xIndex >>= 16;
-        uint32_t yIndex = static_cast<uint32_t>(IY) & ymask;   yIndex >>= yshift;
+        uint16_t color;
+        if (filt) {
+            // Bilinear texel + smooth sky shade (D3D-equivalent)
+            int s = INTENS >> 16;
+            uint32_t sf = (static_cast<uint32_t>(INTENS) >> 8) & 0xFFu;
+            if (s < 0)  { s = 0; sf = 0; }
+            if (s > 14) { s = 14; sf = 256; }
+            BilUV b;
+            biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+            uint16_t c00 = lerp565(SkyFade16[(t.img[b.i00] << 4) | s],
+                                   SkyFade16[(t.img[b.i00] << 4) | (s + 1)], sf);
+            uint16_t c10 = lerp565(SkyFade16[(t.img[b.i10] << 4) | s],
+                                   SkyFade16[(t.img[b.i10] << 4) | (s + 1)], sf);
+            uint16_t c01 = lerp565(SkyFade16[(t.img[b.i01] << 4) | s],
+                                   SkyFade16[(t.img[b.i01] << 4) | (s + 1)], sf);
+            uint16_t c11 = lerp565(SkyFade16[(t.img[b.i11] << 4) | s],
+                                   SkyFade16[(t.img[b.i11] << 4) | (s + 1)], sf);
+            color = bil_despeckle(c00, c10, c01, c11, b);
+            t.ix += t.dx; t.iy += t.dy;
+        } else {
+            // Masked coords -> texel index
+            uint32_t xIndex = static_cast<uint32_t>(IX) & xmask;
+            xIndex >>= 16;
+            uint32_t yIndex = static_cast<uint32_t>(IY) & ymask;   yIndex >>= yshift;
 
-        uint8_t texel = image[xIndex + yIndex];
+            uint8_t texel = image[xIndex + yIndex];
 
-        // Shade = (INTENS + jitter) >> 16, clamp 0..15
-        int shade = (INTENS + static_cast<int>(jitter)) >> 16;
-        if (shade > 0xF) shade = 0xF;
-        if (shade < 0)   shade = 0;
+            // Shade = (INTENS + jitter) >> 16, clamp 0..15
+            int shade = (INTENS + static_cast<int>(jitter)) >> 16;
+            if (shade > 0xF) shade = 0xF;
+            if (shade < 0)   shade = 0;
 
-        // Sky fade lookup: (texel<<4)|shade
-        uint16_t color = SkyFade16[(static_cast<uint32_t>(texel) << 4) | static_cast<uint32_t>(shade)];
+            color = SkyFade16[(static_cast<uint32_t>(texel) << 4) | static_cast<uint32_t>(shade)];
+        }
         *dst = color;
 
         // Advance accumulators
@@ -1111,6 +1445,8 @@ extern "C" void XASM_GouraudHoriLine4(Vertex* right, Vertex* left, uint16_t* scr
     // The ASM adjusts the pointer by -8 bytes before entering the loop
     dstBytes -= 8;
 
+    const bool filt = sw_filter();
+
     // Main loop
     for (int32_t cx = width; cx > 0; --cx) {
         // Advance destination by 8 bytes at the top (add edi,8)
@@ -1121,18 +1457,25 @@ extern "C" void XASM_GouraudHoriLine4(Vertex* right, Vertex* left, uint16_t* scr
         if (xasm_surface_end && (dstBytes+8 > xasm_surface_end || dstBytes < xasm_surface_start))
             break;
 
-        // Shade index from (INTENS + JITTER) >> 16, clamped to 0x0..0xF
-        int32_t shade = INTENS + static_cast<int32_t>(jitter);
-        shade >>= 16;
-        if (shade > 0xF) shade = 0xF;
-        if (shade < 0)   shade = 0;
+        uint16_t color;
+        if (filt) {
+            // Smooth shade lerp (D3D-equivalent) instead of jitter dither
+            int s = INTENS >> 16;
+            uint32_t sf = (static_cast<uint32_t>(INTENS) >> 8) & 0xFFu;
+            if (s < 0)  { s = 0; sf = 0; }
+            if (s > 14) { s = 14; sf = 256; }
+            color = lerp565(horizonFade16[s], horizonFade16[s + 1], sf);
+        } else {
+            int32_t shade = INTENS + static_cast<int32_t>(jitter);
+            shade >>= 16;
+            if (shade > 0xF) shade = 0xF;
+            if (shade < 0)   shade = 0;
+            color = horizonFade16[static_cast<uint32_t>(shade)];
+        }
 
         // Update jitter: add 0x9136, then rotate right by 3 bits
         jitter = static_cast<uint16_t>(jitter + 0x9136u);
         jitter = static_cast<uint16_t>((jitter >> 3) | (jitter << (16 - 3)));
-
-        // Fetch horizon fade color (16-entry table, 16-bit words)
-        uint16_t color = horizonFade16[static_cast<uint32_t>(shade)];
 
         // Write four 16-bit words at offsets 0,2,4,6
         uint16_t* dst16 = reinterpret_cast<uint16_t*>(dstBytes);
@@ -1148,7 +1491,6 @@ extern "C" void XASM_GouraudHoriLine4(Vertex* right, Vertex* left, uint16_t* scr
         JITTER[0] = jitter;
     }
 }
-
 
 extern "C" void XASM_ImageHoriLine4(Vertex* right, Vertex* left, uint16_t* screenBase)
 {
@@ -1171,22 +1513,27 @@ extern "C" void XASM_ImageHoriLine4(Vertex* right, Vertex* left, uint16_t* scree
     uint32_t xmask = colour_data.imagexmask;
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift = colour_data.imageyshift;
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
 
     for (int cx = width; cx > 0; --cx, dst += 4) {
         //RERUN: bound writes to the locked surface
         if (xasm_surface_end && ((uint8_t*)(dst+4) > xasm_surface_end || (uint8_t*)dst < xasm_surface_start))
             break;
-        // Masked texture coords
-        uint32_t ebx = IX & xmask;
-        uint32_t eax = IY & ymask;
-        ebx >>= 16;
-        eax >>= yshift;
 
-        // Texel fetch
-        uint8_t texel = image[ebx + eax];
-
-        // Palette lookup (word table, index*2)
-        uint16_t color = palette_table[texel * 2];
+        uint16_t color;
+        if (filt) {
+            BilUV b;
+            biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+            color = bil_color(t.img, b);
+            t.ix += t.dx; t.iy += t.dy;
+        } else {
+            uint32_t ebx = IX & xmask;
+            uint32_t eax = IY & ymask;
+            ebx >>= 16;
+            eax >>= yshift;
+            color = palette_table[image[ebx + eax]];
+        }
 
         // Write 4 pixels
         dst[0] = color;
@@ -1221,32 +1568,52 @@ extern "C" void XASM_MImageHoriLine4(Vertex* right, Vertex* left, uint16_t* scre
     uint32_t xmask = colour_data.imagexmask;
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift = colour_data.imageyshift;
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
 
     for (int cx = width; cx > 0; --cx, dst += 4) {
         //RERUN: bound writes to the locked surface
         if (xasm_surface_end && ((uint8_t*)(dst+4) > xasm_surface_end || (uint8_t*)dst < xasm_surface_start))
             break;
-        // Masked texture coords
-        uint32_t ebx = IX & xmask;
-        uint32_t eax = IY & ymask;
-        ebx >>= 16;
-        eax >>= yshift;
 
-        // Texel fetch
-        uint8_t texel = image[ebx + eax];
+        if (filt) {
+            // Nearest-tap mask test (as MImage1); bilinear colour only.
+            uint32_t nu = (t.ix >> 16) & t.xm;
+            uint32_t nv = (t.iy >> 16) & t.ym;
+            uint8_t near = t.img[nu + (nv << t.lshift)];
+            if (near != 0xFE) {
+                BilUV b;
+                biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+                uint8_t t00 = t.img[b.i00], t10 = t.img[b.i10],
+                        t01 = t.img[b.i01], t11 = t.img[b.i11];
+                if (t00 == 0xFE) t00 = near;
+                if (t10 == 0xFE) t10 = near;
+                if (t01 == 0xFE) t01 = near;
+                if (t11 == 0xFE) t11 = near;
+                uint16_t c00 = palette_table[t00], c10 = palette_table[t10],
+                         c01 = palette_table[t01], c11 = palette_table[t11];
+                uint16_t s = bil_despeckle(c00, c10, c01, c11, b);
+                dst[0] = s; dst[1] = s; dst[2] = s; dst[3] = s;
+            }
+            t.ix += t.dx; t.iy += t.dy;
+        } else {
+            // Masked texture coords
+            uint32_t ebx = IX & xmask;
+            uint32_t eax = IY & ymask;
+            ebx >>= 16;
+            eax >>= yshift;
 
-        // Transparency check (0xFE = transparent)
-        if (texel != 0xFE) {
-            // Palette lookup (word table, index*2)
-            uint16_t color = palette_table[texel * 2];
+            uint8_t texel = image[ebx + eax];
 
-            // Write 4 pixels
-            dst[0] = color;
-            dst[1] = color;
-            dst[2] = color;
-            dst[3] = color;
+            // Transparency check (0xFE = transparent)
+            if (texel != 0xFE) {
+                uint16_t color = palette_table[texel];
+                dst[0] = color;
+                dst[1] = color;
+                dst[2] = color;
+                dst[3] = color;
+            }
         }
-        // else: skip write (transparent)
 
         // Advance texture coords
         IX += DIX;
@@ -1286,27 +1653,48 @@ extern "C" void XASM_SImageHoriLine4(Vertex* right, Vertex* left, uint16_t* scre
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift = colour_data.imageyshift;
 
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
+
     for (int cx = width; cx > 0; --cx, dst += 4) {
         //RERUN: bound writes to the locked surface
         if (xasm_surface_end && ((uint8_t*)(dst+4) > xasm_surface_end || (uint8_t*)dst < xasm_surface_start))
             break;
-        // Masked texture coords
-        uint32_t ebx = IX & xmask;
-        uint32_t eax = IY & ymask;
-        ebx >>= 16;
-        eax >>= yshift;
 
-        // Texel fetch
-        uint8_t texel = image[ebx + eax];
+        uint16_t color;
+        if (filt) {
+            int s = INTENS >> 16;
+            uint32_t sf = (static_cast<uint32_t>(INTENS) >> 8) & 0xFFu;
+            if (s < 0)  { s = 0; sf = 0; }
+            if (s > 14) { s = 14; sf = 256; }
+            BilUV b;
+            biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+            uint16_t c00 = lerp565(LandFade16[(t.img[b.i00] << 4) | s],
+                                   LandFade16[(t.img[b.i00] << 4) | (s + 1)], sf);
+            uint16_t c10 = lerp565(LandFade16[(t.img[b.i10] << 4) | s],
+                                   LandFade16[(t.img[b.i10] << 4) | (s + 1)], sf);
+            uint16_t c01 = lerp565(LandFade16[(t.img[b.i01] << 4) | s],
+                                   LandFade16[(t.img[b.i01] << 4) | (s + 1)], sf);
+            uint16_t c11 = lerp565(LandFade16[(t.img[b.i11] << 4) | s],
+                                   LandFade16[(t.img[b.i11] << 4) | (s + 1)], sf);
+            color = bil_despeckle(c00, c10, c01, c11, b);
+            t.ix += t.dx; t.iy += t.dy;
+        } else {
+            // Masked texture coords
+            uint32_t ebx = IX & xmask;
+            uint32_t eax = IY & ymask;
+            ebx >>= 16;
+            eax >>= yshift;
 
-        // Shade calculation
-        int shade = (INTENS + jitter) >> 16;
-        if (shade > 0xF) shade = 0xF;
-        if (shade < 0)   shade = 0;
+            uint8_t texel = image[ebx + eax];
 
-        // Fade index: (texel<<4)|shade
-        uint32_t fadeIndex = ((uint32_t)texel << 4) | (uint32_t)shade;
-        uint16_t color = LandFade16[fadeIndex];
+            // Shade calculation
+            int shade = (INTENS + jitter) >> 16;
+            if (shade > 0xF) shade = 0xF;
+            if (shade < 0)   shade = 0;
+
+            color = LandFade16[((uint32_t)texel << 4) | (uint32_t)shade];
+        }
 
         // Write 4 pixels
         dst[0] = color;
@@ -1359,6 +1747,9 @@ extern "C" void XASM_TFImageHoriline4(Vertex* right, Vertex* left, uint16_t* scr
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift = colour_data.imageyshift;
 
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
+
     for (int cx = width; cx > 0; --cx, dst += 4) {
         //RERUN: bound writes to the locked surface
         if (xasm_surface_end && ((uint8_t*)(dst+4) > xasm_surface_end || (uint8_t*)dst < xasm_surface_start))
@@ -1369,15 +1760,37 @@ extern "C" void XASM_TFImageHoriline4(Vertex* right, Vertex* left, uint16_t* scr
         ebx >>= 16;
         eax >>= yshift;
 
-        // Texel fetch
-        uint8_t texel = image[ebx + eax];
-
         // Intensity value
         int intensVal = (INTENS >> 14) & 0x78;
         if (intensVal > 0x38) intensVal = 0x38;
 
         // Advance intensity
         INTENS += DINTENS;
+
+        if (filt) {
+            // Real alpha blend over the 4 destination pixels
+            uint32_t a = (static_cast<uint32_t>(intensVal) * 255u) / 56u;
+            if (a) {
+                BilUV b;
+                biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+                uint16_t s = bil_color(t.img, b);
+                if (a >= 255) {
+                    dst[0] = dst[1] = dst[2] = dst[3] = s;
+                } else {
+                    dst[0] = lerp565(dst[0], s, a);
+                    dst[1] = lerp565(dst[1], s, a);
+                    dst[2] = lerp565(dst[2], s, a);
+                    dst[3] = lerp565(dst[3], s, a);
+                }
+            }
+            t.ix += t.dx; t.iy += t.dy;
+            IX += DIX;
+            IY += DIY;
+            continue;
+        }
+
+        // Texel fetch
+        uint8_t texel = image[ebx + eax];
 
         // Cycle TSHIFT/TOFF
         uint8_t t = static_cast<uint8_t>(TSHIFT + 1);
@@ -1393,8 +1806,7 @@ extern "C" void XASM_TFImageHoriline4(Vertex* right, Vertex* left, uint16_t* scr
         mask >>= TSHIFT;
 
         if ((mask & 0x01) != 0) {
-            // Palette lookup (word table, index*2)
-            uint16_t color = palette_table[texel * 2];
+            uint16_t color = palette_table[texel];
 
             // Write 4 pixels
             dst[0] = color;
@@ -1427,60 +1839,68 @@ extern "C" void XASM_AImageHoriline4(Vertex* right, Vertex* left, uint16_t* scre
     int DIX = (right->ix - IX) / width;
     int DIY = (right->iy - IY) / width;
 
-    // Transparency cycling
-    uint8_t TSHIFT = FUP[leftX & 7];
-    uint8_t TOFF   = static_cast<uint8_t>(left->sy) & 0x07;
-
     const uint8_t* image = reinterpret_cast<const uint8_t*>(colour_data.imageptr);
-    const uint32_t* alpha = reinterpret_cast<const uint32_t*>(colour_data.alphaptr);
+    const uint8_t* alpha = reinterpret_cast<const uint8_t*>(colour_data.alphaptr);
     uint32_t xmask = colour_data.imagexmask;
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift = colour_data.imageyshift;
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
+    FTex ta;
+    if (alpha && filt) {
+        ta = t;
+        int alod = t.lod;   // same level as colour (see AImage1 comment)
+        const uint32_t aw = (xmask >> 16), ah = (ymask >> 16);
+        int maxl = 0;
+        while (((aw >> (maxl + 1)) >= 1) && ((ah >> (maxl + 1)) >= 1)) ++maxl;
+        if (alod > maxl) alod = maxl;
+        ta.img    = mip_data(alpha, aw, ah, alod);
+        ta.xm     = aw >> alod;  ta.ym = ah >> alod;
+        ta.lshift = (16 - yshift) - alod;
+        ta.ix = IX >> alod;  ta.iy = IY >> alod;
+        ta.dx = DIX >> alod; ta.dy = DIY >> alod;
+    }
 
     for (int cx = width; cx > 0; --cx, dst += 4) {
         //RERUN: bound writes to the locked surface
         if (xasm_surface_end && ((uint8_t*)(dst+4) > xasm_surface_end || (uint8_t*)dst < xasm_surface_start))
             break;
-        // Masked texture coords
-        uint32_t ebx = IX & xmask;
-        uint32_t eax = IY & ymask;
-        ebx >>= 16;
-        eax >>= yshift;
 
-        int texIndex = ebx + eax;
-
-        // Texel fetch
-        uint8_t texel = image[texIndex];
-
-        // Alpha fetch (32-bit word at alphaptr+texIndex)
-        uint32_t alphaWord = alpha[texIndex];
-        int intensVal = (alphaWord >> 2) & 0x38; // shr by 2, mask 0x38
-        if (intensVal > 0x38) intensVal = 0x38;
-
-        // Cycle TSHIFT/TOFF
-        uint8_t t = static_cast<uint8_t>(TSHIFT + 1);
-        if (t & 0x08) {
-            TOFF   = static_cast<uint8_t>((TOFF + 1) & 0x07);
-            TSHIFT = 0;
+        uint32_t a;
+        uint16_t s;
+        if (filt) {
+            BilUV b;
+            biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+            s = bil_color(t.img, b);
+            t.ix += t.dx; t.iy += t.dy;
+            a = 0;
+            if (alpha) {
+                BilUV ba;
+                biluv(ta.ix, ta.iy, ta.xm, ta.ym, ta.lshift, ba);
+                a = bil_byte(ta.img, ba);
+                ta.ix += ta.dx; ta.iy += ta.dy;
+            }
         } else {
-            TSHIFT = t;
+            uint32_t ebx = IX & xmask;
+            uint32_t eax = IY & ymask;
+            ebx >>= 16;
+            eax >>= yshift;
+            int texIndex = ebx + eax;
+            a = alpha ? alpha[texIndex] : 0;
+            s = palette_table[image[texIndex]];
         }
 
-        // Transparency test
-        uint8_t mask = TransparencyData[intensVal + TOFF];
-        mask >>= TSHIFT;
-
-        if ((mask & 0x01) != 0) {
-            // Palette lookup (word table, index*2)
-            uint16_t color = palette_table[texel * 2];
-
-            // Write 4 pixels
-            dst[0] = color;
-            dst[1] = color;
-            dst[2] = color;
-            dst[3] = color;
+        // Per-texel alpha -> real translucency (RGB565); the original
+        // software drawer screen-doored this. a<32 mirrors bucket-0.
+        if (a < 32) { IX += DIX; IY += DIY; continue; }
+        if (a >= 255) {
+            dst[0] = dst[1] = dst[2] = dst[3] = s;
+        } else {
+            dst[0] = lerp565(dst[0], s, a);
+            dst[1] = lerp565(dst[1], s, a);
+            dst[2] = lerp565(dst[2], s, a);
+            dst[3] = lerp565(dst[3], s, a);
         }
-        // else: skip write (transparent)
 
         // Advance coords
         IX += DIX;
@@ -1510,27 +1930,32 @@ extern "C" void XASM_CImageHoriLine4(Vertex* right, Vertex* left, uint16_t* scre
     uint32_t xmask = colour_data.imagexmask;
     uint32_t ymask = colour_data.imageymask;
     uint8_t  yshift = colour_data.imageyshift;
+    const bool filt = sw_filter();
+    FTex t = ftex(image, xmask, ymask, yshift, IX, IY, DIX, DIY);
 
     for (int cx = width; cx > 0; --cx, dst += 4) {
         //RERUN: bound writes to the locked surface
         if (xasm_surface_end && ((uint8_t*)(dst+4) > xasm_surface_end || (uint8_t*)dst < xasm_surface_start))
             break;
-        // Masked texture coords
-        uint32_t ebx = IX & xmask;
-        uint32_t eax = IY & ymask;
-        ebx >>= 16;
-        eax >>= yshift;
 
-        int texIndex = ebx + eax;
-
-        // Texel fetch
-        uint8_t texel = image[texIndex];
-
-        // Alias remap
-        texel = alias[texel];
-
-        // Palette lookup (word table, index*2)
-        uint16_t color = palette_table[texel * 2];
+        uint16_t color;
+        if (filt) {
+            // Bilinear colour through the alias remap
+            BilUV b;
+            biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
+            uint16_t c00 = palette_table[alias[t.img[b.i00]]],
+                     c10 = palette_table[alias[t.img[b.i10]]],
+                     c01 = palette_table[alias[t.img[b.i01]]],
+                     c11 = palette_table[alias[t.img[b.i11]]];
+            color = bil_despeckle(c00, c10, c01, c11, b);
+            t.ix += t.dx; t.iy += t.dy;
+        } else {
+            uint32_t ebx = IX & xmask;
+            uint32_t eax = IY & ymask;
+            ebx >>= 16;
+            eax >>= yshift;
+            color = palette_table[alias[image[ebx + eax]]];
+        }
 
         // Write 4 pixels
         dst[0] = color;
