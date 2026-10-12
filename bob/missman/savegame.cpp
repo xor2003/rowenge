@@ -2264,7 +2264,7 @@ void SaveData::SetUnits()
 	}
 
 }
-void SaveData::InitPreferences(int wh)
+void SaveData::InitPreferences(intptr_t wh)
 {
 	HWND hWnd=(HWND)wh;
 

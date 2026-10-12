@@ -117,7 +117,7 @@ public:
 	char*	digerror;
  	Music*			mdi;
 	DigitalDriver*	dig;
-	ULong	currWin;
+	intptr_t	currWin;
 
 	enum
 	{
@@ -317,8 +317,8 @@ public:
 ///////////////////
 
 CON     Sound();
-void	Init(ULong newwin)		{StartUpSound(newwin);}			//RJS 13Mar98
-void	StartUpSound(ULong);									//RJS 13Mar98
+void	Init(intptr_t newwin)		{StartUpSound(newwin);}			//RJS 13Mar98
+void	StartUpSound(intptr_t);									//RJS 13Mar98
 void	SetVP(mobileitem*);										//RJS 21May98
 void	ShutDownSound();
 ///////////////////
@@ -440,7 +440,7 @@ public:
 Bool		IsEnabled(SoundType);								//RJS 08Sep98
 void		StopAll();
 void		SetVolumes(Bool);									//RJS 12Mar99
-Bool		InitUI(int);										//RJS 06Apr99
+Bool		InitUI(intptr_t);										//RJS 06Apr99
 Bool		Init3D();										//RJS 26Jul96
 void		SetDirectSoundWindow(ULong);						//RJS 03Apr98
 void		KillAll();

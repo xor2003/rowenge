@@ -5501,7 +5501,7 @@ LONG ChangeDisplaySettings(DEVMODE* lpDevMode, DWORD dwflags)
     return DISP_CHANGE_SUCCESSFUL;
 }
 
-unsigned int SHAppBarMessage(DWORD /*dwMessage*/, PAPPBARDATA /*pData*/)
+UINT_PTR SHAppBarMessage(DWORD /*dwMessage*/, PAPPBARDATA /*pData*/)
 {
     return 0; // no auto-hide appbars in the SDL environment
 }

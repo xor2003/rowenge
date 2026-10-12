@@ -237,7 +237,7 @@ extern	bool	naughtynaughty;											//RJS 8Nov00
 //------------------------------------------------------------------------------
 extern	void*	ailmalloc(size_t);
 extern	void	ailfree(void*);
-void	Sound::StartUpSound(ULong	thiswin)					//RJS 19May98
+void	Sound::StartUpSound(intptr_t	thiswin)					//RJS 19May98
 {
 #ifdef _NO_Sound_AUDIO_
 	mdi = NULL;
@@ -3775,7 +3775,7 @@ void	Sound::ResetMidiFlags()
 //Returns
 //
 //------------------------------------------------------------------------------
-Bool	Sound::InitUI(int	wind)
+Bool	Sound::InitUI(intptr_t	wind)
 {
 	Bool	theresult = FALSE;
 #ifndef _NO_Sound_AUDIO_

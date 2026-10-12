@@ -375,7 +375,7 @@ public:															//RJS 01Oct97
 			weapindex2:3;										//RJS 08Sep98
 	UByte	lnchtype;											//RJS 21Jul98
 	UByte	delay;												//RJS 21Jul98
-	ULong	originitm;											//RJS 21Jul98
+	uintptr_t			originitm;											//RJS 21Jul98
 };																//RJS 21Jul98
 
 class	FlareAnimData:public	MinAnimData						//RJS 21Jan98
@@ -418,7 +418,7 @@ public:
 	UByte	frameno;
 	UByte	hitstrength;										//DAW 01Dec98
 	UByte	novirtualguns;										//RJS 29Mar99
-	ULong	lastmissile;										//RJS 29Mar99
+	uintptr_t			lastmissile;										//RJS 29Mar99
 	UWord	target;
 	UByte	wpIndex;											//RJS 12Nov99
 	UByte	pad;												//RJS 12Nov99
@@ -434,7 +434,7 @@ class	SmokeTrailAnimData:public	MinAnimData
 {
 public:
 	WeapAnimData	weaponlaunchers[1];
-	ULong			thelist;
+	uintptr_t			thelist;
 	UWord			nopoints;					
  	ULong			lifetime;									
 	ULong			currTime;										

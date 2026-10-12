@@ -465,7 +465,7 @@ public:
 #if defined(__AFX_H__) || defined(CSTRING_Included)
 	CString		lastsavegame,lastreplayname,lastpackname;
 #endif			//Of these only lastreplayname should be stored in savegame.
-	void	InitPreferences(int);
+	void	InitPreferences(intptr_t);
 	void	SavePreferences();
 	void	SetUnits();
 	bool	InitMusicDevice();

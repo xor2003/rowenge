@@ -1990,7 +1990,7 @@ struct APPBARDATA {
     unsigned int uEdge; RECT rc; long lParam;
 };
 typedef APPBARDATA* PAPPBARDATA;
-unsigned int SHAppBarMessage(DWORD dwMessage, PAPPBARDATA pData);
+UINT_PTR SHAppBarMessage(DWORD dwMessage, PAPPBARDATA pData);
 #endif
 
 #ifndef SW_SHOWMINIMIZED

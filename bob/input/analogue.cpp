@@ -404,7 +404,7 @@ void	Analogue::ResetF5()
 //Description: 
 //
 //////////////////////////////////////////////////////////////////////
-Bool	Analogue::Initialise(int HWNDw,int HINSTANCEi,AllowAliasing mousemode,AllowAliasing aliasingmode, bool reinit)
+Bool	Analogue::Initialise(intptr_t HWNDw,intptr_t HINSTANCEi,AllowAliasing mousemode,AllowAliasing aliasingmode, bool reinit)
 {
 //DeadCode JIM 2Nov00 	(*(UByte*)0xB0000)++;
 	CloseDown();												//JIM 15Sep100

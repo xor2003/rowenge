@@ -291,7 +291,7 @@ public:
 
 	void	ResetF5();
 //DeadCode AMM 21Feb100 	Bool	Initialise(int HWNDw,int HINSTANCEi);
-	Bool	Initialise(int HWNDw,int HINSTANCEi,AllowAliasing mousemode,AllowAliasing aliasmode,bool reinit=false);
+	 Bool	Initialise(intptr_t HWNDw,intptr_t HINSTANCEi,AllowAliasing mousemode,AllowAliasing aliasmode,bool reinit=false);
 	bool	WhatAliasModes(AllowAliasing& mousemode,AllowAliasing& aliasmode,ViewPoint* newwin);
 	Bool	LoadGame();
 	Bool	CloseDown();
