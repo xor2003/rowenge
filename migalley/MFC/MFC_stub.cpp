@@ -4543,6 +4543,31 @@ BOOL CDialog::Create(int id, CWnd* pParent)
         return FALSE;
     }
 
+    // RERUN: ROWAN_DUMP_LAYOUT — emit one line per control with its final
+    // post-OnInitDialog rect so tests/menu_audit.sh can check widget
+    // placement, overlaps and drift vs the RC template without a display.
+    if (getenv("ROWAN_DUMP_LAYOUT") && m_pTemplate) {
+        CRect dr; GetWindowRect(&dr);
+        fprintf(stderr, "[layout] dlg=%d screen=%d,%d-%d,%d dlgrect=%d,%d-%d,%d\n",
+            id, dr.left, dr.top, dr.right, dr.bottom,
+            m_pTemplate->x * g_dluX, m_pTemplate->y * g_dluY,
+            (m_pTemplate->x + m_pTemplate->cx) * g_dluX,
+            (m_pTemplate->y + m_pTemplate->cy) * g_dluY);
+        for (const auto& ctl : m_pTemplate->controls) {
+            CWnd* pC = GetDlgItem(ctl.id);
+            CRect r;
+            if (pC) pC->GetWindowRect(&r); else r = CRect(0,0,0,0);
+            CRect want(ctl.x * g_dluX, ctl.y * g_dluY,
+                       (ctl.x + ctl.cx) * g_dluX, (ctl.y + ctl.cy) * g_dluY);
+            fprintf(stderr,
+                "[layout]  dlg=%d ctl=%d cls=%s rect=%d,%d-%d,%d want=%d,%d-%d,%d text='%s'\n",
+                id, ctl.id, ctl.className.c_str(),
+                r.left, r.top, r.right, r.bottom,
+                want.left, want.top, want.right, want.bottom,
+                ctl.text.c_str());
+        }
+    }
+
     return TRUE;
 }
 

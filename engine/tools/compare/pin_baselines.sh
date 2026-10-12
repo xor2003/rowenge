@@ -3,9 +3,11 @@
 # Emits migration/baseline-manifest.json and .md. Re-runnable; timestamps make
 # drift visible, so rerun only at milestones and keep prior outputs in evidence/.
 set -euo pipefail
-cd "$(dirname "$0")/../../.."   # archive root
+REPO="$(cd "$(dirname "$0")/../../.."; pwd)"
+ARCHIVE="${ROWAN_ARCHIVE:-/home/xor/games/bob}"
+cd "$ARCHIVE"                  # archive root (provenance snapshot source)
 ROOT="$(pwd)"
-OUT="rowan-engine/migration"
+OUT="$REPO/engine/migration"
 mkdir -p "$OUT"
 
 J="$OUT/baseline-manifest.json"

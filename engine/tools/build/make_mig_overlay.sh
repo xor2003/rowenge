@@ -11,8 +11,8 @@
 # Usage: make_mig_overlay.sh <overlay_dir>
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../../.."; pwd)"
-MIG_H="$ROOT/mig-alley/source-ported/migalley/H"
-SHARED="$ROOT/rowan-engine/shared/math"
+MIG_H="$ROOT/migalley/H"
+SHARED="$ROOT/engine/shared/math"
 OUT="${1:?usage: make_mig_overlay.sh <overlay_dir>}"
 mkdir -p "$OUT"
 

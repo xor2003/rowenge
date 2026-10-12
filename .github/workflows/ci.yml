@@ -37,7 +37,7 @@ jobs:
       - name: Configure
         run: |
           PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig \
-          cmake -B build -G Ninja \
+          cmake -S migalley -B build -G Ninja \
             -DCMAKE_CXX_FLAGS=-I/usr/include/i386-linux-gnu
 
       - name: Build
@@ -71,7 +71,7 @@ jobs:
       - name: Configure (MIG_SANITIZERS=ON)
         run: |
           PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig \
-          cmake -B build-san -G Ninja -DMIG_SANITIZERS=ON \
+          cmake -S migalley -B build-san -G Ninja -DMIG_SANITIZERS=ON \
             -DCMAKE_CXX_FLAGS=-I/usr/include/i386-linux-gnu
 
       - name: Build
@@ -103,7 +103,7 @@ jobs:
       - name: Configure (compile database only)
         run: |
           PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig \
-          cmake -B build -G Ninja \
+          cmake -S migalley -B build -G Ninja \
             -DCMAKE_CXX_FLAGS=-I/usr/include/i386-linux-gnu
 
       - name: Determine changed files
@@ -136,7 +136,10 @@ jobs:
           # headers can't be linted standalone (no MFC type context);
           # they are checked transitively via changed .cpp TUs, and stay
           # in changed.txt so errors located in them still gate
-          grep -Ei '\.(cpp|cc|cxx)$' /tmp/changed.txt > /tmp/lint_files.txt || true
+          # lint.sh is a migalley-tree driver: restrict to migalley/ files
+          # and strip the prefix so tool output matches the gate patterns
+          grep '^migalley/' /tmp/changed.txt | sed 's|^migalley/||' \
+              | grep -Ei '\.(cpp|cc|cxx)$' > /tmp/lint_files.txt || true
 
       # lint.sh runs clang-check + cppcheck per file (no clang-tidy at
       # all: tidy rewrites would make the tree harder to diff against
@@ -150,12 +153,13 @@ jobs:
           # (enables cppcheck's whole-program unusedFunction check);
           # subsets get explicit files so unusedFunction stays off.
           if [ "${{ inputs.lint_files }}" = "all" ]; then
-            OUT=$(bash scripts/lint.sh 2>&1) || true
+            OUT=$(cd migalley && bash scripts/lint.sh 2>&1) || true
           else
-            OUT=$(bash scripts/lint.sh "${FILES[@]}" 2>&1) || true
+            OUT=$(cd migalley && bash scripts/lint.sh "${FILES[@]}" 2>&1) || true
           fi
           echo "$OUT"
-          sed 's|$|:|' /tmp/changed.txt > /tmp/changed_loc.txt
+          grep '^migalley/' /tmp/changed.txt | sed 's|^migalley/||;s|$|:|' \
+              > /tmp/changed_loc.txt
           NEWERR=$(echo "$OUT" | grep "error:" | grep -Ff /tmp/changed_loc.txt || true)
           if [ -n "$NEWERR" ]; then
             echo "::error::lint errors in changed files"

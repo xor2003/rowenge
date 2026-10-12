@@ -12,10 +12,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(ROWAN_SANITIZERS "Build with ASan + UBSan (32-bit)" OFF)
 
-set(ROWAN_ROOT  ${CMAKE_SOURCE_DIR}/..)
-set(BOB_TREE    ${ROWAN_ROOT}/battle-of-britain/source-ported/bob-flight-sim)
-set(MIG_TREE    ${ROWAN_ROOT}/mig-alley/source-ported/migalley)
-set(SYSROOT     ${ROWAN_ROOT}/mig-alley/sysroot-i386)
+# Unified repo layout: engine/ + migalley/ + bob/ under one root.
+# ROWAN_SYSROOT locates the extracted i386 .deb sysroot (not committed;
+# CI installs the real :i386 -dev packages instead).
+get_filename_component(ROWAN_ROOT "${CMAKE_SOURCE_DIR}/.." ABSOLUTE)
+set(BOB_TREE    ${ROWAN_ROOT}/bob)
+set(MIG_TREE    ${ROWAN_ROOT}/migalley)
+set(SYSROOT     $ENV{ROWAN_SYSROOT})
+if(NOT SYSROOT)
+    set(SYSROOT ${ROWAN_ROOT}/sysroot-i386)
+endif()
 set(BOB_OVERLAY ${CMAKE_BINARY_DIR}/bob_inc_overlay)
 
 # --- flags: same proven 32-bit set as migalley ------------------------------

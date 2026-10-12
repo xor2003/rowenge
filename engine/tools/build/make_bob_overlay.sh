@@ -10,9 +10,9 @@
 #
 # Usage: make_bob_overlay.sh <overlay_dir>
 set -euo pipefail
-BOB_ROOT="$(cd "$(dirname "$0")/../../.."; pwd)/battle-of-britain"
-PORTED="$BOB_ROOT/source-ported/bob-flight-sim"
-ORIG_H="$BOB_ROOT/source-original/bob_src/SRC/H"
+REPO_ROOT="$(cd "$(dirname "$0")/../../.."; pwd)"
+PORTED="$REPO_ROOT/bob"
+ORIG_H="${ROWAN_ARCHIVE:-/home/xor/games/bob}/battle-of-britain/source-original/bob_src/SRC/H"
 OUT="${1:?usage: make_bob_overlay.sh <overlay_dir> [mig_h_dir] [shadow_dir ...]}"
 MIG_H="${2:-}"
 shift $(( $# >= 2 ? 2 : $# ))

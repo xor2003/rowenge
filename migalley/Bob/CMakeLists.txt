@@ -2,9 +2,9 @@
 # layer (ProjectDefaults/WIN32_COMPAT/RowanMFC) — the BoB game module lands
 # incrementally from bob-flight-sim's mfc/ tree onto it (T116 inventory).
 get_filename_component(ROWAN_ENGINE
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../rowan-engine" ABSOLUTE)
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../engine" ABSOLUTE)
 get_filename_component(BOB_SRC
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../battle-of-britain/source-ported/bob-flight-sim" ABSOLUTE)
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../bob" ABSOLUTE)
 
 # ---------------------------------------------------------------------------
 # BoB frontend compile environment (T118).
@@ -32,7 +32,7 @@ execute_process(COMMAND bash
     ${CMAKE_SOURCE_DIR}/H
     ${ROWAN_ENGINE}/compat
     ${SDL2_INCLUDE_DIRS}
-    ${CMAKE_SOURCE_DIR}/../../sysroot-i386/usr/include
+    ${ROWAN_SYSROOT}/usr/include
     RESULT_VARIABLE _ov_rc
     OUTPUT_VARIABLE _ov_out)
 if(NOT _ov_rc EQUAL 0)

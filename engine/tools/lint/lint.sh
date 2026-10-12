@@ -22,12 +22,12 @@
 # Requires build/compile_commands.json (CMAKE_EXPORT_COMPILE_COMMANDS=ON).
 set -u
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-ARCHIVE="$(cd "$ROOT/.." && pwd)"
+ARCHIVE="${ROWAN_ARCHIVE:-/home/xor/games/bob}"
 BUILD="${BUILD_DIR:-$ROOT/build}"
 CC_DB="$BUILD/compile_commands.json"
-BOB="$ARCHIVE/battle-of-britain/source-ported/bob-flight-sim"
-MIG="$ARCHIVE/mig-alley/source-ported/migalley"
-SYSROOT="$ARCHIVE/mig-alley/sysroot-i386"
+BOB="$ROOT/../bob"
+MIG="$ROOT/../migalley"
+SYSROOT="${ROWAN_SYSROOT:-$ARCHIVE/sysroot-i386}"
 OVL="$BUILD/bob_inc_overlay"
 MODE=all
 PE=0

@@ -11,10 +11,12 @@
 #   migration/mig-vs-bob-paths.tsv       path \t mig_raw \t bob_raw \t equal_norm
 #   migration/routine-map.tsv            file-level candidate skeleton (UNKNOWN)
 set -euo pipefail
-cd "$(dirname "$0")/../../.."
-OUT=rowan-engine/migration
-CACHE=rowan-engine/.cache
-MIGZIP=mig-alley/source-original/MIG_001.ZIP
+REPO="$(cd "$(dirname "$0")/../../.."; pwd)"
+ARCHIVE="${ROWAN_ARCHIVE:-/home/xor/games/bob}"
+cd "$REPO"
+OUT=engine/migration
+CACHE=engine/.cache
+MIGZIP="$ARCHIVE/mig-alley/source-original/MIG_001.ZIP"
 MIG_ORIG="$CACHE/mig_orig"
 mkdir -p "$OUT" "$CACHE"
 
@@ -55,9 +57,9 @@ manifest() { # $1=root $2=out — find files, emit tsv (lowercased relpath)
 
 echo "== manifests"
 manifest "$MIG_ORIG" "$OUT/file-manifest-mig_orig.tsv" &
-manifest mig-alley/source-ported/migalley "$OUT/file-manifest-mig_patched.tsv" &
-manifest battle-of-britain/source-original/bob_src/SRC "$OUT/file-manifest-bob_orig.tsv" &
-manifest battle-of-britain/source-ported/bob-flight-sim "$OUT/file-manifest-bob_patched.tsv" &
+manifest migalley "$OUT/file-manifest-mig_patched.tsv" &
+manifest "$ARCHIVE/battle-of-britain/source-original/bob_src/SRC" "$OUT/file-manifest-bob_orig.tsv" &
+manifest bob "$OUT/file-manifest-bob_patched.tsv" &
 wait
 
 # strip zip prefix: mig_orig files live under SRC/ — normalize to relative root

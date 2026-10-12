@@ -9,7 +9,7 @@ endif()
 # (REQ-DETECT/LAUNCH). Sources live in rowan-engine/shell; compiled directly
 # into this target so the exe is self-contained (REQ-LAUNCH-02).
 get_filename_component(ROWAN_ENGINE
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../rowan-engine" ABSOLUTE)
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../engine" ABSOLUTE)
 
 add_executable(MigAlley
     MigCString.cpp

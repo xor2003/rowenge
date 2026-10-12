@@ -42,5 +42,5 @@ add_test(NAME unit_tests COMMAND unit_tests)
 
 # The 32-bit sysroot SDL/mixer libs aren't on the default loader path.
 set_tests_properties(unit_tests PROPERTIES
-    ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_SOURCE_DIR}/../../sysroot-i386/usr/lib/i386-linux-gnu"
+    ENVIRONMENT "LD_LIBRARY_PATH=${ROWAN_SYSROOT}/usr/lib/i386-linux-gnu"
 )

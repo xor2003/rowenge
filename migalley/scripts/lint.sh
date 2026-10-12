@@ -53,7 +53,7 @@ DEF="-D__GNUC__ -DNDEBUG"
 # SDL_config.h pulls in the i386 multiarch header; add it if the compile
 # database lacks it (e.g. a build dir configured without the sysroot flags)
 EXTRA=""
-MARCH_INC="$ROOT/../../sysroot-i386/usr/include/i386-linux-gnu"
+MARCH_INC="${ROWAN_SYSROOT:-$ROOT/../sysroot-i386}/usr/include/i386-linux-gnu"
 [ -d "$MARCH_INC" ] && EXTRA="-extra-arg=-I$(cd "$MARCH_INC" && pwd)"
 FAILED=0
 

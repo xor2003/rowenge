@@ -16,9 +16,9 @@
 set -u
 
 BIN="${1:?usage: lifecycle_xvfb.sh <MigAlley-binary>}"
-ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
-GAMEDIR="$ROOT/runtime/migprefix/drive_c/rowan/mig"
-SYSROOT="$ROOT/sysroot-i386/usr/lib/i386-linux-gnu"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"   # unified repo root
+GAMEDIR="${ROWAN_MIG_GAMEDIR:-$ROOT/runtime/migprefix/drive_c/rowan/mig}"
+SYSROOT="${ROWAN_SYSROOT:-$ROOT/sysroot-i386}/usr/lib/i386-linux-gnu"
 CYCLES=5
 
 command -v Xvfb >/dev/null 2>&1 || { echo "SKIP: Xvfb not found"; exit 77; }

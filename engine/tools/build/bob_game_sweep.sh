@@ -15,10 +15,11 @@
 # — that is how Release builds them.
 set -u
 
-BOB=${BOB:-/home/xor/games/bob/battle-of-britain/source-ported/bob-flight-sim}
-MIG=${MIG:-/home/xor/games/bob/mig-alley/source-ported/migalley}
-SYS=${SYS:-/home/xor/games/bob/mig-alley/sysroot-i386}
-ROWAN=${ROWAN:-/home/xor/games/bob/rowan-engine}
+REPO_ROOT="$(cd "$(dirname "$0")/../../.."; pwd)"
+BOB=${BOB:-$REPO_ROOT/bob}
+MIG=${MIG:-$REPO_ROOT/migalley}
+SYS=${SYS:-${ROWAN_SYSROOT:-$REPO_ROOT/sysroot-i386}}
+ROWAN=${ROWAN:-$REPO_ROOT/engine}
 OVR=${OVR:-$MIG/build/bob_overlay}
 VCPROJ=${VCPROJ:-$BOB/mfc/bob.vcproj}
 

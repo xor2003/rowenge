@@ -15,13 +15,13 @@
 set -u
 cd "$(dirname "$0")"
 
-LAUNCHER="${MIG_LAUNCHER:-$(cd ../../.. && pwd)/run-migalley.sh}"
+LAUNCHER="${MIG_LAUNCHER:-$(cd ../.. && pwd)/run-migalley.sh}"
 
 for t in Xvfb xdotool import convert compare; do
     command -v "$t" >/dev/null 2>&1 || { echo "SKIP: $t not found"; exit 77; }
 done
 [ -x "$LAUNCHER" ] || { echo "SKIP: launcher $LAUNCHER missing"; exit 77; }
-GAMEDIR="$(cd ../../.. && pwd)/runtime/migprefix/drive_c/rowan/mig"
+GAMEDIR="${ROWAN_MIG_GAMEDIR:-$(cd ../.. && pwd)/runtime/migprefix/drive_c/rowan/mig}"
 [ -f "$GAMEDIR/roots.dir" ] || { echo "SKIP: no installed game data at $GAMEDIR"; exit 77; }
 
 # --- pick a free display -------------------------------------------------

@@ -4,9 +4,10 @@
 # binary, REQUIRE a nonzero exit (a detected defect), restore, rebuild.
 # A PASS here means the family catches the injected defect.
 set -u
-BOB=/home/xor/games/bob/battle-of-britain/source-ported/bob-flight-sim
-MIG=/home/xor/games/bob/mig-alley/source-ported/migalley
-BUILD=/home/xor/games/bob/rowan-engine/build
+REPO="$(cd "$(dirname "$0")/../../.."; pwd)"
+BOB=$REPO/bob
+MIG=$REPO/migalley
+BUILD=$REPO/engine/build
 FAILED=0
 MUTATED_FILE=""
 MUTATED_REPO=""

@@ -21,6 +21,17 @@ endif()
 option(MIG_SANITIZERS "Build with AddressSanitizer + UBSan (GCC, 32-bit)" OFF)
 option(MIG_LINT "Run cppcheck during the build" OFF)
 
+# Unified repo layout: this tree lives at <repo>/migalley with siblings
+# <repo>/engine (rowan shared compat) and <repo>/bob (bob-flight-sim).
+# ROWAN_SYSROOT locates the extracted i386 .deb sysroot for 32-bit deps;
+# it is NOT committed — CI installs the real :i386 -dev packages, and
+# locally it defaults to <repo>/sysroot-i386 (symlink or copy).
+set(ROWAN_SYSROOT "$ENV{ROWAN_SYSROOT}" CACHE PATH
+    "32-bit dependency sysroot (usr/include, usr/lib/i386-linux-gnu)")
+if(NOT ROWAN_SYSROOT)
+    get_filename_component(ROWAN_SYSROOT "${CMAKE_SOURCE_DIR}/../sysroot-i386" ABSOLUTE)
+endif()
+
 # -------------------------------------------------------------------
 # Dependencies via pkg-config (ensures 32-bit libs are found)
 # -------------------------------------------------------------------
@@ -90,10 +101,10 @@ target_include_directories(ProjectDefaults INTERFACE
     ${SDL2_MIXER_INCLUDE_DIRS}
     ${VULKAN_INCLUDE_DIRS}
     # i386 multiarch headers (SDL2/_real_SDL_config.h lives here)
-    ${CMAKE_SOURCE_DIR}/../../sysroot-i386/usr/include/i386-linux-gnu
+    ${ROWAN_SYSROOT}/usr/include/i386-linux-gnu
     # sysroot root: vulkan/vulkan.h (the BoB compat backend; the vulkan.pc
     # includedir resolves empty so VULKAN_INCLUDE_DIRS gives nothing)
-    ${CMAKE_SOURCE_DIR}/../../sysroot-i386/usr/include
+    ${ROWAN_SYSROOT}/usr/include
 )
 
 # gcc's multilib config finds the 32-bit sysroot libs implicitly, but clang

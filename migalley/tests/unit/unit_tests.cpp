@@ -2540,7 +2540,9 @@ static void test_curves()
 
 //------------------------------------------------------------------------------
 // Time/phase handlers. ViewPoint::TimeOfDay() is a 3-hop chain in the port:
-//   this+0x3c -> view3dwin, view3dwin+0x50 -> inst, inst+0x1d -> timeofday
+//   this+0x3c -> view3dwin, view3dwin+0x50 -> inst, inst+0x24 -> timeofday
+// (offsets verified against compiled ViewPoint::TimeOfDay/View3d::TimeOfDay
+// disassembly; Inst3d gained members since the chain was first calibrated)
 // (inst sits at an unaligned offset, so a uniform pointer-fill can't fake
 // it - the chain is built at the exact offsets). Setting timeofday makes
 // the returned time controllable instead of just zero.
@@ -2555,7 +2557,7 @@ static void init_fake_viewpoint(int tod)
     std::memset(fake_inst, 0, sizeof(fake_inst));
     *(void**)(fake_viewpoint + 0x3c) = fake_instmid;
     *(void**)(fake_instmid + 0x50) = fake_inst;
-    *(int*)(fake_inst + 0x1d) = tod;
+    *(int*)(fake_inst + 0x24) = tod;
     shape_View_Point = fake_viewpoint;
 }
 

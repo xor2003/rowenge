@@ -5,8 +5,8 @@
 # MFC-coupled/Windows-semantics code can be exercised in a Windows CRT env.
 set -euo pipefail
 
-RE=/home/xor/games/bob/rowan-engine
-BOB=/home/xor/games/bob/battle-of-britain/source-ported/bob-flight-sim
+RE="$(cd "$(dirname "$0")/../../.."; pwd)/engine"
+BOB="$(cd "$(dirname "$0")/../../.."; pwd)/bob"
 TC=${MINGW_I686:-$HOME/games/bob/toolchains/mingw-i686/prefix/usr}
 OVL=${BOB_OVERLAY:-$RE/build/bob_inc_overlay}
 UT=$BOB/UnitTest++
