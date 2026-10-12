@@ -454,16 +454,16 @@ uint16_t palette_table[256] = {0};
 
 #pragma pack(push, 1)
 struct colourdata {
-    uint32_t imageptr;     // +0
-    uint32_t alphaptr;     // +4
-    uint32_t imagexmask;   // +8
-    uint32_t imageymask;   // +12
-    uint32_t aliastblptr;  // +16
-    uint32_t lumtblptr;    // +20
-    uint8_t  col;          // +24
-    uint8_t  imageyshift;  // +25
-    uint8_t  pad2;         // +26
-    uint8_t  pad3;         // +27
+    uintptr_t imageptr;    // texture image pointer (was uint32_t — truncated on LP64)
+    uintptr_t alphaptr;    // alpha table pointer
+    uint32_t imagexmask;
+    uint32_t imageymask;
+    uintptr_t aliastblptr; // alias table pointer
+    uintptr_t lumtblptr;   // luminance table pointer
+    uint8_t  col;
+    uint8_t  imageyshift;
+    uint8_t  pad2;
+    uint8_t  pad3;
 };
 #pragma pack(pop)
 
@@ -605,7 +605,7 @@ inline void ASM_SetPaletteEntry(UWord c,UWord v) {
 	palette_table[c] = v;
 }
 
-inline void ASM_SetColour(Colour a, SLong b, SLong c, UByteP d)
+inline void ASM_SetColour(uintptr_t a, SLong b, SLong c, UByteP d)
 {
     auto floor_log2 = [](uint32_t n) {
         int s = -1;
@@ -619,12 +619,12 @@ inline void ASM_SetColour(Colour a, SLong b, SLong c, UByteP d)
     if (a <= 0xFFu)
         colour_data.col = (uint8_t)a;
     else
-        colour_data.alphaptr = a;
+        colour_data.alphaptr = (uintptr_t)a;
 
     colour_data.imagexmask  = ((1u << dl) - 1u) << 16;
     colour_data.imageyshift = (uint8_t)(16 - dl);
     colour_data.imageymask  = ((1u << bl) - 1u) << 16;
-    colour_data.imageptr    = (uint32_t)(uintptr_t)d;
+    colour_data.imageptr    = (uintptr_t)d;
 }
 
 inline SWord ASM_GetTransparency()
@@ -1891,7 +1891,7 @@ void Graphic::SetColour(ImageMapDescPtr image)
 
 	imageptr = image->body;										//RJS 06Feb98
 
-	Colour c=(Colour)(uintptr_t)image->alpha;
+	uintptr_t c=(uintptr_t)image->alpha;
 
 	ASM_SetColour(c,image->w,image->h,imageptr);	//PD 21Dec95
 }

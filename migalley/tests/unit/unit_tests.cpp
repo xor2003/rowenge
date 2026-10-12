@@ -294,8 +294,9 @@ extern FP   mv_CalcAngle(FP x, FP y) __asm__("_Z9CalcAngleff");
 // Rasterizer colour state from GRAFPRIM.CPP (extern "C", unmangled).
 extern "C" {
 struct TestColourData {
-    uint32_t imageptr, alphaptr, imagexmask, imageymask,
-             aliastblptr, lumtblptr;
+    uintptr_t imageptr, alphaptr;
+    uint32_t imagexmask, imageymask;
+    uintptr_t aliastblptr, lumtblptr;
     uint8_t  col, imageyshift, pad2, pad3;
 };
 extern TestColourData colour_data;

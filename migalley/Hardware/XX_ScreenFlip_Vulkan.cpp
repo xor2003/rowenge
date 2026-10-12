@@ -35,8 +35,10 @@ typedef unsigned long MigWindow_X;   // XID
 typedef unsigned long MigVisualID_X;
 
 // VkXlibSurfaceCreateInfoKHR (layout identical; sType value is permanently
-// assigned by Khronos).
+// assigned by Khronos). NB: VkFlags is uint64_t — under ambient pack(1) the
+// packed layout shifts dpy from 24 to 20 and the ICD reads window as dpy.
 #define MIG_VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR ((VkStructureType)1000004000)
+#pragma pack(push, 8)
 struct MigXlibSurfaceCreateInfoKHR {
     VkStructureType sType;
     const void*     pNext;
@@ -44,6 +46,7 @@ struct MigXlibSurfaceCreateInfoKHR {
     MigDisplay_X*   dpy;
     MigWindow_X     window;
 };
+#pragma pack(pop)
 typedef VkResult (VKAPI_PTR *PFN_MigCreateXlibSurfaceKHR)(
     VkInstance, const MigXlibSurfaceCreateInfoKHR*,
     const VkAllocationCallbacks*, VkSurfaceKHR*);
@@ -68,6 +71,7 @@ struct MigX11WMInfo {
 #pragma pack(pop)
 extern "C" SDL_bool SDL_GetWindowWMInfo(SDL_Window* window, void* info);
 enum { MIG_SYSWM_X11 = 2 };
+
 
 
 // Vulkan objects for sampling the software framebuffer (file scope)
@@ -828,7 +832,10 @@ void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
         uint8_t* mapped = reinterpret_cast<uint8_t*>(stagingPtr);
         const float scaleX = (g_winWidth > 0) ? float(vkExtent.width) / float(g_winWidth) : 1.0f;
         const float scaleY = (g_winHeight > 0) ? float(vkExtent.height) / float(g_winHeight) : 1.0f;
-        const int dstBpp = 4;
+        // Match the swapchain image format: a 16bpp swapchain gets verbatim
+        // RGB565 (staging is sized at 2B/px), 32bpp gets the BGRA expansion.
+        const bool dst565 = (vkSwapFormat == VK_FORMAT_R5G6B5_UNORM_PACK16);
+        const int dstBpp = dst565 ? 2 : 4;
         const size_t dstRowBytes = static_cast<size_t>(vkExtent.width) * dstBpp;
 
         // --- Fast RGB565 → BGRA8888 conversion for framebuffer ---
@@ -854,13 +861,17 @@ void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
                     ? (int)((uint64_t)x * (uint64_t)srcW / vkExtent.width) : 0;
                 if (sx >= srcW) sx = srcW - 1;
                 uint16_t pixel = srcRow[sx];
-                uint8_t r = ((pixel >> 11) & 0x1F) << 3;
-                uint8_t g = ((pixel >> 5) & 0x3F) << 2;
-                uint8_t b = (pixel & 0x1F) << 3;
-                dstRow[x * 4 + 0] = b;
-                dstRow[x * 4 + 1] = g;
-                dstRow[x * 4 + 2] = r;
-                dstRow[x * 4 + 3] = 255; // Opaque alpha
+                if (dst565) {
+                    reinterpret_cast<uint16_t*>(dstRow)[x] = pixel;
+                } else {
+                    uint8_t r = ((pixel >> 11) & 0x1F) << 3;
+                    uint8_t g = ((pixel >> 5) & 0x3F) << 2;
+                    uint8_t b = (pixel & 0x1F) << 3;
+                    dstRow[x * 4 + 0] = b;
+                    dstRow[x * 4 + 1] = g;
+                    dstRow[x * 4 + 2] = r;
+                    dstRow[x * 4 + 3] = 255; // Opaque alpha
+                }
             }
         }
 
