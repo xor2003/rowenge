@@ -23,6 +23,7 @@
 #include "MATHASM.H"
 #include "MESSAGES.H"
 #include "FILES.H"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 enum	{MAXFONTS=14};
 extern CFont* (g_AllFonts[][4]);
@@ -195,7 +196,7 @@ struct	IdEntry
 						{idtype=T_GAP;}
 						{idtype=T_IDT;}
 					}
-	IdEntry(const char* s):	textnum(int(s))
+	IdEntry(const char* s):	textnum(intptr_t(intptr_t(s)))
 			{idtype=T_CHAR;textstr=s;}
 
 };
@@ -390,7 +391,7 @@ protected:
 // Implementation
 protected:
 	RDialog(int i,CWnd* w);
-	bool	OnSizeAxis(int oldw,int neww,long& curr,Edge act);
+	bool	OnSizeAxis(int oldw,int neww,SLong& curr,Edge act);
 	CRect	Place(PosnControl px,PosnControl py,int x=0,int y=0)
 	{	return	::Place(px,py,x,y,this);	}
 public:

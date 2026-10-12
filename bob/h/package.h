@@ -7,6 +7,8 @@
 // Description:
 //
 ////////////////////////////////////////////////////////////////////////
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	PACKAGE_INCLUDED
 #define	PACKAGE_INCLUDED
 //package structure definition
@@ -674,4 +676,5 @@ static	UniqueID	ReorderZero(UniqueID u);
 	int		HandleLaterEvents();
 };
 extern	PackageList	Todays_Packages;
+#pragma pack(pop)
 #endif

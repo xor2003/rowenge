@@ -5,6 +5,8 @@
 //Date           Mon 1 Apr 1996
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	LNCHRDAT_Included
 #define	LNCHRDAT_Included
 
@@ -32,4 +34,5 @@ static LaunchInfo	launcherdata[] =							//RJS 27May99
 	{LT_CONTACT,0,0,0}											//RJS 27May99
 };																//RJS 27May99
 
+#pragma pack(pop)
 #endif

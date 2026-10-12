@@ -16,6 +16,12 @@
 #include <vector>
 #include <string>
 
+// Force natural layout — legacy headers leak pack(1) into this TU otherwise,
+// shifting STL members (verdict check reads offset 0 fine, later members
+// diverge between caller TU and detect.cpp -> corrupted std::string reads).
+#pragma pack(push)
+#pragma pack()
+
 namespace rowan_shell {
 
 // A distinguishing file: path relative to install root + exact size.
@@ -61,4 +67,6 @@ Report detect_install_with(const char* dir, const char* only_game,
                            const EditionManifest* table, int ntable);
 
 } // namespace rowan_shell
+
+#pragma pack(pop)
 #endif

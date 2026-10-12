@@ -26,6 +26,8 @@
 //	stacking, losing the benefit.
 //
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MATHASM_Included
 #define	MATHASM_Included
 
@@ -86,13 +88,13 @@ static inline unsigned char _rowan_bittestandcomplement(long * const a, const lo
 #define _bittestandcomplement	_rowan_bittestandcomplement
 #else
 #define __INTRIN_INLINE static inline
-__INTRIN_INLINE unsigned char _rowan_BitScanForward(unsigned long * const Index, const unsigned long Mask)
+__INTRIN_INLINE unsigned char _rowan_BitScanForward(unsigned int * const Index, const unsigned int Mask)
 {
 	__asm__("bsfl %[Mask], %[Index]" : [Index] "=r" (*Index) : [Mask] "mr" (Mask));
 	return Mask ? 1 : 0;
 }
 
-__INTRIN_INLINE unsigned char _rowan_BitScanReverse(unsigned long * const Index, const unsigned long Mask)
+__INTRIN_INLINE unsigned char _rowan_BitScanReverse(unsigned int * const Index, const unsigned int Mask)
 {
 	__asm__("bsrl %[Mask], %[Index]" : [Index] "=r" (*Index) : [Mask] "mr" (Mask));
 	return Mask ? 1 : 0;
@@ -173,7 +175,7 @@ __INTRIN_INLINE unsigned char _rowan_bittestandset(long * const a, const long b)
 #endif
 
 #pragma warning(disable:4035)
-//дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 //Procedure		BTR
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -291,7 +293,7 @@ inline ULong __fastcall BITRESETI(ULong num1,ULong num2)
 #endif
 */
 
-//дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 //Procedure		BTS
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -394,7 +396,7 @@ inline ULong __fastcall BITSETI(ULong num1, ULong num2)
 #endif
 */
 
-//дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 //Procedure		BT
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -491,7 +493,7 @@ inline bool __fastcall BITTESTI(int num1,ULong num2)
 #endif
 #endif
 */
-//дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 //Procedure		BTC
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -589,7 +591,7 @@ inline ULong __fastcall BITCOMPI(ULong num1,ULong num2)
 #endif
 #endif
 */
-//дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 //Procedure		BSF/BSR
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -703,7 +705,7 @@ inline ULong __fastcall BITSCANHIGHEST(ULong bits,ULong errcode=0)
 #endif
 #endif
 */
-//дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 //Procedure		MUL[SH/DIV][SIN/UNS]
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -1345,4 +1347,5 @@ inline void repmovsd(const void* src, void* dst, int dwords)
     );
 }
 
+#pragma pack(pop)
 #endif

@@ -40,6 +40,7 @@
 //
 //
 
+
 #ifdef	SG2C_CLEANUP
 #undef	SG2C_CLEANUP
 #undef	SG2C_WRITEBACK
@@ -250,3 +251,5 @@ whatbit													 \
 #undef SG2C_CHANGEFIELD
 #endif
 ////////////////////////////////////////////////////////////////////////////
+
+

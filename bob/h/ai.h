@@ -5,6 +5,8 @@
 //Date           Tue 28 May 1996
 //Description    artificial stupidity....
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	AI_Included
 #define	AI_Included
 //DEADCODE MS 31/01/00 #ifndef	__BCPLUSPLUS__
@@ -344,4 +346,5 @@ EXTERNAI(SecretMessages,ItemPtr);
 //DEADCODE CSB 11/02/00 EXTERNAI(SecretMessages,ItemPtr);
 //DEADCODE CSB 11/02/00 EXTERNAI(PreCombatMsg,ItemPtr);
 //DEADCODE CSB 11/02/00 EXTERNAI(FACMsg,ItemPtr);	enum	{FAC_BombsAway=6};
+#pragma pack(pop)
 #endif

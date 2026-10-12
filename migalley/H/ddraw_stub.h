@@ -9,7 +9,7 @@
 
 #pragma pack(push, 1)
 
-typedef long HRESULT;
+typedef int HRESULT;
 #define DD_OK            0
 #define DDERR_GENERIC   -1
 

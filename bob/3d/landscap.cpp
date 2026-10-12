@@ -559,7 +559,7 @@ void LandScape::RenderLandscape(	CLib3D *lib3d )
 		if (lowestgroundpoint==0x07FFFFFFF)							  //JIM 29/03/99
 			lowestgroundpoint=0;	//PD 27Sep97
 
-		g_lpLib3d->SetGlobal( TOGGLE_TEXTURE_ZBIAS, 0UL );
+		g_lpLib3d->SetGlobal( TOGGLE_TEXTURE_ZBIAS, ULong(0) );
 
 		if (View_Point->drawmap == FALSE)
 		{

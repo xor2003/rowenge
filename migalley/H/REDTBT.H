@@ -14,6 +14,7 @@
 
 #include "DLGITEM.H" // RERUN: DlgItem base used below
 #include "FILES.H" // RERUN: FileNum used below
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 class CREdtBt : public DlgItem //RERUN was CWnd
 {
 protected:

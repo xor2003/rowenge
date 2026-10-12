@@ -1,6 +1,7 @@
 //
 //#defines in here force skipping optimisation of certain squares
 //
+
 #define MAP_1233 MAP_1231
 #define MAP_1235 MAP_1231
 #define MAP_1237 MAP_1231
@@ -252,3 +253,5 @@
 #define MAP_8851 MAP_1231
 #define MAP_8853 MAP_1231
 #define MAP_8855 MAP_1231
+
+

@@ -5,6 +5,8 @@
 //Date           Wed 27 Aug 1997
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MODINST_Included
 #define	MODINST_Included
 
@@ -363,5 +365,5 @@ public:
 INSTRUMENTS,
 *PINSTRUMENTS;
 
+#pragma pack(pop)
 #endif
-

@@ -2,6 +2,7 @@
 //  or project specific include files that are used frequently, but
 //      are changed infrequently
 //
+
 #pragma optimize( "g", off )
 
 #if !defined(AFX_STDAFX_H__19CD38C7_A868_11D1_9B68_444553540000__INCLUDED_)
@@ -39,4 +40,3 @@
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_STDAFX_H__19CD38C7_A868_11D1_9B68_444553540000__INCLUDED_)
-

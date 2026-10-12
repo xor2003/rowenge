@@ -8,6 +8,7 @@
 
 #include "DLGITEM.H" // RERUN: DlgItem base used below
 #include "MFC_stub.h"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 class CRTabs : public CWnd
 {

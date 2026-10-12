@@ -1446,7 +1446,7 @@ void	Persons3::make_airgrp(info_airgrp& I)
 
 				if (	eventloglist->homebase==UID_NULL
 					&& currac->ai.homebase
-					&& (int)currac->ai.homebase!=-1
+					&& (intptr_t)currac->ai.homebase!=-1
 //					&& (currac->AutoMoveInfo.movecode==AUTO_TAKEOFF)		//RDH 13Nov96
 					)
 				{
@@ -1529,7 +1529,7 @@ void	Persons3::fixupengagements(AirStrucPtr	firstac)
 {
 	AirStrucPtr attacker=firstac->ai.attacker;
 	if (	firstac->ai.unfriendly
-		&&	(int) firstac->ai.unfriendly !=-1
+		&&	(intptr_t) firstac->ai.unfriendly !=-1
 		&& 	firstac->ai.unfriendly->MigStatus.LaunchFlags.size==AIRSTRUCSIZE	)
 	{
 		AirStrucPtr	eye=firstac;
@@ -1544,7 +1544,7 @@ void	Persons3::fixupengagements(AirStrucPtr	firstac)
 		}
 	}
 	if (	attacker
-		&&	(int)attacker!=-1	)
+		&&	(intptr_t)attacker!=-1	)
 	{
 			AirStrucPtr	eye=attacker;
 			AirStrucPtr trg=firstac;
@@ -2275,8 +2275,8 @@ void	Persons3::SetAngles (FormationItemPtr	newmob)
 {
 
 	if (newmob->formpos == 0)
-		if ((int)newmob->waypoint!=-1)
-			if ((int)newmob->waypoint->target!=-1 && !(newmob->waypoint->World.Y&0x40000000))
+		if ((intptr_t)newmob->waypoint!=-1)
+			if ((intptr_t)newmob->waypoint->target!=-1 && !(newmob->waypoint->World.Y&0x40000000))
 			{
 				newmob->InterceptandRange (newmob->FindDesPos ());
 				newmob->pitch= newmob->PitchIntercept;
@@ -2315,8 +2315,8 @@ void	Persons3::SetAngles (AirStrucPtr	newac)
 {
 
 	if (newac->formpos == 0)
-		if ((int)newac->waypoint!=-1)
-			if ((int)newac->waypoint->target!=-1 && !(newac->waypoint->World.Y&0x40000000))
+		if ((intptr_t)newac->waypoint!=-1)
+			if ((intptr_t)newac->waypoint->target!=-1 && !(newac->waypoint->World.Y&0x40000000))
 			{
 				newac->InterceptandRange (newac->FindDesPos ());
 				newac->pitch= newac->PitchIntercept;
@@ -2797,7 +2797,7 @@ Bool	Persons3::useUID(ItemBasePtr	selecteditem,UniqueID theuid)
 						)
 					&&	(	selecteditem->World.Y&0x40000000
 						||	(	selecteditem->MigStatus.LaunchFlags.size==WAYPOINTSIZE
-							&&	(int)((WayPoint*)*selecteditem)->target==-1
+							&&	(intptr_t)((WayPoint*)*selecteditem)->target==-1
 					)	)	)
 				{
 					foundnode=&foundnode[0]->more;
@@ -2811,12 +2811,12 @@ Bool	Persons3::useUID(ItemBasePtr	selecteditem,UniqueID theuid)
 					||	thenode->request==followmobcopy
 					)
 					if (	(	selecteditem==thenode->posptr
-							&&	(int)((FormationItem*)*selecteditem)->waypoint==-1
+							&&	(intptr_t)((FormationItem*)*selecteditem)->waypoint==-1
 							)
 						|| 	(	selecteditem!=thenode->posptr
 							&&	(	(	selecteditem->MigStatus.LaunchFlags.size==WAYPOINTSIZE
 									&& 	(	(selecteditem->World.Y&0x40000000)
-										||	(int)(((WayPoint*)*selecteditem)->target)==-1
+										||	(intptr_t)(((WayPoint*)*selecteditem)->target)==-1
 									)	)
 								||	(	(selecteditem->MigStatus.LaunchFlags.size==ITEMSIZE)
 									&&	(selecteditem->World.Y&0x40000000)

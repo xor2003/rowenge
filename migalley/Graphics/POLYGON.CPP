@@ -1709,7 +1709,7 @@ void polygon::cpolyscancnvrt(HLINELIST &hll)
 
 	currscreen->DoLockScr(&rsd);
 
-	scradr = (UWord*)(ULong(rsd.lpSurface)+hll.starty*rsd.lPitch);
+	scradr = (UWord*)(uintptr_t(rsd.lpSurface)+hll.starty*rsd.lPitch);
 
 	//Initialise left edge interpolation stuff
 
@@ -1848,7 +1848,7 @@ void polygon::cpolyscancnvrt(HLINELIST &hll)
 		last_leftsx = leftvertex.sx.i;
 		last_rightsx= rightvertex.sx.i;
 
-		scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+		scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 	}
 	currscreen->DoUnlockScr(&rsd);
 }
@@ -1891,7 +1891,7 @@ void polygon::gpolyscancnvrt(HLINELIST &hll)
 
 	currscreen->DoLockScr(&rsd);
 
-	scradr = (UWord*)(ULong(rsd.lpSurface)+hll.starty*rsd.lPitch);
+	scradr = (UWord*)(uintptr_t(rsd.lpSurface)+hll.starty*rsd.lPitch);
 
 	//Initialise left edge interpolation stuff
 
@@ -2060,7 +2060,7 @@ void polygon::gpolyscancnvrt(HLINELIST &hll)
 
 		leftvertex.sy.i++;										//PD 10Jun96
 
-		scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+		scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 	}
 	currscreen->DoUnlockScr(&rsd);
 }
@@ -2138,7 +2138,7 @@ void polygon::ispherescancnvrt(HLINELIST &hll)
 
 		if ((ypos>=MinY)&&(ypos<MaxY))
 		{
-			scradr=(UWord*)(ULong(rsd.lpSurface)+ypos*rsd.lPitch);
+			scradr=(UWord*)(uintptr_t(rsd.lpSurface)+ypos*rsd.lPitch);
 			leftvertex.sy.i=rightvertex.sy.i=ypos;
 			leftvertex.sx.i=xpos<<16;
 			leftvertex.ix.i=SphIxStart;
@@ -2154,8 +2154,8 @@ void polygon::ispherescancnvrt(HLINELIST &hll)
 		ypos2=y-1;
 		iypos=iy+iyscale;
 		iypos2=iy-iyscale;
-		scradr=(UWord*)(ULong(rsd.lpSurface)+ypos*rsd.lPitch);
-		scradr2=(UWord*)(ULong(rsd.lpSurface)+ypos2*rsd.lPitch);
+		scradr=(UWord*)(uintptr_t(rsd.lpSurface)+ypos*rsd.lPitch);
+		scradr2=(UWord*)(uintptr_t(rsd.lpSurface)+ypos2*rsd.lPitch);
 
 		for (dy=1;dy<=Radius;dy++)
 		{
@@ -2199,8 +2199,8 @@ void polygon::ispherescancnvrt(HLINELIST &hll)
 			iypos2-=iyscale;
 			ypos++;
 			ypos2--;
-			scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
-			scradr2=(UWord*)(ULong(scradr)-rsd.lPitch);
+			scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
+			scradr2=(UWord*)(uintptr_t(scradr)-rsd.lPitch);
 		}
 	}
 	currscreen->DoUnlockScr(&rsd);
@@ -2242,7 +2242,7 @@ void polygon::ipolyscancnvrt(HLINELIST &hll)
 
 	currscreen->DoLockScr(&rsd);
 
-	scradr=(UWord*)(ULong(rsd.lpSurface)+hll.starty*rsd.lPitch);
+	scradr=(UWord*)(uintptr_t(rsd.lpSurface)+hll.starty*rsd.lPitch);
 
 	leftvertex.sy.i=rightvertex.sy.i=hll.starty;
 
@@ -2415,7 +2415,7 @@ void polygon::ipolyscancnvrt(HLINELIST &hll)
 		r_ix += rd_ix;
 		r_iy += rd_iy;
 
-		scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+		scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 	}
 	currscreen->DoUnlockScr(&rsd);
 }
@@ -2469,7 +2469,7 @@ void polygon::sipolyscancnvrt(HLINELIST &hll)
 
 	currscreen->DoLockScr(&rsd);
 
-	scradr = (UWord *)(ULong(rsd.lpSurface)+hll.starty*rsd.lPitch);
+	scradr = (UWord *)(uintptr_t(rsd.lpSurface)+hll.starty*rsd.lPitch);
 
 	//Initialise left edge interpolation stuff
 
@@ -2627,7 +2627,7 @@ void polygon::sipolyscancnvrt(HLINELIST &hll)
 		leftvertex.intensity += ld_in;
 		rightvertex.intensity += rd_in;
 
-		scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+		scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 	}
 	currscreen->DoUnlockScr(&rsd);
 }
@@ -3271,7 +3271,7 @@ void polygon::SoftwareWhiteOut()
 		for (int i=rsd.dwHeight-1;i>=0;i--)
 		{
 			UWord* ptr=pscr;
-			pscr=(UWord*)(ULong(pscr)+rsd.lPitch);
+			pscr=(UWord*)(uintptr_t(pscr)+rsd.lPitch);
 			for (int j=rsd.dwWidth-1;j>=0;j--)
 			{
 				UWord in=*ptr;
@@ -3329,7 +3329,7 @@ void polygon::SoftwareBlackOut()
 		for (int i=rsd.dwHeight-1;i>=0;i--)
 		{
 			UWord* ptr=pscr;
-			pscr=(UWord*)(ULong(pscr)+rsd.lPitch);
+			pscr=(UWord*)(uintptr_t(pscr)+rsd.lPitch);
 			for (int j=rsd.dwWidth-1;j>=0;j--)
 			{
 				UWord in=*ptr;
@@ -3387,7 +3387,7 @@ void polygon::SoftwareRedOut()
 		for (int i=rsd.dwHeight-1;i>=0;i--)
 		{
 			UWord* ptr=pscr;
-			pscr=(UWord*)(ULong(pscr)+rsd.lPitch);
+			pscr=(UWord*)(uintptr_t(pscr)+rsd.lPitch);
 			for (int j=rsd.dwWidth-1;j>=0;j--)
 			{
 				UWord in=*ptr;

@@ -672,7 +672,7 @@ CharTableEntryPtr
 int	i;
 int j = f->maxchar;
 	for (i=0;i<j;i++)
-		c[i].pixeldata =(void*)((ULong) c[i].pixeldata + (ULong) &c[j]);
+		c[i].pixeldata =(void*)((uintptr_t) c[i].pixeldata + (uintptr_t) &c[j]);
   }
 
 //------------------------------------------------------------------------------

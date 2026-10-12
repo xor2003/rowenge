@@ -7295,7 +7295,7 @@ void ViewPoint::GetHPIntercept(itemptr ip1,itemptr ip,ANGLES &  out_hdg, ANGLES 
 	}														//RDH 07Oct96
 
 
-	Math_Lib.Intercept(deltax,deltay,deltaz,(long&)range,hdg_word,pitch_word);
+	Math_Lib.Intercept(deltax,deltay,deltaz,(SLong&)range,hdg_word,pitch_word);
 	viewitemrange = range;										//PD 05Jul96
 //DEAD	viewitemhdg = (Angles )hdg_word;							//PD 05Jul96
 

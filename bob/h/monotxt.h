@@ -5,6 +5,8 @@
 //Date           Wed 16 Oct 1996
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MONOTXT_Included
 #define	MONOTXT_Included
 
@@ -182,4 +184,5 @@ struct	ProbeTime
 
 };
 
+#pragma pack(pop)
 #endif

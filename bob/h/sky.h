@@ -5,6 +5,8 @@
 //Date           Mon 10 Mar 1997
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SKY_Included
 #define	SKY_Included
 
@@ -155,5 +157,5 @@ class Atmosphere;
 typedef Atmosphere ATMOSPHERE, *PATMOSPHERE;
 
 
+#pragma pack(pop)
 #endif
-

@@ -5,6 +5,8 @@
 //Date           Tue 12 Aug 1997
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	AERODEV_Included
 #define	AERODEV_Included
 
@@ -200,4 +202,5 @@ typedef AeroDevice AERODEVICE, *PAERODEVICE;
 //DEADCODE CB 29/10/99 typedef AeroDevice AERODEVICE, *PAERODEVICE;
 //DEADCODE CB 29/10/99 
 //DEADCODE CB 29/10/99 
+#pragma pack(pop)
 //DEADCODE CB 29/10/99 #endif

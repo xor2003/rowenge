@@ -54,6 +54,7 @@
 //
 // An invalid media type was specified.%0
 //
+
 #define VFW_E_INVALIDMEDIATYPE           ((HRESULT)0x80040200L)
 
 //
@@ -1478,5 +1479,7 @@
 // The operation failed since the chapter does not exist.%0
 //
 #define VFW_E_DVD_CHAPTER_DOES_NOT_EXIST ((HRESULT)0x80040315L)
+
+
 
 

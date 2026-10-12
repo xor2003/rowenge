@@ -5,6 +5,8 @@
 //Date           Tue 5 Dec 1995
 //Description    New 'persons' to process new battlefield format.
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	PERSONS2_Included
 #define	PERSONS2_Included
 
@@ -770,4 +772,5 @@ UniqueID	loadedSAG[MAX_LOADEDSAG];
 //extern	Persons2	Persons_2;
 //------------------------------------------------------------------------------
 
+#pragma pack(pop)
 #endif

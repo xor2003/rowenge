@@ -8,6 +8,8 @@
 //	F86:
 //			300 rounds per gun, 3 guns on each side of nose
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	WEAPPAK_Included
 #define	WEAPPAK_Included
 
@@ -284,4 +286,5 @@ WeapPakType	ShpToWeapPak[] =
 #endif
 
 
+#pragma pack(pop)
 #endif

@@ -20,16 +20,23 @@ endif()
 
 option(MIG_SANITIZERS "Build with AddressSanitizer + UBSan (GCC, 32-bit)" OFF)
 option(MIG_LINT "Run cppcheck during the build" OFF)
+option(ROWAN_64BIT "Build native 64-bit (drops -m32; needs amd64 deps)" OFF)
 
 # Unified repo layout: this tree lives at <repo>/migalley with siblings
 # <repo>/engine (rowan shared compat) and <repo>/bob (bob-flight-sim).
 # ROWAN_SYSROOT locates the extracted i386 .deb sysroot for 32-bit deps;
 # it is NOT committed — CI installs the real :i386 -dev packages, and
 # locally it defaults to <repo>/sysroot-i386 (symlink or copy).
+# For ROWAN_64BIT builds ROWAN_SYSROOT may instead point at an amd64
+# sysroot (e.g. <repo>/sysroot-amd64) holding deps not installed system-wide.
 set(ROWAN_SYSROOT "$ENV{ROWAN_SYSROOT}" CACHE PATH
-    "32-bit dependency sysroot (usr/include, usr/lib/i386-linux-gnu)")
+    "dependency sysroot (usr/include, usr/lib/<triplet>)")
 if(NOT ROWAN_SYSROOT)
-    get_filename_component(ROWAN_SYSROOT "${CMAKE_SOURCE_DIR}/../sysroot-i386" ABSOLUTE)
+    if(ROWAN_64BIT)
+        get_filename_component(ROWAN_SYSROOT "${CMAKE_SOURCE_DIR}/../sysroot-amd64" ABSOLUTE)
+    else()
+        get_filename_component(ROWAN_SYSROOT "${CMAKE_SOURCE_DIR}/../sysroot-i386" ABSOLUTE)
+    endif()
 endif()
 
 # -------------------------------------------------------------------
@@ -45,29 +52,40 @@ pkg_check_modules(VULKAN REQUIRED vulkan)
 add_library(ProjectDefaults INTERFACE)
 
 if(NOT MSVC)
-    # Force 32-bit build on GCC/Clang, and disable enum comparison warnings
-    message(STATUS "Forcing 32-bit build: adding -m32 to CMAKE_CXX_FLAGS")
     # -fno-delete-null-pointer-checks: this codebase's MSVC-era idiom passes
     # null "references" (e.g. `=*(CRect*)NULL` default args, `if (&ref)` guards).
     # GCC assumes references are non-null and deletes those guards, turning
     # intended "no arg" cases into null derefs (View3d::MakeInteractive crash).
-    target_compile_options(ProjectDefaults INTERFACE
-        -m32 -fms-extensions -Wno-enum-compare -fno-delete-null-pointer-checks
-        # MSVC-era code assumes wrap-around signed overflow; -fwrapv keeps
-        # that behaviour well-defined under optimisation.
-        -fwrapv
-        # -m32 defaults to i686/x87: every float op goes through the 387 stack
-        # and floorf() is a library call.  SSE2 scalar math is several times
-        # faster for the software rasterizer's float-heavy inner loops and is
-        # present on every CPU that can run this port (x86-64 era onward).
-        -msse2 -mfpmath=sse)
-    target_link_options(ProjectDefaults INTERFACE -m32
-        # Statically link the C++ runtime: the build compiles against the
-        # compiler's own headers, but the system libstdc++.so may be newer
-        # (GCC14 vs GCC13 here) with a different class layout — the vtable
-        # vbase offsets then disagree with the inline-ctor offsets and the
-        # first std::ofstream construction segfaults under -O2.
-        -static-libstdc++ -static-libgcc)
+    if(ROWAN_64BIT)
+        message(STATUS "Building native 64-bit (no -m32)")
+        target_compile_options(ProjectDefaults INTERFACE
+            -fms-extensions -Wno-enum-compare -fno-delete-null-pointer-checks
+            -fwrapv -msse2 -mfpmath=sse
+            # surface the 32→64 porting hazards loudly
+            -Wpointer-to-int-cast -Wint-to-pointer-cast -Wformat)
+        target_link_options(ProjectDefaults INTERFACE
+            -static-libstdc++ -static-libgcc)
+    else()
+        # Force 32-bit build on GCC/Clang, and disable enum comparison warnings
+        message(STATUS "Forcing 32-bit build: adding -m32 to CMAKE_CXX_FLAGS")
+        target_compile_options(ProjectDefaults INTERFACE
+            -m32 -fms-extensions -Wno-enum-compare -fno-delete-null-pointer-checks
+            # MSVC-era code assumes wrap-around signed overflow; -fwrapv keeps
+            # that behaviour well-defined under optimisation.
+            -fwrapv
+            # -m32 defaults to i686/x87: every float op goes through the 387 stack
+            # and floorf() is a library call.  SSE2 scalar math is several times
+            # faster for the software rasterizer's float-heavy inner loops and is
+            # present on every CPU that can run this port (x86-64 era onward).
+            -msse2 -mfpmath=sse)
+        target_link_options(ProjectDefaults INTERFACE -m32
+            # Statically link the C++ runtime: the build compiles against the
+            # compiler's own headers, but the system libstdc++.so may be newer
+            # (GCC14 vs GCC13 here) with a different class layout — the vtable
+            # vbase offsets then disagree with the inline-ctor offsets and the
+            # first std::ofstream construction segfaults under -O2.
+            -static-libstdc++ -static-libgcc)
+    endif()
 
     if(MIG_SANITIZERS)
         message(STATUS "Sanitizers enabled: ASan + UBSan")
@@ -100,11 +118,13 @@ target_include_directories(ProjectDefaults INTERFACE
     ${SDL2TTF_INCLUDE_DIRS}
     ${SDL2_MIXER_INCLUDE_DIRS}
     ${VULKAN_INCLUDE_DIRS}
-    # i386 multiarch headers (SDL2/_real_SDL_config.h lives here)
-    ${ROWAN_SYSROOT}/usr/include/i386-linux-gnu
+    # multiarch headers (SDL2/_real_SDL_config.h lives in the arch dir)
+    ${ROWAN_SYSROOT}/usr/include/$<$<BOOL:${ROWAN_64BIT}>:x86_64>$<$<NOT:$<BOOL:${ROWAN_64BIT}>>:i386>-linux-gnu
     # sysroot root: vulkan/vulkan.h (the BoB compat backend; the vulkan.pc
     # includedir resolves empty so VULKAN_INCLUDE_DIRS gives nothing)
     ${ROWAN_SYSROOT}/usr/include
+    # sysroot SDL2 headers (SDL_ttf.h etc.) when the system dir lacks them
+    ${ROWAN_SYSROOT}/usr/include/SDL2
 )
 
 # gcc's multilib config finds the 32-bit sysroot libs implicitly, but clang
@@ -114,6 +134,8 @@ target_link_directories(ProjectDefaults INTERFACE
     ${SDL2TTF_LIBRARY_DIRS}
     ${SDL2_MIXER_LIBRARY_DIRS}
     ${VULKAN_LIBRARY_DIRS}
+    # sysroot libs (SDL2_ttf, vulkan, openal dev symlinks)
+    ${ROWAN_SYSROOT}/usr/lib/x86_64-linux-gnu
 )
 
 target_link_libraries(ProjectDefaults INTERFACE

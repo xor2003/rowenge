@@ -16,6 +16,7 @@
 
 // RERUN class CRListBox : public CWnd
 #include "DLGITEM.H" // RERUN: DlgItem base used below
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 class CRListBox : public DlgItem // RERUN DlgItem is the real base class for all Rowan controls
 {
 protected:

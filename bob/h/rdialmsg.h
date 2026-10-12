@@ -8,6 +8,8 @@
 //				rdialog, rmdldlg, rtoolbar, AND cmigview 
 //				should all respond to all these messages.
 //////////////////////////////////////////////////////////////////////
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 	afx_msg LRESULT OnCommandHelp(WPARAM, LPARAM lParam);
 	virtual afx_msg FileNum OnGetArt();
 	afx_msg long OnGetXYOffset();
@@ -38,3 +40,6 @@ private:
 	MSG2_0(OnGetComboDialog);
 	MSG2_2v(OnActiveXScroll);
 	MSG2_2(OnCommandHelp);
+
+
+#pragma pack(pop)

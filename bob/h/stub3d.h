@@ -20,6 +20,8 @@
 //							0x10n=specific card
 //							0x1m0=specific mode
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	STUB3d_defined
 //#include	"stdafx.h"
 //#include	<afxmt.h>
@@ -178,7 +180,7 @@ class	Mast3d
 
 //x0r #ifdef	__AFXMT_H__
 
-static void CALLBACK StaticTimeProc(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2 );
+static void CALLBACK StaticTimeProc(UINT uID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2 );
 
 void TimeProc(UINT uID, UINT uMsg, DWORD dw1, DWORD dw2 );
 //#endif
@@ -344,4 +346,5 @@ public:
 
 
 
+#pragma pack(pop)
 #endif

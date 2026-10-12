@@ -1,4 +1,5 @@
 #if !defined(MESSAGES_H_INCLUDED)
+
 #define MESSAGES_H_INCLUDED
 
 // these messages are primarily used for communicating between

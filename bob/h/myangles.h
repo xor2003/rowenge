@@ -6,6 +6,8 @@
 //Description    If you find you must cast, cast to ANGLES()
 //------------------------------------------------------------------------------
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	ANGLES_Included
 #define	ANGLES_Included
 #include <dosdefs.h>
@@ -17,8 +19,7 @@ enum	AnglesShiftTwice	{ANGLES_SHIFT_TWICE=30};
 inline	int	operator/(int i,AnglesFract)	{return((i+16384)>>15);}
 inline	int	operator>>(int i,AnglesShift)	{return((i+16384)>>15);}
 
-inline	SLong	operator/(SLong i,AnglesFract)	{return((i+16384)>>15);}
-inline	SLong	operator>>(SLong i,AnglesShift)	{return((i+16384)>>15);}
+
 inline	ULong	operator/(ULong i,AnglesFract)	{return((i+16384)>>15);}
 inline	ULong	operator>>(ULong i,AnglesShift)	{return((i+16384)>>15);}
 enum	AnglePoint
@@ -305,5 +306,5 @@ class ANGLES;
 	inline ANGLES operator += (ANGLES& a, SWord b)	{return a=(Angles)(a.a+b);}
 	//inline ANGLES operator - (ANGLES a, SLong b)	{return (Angles)(a.a-b);}
 	inline ANGLES operator -= (ANGLES& a, SWord b)	{return a=(Angles)(a.a-b);}
+#pragma pack(pop)
 #endif
-

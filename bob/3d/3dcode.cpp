@@ -1982,7 +1982,7 @@ SLong ThreeDee::AddVapourObject(ShapeNum	shape,
  		VapItemP->World.X = wx;
  		VapItemP->World.Y = wy;
  		VapItemP->World.Z = wz;
-		*lastobjptr = (ULong) prevobj3d;							//RJS 17Sep97
+		*lastobjptr = (uintptr_t) prevobj3d;							//RJS 17Sep97
  		VapItemP->roll = ANGLES_0Deg;								//RJS 17Sep97
 		VapItemP->Anim = apoint1;									//RJS 17Sep97
 		VapItemP->Anim = (AnimFlagField)(1<<MINANIM);				//RJS 21Apr99

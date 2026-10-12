@@ -56,7 +56,11 @@ static void segv_report(int sig, siginfo_t* si, void* uc)
 	p = segv_hex(p, (unsigned long)(si ? si->si_addr : 0));
 	static const char mid2[] = " eip=0x";
 	memcpy(p, mid2, sizeof(mid2) - 1); p += sizeof(mid2) - 1;
+#if defined(__x86_64__)
+	p = segv_hex(p, u ? (unsigned long)u->uc_mcontext.gregs[REG_RIP] : 0);
+#else
 	p = segv_hex(p, u ? (unsigned long)u->uc_mcontext.gregs[REG_EIP] : 0);
+#endif
 	static const char tail[] = " ***\n";
 	memcpy(p, tail, sizeof(tail)); p += sizeof(tail) - 1;
 	write(STDERR_FILENO, buf, (size_t)(p - buf));

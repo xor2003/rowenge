@@ -4,8 +4,11 @@
 //DEADCODE DAW 27/05/99 #define DEBUG_NEW new(THIS_FILE, __LINE__)
 //DEADCODE DAW 27/05/99 
 //DEADCODE DAW 27/05/99 #endif
+
 #define DIRECTDRAW_VERSION 0x0600
 #include 	"dosdefs.h"
 #include	<stdio.h>
 #include	<string.h>
+
+
 

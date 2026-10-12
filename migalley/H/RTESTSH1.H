@@ -12,6 +12,7 @@
 // Rtestsh1.h : header file
 //
 #include "FLYINIT.H"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 /////////////////////////////////////////////////////////////////////////////
 // Rtestsh1 dialog

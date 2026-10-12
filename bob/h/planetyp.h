@@ -10,6 +10,8 @@
 // is made to allow instances to occur. 
 // The re-caller has to undef PLANETYP_Included to avoid accidental double call
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	PLANETYP_Included
 #define	PLANETYP_Included
 #include	"DosDefs.h"
@@ -283,5 +285,5 @@ typedef	PlaneType	*PTypePtr;
 
 extern	PlaneInit*	Plane_Type_Translate[];
 
+#pragma pack(pop)
 #endif
-

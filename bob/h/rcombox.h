@@ -7,6 +7,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #if !defined(AFX_RCOMBOX_H__E28400A1_FEC1_11D1_9FD6_D0EC00C10000__INCLUDED_)
 #define AFX_RCOMBOX_H__E28400A1_FEC1_11D1_9FD6_D0EC00C10000__INCLUDED_
 
@@ -114,4 +116,5 @@ char*	trunc(char* s,size_t l);
 
 
 
+#pragma pack(pop)
 #endif // !defined(AFX_RCOMBOX_H__E28400A1_FEC1_11D1_9FD6_D0EC00C10000__INCLUDED_)

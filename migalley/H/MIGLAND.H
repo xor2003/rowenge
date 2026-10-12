@@ -704,9 +704,9 @@ template<class Object> CCircularBlockCache<Object>::~CCircularBlockCache()
 //-----------------------------------------------------------------------------
 template<class Object> void CCircularBlockCache<Object>::DeleteHead()
 {
-	Object* pDataBlk=(Object*)(pHead+4);//Get ptr to stored element
+	Object* pDataBlk=(Object*)(pHead+sizeof(uintptr_t));//Get ptr to stored element
 	pDataBlk->~Object();				//Call its destructor code	
-	pHead=(UByte*)*(ULong*)pHead;		//Get the next ptr
+	pHead=(UByte*)*(uintptr_t*)pHead;		//Get the next ptr
 }
 
 //-----------------------------------------------------------------------------
@@ -717,7 +717,7 @@ template<class Object> void CCircularBlockCache<Object>::DeleteHead()
 template<class Object> Object* CCircularBlockCache<Object>::Alloc(ULong sz)
 {
 	//Add size of ptr to next element
-	sz+=4;
+	sz+=sizeof(uintptr_t);
 	#ifndef NOASSERTS
 	assert((sz)<=size&&" Buffer too small");	//Should never happen
 	#endif
@@ -726,23 +726,23 @@ template<class Object> Object* CCircularBlockCache<Object>::Alloc(ULong sz)
 	//Test for first insertion to an empty buffer
 	if (pTail==NULL)
 	{
-		*(ULong*)pHead=ULong(pLast);//Fill in the 'next' field will be NULL
+		*(uintptr_t*)pHead=(uintptr_t)pLast;//Fill in the 'next' field will be NULL
 		pTail=pHead+sz;				//Set tail ptr to end of the alloc'd block
 		pLast=pHead;				//Record this element as the last inserted
-		pRVal=(Object*)(pHead+4);	//Set pointer to the alloc'd data area
+		pRVal=(Object*)(pHead+sizeof(uintptr_t));	//Set pointer to the alloc'd data area
 	}
 	else
 	{
 		while (pRVal==NULL)
 		{
 			ULong freeSpace;
-			if (ULong(pTail)>ULong(pHead))
+			if (uintptr_t(pTail)>uintptr_t(pHead))
 			{
 				//Moving from pTail->pHead means wrapping round the
 				//end of the buffer. First, test to see if there is
 				//enough room to fit the new data in between pTail
 				//and the end of the buffer.
-				freeSpace=size-(ULong(pTail)-ULong(pBuff));
+				freeSpace=size-(uintptr_t(pTail)-uintptr_t(pBuff));
 				if (sz<=freeSpace)
 				{
 					//The new element will fit without going over
@@ -751,13 +751,13 @@ template<class Object> Object* CCircularBlockCache<Object>::Alloc(ULong sz)
 					//Fill in new elements 'next' field
 					*(ULong*)pTail=0L;
 					//Update the last elements 'next' field
-					*(ULong*)pLast=ULong(pTail);
+					*(uintptr_t*)pLast=(uintptr_t)pTail;
 					//Update the last inserted element ptr
 					pLast=pTail;
 					//Update the tail ptr
 					pTail+=sz;
 					//Set pointer to alloc'd data area
-					pRVal=(Object*)(pLast+4);
+					pRVal=(Object*)(pLast+sizeof(uintptr_t));
 				}
 				else pTail=pBuff;
 			}
@@ -765,7 +765,7 @@ template<class Object> Object* CCircularBlockCache<Object>::Alloc(ULong sz)
 			{
 			 	//Moving from pTail->pHead doesn't involve
 				//wrapping around the end of the buffer
-				freeSpace=ULong(pHead)-ULong(pTail);
+				freeSpace=uintptr_t(pHead)-uintptr_t(pTail);
 				if (sz<=freeSpace)
 				{
 					//The new element will fit between pTail & pHead
@@ -773,13 +773,13 @@ template<class Object> Object* CCircularBlockCache<Object>::Alloc(ULong sz)
 					//Fill in the new elements 'next' field
 					*(ULong*)pTail=0L;
 					//Update the last elements 'next' field
-					*(ULong*)pLast=ULong(pTail);
+					*(uintptr_t*)pLast=(uintptr_t)pTail;
 					//Update the last inserted element ptr
 					pLast=pTail;
 					//Update the tail ptr
 					pTail+=sz;
 					//Set the pointer to the alloc'd data area
-					pRVal=(Object*)(pLast+4);
+					pRVal=(Object*)(pLast+sizeof(uintptr_t));
 				}
 				else
 				{
@@ -791,7 +791,7 @@ template<class Object> Object* CCircularBlockCache<Object>::Alloc(ULong sz)
 						pLast=pHead=pBuff;
 						*(ULong*)pHead=0L;
 						pTail=pHead+sz;
-						pRVal=(Object*)(pLast+4);
+						pRVal=(Object*)(pLast+sizeof(uintptr_t));
 					}
 				}
 			}

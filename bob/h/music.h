@@ -5,6 +5,8 @@
 //Date           Fri 8 Oct 1999
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MUSIC_Included
 #define	MUSIC_Included
 
@@ -92,4 +94,5 @@ private:
 
 typedef	class Music *HSEQUENCE;
 
+#pragma pack(pop)
 #endif

@@ -540,7 +540,7 @@ struct CREATESTRUCT {
 
 using LPCREATESTRUCT = CREATESTRUCT*;
 
-typedef long DISPID;
+typedef int DISPID;
 
 struct VARIANT {
     unsigned short vt;   // VARTYPE
@@ -1511,6 +1511,7 @@ public:
 
 #ifndef ASSERT
     #include <cassert>
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
     #define ASSERT(x) assert(x)
 #endif
 

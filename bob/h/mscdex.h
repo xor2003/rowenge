@@ -5,6 +5,8 @@
 //Date           Mon 28 Oct 1996
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MSCDEX_Included
 #define	MSCDEX_Included
 
@@ -447,4 +449,5 @@ extern "C" void __FAR fileman__DeviceHdrOff();
 
 extern "C" void __FAR fileman__DriveLetter();
 */
+#pragma pack(pop)
 #endif

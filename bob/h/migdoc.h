@@ -2,6 +2,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #if !defined(AFX_MIGDOC_H__19CD38CB_A868_11D1_9B68_444553540000__INCLUDED_)
 #define AFX_MIGDOC_H__19CD38CB_A868_11D1_9B68_444553540000__INCLUDED_
 
@@ -54,5 +56,5 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_MIGDOC_H__19CD38CB_A868_11D1_9B68_444553540000__INCLUDED_)
-

@@ -16,6 +16,7 @@
 #include	"UNIQUEID.H"
 #include	"SHAPENUM.G"
 #include "RSPINBUT.H"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 //obviously, a number of these reference each other
 class	ItemBase;

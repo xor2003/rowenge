@@ -6,6 +6,8 @@
 //}}AFX_INCLUDES
 
 */
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #if !defined(AFX_RAFSQLST_H__F3F730E0_9769_11D3_8ADC_00A0D21BD395__INCLUDED_)
 #define AFX_RAFSQLST_H__F3F730E0_9769_11D3_8ADC_00A0D21BD395__INCLUDED_
 
@@ -73,4 +75,5 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_RAFSQLST_H__F3F730E0_9769_11D3_8ADC_00A0D21BD395__INCLUDED_)

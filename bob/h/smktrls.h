@@ -5,6 +5,8 @@
 //Date           Wed 9 Feb 2000
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SMKTRLS_Included
 #define	SMKTRLS_Included
 
@@ -95,4 +97,5 @@ extern	TrailInfo	Smoke_Trails;
 
 
 
+#pragma pack(pop)
 #endif

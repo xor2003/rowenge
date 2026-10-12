@@ -159,7 +159,7 @@ int		RowanTasks::StartTask()
 			breakif (taskstacks[++count]==0);
 	if (count==lasttasknum)
 		INT3;	//oh dear... run out of tasks?
-	taskstacks[count]=ULong(&count);	//get address of local variable...
+	taskstacks[count]=uintptr_t(&count);	//get address of local variable...
 	return count;
 }
 
@@ -172,7 +172,7 @@ void	RowanTasks::EndTask()
 
 int		RowanTasks::GetCurrTask()
 {
-	ULong testval=ULong(&testval);
+	ULong testval=uintptr_t(&testval);
 	ULong	lowestvalueabove=0xffffffff;
 	int	entforlowest=-1;
 	int	count;

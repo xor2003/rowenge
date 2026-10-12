@@ -9,6 +9,8 @@
 //;;------------------------------------------------------------------------------
 //;;This bit is manually editable:
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	UNIQUEIDBAND_Included
 #define	UNIQUEIDBAND_Included
 enum	UniqueIDBand
@@ -139,6 +141,5 @@ enum	UniqueID
 //------------------------------------------------------------------------------
 
 
+#pragma pack(pop)
 #endif
-
-

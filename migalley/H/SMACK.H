@@ -14,8 +14,8 @@
 //`u64` in <vulkan_core.h> when a TU included smack.h before vulkan headers.
 typedef signed char s8;
 typedef unsigned char u8;
-typedef unsigned long u32;
-typedef signed long s32;
+typedef unsigned int u32;
+typedef signed int s32;
 typedef unsigned long long u64;
 typedef signed long long s64;
 #endif

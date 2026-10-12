@@ -14,6 +14,8 @@
 //				provided for read/write to provide faster throughput
 //
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	BSTREAM_Included
 #define	BSTREAM_Included
 
@@ -130,4 +132,5 @@ inline	Bool	DeleteFile(char* fname)
 		return TRUE;
 }
 
+#pragma pack(pop)
 #endif

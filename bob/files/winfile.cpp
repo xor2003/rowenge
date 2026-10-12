@@ -124,7 +124,7 @@ const	int	DOSFILE_SECTSIZE = 2048;							//PD 18Nov96
 
 //char 	readblockbufferbase[8192];
 char 	readblockbufferbase[65536];
-char* 	readblockbuffer=(char*)(((int)readblockbufferbase+2047)&-2048);
+char* 	readblockbuffer=(char*)(((intptr_t)readblockbufferbase+2047)&-2048);
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		CDSeek

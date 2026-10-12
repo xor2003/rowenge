@@ -16,6 +16,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <stdio.h>
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 #ifdef __cplusplus
 extern "C" {

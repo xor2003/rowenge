@@ -1167,7 +1167,7 @@ void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 }
 static BOOL CALLBACK EnumThreadWndProc(  HWND hwnd,  LPARAM lParam)
 {
-	*(int*)lParam=(int)hwnd;
+	*(int*)lParam=(intptr_t)hwnd;
 	return	FALSE;
 }
    

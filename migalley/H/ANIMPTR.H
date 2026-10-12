@@ -235,13 +235,13 @@ inline UByteP	animptr::operator & ()
 inline int		animptr::operator - (animptr& a)
 {
 #ifndef	NANIMDEBUG
-	int	retval = (int)ptr - (int)a.ptr;
+	int	retval = (int)(intptr_t)ptr - (int)(intptr_t)a.ptr;
 
 	assert((retval>=0)&&(retval<(size&0x3ff)));
 
 	return (retval);
 #else
-	return (int)ptr - (int)a.ptr;
+	return (intptr_t)(intptr_t)ptr - (intptr_t)(intptr_t)a.ptr;
 #endif
 }
 

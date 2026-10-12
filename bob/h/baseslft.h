@@ -1,4 +1,6 @@
 #if !defined(AFX_BASESLFT_H__354A1BA0_8ECF_11D3_8ADB_00A0D21BD395__INCLUDED_)
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #define AFX_BASESLFT_H__354A1BA0_8ECF_11D3_8ADB_00A0D21BD395__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -46,4 +48,5 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_BASESLFT_H__354A1BA0_8ECF_11D3_8ADB_00A0D21BD395__INCLUDED_)

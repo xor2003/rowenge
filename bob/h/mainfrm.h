@@ -1,4 +1,6 @@
 #if !defined(AFX_MAINFRM_H__DB03429D_1B07_11D1_A1F0_444553540000__INCLUDED_)
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #define AFX_MAINFRM_H__DB03429D_1B07_11D1_A1F0_444553540000__INCLUDED_
 
 #if _MSC_VER >= 1000
@@ -172,6 +174,5 @@ inline	TitleBar& TitleBarPtr()
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_MAINFRM_H__DB03429D_1B07_11D1_A1F0_444553540000__INCLUDED_)
-
-

@@ -5,6 +5,8 @@
 //Date           Wed 27 Jan 1999
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	CSTRING_Included
 #define	CSTRING_Included
 
@@ -42,7 +44,7 @@ typedef unsigned char TBYTE , *PTBYTE ;
 #define VOID void
 typedef char CHAR;
 typedef short SHORT;
-typedef long LONG;
+typedef int LONG;
 #endif
 
 //
@@ -434,5 +436,5 @@ _AFX_INLINE bool AFXAPI operator>=(LPCTSTR s1, const CString& s2)
 
 #endif
 
+#pragma pack(pop)
 #endif
-

@@ -5,6 +5,8 @@
 //Date           Mon 22 Apr 1996
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SAVEGAME_Included
 #define	SAVEGAME_Included
 
@@ -624,4 +626,5 @@ public:
 #endif
 
 
+#pragma pack(pop)
 #endif

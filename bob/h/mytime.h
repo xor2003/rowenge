@@ -6,6 +6,8 @@
 //				 Code now in hardware\dostime&wintime.cpp		//ARM 01Jul96
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	TIME_Included
 #define	TIME_Included
 
@@ -470,4 +472,5 @@ public:
 
 extern class TimerCode Timer_Code;
 
+#pragma pack(pop)
 #endif

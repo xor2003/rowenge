@@ -29,6 +29,8 @@
 //			Use (srcField::Make(),src,src,src) as fn parameter
 //
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	BITFIELD_Included
 #define	BITFIELD_Included
 /*#ifndef	assert
@@ -331,4 +333,5 @@ static MakeField	Make(const int s=0)
 
 //----------------------------------------------------------------------------
 //
+#pragma pack(pop)
 #endif

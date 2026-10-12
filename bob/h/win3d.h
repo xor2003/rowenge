@@ -6,6 +6,7 @@
 //Description    
 //------------------------------------------------------------------------------
 /*#ifndef	WIN3D_Included
+
 #define	WIN3D_Included
 
 #define	DEFAULT_WIN3D 0
@@ -1372,3 +1373,4 @@ extern	void D3DErrorCodes(char*,int,HRESULT);
 
 #endif
 */
+

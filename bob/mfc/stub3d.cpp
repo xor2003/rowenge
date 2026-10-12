@@ -214,7 +214,7 @@ Mast3d::Mast3d()
 	UINT delay=Timer_Code.FRAMETIME*10; // want millisecs
 	timeBeginPeriod (REQUIREDTIMEPERIOD);	  //timeEndPeriod
 
-	uTimerID = timeSetEvent (delay, REQUIREDTIMEPERIOD, &Mast3d::StaticTimeProc, (int)&Master_3d, TIME_PERIODIC); //AMM 25/11/99
+	uTimerID = timeSetEvent (delay, REQUIREDTIMEPERIOD, &Mast3d::StaticTimeProc, (intptr_t)&Master_3d, TIME_PERIODIC); //AMM 25/11/99
 
 	currinst=NULL;
 //DeadCode JIM 20Oct00 	int mv=0;
@@ -257,7 +257,7 @@ void	Mast3d::MainInit(void)
 
 	_DPlay.Implemented = FALSE;
 
- 	_Miles.Init((ULong)winst);											//RJS 02Nov98
+ 	_Miles.Init((uintptr_t)winst);											//RJS 02Nov98
 	_Radio.Init();														//RJS 16Aug00
 
 	if ( g_lpLib3d->Initialise(winst, fastMath.fastSqrtTable ) != S_OK )
@@ -983,7 +983,7 @@ View3d::~View3d()
 
 	Master_3d.g_lpLib3d->FreeLandscapeTextures();
 	Master_3d.g_lpLib3d->RestoreDisplayMode();
-	_Miles.InitUI((int)window);									//DAW 06Apr99
+	_Miles.InitUI((intptr_t)window);									//DAW 06Apr99
 
 	Three_Dee.FreeLandscapeTextures();							//RJS 31Jul00
 	Three_Dee.DeleteFor2D();									//RJS 08Sep00
@@ -1081,7 +1081,7 @@ int	View3d::MakePassive(WinMode	v,const CRect& pos,bool flag,bool flag2)
 	}
 
 	Master_3d.g_lpLib3d->AllocateLandscapeTextures();
-	_Miles.SetDirectSoundWindow((ULong)Master_3d.winst);
+	_Miles.SetDirectSoundWindow((uintptr_t)Master_3d.winst);
 
 	// now set the gamma
 	Master_3d.g_lpLib3d->SetGammaLevel( Save_Data.gammacorrection );
@@ -1097,7 +1097,7 @@ int	View3d::MakePassive(WinMode	v,const CRect& pos,bool flag,bool flag2)
 	OverLay.SetViewpoint(View_Point);
 	OverLay.LoaderScreen(0);									//PD 02Mar99
 	_Miles.Init3D();											//RJS 06Apr99
-	_Miles.SetDirectSoundWindow((ULong)Master_3d.winst);
+	_Miles.SetDirectSoundWindow((uintptr_t)Master_3d.winst);
 //	_Miles.SetVolumes(TRUE);									//RJS 12Mar99
 	OverLay.LoaderScreen(0+32);									//PD 02Mar99
 //DEADCODE DAW 13/04/99 	_Miles.SetVolumes(TRUE);
@@ -1261,7 +1261,7 @@ View3d* Inst3d::Interactive(View3d* newwin)
 			AllowAliasing	aliassingUI,aliassing;
 			_Analogue.WhatAliasModes(aliassingUI,aliassing,newwin->View_Point);
 
-			_Analogue.Initialise((int)Master_3d.winst,(int)Master_3d.hinst,aliassingUI,aliassing);
+			_Analogue.Initialise((intptr_t)Master_3d.winst,(intptr_t)Master_3d.hinst,aliassingUI,aliassing);
 
 			TRACE("Interactive setup success1\n");
 			if (Master_3d.g_lpDI)
@@ -1747,7 +1747,7 @@ int	View3d::WaitEndDraw(DrawState d,int timeoutmilisec)
 //DeadCode AMM 24Aug00 }
 
 static int	howcamehere;
-void CALLBACK Mast3d::StaticTimeProc(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2 )
+void CALLBACK Mast3d::StaticTimeProc(UINT uID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2 )
 {
 
 #ifdef DO_TIMER_DIAGS
@@ -2068,7 +2068,7 @@ void	Inst3d::DoMoveCycle()
 				&& !_DPlay.SimulateExitKey
 				&& !_DPlay.Implemented									//JIM 24Oct00
 				)
-				_Analogue.Initialise((int)Master_3d.winst,(int)Master_3d.hinst,uimode,mainmode);
+				_Analogue.Initialise((intptr_t)Master_3d.winst,(intptr_t)Master_3d.hinst,uimode,mainmode);
 
 //DeadCode JIM 31Aug00 			if (Key_Tests.KeyPress3d(JOYSTICKMODETOGGLE))
 //DeadCode JIM 31Aug00 			{

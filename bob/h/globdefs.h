@@ -11,6 +11,7 @@
 //				The system that MFC uses for it's own purposes makes 
 //				this look high-tech!
 //////////////////////////////////////////////////////////////////////
+
 #pragma once
 #ifndef Globdefs_DEFINED_4_2_2000
 #define Globdefs_DEFINED_4_2_2000
@@ -26,12 +27,12 @@
 #define ON_MESSAGE_CLASS(msg,type,routine)\
 	{ msg, 0, 0, 0, \
 		(AFX_PMSG)(void (CCmdTarget::*)())(LRESULT (CWnd::*)(WPARAM, LPARAM))(LRESULT (type::*)(WPARAM, LPARAM))&MSG2_##routine },
-#define MSG2_0(memberFxn)	LRESULT MSG2_##memberFxn(int,int) {return (int)memberFxn();}
-#define MSG2_1(memberFxn)	LRESULT MSG2_##memberFxn(int a,int) {return (int)memberFxn(a);}
-#define MSG2_2(memberFxn)	LRESULT MSG2_##memberFxn(int a,int b) {return (int)memberFxn(a,b);}
-#define MSG2_0v(memberFxn)	LRESULT MSG2_##memberFxn(int,int) {memberFxn();return 0;}
-#define MSG2_1v(memberFxn)	LRESULT MSG2_##memberFxn(int a,int) {memberFxn(a);return 0;}
-#define MSG2_2v(memberFxn)	LRESULT MSG2_##memberFxn(int a,int b) {memberFxn(a,b);return 0;}
-#define MSG2(memberFxn)		LRESULT MSG2_##memberFxn(int a,int b)
+#define MSG2_0(memberFxn)	LRESULT MSG2_##memberFxn(WPARAM,LPARAM) {return (LRESULT)memberFxn();}
+#define MSG2_1(memberFxn)	LRESULT MSG2_##memberFxn(WPARAM a,LPARAM) {return (LRESULT)memberFxn(a);}
+#define MSG2_2(memberFxn)	LRESULT MSG2_##memberFxn(WPARAM a,LPARAM b) {return (LRESULT)memberFxn(a,b);}
+#define MSG2_0v(memberFxn)	LRESULT MSG2_##memberFxn(WPARAM,LPARAM) {memberFxn();return 0;}
+#define MSG2_1v(memberFxn)	LRESULT MSG2_##memberFxn(WPARAM a,LPARAM) {memberFxn(a);return 0;}
+#define MSG2_2v(memberFxn)	LRESULT MSG2_##memberFxn(WPARAM a,LPARAM b) {memberFxn(a,b);return 0;}
+#define MSG2(memberFxn)		LRESULT MSG2_##memberFxn(WPARAM a,LPARAM b)
 
 #endif define Globdefs_DEFINED_4_2_2000

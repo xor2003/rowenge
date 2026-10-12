@@ -4134,7 +4134,7 @@ SLong TransObj::LaunchWeapon(bool received,						//AMM 09Apr99
 				}
 				amount = noVirtualBullets;						//RJS 20Apr99
 
-				weapon->currLink = ULong(currbul);				//RJS 15Nov99
+				weapon->currLink = uintptr_t(currbul);				//RJS 15Nov99
 			}
 			break;
 //			case LT_CANNON:
@@ -4317,7 +4317,7 @@ void	TransObj::LaunchCloneGun(	mobileitem* launcher,
 
 			adptr->weapindex = weapindex2;				//Swap indexes around,
 			adptr->weapindex2 = weapindex;				//... so as to alternate fire
-			adptr->originitm = (ULong) launcher;
+			adptr->originitm = (uintptr_t) launcher;
 			adptr->delay = bulletdelay;
 			adptr->shapename = bulletlnchr->shape;
 			adptr->lnchtype = lchtype;
@@ -4524,7 +4524,8 @@ void	TransObj::LaunchCanopyEject(mobileitem* launcher,WorldStuff& worldptr)
 				OpenChance = (OpenChance * Math_Lib.rnd()) >> 16;
 				if (	(OpenChance < 32)								//RJS 28Aug00
 					||	canopyState										//RJS 28Sep00
-					||	(ac && ac->classtype->aerobaticfactor == AEROBATIC_LOW)	)	//RJS 28Sep00	//RERUN: ac may be null (see !ac below)
+					||	(ac && ac->classtype->aerobaticfactor == AEROBATIC_LOW)	)	//RJS 28Sep00
+	//RERUN: ac may be null (see !ac below)
 				{
 					if (!ac)
 					{
@@ -5213,7 +5214,7 @@ TransObj::LaunchSuperLauncher(	item*		launcher,
 					tmpitm->isOwned = 1;										//RJS 03Jun99
 			}
 
-			weapon->currLink = ULong(newitem);					//RJS 15Nov99
+			weapon->currLink = uintptr_t(newitem);					//RJS 15Nov99
 
 			isAC = true;										//RJS 16Jun99
 		}
@@ -5351,7 +5352,7 @@ void TransObj::MobileBullet(TransientItemPtr transit,WorldStuff& world)
 		}
 
 		if (transit->Launcher)									//RJS 31Aug00
-			ClearWeaponChain((mobileitem*)transit->Launcher,ULong(transit),adptr->wpIndex);//RJS 31Aug00
+			ClearWeaponChain((mobileitem*)transit->Launcher,uintptr_t(transit),adptr->wpIndex);//RJS 31Aug00
 		else
 			INT3;
 
@@ -8500,7 +8501,7 @@ void TransObj::MobileDoDamage(TransientItemPtr transit,WorldStuff& world)
 								if (pNewToll)
 								{
 									mad->IsBullied = 1;
-									adptr->lastmissile = ULong(pNewToll);
+									adptr->lastmissile = uintptr_t(pNewToll);
 									adptr->pad = 8;
 								}
 
@@ -10973,7 +10974,7 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 		{
 			AircraftAnimData*	adptr = (AircraftAnimData*) hitpositm->Anim;
 
-			ULong	animoffset = ULong(&adptr->ENGINELEFT) - ULong(adptr);
+			ULong	animoffset = uintptr_t(&adptr->ENGINELEFT) - uintptr_t(adptr);
 
 			LaunchTimeBomb(hitpositm,animoffset,worldptr);
 		}
@@ -13935,7 +13936,7 @@ void	TransObj::LaunchReplayTrail(Coords3D&			cpos,
 		adptr->weaponlaunchers[0].pitch = -1;
 		adptr->weaponlaunchers[0].LauncherType = LT_VAPOUR;	//RJS 13Apr99
 		adptr->nopoints = smkptr->nopoints;
-		adptr->thelist = (ULong) thelist;
+		adptr->thelist = (uintptr_t) thelist;
 		adptr->lifetime = smkptr->lifetime;
 		adptr->SmkDescIndex = smkptr->smkindex;
 		adptr->currTime = smkptr->currTime;						//RJS 16Jun99

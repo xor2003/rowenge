@@ -267,7 +267,7 @@ void	MigDisplay::XX_SetGraphicsMode()
 	if (DD.PaletteBuffer==NULL)
 		DD.PaletteBuffer = new MYPALETTEENTRY [256];
 
-	if (bupLogicalScreenPtr!=NULL && (int)oldscreenaddr!=-1)
+	if (bupLogicalScreenPtr!=NULL && (intptr_t)oldscreenaddr!=-1)
 	{
 		MigWindow* window;
 
@@ -2269,17 +2269,17 @@ Bool MigDisplay::HardPlainRectFill(MigWindow* win,SWord X,SWord Y,SWord W,SWord 
 	{
 		scanlineaddr = scradr;
 		j=W-3;
-		if	((ULong )scanlineaddr &0x00000003)
+		if	((uintptr_t)scanlineaddr &0x00000003)
 		{
 			*(UWord*) (scanlineaddr) = tColour;
 			scanlineaddr+=2;
 			j--;
-			if	((ULong )scanlineaddr &0x00000003)
+			if	((uintptr_t)scanlineaddr &0x00000003)
 			{
 				*(UWord*) (scanlineaddr) = tColour;
 				scanlineaddr+=2;
 				j--;
-				if	((ULong )scanlineaddr &0x00000003)
+				if	((uintptr_t)scanlineaddr &0x00000003)
 				{
 					*(UWord*) (scanlineaddr) = tColour;
 					scanlineaddr+=2;

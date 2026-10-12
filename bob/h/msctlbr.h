@@ -3,6 +3,8 @@
 #include "rbutton.h"
 //}}AFX_INCLUDES
 */
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #if !defined(AFX_MSCTLBR_H__9EF0A801_2D49_11D2_A5A3_0040052179B6__INCLUDED_)
 #define AFX_MSCTLBR_H__9EF0A801_2D49_11D2_A5A3_0040052179B6__INCLUDED_
 
@@ -75,4 +77,5 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_MSCTLBR_H__9EF0A801_2D49_11D2_A5A3_0040052179B6__INCLUDED_)

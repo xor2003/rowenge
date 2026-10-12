@@ -5,6 +5,8 @@
 
  /* File created by MIDL compiler version 7.00.0555 */
 /* Compiler settings for control.odl:
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
     Oicf, W0, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
@@ -3753,7 +3755,5 @@ DEFINE_GUID(IID_IAMStats,0xbc9bcf80,0xdcd2,0x11d2,0xab,0xf6,0x00,0xa0,0xc9,0x05,
 }
 #endif
 
+#pragma pack(pop)
 #endif
-
-
-

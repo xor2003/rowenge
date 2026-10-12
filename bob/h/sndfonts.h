@@ -5,6 +5,8 @@
 //Date           Fri 3 Jul 1998
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SNDFONTS_Included
 #define	SNDFONTS_Included
 
@@ -110,4 +112,5 @@ private:
 extern SndFonts _SndFonts;
 
 
+#pragma pack(pop)
 #endif

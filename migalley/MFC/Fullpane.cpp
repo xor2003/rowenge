@@ -1909,7 +1909,7 @@ void RFullPanelDial::LaunchSmacker(int dialID,FileNum smackerID)
 #ifdef MIG_DEMO_VER
 		if (!_DPlay.PossibleLobby)
 #endif
-			OpenSmack(smackerID,(int)m_hWnd,X,Y,0,0);					//DAW 09Jul99
+			OpenSmack(smackerID,(intptr_t)m_hWnd,X,Y,0,0);					//DAW 09Jul99
 
 		m_timerID=SetTimer(2398,1,NULL);
 	}
@@ -1922,7 +1922,7 @@ void RFullPanelDial::OnTimer(UINT nIDEvent)
 	// Nick the Enum loop thing
 	if (nIDEvent==m_timerID)
 	{
-		if (!DoSmack((int)m_hWnd) || _DPlay.ConnectToLobby())
+		if (!DoSmack((intptr_t)m_hWnd) || _DPlay.ConnectToLobby())
 		{
 			if (_DPlay.PossibleLobby)
 			{
@@ -2299,7 +2299,7 @@ Bool RFullPanelDial::IntroSmackInitForCredits()
 Bool RFullPanelDial::IntroSmackInit()
 {
 	UpdateSize();
-	Save_Data.InitPreferences((int)Master_3d.winst);
+	Save_Data.InitPreferences((intptr_t)Master_3d.winst);
 	_Replay.TruncateTempFiles();
  	char buffer[80];
  	File_Man.NameNumberedFile(FIL_SMACK_GAMEINTRO,buffer);
@@ -2331,7 +2331,7 @@ Bool RFullPanelDial::IntroSmackInit()
 	SetCursorPos(10,10);
 
 	// RERUN: Call OpenSmack directly with -1 width/height to signal full-width stretching
-	OpenSmack(FIL_SMACK_GAMEINTRO, (int)m_hWnd, 0, 0, -1, -1);
+	OpenSmack(FIL_SMACK_GAMEINTRO, (intptr_t)m_hWnd, 0, 0, -1, -1);
 	m_timerID = SetTimer(2398, 1, NULL);
 
 	return TRUE;
@@ -3782,7 +3782,7 @@ void	RFullPanelDial::ChangeCamp(int campnum)
 		whichcamp=campnum;
 		File_Man.DiscardDirList(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp));
 		File_Man.ExistNumberedFile(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp));
-		OpenSmack(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp),(int)m_hWnd,-1,-1,0,0);
+		OpenSmack(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp),(intptr_t)m_hWnd,-1,-1,0,0);
 	}
 }										  
 Bool	RFullPanelDial::StartCampSmacker(FullScreen*&fs)
@@ -3796,7 +3796,7 @@ Bool	RFullPanelDial::StartCampSmacker(FullScreen*&fs)
 	whichcamp=(whichcamp&0x0f);
 	File_Man.DiscardDirList(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp));
 	File_Man.ExistNumberedFile(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp));
-	OpenSmack(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp),(int)m_hWnd,-1,-1,0,0);
+	OpenSmack(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp),(intptr_t)m_hWnd,-1,-1,0,0);
 	return FALSE;
 }
 Bool	RFullPanelDial::StartCampBackground(FullScreen*&fs)

@@ -1,4 +1,6 @@
 #if !defined(AFX_RTESTSH1_H__67C77A87_A927_11D1_9B68_444553540000__INCLUDED_)
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #define AFX_RTESTSH1_H__67C77A87_A927_11D1_9B68_444553540000__INCLUDED_
 
 #if _MSC_VER >= 1000
@@ -67,4 +69,5 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_RTESTSH1_H__67C77A87_A927_11D1_9B68_444553540000__INCLUDED_)

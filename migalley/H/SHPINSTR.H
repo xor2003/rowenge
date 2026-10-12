@@ -439,7 +439,7 @@ DOVDOT4,
 typedef struct _doquikpoly
 {
 	UByte	edges;
-	UWord*	vertices;
+	ULong	vertices;   /* 32-bit file slot: never dereferenced; data read past sizeof */
 }
 DOQUIKPOLY,
 *DOQUIKPOLY_PTR;
@@ -618,7 +618,7 @@ DONORMAL,
 typedef struct _dosmoothpoly
 {
 	UByte	edges;
-	UWord*	vertices;
+	ULong	vertices;   /* 32-bit file slot: never dereferenced; data read past sizeof */
 }
 DOSMOOTHPOLY,
 *DOSMOOTHPOLY_PTR;
@@ -673,7 +673,7 @@ DOSETCOLOURH,
 typedef struct _doquiksmoothpoly
 {
 	UByte	edges;
-	UWord*	vertices;
+	ULong	vertices;   /* 32-bit file slot: never dereferenced; data read past sizeof */
 }
 DOQUIKSMOOTHPOLY,
 *DOQUIKSMOOTHPOLY_PTR;
@@ -717,7 +717,7 @@ typedef struct _dosmthrelpoly
 {
 	UByte	edges;
 	UWord	start_vertex;
-	SByte*	offsets;
+	ULong	offsets;   /* 32-bit file slot: never dereferenced; data read past sizeof */
 }
 DOSMTHRELPOLY,
 *DOSMTHRELPOLY_PTR;
@@ -728,7 +728,7 @@ typedef struct _doquikrelpoly
 {
 	UByte	edges;
 	UWord	start_vertex;
-	SByte*	offsets;
+	ULong	offsets;   /* 32-bit file slot: never dereferenced; data read past sizeof */
 }
 DOQUIKRELPOLY,
 *DOQUIKRELPOLY_PTR;

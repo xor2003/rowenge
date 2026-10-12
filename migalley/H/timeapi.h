@@ -80,7 +80,7 @@ static inline MMRESULT timeGetDevCaps(LPTIMECAPS ptc, UINT cbtc) {
 #define CALLBACK
 #endif
 #ifndef DWORD_PTR
-typedef unsigned long DWORD_PTR;
+typedef uintptr_t DWORD_PTR;
 #endif
 
 #ifndef TIME_PERIODIC

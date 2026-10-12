@@ -5,6 +5,8 @@
 //Date           Mon 1 Jun 1998
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	RCHATTER_Included
 #define	RCHATTER_Included
 
@@ -827,4 +829,5 @@ extern	RadioChatter	_Radio;
 #define	TriggerMsg(param) AfxTrace(#param,_Radio.totmess).TriggerMsg(param)
 #endif
 
+#pragma pack(pop)
 #endif

@@ -12,6 +12,7 @@
 // RDEmptyP.h : header file
 //
 #include "RTABS.H" //RERUN
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 /////////////////////////////////////////////////////////////////////////////
 // RDEmptyP dialog

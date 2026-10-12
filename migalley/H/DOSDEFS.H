@@ -170,8 +170,8 @@ typedef	unsigned char	UByte,*UByteP;
 typedef	signed	short	SWord,*SWordP;
 typedef	unsigned short	UWord,*UWordP;
 
-typedef	signed	long	SLong,*SLongP;
-typedef	unsigned long	ULong,*ULongP;
+typedef	signed	int		SLong,*SLongP;	// LLP64: MSVC 'long' is 32-bit
+typedef	unsigned int	ULong,*ULongP;
 typedef double 	Float,*FloatP;							//PD 06Jan97
 
 typedef	char	*string,*String,	//pointer to a character array

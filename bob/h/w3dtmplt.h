@@ -5,6 +5,8 @@
 //Date           Fri 13 Feb 1998
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	W3DTMPLT_Included
 #define	W3DTMPLT_Included
 
@@ -98,4 +100,5 @@ public:
 	}
 };
 
+#pragma pack(pop)
 #endif

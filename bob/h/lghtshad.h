@@ -6,6 +6,7 @@
 //Description    Minimum shade values for varying palettes (light-shading only)
 //
 //------------------------------------------------------------------------------
+
 #ifndef	LGHTSHAD_Included
 #define	LGHTSHAD_Included
 

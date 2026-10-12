@@ -5,6 +5,8 @@
 //Date           Thu 16 Jul 1998
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	TILEMAKE_Included
 #define	TILEMAKE_Included
 
@@ -73,4 +75,5 @@ public:
 
 extern TMake* tMake;
 
+#pragma pack(pop)
 #endif

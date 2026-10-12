@@ -12,6 +12,8 @@
 //				They can contain static data if you must
 //
 //////////////////////////////////////////////////////////////////////
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	AIRSTRUC_INCLUDED
 #define	AIRSTRUC_INCLUDED
 #pragma once
@@ -454,4 +456,5 @@ class	MoveAirStruc:public	AirStruc
 
 };
 typedef	MoveAirStruc *MoveAirStrucPtr;
+#pragma pack(pop)
 #endif	AIRSTRUC_INCLUDED

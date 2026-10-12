@@ -3,6 +3,8 @@
 
 //}}AFX_INCLUDES
 */
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #if !defined(AFX_VWQLIST_H__4CD00AA1_57B7_11D2_9FD5_D0EC00C10000__INCLUDED_)
 #define AFX_VWQLIST_H__4CD00AA1_57B7_11D2_9FD5_D0EC00C10000__INCLUDED_
 
@@ -55,5 +57,5 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_VWQLIST_H__4CD00AA1_57B7_11D2_9FD5_D0EC00C10000__INCLUDED_)
-

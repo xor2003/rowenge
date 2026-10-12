@@ -106,7 +106,7 @@ extern	"C"	SLong ASMTransform(MATRIX_PTR,SLong&,SLong&,SLong&);
 SLong ASMTransform(MATRIX_PTR m, SLong& x, SLong& y, SLong& z)
 { //x0r tested
 	int _EAX;
-	unsigned long _ECX;
+	unsigned int _ECX;
 
 	int LocalX; // weak
 	int LocalY; // weak

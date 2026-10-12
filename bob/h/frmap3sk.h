@@ -1,6 +1,7 @@
 //
 //#defines in here force skipping optimisation of certain squares
 //
+
 #define FIL_MAP32_1151 FIL_MAP2_51
 #define FIL_MAP32_2111 FIL_MAP2_51
 #define FIL_MAP32_2151 FIL_MAP2_51
@@ -111,3 +112,5 @@
 #define FIL_MAP32_8811 FIL_MAP32_1255
 #define FIL_MAP32_8815 FIL_MAP32_1255
 #define FIL_MAP32_8855 FIL_MAP32_1255
+
+

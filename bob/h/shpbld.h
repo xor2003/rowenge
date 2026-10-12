@@ -5,6 +5,8 @@
 //Date           Mon 22 Jan 1996
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SHPBLD_Included
 #define	SHPBLD_Included
 
@@ -47,4 +49,5 @@ class	ShapeBuild
 
 extern class ShapeBuild Shape_Build;
 
+#pragma pack(pop)
 #endif

@@ -2060,19 +2060,19 @@ void direct_3d::SetFog(UByte r,UByte g,UByte b)
 	void *pistart=pinst;
 	OP_STATE_RENDER(1,pinst);
 	STATE_DATA(D3DRENDERSTATE_FOGCOLOR,RGB_MAKE(r,g,b),pinst);
-	normalXXB.instOffset+=ULong(pinst)-ULong(pistart);
+	normalXXB.instOffset+=uintptr_t(pinst)-uintptr_t(pistart);
 
 	pinst=(void*)(((UByte*)transpXXB.xbDesc.lpData)+transpXXB.instOffset);
 	pistart=pinst;
 	OP_STATE_RENDER(1,pinst);
 	STATE_DATA(D3DRENDERSTATE_FOGCOLOR,RGB_MAKE(r,g,b),pinst);
-	transpXXB.instOffset+=ULong(pinst)-ULong(pistart);
+	transpXXB.instOffset+=uintptr_t(pinst)-uintptr_t(pistart);
 
 	pinst=(void*)(((UByte*)nzbufXXB.xbDesc.lpData)+nzbufXXB.instOffset);
 	pistart=pinst;
 	OP_STATE_RENDER(1,pinst);
 	STATE_DATA(D3DRENDERSTATE_FOGCOLOR,RGB_MAKE(r,g,b),pinst);
-	nzbufXXB.instOffset+=ULong(pinst)-ULong(pistart);
+	nzbufXXB.instOffset+=uintptr_t(pinst)-uintptr_t(pistart);
 }
 
 //------------------------------------------------------------------------------
@@ -7920,7 +7920,7 @@ void direct_3d::RegisterTextureUse(	struct _DirectDraw* pDirectD,
 
 		for (int j=0;j<=pmapUse->count;j++)
 		{
-		 	void* pinst=(void*)(ULong(pBase)+ULong(pmapUse->offset[j]));
+		 	void* pinst=(void*)(uintptr_t(pBase)+uintptr_t(pmapUse->offset[j]));
 	  		*(DWORD*)pinst=DWORD(hTexture);
 		}
 	}
@@ -9211,11 +9211,11 @@ void direct_3d::WriteStateChanged(	DirectD* pDirectD,
 //------------------------------------------------------------------------------
 void direct_3d::RestoreZWriteState(XBuf* pxb)
 {
-	void* pinst=(void*)(ULong(pxb->xbDesc.lpData)+pxb->instOffset);
+	void* pinst=(void*)(uintptr_t(pxb->xbDesc.lpData)+pxb->instOffset);
 	void* pistart=pinst;
 	OP_STATE_RENDER(1,pinst);
 	STATE_DATA(D3DRENDERSTATE_ZWRITEENABLE,TRUE,pinst);
-	pxb->instOffset+=ULong(pinst)-ULong(pistart);
+	pxb->instOffset+=uintptr_t(pinst)-uintptr_t(pistart);
 }
 
 //------------------------------------------------------------------------------
@@ -10994,11 +10994,11 @@ HTEXT direct_3d::AllocateTexture(UByte textRez)
 	assert(false&&"Bad texture resolution requestsed");
 	break;
 	}
-	while (ULong(pmin)!=ULong(pmax))
+	while (uintptr_t(pmin)!=uintptr_t(pmax))
 	{
 		if (*pmin==0x00)
 		{
-			HTEXT retVal=HTEXT((ULong(pmin)-ULong(landTextureUsage)));
+			HTEXT retVal=HTEXT((uintptr_t(pmin)-uintptr_t(landTextureUsage)));
 			*pmin=0xFF;
 			return retVal;
 		}

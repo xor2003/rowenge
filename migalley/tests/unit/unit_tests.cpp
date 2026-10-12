@@ -348,7 +348,7 @@ static void test_type_layout()
     CHECK_EQ(sizeof(SLong), 4);
     CHECK_EQ(sizeof(ULong), 4);
     CHECK_EQ(sizeof(Float), 8);          // Float is double
-    CHECK_EQ(sizeof(void*), 4);          // 32-bit build
+    CHECK_EQ(sizeof(void*), sizeof(intptr_t));  // 4 on i386, 8 on LP64
 }
 
 static void test_ifshare()
@@ -2540,24 +2540,38 @@ static void test_curves()
 
 //------------------------------------------------------------------------------
 // Time/phase handlers. ViewPoint::TimeOfDay() is a 3-hop chain in the port:
-//   this+0x3c -> view3dwin, view3dwin+0x50 -> inst, inst+0x24 -> timeofday
-// (offsets verified against compiled ViewPoint::TimeOfDay/View3d::TimeOfDay
-// disassembly; Inst3d gained members since the chain was first calibrated)
-// (inst sits at an unaligned offset, so a uniform pointer-fill can't fake
-// it - the chain is built at the exact offsets). Setting timeofday makes
-// the returned time controllable instead of just zero.
+//   i386: this+0x3c -> view3dwin, view3dwin+0x50 -> inst, inst+0x24 -> tod
+//   LP64: this+0x4c -> view3dwin, view3dwin+0x70 -> inst, inst+0x3c -> tod
+// (offsets verified against compiled TimeOfDay/SetTimeOfDay disassembly;
+// ViewPoint is forward-declared here so offsetof is unavailable — the
+// constants are pinned per-arch and re-verified by the tests below)
 //------------------------------------------------------------------------------
-static UByte fake_viewpoint[4096];
-static UByte fake_instmid[4096];
-static UByte fake_inst[4096];
+static UByte fake_viewpoint[8192];
+static UByte fake_instmid[8192];
+static UByte fake_inst[8192];
+#if defined(__x86_64__) || defined(_M_X64)
+#  define ROWAN_OFF_VIEW3DWIN 0x4c
+#  define ROWAN_OFF_INST      0x70
+#  define ROWAN_OFF_TIMEOFDAY 0x3c
+#  define ROWAN_OFF_ISLIGHT   0x2bc
+#  define ROWAN_OFF_CTRLAC2   0x14
+#  define ROWAN_OFF_LIGHTSON  0x3a8
+#else
+#  define ROWAN_OFF_VIEW3DWIN 0x3c
+#  define ROWAN_OFF_INST      0x50
+#  define ROWAN_OFF_TIMEOFDAY 0x24
+#  define ROWAN_OFF_ISLIGHT   0x1e4
+#  define ROWAN_OFF_CTRLAC2   12
+#  define ROWAN_OFF_LIGHTSON  0x2f0
+#endif
 static void init_fake_viewpoint(int tod)
 {
     std::memset(fake_viewpoint, 0, sizeof(fake_viewpoint));
     std::memset(fake_instmid, 0, sizeof(fake_instmid));
     std::memset(fake_inst, 0, sizeof(fake_inst));
-    *(void**)(fake_viewpoint + 0x3c) = fake_instmid;
-    *(void**)(fake_instmid + 0x50) = fake_inst;
-    *(int*)(fake_inst + 0x24) = tod;
+    *(void**)(fake_viewpoint + ROWAN_OFF_VIEW3DWIN) = fake_instmid;
+    *(void**)(fake_instmid + ROWAN_OFF_INST) = fake_inst;
+    *(int*)(fake_inst + ROWAN_OFF_TIMEOFDAY) = tod;
     shape_View_Point = fake_viewpoint;
 }
 
@@ -2785,7 +2799,7 @@ static void test_doifpiloted()
     pp->offset = 40;
 
     void* ac = (void*)0x1234;
-    *(void**)(Manual_Pilot_bytes + 12) = ac;     // ControlledAC2
+    *(void**)(Manual_Pilot_bytes + ROWAN_OFF_CTRLAC2) = ac; // ControlledAC2
 
     BoxCol_Col_Shooter = ac;                     // match -> +sizeof
     UByte* ip = stream;
@@ -2838,7 +2852,7 @@ static void test_drawstation_whiteout()
 
 //------------------------------------------------------------------------------
 // Lighting/vector handlers: donvec and dondupvec gate everything on
-// View_Point->isLightShaded (Bool at ViewPoint+0x1e4, per dolshadeon's store).
+// View_Point->isLightShaded (Bool; i386+0x1e4 / LP64+0x2bc, per dolshadeon's store).
 // Shaded path normalises each NEXTVEC record, dots it with TransLightVector,
 // maps to intensity, and optionally runs calcSpecular against TransViewVector.
 //------------------------------------------------------------------------------
@@ -2869,7 +2883,7 @@ static void test_donvec()
 
     // light-shaded: light = +X. Facing normal -> lit (intensity 1);
     // back-facing -> clamps at 256.
-    *(int*)(fake_viewpoint + 0x1e4) = 1;   // isLightShaded = TRUE
+    *(int*)(fake_viewpoint + ROWAN_OFF_ISLIGHT) = 1;   // isLightShaded = TRUE
     shape_TransLightVector.ni.f = 1.0;
     shape_TransLightVector.nj.f = 0.0;
     shape_TransLightVector.nk.f = 0.0;
@@ -2923,7 +2937,7 @@ static void test_donvec()
     CHECK_EQ(ip - stream, (long)sizeof(DONVEC));
     CHECK_EQ(shape_shpco[2].intensity, 0x7777);
 
-    *(int*)(fake_viewpoint + 0x1e4) = 0;
+    *(int*)(fake_viewpoint + ROWAN_OFF_ISLIGHT) = 0;
     shape_specularEnabled = FALSE;
 }
 
@@ -2949,7 +2963,7 @@ static void test_dondupvec()
     CHECK_EQ(ip - stream, (long)sizeof(DONDUPVEC));
     CHECK_EQ(shape_shpco[2].intensity, 0x7777);
 
-    *(int*)(fake_viewpoint + 0x1e4) = 1;   // isLightShaded = TRUE
+    *(int*)(fake_viewpoint + ROWAN_OFF_ISLIGHT) = 1;   // isLightShaded = TRUE
     shape_TransLightVector.ni.f = 1.0;
     shape_TransLightVector.nj.f = 0.0;
     shape_TransLightVector.nk.f = 0.0;
@@ -2993,7 +3007,7 @@ static void test_dondupvec()
     CHECK_EQ(ip - stream, (long)sizeof(DONDUPVEC));
     CHECK_EQ(shape_shpco[2].intensity, 0x7777);
 
-    *(int*)(fake_viewpoint + 0x1e4) = 0;
+    *(int*)(fake_viewpoint + ROWAN_OFF_ISLIGHT) = 0;
     shape_specularEnabled = FALSE;
 }
 
@@ -3049,7 +3063,7 @@ static void test_dovector()
     CHECK_EQ(ip - stream, (long)sizeof(DOVECTOR));
     CHECK_EQ(shape_shpco[3].intensity, 0x7777);
 
-    *(int*)(fake_viewpoint + 0x1e4) = 1;   // isLightShaded = TRUE
+    *(int*)(fake_viewpoint + ROWAN_OFF_ISLIGHT) = 1;   // isLightShaded = TRUE
     shape_TransLightVector.ni.f = 1.0;
     shape_TransLightVector.nj.f = 0.0;
     shape_TransLightVector.nk.f = 0.0;
@@ -3076,7 +3090,7 @@ static void test_dovector()
     shape_dovector(ip);
     CHECK_EQ(shape_shpco[3].intensity, 256);
 
-    *(int*)(fake_viewpoint + 0x1e4) = 0;
+    *(int*)(fake_viewpoint + ROWAN_OFF_ISLIGHT) = 0;
     shape_specularEnabled = FALSE;
 }
 
@@ -3346,7 +3360,7 @@ static void test_dolighttimer()
     static UByte anim[64];
     std::memset(anim, 0, sizeof(anim));
     shape_GlobalAdptr = anim;
-    *(Bool*)(Three_Dee_bytes + 0x2f0) = FALSE; // lightson
+    *(Bool*)(Three_Dee_bytes + ROWAN_OFF_LIGHTSON) = FALSE; // lightson
 
     UByte stream[8] = {0};
     DOLIGHTTIMER* lt = (DOLIGHTTIMER*)stream;
@@ -3395,7 +3409,7 @@ static void test_dolighttimer()
 
     // ONLY_DARK with lights ON -> else branch runs: frametime read
     // (USER-like), non-periodic so value preserved.
-    *(Bool*)(Three_Dee_bytes + 0x2f0) = TRUE;
+    *(Bool*)(Three_Dee_bytes + ROWAN_OFF_LIGHTSON) = TRUE;
     lt->timertype = 4;
     lt->isword = 0;
     anim[10] = 33;
@@ -3403,7 +3417,7 @@ static void test_dolighttimer()
     shape_dolighttimer(ip);
     CHECK_EQ(anim[10], 33);
 
-    *(Bool*)(Three_Dee_bytes + 0x2f0) = FALSE;
+    *(Bool*)(Three_Dee_bytes + ROWAN_OFF_LIGHTSON) = FALSE;
 }
 
 //------------------------------------------------------------------------------

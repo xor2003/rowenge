@@ -6,6 +6,8 @@
 //Description    
 //				Designed by Jim! Handles balloons....
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	IMPACT_Included
 #define	IMPACT_Included
 
@@ -165,4 +167,5 @@ extern	Impact	Fake_Damage;									//RJS 05Apr00
 
 
 
+#pragma pack(pop)
 #endif

@@ -12,6 +12,8 @@
 //		Tip-Tanks are 100lb each
 //
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SHPWEAP_Included
 #define	SHPWEAP_Included
 
@@ -125,4 +127,5 @@ static ShpToWeapType	ShpToWeap[] =
 };
 
 
+#pragma pack(pop)
 #endif

@@ -5,6 +5,7 @@
 //Date           Tue 4 Jan 2000
 //Description    
 //------------------------------------------------------------------------------
+#include <stdint.h>
 #include "radix.h"
 
 static radix_sort_t *sortTable[512];
@@ -31,7 +32,7 @@ __inline radix_sort_t **RadixFindFirst(radix_sort_t **ptr)
  	while (0UL==*ptr)
 	{
 	 	ptr++;
-		if ((unsigned int)ptr>(unsigned int)(sortTable+255))
+		if ((uintptr_t)ptr>(uintptr_t)(sortTable+255))
 			return 0UL;
 	}
 	return (ptr);
@@ -47,7 +48,7 @@ __inline radix_sort_t **RadixRFindFirst(radix_sort_t **ptr)
  	while (0UL==*ptr)
 	{
 	 	ptr--;
-		if ((unsigned int)ptr<(unsigned int)sortTable)
+		if ((uintptr_t)ptr<(uintptr_t)sortTable)
 			return 0UL;
 	}
 	return (ptr);
@@ -63,7 +64,7 @@ __inline radix_sort_t **RadixFindNext(radix_sort_t **ptr)
 	do
 	{
 		ptr++;
-		if ((unsigned int)ptr>(unsigned int)(sortTable+255))
+		if ((uintptr_t)ptr>(uintptr_t)(sortTable+255))
 			return 0UL;
 	}
  	while (0UL==*ptr);
@@ -81,7 +82,7 @@ __inline radix_sort_t **RadixRFindNext(radix_sort_t **ptr)
 	do
 	{
 		ptr--;
-		if ((unsigned int)ptr<(unsigned int)sortTable)
+		if ((uintptr_t)ptr<(uintptr_t)sortTable)
 			return 0UL;
 	}
  	while (0UL==*ptr);

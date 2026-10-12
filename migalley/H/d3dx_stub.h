@@ -9,6 +9,7 @@
 #pragma pack()
 #include "WIN32_COMPAT.H"
 #include "d3d_stub.h"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 
 static inline HRESULT D3DXMatrixIdentity(D3DMATRIX* out)

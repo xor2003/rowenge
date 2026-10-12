@@ -4,6 +4,8 @@
 #include "rbutton.h"
 //}}AFX_INCLUDES
 */
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #if !defined(AFX_CAMPNAME_H__9D1016E0_599A_11D4_ADE7_0040052179B6__INCLUDED_)
 #define AFX_CAMPNAME_H__9D1016E0_599A_11D4_ADE7_0040052179B6__INCLUDED_
 
@@ -61,4 +63,5 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_CAMPNAME_H__9D1016E0_599A_11D4_ADE7_0040052179B6__INCLUDED_)

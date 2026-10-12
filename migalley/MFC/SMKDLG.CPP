@@ -148,7 +148,7 @@ BOOL CSmackerDialog::OnInitDialog()
 //	OpenSmack(FindSmacker(),(int)m_hWnd,0,0,0,0);
 	File_Man.DiscardDirList(file);
 	File_Man.ExistNumberedFile(file);
-	OpenSmack(file,(int)m_hWnd,0,0,0,0);
+	OpenSmack(file,(intptr_t)m_hWnd,0,0,0,0);
 	m_timerID=SetTimer(1984,1,NULL);
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -159,7 +159,7 @@ void CSmackerDialog::OnTimer(UINT nIDEvent)
 {
 	if (nIDEvent==m_timerID)
 	{
-		if (!DoSmack((int)m_hWnd))
+		if (!DoSmack((intptr_t)m_hWnd))
 		{
 			OnOK();
 		}
@@ -202,7 +202,7 @@ void CSmackerDialog::OnSize(UINT nType, int cx, int cy)
 	File_Man.DiscardDirList(file);
 	File_Man.ExistNumberedFile(file);
 //	OpenSmack(FindSmacker(),(int)m_hWnd,0,0,rect.right,rect.bottom);
-	OpenSmack(file,(int)m_hWnd,0,0,rect.right,rect.bottom);
+	OpenSmack(file,(intptr_t)m_hWnd,0,0,rect.right,rect.bottom);
 }
 
 

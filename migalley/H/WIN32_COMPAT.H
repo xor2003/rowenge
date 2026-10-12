@@ -55,9 +55,9 @@ static inline void Sleep(unsigned int dwMilliseconds)
 #endif
 
 typedef unsigned short VARTYPE;
-typedef long HRESULT;
-typedef unsigned long LCID; // locale ID 
-typedef long DISPID; // dispatch ID 
+typedef int HRESULT;
+typedef unsigned int LCID; // locale ID 
+typedef int DISPID; // dispatch ID 
 
 #define FAR
 #define __FAR
@@ -82,7 +82,7 @@ typedef wchar_t* LPWSTR;
 typedef const wchar_t* LPCWSTR;
 typedef const void* LPCVOID;/* Long pointer to constant void */
 
-typedef unsigned long ULONG;
+typedef unsigned int ULONG;   // LLP64: stays 32-bit on Win64 too
 typedef ULONG *PULONG;
 
 typedef void VOID;
@@ -95,7 +95,7 @@ typedef const void* LPCVOID;
 #if defined(__x86_64__) || defined(_WIN64)
 typedef uint32_t DWORD;
 #else
-typedef unsigned long DWORD;
+typedef unsigned int DWORD;   // LLP64: stays 32-bit on Win64 too
 #endif
 static_assert(sizeof(DWORD) == 4, "DWORD must stay 32-bit");
 typedef DWORD* LPDWORD;
@@ -143,7 +143,7 @@ typedef unsigned long long ULONGLONG;
 typedef ULONGLONG          DWORDLONG;
 #endif
 #ifndef LPLONG
-typedef long* LPLONG;
+typedef int* LPLONG;   // LONG is 32-bit on Win64 too
 #endif
 #ifndef FILETIME
 typedef struct { DWORD dwLowDateTime; DWORD dwHighDateTime; } FILETIME;
@@ -175,7 +175,7 @@ typedef IStream* LPSTREAM;
 #ifndef REFERENCE_TIME
 typedef LONGLONG   REFERENCE_TIME;
 typedef REFERENCE_TIME* LPREFERENCE_TIME;
-typedef long       MUSIC_TIME;
+typedef int        MUSIC_TIME;   // DirectMusic LONG
 #endif
 
 // Some MSVC headers use the __cdecl keyword; on non-MSVC compilers make it a no-op
@@ -230,7 +230,7 @@ typedef unsigned char BOOLEAN;
 
 #ifndef RECT_DEFINED
 #define RECT_DEFINED
-typedef long LONG;
+typedef int LONG;             // LLP64: stays 32-bit on Win64 too
 typedef LONG* LPLONG;  // pointer to LONG
 
 typedef struct tagRECT {
@@ -838,14 +838,14 @@ static inline int QueryPerformanceFrequency(LARGE_INTEGER* lpFrequency)
 }
 
 
-typedef int32_t   LRESULT;
+typedef intptr_t  LRESULT;    // LLP64: LONG_PTR — pointer-sized on Win64
 typedef DWORD*    PDWORD;
 typedef WORD*     PWORD;
 typedef GUID INTERFACEID;
 typedef unsigned int UINT;   // 32-bit unsigned
 typedef UINT* PUINT;
 typedef UINT* LPUINT;
-typedef long         LPARAM; // 32-bit signed (with -m32)
+typedef intptr_t     LPARAM; // LONG_PTR — pointer-sized on Win64
 typedef UINT_PTR        WPARAM;
 
 #ifndef INT
@@ -1468,7 +1468,7 @@ struct MSG {
 
 typedef HANDLE HMENU;
 
-typedef unsigned long ULONG_PTR;
+typedef uintptr_t ULONG_PTR;
 
 typedef struct tagMEASUREITEMSTRUCT {
     UINT  CtlType;
@@ -2110,7 +2110,7 @@ typedef int* LPINT;
    source compiles; impls return failure so callers keep defaults. */
 #ifndef HKEY_CLASSES_ROOT
 struct HKEY__; typedef HKEY__* HKEY;
-typedef unsigned long REGSAM;
+typedef unsigned int REGSAM;   // ACCESS_MASK (DWORD-width)
 #define VER_PLATFORM_WIN32_WINDOWS 1
 #define VER_PLATFORM_WIN32_NT      2
 
@@ -2589,7 +2589,7 @@ typedef struct _SECURITY_ATTRIBUTES {
 #define WS_EX_TOPMOST 0x00000008
 #endif
 
-typedef long DISPID;
+typedef int DISPID;
 typedef wchar_t* BSTR;
 
 struct VARIANTARG {
@@ -2705,13 +2705,14 @@ typedef struct tagSCROLLINFO
 }   SCROLLINFO, *LPSCROLLINFO;
 
 #ifndef DWORD_PTR
-typedef unsigned long DWORD_PTR;
+typedef uintptr_t DWORD_PTR;
 #endif
 
 /* winmm timer shim (timeGetTime/timeSetEvent/etc.) — SDL-backed; included
    here so every WIN32_COMPAT consumer gets the surface. Its static-inline
    impls need UINT/DWORD/MMRESULT/CALLBACK/DWORD_PTR, all defined above. */
 #include "timeapi.h"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 #pragma pack(pop)
 #endif // WIN32_COMPAT_H

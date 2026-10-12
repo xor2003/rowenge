@@ -17,6 +17,7 @@
 #include "atlstr.h"
 #else
 #include "MigCstring.h"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 #endif
 #pragma pack(pop)
 #endif

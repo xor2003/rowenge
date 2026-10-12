@@ -11,6 +11,7 @@
 //
 //------------------------------------------------------------------------------
 /*
+
 #ifndef	VECTOR_Included
 #define	VECTOR_Included
 
@@ -1193,3 +1194,4 @@ const vector ORIGIN = vector(0,0,0);
 #endif
 
 */
+

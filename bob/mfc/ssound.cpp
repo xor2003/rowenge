@@ -221,7 +221,7 @@ void CSSound::PreDestroyPanel()
 		if (_Miles.dig && _Miles.dig->DIG_valid())
 		{
 			HWND oldwin=_Miles.dig->GetWindow();
-			_Miles.InitUI((int)oldwin);
+			_Miles.InitUI((intptr_t)oldwin);
 		}
 	}
 

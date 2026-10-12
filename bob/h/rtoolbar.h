@@ -3,6 +3,8 @@
 
 //}}AFX_INCLUDES
 */
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #if !defined(AFX_RTOOLBAR_H__95882EC2_D9F5_11D1_A1F0_0080C8582DE4__INCLUDED_)
 #define AFX_RTOOLBAR_H__95882EC2_D9F5_11D1_A1F0_0080C8582DE4__INCLUDED_
 
@@ -139,4 +141,5 @@ private:
 	CRToolBar* FindToolBar(CPoint point); // this is a slightly dodgy function so dont call it
 											// unless you KNOW a docked toolbar is inside point
 };
+#pragma pack(pop)
 #endif

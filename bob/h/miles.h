@@ -5,6 +5,8 @@
 //Date           Fri 1 Mar 1996
 //Description	Header file for the Sound midi and sample library
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	Sound_Included
 #define	Sound_Included
 
@@ -503,4 +505,5 @@ void		PlayAnyDelayed(FileNum,ItemPtr,SLong vol=128,Bool islooped=FALSE,FileNum	s
 };
 extern Sound _Miles;											//RJS 05Nov99
 
+#pragma pack(pop)
 #endif

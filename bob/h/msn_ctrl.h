@@ -5,6 +5,8 @@
 //Date           Wed 17 Jul 1996
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MSN_CTRL_Included
 #define	MSN_CTRL_Included
 
@@ -59,4 +61,5 @@ enum	{		CLIPBOARDAREAX = PIXEL640 * 85,					//RDH 20Jul96
 
 
 
+#pragma pack(pop)
 #endif

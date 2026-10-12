@@ -512,7 +512,7 @@ void	ItemBase::operator delete(void* area)
 	if (it->Status.size==ItemBaseSize)
 		::delete(ItemBasePtr)it;
 	else
-	if (int(ItemPtr(it)->Next)==-1)
+	if (intptr_t(ItemPtr(it)->Next)==-1)
 			switch (it->Status.size)
 			{
 			case	ItemSize:		::delete(info_itemS*) it;		return;

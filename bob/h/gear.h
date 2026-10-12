@@ -7,6 +7,8 @@
 //------------------------------------------------------------------------------
 #include "aerodev.h"
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	GEAR_Included
 #define	GEAR_Included
 
@@ -89,5 +91,5 @@ public:
 class Gear;
 typedef class Gear  GEAR, *PGEAR, **PPGEAR;
 
+#pragma pack(pop)
 #endif
-

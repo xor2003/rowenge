@@ -5,6 +5,8 @@
 //Date           Mon 4 Mar 1996
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	TRANSITE_Included
 #define	TRANSITE_Included
 
@@ -513,4 +515,5 @@ private:
 
 extern TransObj Trans_Obj;
 
+#pragma pack(pop)
 #endif

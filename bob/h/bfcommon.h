@@ -1,4 +1,5 @@
 #define	F_COMMON
+
 #define	F_GRAFIX
 //#define	WINMOVE_Included
 #include	"DOSDefs.h"
@@ -51,3 +52,5 @@
 
 #include	"modinst.h"
 //#include	"replay.h"
+
+

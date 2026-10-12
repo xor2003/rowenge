@@ -16,11 +16,11 @@
 #endif
 
 #ifndef HRESULT
-typedef long HRESULT;
+typedef int HRESULT;
 #endif
 
 #ifndef GUID_DEFINED
-struct _GUID { unsigned long d1; unsigned short d2, d3; unsigned char d4[8]; };
+struct _GUID { unsigned int d1; unsigned short d2, d3; unsigned char d4[8]; };
 typedef struct _GUID GUID;
 #endif
 typedef GUID* LPGUID;
@@ -63,8 +63,8 @@ typedef const GUID& REFIID_DSOUND; // keep decls obvious; real REFIID comes from
 typedef struct {
     unsigned short wFormatTag;
     unsigned short nChannels;
-    unsigned long  nSamplesPerSec;
-    unsigned long  nAvgBytesPerSec;
+    DWORD  nSamplesPerSec;
+    DWORD  nAvgBytesPerSec;
     unsigned short nBlockAlign;
     unsigned short wBitsPerSample;
     unsigned short cbSize;
@@ -76,8 +76,8 @@ typedef const WAVEFORMATEX* LPCWAVEFORMATEX;
 typedef struct {
     unsigned short wFormatTag;
     unsigned short nChannels;
-    unsigned long  nSamplesPerSec;
-    unsigned long  nAvgBytesPerSec;
+    DWORD  nSamplesPerSec;
+    DWORD  nAvgBytesPerSec;
     unsigned short nBlockAlign;
 } WAVEFORMAT, *LPWAVEFORMAT;
 typedef struct {
@@ -89,59 +89,59 @@ typedef struct {
 
 // ---- capability/descriptor structs --------------------------------------
 typedef struct {
-    unsigned long dwSize;
-    unsigned long dwFlags;
-    unsigned long dwBufferBytes;
-    unsigned long dwReserved;
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwBufferBytes;
+    DWORD dwReserved;
     LPWAVEFORMATEX lpwfxFormat;
 } DSBUFFERDESC, *LPDSBUFFERDESC;
 typedef const DSBUFFERDESC* LPCDSBUFFERDESC;
 
 typedef struct {
-    unsigned long dwSize;
-    unsigned long dwFlags;
-    unsigned long dwBufferBytes;
-    unsigned long dwReserved;
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwBufferBytes;
+    DWORD dwReserved;
     LPWAVEFORMATEX lpwfxFormat;
     GUID          guid3DAlgorithm;
 } DSBUFFERDESC1, *LPDSBUFFERDESC1;
 
 typedef struct {
-    unsigned long dwSize;
-    unsigned long dwFlags;
-    unsigned long dwMinSecondarySampleRate;
-    unsigned long dwMaxSecondarySampleRate;
-    unsigned long dwPrimaryBuffers;
-    unsigned long dwMaxHwMixingAllBuffers;
-    unsigned long dwMaxHwMixingStaticBuffers;
-    unsigned long dwMaxHwMixingStreamingBuffers;
-    unsigned long dwFreeHwMixingAllBuffers;
-    unsigned long dwFreeHwMixingStaticBuffers;
-    unsigned long dwFreeHwMixingStreamingBuffers;
-    unsigned long dwMaxHw3DAllBuffers;
-    unsigned long dwMaxHw3DStaticBuffers;
-    unsigned long dwMaxHw3DStreamingBuffers;
-    unsigned long dwFreeHw3DAllBuffers;
-    unsigned long dwFreeHw3DStaticBuffers;
-    unsigned long dwFreeHw3DStreamingBuffers;
-    unsigned long dwTotalHwMemBytes;
-    unsigned long dwFreeHwMemBytes;
-    unsigned long dwMaxContigFreeHwMemBytes;
-    unsigned long dwUnlockTransferRateHwBuffers;
-    unsigned long dwPlayCpuOverheadSwBuffers;
-    unsigned long dwReserved1;
-    unsigned long dwReserved2;
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwMinSecondarySampleRate;
+    DWORD dwMaxSecondarySampleRate;
+    DWORD dwPrimaryBuffers;
+    DWORD dwMaxHwMixingAllBuffers;
+    DWORD dwMaxHwMixingStaticBuffers;
+    DWORD dwMaxHwMixingStreamingBuffers;
+    DWORD dwFreeHwMixingAllBuffers;
+    DWORD dwFreeHwMixingStaticBuffers;
+    DWORD dwFreeHwMixingStreamingBuffers;
+    DWORD dwMaxHw3DAllBuffers;
+    DWORD dwMaxHw3DStaticBuffers;
+    DWORD dwMaxHw3DStreamingBuffers;
+    DWORD dwFreeHw3DAllBuffers;
+    DWORD dwFreeHw3DStaticBuffers;
+    DWORD dwFreeHw3DStreamingBuffers;
+    DWORD dwTotalHwMemBytes;
+    DWORD dwFreeHwMemBytes;
+    DWORD dwMaxContigFreeHwMemBytes;
+    DWORD dwUnlockTransferRateHwBuffers;
+    DWORD dwPlayCpuOverheadSwBuffers;
+    DWORD dwReserved1;
+    DWORD dwReserved2;
 } DSCAPS, *LPDSCAPS;
 
 typedef struct {
-    unsigned long dwSize;
-    unsigned long dwPlayCursor;
-    unsigned long dwWriteCursor;
+    DWORD dwSize;
+    DWORD dwPlayCursor;
+    DWORD dwWriteCursor;
 } DSBCURSORPOS, *LPDSBCURSORPOS;
 
 typedef struct {
-    unsigned long dwOffset;
-    unsigned long hEventNotify;
+    DWORD dwOffset;
+    DWORD hEventNotify;
 } DSBPOSITIONNOTIFY, *LPDSBPOSITIONNOTIFY;
 typedef const DSBPOSITIONNOTIFY* LPCDSBPOSITIONNOTIFY;
 
@@ -225,6 +225,7 @@ typedef const DSBPOSITIONNOTIFY* LPCDSBPOSITIONNOTIFY;
 #include <vector>
 #include <cstdlib>
 #include <math.h>
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 namespace rowan_ds {
 
@@ -243,7 +244,7 @@ struct MixState {
     Listener lis;
     bool openFailed;
     // env-gated diagnostics (ROWAN_DEBUG_SOUND): API call counters + mix stats
-    unsigned long nCreate, nLock, nUnlock, nPlay, nStop, nFramesMixed;
+    DWORD nCreate, nLock, nUnlock, nPlay, nStop, nFramesMixed;
     int dbgSound, dbgLogCtr, dbgPeak;
     MixState() : dev(0), freq(22050), ch(2), openFailed(false),
                  nCreate(0), nLock(0), nUnlock(0), nPlay(0), nStop(0),
@@ -297,9 +298,9 @@ inline void EnsureDevice()
 
 // first GUID word regardless of which GUID definition won (WIN32_COMPAT.H
 // uses Data1; the fallback above uses d1 — same layout, read it by memcpy)
-inline unsigned long RowanGuidD1(const GUID& g)
+inline DWORD RowanGuidD1(const GUID& g)
 {
-    unsigned long v; memcpy(&v, &g, sizeof v); return v;
+    DWORD v; memcpy(&v, &g, sizeof v); return v;
 }
 
 struct IDirectSound3DBuffer;    // fwd
@@ -307,20 +308,20 @@ struct IDirectSound3DListener;  // fwd
 IDirectSound3DListener* RowanDSListener();  // defined below IDirectSound3DListener
 
 struct IDirectSoundBuffer {
-    long refCnt;
+    LONG refCnt;
     // ---- backend state ----
     std::vector<unsigned char> pcm;  // PCM bytes, Lock() writes into this
     WAVEFORMATEX fmt;
-    unsigned long capsFlags;
+    DWORD capsFlags;
     bool   primary, is3d;
     bool   playing, looping, lost;
     double cursor;                   // fractional frame position
-    long   vol;                      // hundredths of dB (0..-10000)
-    long   panv;                     // -10000..10000
-    unsigned long freq;              // Hz, 0 = format rate
+    LONG   vol;                      // hundredths of dB (0..-10000)
+    LONG   panv;                     // -10000..10000
+    DWORD freq;              // Hz, 0 = format rate
     // 3D state
     float  px,py,pz, pvx,pvy,pvz, mind, maxd;
-    unsigned long mode3d;
+    DWORD mode3d;
     IDirectSound3DBuffer* buf3d;     // facade, created on first QI
 
     IDirectSoundBuffer()
@@ -335,8 +336,8 @@ struct IDirectSoundBuffer {
     ~IDirectSoundBuffer();   // defined after IDirectSound3DBuffer (complete type needed)
 
     HRESULT QueryInterface(const GUID& riid, void** ppv);   // defined below IDirectSound3DBuffer
-    unsigned long AddRef()  { return ++refCnt; }
-    unsigned long Release() { unsigned long r = refCnt>0 ? --refCnt : 0; if(!r) delete this; return r; }
+    DWORD AddRef()  { return ++refCnt; }
+    DWORD Release() { DWORD r = refCnt>0 ? --refCnt : 0; if(!r) delete this; return r; }
 
     int FrameBytes() const
     {
@@ -344,17 +345,17 @@ struct IDirectSoundBuffer {
         if (!fb) fb = (fmt.nChannels ? fmt.nChannels : 1) * ((fmt.wBitsPerSample ? fmt.wBitsPerSample : 16) / 8);
         return fb;
     }
-    unsigned long Frames() const { int fb = FrameBytes(); return fb ? (unsigned long)(pcm.size() / fb) : 0; }
+    DWORD Frames() const { int fb = FrameBytes(); return fb ? (DWORD)(pcm.size() / fb) : 0; }
 
-    HRESULT Lock(unsigned long off, unsigned long bytes, void** pp1, unsigned long* pn1,
-                 void** pp2, unsigned long* pn2, unsigned long flags)
+    HRESULT Lock(DWORD off, DWORD bytes, void** pp1, DWORD* pn1,
+                 void** pp2, DWORD* pn2, DWORD flags)
     {
         if (primary || pcm.empty()) return DSERR_GENERIC;
         if (off >= pcm.size()) off = 0;
-        if (flags & DSBLOCK_ENTIREBUFFER) { off = 0; bytes = (unsigned long)pcm.size(); }
-        if (!bytes) bytes = (unsigned long)pcm.size() - off;
-        unsigned long size = (unsigned long)pcm.size();
-        unsigned long first = bytes;
+        if (flags & DSBLOCK_ENTIREBUFFER) { off = 0; bytes = (DWORD)pcm.size(); }
+        if (!bytes) bytes = (DWORD)pcm.size() - off;
+        DWORD size = (DWORD)pcm.size();
+        DWORD first = bytes;
         if (off + first > size) first = size - off;
         if (pp1) *pp1 = pcm.data() + off;
         if (pn1) *pn1 = first;
@@ -368,9 +369,9 @@ struct IDirectSoundBuffer {
         rowan_ds::S().nLock++;
         return DS_OK;
     }
-    HRESULT Unlock(void*, unsigned long, void*, unsigned long) { rowan_ds::S().nUnlock++; return DS_OK; }
+    HRESULT Unlock(void*, DWORD, void*, DWORD) { rowan_ds::S().nUnlock++; return DS_OK; }
 
-    HRESULT Play(unsigned long, unsigned long, unsigned long dwFlags)
+    HRESULT Play(DWORD, DWORD, DWORD dwFlags)
     {
         if (primary) return DS_OK;
         rowan_ds::EnsureDevice();
@@ -383,7 +384,7 @@ struct IDirectSoundBuffer {
         return DS_OK;
     }
     HRESULT Stop() { rowan_ds::Lock_(); playing = false; rowan_ds::S().nStop++; rowan_ds::Unlock_(); return DS_OK; }
-    HRESULT SetCurrentPosition(unsigned long pos)
+    HRESULT SetCurrentPosition(DWORD pos)
     {
         rowan_ds::Lock_();
         cursor = (double)pos / FrameBytes();
@@ -391,39 +392,39 @@ struct IDirectSoundBuffer {
         rowan_ds::Unlock_();
         return DS_OK;
     }
-    HRESULT GetCurrentPosition(unsigned long* p, unsigned long* w)
+    HRESULT GetCurrentPosition(DWORD* p, DWORD* w)
     {
         rowan_ds::Lock_();
-        unsigned long bytepos = (unsigned long)(cursor * FrameBytes());
+        DWORD bytepos = (DWORD)(cursor * FrameBytes());
         if (p) *p = bytepos;
         if (w) *w = bytepos;
         rowan_ds::Unlock_();
         return DS_OK;
     }
-    HRESULT SetFrequency(unsigned long f)
+    HRESULT SetFrequency(DWORD f)
     {
         if (f && (f < DSBFREQUENCY_MIN || f > DSBFREQUENCY_MAX)) return DSERR_INVALIDPARAM;
         rowan_ds::Lock_(); freq = f; rowan_ds::Unlock_();
         return DS_OK;
     }
-    HRESULT GetFrequency(unsigned long* p) { if (p) *p = freq ? freq : fmt.nSamplesPerSec; return DS_OK; }
-    HRESULT SetVolume(long v)
+    HRESULT GetFrequency(DWORD* p) { if (p) *p = freq ? freq : fmt.nSamplesPerSec; return DS_OK; }
+    HRESULT SetVolume(LONG v)
     {
         if (v < DSBVOLUME_MIN) v = DSBVOLUME_MIN;
         if (v > DSBVOLUME_MAX) v = DSBVOLUME_MAX;
         rowan_ds::Lock_(); vol = v; rowan_ds::Unlock_();
         return DS_OK;
     }
-    HRESULT GetVolume(long* p) { if (p) *p = vol; return DS_OK; }
-    HRESULT SetPan(long p)
+    HRESULT GetVolume(LONG* p) { if (p) *p = vol; return DS_OK; }
+    HRESULT SetPan(LONG p)
     {
         if (p < DSBPAN_LEFT) p = DSBPAN_LEFT;
         if (p > DSBPAN_RIGHT) p = DSBPAN_RIGHT;
         rowan_ds::Lock_(); panv = p; rowan_ds::Unlock_();
         return DS_OK;
     }
-    HRESULT GetPan(long* p) { if (p) *p = panv; return DS_OK; }
-    HRESULT GetStatus(unsigned long* p)
+    HRESULT GetPan(LONG* p) { if (p) *p = panv; return DS_OK; }
+    HRESULT GetStatus(DWORD* p)
     {
         if (p) {
             rowan_ds::Lock_();
@@ -449,7 +450,7 @@ struct IDirectSoundBuffer {
         }
         return DS_OK;
     }
-    HRESULT GetFormat(LPWAVEFORMATEX p, unsigned long n, unsigned long* written)
+    HRESULT GetFormat(LPWAVEFORMATEX p, DWORD n, DWORD* written)
     {
         if (p) { memcpy(p, &fmt, n < sizeof fmt ? n : sizeof fmt); }
         if (written) *written = sizeof fmt;
@@ -461,30 +462,30 @@ struct IDirectSoundBuffer {
 
 // 3D buffer facade — forwards into the owning secondary buffer's state.
 struct IDirectSound3DBuffer {
-    long refCnt;
+    LONG refCnt;
     IDirectSoundBuffer* owner;
     IDirectSound3DBuffer(IDirectSoundBuffer* o) : refCnt(0), owner(o) {}
     HRESULT QueryInterface(const GUID&, void** ppv) { *ppv = 0; return DSERR_GENERIC; }
-    unsigned long AddRef()  { if (owner) owner->AddRef(); return ++refCnt; }
-    unsigned long Release()
+    DWORD AddRef()  { if (owner) owner->AddRef(); return ++refCnt; }
+    DWORD Release()
     {
-        unsigned long r = refCnt ? --refCnt : 0;
+        DWORD r = refCnt ? --refCnt : 0;
         IDirectSoundBuffer* o = owner;
         if (!r) delete this;
         if (o) o->Release();
         return r;
     }
-    HRESULT SetMaxDistance(D3DVALUE d, unsigned long) { if(owner){owner->maxd=d;} return DS_OK; }
+    HRESULT SetMaxDistance(D3DVALUE d, DWORD) { if(owner){owner->maxd=d;} return DS_OK; }
     HRESULT GetMaxDistance(D3DVALUE* p) { if(p)*p=owner?owner->maxd:0; return DS_OK; }
-    HRESULT SetMinDistance(D3DVALUE d, unsigned long) { if(owner){owner->mind=d>0?d:0.001f;} return DS_OK; }
+    HRESULT SetMinDistance(D3DVALUE d, DWORD) { if(owner){owner->mind=d>0?d:0.001f;} return DS_OK; }
     HRESULT GetMinDistance(D3DVALUE* p) { if(p)*p=owner?owner->mind:0; return DS_OK; }
-    HRESULT SetMode(unsigned long m, unsigned long) { if(owner)owner->mode3d=m; return DS_OK; }
-    HRESULT GetMode(unsigned long* p) { if(p)*p=owner?owner->mode3d:0; return DS_OK; }
-    HRESULT SetPosition(D3DVALUE x, D3DVALUE y, D3DVALUE z, unsigned long)
+    HRESULT SetMode(DWORD m, DWORD) { if(owner)owner->mode3d=m; return DS_OK; }
+    HRESULT GetMode(DWORD* p) { if(p)*p=owner?owner->mode3d:0; return DS_OK; }
+    HRESULT SetPosition(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD)
         { if(owner){rowan_ds::Lock_();owner->px=x;owner->py=y;owner->pz=z;rowan_ds::Unlock_();} return DS_OK; }
     HRESULT GetPosition(void* v)
         { if(v&&owner){((D3DVALUE*)v)[0]=owner->px;((D3DVALUE*)v)[1]=owner->py;((D3DVALUE*)v)[2]=owner->pz;} return DS_OK; }
-    HRESULT SetVelocity(D3DVALUE x, D3DVALUE y, D3DVALUE z, unsigned long)
+    HRESULT SetVelocity(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD)
         { if(owner){owner->pvx=x;owner->pvy=y;owner->pvz=z;} return DS_OK; }
     HRESULT GetVelocity(void* v)
         { if(v&&owner){((D3DVALUE*)v)[0]=owner->pvx;((D3DVALUE*)v)[1]=owner->pvy;((D3DVALUE*)v)[2]=owner->pvz;} return DS_OK; }
@@ -520,17 +521,17 @@ inline IDirectSoundBuffer::~IDirectSoundBuffer()
 
 // 3D listener facade — writes into the global mixer listener state.
 struct IDirectSound3DListener {
-    long refCnt;
+    LONG refCnt;
     IDirectSound3DListener() : refCnt(1) {}
     HRESULT QueryInterface(const GUID&, void** ppv) { *ppv = 0; return DSERR_GENERIC; }
-    unsigned long AddRef()  { return ++refCnt; }
-    unsigned long Release() { unsigned long r=--refCnt; if(!r) delete this; return r; }
+    DWORD AddRef()  { return ++refCnt; }
+    DWORD Release() { DWORD r=--refCnt; if(!r) delete this; return r; }
     HRESULT CommitDeferredSettings() { return DS_OK; }
-    HRESULT SetDistanceFactor(D3DVALUE f, unsigned long) { rowan_ds::S().lis.distFactor=f; return DS_OK; }
-    HRESULT SetDopplerFactor(D3DVALUE f, unsigned long)  { rowan_ds::S().lis.doppler=f;    return DS_OK; }
-    HRESULT SetRolloffFactor(D3DVALUE f, unsigned long)  { rowan_ds::S().lis.rolloff=f;    return DS_OK; }
+    HRESULT SetDistanceFactor(D3DVALUE f, DWORD) { rowan_ds::S().lis.distFactor=f; return DS_OK; }
+    HRESULT SetDopplerFactor(D3DVALUE f, DWORD)  { rowan_ds::S().lis.doppler=f;    return DS_OK; }
+    HRESULT SetRolloffFactor(D3DVALUE f, DWORD)  { rowan_ds::S().lis.rolloff=f;    return DS_OK; }
     HRESULT SetOrientation(D3DVALUE fx,D3DVALUE fy,D3DVALUE fz,
-                           D3DVALUE ux,D3DVALUE uy,D3DVALUE uz, unsigned long)
+                           D3DVALUE ux,D3DVALUE uy,D3DVALUE uz, DWORD)
     {
         rowan_ds::Listener& l = rowan_ds::S().lis;
         rowan_ds::Lock_();
@@ -538,13 +539,13 @@ struct IDirectSound3DListener {
         rowan_ds::Unlock_();
         return DS_OK;
     }
-    HRESULT SetPosition(D3DVALUE x, D3DVALUE y, D3DVALUE z, unsigned long)
+    HRESULT SetPosition(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD)
     {
         rowan_ds::Listener& l = rowan_ds::S().lis;
         rowan_ds::Lock_(); l.px=x; l.py=y; l.pz=z; rowan_ds::Unlock_();
         return DS_OK;
     }
-    HRESULT SetVelocity(D3DVALUE x, D3DVALUE y, D3DVALUE z, unsigned long)
+    HRESULT SetVelocity(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD)
     {
         rowan_ds::Listener& l = rowan_ds::S().lis;
         l.vx=x; l.vy=y; l.vz=z; return DS_OK;
@@ -562,12 +563,12 @@ inline IDirectSound3DListener* RowanDSListener()
 namespace rowan_ds {
 
 // decode one source frame (mono or stereo, 8/16-bit PCM) into L/R floats
-inline void DecodeFrame(const IDirectSoundBuffer* b, unsigned long frame, float& L, float& R)
+inline void DecodeFrame(const IDirectSoundBuffer* b, DWORD frame, float& L, float& R)
 {
     const unsigned char* d = b->pcm.data();
     int ch = b->fmt.nChannels ? b->fmt.nChannels : 1;
     int bits = b->fmt.wBitsPerSample ? b->fmt.wBitsPerSample : 16;
-    unsigned long off = frame * b->FrameBytes();
+    DWORD off = frame * b->FrameBytes();
     if (off >= b->pcm.size()) { L = R = 0; return; }
     if (bits == 16) {
         const short* s = (const short*)(d + off);
@@ -589,10 +590,10 @@ inline void AudioCb(void*, Uint8* stream, int len)
     for (size_t bi = 0; bi < s.bufs.size(); ++bi) {
         IDirectSoundBuffer* b = s.bufs[bi];
         if (!b->playing || b->lost || b->pcm.empty()) continue;
-        unsigned long nfr = b->Frames();
+        DWORD nfr = b->Frames();
         if (!nfr) { b->playing = false; continue; }
 
-        unsigned long srcRate = b->freq ? b->freq : (b->fmt.nSamplesPerSec ? b->fmt.nSamplesPerSec : 22050);
+        DWORD srcRate = b->freq ? b->freq : (b->fmt.nSamplesPerSec ? b->fmt.nSamplesPerSec : 22050);
         double step = (double)srcRate / s.freq;
         float g = (float)pow(10.0, b->vol / 2000.0);
         // pan: DS pan is hundredths-dB attenuation of the opposite channel
@@ -629,9 +630,9 @@ inline void AudioCb(void*, Uint8* stream, int len)
         }
 
         for (int i = 0; i < frames; ++i) {
-            unsigned long f = (unsigned long)b->cursor;
+            DWORD f = (DWORD)b->cursor;
             if (f >= nfr) {
-                if (b->looping) { b->cursor = fmod(b->cursor, (double)nfr); f = (unsigned long)b->cursor; }
+                if (b->looping) { b->cursor = fmod(b->cursor, (double)nfr); f = (DWORD)b->cursor; }
                 else { b->playing = false; break; }
             }
             float L, R;
@@ -667,11 +668,11 @@ inline void AudioCb(void*, Uint8* stream, int len)
 } // namespace rowan_ds
 
 struct IDirectSound {
-    long refCnt;
+    LONG refCnt;
     IDirectSound() : refCnt(1) {}
     HRESULT QueryInterface(const GUID&, void** ppv) { *ppv = 0; return DSERR_GENERIC; }
-    unsigned long AddRef()  { return ++refCnt; }
-    unsigned long Release() { unsigned long r=--refCnt; if(!r) delete this; return r; }
+    DWORD AddRef()  { return ++refCnt; }
+    DWORD Release() { DWORD r=--refCnt; if(!r) delete this; return r; }
     HRESULT CreateSoundBuffer(LPCDSBUFFERDESC d, LPDIRECTSOUNDBUFFER* pp, IUnknown*)
     {
         if (!pp) return DSERR_INVALIDPARAM;
@@ -708,13 +709,13 @@ struct IDirectSound {
         }
         return DS_OK;
     }
-    HRESULT SetCooperativeLevel(void*, unsigned long) { return DS_OK; }
+    HRESULT SetCooperativeLevel(void*, DWORD) { return DS_OK; }
     HRESULT Compact() { return DS_OK; }
     HRESULT Initialize(const GUID*) { return DS_OK; }
 };
 
 struct IDirectSoundNotify {
-    HRESULT SetNotificationPositions(unsigned long, LPCDSBPOSITIONNOTIFY) { return DS_OK; }
+    HRESULT SetNotificationPositions(DWORD, LPCDSBPOSITIONNOTIFY) { return DS_OK; }
 };
 
 // ---- module functions ----------------------------------------------------

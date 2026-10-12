@@ -2,6 +2,7 @@
 //		Included into  MIG.CPP to define font.
 //		Loaded into various property sheets to list fonts
 //
+
 {110,FO_ARIAL},				//"Arial Italic"},	//data font (small frontend and map)
 {200,FO_FUSIONBOLD},	//"Fusion Bold"},	//title bar font (map only)
 {110,FO_ARIAL},				//"Arial"},	//Arial font (small frontend and map) was 110
@@ -16,3 +17,5 @@
 {120,FO_COURIER},			//"Courier New"},	//typewriter "Typewriter Bold"
 {140,FO_COURIER},			//"Courier New"},	//typewriter "Typewriter Bold"
 {110,FO_COURIER},			//"Courier New"},	//typewriter "Typewriter Bold"
+
+

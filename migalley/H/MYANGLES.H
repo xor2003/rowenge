@@ -18,8 +18,7 @@ enum	AnglesShiftTwice	{ANGLES_SHIFT_TWICE=30};
 inline	int	operator	/	(int i,AnglesFract)	{return((i+16384)>>15);}
 inline	int	operator	>>	(int i,AnglesShift)	{return((i+16384)>>15);}
 
-inline	SLong	operator	/	(SLong i, AnglesFract)	{ return((i + 16384) >> 15); }
-inline	SLong	operator	>>	(SLong i,AnglesShift)	{return((i+16384)>>15);}
+
 inline	ULong	operator	/	(ULong i,AnglesFract)	{return((i+16384)>>15);}
 inline	ULong	operator	>>	(ULong i,AnglesShift)	{return((i+16384)>>15);}
 enum	AnglePoint

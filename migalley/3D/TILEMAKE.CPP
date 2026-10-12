@@ -531,7 +531,7 @@ inline ROWANSURFACEDESC* CreateLandTBuffer(SLong size)
 		rsd->dwWidth=rsd->dwHeight=size;
 		rsd->lPitch=size;
 		rsd->dwRGBBitCount=8;
-		rsd->lpSurface=(void*)(ULong(ptr)+sizeof(ROWANSURFACEDESC));
+		rsd->lpSurface=(void*)(uintptr_t(ptr)+sizeof(ROWANSURFACEDESC));
 	}
 	return (ROWANSURFACEDESC*)ptr;
 }
@@ -652,11 +652,11 @@ HTEXT DoAllocateTexture(UByte textRez)
 	assert(false&&"Bad texture resolution requestsed");
 	break;
 	}
-	while (ULong(pmin)!=ULong(pmax))
+	while (uintptr_t(pmin)!=uintptr_t(pmax))
 	{
 		if (*pmin==0x00)
 		{
-			HTEXT retVal=HTEXT((ULong(pmin)-ULong(landTextureUsage)));
+			HTEXT retVal=HTEXT((uintptr_t(pmin)-uintptr_t(landTextureUsage)));
 			*pmin=0xFF;
 			return retVal;
 		}
@@ -734,7 +734,7 @@ void SetTexturePointers(const bool hardVer=true)
 		imagePtrs[j]=new ImageMapDesc;
 		imagePtrs[j]->FixLbmImageMap(&fb);
 		imageData[j]=imagePtrs[j]->body;
-		if (j==0 && ULong(imagePtrs[0]->palette)>256)
+		if (j==0 && uintptr_t(imagePtrs[0]->palette)>256)
 		{
 			imagePalette=imagePtrs[0]->palette;
 			imagePalette[255*3+1]=0xFF;
@@ -867,8 +867,8 @@ template<class t> inline t MakeRecIndex(const t a,const t b)
 //------------------------------------------------------------------------------
 inline EdgePtr EdgeSetup(const VData* va,const VData* vb)
 {
-	const ULong _indexableLimit=ULong(EdgeList+Indexable_Edges);
-	const ULong _realEdgeLimit=ULong(EdgeList+Real_Max_Edges);
+	const ULong _indexableLimit=uintptr_t(EdgeList+Indexable_Edges);
+	const ULong _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
 
 	//check whether we have already created the data for this edge
 
@@ -876,7 +876,7 @@ inline EdgePtr EdgeSetup(const VData* va,const VData* vb)
 
 	EdgePtr e=curEdge++;
 
-	if (ULong(e)<_indexableLimit &&	0xFF!=edgeRecord[ri])
+	if (uintptr_t(e)<_indexableLimit &&	0xFF!=edgeRecord[ri])
 		return EdgeList+edgeRecord[ri];
 
 	ULong ei=e-EdgeList;
@@ -904,8 +904,8 @@ inline EdgePtr EdgeSetup(const VData* va,const VData* vb)
 //------------------------------------------------------------------------------
 inline EdgePtr EdgeSetup(const VData* va,const VData* vb,SWord scale)
 {
-	const ULong _indexableLimit=ULong(EdgeList+Indexable_Edges);
-	const ULong _realEdgeLimit=ULong(EdgeList+Real_Max_Edges);
+	const ULong _indexableLimit=uintptr_t(EdgeList+Indexable_Edges);
+	const ULong _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
 
 	//check whether we have already created the data for this edge
 
@@ -913,7 +913,7 @@ inline EdgePtr EdgeSetup(const VData* va,const VData* vb,SWord scale)
 
 	EdgePtr e=curEdge++;
 
-	if (ULong(e)<_indexableLimit &&	0xFF!=edgeRecord[ri])
+	if (uintptr_t(e)<_indexableLimit &&	0xFF!=edgeRecord[ri])
 		return EdgeList+edgeRecord[ri];
 
 	ULong ei=e-EdgeList;
@@ -941,7 +941,7 @@ inline EdgePtr EdgeSetup(const VData* va,const VData* vb,SWord scale)
 //------------------------------------------------------------------------------
 inline EdgePtr EdgeSetup2(const VData& va,const VData& vb)
 {
-	const ULong _realEdgeLimit=ULong(EdgeList+Real_Max_Edges);
+	const ULong _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
 
 	EdgePtr e=curEdge++;
 
@@ -3116,7 +3116,7 @@ void NDDAliasPixel8(ROWANSURFACEDESC* prsd,SLong x,SLong y)
 //------------------------------------------------------------------------------
 void SDDAliasPixel16(ROWANSURFACEDESC* prsd,SLong x,SLong y)
 {
-	UWord* ptxtadr=((UWord*)(SLong(prsd->lpSurface)+x*prsd->lPitch))+y;
+	UWord* ptxtadr=((UWord*)(intptr_t(prsd->lpSurface)+x*prsd->lPitch))+y;
 	*ptxtadr=currentRouteColor16;
 }
 
@@ -3127,7 +3127,7 @@ void SDDAliasPixel16(ROWANSURFACEDESC* prsd,SLong x,SLong y)
 //------------------------------------------------------------------------------
 void NDDAliasPixel16(ROWANSURFACEDESC* prsd,SLong x,SLong y)
 {
-	UWord* ptxtadr=((UWord*)(SLong(prsd->lpSurface)+y*prsd->lPitch))+x;
+	UWord* ptxtadr=((UWord*)(intptr_t(prsd->lpSurface)+y*prsd->lPitch))+x;
 	*ptxtadr=currentRouteColor16;
 }
 
@@ -4208,7 +4208,7 @@ void DDSortedTriangle16(VTriPtr sTri,
 	src_dx=1<<scale;
 	src_dy=TextureWidth<<scale;
 
-	pdst=(UWord*)(ULong(prsd->lpSurface)+ULong(yi*prsd->lPitch));
+	pdst=(UWord*)(uintptr_t(prsd->lpSurface)+uintptr_t(yi*prsd->lPitch));
 	psrc=ptxt+(left.ymin<<8);
 
 	ymax=Min(left.ymax,right.ymax)>>scale;
@@ -4234,7 +4234,7 @@ void DDSortedTriangle16(VTriPtr sTri,
 				*pdst2++=palLookup[*psrc2];
 				psrc2+=src_dx;
 			}
-		pdst=(UWord*)(ULong(pdst)+ULong(prsd->lPitch));
+		pdst=(UWord*)(uintptr_t(pdst)+uintptr_t(prsd->lPitch));
 		psrc+=src_dy;
 	}
 
@@ -4245,7 +4245,7 @@ void DDSortedTriangle16(VTriPtr sTri,
 
 	psrc=ptxt+(yi<<8);
 	yi>>=scale;
-	pdst=(UWord*)(ULong(prsd->lpSurface)+ULong(yi*prsd->lPitch));
+	pdst=(UWord*)(uintptr_t(prsd->lpSurface)+uintptr_t(yi*prsd->lPitch));
 
 	ymax=left.ymax>>scale;
 
@@ -4270,7 +4270,7 @@ void DDSortedTriangle16(VTriPtr sTri,
 				*pdst2++=palLookup[*psrc2];
 				psrc2+=src_dx;
 			}
-		pdst=(UWord*)(ULong(pdst)+ULong(prsd->lPitch));
+		pdst=(UWord*)(uintptr_t(pdst)+uintptr_t(prsd->lPitch));
 		psrc+=src_dy;
 	}
 }
@@ -4400,7 +4400,7 @@ void DDShadowTriangle16(ROWANSURFACEDESC* prsd,
 
 	yi=left.ymin>>scale;
 
-	pdst=(UWord*)(ULong(prsd->lpSurface)+ULong(yi*prsd->lPitch));
+	pdst=(UWord*)(uintptr_t(prsd->lpSurface)+uintptr_t(yi*prsd->lPitch));
 
 	ymax=Min(left.ymax,right.ymax)>>scale;
 
@@ -4422,7 +4422,7 @@ void DDShadowTriangle16(ROWANSURFACEDESC* prsd,
 			{
 				*pdst2++=0;
 			}
-		pdst=(UWord*)(ULong(pdst)+ULong(prsd->lPitch));
+		pdst=(UWord*)(uintptr_t(pdst)+uintptr_t(prsd->lPitch));
 	}
 
 	if (!det)	left=*EdgeSetup(&sTri->v2,&sTri->v3,scale);
@@ -4431,7 +4431,7 @@ void DDShadowTriangle16(ROWANSURFACEDESC* prsd,
 	yi=Max(left.ymin,right.ymin);
 
 	yi>>=scale;
-	pdst=(UWord*)(ULong(prsd->lpSurface)+ULong(yi*prsd->lPitch));
+	pdst=(UWord*)(uintptr_t(prsd->lpSurface)+uintptr_t(yi*prsd->lPitch));
 
 	ymax=left.ymax>>scale;
 
@@ -4453,7 +4453,7 @@ void DDShadowTriangle16(ROWANSURFACEDESC* prsd,
 			{
 				*pdst2++=0;
 			}
-		pdst=(UWord*)(ULong(pdst)+ULong(prsd->lPitch));
+		pdst=(UWord*)(uintptr_t(pdst)+uintptr_t(prsd->lPitch));
 	}
 }
 

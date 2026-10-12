@@ -93,7 +93,7 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "FILES.G"
 
 //Supposedly in the windows header file. Ho hum!
-#define FIELDOFFSET(type, field)    ((int)&(((type *)0)->field))
+#define FIELDOFFSET(type, field)    ((intptr_t)&(((type *)0)->field))
 
 //DeadCode RDH 16Mar100 MAKEFIELD(UniqueID,UID_NULL,IllegalSepID);
 //DEADCODE RDH 29/02/00 #include "package.h"
@@ -433,7 +433,7 @@ bool	CMainFrame::MakeToolMenu(CPoint point,int helpdialindex)
 	menu.CreatePopupMenu();
 
 	secondary.CreatePopupMenu();
-	menu.AppendMenu(MF_POPUP|MF_STRING,(int)secondary.m_hMenu,RESSTRING(TIMETOOLBAR));
+	menu.AppendMenu(MF_POPUP|MF_STRING,(intptr_t)secondary.m_hMenu,RESSTRING(TIMETOOLBAR));
 		secondary.AppendMenu(MF_STRING,1000,RESSTRING(TIMETOOLBAR));
 		secondary.AppendMenu(MF_STRING,1001,RESSTRING(SPEEDCONTROL));
 		secondary.AppendMenu(MF_STRING,1002,RESSTRING(PAUSE));
@@ -443,7 +443,7 @@ bool	CMainFrame::MakeToolMenu(CPoint point,int helpdialindex)
 	secondary.CreatePopupMenu();
 	if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)			//RDH 17/05/00
 	{
-		menu.AppendMenu(MF_POPUP|MF_STRING,(int)secondary.m_hMenu,RESSTRING(MAIN));
+		menu.AppendMenu(MF_POPUP|MF_STRING,(intptr_t)secondary.m_hMenu,RESSTRING(MAIN));
 			secondary.AppendMenu(MF_STRING,1010,RESSTRING(AIRCRAFTALLOC));
 			secondary.AppendMenu(MF_STRING,1011,RESSTRING(RESOURCES));
 			secondary.AppendMenu(MF_STRING,1012,RESSTRING(GESCHWADERLIST));
@@ -454,7 +454,7 @@ bool	CMainFrame::MakeToolMenu(CPoint point,int helpdialindex)
 			secondary.AppendMenu(MF_STRING,1017,RESSTRING(MISSIONFOLDER));
 	}else
 	{
-		menu.AppendMenu(MF_POPUP|MF_STRING,(int)secondary.m_hMenu,RESSTRING(MAIN));
+		menu.AppendMenu(MF_POPUP|MF_STRING,(intptr_t)secondary.m_hMenu,RESSTRING(MAIN));
 			secondary.AppendMenu(MF_STRING,1010,RESSTRING(AIRCRAFTALLOC));
 			secondary.AppendMenu(MF_STRING,1011,RESSTRING(RESOURCES));
 			secondary.AppendMenu(MF_STRING,1012,RESSTRING(SQUADRONLIST));
@@ -468,7 +468,7 @@ bool	CMainFrame::MakeToolMenu(CPoint point,int helpdialindex)
 	}
 	secondary.Detach();
 	secondary.CreatePopupMenu();
-	menu.AppendMenu(MF_POPUP|MF_STRING,(int)secondary.m_hMenu,RESSTRING(MAPTOOLS));
+	menu.AppendMenu(MF_POPUP|MF_STRING,(intptr_t)secondary.m_hMenu,RESSTRING(MAPTOOLS));
 		secondary.AppendMenu(MF_STRING,1020,RESSTRING(THUMBNAILMAP));
 		secondary.AppendMenu(MF_STRING,1021,RESSTRING(ZOOMLEVEL));
 		secondary.AppendMenu(MF_STRING,1022,RESSTRING(ZOOMTOGGLE));

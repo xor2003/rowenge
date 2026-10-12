@@ -127,9 +127,9 @@ UniqueID		UIDExpr::EvalW(Coords3D& c)
 		if (p->Status.size==WAYPOINTSIZE)
 		{	//It may be a target relative waypoint!!!
 			WayPoint* w=*p;
-			if ((int)w->next!=-1 && w->target)
+			if ((intptr_t)w->next!=-1 && w->target)
 			{
-				if ((int)w->target==-1)			//outstanding warrant...
+				if ((intptr_t)w->target==-1)			//outstanding warrant...
 					return UniqueID(val.Evaluate(0));
 				c.X+=w->target->World.X;
 				c.Y+=w->target->World.Y;
@@ -307,7 +307,7 @@ UniqueID		IcptExpr::EvalA(HP& a)
 	UniqueID rv;
 	if (UID_NULL==(rv=EvalW(d)))
 	{
-		long	range;
+		SLong	range;
 		Math_Lib.HighIntercept(d.X,d.Y,d.Z,range,a.H,a.P);
 
 		return UID_Null;
@@ -323,7 +323,7 @@ int		IcptExpr::Evaluate(int)
 	if (!EvalW(d))
 	{
 		HP	a;
-		long	range;
+		SLong	range;
 		Math_Lib.Intercept(d.X,d.Y,d.Z,range,a.H,a.P);			//Using Intercept because runtime code uses intercept and result slightly different
 //		Math_Lib.HighIntercept(d.X,d.Y,d.Z,range,a.H,a.P);
 		return range;

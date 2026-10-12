@@ -6,6 +6,8 @@
 //Description    
 //------------------------------------------------------------------------------
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	ENGINE_Included
 #define	ENGINE_Included
 
@@ -165,4 +167,5 @@ public:
 class  Engine;
 typedef class  Engine ENGINE, *PENGINE, **PPENGINE;
 
+#pragma pack(pop)
 #endif

@@ -28,6 +28,8 @@
 //	To find them you MUST compile occasionally with TRACKBADASSIGNMENTS set.
 //	This unpacks the structure so that the miscreants can be found.
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	BITF2_Included
 #define	BITF2_Included
 //   "limits.h"
@@ -154,4 +156,5 @@ BITFIELD_AGGREGATOR	{								 \
 #define	LASTFIELD(Type,name,minb,maxb)		Type	name:(maxb+1-minb);
 #define	ONLYFIELD(size,Type,name)			Type	name
 #endif
+#pragma pack(pop)
 #endif

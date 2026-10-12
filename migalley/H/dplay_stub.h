@@ -7,6 +7,7 @@
 #pragma pack()
 
 #include <stdint.h>
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 /* Boolean values */
 #ifndef TRUE
@@ -233,7 +234,7 @@ typedef BOOL (WINAPI *LPDPENUMCONNECTIONSCALLBACK)(
     LPVOID lpContext
 );
 
-typedef unsigned long DPID;
+typedef unsigned int DPID;   // DWORD-width player id
 typedef DPID* LPDPID;
 
 HRESULT GetConnectionSettings(

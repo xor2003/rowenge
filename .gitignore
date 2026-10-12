@@ -1,6 +1,7 @@
 # Build output
 /build/
 /build-*/
+/build64/
 *.o
 *.a
 *.exe

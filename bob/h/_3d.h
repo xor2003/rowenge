@@ -6,6 +6,7 @@
 //DEADCODE DAW 27/05/99 #define DEBUG_NEW new(THIS_FILE, __LINE__)
 //DEADCODE DAW 27/05/99 #endif
 //left in migland.h ? const int _altitudeScale=50;
+
 #define IN_MIGLAND_CPP
 #define	F_BATTLE
 //#include <windows.h>
@@ -13,4 +14,6 @@
 #include "fileman.h"
 #include "uniqueid.h"
 #include	"bfnumber.h"
+
+
 

@@ -4374,7 +4374,7 @@ void MapScr::HandleUpDnLftRgtToggleKeys()
 	{
 		//move the selected hilight option up
 
-		if (ULong(--pCurOpt)<ULong(optionList))
+		if (uintptr_t(--pCurOpt)<uintptr_t(optionList))
 		{
 			pCurOpt=optionList;
 			while (pCurOpt[1].key!=SEL_EOL) pCurOpt++;
@@ -4382,7 +4382,7 @@ void MapScr::HandleUpDnLftRgtToggleKeys()
 		abort=false;
 		while (pCurOpt->key==SEL_BLANK)
 		{
-			if (ULong(--pCurOpt)<ULong(optionList))
+			if (uintptr_t(--pCurOpt)<uintptr_t(optionList))
 			{
 				if (abort) return;
 				pCurOpt=optionList;
@@ -5840,7 +5840,7 @@ MapScr* MapScr::SelectFromReplayScreen(UByte&,Key k)
 		case SEL_PAUSE:
 		case SEL_4:		//pause/play
 			//force a screen change to toggle the icons
-			if (ULong(this)==ULong(&OverLay.replayPlayingScr))
+			if (uintptr_t(this)==uintptr_t(&OverLay.replayPlayingScr))
 			{
 				//was playing but not now
 				OverLay.pCurScr=OverLay.pNewScr=retval=&OverLay.replayScr;
@@ -6635,7 +6635,7 @@ void COverlay::DoArtHoriz()
 			pDst+=pball->w;
 			pMsk+=pball->w;
 			pSrc+=pCentralImage->w;
-			if (ULong(pSrc)>=ULong(pSrcEnd))
+			if (uintptr_t(pSrc)>=uintptr_t(pSrcEnd))
 				pSrc-=pCentralImage->w*pCentralImage->h;
 		}
 

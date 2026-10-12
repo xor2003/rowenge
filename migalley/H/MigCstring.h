@@ -12,6 +12,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 // RERUN: Robust CString replacement that mimics MFC layout.
 // By holding only a single char* pointer, sizeof(CString) == sizeof(char*).

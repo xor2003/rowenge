@@ -5,6 +5,7 @@
 //Date           Wed 14 Oct 1998
 //Description    
 //------------------------------------------------------------------------------
+
 #ifndef	HDATA2_Included
 #define	HDATA2_Included
 

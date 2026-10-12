@@ -5,6 +5,8 @@
 //Date           Wed 26 Feb 1997
 //Description    Model Interface
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MODINT_Included
 #define	MODINT_Included
 
@@ -62,4 +64,5 @@ public:
 
 } MODELANIM, *PMODELANIM;
 
+#pragma pack(pop)
 #endif

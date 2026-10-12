@@ -20,6 +20,7 @@
 #include "FILES.H"
 #include "RBUTTON.H"
 #include "RSTATIC.H"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 class fileblock;
 

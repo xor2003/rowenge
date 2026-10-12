@@ -5,6 +5,7 @@
 //Date           Tue 4 Jan 2000
 //Description
 //------------------------------------------------------------------------------
+#include <stdint.h>
 #include <stdlib.h>
 #include "alloc.h"
 
@@ -28,7 +29,7 @@ static alloc_hdr_t *root=0UL;
 
 char *AllocSetToAlignment(char *c)
 {
-	unsigned int i=(unsigned int )c;
+	unsigned int i=(uintptr_t)c;
 	i=(i+ALIGN_BYTES-1)&-ALIGN_BYTES;
 	return (char* )i;
 }
@@ -81,7 +82,7 @@ char *Alloc(int size)
 	size=(size+ALIGN_BYTES-1)&-ALIGN_BYTES;
 	mem=blk->free;
 	blk->free+=size;
-	if ((unsigned int)(blk->free)>(unsigned int)(blk->end))
+	if ((uintptr_t)(blk->free)>(uintptr_t)(blk->end))
 	{
 		if (blk->next!=0UL)
 		{

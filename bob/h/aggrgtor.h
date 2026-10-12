@@ -5,6 +5,8 @@
 //Date           Wed 29 Apr 1998
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	AGGRGTOR_Included
 #define	AGGRGTOR_Included
 
@@ -92,4 +94,5 @@ private:
 extern Aggregator _Agg;
 
 
+#pragma pack(pop)
 #endif

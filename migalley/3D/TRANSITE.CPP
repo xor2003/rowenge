@@ -3668,7 +3668,7 @@ SLong TransObj::LaunchWeapon(bool received,						//AMM 09Apr99
 				if (!received)									//AMM 09Apr99
 				{
 					MissileAnimData*	adptr = (MissileAnimData*) currbul->Anim;
-					adptr->lastmissile = (ULong) ac->weap.currentbullet;
+					adptr->lastmissile = (uintptr_t) ac->weap.currentbullet;
 					adptr->novirtualguns = ac->classtype->noGuns;	//RJS 29Mar99
 					if (adptr->lastmissile)
 					{
@@ -3859,7 +3859,7 @@ void	TransObj::LaunchCloneGun(	mobileitem* launcher,
 
 		adptr->weapindex = weapindex2;				//Swap indexes around,
 		adptr->weapindex2 = weapindex;				//... so as to alternate fire
-		adptr->originitm = (ULong) launcher;
+		adptr->originitm = (uintptr_t) launcher;
 		adptr->delay = bulletdelay;
 		adptr->shapename = bulletlnchr->shape;
 		adptr->lnchtype = lchtype;
@@ -4632,7 +4632,7 @@ TransObj::LaunchSuperLauncher(	item*		launcher,
 		{
 			MissileAnimData*	adptr = (MissileAnimData*) newitem->Anim;
 
-			adptr->lastmissile = (ULong) ((AirStrucPtr)newitem->Launcher)->weap.currentbullet;
+			adptr->lastmissile = (uintptr_t) ((AirStrucPtr)newitem->Launcher)->weap.currentbullet;
 			adptr->novirtualguns = ((AirStrucPtr)newitem->Launcher)->classtype->noGuns;//RJS 29Mar99
 			if (adptr->lastmissile)
 			{
@@ -10417,7 +10417,7 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 			{
 				AircraftAnimData*	adptr = (AircraftAnimData*) hitpositm->Anim;
 
-				ULong	animoffset = ULong(&adptr->ENGINELEFTIN) - ULong(adptr);
+				ULong	animoffset = uintptr_t(&adptr->ENGINELEFTIN) - uintptr_t(adptr);
 
 				LaunchTimeBomb(hitpositm,animoffset,worldptr);
 			}
@@ -12979,7 +12979,7 @@ void	TransObj::LaunchReplayTrail(Coords3D&			cpos,
 		adptr->weaponlaunchers[0].pitch = -1;
 		adptr->weaponlaunchers[0].LauncherType = LT_VAPOUR;	//RJS 13Apr99
 		adptr->nopoints = smkptr->nopoints;
-		adptr->thelist = (ULong) thelist;
+		adptr->thelist = (uintptr_t) thelist;
 		adptr->lifetime = smkptr->lifetime;
 		adptr->SmkDescIndex = smkptr->smkindex;
 		adptr->currTime = smkptr->currTime;						//RJS 16Jun99

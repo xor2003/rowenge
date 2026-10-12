@@ -31,6 +31,8 @@
 //  This provides a 'one-shot' test, or a 'held' test, as required for each
 //  combination.
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	KEYTEST_Included
 #define	KEYTEST_Included
 #include	"dosdefs.h"
@@ -224,4 +226,5 @@ extern	"C" void	keytests__dexISRstart();
 extern	"C" void	keytests__dexISRcode();
 extern	"C" void	keytests__dexISRend();
 
+#pragma pack(pop)
 #endif

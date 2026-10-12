@@ -2136,7 +2136,7 @@ void CDecompressData::UnpackIntData(UByte* pSrc,ULong rez)
 
 	//add tree data to the end of the list
 
-	ddhDst.treeOffset=ULong(pDst)-ULong(pDataStart);
+	ddhDst.treeOffset=uintptr_t(pDst)-uintptr_t(pDataStart);
 
 	for (i=0;i<ddhDst.noOfTrees;i++)
 	{
@@ -2144,7 +2144,7 @@ void CDecompressData::UnpackIntData(UByte* pSrc,ULong rez)
 		pDst+=sizeof(SmallPoint);
 	}
 
-	ddhDst.waveOffset=ULong(pDst)-ULong(pDataStart);
+	ddhDst.waveOffset=uintptr_t(pDst)-uintptr_t(pDataStart);
 
 	for (i=0;i<ddhDst.noOfWaves;i++)
 	{
@@ -2156,7 +2156,7 @@ void CDecompressData::UnpackIntData(UByte* pSrc,ULong rez)
 
 	aphDst.MakeChecksum();		//CHECKSUM!!!
 
-	dataLen=ULong(pDst)-ULong(pDataStart);
+	dataLen=uintptr_t(pDst)-uintptr_t(pDataStart);
 }
 
 //------------------------------------------------------------------------------
@@ -2249,7 +2249,7 @@ void CDecompressData::MakeIntermediateData()
 	//Prepare to record the edge definitions
 	EdgeDef* ped=(EdgeDef*)ppd;
 	edgeDefs=ped;
-	aph.edgeListStart=ULong(ped)-ULong(&aph);
+	aph.edgeListStart=uintptr_t(ped)-uintptr_t(&aph);
 
 	//Rearrange the draw data
 	GenerateEdges();
@@ -2258,12 +2258,12 @@ void CDecompressData::MakeIntermediateData()
 
 	pDst=(UByte*)ped;
 	pDst+=sizeof(EdgeDef)*edgeCount;
-	aph.edgePointsStart=ULong(pDst)-ULong(&aph);
+	aph.edgePointsStart=uintptr_t(pDst)-uintptr_t(&aph);
 
 	//Copy back the edge point data
 	for (i=0;i<edgePointLen;i++) *pDst++=edgePoints[i];
 
-	aph.polyDataStart=ULong(pDst)-ULong(&aph);
+	aph.polyDataStart=uintptr_t(pDst)-uintptr_t(&aph);
 
 	DrawDataHdr& ddh=*(DrawDataHdr*)pDst;
 	pDst+=sizeof(ddh);
@@ -2276,7 +2276,7 @@ void CDecompressData::MakeIntermediateData()
 
 	aph.MakeChecksum();		//CHECKSUM!!!
 
-	dataLen=ULong(pDst)-ULong(&aph);
+	dataLen=uintptr_t(pDst)-uintptr_t(&aph);
 }
 
 //------------------------------------------------------------------------------
@@ -2399,9 +2399,9 @@ void CDecompressData::GenerateEdges()
 		}
 	}
 
-	polyStreamLen=ULong(ppd)-ULong(newPolyStream);
-	lineStreamLen=ULong(pld)-ULong(newLineStream);
-	edgePointLen=ULong(pep)-ULong(edgePoints);
+	polyStreamLen=uintptr_t(ppd)-uintptr_t(newPolyStream);
+	lineStreamLen=uintptr_t(pld)-uintptr_t(newLineStream);
+	edgePointLen=uintptr_t(pep)-uintptr_t(edgePoints);
 }
 
 //------------------------------------------------------------------------------
@@ -2585,7 +2585,7 @@ UWord CDecompressData::AddEdge(	UByte jStart,UByte jEnd,
 	if (pntCnt==0)
 		ed.edgeOffset=UWord(0);
 	else{
-		ed.edgeOffset=UWord(ULong(pep)-ULong(edgePoints));
+		ed.edgeOffset=UWord(uintptr_t(pep)-uintptr_t(edgePoints));
 		for (j=0;j<pntCnt;j++) *pep++=*pntLst++;
 	}
 

@@ -5,6 +5,8 @@
 //Date           Mon 10 Feb 1997
 //Description    Template for Linked List Item
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	LINK_Included
 #define	LINK_Included
 
@@ -74,5 +76,5 @@ template <class ITEM> void LINKEDLIST<ITEM>::Detach (ITEM* item)
 
 }
 
+#pragma pack(pop)
 #endif
-

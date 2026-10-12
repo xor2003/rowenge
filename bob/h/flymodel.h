@@ -5,6 +5,8 @@
 //Date           Thu 26 Oct 1995
 //Description    flymodel.cpp header file
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	FLYMODEL_Included
 #define	FLYMODEL_Included
 
@@ -285,5 +287,5 @@ public:
 
 	extern	class ManualPilot Manual_Pilot;
 
+#pragma pack(pop)
 #endif
-

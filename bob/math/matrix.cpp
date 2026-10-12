@@ -126,15 +126,14 @@ SLong oldASMTransform(MATRIX_PTR a,SLong& b,SLong& c,SLong& d)
 #endif
 #endif
 */
-	typedef  __int64 int64_t;
-	typedef  unsigned __int64 uint64_t;
+#include <stdint.h>  /* LP64: int64_t from stdint; __int64 maps to long long */
 typedef __int16 _WORD;
 
 
 SLong ASMTransform(MATRIX_PTR m, SLong& x, SLong& y, SLong& z)
 { //x0r tested
 	int _EAX;
-	unsigned long _ECX;
+	unsigned int _ECX;
 
 	int LocalX; // weak
 	int LocalY; // weak
@@ -1086,7 +1085,7 @@ SWord oldGetScale(SLong x,SLong y,SLong z)
 SWord GetScale(SLong x, SLong y, SLong z)
 {//x0r tested
 	__int16 result; // eax@1
-	unsigned long _EAX;
+	unsigned int _EAX;
 	int _ECX;
 	bool _CF;
 

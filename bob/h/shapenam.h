@@ -5,6 +5,8 @@
 //Date           Fri 20 Nov 1998
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SHAPENAM_Included
 #define	SHAPENAM_Included
 
@@ -88,4 +90,5 @@ const	ShapeNum	DingyShape			=	DINGY;				//RJS 19Jun00
 const	ShapeNum	ExplodeSmokeShape	=	SMKMED;				//RJS 22May00
 const	ShapeNum	ExplodeDirtShape	=	DRTMED;				//RJS 22May00
 
+#pragma pack(pop)
 #endif

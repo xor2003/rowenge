@@ -7,6 +7,8 @@
 // Description:
 //
 //////////////////////////////////////////////////////////////////////
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef nodebob_DEFINED_17_11_1999
 #define nodebob_DEFINED_17_11_1999
 #include "bitcount.h"
@@ -804,4 +806,5 @@ extern	NodeData	Node_Data;
 #undef	SUBSTRUCT
 #undef	ENDSTRUCT
 #undef	ONLYFIELDI
+#pragma pack(pop)
 #endif // define nodebob_DEFINED_17_11_1999

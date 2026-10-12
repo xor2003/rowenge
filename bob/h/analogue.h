@@ -6,6 +6,8 @@
 //Description    Rowan DirectX joystick interface header.
 //
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	ANALOGUE_Included
 #define	ANALOGUE_Included
 
@@ -341,4 +343,5 @@ public:
 };
 
 extern	Analogue	_Analogue;
+#pragma pack(pop)
 #endif

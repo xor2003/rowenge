@@ -5,6 +5,8 @@
 //Date           Wed 5 Jul 1995
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	main_Included
 #define	main_Included
 
@@ -33,4 +35,5 @@ class	Main : public	GetSet
 
 	extern Main _Main;		//For 'EmitSysErr'			//JIM 21Sep95
 
+#pragma pack(pop)
 #endif

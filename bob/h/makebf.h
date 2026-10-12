@@ -5,6 +5,8 @@
 //Date           Wed 3 Jan 1996
 //Description    Communication between MakeBF.CPP and Persons.CPP
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MAKEBF_Included
 #define	MAKEBF_Included
 	#include	"flyinit.h"
@@ -77,4 +79,5 @@ extern	GlobalRef	BFieldGlobalTable[];
 
 
 
+#pragma pack(pop)
 #endif

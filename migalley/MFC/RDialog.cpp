@@ -1708,7 +1708,7 @@ void RDialog::OnSize(UINT t, int w, int h)
 //	MoveWindow(viewsize);
 }
 
-bool RDialog::OnSizeAxis(int oldw,int neww,long& curr,Edge act)
+bool RDialog::OnSizeAxis(int oldw,int neww,SLong& curr,Edge act)
 {
 	switch (act&EDGE::ALIGN_MASK)
 	{

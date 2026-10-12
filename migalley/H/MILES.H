@@ -294,23 +294,23 @@ public:
 	///////////////////			
 
 	#ifdef __WATCOMC__
-	static	void	AILEXPORT mainbeatint (HSEQUENCE callerseq,signed long channel, signed long value);//ARM 15Jul96
-	static	void	AILEXPORT subbeatint(HSEQUENCE callerseq, signed long	channel, signed long value);
+	static	void	AILEXPORT mainbeatint (HSEQUENCE callerseq,SLong channel, SLong value);//ARM 15Jul96
+	static	void	AILEXPORT subbeatint(HSEQUENCE callerseq, SLong	channel, SLong value);
 	static	void	AILEXPORT mainendint(HSEQUENCE callerseq);
 	static	void	AILEXPORT subendint(HSEQUENCE callerseq);
 	#endif
 	#ifdef __MSVC__
-	static	void	__stdcall mainbeatint (HSEQUENCE callerseq,signed long channel, signed long value);//ARM 15Jul96
-	static	void	__stdcall subbeatint(HSEQUENCE callerseq, signed long	channel, signed long value);
+	static	void	__stdcall mainbeatint (HSEQUENCE callerseq,SLong channel, SLong value);//ARM 15Jul96
+	static	void	__stdcall subbeatint(HSEQUENCE callerseq, SLong	channel, SLong value);
 	static	void	__stdcall mainendint(HSEQUENCE callerseq);
 	static	void	__stdcall subendint(HSEQUENCE callerseq);
-	static	signed long	__stdcall MIDIEventInterrupt(HMDIDRIVER,HSEQUENCE,signed long,signed long,signed long);//RJS 14Apr99
+	static	SLong	__stdcall MIDIEventInterrupt(HMDIDRIVER,HSEQUENCE,SLong,SLong,SLong);//RJS 14Apr99
 	#else
-	static	void mainbeatint (HSEQUENCE callerseq,signed long channel, signed long value);//ARM 15Jul96
-	static	void subbeatint(HSEQUENCE callerseq, signed long	channel, signed long value);
+	static	void mainbeatint (HSEQUENCE callerseq,SLong channel, SLong value);//ARM 15Jul96
+	static	void subbeatint(HSEQUENCE callerseq, SLong	channel, SLong value);
 	static	void mainendint(HSEQUENCE callerseq);
 	static	void subendint(HSEQUENCE callerseq);
-	static	signed long MIDIEventInterrupt(HMDIDRIVER,HSEQUENCE,signed long,signed long,signed long);//RJS 14Apr99
+	static	SLong MIDIEventInterrupt(HMDIDRIVER,HSEQUENCE,SLong,SLong,SLong);//RJS 14Apr99
 	#endif
 	DES		~Miles()	{ShutDownMiles();/*delete theblock*/;theblock=NULL;}
 	static	void timerint(ULong	user);

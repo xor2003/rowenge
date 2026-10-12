@@ -5,6 +5,8 @@
 //Date           Mon 6 Nov 1995
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	LANDSCAP_Included
 #define	LANDSCAP_Included
 		#include "enumbits.m"									//PD 04Dec95
@@ -772,5 +774,5 @@ private:
 
 extern class LandScape Land_Scape;
 
+#pragma pack(pop)
 #endif
-

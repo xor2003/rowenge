@@ -93,7 +93,7 @@ class CPolyTree
         const ULong _SpaceToAllocate=sizeof(SPolyRec)+pPoly->points*(sizeof(vertex)+sizeof(vertex*));
         UByte* _BackupBuffer=pBufferCur;
 
-        if (ULong(pBufferCur)+_SpaceToAllocate-ULong(pBufferSpace)>=BUFFER_SIZE)
+        if (uintptr_t(pBufferCur)+_SpaceToAllocate-uintptr_t(pBufferSpace)>=BUFFER_SIZE)
             return NULL;
 
         void_ptr=(void*)pBufferCur;
@@ -105,10 +105,10 @@ class CPolyTree
 
         ret_val->poly_type.lplpVertices=
         vertex_ptr_ptr=
-        (vertex**)(ULong(ret_val)+sizeof(SPolyRec));
+        (vertex**)(uintptr_t(ret_val)+sizeof(SPolyRec));
 
         vertex_ptr=
-        (vertex*)(ULong(ret_val)+sizeof(SPolyRec)+ret_val->poly_type.points*sizeof(vertex*));
+        (vertex*)(uintptr_t(ret_val)+sizeof(SPolyRec)+ret_val->poly_type.points*sizeof(vertex*));
 
         source_ptr_ptr=pPoly->lplpVertices;
 

@@ -5,6 +5,8 @@
 //Date           Mon 6 Jan 1997
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MODVEC_Included
 #define	MODVEC_Included
 
@@ -317,4 +319,5 @@ void RotOriZVec (FORI&, FP);
 void SetOri (FORI&, FP, FP, FP);
 
 
+#pragma pack(pop)
 #endif

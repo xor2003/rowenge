@@ -10,27 +10,39 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)            # strict c++17 (glibc keeps M_PI etc. hidden)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(ROWAN_SANITIZERS "Build with ASan + UBSan (32-bit)" OFF)
+option(ROWAN_SANITIZERS "Build with ASan + UBSan" OFF)
+option(ROWAN_64BIT "Build native 64-bit (drops -m32)" OFF)
 
 # Unified repo layout: engine/ + migalley/ + bob/ under one root.
-# ROWAN_SYSROOT locates the extracted i386 .deb sysroot (not committed;
+# ROWAN_SYSROOT locates the extracted .deb sysroot (not committed;
 # CI installs the real :i386 -dev packages instead).
 get_filename_component(ROWAN_ROOT "${CMAKE_SOURCE_DIR}/.." ABSOLUTE)
 set(BOB_TREE    ${ROWAN_ROOT}/bob)
 set(MIG_TREE    ${ROWAN_ROOT}/migalley)
 set(SYSROOT     $ENV{ROWAN_SYSROOT})
 if(NOT SYSROOT)
-    set(SYSROOT ${ROWAN_ROOT}/sysroot-i386)
+    if(ROWAN_64BIT)
+        set(SYSROOT ${ROWAN_ROOT}/sysroot-amd64)
+    else()
+        set(SYSROOT ${ROWAN_ROOT}/sysroot-i386)
+    endif()
 endif()
 set(BOB_OVERLAY ${CMAKE_BINARY_DIR}/bob_inc_overlay)
 
-# --- flags: same proven 32-bit set as migalley ------------------------------
+# --- flags: same proven set as migalley -------------------------------------
 add_library(RowanDefaults INTERFACE)
-target_compile_options(RowanDefaults INTERFACE
-    -m32 -fms-extensions -fno-delete-null-pointer-checks
-    -Wno-narrowing
-    -Wno-enum-compare)
-target_link_options(RowanDefaults INTERFACE -m32)
+if(ROWAN_64BIT)
+    target_compile_options(RowanDefaults INTERFACE
+        -fms-extensions -fno-delete-null-pointer-checks
+        -Wno-narrowing -Wno-enum-compare
+        -Wpointer-to-int-cast -Wint-to-pointer-cast -Wformat)
+else()
+    target_compile_options(RowanDefaults INTERFACE
+        -m32 -fms-extensions -fno-delete-null-pointer-checks
+        -Wno-narrowing
+        -Wno-enum-compare)
+    target_link_options(RowanDefaults INTERFACE -m32)
+endif()
 # d3dvk.h dlopens libvulkan at runtime — every binary that compiles the
 # compat layer needs -ldl (a no-op stub on glibc>=2.34).
 target_link_libraries(RowanDefaults INTERFACE ${CMAKE_DL_LIBS})

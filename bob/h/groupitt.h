@@ -5,6 +5,8 @@
 //Date           Mon 15 Feb 1999
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	GROUPITT_Included
 #define	GROUPITT_Included
 
@@ -151,5 +153,5 @@ struct DamageDef
 	char*		remaininganimbytes;
 };
 
+#pragma pack(pop)
 #endif
-

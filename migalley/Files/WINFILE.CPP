@@ -148,7 +148,7 @@ const	int	DOSFILE_SECTSIZE = 2048;							//PD 18Nov96
 
 //char 	readblockbufferbase[8192];
 char 	readblockbufferbase[65536];
-char* 	readblockbuffer=(char*)(((int)readblockbufferbase+2047)&-2048);
+char* 	readblockbuffer=(char*)(((intptr_t)readblockbufferbase+2047)&-2048);
 
 //------------------------------------------------------------------------------
 //Procedure		CDSeek
@@ -322,7 +322,7 @@ void fileman::resetCDfile(FileNum myfile)
 //------------------------------------------------------------------------------
 void* fileman::loadCDfile(FileNum myfile,SLong length,SLong offset,Bool skipread)
 {
-	if (length>ULong(readblockbufferbase+65536)-ULong(readblockbuffer))
+	if (length>uintptr_t(readblockbufferbase+65536)-uintptr_t(readblockbuffer))
 		assert(false);
 
 	pingcount=0;

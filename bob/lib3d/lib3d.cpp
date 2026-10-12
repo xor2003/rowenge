@@ -879,7 +879,7 @@ inline HRESULT Lib3D::PerformSlowCopy(LPDIRECTDRAWSURFACE7 pDst,LPDIRECTDRAWSURF
     case 16:
     {
         UWord *lpSrc=(UWord*)ddsdSrc.lpSurface;
-        lpSrc=(UWord*)(ULong(lpSrc)+(lPitch*rect->top));			//JON 16Oct00
+        lpSrc=(UWord*)(uintptr_t(lpSrc)+(lPitch*rect->top));			//JON 16Oct00
         lpSrc+=rect->left;
         UWord *lpDst=(UWord*)ddsdDst.lpSurface;
         for (DWORD y=ddsdDst.dwHeight; y>0;
@@ -910,15 +910,15 @@ inline HRESULT Lib3D::PerformSlowCopy(LPDIRECTDRAWSURFACE7 pDst,LPDIRECTDRAWSURF
 //DEADCODE JON 5/11/00
                 lpSrc2+=scale; // this does the x scaling down if needed... - skip the unwanted pixels
             }
-            lpSrc=(UWord*)(ULong(lpSrc)+lPitch);
-            lpDst=(UWord*)(ULong(lpDst)+ddsdDst.lPitch);
+            lpSrc=(UWord*)(uintptr_t(lpSrc)+lPitch);
+            lpDst=(UWord*)(uintptr_t(lpDst)+ddsdDst.lPitch);
         }
     }
     break;
     case 32:
     {
         ULong *lpSrc=(ULong*)ddsdSrc.lpSurface;
-        lpSrc=(ULong*)(ULong(lpSrc)+(lPitch*rect->top));			//JON 16Oct00
+        lpSrc=(ULong*)(uintptr_t(lpSrc)+(lPitch*rect->top));			//JON 16Oct00
         lpSrc+=rect->left;
         UWord *lpDst=(UWord*)ddsdDst.lpSurface;
         for (DWORD y=ddsdDst.dwHeight; y>0; y--) // for each y in the destination
@@ -944,8 +944,8 @@ inline HRESULT Lib3D::PerformSlowCopy(LPDIRECTDRAWSURFACE7 pDst,LPDIRECTDRAWSURF
 //DEADCODE JON 5/11/00 					*lpDst2++=UWord(r|g|b);
                 lpSrc2+=scale; // this does the x scaling down if needed... - skip the unwanted pixels
             }
-            lpSrc=(ULong*)(ULong(lpSrc)+lPitch);
-            lpDst=(UWord*)(ULong(lpDst)+ddsdDst.lPitch);
+            lpSrc=(ULong*)(uintptr_t(lpSrc)+lPitch);
+            lpDst=(UWord*)(uintptr_t(lpDst)+ddsdDst.lPitch);
         }
     }
     break;
@@ -5291,7 +5291,7 @@ inline HRESULT Lib3D::CopyMapToSurface( MAPDESC *pMapDesc,LPDIRECTDRAWSURFACE7 &
         UByte *pSrc=pMapDesc->body;
         for (int i=scaledH; i>0; i--)
         {
-            UWord *pNxt=(UWord*)(ULong(pDst)+ddsd.lPitch);
+            UWord *pNxt=(UWord*)(uintptr_t(pDst)+ddsd.lPitch);
             UByte *pSr2=pSrc+stepY;
             for (int j=scaledW; j>0; *pDst++=pPal[*pSrc],pSrc+=stepX,j--);
             pDst=pNxt;
@@ -5318,7 +5318,7 @@ inline HRESULT Lib3D::CopyMapToSurface( MAPDESC *pMapDesc,LPDIRECTDRAWSURFACE7 &
         UByte *pTrn=pMapDesc->alpha;
         for (int i=scaledH; i>0; i--)
         {
-            UWord *pNxt=(UWord*)(ULong(pDst)+ddsd.lPitch);
+            UWord *pNxt=(UWord*)(uintptr_t(pDst)+ddsd.lPitch);
             UByte *pTr2=pTrn+stepY;
             for (int j=scaledW; j>0; pTrn+=stepX,j--)
                 *pDst++=alphaSMsk+(UWord(pTrn[0]>>alphaBits)<<alphaShift);
@@ -5348,7 +5348,7 @@ inline HRESULT Lib3D::CopyMapToSurface( MAPDESC *pMapDesc,LPDIRECTDRAWSURFACE7 &
         UByte *pTrn=pMapDesc->alpha;
         for (int i=scaledH; i>0; i--)
         {
-            UWord *pNxt=(UWord*)(ULong(pDst)+ddsd.lPitch);
+            UWord *pNxt=(UWord*)(uintptr_t(pDst)+ddsd.lPitch);
             UByte *pSr2=pSrc+stepY;
             UByte *pTr2=pTrn+stepY;
             for (int j=scaledW; j>0; pSrc+=stepX,pTrn+=stepX,j--)
@@ -5613,7 +5613,7 @@ inline HRESULT Lib3D::_CreateTextureMap(MAPDESC *pMapDesc,LPDIRECTDRAWSURFACE7 &
         UByte *pSrc=pMapDesc->body;
         for (int i=scaledH; i>0; i--)
         {
-            UWord *pNxt=(UWord*)(ULong(pDst)+ddsd.lPitch);
+            UWord *pNxt=(UWord*)(uintptr_t(pDst)+ddsd.lPitch);
             UByte *pSr2=pSrc+stepY;
             for (int j=scaledW; j>0; *pDst++=pPal[*pSrc],pSrc+=stepX,j--);
             pDst=pNxt;
@@ -5640,7 +5640,7 @@ inline HRESULT Lib3D::_CreateTextureMap(MAPDESC *pMapDesc,LPDIRECTDRAWSURFACE7 &
         UByte *pTrn=pMapDesc->alpha;
         for (int i=scaledH; i>0; i--)
         {
-            UWord *pNxt=(UWord*)(ULong(pDst)+ddsd.lPitch);
+            UWord *pNxt=(UWord*)(uintptr_t(pDst)+ddsd.lPitch);
             UByte *pTr2=pTrn+stepY;
             for (int j=scaledW; j>0; pTrn+=stepX,j--)
                 *pDst++=alphaSMsk+(UWord(pTrn[0]>>alphaBits)<<alphaShift);
@@ -5670,7 +5670,7 @@ inline HRESULT Lib3D::_CreateTextureMap(MAPDESC *pMapDesc,LPDIRECTDRAWSURFACE7 &
         UByte *pTrn=pMapDesc->alpha;
         for (int i=scaledH; i>0; i--)
         {
-            UWord *pNxt=(UWord*)(ULong(pDst)+ddsd.lPitch);
+            UWord *pNxt=(UWord*)(uintptr_t(pDst)+ddsd.lPitch);
             UByte *pSr2=pSrc+stepY;
             UByte *pTr2=pTrn+stepY;
             for (int j=scaledW; j>0; pSrc+=stepX,pTrn+=stepX,j--)
@@ -13531,7 +13531,7 @@ void Lib3D::RenderPolyList(SPolygon* &pHead)
 //#define DO_INDEXED_VB
 
     lpD3DVB7=gpD3DVB7;
-    offset=ULong(&pHead->material.uniqueTextID)-ULong(pHead);
+    offset=uintptr_t(&pHead->material.uniqueTextID)-uintptr_t(pHead);
     pHead=(SPolygon*)RadixSortAscending((radix_sort_t*)pHead,offset);
     HMATERIAL* curmat=&pHead->material;
     InlineSetCurrentMaterial( *curmat, ULong( curmat->materialFlags) );
@@ -13736,7 +13736,7 @@ void Lib3D::RenderTPolyList(SPolygon *pHead)
     GetViewPort( /*pD3DDEV7,*/ sx, sy, cx, cy );
 
     lpD3DVB7=gpD3DVB7;
-    offset=ULong(&pHead->zbuffer)-ULong(pHead);
+    offset=uintptr_t(&pHead->zbuffer)-uintptr_t(pHead);
     pHead=(SPolygon*)RadixSortDescending((radix_sort_t*)pHead,offset);
 //	curmat=0xFFFF;
 //	hr=pD3DDEV7->SetMaterial(&materialMapped);
@@ -15091,8 +15091,8 @@ HRESULT Lib3D::MakeMipLevel(LPDIRECTDRAWSURFACE7 pddsSrc,LPDIRECTDRAWSURFACE7 pd
         UWord *pdst2=pdst;
         ULong *psrc2=psrc;
         for (DWORD x=ddsdDst.dwWidth; x>0; x--) *pdst2++=*psrc2++;
-        pdst=(UWord*)(ULong(pdst)+ddsdDst.lPitch);
-        psrc=(ULong*)(ULong(psrc)+(ddsdSrc.lPitch<<1));
+        pdst=(UWord*)(uintptr_t(pdst)+ddsdDst.lPitch);
+        psrc=(ULong*)(uintptr_t(psrc)+(ddsdSrc.lPitch<<1));
     }
     pddsSrc->Unlock(NULL);
     pddsDst->Unlock(NULL);
@@ -15255,11 +15255,11 @@ public:
     }
     void incByBytes( int val )
     {
-        data=(UWord*)( ULong(data)+val );
+        data=(UWord*)( uintptr_t(data)+val );
     }
     void decByBytes( int val )
     {
-        data=(UWord*)( ULong(data)-val );
+        data=(UWord*)( uintptr_t(data)-val );
     }
 };
 
@@ -15297,11 +15297,11 @@ public:
     }
     void incByBytes( int val )
     {
-        data=(ULong*)( ULong(data)+val );
+        data=(ULong*)( uintptr_t(data)+val );
     }
     void decByBytes( int val )
     {
-        data=(ULong*)( ULong(data)-val );
+        data=(ULong*)( uintptr_t(data)-val );
     }
 };
 
@@ -15315,7 +15315,7 @@ public:
 	{																				\
 		flipSource = true;															\
 		sourceHeight =- sourceHeight;												\
-		lpSrc=(ULong*) (ULong(pSourceData) + (sourceHeight-1)*sourcePitch);			\
+		lpSrc=(ULong*) (uintptr_t(pSourceData) + (sourceHeight-1)*sourcePitch);			\
 	} else																			\
 	{																				\
 		flipSource = false;															\
@@ -16866,7 +16866,7 @@ void	Lib3D::SetMasterShading( LIGHTFLAG& lf )							//JON 29Sep00
         (p1)->material=hLastMaterial;
         (p1)->orcode=0;
         (p1)->andcode=0xFFFF;
-        (p1)->pVertexList=(SVertex*)(ULong(p1)+sizeof(SPolygon));
+        (p1)->pVertexList=(SVertex*)(uintptr_t(p1)+sizeof(SPolygon));
         {
             SVertex *pp=(p1)->pVertexList;
             for (int q=(p2)-1; q>0; q--,pp++)
@@ -16887,7 +16887,7 @@ void	Lib3D::SetMasterShading( LIGHTFLAG& lf )							//JON 29Sep00
         (p1)->material=hLastMaterial;
         (p1)->orcode=0;
         (p1)->andcode=0xFFFF;
-        (p1)->pVertexList=(SVertex*)(ULong(p1)+sizeof(SPolygon));
+        (p1)->pVertexList=(SVertex*)(uintptr_t(p1)+sizeof(SPolygon));
     }
 
     inline void Lib3D::ALLOCATE_POLYGON_TNL( SPolygon* &p1, const ULong &p2 )
@@ -16895,7 +16895,7 @@ void	Lib3D::SetMasterShading( LIGHTFLAG& lf )							//JON 29Sep00
         (p1)=(SPolygon*)Alloc(sizeof(SPolygon)+(p2)*sizeof(TNLSVertex));
         (p1)->vertexcount=(p2);
         (p1)->material=hLastMaterial;
-        (p1)->pVertexList=(SVertex*)(ULong(p1)+sizeof(SPolygon));
+        (p1)->pVertexList=(SVertex*)(uintptr_t(p1)+sizeof(SPolygon));
     }
 
     inline void Lib3D::ADD_POLYGON( SPolygon* &l1, SPolygon* &p1 )

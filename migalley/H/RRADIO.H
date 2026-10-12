@@ -18,6 +18,7 @@
 
 #include <vector>
 #include "CSTRING.H"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 /////////////////////////////////////////////////////////////////////////////
 // CRRadio wrapper class

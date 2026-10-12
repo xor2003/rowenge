@@ -1891,7 +1891,7 @@ void Graphic::SetColour(ImageMapDescPtr image)
 
 	imageptr = image->body;										//RJS 06Feb98
 
-	Colour c=(Colour)(ULong)image->alpha;
+	Colour c=(Colour)(uintptr_t)image->alpha;
 
 	ASM_SetColour(c,image->w,image->h,imageptr);	//PD 21Dec95
 }
@@ -2069,11 +2069,11 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 
 			x = x1;
 
-			scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+			scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 			*scradr = linecol;	// PlotPixel(x,y);
 
-			for (;disty--;scradr=(UWord*)(ULong(scradr)+rsd.lPitch),y++)
+			for (;disty--;scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch),y++)
 				*scradr = linecol;	//	PlotPixel(x,y);
 
 			Master()->DoUnlockScr(&rsd);
@@ -2088,7 +2088,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 
 			y = y1;
 
-			scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+			scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 			*scradr = linecol;	// PlotPixel(x,y);
 
@@ -2115,7 +2115,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 				x = x1; y = y1;
 			}
 
-			scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+			scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 			*scradr = linecol;	// PlotPixel(x,y);
 
@@ -2133,7 +2133,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 					{
 						y++;
 
-						scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+						scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 
 						p += const2;
 					}
@@ -2157,7 +2157,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 					{
 						y--;
 
-						scradr=(UWord*)(ULong(scradr)-rsd.lPitch);
+						scradr=(UWord*)(uintptr_t(scradr)-rsd.lPitch);
 
 						p += const2;
 					}
@@ -2187,7 +2187,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 	 			x = x1; y = y1;
 	 		}
 
-			scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+			scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 			*scradr = linecol;	// PlotPixel(x,y);
 		
@@ -2197,7 +2197,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
  				{
  					y++;
 
-					scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+					scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 
 	 				if (p<0)
 	 					p += const1;
@@ -2221,7 +2221,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 	 			{
 	 				y++;
 
-					scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+					scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 
 	 				if (p<0)
 	 					p += const1;
@@ -2252,7 +2252,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 	 		x = x1; y = y1;
 		}
 
-		scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+		scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 		*scradr = linecol;	// PlotPixel(x,y);
 
@@ -2262,7 +2262,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 			{
 				x++; y++;
 
-				scradr=(UWord*)(ULong(scradr)+rsd.lPitch+2);
+				scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch+2);
 
 				*scradr = linecol;	// PlotPixel(x,y);
 			}
@@ -2273,7 +2273,7 @@ void Graphic::PlainLine(SWord x1,SWord y1,SWord x2,SWord y2)
 			{
 				x++; y--;
 
-				scradr=(UWord*)(ULong(scradr)-rsd.lPitch+2);
+				scradr=(UWord*)(uintptr_t(scradr)-rsd.lPitch+2);
 
 				*scradr = linecol;	// PlotPixel(x,y);
 			}
@@ -2336,11 +2336,11 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 
 		x = x1;
 
-		scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+		scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 		*(UWord*)scradr = linecol;					// PlotPixel(x,y);
 
-		for (;disty--;scradr=(UWord*)(ULong(scradr)+rsd.lPitch),y++)
+		for (;disty--;scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch),y++)
 			*(UWord*)scradr = linecol;				//	PlotPixel(x,y);
 
 		Master()->DoUnlockScr(&rsd);
@@ -2355,7 +2355,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 
 		y = y1;
 
-		scradr=(UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch) + (x<<1));
+		scradr=(UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch) + (x<<1));
 
 		*(UWord*)scradr = linecol;					// PlotPixel(x,y);
 
@@ -2383,7 +2383,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 			x = x1; y = y1;
 		}
 
-		scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+		scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 		*(UWord*)scradr = linecol;					// PlotPixel(x,y);
 
@@ -2401,7 +2401,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 				{
 					y++;
 
-					scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+					scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 
 					p += const2;
 				}
@@ -2425,7 +2425,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 				{
 					y--;
 
-					scradr=(UWord*)(ULong(scradr)-rsd.lPitch);
+					scradr=(UWord*)(uintptr_t(scradr)-rsd.lPitch);
 
 					p += const2;
 				}
@@ -2455,7 +2455,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 	 		x = x1; y = y1;
 	 	}
 
-		scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+		scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 		*(UWord*)scradr = linecol;			// PlotPixel(x,y);
 		
@@ -2465,7 +2465,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
  			{
  				y++;
 
-				scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+				scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 
 	 			if (p<0)
 	 				p += const1;
@@ -2489,7 +2489,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 	 		{
 	 			y++;
 
-				scradr=(UWord*)(ULong(scradr)+rsd.lPitch);
+				scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch);
 
 	 			if (p<0)
 	 				p += const1;
@@ -2520,7 +2520,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 	 	x = x1; y = y1;
 	}
 
-	scradr = (UWord*)(ULong(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
+	scradr = (UWord*)(uintptr_t(rsd.lpSurface)+(y*rsd.lPitch)+(x<<1));
 
 	*(UWord*)scradr = linecol;							// PlotPixel(x,y);
 
@@ -2530,7 +2530,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 		{
 			x++; y++;
 
-			scradr=(UWord*)(ULong(scradr)+rsd.lPitch+2);
+			scradr=(UWord*)(uintptr_t(scradr)+rsd.lPitch+2);
 
 			*(UWord*)scradr = linecol;					// PlotPixel(x,y);
 		}
@@ -2541,7 +2541,7 @@ void Graphic::PlainLine16(SWord x1,SWord y1,SWord x2,SWord y2)
 		{
 			x++; y--;
 
-			scradr=(UWord*)(ULong(scradr)-rsd.lPitch+2);
+			scradr=(UWord*)(uintptr_t(scradr)-rsd.lPitch+2);
 
 			*(UWord*)scradr = linecol;					// PlotPixel(x,y);
 		}
@@ -3165,15 +3165,15 @@ UWord Graphic::PlainRectangleFill(SWord X,SWord Y,SWord W,SWord H)
 	{
 		scanlineaddr = scradr;
 		j=W-3;
-		if	((ULong )scanlineaddr &0x00000003)
+		if	((uintptr_t)scanlineaddr &0x00000003)
 		{
 			*(char*) (scanlineaddr++) = colour;
 			j--;
-			if	((ULong )scanlineaddr &0x00000003)
+			if	((uintptr_t)scanlineaddr &0x00000003)
 			{
 				*(char*) (scanlineaddr++) = colour;
 				j--;
-				if	((ULong )scanlineaddr &0x00000003)
+				if	((uintptr_t)scanlineaddr &0x00000003)
 				{
 					*(char*) (scanlineaddr++) = colour;
 					j--;

@@ -5,6 +5,8 @@
 //Date           Thu 31 Jul 1997
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	BFENUM_Included
 #define	BFENUM_Included
 
@@ -31,4 +33,5 @@ enum	EnableComplexVal		//different names for the same thing...
 	};
 
 
+#pragma pack(pop)
 #endif

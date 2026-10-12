@@ -17,6 +17,7 @@
 // RERUN class CRCombo : public CWnd
 #include "DLGITEM.H" // RERUN: DlgItem base used below
 #include "FILES.H" // RERUN: FileNum used below
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 class CRCombo : public DlgItem // RERUN DlgItem is the real base class for all Rowan controls
 {
 private:

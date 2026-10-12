@@ -17,6 +17,8 @@
 //// Keys are not mapped to all these entries, but extras can be added externally
 //// This will make gaps in the key lists above.
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	KEYMAPS_Included
 #define	KEYMAPS_Included
 struct	KeyMapping
@@ -1547,5 +1549,5 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 #undef	KeyAll
 //#endif
 //#undef	SPECIAL_KEYMAPS
+#pragma pack(pop)
 #endif
-

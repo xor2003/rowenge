@@ -10,6 +10,8 @@
 //
 //
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	DISPLAY_Included
 #define	DISPLAY_Included
 
@@ -1298,5 +1300,5 @@ private:
 //{Master()->DoDomeHorizon(a,b);}
 
 //------------------------------------------------------------------------------
+#pragma pack(pop)
 #endif
-

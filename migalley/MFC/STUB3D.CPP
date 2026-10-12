@@ -164,7 +164,7 @@ Mast3d	Master_3d;
 HANDLE			hTimerQueue;  //RERUN Added
 
 static Uint32 SDLCALL Mast3d_TimerCallback(Uint32 interval, void *param) {
-    Mast3d::StaticTimeProc(0, 0, (DWORD)(UINT_PTR)param, 0, 0);
+    Mast3d::StaticTimeProc(0, 0, (DWORD_PTR)(UINT_PTR)param, 0, 0);
     return interval;
 }
 
@@ -177,7 +177,7 @@ Mast3d::Mast3d()
 	wTimerRes=std::max<int>(tcaps.wPeriodMin,1);
 	timeBeginPeriod (wTimerRes);
 #if USE_OLD_TIMER_CODE
-	uTimerID = timeSetEvent (20, wTimerRes, Master_3d.StaticTimeProc, (int)&Master_3d, TIME_PERIODIC);
+	uTimerID = timeSetEvent (20, wTimerRes, Master_3d.StaticTimeProc, (DWORD_PTR)(uintptr_t)(int)&Master_3dMaster_3d, TIME_PERIODIC);
 #else
 	int periodicTime, dueTime;
 	periodicTime = dueTime= 20;
@@ -238,7 +238,7 @@ void	Mast3d::MainInit(void)
 
 	_DPlay.Implemented = BOOL_FALSE;
 
-	_Miles.Init((ULong)winst);											//RJS 02Nov98
+	_Miles.Init((uintptr_t)winst);											//RJS 02Nov98
 	MigDisplay* Whole_Screen;
 
 	_DirectDraw::lpDirectDD=new DirectDD;
@@ -799,7 +799,7 @@ View3d::~View3d()
 
 	MakeResize(WinMode::NONE);
 
-	_Miles.InitUI((int)window);									//DAW 06Apr99
+	_Miles.InitUI((intptr_t)window);									//DAW 06Apr99
 	Log_Stack.UnLog(LogStack::MESSAGELOOP);
 }
 
@@ -850,7 +850,7 @@ int	View3d::MakePassive(WinMode::Mode	v,const CRect* pos,bool flag,bool flag2)
 	Whole_Screen=new MigDisplay(this);
 	Whole_Screen->DD.hWnd = window;
 	Whole_Screen->DD.hWndApp = Master_3d.winst;
-	_Miles.SetDirectSoundWindow((ULong)Master_3d.winst);
+	_Miles.SetDirectSoundWindow((uintptr_t)Master_3d.winst);
 	Whole_Screen->InitDirectDraw ();
 	Whole_Screen->Init(v,coords.left,coords.top,coords.right,coords.bottom);
 	View_Point=new ViewPoint(Whole_Screen,this);
@@ -858,7 +858,7 @@ int	View3d::MakePassive(WinMode::Mode	v,const CRect* pos,bool flag,bool flag2)
 	OverLay.SetViewpoint(View_Point);
 	OverLay.LoaderScreen(0);									//PD 02Mar99
 	_Miles.Init3D();											//RJS 06Apr99
-	_Miles.SetDirectSoundWindow((ULong)Master_3d.winst);
+	_Miles.SetDirectSoundWindow((uintptr_t)Master_3d.winst);
 	OverLay.LoaderScreen(0+32);									//PD 02Mar99
 
 	if (!flag)
@@ -962,7 +962,7 @@ View3d* Inst3d::Interactive(View3d* newwin)
 	if (newwin!=rv)
 		if (newwin)
 		{
-			_Analogue.Initialise((int)Master_3d.winst,(int)Master_3d.hinst);
+			_Analogue.Initialise((intptr_t)Master_3d.winst,(intptr_t)Master_3d.hinst);
 			if (Master_3d.g_lpDI)
 			if (!Master_3d.g_lpDIDevice)
 			{
@@ -1297,7 +1297,7 @@ void	Mast3d::QuitGame(void )
 }
 
 //DEADCODE DAW 17/02/00 static int	howcamehere;
-void CALLBACK Mast3d::StaticTimeProc(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2 )
+void CALLBACK Mast3d::StaticTimeProc(UINT uID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2 )
 {
 	ULong t=0;
 	if (_DPlay.Implemented)

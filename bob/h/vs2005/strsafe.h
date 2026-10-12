@@ -51,10 +51,10 @@ typedef _W64 unsigned int   size_t;
 
 #ifndef _HRESULT_DEFINED
 #define _HRESULT_DEFINED
-typedef __success(return >= 0) long HRESULT;
+typedef __success(return >= 0) int HRESULT;
 #endif
 
-typedef unsigned long DWORD;
+typedef unsigned int DWORD;   // LLP64: stays 32-bit
 
 
 // macros

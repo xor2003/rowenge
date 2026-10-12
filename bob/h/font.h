@@ -12,6 +12,8 @@
 // COleFont wrapper class
 //#pragma message ("<font.h>")
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 class COleFont : public COleDispatchDriver
 {
 public:
@@ -41,3 +43,6 @@ public:
 // Operations
 public:
 };
+
+
+#pragma pack(pop)

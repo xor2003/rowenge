@@ -20,8 +20,10 @@
  * Some types
  */
 
-#ifndef _WIN64
-#define DWORD_PTR DWORD
+#ifndef DWORD_PTR
+#include <stdint.h>
+typedef uintptr_t DWORD_PTR;
+#define DWORD_PTR DWORD_PTR
 #endif
 
 typedef LPVOID (*LPRGLPVOID)[];

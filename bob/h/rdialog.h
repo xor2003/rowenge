@@ -1,4 +1,6 @@
 #if !defined(AFX_RDIALOG_H__19CD38F4_A868_11D1_9B68_444553540000__INCLUDED_)
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #define AFX_RDIALOG_H__19CD38F4_A868_11D1_9B68_444553540000__INCLUDED_
 
 #if _MSC_VER >= 1000
@@ -435,7 +437,7 @@ public:
 // Implementation
 protected:
 	RDialog(int i,CWnd* w);
-	bool	OnSizeAxis(int oldw,int neww,long& curr,Edge act);
+	bool	OnSizeAxis(int oldw,int neww,SLong& curr,Edge act);
 	CRect	Place(PosnControl px,PosnControl py,int x=0,int y=0)
 	{	return	::Place(px,py,x,y,this);	}
 public:
@@ -593,4 +595,5 @@ localname&	operator +(realname&p)	{return (localname&)(p);}
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_RDIALOG_H__19CD38F4_A868_11D1_9B68_444553540000__INCLUDED_)

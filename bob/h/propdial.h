@@ -7,6 +7,8 @@
 // Description: 
 //
 //////////////////////////////////////////////////////////////////////
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #define PROJDIR	"\\BOB"
 #ifndef	PROPDIAL_H
 #define	PROPDIAL_H
@@ -78,4 +80,5 @@ inline void ComboTexts::SetComboList(CComboBox* combo)
 
 
 
+#pragma pack(pop)
 #endif

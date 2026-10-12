@@ -1,6 +1,8 @@
 // MIG.h : main header file for the MIG application
 //
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #if !defined(AFX_MIG_H__19CD38C5_A868_11D1_9B68_444553540000__INCLUDED_)
 #define AFX_MIG_H__19CD38C5_A868_11D1_9B68_444553540000__INCLUDED_
 
@@ -53,4 +55,5 @@ public:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 
+#pragma pack(pop)
 #endif // !defined(AFX_MIG_H__19CD38C5_A868_11D1_9B68_444553540000__INCLUDED_)

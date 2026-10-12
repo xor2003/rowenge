@@ -15,6 +15,8 @@
 
 
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MODEL_Included
 #define	MODEL_Included
 class Ctrl ;
@@ -577,4 +579,5 @@ void HURRICANE_SetupAI (AirStrucPtr const, ULong);	//CSB 27/10/99
 void BF109_SetupAI (AirStrucPtr const, ULong);		//CSB 27/10/99	
 void BF110_SetupAI (AirStrucPtr const, ULong);		//CSB 27/10/99	
 
+#pragma pack(pop)
 #endif

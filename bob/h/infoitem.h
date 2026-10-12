@@ -7,6 +7,8 @@
 // Description: info_item variants of item
 //
 ////////////////////////////////////////////////////////////////////////
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	INFOITEM_INCLUDED
 #define	INFOITEM_INCLUDED
 #include "uiicons.h"
@@ -373,4 +375,5 @@ int			usedpaintrules;
 //DEADCODE DAW 08/03/00 	ONLYFIELD(UByte,PlaneTypeSelect,escorttype);
 //DEADCODE DAW 08/03/00
 //DEADCODE DAW 08/03/00 };
+#pragma pack(pop)
 #endif

@@ -12,6 +12,7 @@
 #pragma pack()
 /////////////////////////////////////////////////////////////////////////////
 #include "DLGITEM.H"
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 // CRButton wrapper class
 
 class CRButton : public DlgItem

@@ -109,7 +109,7 @@ DDCAPS			DDHelCaps;
 //------------------------------------------------------------------------------
 short MigDisplay::GetDOSRAM(long& buffer, short size)
 {
-	buffer = (int)new char [size];
+	buffer = (intptr_t)new char [size];
 
 	return ((buffer!=0)?TRUE:FALSE);
 }

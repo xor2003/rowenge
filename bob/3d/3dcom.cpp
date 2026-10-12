@@ -6721,7 +6721,7 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 
 //	FPMATRIX_PTR	tmatp = &tmat;
 	R3DMATRIX tmat;
-	HMATRIX tmatp=HMATRIX(ULong(&tmat));
+	HMATRIX tmatp=HMATRIX(uintptr_t(&tmat));
 
 	UWord			rpm;										//RJS 02Sep97
 
@@ -14157,7 +14157,7 @@ int shape::GetLiveElementPos(int num, ItemPtr itm, SLong& x, SLong& y, SLong& z)
 				if (num==0)	return(actualeltnum);
 				num--;
 			}
-			aptr=(MinAnimData*)((int)aptr+GetElementAnimOffset(newshp));//RJS 20Nov97
+			aptr=(MinAnimData*)((intptr_t)aptr+GetElementAnimOffset(newshp));//RJS 20Nov97
 		}
 		x=y=z=0;
 		return(0);
@@ -15525,7 +15525,7 @@ UByteP	shape::GetLightDataPtr(ShapeNum	shpno, int	index)
 	UByteP			retval = NULL;
 
 	if (sdptr->LightDataOffset)
-		retval = (UByteP) ((ULong)sdptr + lsize + 1);			//RJS 19Dec97
+		retval = (UByteP) ((uintptr_t)sdptr + lsize + 1);			//RJS 19Dec97
 
 	return(retval);
 }
@@ -15923,7 +15923,7 @@ WeapAnimData* shape::GetWeaponLauncher(itemptr	itm, UByte	index,
 									break;
 								}
 					}
-					aptr=(MoveGunAnimData*)((int)aptr+GetElementAnimOffset(shape));//RJS 20Nov97
+					aptr=(MoveGunAnimData*)((intptr_t)aptr+GetElementAnimOffset(shape));//RJS 20Nov97
 				}
 				if (index!=0xff)
 					return(NULL);
@@ -23844,7 +23844,7 @@ void	shape::ProbeStaticTrail(UByteP	rsdptr, itemptr	itm,animptr&	aptr)
 
 			DrawSmokeTrail(index,NULL,TrailPtr->lifetime,TRUE);			//RJS 24Oct00
 
-			adptr->thelist = (ULong)TrailPtr->thelist;
+			adptr->thelist = (uintptr_t)TrailPtr->thelist;
 			adptr->currTime = TrailPtr->currTime;				//RJS 17Jun99
 		}
 	}
@@ -24927,7 +24927,7 @@ void	shape::GenerateProbeTrails()
 					realnopoints = howmany;
 
 				adptr->nopoints = realnopoints;
-				adptr->thelist = (ULong) TrailPtr->thelist;
+				adptr->thelist = (uintptr_t) TrailPtr->thelist;
 				adptr->lifetime = TrailPtr->lifetime;
 				adptr->SmkDescIndex = ((UByteP)TrailPtr->SmkDescPtr - (UByteP) &SmokeTrlList[0])/sizeof(SmokeType);
 				adptr->currTime = TrailPtr->currTime;						//RJS 16Jun99
@@ -29501,7 +29501,7 @@ int		animptr::operator - (animptr& a)
 
 	return (retval);
 #else
-	return (int)ptr - (int)a.ptr;
+	return (intptr_t)ptr - (intptr_t)a.ptr;
 #endif
 }
 

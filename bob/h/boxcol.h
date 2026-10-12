@@ -5,6 +5,8 @@
 //Date           Tue 26 Nov 1996
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	BOXCOL_Included
 #define	BOXCOL_Included
 
@@ -161,4 +163,5 @@ private:
 
 
 
+#pragma pack(pop)
 #endif

@@ -5,6 +5,8 @@
 //Date           Fri 22 Sep 1995
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	VERTEX_Included
 #define	VERTEX_Included
 
@@ -60,4 +62,5 @@ struct	vertex
 //DEAD	float fsy;
 };
 
+#pragma pack(pop)
 #endif

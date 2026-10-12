@@ -1,4 +1,5 @@
 #define IDC_RLIST_CAMPAIGNS             1000
+
 #define IDC_THUMBNAIL                   1001
 #define IDC_ZOOMIN                      1002
 #define IDC_FILES                       1003
@@ -1184,3 +1185,5 @@
 #define IDC_RBUTTONMISSIONFOLDER        2183
 #define IDC_RBUTTONASSIGNPATROL         2184
 #define IDC_STATICPRODUCTIONPAUSED      2185
+
+

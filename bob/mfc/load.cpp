@@ -298,7 +298,7 @@ void	CLoad::MakeFileList()
 		}
 	else
 		if (acnum==LSD_SAVE_DESELECT || acnum==LSD_LOAD_DESELECT)
-			((RowanDialog*)parent->parent)->acnum=(int)this;
+			((RowanDialog*)parent->parent)->acnum=(intptr_t)this;
 
 
 	currrow=found;

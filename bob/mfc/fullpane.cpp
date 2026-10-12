@@ -148,7 +148,7 @@ Bool RFullPanelDial::IntroSmackInitForCredits()
 }
 Bool RFullPanelDial::IntroSmackInit()
 {
-	Save_Data.InitPreferences((int)Master_3d.winst);
+	Save_Data.InitPreferences((intptr_t)Master_3d.winst);
 	if (	FILEMAN.existnumberedfile(FIL_VID_INTRO))
 		Save_Data.ChangeMode(SaveData::UIR_SMACKER);
 	UpdateSize();

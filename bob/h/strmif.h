@@ -5,6 +5,8 @@
 
  /* File created by MIDL compiler version 7.00.0555 */
 /* Compiler settings for strmif.idl:
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
@@ -23633,7 +23635,5 @@ extern RPC_IF_HANDLE __MIDL_itf_strmif_0000_0141_v0_0_s_ifspec;
 }
 #endif
 
+#pragma pack(pop)
 #endif
-
-
-

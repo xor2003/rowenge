@@ -14,6 +14,8 @@
 // MOST FIELDS ARE MARKED "C" for Constant or "S" for Saved
 // UNMARKED FIELDS ARE EITHER IN STRUCTURES THAT AREN'T SAVED, OR ARE LOOPHOLES!!!
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	KEEPINGTHIS
 #define KEEPINGTHIS
 struct	Attacks		//Saved
@@ -940,4 +942,5 @@ inline SupplyFightFiles* SupplyNode::FightFiles::operator->()
 	{if (fightfiles) return  fightfiles;else return &SupplyTree::DummyBlank;}
 
 
+#pragma pack(pop)
 #endif

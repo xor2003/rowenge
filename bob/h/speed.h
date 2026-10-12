@@ -5,6 +5,8 @@
 //Date           Wed 19 Jun 1996
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SPEED_Included
 #define	SPEED_Included
 
@@ -47,4 +49,5 @@ enum	speeds	{												//JIM 18Dec96 //CSB 08/11/99
 				};			
 
 
+#pragma pack(pop)
 #endif

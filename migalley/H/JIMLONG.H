@@ -13,8 +13,8 @@
 #pragma pack(push,1)
 
 #define	DEFAULT_JIMLONG 0
-typedef	unsigned long	ULong;
-typedef	signed long		SLong;
+typedef	unsigned int	ULong;	// LLP64: MSVC 'long' is 32-bit
+typedef	signed int		SLong;
 
 	struct	fake;
 	typedef	fake	__FAR & Xref;

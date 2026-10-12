@@ -32,6 +32,8 @@
 //#define PARAMS	int p, int s
 //#include "sagmove.h"  
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifdef sagmove_REQUIRED
 #ifndef PARAMS
 #define PARAMS
@@ -96,3 +98,6 @@ struct	sagmove_REQUIRED
 
 typedef SAGAirstruc SAGAirStruc;
 
+
+
+#pragma pack(pop)

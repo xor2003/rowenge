@@ -16,7 +16,7 @@
 
 
 
-//дддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд
+//О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 //Procedure	Graphic::UnpackNRow
 //------------------------------------------------------------------------------
 //Author		Paul.   
@@ -48,6 +48,7 @@
 
 //	#define LOADVALUE(x)	TRANSFERVALUE=*(TRANSFERVALUESIZE*)(ExpandBuff[x])
 //	#define COPYVALUE(x,y)	*((TRANSFERVALUESIZE*&)x)++=*(TRANSFERVALUESIZE*)(ExpandBuff[x])
+
 
 	#ifndef SAVEVALUE
 	#define SAVEVALUE(x)	*((TRANSFERVALUESIZE*&)x)++=TRANSFERVALUE
@@ -298,3 +299,5 @@
 #undef	COPYVALUE
 #undef	DELTAVALUE
 #undef TRANSFERVALUESIZE
+
+

@@ -5,6 +5,8 @@
 //Date           Thu 22 Aug 1996
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MISSSUB_Included
 #define	MISSSUB_Included
 
@@ -1181,4 +1183,5 @@ struct	PeriodReview:PeriodReviewBase
 
 #endif
 
+#pragma pack(pop)
 #endif

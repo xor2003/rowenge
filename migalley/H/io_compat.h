@@ -45,6 +45,7 @@ FILE* fopen_ci(const char* path, const char* mode);
 }
 
 #include <string>
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 // Resolve a Windows-style path component-by-component under
 // case-insensitive matching: '\' -> '/', existing components take the
 // on-disk spelling, the unresolved tail is kept verbatim (so a file yet

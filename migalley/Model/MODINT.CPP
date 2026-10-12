@@ -662,7 +662,7 @@ void Model::Animations (AirStrucPtr const ControlledAC)
 			{
 
 				case MA_SURFACE:
-					pModelAnim->pSrce = (void*)(pModelAnim->pSrcOffset + (ULong)ControlledAC);//RJS 20Jul98
+					pModelAnim->pSrce = (void*)(pModelAnim->pSrcOffset + (uintptr_t)ControlledAC);//RJS 20Jul98
 				case MA_AEROSURFACE:											//RJS 20Jul98
 					pModelAnim->ProcAnimSurface ();
 					break;
@@ -672,7 +672,7 @@ void Model::Animations (AirStrucPtr const ControlledAC)
 					break;
 
 				case MA_GENERICFP:
-					pModelAnim->pSrce = (void*)(pModelAnim->pSrcOffset + (ULong)ControlledAC);//RDH 10Sep98
+					pModelAnim->pSrce = (void*)(pModelAnim->pSrcOffset + (uintptr_t)ControlledAC);//RDH 10Sep98
 					pModelAnim->ProcAnimGenericFP ();
 					break;
 

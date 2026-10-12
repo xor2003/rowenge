@@ -742,7 +742,7 @@ void LandScape::ManageHighLandTextures(SLong px,SLong pz)
 			{
 				newTiles[new_tiles].newRez=srcVal;
 				newTiles[new_tiles++].offset=
-					(UWord)(ULong(pdst)-ULong(pLastGrid));
+					(UWord)(uintptr_t(pdst)-uintptr_t(pLastGrid));
 				*pdst=*psrc;
 			}
 			//test to see if a tile that was visible on the last frame
@@ -750,7 +750,7 @@ void LandScape::ManageHighLandTextures(SLong px,SLong pz)
 
 			else if (srcVal==0xFF)
 			{
-				UWord offset=(UWord)(ULong(pdst)-ULong(pLastGrid));
+				UWord offset=(UWord)(uintptr_t(pdst)-uintptr_t(pLastGrid));
 				if (!Save_Data.fSoftware)	currscreen->DoFreeTexture(*(pHTextureGrid+offset));
 				else						Three_Dee.pTMake->DoFreeTexture(*(pHTextureGrid+offset));
 				*(pHTextureGrid+offset)=HTEXTNULL;
@@ -760,7 +760,7 @@ void LandScape::ManageHighLandTextures(SLong px,SLong pz)
 
 			else
 			{
-				UWord offset=(UWord)(ULong(pdst)-ULong(pLastGrid));
+				UWord offset=(UWord)(uintptr_t(pdst)-uintptr_t(pLastGrid));
 				changedTiles[changed_tiles].oldHTexture=*(pHTextureGrid+offset);
 				if (!Save_Data.fSoftware)	currscreen->DoFreeTexture(changedTiles[changed_tiles].oldHTexture);
 				else						Three_Dee.pTMake->DoFreeTexture(changedTiles[changed_tiles].oldHTexture);
@@ -1416,7 +1416,7 @@ void LandScape::RenderTrees(UByte* pds,COORDS3D& view)
 
 	dummyItem.Anim=CloudAnimP;
 
-	SmallPoint* psp=(SmallPoint*)(ULong(&aph)+ULong(ddh.treeOffset));
+	SmallPoint* psp=(SmallPoint*)(uintptr_t(&aph)+uintptr_t(ddh.treeOffset));
 
 	SLong treeRnd=perm(ddh.treeOffset>>3);
 
@@ -2611,7 +2611,7 @@ int LandScape::ClippedTile(	UByte*& 	xpds,ULong& dl,
 
 	//abort if all polys were clipped
 
-	if (ULong(abortPtr)==ULong(pnds))
+	if (uintptr_t(abortPtr)==uintptr_t(pnds))
 	{
 		xpds=pds;
 		return 0;

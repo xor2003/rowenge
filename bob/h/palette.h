@@ -5,6 +5,8 @@
 //Date           Tue 4 Jul 1995
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	palette_Included
 #define	palette_Included
 
@@ -213,4 +215,5 @@ const	Colour		PAL_ICNACT_COLOUR = (Colour )48;		//Icon greyed out base colour//R
 const	Colour		TEXT_MIDGRY_COLOUR = (Colour )40;
 const	Colour		TEXT_TYPEWRITERRED = (Colour )16;
 
+#pragma pack(pop)
 #endif

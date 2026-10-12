@@ -6,6 +6,8 @@
 //Description    Contour list cache.
 //				 This tells a truck how to move along
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	CONTLIST_Included
 #define	CONTLIST_Included
 
@@ -42,4 +44,5 @@ static
 
 
 
+#pragma pack(pop)
 #endif

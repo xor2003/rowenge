@@ -1805,7 +1805,7 @@ void direct_draw::MakePaletteFadeTable(	struct _DirectDraw* pdirectd,
 	
 	for (i=255,srcRGB=psrcpal+3*i;i>=0;i--,srcRGB-=3)
 	{
-		UWord*  newCol=(UWord*)(ULong(plut)+(i<<5));
+		UWord*  newCol=(UWord*)(uintptr_t(plut)+(i<<5));
 		
 		UByte	*redptr=redbaseptr+(ULong(srcRGB[1]>>redShift2)<<10),
 				*greenptr=greenbaseptr+(ULong(srcRGB[2]>>greenShift2)<<10),

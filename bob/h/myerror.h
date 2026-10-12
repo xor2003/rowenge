@@ -5,6 +5,8 @@
 //Date           Fri 6 Oct 1995
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	error_Included
 #define	error_Included
 
@@ -98,4 +100,5 @@ extern	class Error	_Error;
 		#define myassert(expr) {assert(expr);}
 	#endif
 
+#pragma pack(pop)
 #endif

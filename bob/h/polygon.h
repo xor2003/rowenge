@@ -6,6 +6,7 @@
 //Description    
 //------------------------------------------------------------------------------
 /*#ifndef	POLYGON_Included
+
 #define	POLYGON_Included
 
 #define	DEFAULT_POLYGON 0
@@ -408,3 +409,4 @@ class	polygon
 
 #endif
 */
+

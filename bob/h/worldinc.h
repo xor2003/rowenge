@@ -5,6 +5,8 @@
 //Date           Thu 19 Oct 1995
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	WORLDINC_Included
 #define	WORLDINC_Included
 #include	"movement.h"										//RDH 19Feb96
@@ -308,7 +310,7 @@ struct	ITEM_STATUS
 //				Drawn:		1;
 //	ITEM_SIZE	size:		5;
 //	UByte		deadtime:	5,	//max=32
-//				deadscale:	2;	//¬hours/2hours/days/weeks
+//				deadscale:	2;	//ï¿½hours/2hours/days/weeks
 //	ITEM_STATUS() {};
 
 	ITEM_STATUS()
@@ -1745,6 +1747,5 @@ public:
 enum	ScaleType {SHP_1CM=0,SHP_4CM,SHP_16CM,SHP_GRP};			//PD 06Mar96
 
 
+#pragma pack(pop)
 #endif
-
-

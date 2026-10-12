@@ -11,6 +11,8 @@
 /////////////////////////////////////////////////////////////////////////////
 // CPicture wrapper class
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 class CPicture : public COleDispatchDriver
 {
 public:
@@ -31,3 +33,6 @@ public:
 public:
 	// method 'Render' not emitted because of invalid return type or parameter type
 };
+
+
+#pragma pack(pop)

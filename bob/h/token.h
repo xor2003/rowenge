@@ -5,6 +5,8 @@
 //Date           Mon 1 Apr 1996
 //Description    Header file for the token dictionary class
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	TOKEN_Included
 #define	TOKEN_Included
 
@@ -275,5 +277,5 @@ class	TokenSpell:public DataInst
 };
 extern	TokenSpell _Token;
 
+#pragma pack(pop)
 #endif
-

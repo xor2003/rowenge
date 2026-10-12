@@ -46,10 +46,10 @@ extern "C" {
 
 typedef unsigned char  UBYTE;
 typedef unsigned short UWORD;
-typedef unsigned long  ULONG;
+typedef unsigned int   ULONG;   // LLP64: stays 32-bit
 typedef char  BYTE;
 typedef short WORD;
-typedef long  LONG;
+typedef int   LONG;   // LLP64: stays 32-bit
 
 #endif
 

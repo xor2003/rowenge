@@ -2724,7 +2724,7 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 	//assert(globalTriCount>=ddhDst.noOfPolys);
 
 	ddhDst.totalTris=globalTriCount;	//for HW execute buffer fill test
-	ddhDst.lineOffset=ULong(pDst)-ULong(pDataStart);
+	ddhDst.lineOffset=uintptr_t(pDst)-uintptr_t(pDataStart);
 	UByte *lineDB = pDst; // needed later for cliff and tree work.
 	{
 	for (int i=0;i<ddhSrc.noOfLines;i++)
@@ -2790,7 +2790,7 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 
 		aphDst.MakeChecksum();		//CHECKSUM!!!
 
-		dataLen=ULong(pDst)-ULong(pDataStart);
+		dataLen=uintptr_t(pDst)-uintptr_t(pDataStart);
 
 		return;
 	}
@@ -2832,7 +2832,7 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 	// generate sheep, cows etc...
 	ULong polyCount;
 	ddhDst.noOfSheep = 0;
-	ddhDst.sheepOffset = ULong(pDst)-ULong(pDataStart);
+	ddhDst.sheepOffset = uintptr_t(pDst)-uintptr_t(pDataStart);
 //	if ( rez < TILE_REZ_LIMIT_ITEM )
 	if ( doSheep )
 	{ // do the items...
@@ -2929,7 +2929,7 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 		if ( cumItemCount < 6 )
 		{ // right not enough to bother with, scrap all
 			ddhDst.noOfSheep = 0;
-			pDst = (UByte*) (ULong(pDataStart) + ddhDst.sheepOffset);
+			pDst = (UByte*) (uintptr_t(pDataStart) + ddhDst.sheepOffset);
 		}
 	
 		// now add in trees
@@ -3054,9 +3054,9 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 			}
 		}
 	}
-	ddhDst.edgeOffset=ULong(pDst)-ULong(pDataStart);
+	ddhDst.edgeOffset=uintptr_t(pDst)-uintptr_t(pDataStart);
 	sorter.output( pDst );
-	ddhDst.cliffOffset = ULong(pDst)-ULong(pDataStart);
+	ddhDst.cliffOffset = uintptr_t(pDst)-uintptr_t(pDataStart);
 	bool* cliffFlag = (bool*)pDst++;
 	*cliffFlag = false;
 	UByte* pointCliff = pDst;
@@ -3133,7 +3133,7 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 
 	aphDst.MakeChecksum();		//CHECKSUM!!!
 
-	dataLen=ULong(pDst)-ULong(pDataStart);
+	dataLen=uintptr_t(pDst)-uintptr_t(pDataStart);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3335,7 +3335,7 @@ void CDecompressData::MakeIntermediateData()
 	//Prepare to record the edge definitions
 	EdgeDef* ped=(EdgeDef*)ppd;
 	edgeDefs=ped;
-	aph.edgeListStart=ULong(ped)-ULong(&aph);
+	aph.edgeListStart=uintptr_t(ped)-uintptr_t(&aph);
 
 	//Rearrange the draw data
 	GenerateEdges( aph.hasCliffs );
@@ -3344,14 +3344,14 @@ void CDecompressData::MakeIntermediateData()
 
 	pDst=(UByte*)ped;
 	pDst+=sizeof(EdgeDef)*edgeCount;
-	aph.edgePointsStart=ULong(pDst)-ULong(&aph);
+	aph.edgePointsStart=uintptr_t(pDst)-uintptr_t(&aph);
 
 	//Copy back the edge point data
 	{
 	for (int i=0;i<edgePointLen;i++) *pDst++=edgePoints[i];
 	}
 
-	aph.polyDataStart=ULong(pDst)-ULong(&aph);
+	aph.polyDataStart=uintptr_t(pDst)-uintptr_t(&aph);
 
 	DrawDataHdr& ddh=*(DrawDataHdr*)pDst;
 	pDst+=sizeof(ddh);
@@ -3366,7 +3366,7 @@ void CDecompressData::MakeIntermediateData()
 
 	aph.MakeChecksum();		//CHECKSUM!!!
 
-	dataLen=ULong(pDst)-ULong(&aph);
+	dataLen=uintptr_t(pDst)-uintptr_t(&aph);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3495,9 +3495,9 @@ void CDecompressData::GenerateEdges( UByte& hasCliffs )
 		}
 	}
 
-	polyStreamLen=ULong(ppd)-ULong(newPolyStream);
-	lineStreamLen=ULong(pld)-ULong(newLineStream);
-	edgePointLen=ULong(pep)-ULong(edgePoints);
+	polyStreamLen=uintptr_t(ppd)-uintptr_t(newPolyStream);
+	lineStreamLen=uintptr_t(pld)-uintptr_t(newLineStream);
+	edgePointLen=uintptr_t(pep)-uintptr_t(edgePoints);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3699,7 +3699,7 @@ int i;
 	if (pntCnt==0)
 		ed.edgeOffset=UWord(0);
 	else{
-		ed.edgeOffset=UWord(ULong(pep)-ULong(edgePoints));
+		ed.edgeOffset=UWord(uintptr_t(pep)-uintptr_t(edgePoints));
 		for (int j=0;j<pntCnt;j++) *pep++=*pntLst++;
 	}
 

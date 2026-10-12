@@ -5,6 +5,8 @@
 //Date           Tue 20 Oct 1998
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	ANIMMOVE_Included
 #define	ANIMMOVE_Included
 
@@ -137,4 +139,5 @@ public:
 
 extern class AnimControl Anim_Control;
 
+#pragma pack(pop)
 #endif

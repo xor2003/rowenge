@@ -5,6 +5,8 @@
 //Date           Tue 19 Sep 1995
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	WORLD_Included
 #define	WORLD_Included
 
@@ -126,4 +128,5 @@ struct	WorldSearch
 			return(currelt);
 		}
 };
+#pragma pack(pop)
 #endif

@@ -26,7 +26,7 @@ extern "C" {
 
 typedef WORD            TRANSITION_TYPE;
 typedef __int64         REFERENCE_TIME;
-typedef long            MUSIC_TIME;
+typedef int             MUSIC_TIME;
 
 #define DMUS_PPQ        768     /* parts per quarter note */
 

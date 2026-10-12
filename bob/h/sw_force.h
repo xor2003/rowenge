@@ -1,5 +1,7 @@
 /****************************************************************************
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
     MODULE:     	SW_Force.H
 	Tab settings: 	5 9
 
@@ -459,4 +461,5 @@ typedef struct _VFX_PARAM
 } VFX_PARAM, *PVFX_PARAM;
 
 
+#pragma pack(pop)
 #endif // of ifdef _SW_Force_SEEN

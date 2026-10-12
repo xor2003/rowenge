@@ -8,6 +8,7 @@
 //				Scales linear volume (0 - 511) to 100 x db
 //
 //------------------------------------------------------------------------------
+
 #ifndef	VOLSCALE_Included
 #define	VOLSCALE_Included
 
@@ -534,4 +535,3 @@ static	SWord	Vol_Table[] =
 
 
 #endif
-

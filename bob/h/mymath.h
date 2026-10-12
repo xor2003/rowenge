@@ -5,6 +5,8 @@
 //Date           Thu 21 Sep 1995
 //Description    Starter for 10... base 10 that is!
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	MATH_Included
 #define	MATH_Included
 
@@ -162,7 +164,7 @@ static	UWord	AbsSign(SWord	inputvar)
 static	SLong	AbsSign(SLong	inputvar)
 {	return(UseSign(inputvar,GetSign(inputvar)));}
 static	UWord	AbsSign(ANGLES	inputvar)
-{	return(UseSign(inputvar,GetSign(inputvar)));}
+{	return(UseSign((SWord)(int)inputvar,GetSign(inputvar)));}
 
 SWord MonthFromDays (SWord daysinyear, SWord &daysinfullmonth,SWord leapyear );
 void DateFromSecs (SLong secs, SWord &day, SWord &month, SWord &year);
@@ -228,5 +230,5 @@ inline Float FPATan(Float opp, Float adj)
 
 #endif
 
+#pragma pack(pop)
 #endif
-

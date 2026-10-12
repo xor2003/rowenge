@@ -19,6 +19,7 @@
 #include "WIN32_COMPAT.H"
 #include <deque>
 #include <string.h>
+#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,7 +109,7 @@ typedef IUnknown *LPUNKNOWN;
 #ifndef GUID_DEFINED
 #define GUID_DEFINED
 typedef struct _GUID {
-    unsigned long  Data1;
+    unsigned int   Data1;
     unsigned short Data2;
     unsigned short Data3;
     unsigned char  Data4[8];

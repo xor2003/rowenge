@@ -5,6 +5,8 @@
 //Date           Mon 19 Feb 1996
 //Description
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	VIEWSEL_Included
 #define	VIEWSEL_Included
 
@@ -738,4 +740,5 @@ protected:
 
 //extern class ViewPoint View_Point;
 
+#pragma pack(pop)
 #endif

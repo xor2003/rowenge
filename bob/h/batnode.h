@@ -3,6 +3,8 @@
 //
 //
 
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 struct	TeamDef;
 struct	SuperBattleNode;
 struct	SuperBattleNode
@@ -148,3 +150,6 @@ struct	SuperBattleDesc
 	}	header;
 	SuperBattleNode	nodelist[MAXNODES];
 };
+
+
+#pragma pack(pop)

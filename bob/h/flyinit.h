@@ -5,6 +5,8 @@
 //Date           Mon 4 Dec 1995
 //Description    project specific list of planeytpes
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	FLYINIT_Included
 #define	FLYINIT_Included
 
@@ -559,6 +561,5 @@ enum	QuickMissDamageTypes
 	QMD_RANDOMLEVEL	=0x10000	//Add a level to set the max. level.
 };
 
+#pragma pack(pop)
 #endif
-
-

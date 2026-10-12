@@ -5,6 +5,8 @@
 //Date           Mon 24 Jan 2000
 //Description    
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	SQDDIARY_Included
 #define	SQDDIARY_Included
 
@@ -608,4 +610,5 @@ extern	Diary	Squad_Diary;
 
 																		   
 
+#pragma pack(pop)
 #endif

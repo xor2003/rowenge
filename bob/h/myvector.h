@@ -10,6 +10,8 @@
 //				That would mean dirtily using far pointers, probably.
 //
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	VECTOR_Included
 #define	VECTOR_Included
 
@@ -1198,5 +1200,5 @@ inline	Bool operator!=(vector A,vector B)
 
 //const vector ORIGIN = vector(0,0,0);
 
+#pragma pack(pop)
 #endif
-

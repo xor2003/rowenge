@@ -484,7 +484,7 @@ void	ItemBase::operator delete(void* area)
 	if (it->MigStatus.LaunchFlags.size==ItemBaseSize)
 		::delete(ItemBasePtr)it;
 	else
-		if (int(ItemPtr(it)->Next) == -1)
+		if (intptr_t(ItemPtr(it)->Next) == -1)
 		{
 			switch (it->MigStatus.LaunchFlags.size)
 			{

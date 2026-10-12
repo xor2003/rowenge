@@ -6,6 +6,8 @@
 //Description
 //BOOL BitBlt( int x, int y, int nWidth, int nHeight, CDC* pSrcDC, int xSrc, int ySrc, DWORD dwRop );
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	UIICONS_Included
 #define	UIICONS_Included
 
@@ -99,4 +101,5 @@ public:
 	virtual bool	OrIcon(CDC* target,const CPoint& p,Alignment x=MINIMUM,Alignment y=MINIMUM);
 	virtual bool	AndIcon(CDC* target,const CPoint& p,Alignment x=MINIMUM,Alignment y=MINIMUM);
 };
+#pragma pack(pop)
 #endif

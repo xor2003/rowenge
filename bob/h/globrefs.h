@@ -4,6 +4,8 @@
 //
 //	See also "..\bfields\globrefs.txt" for interface to battlefield system 
 //
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifdef	pass
 #if	pass==1
 
@@ -325,3 +327,6 @@ Winmove.obj :  GR_H2H_PT2
 Comms.obj :    GR_H2H_PT1
 Winmove.obj :  GR_H2H_PT1
 */
+
+
+#pragma pack(pop)

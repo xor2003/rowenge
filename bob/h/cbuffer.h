@@ -5,6 +5,8 @@
 //Date           Tue 28 Apr 1998
 //Description    Circular buffer used for comms
 //------------------------------------------------------------------------------
+#pragma pack(push,1)	// self-assert: dosdefs-era headers require pack(1)
+									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	BUFFER_Included
 #define	BUFFER_Included
 
@@ -168,4 +170,5 @@ public:
 };
 
 
+#pragma pack(pop)
 #endif
