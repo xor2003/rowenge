@@ -1,0 +1,58 @@
+[MFC_stub] Loading dialog templates from MIG_RC.json
+[RCParser] Loaded 0 captions from JSON.
+[CDialog::Create] ID=158 No caption found in g_dlgCaptions.
+fopen failed!!! English/text/migall.hlp (file 7107)
+fopen failed!!! English/text/migpanes.hlp (file 7106)
+fopen failed!!! English/text/migtabs.hlp (file 7105)
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[MFC_stub] Found system font: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+[CDialog::Create] ID=960 No caption found in g_dlgCaptions.
+[CDialog::Create] ID=828 No caption found in g_dlgCaptions.
+[CDialog::Create] ID=826 No caption found in g_dlgCaptions.
+[CDialog::Create] ID=965 No caption found in g_dlgCaptions.
+[CDialog::Create] ID=942 No caption found in g_dlgCaptions.
+[CDialog::Create] ID=819 No caption found in g_dlgCaptions.
+[CDialog::Create] ID=959 No caption found in g_dlgCaptions.
+[RDEmptyD] Manually created IDJ_TITLE, missing from template?
+[CDialog::Create] ID=823 Set Fallback Caption='System'
+[MFC_stub] WARNING WARNING SetWindowPos called with zero size, ignoring size change.
+[DIAL] viewrect=(320,60,1600,1020) sheet=(850,650,921,694)
+[CDialog::Create] ID=827 No caption found in g_dlgCaptions.
+[RDEmptyD] Manually created IDJ_TITLE, missing from template?
+[CDialog::Create] ID=254 No caption found in g_dlgCaptions.
+[DDX_Control] Warning: Metadata found for control ID 2063 in Dialog 254 but its type (9CRListBox) is not a CRButton or CRRadio.
+[MFC_stub] WARNING WARNING SetWindowPos called with zero size, ignoring size change.
+[DIAL] viewrect=(0,0,1024,768) sheet=(0,0,1024,768)
+fopen failed!!! savegame/settings.mig (file 3408)
+OpenSmack: smacker/intro.smk (640x332 @ 15.1515fps)
+[MFC_stub] window watchdog armed on X window 0x200008
+[IN] DOWN btn=1 hwnd=0x63da7240 wnd=0x613c1c90 sdlwin=0x613b8950 at 800,450 cap=0
+[IN] UP btn=1 hwnd=0x63da7240 wnd=0x613c1c90 sdlwin=0x613b8950 at 800,450 cap=0
+[DISP] DOWN hwnd=0x63da7240 be=0x63da7258 owner=0x61552e50 type=14RFullPanelDial
+[DISP] UP hwnd=0x63da7240 be=0x63da7258 owner=0x61552e50 type=14RFullPanelDial
+[IN] DOWN btn=1 hwnd=0x63da71e0 wnd=0x613c1c90 sdlwin=0x613b8950 at 140,71 cap=0
+[IN] UP btn=1 hwnd=0x63da71e0 wnd=0x613c1c90 sdlwin=0x613b8950 at 140,71 cap=0
+[DISP] DOWN hwnd=0x63da71e0 be=0x63da7348 owner=0x61552ff5 type=9CRListBox
+[DISP] UP hwnd=0x63da71e0 be=0x63da7348 owner=0x61552ff5 type=9CRListBox

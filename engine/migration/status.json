@@ -1,0 +1,113 @@
+{
+  "milestone": "M3",
+  "status": "IN_PROGRESS",
+  "date": "2026-10-06",
+  "supersedes": "M2 (2026-10-06 PASS_WITH_FINDINGS)",
+  "repos": {
+    "rowan-engine": {
+      "head": "df56325",
+      "tree": "clean"
+    },
+    "bob-flight-sim": {
+      "branch": "rowan-port",
+      "head": "66f1f60",
+      "tree": "clean"
+    },
+    "migalley": {
+      "branch": "rowan-transfers",
+      "head": "29b9a4f",
+      "tree": "clean"
+    }
+  },
+  "tasks": {
+    "T116": {
+      "status": "PASS",
+      "evidence": ["migration/bob-frontend-inventory.md (migalley ef841aa, rowan-engine inventory doc)"]
+    },
+    "T117": {
+      "status": "PASS",
+      "evidence": ["bob exe skeleton: shell gate + wave-2 entry seam (migalley b78d7df)"]
+    },
+    "T118": {
+      "status": "PASS",
+      "evidence": [
+        "all 168 non-unity mfc/ TUs compile clean -> bob_frontend.a",
+        "migalley 1a4338a+73e4ffe, bob 9d2e2be, rowan-engine b14e145+26edcdb"
+      ]
+    },
+    "T119": {
+      "status": "PASS",
+      "evidence": ["146 BoB dialog templates -> BOB_RC.json + CLSID dispatch (migalley 130d96f)"]
+    },
+    "T120": {
+      "status": "PASS",
+      "evidence": ["backend route C decided (migalley ef4e512)"]
+    },
+    "T120a": {
+      "status": "PASS",
+      "evidence": [
+        "native lib3d: DX7 emulation + 9/9 TUs clean + bob_lib3d.a",
+        "rowan 4f070f3, bob b4e30f2, mig 8516c5c"
+      ]
+    },
+    "T120b": {
+      "status": "PASS",
+      "evidence": [
+        "bob_lib3d_smoke test: COM-ABI vtables, complex backbuffer, HAL-first EnumDevices",
+        "rowan df1a113, bob 20d8932, mig 1b3af56"
+      ]
+    },
+    "T121": {
+      "status": "PASS",
+      "evidence": [
+        "REQ-JOURNEY-01/02 verified under Xvfb: title -> Campaigns -> RAF side -> campaign select -> new-campaign setup -> campaign init (blank_nt.dat regenerated 76KB) -> map world init -> RAF directives, game alive and interactive",
+        "hit-test/dock layout verified via ROWAN_DUMP_LAYOUT: sysbox outside map rect, toolbar strip visible, SDL window held at 1280x960",
+        "REQ-SAVE-01 verified end-to-end: sysbox -> exit modal -> Save -> save dialog -> SAVEGAME/Bob.bsR written (223KB) -> clean return to title; Load Game -> RAF -> Bob listed -> load -> campaign screen restored",
+        "ctest 4/4 green: bob_lib3d_smoke, smoke_xvfb (MiG journey — shared compat layer unchanged in behavior), lifecycle_xvfb, unit_tests (1575 checks 0 failures)",
+        "commits: rowan-engine df56325, bob f10fb9d+66f1f60, migalley 248c32c+29b9a4f"
+      ]
+    }
+  },
+  "test_inventory": {
+    "native": {
+      "unit_tests": "1575 checks, 0 failures (covers bob + shared + shell suites)",
+      "bob_lib3d_smoke": "PASS"
+    },
+    "integration": {
+      "smoke_xvfb": "PASS 32s (MiG Alley journey)",
+      "lifecycle_xvfb": "PASS 26s",
+      "bob_journey_xvfb": "manual PASS — full campaign journey + save + load round-trip on Xvfb :99"
+    },
+    "lint": "scripts/lint.sh clean on touched files (io_compat.cpp, MFC_stub.cpp); analyzer noise noted on pre-existing dynamic_cast chain"
+  },
+  "defect_ledger": {
+    "fixed_this_milestone": [
+      "pack(4)/pack() pragma pairs in D3D/sfman headers destroyed dosdefs pack(1) under GCC — ShapeDesc/II_TargetGroup/save-record sizes wrong; fixed with push/pop (bob f10fb9d)",
+      "stale blank_nt.dat binary cache desynced static node arrays (84B file records vs 78B structs) — regenerated after pack fix",
+      "CRScrlBar ParentPointer HWND-vs-CWnd* confusion crashed BoB scrollbar clicks",
+      "SetWindowPos ignored SWP_SHOWWINDOW/HIDEWINDOW — docked toolbars never visible",
+      "non-owner CWnd (the view) resized the physical SDL window via shared frame backend; owner guard added",
+      "GetClientRect/GetWindowRect reported physical frame size for logical children — same guard",
+      "CFrameWnd::OnSize bypassed derived RecalcLayout — view regrew over docked controls",
+      "routed-dialog path never initialized m_rect — zero-rect RMdlDlg unreachable by hit-testing",
+      "BoB icon indices treated as FileNums hit fileman EmitSysErr — RowanFileNumSafe + g_rowanGameIsBoB guards",
+      "_findfirst did not fold directory case — SAVEGAME/ enumeration empty, save list unpopulated",
+      "LaunchScreen left mouse capture held when no video backend — next click swallowed"
+    ],
+    "deferred_behavior_decisions": [
+      "BoB buttons fall back to 'Btn:NNNN' captions where iconset artwork is unresolved — cosmetic, per owner direction",
+      "campaign map 3D/DirectDraw present path renders blank in native build — tracked as M3 open item below"
+    ]
+  },
+  "key_findings": [
+    "BoB compiles, links, and runs natively end-to-end: bob exe = shell gate + CMIGApp + bob_game (vcxproj Release TU list) + bob_frontend + bob_lib3d on the shared compat layer",
+    "the logical-vs-physical window distinction is the central compat-layer invariant: only backend.owner may touch the SDL window; every geometry API must fall back to m_rect for shared-backend children",
+    "BoB stores HWNDs where MiG stores CWnd* (scrollbar ParentPointer) — parent resolution must try HWND first",
+    "BoB button artwork is icon-table indices, not FileNums; the JSON metadata mixes both forms",
+    "pack-pragma balance is a whole-class latent bug class: any header with pack(N)/pack() silently corrupts every struct parsed after it under GCC"
+  ],
+  "blockers": [
+    "M3 gate remains open: gate requires one real 3D mission via lib3d internals plus renderer/input/audio/video evidence — the campaign-map/3D present path does not yet render natively (DirectDraw surface chain stubbed)"
+  ],
+  "next": "T123 3D mission slice: wire the native lib3d/DirectDraw present path (or surviving software path per T120 route C) to get one real BoB mission rendering + input in-flight; then performance/replay baselines for the M3 gate"
+}

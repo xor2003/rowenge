@@ -1,0 +1,11 @@
+# Build output (native + PE)
+/build/
+*.o
+*.a
+*.exe
+*.plist
+.cache/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
