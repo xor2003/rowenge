@@ -107,7 +107,7 @@ struct	info_base
 EventVal	uid,						//not saved for aircraft	//negative for key waypoints
 			position;					//not saved for aircraft
 protected:
-	info_base()	{SGT=UID_Null;(int&)Next=-1;}
+	info_base()	{SGT=UID_Null;Next=(ItemPtr)-1;}
 
 
 }

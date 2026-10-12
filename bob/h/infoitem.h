@@ -111,7 +111,7 @@ struct	info_base
 EventVal	uid,						//not saved for aircraft	//negative for key waypoints
 			position;					//not saved for aircraft
 protected:
-	info_base()	{SGT=UID_Null;(int&)Next=-1;bfieldindex=1023;}
+	info_base()	{SGT=UID_Null;Next=(ItemPtr)-1;bfieldindex=1023;}
 public:
 	enum	VisibilityConditionSlot	 {VCS_BEFORE=0,VCS_AFTER,VCS_ICON,VCS_TABLESIZE};
 	enum	VisibilityCondition
