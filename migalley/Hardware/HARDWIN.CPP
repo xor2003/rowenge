@@ -833,13 +833,23 @@ ULong MigDisplay::SetDirectDrawMode (InitDisplayDef& Mode)
 	SDL_Rect 	rect;
 	if (!fullScreen)
 	{
-
-		::GetWindowRect(DD.hWnd,&winrect);
-
-		rect.h = winrect.bottom - winrect.top;
-		rect.w = winrect.right - winrect.left;
-		rect.x = winrect.left;
-		rect.y = winrect.top;
+		//RERUN: size from the real SDL window (DD.hWndApp). DD.hWnd is a
+		//frontend dialog hwnd whose rect can be virtual/stale — it returned
+		//a 1666x900 surface for a 1024x768 window (black right band).
+		auto* wbe = backend_from_hwnd(DD.hWndApp);
+		if (wbe && wbe->window)
+		{
+			SDL_GetWindowSize(wbe->window, &rect.w, &rect.h);
+			SDL_GetWindowPosition(wbe->window, &rect.x, &rect.y);
+		}
+		else
+		{
+			::GetWindowRect(DD.hWnd,&winrect);
+			rect.h = winrect.bottom - winrect.top;
+			rect.w = winrect.right - winrect.left;
+			rect.x = winrect.left;
+			rect.y = winrect.top;
+		}
 	}
 	else
 	{

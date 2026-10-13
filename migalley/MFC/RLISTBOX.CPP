@@ -93,6 +93,7 @@ struct RListBoxData {
     bool drawBackground = false; // RERUN: Added
     int rowCount = 0;
     int fontNum = 2; // RERUN: Default to Font 2 (11pt) instead of 4 (20pt)
+    int fontNum2 = 2; // RERUN: column-metric font (OCX m_FontNum2)
     OLE_COLOR foreColor = RGB(255, 255, 0); // Default Yellow
     OLE_COLOR backColor = RGB(0, 0, 0);
     OLE_COLOR stripeColor = RGB(0, 0, 64); // Dark blue default
@@ -114,6 +115,30 @@ static RListBoxData& GetData(CWnd* wnd) {
     return g_rlistbox_data[wnd];
 }
 
+// RERUN: Resolve a global font by index via the parent's WM_GETGLOBALFONT.
+// Non-FI_4VER fonts only have slot 0 populated, so the resolution-aware
+// handler returns NULL for them at hi-res scaling; the OCX then ran on the
+// DC's stock font (~16px). Our DC default is much larger, which blew the
+// campaign phase strip's persisted columns past the control edge — so fall
+// back to slot 0 (always created) for a real font of consistent size.
+static CFont* ResolveGlobalFont(CWnd* pParent, int fontNum)
+{
+	if (!pParent) {
+		if (getenv("ROWAN_DEBUG_RADIO"))
+			fprintf(stderr, "[rradio-fontres] parent=NULL\n");
+		return nullptr;
+	}
+	int idx = abs(fontNum);
+	CFont* f = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, idx);
+	CFont* base = (idx >= 0 && idx < MAXFONTS) ? g_AllFonts[idx][0] : nullptr;
+	if (getenv("ROWAN_DEBUG_RADIO"))
+		fprintf(stderr, "[rradio-fontres] parent=%p cls=%s idx=%d msg=%p base=%p\n",
+			(void*)pParent, pParent->GetRuntimeClass() ? pParent->GetRuntimeClass()->m_lpszClassName : "?",
+			idx, (void*)f, (void*)base);
+	if (!f) f = base;
+	return f;
+}
+
 static int GetRowHeight(CWnd* pWnd)
 {
 	CDC dc(pWnd);
@@ -121,7 +146,7 @@ static int GetRowHeight(CWnd* pWnd)
 	CWnd* pParent = pWnd->GetParent();
     RListBoxData& data = GetData(pWnd);
 	if (pParent) {
-		CFont* pGlobalFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, abs(data.fontNum));
+		CFont* pGlobalFont = ResolveGlobalFont(pParent, data.fontNum);
 		if (pGlobalFont) {
 			pOldFont = dc.SelectObject(pGlobalFont);
 		}
@@ -182,7 +207,7 @@ void CRListBox::OnPaint()
 	CFont* pOldFont = nullptr;
 	CWnd* pParent = GetParent();
 	if (pParent) {
-		CFont* pGlobalFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, abs(data.fontNum));
+		CFont* pGlobalFont = ResolveGlobalFont(pParent, data.fontNum);
 		if (pGlobalFont) {
 			pOldFont = dc.SelectObject(pGlobalFont);
 		}
@@ -223,8 +248,16 @@ void CRListBox::OnPaint()
             dc.SetTextColor(data.foreColor);
 
 		int x = 0;
+		size_t lastCol = data.colWidths.size() - 1;
 		for (size_t col = 0; col < data.colWidths.size(); ++col) {
 			int width = data.colWidths[col];
+			// RERUN: OCX OnDraw semantics — a column is clipped at the list
+			// right edge, and the last column always fills out to that edge.
+			if (x + width > listRect.right)
+				width = listRect.right - x;
+			if (col == lastCol)
+				width = listRect.right - x;
+			if (width <= 0) break;
 			static bool ldb = getenv("ROWAN_DEBUG_BMP") != nullptr;
 			if (ldb && row < 12 && data.columns.count(col) && row < (int)data.columns[col].size())
 				fprintf(stderr,"[lb] row=%d col=%d x=%d w=%d text='%s' ext=%d\n",
@@ -548,6 +581,7 @@ long CRListBox::GetFontNum2()
 
 void CRListBox::SetFontNum2(long propVal)
 {
+	GetData(this).fontNum2 = (int)propVal;
 	SetProperty(0xe, VT_I4, propVal);
 }
 
@@ -781,7 +815,50 @@ void CRListBox::Clear()
 void CRListBox::AddColumn(long width)
 {
 	RListBoxData& data = GetData(this);
+	// RERUN: original OCX semantic — AddColumn takes character units and
+	// scales them by the FontNum2 font height: width = (w*tmHeight)/16.
+	if (m_hWnd) {
+		CDC dc(this);
+		CFont* pOldFont = nullptr;
+		CWnd* pParent = GetParent();
+		if (pParent) {
+			CFont* pGlobalFont = ResolveGlobalFont(pParent, data.fontNum2);
+			if (pGlobalFont) pOldFont = dc.SelectObject(pGlobalFont);
+		}
+		TEXTMETRIC tm;
+		if (dc.GetTextMetrics(&tm) && tm.tmHeight > 0)
+			width = (width * tm.tmHeight) / 16;
+		if (pOldFont) dc.SelectObject(pOldFont);
+	}
 	data.colWidths.push_back(width);
+}
+
+// RERUN: persisted column from the OCX stream (A0-A8 char units + C0-C8
+// flags: ==1 right-aligned, >=8 icon column). Same scaling as AddColumn.
+void CRListBox::AddPersistedColumn(long charUnits, long alignFlags)
+{
+	RListBoxData& data = GetData(this);
+	long width = charUnits;
+	if (m_hWnd) {
+		CDC dc(this);
+		CFont* pOldFont = nullptr;
+		CWnd* pParent = GetParent();
+		if (pParent) {
+			CFont* pGlobalFont = ResolveGlobalFont(pParent, data.fontNum2);
+			if (pGlobalFont) pOldFont = dc.SelectObject(pGlobalFont);
+		}
+		TEXTMETRIC tm;
+		if (dc.GetTextMetrics(&tm) && tm.tmHeight > 0)
+			width = (width * tm.tmHeight) / 16;
+		if (pOldFont) dc.SelectObject(pOldFont);
+		if (getenv("ROWAN_DEBUG_RADIO"))
+			fprintf(stderr, "[rradio-addcol] this=%p fontNum2=%d tmH=%ld units=%ld -> w=%ld\n",
+				(void*)this, data.fontNum2, tm.tmHeight, charUnits, width);
+	}
+	int index = (int)data.colWidths.size();
+	data.colWidths.push_back(width);
+	if (alignFlags == 1)
+		data.colRightAlign[index] = true;
 }
 
 void CRListBox::SetColumnWidth(short index, long width)
@@ -800,12 +877,12 @@ void CRListBox::SetColumnWidth(short index, long width)
             if (width < 0) width = 0;
         } else if (m_hWnd) {
             // RERUN: original OCX semantic — positive widths are character
-            // units scaled by the row font height (width*tmHeight)/16.
+            // units scaled by the FontNum2 font height (width*tmHeight)/16.
             CDC dc(this);
             CFont* pOldFont = nullptr;
             CWnd* pParent = GetParent();
             if (pParent) {
-                CFont* pGlobalFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, abs(data.fontNum));
+                CFont* pGlobalFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, abs(data.fontNum2));
                 if (pGlobalFont) pOldFont = dc.SelectObject(pGlobalFont);
             }
             TEXTMETRIC tm;

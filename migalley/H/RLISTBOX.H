@@ -116,6 +116,7 @@ public:
 	void DeleteString(short row, short column);
 	void Clear();
 	void AddColumn(long width);
+	void AddPersistedColumn(long charUnits, long alignFlags);
 	void SetColumnWidth(short index, long width);
 	void AddPlayerNum(long playerNum);
 	long DeletePlayerNum(short row);

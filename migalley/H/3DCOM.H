@@ -601,4 +601,13 @@ class	shape
 
 	extern	class	shape	SHAPE;
 
+// RERUN 64-bit: vapour-trail "previous object" link. The original code
+// stashed a raw object pointer in the 32-bit AngH/hdg field — fine on
+// Win32, truncated on 64-bit (dosmktrail derefs it -> SIGSEGV). Keep the
+// 32-bit slot but store a handle into this table; handle 0 = no link.
+#include <vector>
+inline std::vector<void*>& SmkTrailPrevTable() { static std::vector<void*> t; return t; }
+inline ULong SmkTrailPrevStore(void* p) { if (!p) return 0; std::vector<void*>& t = SmkTrailPrevTable(); t.push_back(p); return (ULong)t.size(); }
+inline void* SmkTrailPrevLoad(ULong h) { std::vector<void*>& t = SmkTrailPrevTable(); return (h && h <= t.size()) ? t[h - 1] : NULL; }
+
 #endif

@@ -3443,12 +3443,24 @@ void CListBox::OnLButtonDown(UINT nFlags, CPoint point) {
             // l1 carries the control id so ON_EVENT_RANGE (VTS_I4 VTS_BSTR VTS_I2)
             // handlers learn which combo fired; plain VTS_BSTR VTS_I2 handlers
             // ignore it and take (text, index).
-            m_pComboOwner->FireEvent(1, (long)m_pComboOwner->GetDlgCtrlID(), 0,
-                                     selectedText.c_str(), (int)m_curSel);
-            if (m_pComboOwner->GetParent()) {
-                m_pComboOwner->GetParent()->SendMessage(WM_COMMAND, MAKEWPARAM(m_pComboOwner->GetDlgCtrlID(), 1 /*CBN_SELCHANGE*/), (LPARAM)m_pComboOwner->m_hWnd);
+            // RERUN: either handler may synchronously destroy the combo, this
+            // dropdown, and the parent dialog (PostNcDestroy -> delete this) —
+            // snapshot everything and check liveness via the hwnd registry.
+            CWnd* pOwner = m_pComboOwner;
+            UINT ctrlID = pOwner->GetDlgCtrlID();
+            HWND hOwner = pOwner->m_hWnd;
+            CWnd* pParent = pOwner->GetParent();
+            HWND hParent = pParent ? pParent->m_hWnd : nullptr;
+            HWND hSelf = m_hWnd;
+            pOwner->FireEvent(1, (long)ctrlID, 0,
+                              selectedText.c_str(), (int)m_curSel);
+            if (pParent && CWnd::FromHandle(hOwner) == pOwner
+                       && CWnd::FromHandle(hParent) == pParent) {
+                pParent->SendMessage(WM_COMMAND, MAKEWPARAM(ctrlID, 1 /*CBN_SELCHANGE*/), (LPARAM)hOwner);
             }
-            
+            if (CWnd::FromHandle(hSelf) != this)
+                return;
+
             m_hotSel = -1; // Reset hover highlight
             ShowWindow(SW_HIDE);
             ReleaseCapture(); // RERUN: Release mouse capture after selection.
@@ -3739,6 +3751,37 @@ CDataExchange::CDataExchange(CWnd* pDlgWnd, BOOL bSaveAndValidate)
     : m_pDlgWnd(pDlgWnd), m_bSaveAndValidate(bSaveAndValidate) {}
 // This function connects a dialog's member variable (like an RButton) to a control
 // that was created from the RC template. This is the standard MFC mechanism.
+// RERUN: Apply the version-9 RListBox OCX persist blob — FontNum/FontNum2
+// signed LE dwords at tail offsets 27-30, then the A0-A8 column widths
+// (char units, 9 shorts) and C0-C8 flags (9 dwords; ==1 right-align) in
+// the final 27 words. Called for both the template child and the member
+// object that subclasses it via DDX_Control.
+static void ApplyRListBoxPersistBlob(CRListBox* pLB, const std::vector<long>& w,
+                                     int dlgID, int ctlID)
+{
+    if (!pLB || w.size() < 31) return;
+    if ((w[4] & 0xffff) != 0x0009 || (w[5] & 0xffff) != 0) return;
+    long fontNum  = (long)(int)((w[27] & 0xffff) | ((w[28] & 0xffff) << 16));
+    long fontNum2 = (long)(int)((w[29] & 0xffff) | ((w[30] & 0xffff) << 16));
+    if (getenv("ROWAN_DEBUG_RADIO"))
+        fprintf(stderr, "[rradio-font] dlg=%d ctl=%d fontNum=%ld fontNum2=%ld\n",
+            dlgID, ctlID, fontNum, fontNum2);
+    pLB->SetFontNum(fontNum);
+    pLB->SetFontNum2(fontNum2);
+    if (w.size() < 27) return;
+    size_t base = w.size() - 27;
+    for (int i = 0; i < 9; ++i) {
+        long cw = (long)(int)(short)(w[base + i] & 0xffff);
+        if (!cw) continue;
+        long align = (long)(int)((w[base + 9 + 2 * i] & 0xffff) |
+                        ((w[base + 10 + 2 * i] & 0xffff) << 16));
+        if (getenv("ROWAN_DEBUG_RADIO"))
+            fprintf(stderr, "[rradio-cols] dlg=%d ctl=%d A%d=%ld C%d=%ld\n",
+                dlgID, ctlID, i, cw, i, align);
+        pLB->AddPersistedColumn(cw, align);
+    }
+}
+
 void AFXAPI DDX_Control(CDataExchange* pDX, int nIDC, CWnd& rControl)
 {
     if (pDX->m_bSaveAndValidate)
@@ -3813,17 +3856,13 @@ void AFXAPI DDX_Control(CDataExchange* pDX, int nIDC, CWnd& rControl)
                     } else if (CRListBox* pLB = dynamic_cast<CRListBox*>(&rControl)) {
                         // RERUN: The subclassed member paints, so the OCX persist
                         // blob must land here too — FontNum/FontNum2 signed LE
-                        // dwords in the version-9 RListBox tail.
+                        // dwords in the version-9 RListBox tail, plus the
+                        // persisted A0-A8/C0-C8 column layout.
                         auto itRW = g_dlgInitWords.find(dlgID);
                         if (itRW != g_dlgInitWords.end()) {
                             auto itW = itRW->second.find(nIDC);
                             if (itW != itRW->second.end()) {
-                                const std::vector<long>& w = itW->second;
-                                if (w.size() >= 31 &&
-                                    (w[4] & 0xffff) == 0x0009 && (w[5] & 0xffff) == 0) {
-                                    pLB->SetFontNum((long)(int)((w[27] & 0xffff) | ((w[28] & 0xffff) << 16)));
-                                    pLB->SetFontNum2((long)(int)((w[29] & 0xffff) | ((w[30] & 0xffff) << 16)));
-                                }
+                                ApplyRListBoxPersistBlob(pLB, itW->second, dlgID, nIDC);
                             }
                         }
                     } else if (rControl.IsKindOf(RUNTIME_CLASS(CRCombo))) {
@@ -4502,11 +4541,8 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                         const std::vector<long>& w = itW->second;
                         if (w.size() >= 31 &&
                             (w[4] & 0xffff) == 0x0009 && (w[5] & 0xffff) == 0) {
-                            long fontNum  = (long)(int)((w[27] & 0xffff) | ((w[28] & 0xffff) << 16));
-                            long fontNum2 = (long)(int)((w[29] & 0xffff) | ((w[30] & 0xffff) << 16));
                             if (CRListBox* pLB = dynamic_cast<CRListBox*>(pChild)) {
-                                pLB->SetFontNum(fontNum);
-                                pLB->SetFontNum2(fontNum2);
+                                ApplyRListBoxPersistBlob(pLB, w, id, ctl.id);
                             }
                         }
                         // RERUN: RRadio persist blob (version 8). Tail dwords after

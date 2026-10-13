@@ -1233,7 +1233,7 @@ SLong ThreeDee::AddVapourObject(ShapeNum	shape,
  		VapItemP->World.X = wx;
  		VapItemP->World.Y = wy;
  		VapItemP->World.Z = wz;
-		*lastobjptr = (uintptr_t) prevobj3d;							//RJS 17Sep97
+		*lastobjptr = SmkTrailPrevStore(prevobj3d);				//RERUN 64-bit: store handle, not raw ptr	//RJS 17Sep97
  		VapItemP->roll = ANGLES_0Deg;								//RJS 17Sep97
 		VapItemP->Anim = apoint1;									//RJS 17Sep97
 		VapItemP->Anim = (1<<MINANIM);				//RJS 21Apr99

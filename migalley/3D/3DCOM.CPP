@@ -6444,7 +6444,7 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
  void shape::dosmktrail(UByte *& instr_ptr)						//RJS 20Sep96
 {
 	ULongP			lo3dptr = (ULongP) &object_obj3d->AngH;
-	Obj3DPtr		lastobj3d = (Obj3DPtr) (*lo3dptr);
+	Obj3DPtr		lastobj3d = (Obj3DPtr) SmkTrailPrevLoad(*lo3dptr);	//RERUN 64-bit: handle, not raw ptr
 	VapAnimDatPtr	vapptr = (VapAnimDatPtr) &object_obj3d->AngR;
 											
 	if (lastobj3d && vapptr->drawit && !Three_Dee.shapecheat)	//RJS 15Apr98

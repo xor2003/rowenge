@@ -1272,15 +1272,33 @@ extern "C" void XASM_AImageHoriline1(Vertex* right, Vertex* left, uint16_t* scre
             // Bilinear colour + bilinear alpha, blended over dest
             BilUV b;
             biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
-            s = bil_color(t.img, b);
-            t.ix += t.dx; t.iy += t.dy;
             a = 0;
+            BilUV ba;
             if (alpha) {
-                BilUV ba;
                 biluv(ta.ix, ta.iy, ta.xm, ta.ym, ta.lshift, ba);
+                uint8_t a00 = ta.img[ba.i00], a10 = ta.img[ba.i10],
+                        a01 = ta.img[ba.i01], a11 = ta.img[ba.i11];
                 a = bil_byte(ta.img, ba);
                 ta.ix += ta.dx; ta.iy += ta.dy;
+                // Alpha-aware colour taps: transparent texels carry padding
+                // colours — clamp them to the strongest tap so the film keeps
+                // the puff's own colour instead of bleeding atlas garbage.
+                uint8_t t0 = t.img[b.i00], t1 = t.img[b.i10],
+                        t2 = t.img[b.i01], t3 = t.img[b.i11];
+                int am = a00; uint8_t sub = t0;
+                if (a10 > am) { am = a10; sub = t1; }
+                if (a01 > am) { am = a01; sub = t2; }
+                if (a11 > am) { am = a11; sub = t3; }
+                if (a00 < 32) t0 = sub;
+                if (a10 < 32) t1 = sub;
+                if (a01 < 32) t2 = sub;
+                if (a11 < 32) t3 = sub;
+                s = bil_despeckle(palette_table[t0], palette_table[t1],
+                                  palette_table[t2], palette_table[t3], b);
+            } else {
+                s = bil_color(t.img, b);
             }
+            t.ix += t.dx; t.iy += t.dy;
         } else {
             // Masked coords -> texel index
             uint32_t xIndex = static_cast<uint32_t>(IX) & xmask;   xIndex >>= 16;
@@ -1871,15 +1889,30 @@ extern "C" void XASM_AImageHoriline4(Vertex* right, Vertex* left, uint16_t* scre
         if (filt) {
             BilUV b;
             biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
-            s = bil_color(t.img, b);
-            t.ix += t.dx; t.iy += t.dy;
             a = 0;
             if (alpha) {
                 BilUV ba;
                 biluv(ta.ix, ta.iy, ta.xm, ta.ym, ta.lshift, ba);
+                uint8_t a00 = ta.img[ba.i00], a10 = ta.img[ba.i10],
+                        a01 = ta.img[ba.i01], a11 = ta.img[ba.i11];
                 a = bil_byte(ta.img, ba);
                 ta.ix += ta.dx; ta.iy += ta.dy;
+                uint8_t t0 = t.img[b.i00], t1 = t.img[b.i10],
+                        t2 = t.img[b.i01], t3 = t.img[b.i11];
+                int am = a00; uint8_t sub = t0;
+                if (a10 > am) { am = a10; sub = t1; }
+                if (a01 > am) { am = a01; sub = t2; }
+                if (a11 > am) { am = a11; sub = t3; }
+                if (a00 < 32) t0 = sub;
+                if (a10 < 32) t1 = sub;
+                if (a01 < 32) t2 = sub;
+                if (a11 < 32) t3 = sub;
+                s = bil_despeckle(palette_table[t0], palette_table[t1],
+                                  palette_table[t2], palette_table[t3], b);
+            } else {
+                s = bil_color(t.img, b);
             }
+            t.ix += t.dx; t.iy += t.dy;
         } else {
             uint32_t ebx = IX & xmask;
             uint32_t eax = IY & ymask;

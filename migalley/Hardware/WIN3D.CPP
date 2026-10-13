@@ -595,8 +595,9 @@ CON	direct_draw::direct_draw()
 		DDSURFACEDESC ddsdTemp;
 		ZeroMemory(&ddsdTemp, sizeof(DDSURFACEDESC));
 		pDDLocal->GetDisplayMode(&ddsdTemp);
-		winmode_w = ddsdTemp.dwWidth;
-		winmode_h = ddsdTemp.dwHeight;
+		//RERUN: keep winmode at the PHYSICAL window size (set above from
+		//Master_3d.winst): it feeds the 3D projection width and surface size.
+		//The raw display mode is only correct when the window covers it.
 		winmode_bpp = ddsdTemp.ddpfPixelFormat.dwRGBBitCount;
 
 		CurrDriver = -1; // Explicitly tag enumerated modes as Primary/Stub

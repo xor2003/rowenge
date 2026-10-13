@@ -359,47 +359,12 @@ void CRButton::OnPaint()
 		}
 		else // Artwork load failed or is not a BMP
 		{
-			// Fallback drawing with debug info
-			dc.FillSolidRect(rect, RGB(192, 192, 192));
-			dc.Draw3dRect(rect, RGB(255, 255, 255), RGB(128, 128, 128));
-
-			// RERUN: Add debug prints for failed artwork load
-			std::cout << "[CRButton::OnPaint] Fallback for BtnID: " << GetDlgCtrlID() << ", artnum: " << artnum << std::endl;
-			
-			if (pData) {
-				std::cout << "  > pData is NOT NULL, but not a BMP. First 4 bytes: " 
-						  << (int)pData[0] << " " << (int)pData[1] << " " 
-						  << (int)pData[2] << " " << (int)pData[3] << std::endl;
-			} else {
-				std::cout << "  > pData is NULL. fileblock failed to load artnum " << artnum << std::endl;
-			}
-
-			char buf[32];
-			snprintf(buf, sizeof(buf), "Btn:%d", GetDlgCtrlID());
-			dc.SetTextColor(RGB(0, 0, 0));
-			dc.SetBkMode(TRANSPARENT);
-			dc.DrawText(buf, rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			// RERUN: retail draws nothing but the caption here — the parent
+			// backdrop shows through. No gray fallback box.
 		}
 	}
-	else // artnum is FIL_NULL
+	else // artnum is FIL_NULL — retail draws just the caption over the backdrop
 	{
-		// RERUN: Make TitleBar text controls (e.g. IDC_TITLE, IDC_DATE) transparent
-		if (m_nID != 2042 && m_nID != 2082)
-		{
-			// Fallback drawing if no artwork is assigned at all
-			dc.FillSolidRect(rect, RGB(192, 192, 192));
-			dc.Draw3dRect(rect, RGB(255, 255, 255), RGB(128, 128, 128));
-
-			// RERUN: Add debug prints for missing artwork
-			std::cout << "[CRButton::OnPaint] Fallback for BtnID: " << GetDlgCtrlID() << ", artnum: FIL_NULL" << std::endl;
-			std::cout << "  > No artwork assigned to button state." << std::endl;
-
-			char buf[32];
-			snprintf(buf, sizeof(buf), "Btn:%d", GetDlgCtrlID());
-			dc.SetTextColor(RGB(0, 0, 0));
-			dc.SetBkMode(TRANSPARENT);
-			dc.DrawText(buf, rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		}
 	}
 
 	CString text = m_sCaption;
@@ -575,11 +540,20 @@ void CRButton::OnLButtonUp(UINT nFlags, CPoint point)
 	if (rect.PtInRect(point))
 	{
 		SetPressed(!m_bPressed); // This toggles the state and invalidates.
-		GetParent()->SendMessage(WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(), BN_CLICKED), (LPARAM)m_hWnd);
+		// RERUN: the parent's click handler may synchronously destroy this
+		// control and the whole dialog (PostNcDestroy -> delete this).
+		// Snapshot the hwnd first and bail if we're gone afterwards.
+		HWND hSelf = m_hWnd;
+		CWnd* pParent = GetParent();
+		pParent->SendMessage(WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(), BN_CLICKED), (LPARAM)m_hWnd);
+		if (CWnd::FromHandle(hSelf) != this)
+			return;
 		// RERUN: Fire event to parent for ActiveX compatibility.
 		// Route through FireEvent so the sink-map params string picks the
 		// correct handler signature (VTS_NONE buttons, VTS_I4 selectors).
 		FireEvent(1, (long)m_nID);
+		if (CWnd::FromHandle(hSelf) != this)
+			return;
 	} else {
 		// Mouse was released outside, don't toggle, just redraw to remove the "pressed" look.
 		Invalidate();
