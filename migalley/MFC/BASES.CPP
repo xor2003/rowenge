@@ -271,6 +271,11 @@ void CBases::PositionSquadDisplay(int listindex)
 }
 void CBases::AddAirfield(int& listindex, int afnum)
 {
+	// RERUN: Added extra bounds check (as in AddSquadron) — the callers in
+	// OnInitDialog don't bound listindex, and afuses[DIALOGROWS] sits right
+	// before the m_IDC_AFBUTTON/AFINFO members, so an overflow clobbers
+	// control objects (vptr) -> heap corruption.
+	if (listindex >= DIALOGROWS || listindex >= (int)(sizeof(afuses)/sizeof(afuses[0]))) return;
 	PositionAfDisplay(listindex);
 	UpdateAirfieldDisplay(listindex, afnum);
 	afuses[listindex++]=afnum;

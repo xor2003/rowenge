@@ -1,5 +1,11 @@
+#ifndef redtbt_INCLUDED
 #pragma once // RERUN: BoB TUs include this via multiple forwards
-
+#define redtbt_INCLUDED
+// RERUN: single definition for both H/ and MFC/ include paths - MFC/REDTBT.H
+// forwards here. The previous duplicate (memberless in H/, full impl in MFC/)
+// gave CREdtBt two different layouts across TUs (ODR) - a linker-picked
+// out-of-line ctor initialised members at offsets that were out-of-bounds in
+// pack(1)-view elements (CSqdnlist heap smash).
 // RERUN: self-assert packing - DOSDEFS-era headers assumed ambient pack(1);
 // guard so include order cannot change this layout across TUs (ODR).
 #pragma pack(push)
@@ -12,33 +18,33 @@
 /////////////////////////////////////////////////////////////////////////////
 // CREdtBt wrapper class
 
+#include "MFC_stub.h" // RERUN: CWnd base chain
 #include "DLGITEM.H" // RERUN: DlgItem base used below
-#include "FILES.H" // RERUN: FileNum used below
-#pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
+
 class CREdtBt : public DlgItem //RERUN was CWnd
 {
+private:
+    bool m_bDepressed = false;
+    OLE_COLOR m_foreColor = 0;
+    long m_fontNum = 0;
+    long m_pictureFileNum = 0;
+    long m_dragDropID = 0;
 protected:
 	DECLARE_DYNCREATE(CREdtBt)
 public:
-	CLSID const& GetClsid()
-	{
-		static CLSID const clsid
-			= { 0x461a1fe3, 0xb81b, 0x11d1, { 0xa1, 0xf0, 0x44, 0x45, 0x53, 0x54, 0x0, 0x0 } };
-		return clsid;
-	}
-	virtual BOOL Create(LPCTSTR lpszClassName,
-		LPCTSTR lpszWindowName, DWORD dwStyle,
-		const RECT& rect,
-		CWnd* pParentWnd, UINT nID,
-		CCreateContext* pContext = NULL)
+    CREdtBt();
+	CLSID const& GetClsid();
+	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle,
+						const RECT& rect, CWnd* pParentWnd, UINT nID,
+						CCreateContext* pContext = NULL)
 	{ return CreateControl(GetClsid(), lpszWindowName, dwStyle, rect, pParentWnd, nID); }
 
     BOOL Create(LPCTSTR lpszWindowName, DWORD dwStyle,
-		const RECT& rect, CWnd* pParentWnd, UINT nID,
-		CFile* pPersist = NULL, BOOL bStorage = FALSE,
-		BSTR bstrLicKey = NULL)
+						const RECT& rect, CWnd* pParentWnd, UINT nID,
+						CFile* pPersist = NULL, BOOL bStorage = FALSE,
+						BSTR bstrLicKey = NULL)
 	{ return CreateControl(GetClsid(), lpszWindowName, dwStyle, rect, pParentWnd, nID,
-		pPersist, bStorage, bstrLicKey); }
+						pPersist, bStorage, bstrLicKey); }
 
 // Attributes
 public:
@@ -50,10 +56,13 @@ public:
 	void SetFontNum(long);
 	long GetDragAndDropID();
 	void SetDragAndDropID(long);
-
-// Operations
-public:
 	void SetPictureFileNum(long picture);
+    virtual void OnPaint(); // RERUN: Added override
+    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+    afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+    afx_msg void OnDestroy();
+    DECLARE_MESSAGE_MAP()
 };
 
 #pragma pack(pop)
+#endif
