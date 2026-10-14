@@ -245,7 +245,7 @@ void CREdit::OnPaint()
 	CFont* pOldFont = nullptr;
 	if (GetParent())
 	{
-		CFont* pNewFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, m_fontNum);
+		CFont* pNewFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(m_fontNum));
 		if (pNewFont)
 			pOldFont = dc.SelectObject(pNewFont);
 	}

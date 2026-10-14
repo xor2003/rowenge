@@ -392,11 +392,22 @@ void CRButton::OnPaint()
 		CFont* pOldFont = nullptr;
 		if (GetParent())
 		{
-			CFont* pNewFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, m_iFontNum);
+			CFont* pNewFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(m_iFontNum));
 			if (pNewFont)
 				pOldFont = dc.SelectObject(pNewFont);
 		}
 
+		if (getenv("ROWAN_DEBUG_BMP"))
+		{
+			TEXTMETRIC tmd; memset(&tmd, 0, sizeof(tmd)); dc.GetTextMetrics(&tmd);
+			int pdlg = -1;
+			if (GetParent()) {
+				WindowBackend* pbe = backend_from_hwnd(GetParent()->GetSafeHwnd());
+				if (pbe) pdlg = pbe->templateID;
+			}
+			fprintf(stderr, "[rbtn] dlg=%d ctl=%d this=%p fontNum=%d tmH=%ld text='%s'\n",
+				pdlg, GetDlgCtrlID(), (void*)this, m_iFontNum, (long)tmd.tmHeight, (const char*)text);
+		}
 		dc.DrawText(text, rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 		if (pOldFont)

@@ -243,7 +243,7 @@ void CRStatic::OnPaint()
     if (!pFont && GetParent()) {
         // Try to get font from parent using our font property index
         // 0=Small, 1=Title, 2=Normal, 3=Large typically
-        pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, m_fontNum);
+        pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(m_fontNum));
     }
     
     CFont* pOldFont = nullptr;

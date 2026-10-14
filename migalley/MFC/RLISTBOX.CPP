@@ -116,11 +116,12 @@ static RListBoxData& GetData(CWnd* wnd) {
 }
 
 // RERUN: Resolve a global font by index via the parent's WM_GETGLOBALFONT.
-// Non-FI_4VER fonts only have slot 0 populated, so the resolution-aware
-// handler returns NULL for them at hi-res scaling; the OCX then ran on the
-// DC's stock font (~16px). Our DC default is much larger, which blew the
-// campaign phase strip's persisted columns past the control edge — so fall
-// back to slot 0 (always created) for a real font of consistent size.
+// Negative fontNums are resolution-scaled indices (abs) — the RAF/Luftwaffe
+// campaign buttons persist -10 and retail renders them at ~22px, matching
+// font 10's 1024-res slot. A negative value also picks a heavier (bold)
+// text style — the OCX blob comment is verified against retail: the
+// phase-strip tabs render bold. A separate FontNum2 column-metric property
+// uses -1 for "unset" — callers leave it on the ambient stock font then.
 static CFont* ResolveGlobalFont(CWnd* pParent, int fontNum)
 {
 	if (!pParent) {
@@ -130,12 +131,27 @@ static CFont* ResolveGlobalFont(CWnd* pParent, int fontNum)
 	}
 	int idx = abs(fontNum);
 	CFont* f = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, idx);
-	CFont* base = (idx >= 0 && idx < MAXFONTS) ? g_AllFonts[idx][0] : nullptr;
+	// RERUN: heavier style for negative fontNum — bold clone, cached per
+	// source font so each repaint doesn't reopen the TTF.
+	if (f && fontNum < 0) {
+		static std::map<CFont*, CFont*> s_boldCache;
+		CFont*& b = s_boldCache[f];
+		if (!b) {
+			b = new CFont;
+			LOGFONT lf{};
+			f->GetLogFont(&lf);
+			lf.lfWeight = FW_BOLD;
+			if (!b->CreateFontIndirect(&lf)) {
+				delete b;
+				b = f;
+			}
+		}
+		f = b;
+	}
 	if (getenv("ROWAN_DEBUG_RADIO"))
-		fprintf(stderr, "[rradio-fontres] parent=%p cls=%s idx=%d msg=%p base=%p\n",
+		fprintf(stderr, "[rradio-fontres] parent=%p cls=%s idx=%d msg=%p\n",
 			(void*)pParent, pParent->GetRuntimeClass() ? pParent->GetRuntimeClass()->m_lpszClassName : "?",
-			idx, (void*)f, (void*)base);
-	if (!f) f = base;
+			idx, (void*)f);
 	return f;
 }
 
@@ -232,8 +248,13 @@ void CRListBox::OnPaint()
 
         CRect rowRect(0, y, listRect.right, y + rowHeight);
 
-        // Background drawing (Stripes / Selection)
-        if (row == data.hilightRow) {
+        // RERUN: selection rendering — when a column is selected the OCX
+        // hilights just that cell's text (white), no band; a row-only
+        // selection fills the row band (e.g. roster lists). Verified
+        // against retail BoB: the campaign phase strip shows "Convoys"
+        // in white text over the artwork, no navy band.
+        bool rowHiliteBand = (row == data.hilightRow && data.hilightCol < 0);
+        if (rowHiliteBand) {
             dc.FillSolidRect(rowRect, data.selectColor);
         } else if (data.isStripey && (row % 2 == 1)) {
             dc.FillSolidRect(rowRect, data.stripeColor);
@@ -246,6 +267,9 @@ void CRListBox::OnPaint()
             dc.SetTextColor(data.rowColors[row]);
         else
             dc.SetTextColor(data.foreColor);
+
+        OLE_COLOR normalColor = data.rowColors.count(row) ? data.rowColors[row]
+                                                          : data.foreColor;
 
 		int x = 0;
 		size_t lastCol = data.colWidths.size() - 1;
@@ -260,8 +284,8 @@ void CRListBox::OnPaint()
 			if (width <= 0) break;
 			static bool ldb = getenv("ROWAN_DEBUG_BMP") != nullptr;
 			if (ldb && row < 12 && data.columns.count(col) && row < (int)data.columns[col].size())
-				fprintf(stderr,"[lb] row=%d col=%d x=%d w=%d text='%s' ext=%d\n",
-					row,(int)col,x,width,data.columns[col][row].c_str(),
+				fprintf(stderr,"[lb] this=%p row=%d col=%d x=%d w=%d text='%s' ext=%d\n",
+					(void*)this,row,(int)col,x,width,data.columns[col][row].c_str(),
 					(int)dc.GetTextExtent(data.columns[col][row].c_str()).cx);
 
             // Draw Icon if present
@@ -291,7 +315,13 @@ void CRListBox::OnPaint()
 
 			if (data.columns.count(col) && row < (int)data.columns[col].size()) {
 				std::string text = data.columns[col][row];
-				
+
+				// RERUN: cell-level selection — white text (OCX behavior).
+				if (row == data.hilightRow && (int)col == data.hilightCol)
+					dc.SetTextColor(RGB(255, 255, 255));
+				else
+					dc.SetTextColor(normalColor);
+
 				CRect cellRect(x, y, x + width, y + rowHeight);
 				
 				// Simple centering logic
@@ -821,7 +851,9 @@ void CRListBox::AddColumn(long width)
 		CDC dc(this);
 		CFont* pOldFont = nullptr;
 		CWnd* pParent = GetParent();
-		if (pParent) {
+		// RERUN: FontNum2<0 means no column font persisted — measure in the
+		// ambient DC font, matching retail (~16px stock metric -> ~185px cols).
+		if (pParent && data.fontNum2 >= 0) {
 			CFont* pGlobalFont = ResolveGlobalFont(pParent, data.fontNum2);
 			if (pGlobalFont) pOldFont = dc.SelectObject(pGlobalFont);
 		}
@@ -843,7 +875,7 @@ void CRListBox::AddPersistedColumn(long charUnits, long alignFlags)
 		CDC dc(this);
 		CFont* pOldFont = nullptr;
 		CWnd* pParent = GetParent();
-		if (pParent) {
+		if (pParent && data.fontNum2 >= 0) {
 			CFont* pGlobalFont = ResolveGlobalFont(pParent, data.fontNum2);
 			if (pGlobalFont) pOldFont = dc.SelectObject(pGlobalFont);
 		}
@@ -852,13 +884,14 @@ void CRListBox::AddPersistedColumn(long charUnits, long alignFlags)
 			width = (width * tm.tmHeight) / 16;
 		if (pOldFont) dc.SelectObject(pOldFont);
 		if (getenv("ROWAN_DEBUG_RADIO"))
-			fprintf(stderr, "[rradio-addcol] this=%p fontNum2=%d tmH=%ld units=%ld -> w=%ld\n",
-				(void*)this, data.fontNum2, tm.tmHeight, charUnits, width);
+			fprintf(stderr, "[rradio-addcol] this=%p fontNum2=%d tmH=%d units=%ld -> w=%ld\n",
+				(void*)this, data.fontNum2, (int)tm.tmHeight, charUnits, width);
 	}
 	int index = (int)data.colWidths.size();
 	data.colWidths.push_back(width);
-	if (alignFlags == 1)
-		data.colRightAlign[index] = true;
+	// RERUN: the C-flag is not right-alignment — retail BoB renders the
+	// phase tabs (C2=C3=1) left-aligned at the column start; interpreting
+	// it as right-align pushed the last tab off the window's right edge.
 }
 
 void CRListBox::SetColumnWidth(short index, long width)
@@ -881,8 +914,8 @@ void CRListBox::SetColumnWidth(short index, long width)
             CDC dc(this);
             CFont* pOldFont = nullptr;
             CWnd* pParent = GetParent();
-            if (pParent) {
-                CFont* pGlobalFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, abs(data.fontNum2));
+            if (pParent && data.fontNum2 >= 0) {
+                CFont* pGlobalFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, data.fontNum2);
                 if (pGlobalFont) pOldFont = dc.SelectObject(pGlobalFont);
             }
             TEXTMETRIC tm;

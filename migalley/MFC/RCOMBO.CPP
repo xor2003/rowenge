@@ -316,7 +316,7 @@ void CRCombo::OnPaint()
 		text = m_items[m_curSel].c_str();
 	}
 
-    CFont* pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, GetFontNum());
+    CFont* pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(GetFontNum()));
     if (pFont) dc.SelectObject(pFont);
 
     dc.SetTextColor(RGB(255, 255, 0)); // Yellow text
@@ -372,7 +372,7 @@ void CRCombo::OnLButtonDown(UINT nFlags, CPoint point) {
     // calculations during OnPaint or OnLButtonDown.
     
     CDC* pDC = GetDC();
-    CFont* pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, GetFontNum());
+    CFont* pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(GetFontNum()));
     
     // Pass the correct font to the dropdown so its internal calculations match ours
     m_dropDown->OnSetFont(pFont);

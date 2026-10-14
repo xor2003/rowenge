@@ -3272,6 +3272,10 @@ Bool RFullPanelDial::PaintShopInit()
 CFont* RFullPanelDial::OnGetGlobalFont(int fontnum)
 {
     CFont* f = NULL;
+    // RERUN: persisted OCX blobs carry -1 for "no font" — clamp like
+    // RDialog::OnGetGlobalFont does, else this indexes g_AllFonts[-1].
+	if (fontnum<0||fontnum>MAXFONTS)
+		fontnum=0;
 	if (m_currentres==-1) m_currentres=GetCurrentRes();
 	if (g_AllFonts[fontnum][1])
 	{

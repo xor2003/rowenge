@@ -202,7 +202,7 @@ void CREdtBt::OnPaint()
         // Try to get font 0 (Small) as requested by BASES.CPP (-9 maps to 0)
         CFont* pFont = m_pFont;
         if (!pFont && GetParent()) {
-             pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, m_fontNum);
+             pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(m_fontNum));
         }
         
         CFont* pOld = nullptr;

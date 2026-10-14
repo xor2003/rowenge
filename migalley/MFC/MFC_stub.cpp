@@ -330,6 +330,24 @@ BOOL CFont::CreateFontIndirect(const LOGFONT* lpLogFont)
     return (m_hObject != nullptr);
 }
 
+// RERUN: single stock TTF for every "no font selected" path — retail's
+// SYSTEM_FONT is the ~16px bitmap font (tmHeight 16), so a 12pt TTF
+// (~16px line height) is the closest match. The previous per-site
+// fallbacks opened 16pt and 24pt fonts, so metrics (24pt, tmHeight~30)
+// disagreed with drawing — the BoB campaign phase strip sized its
+// persisted 180-unit columns against the big font and overflowed.
+static TTF_Font* StockSystemTTF()
+{
+    static TTF_Font* s_stock = nullptr;
+    if (!s_stock) {
+        std::string path = GetSystemFontPath();
+        // RERUN: retail SYSTEM_FONT is a fixed 16px bitmap font (tmHeight
+        // ~18 incl leading) — match it; OCX column metrics key off this.
+        if (!path.empty()) s_stock = TTF_OpenFont(path.c_str(), 20);
+    }
+    return s_stock;
+}
+
 BOOL CFont::CreateFont(int nHeight, int nWidth, int nEscapement,
                 int nOrientation, int nWeight, BYTE bItalic,
                 BYTE bUnderline, BYTE cStrikeOut, BYTE nCharSet,
@@ -387,7 +405,9 @@ CObject* CDC::SelectStockObject(int object)
 
     if (dummyFont.m_lf.lfHeight == 0) {
         // Initialize default font properties so GetLogFont returns sensible values
-        dummyFont.CreateFont(12, 0, 0, 0, 400, 0, 0, 0, 0, 0, 0, 0, 0, "System");
+        // Retail SYSTEM_FONT is the 16px fixed bitmap face — keep metrics
+        // aligned with StockSystemTTF so ambient measures/draws agree.
+        dummyFont.CreateFont(20, 0, 0, 0, 400, 0, 0, 0, 0, 0, 0, 0, 0, "System");
     }
 
     switch (object) {
@@ -1707,14 +1727,7 @@ int CDC::DrawText(const CString& str, const CRect& rect, UINT nFormat)
         if (m_pCurrentFont && m_pCurrentFont->m_hObject) {
             font = (TTF_Font*)m_pCurrentFont->m_hObject;
         }
-        if (!font) {
-             static TTF_Font* s_defaultFont = nullptr;
-             if (!s_defaultFont) {
-                 std::string path = GetSystemFontPath();
-                 if (!path.empty()) s_defaultFont = TTF_OpenFont(path.c_str(), 16);
-             }
-             font = s_defaultFont;
-        }
+        if (!font) font = StockSystemTTF();
         if (!font) return 0;
 
         SDL_Color color = { (Uint8)GetRValue(m_textColor), (Uint8)GetGValue(m_textColor), (Uint8)GetBValue(m_textColor), 255 };
@@ -1839,14 +1852,7 @@ CSize CDC::GetTextExtent(const CString& str) const
              std::cout << "[CDC::GetTextExtent] Font is NULL (load failed?), falling back to default 24pt font." << std::endl;
              s_fallbackWarned = true;
         }
-        static TTF_Font* s_defaultFont = nullptr;
-        if (!s_defaultFont) {
-            std::string path = GetSystemFontPath();
-            if (!path.empty()) {
-                s_defaultFont = TTF_OpenFont(path.c_str(), 24);
-            }
-        }
-        font = s_defaultFont;
+        font = StockSystemTTF();
     }
 
     if (font) {
@@ -1867,14 +1873,7 @@ BOOL CDC::GetTextMetrics(TEXTMETRIC* pTM) const
     if (m_pCurrentFont && m_pCurrentFont->m_hObject) {
         font = (TTF_Font*)m_pCurrentFont->m_hObject;
     }
-    if (!font) {
-        static TTF_Font* s_defaultFont = nullptr;
-        if (!s_defaultFont) {
-            std::string path = GetSystemFontPath();
-            if (!path.empty()) s_defaultFont = TTF_OpenFont(path.c_str(), 24);
-        }
-        font = s_defaultFont;
-    }
+    if (!font) font = StockSystemTTF();
     if (!font) return FALSE;
     memset(pTM, 0, sizeof(*pTM));
     pTM->tmHeight = TTF_FontHeight(font);
@@ -2179,17 +2178,10 @@ void CDC::TextOut(int x, int y, const char* str, int len)
     if (!font) {
         static bool s_fallbackWarned = false;
         if (!s_fallbackWarned) {
-             std::cout << "[CDC::TextOut] Font is NULL (load failed?), falling back to default 16pt font." << std::endl;
+             std::cout << "[CDC::TextOut] Font is NULL (load failed?), falling back to stock font." << std::endl;
              s_fallbackWarned = true;
         }
-        static TTF_Font* s_defaultFont = nullptr;
-        if (!s_defaultFont) {
-            std::string path = GetSystemFontPath();
-            if (!path.empty()) {
-                s_defaultFont = TTF_OpenFont(path.c_str(), 16);
-            }
-        }
-        font = s_defaultFont;
+        font = StockSystemTTF();
     }
 
     if (!font) {
@@ -2656,6 +2648,9 @@ BOOL CWnd::SubclassWindow(HWND hWnd)
     WindowBackend* be = backend_from_hwnd(hWnd);
     if (be)
     {
+        if (getenv("ROWAN_DEBUG_BMP"))
+            fprintf(stderr, "[subclass] this=%p hwnd=%p oldowner=%p templctl=%d\n",
+                (void*)this, (void*)hWnd, (void*)be->owner, be->templateID);
         // The placeholder CWnd/DlgItem object is now orphaned. This is a known
         // simplification in this stub to avoid complex memory management.
         if (be->owner)
@@ -2669,6 +2664,12 @@ BOOL CWnd::SubclassWindow(HWND hWnd)
                 ((CRStatic*)this)->SetFontNum(((CRStatic*)be->owner)->GetFontNum());
                 ((CRStatic*)this)->SetResourceNumber(((CRStatic*)be->owner)->GetResourceNumber());
             }
+            // RERUN: CRButton too — a DDX'd member (e.g. CSCampaign's
+            // m_IDC_RBUTTONDATE) must inherit the template child's persisted
+            // font, else it repaints with fontNum=0 (stock) instead of the
+            // OCX's persisted font.
+            if (IsKindOf(RUNTIME_CLASS(CRButton)) && be->owner->IsKindOf(RUNTIME_CLASS(CRButton)))
+                ((CRButton*)this)->SetFontNum(((CRButton*)be->owner)->GetFontNum());
 
             be->owner->m_hWnd = nullptr; // Prevent placeholder from destroying window
         }
@@ -2687,7 +2688,6 @@ BOOL CWnd::SubclassWindow(HWND hWnd)
         // RERUN FIX: Update parent's child map to point to this new object instead of the placeholder
         if (m_pParent && m_nID != 0) {
              m_pParent->AddChild(this, m_nID);
-             // std::cout << "[MFC_stub] SubclassWindow: Updated parent's child map for ID " << m_nID << " to object " << this << " HWND=" << hWnd << std::endl;
         }
         PreSubclassWindow();
 
@@ -3364,7 +3364,7 @@ int CListBox::GetItemHeight() const
         }
 
         if (pParent) {
-            pFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, fontNum);
+            pFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, abs(fontNum));
         }
     }
 
@@ -3568,7 +3568,7 @@ void CListBox::OnPaint() {
             fontNum = m_pComboOwner->GetFontNum();
         }
         if (pParent) {
-            pFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, fontNum);
+            pFont = (CFont*)pParent->SendMessage(WM_GETGLOBALFONT, abs(fontNum));
         }
     }
 
@@ -3795,6 +3795,13 @@ void AFXAPI DDX_Control(CDataExchange* pDX, int nIDC, CWnd& rControl)
             HWND hWnd = pOldCtrl->GetSafeHwnd();
             if (hWnd)
             {
+                if (getenv("ROWAN_DEBUG_BMP")) {
+                    WindowBackend* dbe = backend_from_hwnd(pDX->m_pDlgWnd->GetSafeHwnd());
+                    fprintf(stderr, "[ddx] nIDC=%d dlgTempl=%d dlgObj=%p dlgType=%s rControl=%p type=%s old=%p\n",
+                        nIDC, dbe ? dbe->templateID : -1, (void*)pDX->m_pDlgWnd,
+                        typeid(*pDX->m_pDlgWnd).name(), (void*)&rControl,
+                        typeid(rControl).name(), (void*)pOldCtrl);
+                }
                 // Re-wire the HWND to be owned by the new control object (e.g., an RButton)
                 rControl.SubclassWindow(hWnd);
 
@@ -4488,6 +4495,14 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                         ((CRButton*)pChild)->SetCloseButton(TRUE);
                         ((CRButton*)pChild)->SetHelpButton(TRUE);
                     }
+                    // RERUN: RButtonDate — the OCX blob carries a font prop we
+                    // don't decode; retail shows the strip date at ~20px.
+                    if (id == 289 && ctl.id == 1469) {
+                        ((CRButton*)pChild)->SetFontNum(10);
+                        if (getenv("ROWAN_DEBUG_BMP"))
+                            fprintf(stderr, "[rbtn-font] set ctl=%d pChild=%p fontNum=10\n",
+                                ctl.id, (void*)pChild);
+                    }
                 }
                 else if (clsid.rfind("{C42BAC3D-", 0) == 0) {
                     pChild = new CRStatic();
@@ -4518,7 +4533,11 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                 auto itDlg = g_dlgInitStrings.find(id);
                 if (itDlg != g_dlgInitStrings.end()) {
                     auto itCtl = itDlg->second.find(ctl.id);
-                    if (itCtl != itDlg->second.end()) {
+                    // RERUN: dlg 289's RStaticDate (1227) sits fully under the
+                    // phase-strip listbox in z-order — the real OCX never shows
+                    // this caption (verified against retail). Don't apply it.
+                    if (itCtl != itDlg->second.end() &&
+                        !(id == 289 && ctl.id == 1227)) {
                         pChild->SetWindowText(itCtl->second.c_str());
                         //std::cout << "[DEBUG] CDialog::Create: Applied text '" << itCtl->second << "' to Control " << ctl.id << " in Dialog " << id << std::endl;
                     }
