@@ -200,7 +200,7 @@ struct	IdEntry
 	IdEntry(const char* s) :	textnum(0)
 			{idtype=T_CHAR;textstr=s;}
 
-	IdEntry(CString s)		:	textnum(0)
+	IdEntry(const CString& s)		:	textnum(0)
 			{idtype=T_CHAR;textstr=s;}
 
 };
@@ -229,8 +229,8 @@ private:
 
 struct HTabBox:DialList
 {
-	IdList* titles;
-	HTabBox(FileNum artnum,IdList idlist,Edges e,
+	const IdList* titles;
+	HTabBox(FileNum artnum,const IdList& idlist,const Edges& e,
 			const DialBox& d0,
 			const DialBox& d1=*(DialBox*)NULL,
 			const DialBox& d2=*(DialBox*)NULL,
@@ -246,7 +246,7 @@ struct HTabBox:DialList
 		edges=&e;
 		childtype=TABT;
 	}
-	HTabBox(FileNum artnum,Edges e,
+	HTabBox(FileNum artnum,const Edges& e,
 			const DialBox& d0,
 			const DialBox& d1=*(DialBox*)NULL,
 			const DialBox& d2=*(DialBox*)NULL,
@@ -266,7 +266,7 @@ struct HTabBox:DialList
 
 struct VTabBox:HTabBox
 {
-	VTabBox(FileNum artnum,IdList idlist,Edges e,
+	VTabBox(FileNum artnum,const IdList& idlist,const Edges& e,
 			const DialBox& d0,
 			const DialBox& d1=*(DialBox*)NULL,
 			const DialBox& d2=*(DialBox*)NULL,
@@ -277,7 +277,7 @@ struct VTabBox:HTabBox
 			const DialBox& d7=*(DialBox*)NULL):
 	HTabBox(artnum,idlist,e,d0,d1,d2,d3,d4,d5,d6,d7)
 	{childtype=TABR;}
-	VTabBox(FileNum artnum,Edges e,
+	VTabBox(FileNum artnum,const Edges& e,
 			const DialBox& d0,
 			const DialBox& d1=*(DialBox*)NULL,
 			const DialBox& d2=*(DialBox*)NULL,
