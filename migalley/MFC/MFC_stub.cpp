@@ -1181,13 +1181,20 @@ BOOL DispatchMessage(const MSG* msg)
             if (root && root->renderer && !DDPrimaryActive()) {
                 int absX = 0, absY = 0;
                 for (CWnd* p = backend->owner; p; ) {
-                    absX += (int)p->m_rect.left;
-                    absY += (int)p->m_rect.top;
-                    CWnd* pp = p->GetParent();
-                    if (!pp) {
-                        WindowBackend* pbe = backend_from_hwnd(p->GetSafeHwnd());
-                        pp = pbe ? pbe->parent : nullptr;
+                    WindowBackend* pbe = backend_from_hwnd(p->GetSafeHwnd());
+                    // A window owning a real top-level SDL window keeps its
+                    // m_rect in screen coordinates; its children are laid out
+                    // relative to its client area, so it must not contribute
+                    // to the client-space origin of the painted window.
+                    // (Matches GetWindowRect's be->owner == this convention;
+                    // a view sharing the frame's HWND is client-relative.)
+                    if (!(pbe && pbe->window && !pbe->isChild && pbe->owner == p)) {
+                        absX += (int)p->m_rect.left;
+                        absY += (int)p->m_rect.top;
                     }
+                    CWnd* pp = p->GetParent();
+                    if (!pp)
+                        pp = pbe ? pbe->parent : nullptr;
                     if (pp == p) break;
                     p = pp;
                 }
@@ -2094,6 +2101,13 @@ int CDC::SetDIBitsToDevice(int xDest, int yDest, DWORD w, DWORD h, int xSrc, int
             (int)lpbmi->bmiHeader.biWidth,(int)lpbmi->bmiHeader.biHeight,
             (int)lpbmi->bmiHeader.biBitCount,(int)lpbmi->bmiHeader.biCompression,
             (int)lpbmi->bmiHeader.biClrUsed,xDest,yDest,(int)w,(int)h,(int)fuColorUse,(void*)m_renderer);
+    if (dibDbg) {
+        SDL_Rect vp{}; SDL_RenderGetViewport(m_renderer, &vp);
+        int lw=0,lh=0; SDL_RenderGetLogicalSize(m_renderer,&lw,&lh);
+        float sx=0,sy=0; SDL_RenderGetScale(m_renderer,&sx,&sy);
+        fprintf(stderr,"[dibst] vp=%d,%d %dx%d logical=%dx%d scale=%gx%g\n",
+            vp.x,vp.y,vp.w,vp.h,lw,lh,sx,sy);
+    }
 
     int width = lpbmi->bmiHeader.biWidth;
     int height = lpbmi->bmiHeader.biHeight; // Can be negative for top-down
@@ -5310,6 +5324,14 @@ static void PaintChildrenRecursive(HWND parentHwnd, SDL_Renderer* renderer, int 
         if (childBe && childBe->owner) {
             childAbsX = parentAbsX + childBe->owner->m_rect.left;
             childAbsY = parentAbsY + childBe->owner->m_rect.top;
+            static const bool dbgAbs = getenv("ROWAN_DEBUG_ABS") != nullptr;
+            if (dbgAbs)
+                fprintf(stderr,"[abs] %*sowner=%p %s id=%d tid=%d vis=%d m_rect=%ld,%ld-%ld,%ld abs=%d,%d pabs=%d,%d\n",
+                    depth*2,"",childBe->owner,typeid(*childBe->owner).name(),
+                    childBe->owner->m_nID, childBe->templateID, (int)childBe->visible,
+                    childBe->owner->m_rect.left,childBe->owner->m_rect.top,
+                    childBe->owner->m_rect.right,childBe->owner->m_rect.bottom,
+                    childAbsX,childAbsY,parentAbsX,parentAbsY);
             if (dumpLayout)
                 printf("[LAYOUT] %*shwnd=%p vis=%d tid=%d id=%d type=%s par=%p ptype=%s abs=(%d,%d) rect=(%ld,%ld)-(%ld,%ld)\n",
                     depth * 2, "",

@@ -487,7 +487,10 @@ int CRToolBar::GetDockSide(CPoint point,bool allowsideifgripper)
 //		CRect parentrect;
 //		m_pFrame->GetWindowRect(parentrect);
 		CRect rect;
-		m_pFrame->GetWindowRect(rect);
+		//RERUN: child rects are frame-client coords, but the frame's own
+		//GetWindowRect is screen space - use client rect so the spaces match
+		//(a centered OS window would shift dock detection by its position).
+		m_pFrame->GetClientRect(rect);
 		CRect rect2;
 		GetWindowRect(rect2);
 		point+=rect2.TopLeft();
@@ -524,7 +527,7 @@ BOOL CRToolBar::OnEraseBkgnd(CDC* pDC)
 	CRect rect;
 	GetWindowRect(rect);
 	CRect viewrect;
-	m_pFrame->GetWindowRect(viewrect);
+	m_pFrame->GetClientRect(viewrect);
 //DeadCode JIM 20Oct00 	int m_length=0;
 //	if (rect.Width()>m_length || rect.Height()>m_length)  // presumably width is always smaller than length
 	{
@@ -649,7 +652,8 @@ long CRToolBar::OnGetXYOffset()
 	CRect rect;
 	GetWindowRect(rect);
 	CRect viewrect;
-	m_pFrame->GetWindowRect(viewrect);
+	//RERUN: same client-space fix - viewrect offsets docked toolbar artwork.
+	m_pFrame->GetClientRect(viewrect);
 	int yoffset=0;
 	int xoffset=0;
 	if (m_index>-1) // offset the artwork if docked

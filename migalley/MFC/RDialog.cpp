@@ -297,7 +297,11 @@ RDialog*	RDialog::MakeParentDialog(CRect& dialsize,RDialog* parent,DialBox* tree
 		{
 			CRect apppos;
 			int delta=0;								//RERUN: uninit if flag outside POSN_MIN..MAX (scan-build)
-			m_pView->GetWindowRect(&apppos);
+			//RERUN: viewsize/dialsize are in view client coords - the deltas
+			//must be too. GetWindowRect returns screen coords, leaking the
+			//OS window's desktop position into every POSN_* dialog offset
+			//(invisible on Xvfb at 0,0; shifted down-right on real desktops).
+			m_pView->GetClientRect(&apppos);
 			if (apppos.Width()<m_pView->m_size.cx) 
 				apppos.bottom-=15;
 			if (apppos.Height()<m_pView->m_size.cy) 
@@ -345,15 +349,13 @@ RDialog*	RDialog::MakeParentDialog(CRect& dialsize,RDialog* parent,DialBox* tree
 	dial->dragstate=DRAG_NO;
 	dial->AddChildren(tree->diallist);
 	dial->MoveWindow(dial->viewsize);		//IDC_BUTTON1
-	m_pView->GetWindowRect(&rect);
-	std::cout << "[DIAL] viewrect=(" << rect.left << "," << rect.top << "," << rect.right << "," << rect.bottom << ") sheet=(" << main->viewsize.left << "," << main->viewsize.top << "," << main->viewsize.right << "," << main->viewsize.bottom << ")" << std::endl;
+	m_pView->GetClientRect(&rect);
 	if (main->viewsize.right>rect.right || main->viewsize.bottom>rect.bottom)
-	{					   
+	{
 		main->viewsize.left=rect.right-main->viewsize.Width();
 		main->viewsize.top=rect.bottom-main->viewsize.Height();
 		main->viewsize.right=rect.right;
 		main->viewsize.bottom=rect.bottom;
-		std::cout << "[DIAL] clamped sheet -> left=" << main->viewsize.left << " top=" << main->viewsize.top << std::endl;
 	}
 	main->SetMinSize(CRect(0,0,main->viewsize.Width(),main->viewsize.Height()));
 	main->SetMaxSize(CRect(0,0,main->viewsize.Width(),main->viewsize.Height()));

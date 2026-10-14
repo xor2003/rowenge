@@ -427,7 +427,9 @@ void	CMainFrame::PositionSysBox()
 	if (!m_wndSystemBox)
 		return;
 	CRect rect;
-	GetWindowRect(rect);
+	//RERUN: the system box is positioned in frame-client coords - use the
+	//client rect, not the screen-space window rect.
+	GetClientRect(rect);
 	CRect systemrect;
 
 	m_wndSystemBox->InDialAncestor()->GetClientRect(systemrect);
@@ -583,7 +585,12 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	// first row on top row is a bit shorter because of system box
 	int totalwidth=rect2.Width()-systemrect.Width()+1;
 	int totalheight=rect2.Height();
-	ClientToScreen(rect2);
+	//RERUN: toolbars/view are painted as children of the shared renderer, so
+	//their m_rect must stay in frame-client coords. Win32 needed
+	//ClientToScreen because they were real top-level windows; converting here
+	//leaks the OS window's desktop position into every docked toolbar and
+	//pushes the view's m_rect negative (invisible on a 0,0 desktop).
+	//ClientToScreen(rect2);
 	// Start with the top
 
 	position=m_top.GetHeadPosition();

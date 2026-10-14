@@ -344,7 +344,10 @@ RDialog*	RDialog::MakeParentDialog(CRect dialsize,RDialog* parent,const DialBox*
 		{
 			CRect apppos;
 			int delta;
-			m_pView->GetWindowRect(apppos);
+			//RERUN: viewsize/dialsize are view client coords - GetWindowRect
+			//returns screen coords and would leak the OS window's desktop
+			//position into every POSN_* offset (invisible at 0,0).
+			m_pView->GetClientRect(apppos);
 			if (apppos.Width()<m_pView->m_size.cx) 
 				apppos.bottom-=15;
 			if (apppos.Height()<m_pView->m_size.cy) 
@@ -393,6 +396,10 @@ RDialog*	RDialog::MakeParentDialog(CRect dialsize,RDialog* parent,const DialBox*
 	dial->dragstate=DRAG_NO;
 	dial->AddChildren(tree->diallist);
 	dial->MoveWindow(dial->viewsize);		//IDC_BUTTON1
+	if (getenv("ROWAN_DEBUG_POS"))
+		fprintf(stderr,"[pos] MP dial=%d viewsize=%d,%d-%d,%d main->viewsize=%d,%d-%d,%d\n",
+			(int)dial->MY_IID,(int)dial->viewsize.left,(int)dial->viewsize.top,(int)dial->viewsize.right,(int)dial->viewsize.bottom,
+			(int)main->viewsize.left,(int)main->viewsize.top,(int)main->viewsize.right,(int)main->viewsize.bottom);
 
 	if (cachedlocation>=0 && Save_Data.dialposmem[cachedlocation].l==-0x8000)
 	{
@@ -402,7 +409,9 @@ RDialog*	RDialog::MakeParentDialog(CRect dialsize,RDialog* parent,const DialBox*
 		Save_Data.dialposmem[cachedlocation].b=dial->viewsize.bottom;
 	}
 
-	GetDesktopWindow()->GetWindowRect(rect);
+	//RERUN: viewsize is in view client coords - clamp against the view's
+	//client rect, not the desktop rect (screen space).
+	m_pView->GetClientRect(rect);
 	int w=0;
 	if (	main->viewsize.left>rect.right-30 )
 	{
@@ -435,6 +444,9 @@ RDialog*	RDialog::MakeParentDialog(CRect dialsize,RDialog* parent,const DialBox*
 	main->SetMaxSize(CRect(0,0,main->viewsize.Width(),main->viewsize.Height()));
 //	dial->SetMinSize(CRect(0,0,main->viewsize.Width(),main->viewsize.Height()));
 //	dial->SetMaxSize(CRect(0,0,main->viewsize.Width(),main->viewsize.Height()));
+	if (getenv("ROWAN_DEBUG_POS"))
+		fprintf(stderr,"[pos] MP main move %d,%d-%d,%d (dial %d)\n",
+			(int)main->viewsize.left,(int)main->viewsize.top,(int)main->viewsize.right,(int)main->viewsize.bottom,(int)dial->MY_IID);
 	main->MoveWindow(main->viewsize);
 	// check if its the top sheet.
 /*	dial->m_systemopen.Create(">",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | BS_BITMAP,
