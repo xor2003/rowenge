@@ -244,6 +244,19 @@ target_link_options(bob_unit_tests PRIVATE -Wl,--gc-sections)
 target_link_libraries(bob_unit_tests PRIVATE ProjectDefaults)
 add_test(NAME bob_unit_tests COMMAND bob_unit_tests)
 
+# bob_dplay_net — loopback host+guest test of the native DirectPlay4
+# transport (discovery, join, player/group ids, routed Send/Receive).
+add_executable(bob_dplay_net
+    tests/bob_dplay_net.cpp
+    ${CMAKE_SOURCE_DIR}/MFC/dplay_net.cpp
+)
+target_include_directories(bob_dplay_net PRIVATE
+    ${CMAKE_SOURCE_DIR}/MFC
+    ${CMAKE_SOURCE_DIR}/H
+)
+target_link_libraries(bob_dplay_net PRIVATE ProjectDefaults pthread)
+add_test(NAME bob_dplay_net COMMAND bob_dplay_net)
+
 # ---------------------------------------------------------------------------
 # The `bob` executable (REQ-LAUNCH-02) — shell gate + real BoB entry.
 # Declared last: needs BOB_OVERLAY set and the module libs defined above.

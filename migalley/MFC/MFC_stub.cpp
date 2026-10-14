@@ -17,6 +17,7 @@
 
 #include "WIN32_COMPAT.H"
 #include "MFC_stub.h"
+#include "dplay_net.h"
 #include "dinput_stub.h"
 #include "DLGITEM.H"
 #include "RDIALOG.H"
@@ -6243,10 +6244,23 @@ char* _i64toa(long long value, char* str, int base)
     return str;
 }
 
-// DirectShow-era COM surface — nothing is ever instantiated.
-HRESULT CoCreateInstance(REFCLSID, LPUNKNOWN, DWORD, REFIID, LPVOID* ppv)
+// COM surface — DirectPlay is backed by our native LAN implementation
+// (dplay_net.cpp); other classes still report E_NOINTERFACE.
+HRESULT CoCreateInstance(REFCLSID clsid, LPUNKNOWN, DWORD, REFIID riid, LPVOID* ppv)
 {
     if (ppv) *ppv = nullptr;
+    /* CLSID_DirectPlay {D1EB6D20-8923-11D0-9D97-00A0C90A43CB} */
+    static const GUID CLSID_DP = {0xD1EB6D20, 0x8923, 0x11D0, {0x9D,0x97,0x00,0xA0,0xC9,0x0A,0x43,0xCB}};
+    /* IID_IDirectPlay4A — BoB's DX6-era {0AB1C531-...} and the later
+       DirectX IID {9D460580-...}; both get the same ANSI vtable object. */
+    static const GUID IID_DP4A_OLD = {0x0AB1C531, 0x4745, 0x11D1, {0xA7,0xA1,0x00,0x00,0xF8,0x03,0xAB,0xFC}};
+    static const GUID IID_DP4A     = {0x9D460580, 0xA822, 0x11CF, {0x96,0x17,0x00,0x80,0xC7,0x53,0x4E,0x82}};
+    static const GUID IID_DP4      = {0x9D460581, 0xA822, 0x11CF, {0x96,0x17,0x00,0x80,0xC7,0x53,0x4E,0x82}};
+    if (ppv && clsid == CLSID_DP &&
+        (riid == IID_DP4A_OLD || riid == IID_DP4A || riid == IID_DP4)) {
+        *ppv = RowanDPlay_CreateInstance();
+        return S_OK;
+    }
     return E_NOINTERFACE;
 }
 

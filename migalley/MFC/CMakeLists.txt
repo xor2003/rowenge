@@ -4,6 +4,7 @@ project(MFC LANGUAGES CXX)
 set(ROWAN_MFC_SOURCES
     uid_reverse.cpp
     MFC_stub.cpp
+    dplay_net.cpp
     MIGVIEW.CPP
     CntrItem.cpp
     CREDITS.CPP
