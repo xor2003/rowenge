@@ -74,142 +74,145 @@ questions about this file may be asked at http://www.simhq.com/
 #include "RESOURCE.H"
 #include "MIGVIEW.H"
 
+// RERUN: BoB-only helper exported by bob/mfc/uiicons.cpp (weak — nullptr in MiG).
+extern "C" __attribute__((weak)) bool RowanUIDrawIcon(void* cdc, long iconsui, int x, int y);
+
 /////////////////////////////////////////////////////////////////////////////
 // CRSpinBut
 
-IMPLEMENT_DYNCREATE(CRSpinBut, CWnd)
+IMPLEMENT_DYNCREATE(CRSpinBut, DlgItem)
 
-/////////////////////////////////////////////////////////////////////////////
-// CRSpinBut properties
+BEGIN_MESSAGE_MAP(CRSpinBut, DlgItem)
+	ON_WM_PAINT()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+END_MESSAGE_MAP()
 
-OLE_COLOR CRSpinBut::GetForeColor()
-{
-	OLE_COLOR result;
-	GetProperty(DISPID_FORECOLOR, VT_I4, (void*)&result);
-	return result;
-}
-
-void CRSpinBut::SetForeColor(OLE_COLOR propVal)
-{
-	SetProperty(DISPID_FORECOLOR, VT_I4, propVal);
-}
-
-long CRSpinBut::GetRepeatDelay()
-{
-	long result;
-	GetProperty(0x1, VT_I4, (void*)&result);
-	return result;
-}
-
-void CRSpinBut::SetRepeatDelay(long propVal)
-{
-	SetProperty(0x1, VT_I4, propVal);
-}
-
-long CRSpinBut::GetIndex()
-{
-	long result;
-	GetProperty(0x2, VT_I4, (void*)&result);
-	return result;
-}
-
-void CRSpinBut::SetIndex(long propVal)
-{
-	SetProperty(0x2, VT_I4, propVal);
-}
-
-long CRSpinBut::GetFontNum()
-{
-	long result;
-	GetProperty(0x3, VT_I4, (void*)&result);
-	return result;
-}
-
-void CRSpinBut::SetFontNum(long propVal)
-{
-	SetProperty(0x3, VT_I4, propVal);
-}
-
-long CRSpinBut::GetCurrentValue()
-{
-	long result;
-	GetProperty(0x4, VT_I4, (void*)&result);
-	return result;
-}
-
-void CRSpinBut::SetCurrentValue(long propVal)
-{
-	SetProperty(0x4, VT_I4, propVal);
-}
+// RERUN: real in-process state (the InvokeHelper bodies were no-ops)
+OLE_COLOR CRSpinBut::GetForeColor() { return m_foreColor; }
+void CRSpinBut::SetForeColor(OLE_COLOR propVal) { m_foreColor = propVal; Invalidate(); }
+long CRSpinBut::GetRepeatDelay() { return m_repeatDelay; }
+void CRSpinBut::SetRepeatDelay(long propVal) { m_repeatDelay = propVal; }
+long CRSpinBut::GetIndex() { return m_index; }
+void CRSpinBut::SetIndex(long propVal) { m_index = propVal; Invalidate(); }
+long CRSpinBut::GetFontNum() { return m_FontNum; }
+void CRSpinBut::SetFontNum(long propVal) { m_FontNum = propVal; Invalidate(); }
+long CRSpinBut::GetCurrentValue() { return m_currentValue; }
+void CRSpinBut::SetCurrentValue(long propVal) { m_currentValue = propVal; Invalidate(); }
 
 /////////////////////////////////////////////////////////////////////////////
 // CRSpinBut operations
 
-void CRSpinBut::AddString(LPCTSTR text)
-{
-	static BYTE parms[] =
-		VTS_BSTR;
-	InvokeHelper(0x5, DISPATCH_METHOD, VT_EMPTY, NULL, parms,
-		 text);
-}
-
+void CRSpinBut::AddString(LPCTSTR text) { m_list.push_back(CString(text)); }
 void CRSpinBut::DeleteString(long Index)
 {
-	static BYTE parms[] =
-		VTS_I4;
-	InvokeHelper(0x6, DISPATCH_METHOD, VT_EMPTY, NULL, parms,
-		 Index);
+	if (Index >= 0 && Index < (long)m_list.size())
+		m_list.erase(m_list.begin() + Index);
 }
-
-void CRSpinBut::Clear()
-{
-	InvokeHelper(0x7, DISPATCH_METHOD, VT_EMPTY, NULL, NULL);
-}
+void CRSpinBut::Clear() { m_list.clear(); m_index = 0; }
 
 BOOL CRSpinBut::SetPriceOption(long min, long max, long current)
 {
-	BOOL result;
-	static BYTE parms[] =
-		VTS_I4 VTS_I4 VTS_I4;
-	InvokeHelper(0x8, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
-		min, max, current);
-	return result;
+	m_min = min; m_max = max; m_currentValue = current; m_SpinState = 1;
+	Invalidate(); return TRUE;
 }
-
 BOOL CRSpinBut::SetValueOption(long min, long max, long current)
 {
-	BOOL result;
-	static BYTE parms[] =
-		VTS_I4 VTS_I4 VTS_I4;
-	InvokeHelper(0x9, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
-		min, max, current);
-	return result;
+	m_min = min; m_max = max; m_currentValue = current; m_SpinState = 2;
+	Invalidate(); return TRUE;
 }
-
-void CRSpinBut::SetPassWord(BOOL ispassword)
-{
-	static BYTE parms[] =
-		VTS_BOOL;
-	InvokeHelper(0xa, DISPATCH_METHOD, VT_EMPTY, NULL, parms,
-		 ispassword);
-}
-
+void CRSpinBut::SetPassWord(BOOL) {}
 BOOL CRSpinBut::SetSearchValueOption(long min, long max, long current)
 {
-	BOOL result;
-	static BYTE parms[] =
-		VTS_I4 VTS_I4 VTS_I4;
-	InvokeHelper(0xb, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
-		min, max, current);
-	return result;
+	m_min = min; m_max = max; m_currentValue = current; m_SpinState = 3;
+	Invalidate(); return TRUE;
 }
-
 BOOL CRSpinBut::SetPlayerNegPriceOption(long min, long max, long current)
 {
-	BOOL result;
-	static BYTE parms[] =
-		VTS_I4 VTS_I4 VTS_I4;
-	InvokeHelper(0xc, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
-		min, max, current);
-	return result;
+	m_min = min; m_max = max; m_currentValue = current; m_SpinState = 4;
+	Invalidate(); return TRUE;
+}
+
+// RERUN: mirror of rspinbtc.cpp::OnDraw — text clipped to the right 15px,
+// up/down sheet icons at the right edge, lite/dark L-border.
+void CRSpinBut::OnPaint()
+{
+	CPaintDC dc(this);
+	CRect rc;
+	GetClientRect(rc);
+
+	static const bool spinDbg = getenv("ROWAN_DEBUG_BMP") != nullptr;
+	if (spinDbg)
+		fprintf(stderr, "[spin] ctl=%d this=%p state=%d idx=%ld list=%zu cur=%ld en=%d\n",
+			GetDlgCtrlID(), (void*)this, (int)m_SpinState, m_index,
+			m_list.size(), m_currentValue, (int)IsWindowEnabled());
+
+	CString text;
+	if (m_SpinState == 2 || m_SpinState == 1) {
+		char buf[32]; snprintf(buf, sizeof(buf), "%ld", m_currentValue); text = buf;
+	} else if (m_index >= 0 && m_index < (long)m_list.size()) {
+		text = m_list[m_index];
+	}
+
+	dc.SetBkMode(TRANSPARENT);
+	dc.SetTextColor(m_foreColor ? m_foreColor : RGB(255,255,255));
+	dc.SetTextAlign(TA_LEFT | TA_TOP);
+
+	CFont* pOldFont = nullptr;
+	if (GetParent()) {
+		CFont* pNewFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(m_FontNum));
+		if (pNewFont) pOldFont = dc.SelectObject(pNewFont);
+	}
+
+	if (!text.IsEmpty()) {
+		CRect clip = rc; clip.right -= 15;
+		dc.DrawText(text, clip, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+	}
+
+	// up/down arrows — ICON_PAGE_1(0x10000)|18 = ICON_SPINDOWN, |19 = ICON_SPINUP
+	if (RowanUIDrawIcon && IsWindowEnabled()) {
+		RowanUIDrawIcon(&dc, 0x10012, rc.right - 14, 2);
+		RowanUIDrawIcon(&dc, 0x10013, rc.right - 14, rc.Height() / 2);
+	}
+
+	// lite right+bottom edge, dark left+top edge
+	CPen darkPen, litePen;
+	darkPen.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+	litePen.CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+	CPen* oldPen = dc.SelectObject(&litePen);
+	dc.MoveTo(rc.right - 1, rc.top);
+	dc.LineTo(rc.right - 1, rc.bottom - 1);
+	dc.LineTo(rc.left, rc.bottom - 1);
+	dc.SelectObject(&darkPen);
+	dc.LineTo(rc.left, rc.top);
+	dc.LineTo(rc.right - 1, rc.top);
+	dc.SelectObject(oldPen);
+
+	if (pOldFont) dc.SelectObject(pOldFont);
+}
+
+void CRSpinBut::OnLButtonDown(UINT, CPoint point)
+{
+	m_bMouseDown = TRUE;
+	CRect rc; GetClientRect(rc);
+	m_bDownHalf = (point.y > rc.Height() / 2);
+}
+
+void CRSpinBut::OnLButtonUp(UINT, CPoint point)
+{
+	if (!m_bMouseDown) return;
+	m_bMouseDown = FALSE;
+	CRect rc; GetClientRect(rc);
+	if (!rc.PtInRect(point)) return;
+	int dir = (point.y > rc.Height() / 2) ? -1 : 1;
+	if (!m_list.empty()) {
+		m_index += dir;
+		if (m_index < 0) m_index = 0;
+		if (m_index >= (long)m_list.size()) m_index = (long)m_list.size() - 1;
+	} else if (m_SpinState) {
+		m_currentValue += dir;
+		if (m_currentValue < m_min) m_currentValue = m_min;
+		if (m_max > m_min && m_currentValue > m_max) m_currentValue = m_max;
+	}
+	Invalidate();
 }

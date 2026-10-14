@@ -76,6 +76,8 @@ questions about this file may be asked at http://www.simhq.com/
 #include "FILES.H"
 #include "FILEMAN.H" //RERUN for File_Man/namenumberedfilelessfail
 
+static bool RowanDbgRadio() { static const bool b = getenv("ROWAN_DEBUG_RADIO") != nullptr; return b; }
+
 /////////////////////////////////////////////////////////////////////////////
 // CRRadio
 
@@ -243,7 +245,7 @@ void CRRadio::OnPaint()
     if (colWidth < 1) colWidth = 1;
     if (rowHeight < buttonHeight) rowHeight = buttonHeight;
 
-    if (getenv("ROWAN_DEBUG_RADIO"))
+    if (RowanDbgRadio())
         fprintf(stderr, "[rradio] rect=%dx%d fontNum=%ld pFont=%p cols=%d colW=%d rowH=%d aveW=%d textH=%ld btns=%zu sel=%ld\n",
             rect.Width(), rect.Height(), m_fontNum, (void*)pFont, cols, colWidth,
             rowHeight, aveCharWidth, (long)textSize.cy, m_buttons.size(), m_currentSelection);

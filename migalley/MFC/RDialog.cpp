@@ -98,6 +98,8 @@ questions about this file may be asked at http://www.simhq.com/
 #include "MAINFRM.H"
 #include <climits>
 
+static bool RowanDbgRadio() { static const bool b = getenv("ROWAN_DEBUG_RADIO") != nullptr; return b; }
+
 //#ifdef _DEBUG
 //#define new DEBUG_NEW
 //#ifndef	THIS_FILE_DEFINED
@@ -1838,7 +1840,7 @@ CFont* RDialog::OnGetGlobalFont(int fontnum)
 	if (m_scalingfactor>1.5) f = g_AllFonts[fontnum][3];
 	else f = g_AllFonts[fontnum][0];
 
-	if (getenv("ROWAN_DEBUG_RADIO"))
+	if (RowanDbgRadio())
 		fprintf(stderr, "[rdialog-font] this=%p fontnum=%d scaling=%g f=%p\n",
 			(void*)this, fontnum, m_scalingfactor, (void*)f);
 	if (!f) std::cout << "[RDialog] OnGetGlobalFont: Returning NULL for fontnum=" << fontnum << " scaling=" << m_scalingfactor << std::endl;

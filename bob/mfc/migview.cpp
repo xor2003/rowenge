@@ -3298,6 +3298,11 @@ void CMIGView::UpdateBitmaps(CDC* pDC,CRect bounds)
 	hDC = pDC->GetSafeHdc( );  // gets and stores handle of mapdlg DC	
 	assert(areax==1 || startx<areax);
 	assert(areay==1 || starty<areay);
+	static const bool mapDbg = getenv("ROWAN_DEBUG_BMP") != nullptr;
+	if (mapDbg)
+		fprintf(stderr,"[map] UpdateBitmaps bounds=%ld,%ld-%ld,%ld scroll=%ld,%ld zoom=%g ss=%d area=%dx%d\n",
+			(long)bounds.left,(long)bounds.top,(long)bounds.right,(long)bounds.bottom,
+			(long)m_scrollpoint.x,(long)m_scrollpoint.y,mzoom,zoomsquaresize,areax,areay);
 	int sstartx=max((m_scrollpoint.x+rect.left)/zoomsquaresize,0);
 	int sstarty=max((m_scrollpoint.y+rect.top)/zoomsquaresize,0);
 	int endx=min((m_scrollpoint.x+rect.right+zoomsquaresize-1)/zoomsquaresize,areax);
@@ -3458,6 +3463,10 @@ void CMIGView::UpdateBitmaps(CDC* pDC,CRect bounds)
 			{
 				fileblock fb(FileNum(startfile+x+areax*(areay-y-1)),PalTrans);
 				pData=(BYTE*)getdata(fb);
+				if (mapDbg)
+					fprintf(stderr,"[map] tile %d,%d fn=%d pData=%p magic=%02x%02x\n",
+						x,y,startfile+x+areax*(areay-y-1),(void*)pData,
+						pData?pData[0]:0,pData?pData[1]:0);
 				if (pData && pData[0]=='B' && pData[1]=='M') // checks if its a bitmap file
 				{
 					// now render it...

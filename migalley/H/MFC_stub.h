@@ -1722,6 +1722,9 @@ public:
     BITMAP info{};   // width, height, etc.
     SDL_Texture* m_texture = nullptr;
     SDL_Renderer* m_pRenderer = nullptr;
+    // Set by FromHandle: the SDL_Surface in m_hObject is owned by the
+    // caller's HBITMAP, so DeleteObject must not free it.
+    bool m_borrowedHandle = false;
 
     CBitmap() = default;
     ~CBitmap() { DeleteObject(); }
@@ -1733,8 +1736,8 @@ public:
     SDL_Texture* GetTexture(SDL_Renderer* renderer);
 
     // BoB's uiicons wraps raw HBITMAPs — our objects are heap-owned;
-    // FromHandle returns a wrapper borrowed for the call duration.
-    static CBitmap* FromHandle(HBITMAP /*h*/) { return nullptr; }
+    // FromHandle returns a stable non-owning wrapper per handle.
+    static CBitmap* FromHandle(HBITMAP h);
 };
 
 

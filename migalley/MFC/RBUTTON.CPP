@@ -76,7 +76,14 @@ questions about this file may be asked at http://www.simhq.com/
 #include "RTOOLBAR.H" //RERUN for CRToolBar check
 #include "FILEMAN.H" //RERUN for fileblock
 
+static bool RowanDbgBmp()   { static const bool b = getenv("ROWAN_DEBUG_BMP")   != nullptr; return b; }
+
 extern bool g_rowanGameIsBoB;
+
+// RERUN: BoB-only helper exported by bob/mfc/uiicons.cpp — draws an icon from
+// the shared IconDescUI sheet (MaskIcon AND/OR pair). Weak so the MiG Alley
+// link (which has no uiicons.cpp) resolves it to nullptr.
+extern "C" __attribute__((weak)) bool RowanUIDrawIcon(void* cdc, long iconsui, int x, int y);
 
 /////////////////////////////////////////////////////////////////////////////
 // CRButton
@@ -291,7 +298,25 @@ void CRButton::OnPaint()
 	}
 	// RERUN HACK END
 
-	if (m_iIconEnum != 0)
+	// RERUN: BoB glyph buttons (tickboxes, map-filter icons) persist an IconsUI
+	// sheet index in m_iIconEnum rather than a FileNum: <0x10000 is a page-1
+	// entry index, 0x1xxxx arrives already page-tagged. FileNum metadata (e.g.
+	// IDC_AUTHORISE=27299) keeps the artwork path. Mirrors rbuttonc.cpp's
+	// `filenum >= ICON_PAGE_1` split and ICON_SELECT_* state offsets.
+	bool iconGlyphDrawn = false;
+	if (g_rowanGameIsBoB && m_iIconEnum != 0 &&
+	    (m_iIconEnum < 0x10000 || (m_iIconEnum & 0xff0000) != 0))
+	{
+		long iu = m_iIconEnum;
+		if (iu < 0x10000) iu |= 0x10000;          // ICON_PAGE_1
+		if (m_bDisabled)          iu |= 0x4000000; // ICON_SELECT_4
+		else if (m_bMouseDown)    iu |= 0x2000000; // ICON_SELECT_2
+		else if (m_bPressed)      iu |= 0x1000000; // ICON_SELECT_1
+		if (RowanUIDrawIcon)
+			iconGlyphDrawn = RowanUIDrawIcon(&dc, iu, 0, 0);
+	}
+
+	if (m_iIconEnum != 0 && !iconGlyphDrawn)
 	{
 		m_nNormalFileNum = (FileNum)(m_iIconEnum + 2);
 		m_nDisabledFileNum = (FileNum)m_iIconEnum;
@@ -397,7 +422,7 @@ void CRButton::OnPaint()
 				pOldFont = dc.SelectObject(pNewFont);
 		}
 
-		if (getenv("ROWAN_DEBUG_BMP"))
+		if (RowanDbgBmp())
 		{
 			TEXTMETRIC tmd; memset(&tmd, 0, sizeof(tmd)); dc.GetTextMetrics(&tmd);
 			int pdlg = -1;

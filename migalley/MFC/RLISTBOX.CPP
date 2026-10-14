@@ -82,6 +82,9 @@ questions about this file may be asked at http://www.simhq.com/
 #include <algorithm>
 #include <iostream>
 
+static bool RowanDbgBmp()   { static const bool b = getenv("ROWAN_DEBUG_BMP")   != nullptr; return b; }
+static bool RowanDbgRadio() { static const bool b = getenv("ROWAN_DEBUG_RADIO") != nullptr; return b; }
+
 struct RListBoxData {
     std::vector<int> colWidths;
     std::map<int, std::vector<std::string>> columns; // col -> rows
@@ -125,7 +128,7 @@ static RListBoxData& GetData(CWnd* wnd) {
 static CFont* ResolveGlobalFont(CWnd* pParent, int fontNum)
 {
 	if (!pParent) {
-		if (getenv("ROWAN_DEBUG_RADIO"))
+		if (RowanDbgRadio())
 			fprintf(stderr, "[rradio-fontres] parent=NULL\n");
 		return nullptr;
 	}
@@ -148,7 +151,7 @@ static CFont* ResolveGlobalFont(CWnd* pParent, int fontNum)
 		}
 		f = b;
 	}
-	if (getenv("ROWAN_DEBUG_RADIO"))
+	if (RowanDbgRadio())
 		fprintf(stderr, "[rradio-fontres] parent=%p cls=%s idx=%d msg=%p\n",
 			(void*)pParent, pParent->GetRuntimeClass() ? pParent->GetRuntimeClass()->m_lpszClassName : "?",
 			idx, (void*)f);
@@ -282,7 +285,7 @@ void CRListBox::OnPaint()
 			if (col == lastCol)
 				width = listRect.right - x;
 			if (width <= 0) break;
-			static bool ldb = getenv("ROWAN_DEBUG_BMP") != nullptr;
+			static bool ldb = RowanDbgBmp();
 			if (ldb && row < 12 && data.columns.count(col) && row < (int)data.columns[col].size())
 				fprintf(stderr,"[lb] this=%p row=%d col=%d x=%d w=%d text='%s' ext=%d\n",
 					(void*)this,row,(int)col,x,width,data.columns[col][row].c_str(),
@@ -883,7 +886,7 @@ void CRListBox::AddPersistedColumn(long charUnits, long alignFlags)
 		if (dc.GetTextMetrics(&tm) && tm.tmHeight > 0)
 			width = (width * tm.tmHeight) / 16;
 		if (pOldFont) dc.SelectObject(pOldFont);
-		if (getenv("ROWAN_DEBUG_RADIO"))
+		if (RowanDbgRadio())
 			fprintf(stderr, "[rradio-addcol] this=%p fontNum2=%d tmH=%d units=%ld -> w=%ld\n",
 				(void*)this, data.fontNum2, (int)tm.tmHeight, charUnits, width);
 	}

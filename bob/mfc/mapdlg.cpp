@@ -479,6 +479,10 @@ void CMapDlg::OnPaint()
 	CDC* pDC;
 	pDC=this->BeginPaint(&paintstruct);
 	RECT& bounds=paintstruct.rcPaint;
+	static const bool mapdlgDbg = getenv("ROWAN_DEBUG_BMP") != nullptr;
+	if (mapdlgDbg)
+		fprintf(stderr,"[mapdlg] OnPaint bounds=%ld,%ld-%ld,%ld view=%p\n",
+			(long)bounds.left,(long)bounds.top,(long)bounds.right,(long)bounds.bottom,(void*)RDialog::m_pView);
 //DEADCODE RDH 22/05/00 	::AfxTrace("Refresh area (%i,%i),(%i,%i)\n",bounds.left,bounds.top,bounds.right,bounds.bottom);
 	inside_move=11;
 //DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("Draw{"));

@@ -38,6 +38,9 @@
 #include <SDL_ttf.h>
 #include <nlohmann/json.hpp>
 
+static bool RowanDbgBmp()   { static const bool b = getenv("ROWAN_DEBUG_BMP")   != nullptr; return b; }
+static bool RowanDbgRadio() { static const bool b = getenv("ROWAN_DEBUG_RADIO") != nullptr; return b; }
+
 float g_dluX = 1.5; // 1.5 to 2 is typical for 8pt font
 float g_dluY = 1.5;
 
@@ -261,7 +264,7 @@ static std::string GetSystemFontPath(const char* faceName = nullptr, bool bold =
     candidates.push_back("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
     candidates.push_back("./INTEL.TTF");
 
-    static bool fdbg = getenv("ROWAN_DEBUG_BMP") != nullptr;
+    static const bool fdbg = RowanDbgBmp();
     for (const auto& f : candidates) {
         FILE* fp = fopen(f.c_str(), "rb");
         if (fp) {
@@ -1907,14 +1910,71 @@ CFont* CDC::GetCurrentFont() const
     return m_pCurrentFont;
 }
 BOOL CDC::BitBlt(int x, int y, int cx, int cy,
-                 CDC* pSrcDC, int srcX, int srcY, DWORD /*rop*/)
+                 CDC* pSrcDC, int srcX, int srcY, DWORD rop)
 {
-    if (getenv("ROWAN_DEBUG_BMP"))
-        fprintf(stderr,"[bitblt] dest=(%d,%d) %dx%d srcdc=%p selbmp=%p\n",
+    static const bool bltDbg = RowanDbgBmp();
+    if (bltDbg)
+        fprintf(stderr,"[bitblt] dest=(%d,%d) %dx%d srcdc=%p selbmp=%p rop=%x\n",
             x,y,cx,cy,(void*)pSrcDC,
-            pSrcDC?(void*)pSrcDC->m_selectedBitmap:0);
+            pSrcDC?(void*)pSrcDC->m_selectedBitmap:0,(unsigned)rop);
     if (!pSrcDC || !pSrcDC->m_selectedBitmap)
         return FALSE;
+
+    // Bitwise raster ops (SRCAND/SRCPAINT — BoB's MaskIcon AND/OR pair) can't
+    // be expressed as SDL blends, so combine against a readback of the target.
+    if (rop == SRCAND || rop == SRCPAINT)
+    {
+        SDL_Surface* srcRaw = (SDL_Surface*)pSrcDC->m_selectedBitmap->m_hObject;
+        if (!srcRaw || cx <= 0 || cy <= 0) return FALSE;
+        if (srcX + cx > srcRaw->w) cx = srcRaw->w - srcX;
+        if (srcY + cy > srcRaw->h) cy = srcRaw->h - srcY;
+        if (cx <= 0 || cy <= 0 || srcX < 0 || srcY < 0) return FALSE;
+        SDL_Surface* srcA = SDL_ConvertSurfaceFormat(srcRaw, SDL_PIXELFORMAT_ARGB8888, 0);
+        SDL_Surface* dstA = SDL_CreateRGBSurfaceWithFormat(0, cx, cy, 32, SDL_PIXELFORMAT_ARGB8888);
+        if (!srcA || !dstA) {
+            if (srcA) SDL_FreeSurface(srcA);
+            if (dstA) SDL_FreeSurface(dstA);
+            return FALSE;
+        }
+        SDL_Rect drect{ x, y, cx, cy };
+        bool got = false;
+        if (m_renderer)
+            got = (SDL_RenderReadPixels(m_renderer, &drect, SDL_PIXELFORMAT_ARGB8888,
+                                        dstA->pixels, dstA->pitch) == 0);
+        else if (m_targetSurface) {
+            SDL_SetSurfaceBlendMode(dstA, SDL_BLENDMODE_NONE);
+            got = (SDL_BlitSurface(m_targetSurface, &drect, dstA, nullptr) == 0);
+        }
+        if (!got) { SDL_FreeSurface(srcA); SDL_FreeSurface(dstA); return FALSE; }
+
+        const int bpp = srcA->format->BytesPerPixel;
+        for (int row = 0; row < cy; ++row) {
+            const Uint8* srow = (const Uint8*)srcA->pixels + (srcY + row) * srcA->pitch + srcX * bpp;
+            Uint32* drow = (Uint32*)((Uint8*)dstA->pixels + row * dstA->pitch);
+            for (int col = 0; col < cx; ++col) {
+                Uint32 s = (bpp == 4) ? ((const Uint32*)srow)[col]
+                         : (bpp == 2) ? ((const Uint16*)srow)[col]
+                         : srow[col];
+                drow[col] = (rop == SRCAND) ? (drow[col] & s) : (drow[col] | s);
+            }
+        }
+        SDL_FreeSurface(srcA);
+
+        BOOL ok = FALSE;
+        if (m_renderer) {
+            SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer, dstA);
+            if (tex) {
+                SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE);
+                ok = (SDL_RenderCopy(m_renderer, tex, nullptr, &drect) == 0);
+                SDL_DestroyTexture(tex);
+            }
+        } else if (m_targetSurface) {
+            SDL_SetSurfaceBlendMode(dstA, SDL_BLENDMODE_NONE);
+            ok = (SDL_BlitSurface(dstA, nullptr, m_targetSurface, &drect) == 0);
+        }
+        SDL_FreeSurface(dstA);
+        return ok;
+    }
 
     // If we have a renderer, use hardware acceleration
     if (m_renderer) {
@@ -1986,7 +2046,8 @@ int CDC::SetDIBitsToDevice(int xDest, int yDest, DWORD w, DWORD h, int xSrc, int
 {
     if (!m_renderer || !lpvBits || !lpbmi) return 0;
 
-    if (getenv("ROWAN_DEBUG_BMP"))
+    static const bool dibDbg = RowanDbgBmp();
+    if (dibDbg)
         fprintf(stderr,"[dib] %dx%d bpp=%d comp=%d clrused=%d dest=(%d,%d) wh=%dx%d use=%d rdr=%p\n",
             (int)lpbmi->bmiHeader.biWidth,(int)lpbmi->bmiHeader.biHeight,
             (int)lpbmi->bmiHeader.biBitCount,(int)lpbmi->bmiHeader.biCompression,
@@ -2648,7 +2709,7 @@ BOOL CWnd::SubclassWindow(HWND hWnd)
     WindowBackend* be = backend_from_hwnd(hWnd);
     if (be)
     {
-        if (getenv("ROWAN_DEBUG_BMP"))
+        if (RowanDbgBmp())
             fprintf(stderr, "[subclass] this=%p hwnd=%p oldowner=%p templctl=%d\n",
                 (void*)this, (void*)hWnd, (void*)be->owner, be->templateID);
         // The placeholder CWnd/DlgItem object is now orphaned. This is a known
@@ -2734,9 +2795,48 @@ void CWnd::MapDialogRect(LPRECT lpRect) const
     lpRect->top    *= g_dluY;
     lpRect->bottom *= g_dluY;
 }
-CDC* CWnd::BeginPaint(PAINTSTRUCT* /*ps*/)
+CDC* CWnd::BeginPaint(PAINTSTRUCT* ps)
 {
     WindowBackend* be = backend_from_hwnd(m_hWnd);
+    // RERUN: Win32 BeginPaint fills rcPaint with the update region's
+    // bounding box in client coords. BoB's CMapDlg::OnPaint passes it
+    // to UpdateBitmaps as the tile range — leaving it uninitialised
+    // made it blit map tiles at garbage coordinates. Union the tracked
+    // dirty regions; fall back to the whole client rect.
+    if (ps)
+    {
+        CRect cli;
+        GetClientRect(&cli);
+        RECT u;
+        bool have = be && !be->dirtyRegions.empty();
+        if (have)
+        {
+            u.left = be->dirtyRegions[0].x;
+            u.top = be->dirtyRegions[0].y;
+            u.right = be->dirtyRegions[0].x + be->dirtyRegions[0].w;
+            u.bottom = be->dirtyRegions[0].y + be->dirtyRegions[0].h;
+            for (size_t i = 1; i < be->dirtyRegions.size(); ++i)
+            {
+                const SDL_Rect& r = be->dirtyRegions[i];
+                if (r.x < u.left) u.left = r.x;
+                if (r.y < u.top) u.top = r.y;
+                if (r.x + r.w > u.right) u.right = r.x + r.w;
+                if (r.y + r.h > u.bottom) u.bottom = r.y + r.h;
+            }
+        }
+        else
+        {
+            u.left = cli.left; u.top = cli.top;
+            u.right = cli.right; u.bottom = cli.bottom;
+        }
+        if (u.left < cli.left) u.left = cli.left;
+        if (u.top < cli.top) u.top = cli.top;
+        if (u.right > cli.right) u.right = cli.right;
+        if (u.bottom > cli.bottom) u.bottom = cli.bottom;
+        ps->rcPaint = u;
+        ps->fErase = TRUE;
+        ps->hdc = nullptr;
+    }
     // Win32 BeginPaint validates the update region — the window stops
     // being dirty here, not in EndPaint.
     // Exception: while DirectDraw presents own the window, EndPaint and
@@ -3740,6 +3840,7 @@ void CComboBox::ResetContent() {}
 std::map<int, DlgTemplate> g_dlgTemplates;
 // RERUN: Store DLGINIT strings for controls (DialogID -> ControlID -> Text)
 std::map<int, std::map<int, std::string>> g_dlgInitStrings;
+std::map<int, std::map<int, std::vector<std::string>>> g_dlgInitStringsList;
 std::map<int, std::map<int, std::vector<long>>> g_dlgInitWords;
 // RERUN: Store dialog captions (DialogID -> Caption)
 std::map<int, std::string> g_dlgCaptions;
@@ -3763,7 +3864,7 @@ static void ApplyRListBoxPersistBlob(CRListBox* pLB, const std::vector<long>& w,
     if ((w[4] & 0xffff) != 0x0009 || (w[5] & 0xffff) != 0) return;
     long fontNum  = (long)(int)((w[27] & 0xffff) | ((w[28] & 0xffff) << 16));
     long fontNum2 = (long)(int)((w[29] & 0xffff) | ((w[30] & 0xffff) << 16));
-    if (getenv("ROWAN_DEBUG_RADIO"))
+    if (RowanDbgRadio())
         fprintf(stderr, "[rradio-font] dlg=%d ctl=%d fontNum=%ld fontNum2=%ld\n",
             dlgID, ctlID, fontNum, fontNum2);
     pLB->SetFontNum(fontNum);
@@ -3775,7 +3876,7 @@ static void ApplyRListBoxPersistBlob(CRListBox* pLB, const std::vector<long>& w,
         if (!cw) continue;
         long align = (long)(int)((w[base + 9 + 2 * i] & 0xffff) |
                         ((w[base + 10 + 2 * i] & 0xffff) << 16));
-        if (getenv("ROWAN_DEBUG_RADIO"))
+        if (RowanDbgRadio())
             fprintf(stderr, "[rradio-cols] dlg=%d ctl=%d A%d=%ld C%d=%ld\n",
                 dlgID, ctlID, i, cw, i, align);
         pLB->AddPersistedColumn(cw, align);
@@ -3795,7 +3896,7 @@ void AFXAPI DDX_Control(CDataExchange* pDX, int nIDC, CWnd& rControl)
             HWND hWnd = pOldCtrl->GetSafeHwnd();
             if (hWnd)
             {
-                if (getenv("ROWAN_DEBUG_BMP")) {
+                if (RowanDbgBmp()) {
                     WindowBackend* dbe = backend_from_hwnd(pDX->m_pDlgWnd->GetSafeHwnd());
                     fprintf(stderr, "[ddx] nIDC=%d dlgTempl=%d dlgObj=%p dlgType=%s rControl=%p type=%s old=%p\n",
                         nIDC, dbe ? dbe->templateID : -1, (void*)pDX->m_pDlgWnd,
@@ -4102,6 +4203,11 @@ void ParseRCFile(const std::string& filename)
                             // (index 0 is often copyright/empty).
                             if (dlgID != 0 && entry_json.contains("strings") && entry_json["strings"].is_array()) {
                                 const auto& strings = entry_json["strings"];
+                                std::vector<std::string> all;
+                                for (const auto& s : strings)
+                                    if (s.is_string()) all.push_back(s.get<std::string>());
+                                if (!all.empty())
+                                    g_dlgInitStringsList[dlgID][control_id] = all;
                                 if (strings.size() >= 2 && strings[1].is_string()) {
                                     std::string val = strings[1].get<std::string>();
                                     if (!val.empty()) {
@@ -4495,11 +4601,21 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                         ((CRButton*)pChild)->SetCloseButton(TRUE);
                         ((CRButton*)pChild)->SetHelpButton(TRUE);
                     }
+                    // RERUN: persisted icon metadata applies to template
+                    // children too (the DDX path already covers members) —
+                    // BoB tickboxes carry an IconsUI index in icon_enum.
+                    auto itBM = g_buttonMetadataMap.find(id);
+                    if (itBM != g_buttonMetadataMap.end()) {
+                        auto itM = itBM->second.find(ctl.id);
+                        if (itM != itBM->second.end() && itM->second.icon_enum != 0)
+                            ((CRButton*)pChild)->SetButtonMetadata(
+                                itM->second.icon_enum, itM->second.icon_name.c_str());
+                    }
                     // RERUN: RButtonDate — the OCX blob carries a font prop we
                     // don't decode; retail shows the strip date at ~20px.
                     if (id == 289 && ctl.id == 1469) {
                         ((CRButton*)pChild)->SetFontNum(10);
-                        if (getenv("ROWAN_DEBUG_BMP"))
+                        if (RowanDbgBmp())
                             fprintf(stderr, "[rbtn-font] set ctl=%d pChild=%p fontNum=10\n",
                                 ctl.id, (void*)pChild);
                     }
@@ -4529,19 +4645,40 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                 // RERUN: Apply style parsed from RC file (e.g. SS_CENTER)
                 pChild->Create(ctl.className.c_str(), ctl.text.c_str(), WS_CHILD | WS_VISIBLE | ctl.style, r, this, ctl.id);
 
-                // RERUN: Apply DLGINIT text if available for this control
-                auto itDlg = g_dlgInitStrings.find(id);
-                if (itDlg != g_dlgInitStrings.end()) {
-                    auto itCtl = itDlg->second.find(ctl.id);
-                    // RERUN: dlg 289's RStaticDate (1227) sits fully under the
-                    // phase-strip listbox in z-order — the real OCX never shows
-                    // this caption (verified against retail). Don't apply it.
-                    if (itCtl != itDlg->second.end() &&
-                        !(id == 289 && ctl.id == 1227)) {
-                        pChild->SetWindowText(itCtl->second.c_str());
-                        //std::cout << "[DEBUG] CDialog::Create: Applied text '" << itCtl->second << "' to Control " << ctl.id << " in Dialog " << id << std::endl;
+                // RERUN: Rowan button DLGINIT blobs pack the caption (m_string),
+                // artwork filenames and the hint string into one stream — and a
+                // mis-inferred label_id can poison g_dlgInitStrings entirely
+                // (dlg 1034's tickboxes all resolved to "Reflections"). Pick the
+                // last clean short string: it is the caption; longer/prefixed
+                // entries are hints or stream junk.
+                auto applyDlgInitText = [&](int ctlID) {
+                    if (pChild->IsKindOf(RUNTIME_CLASS(CRButton))) {
+                        auto itAll = g_dlgInitStringsList.find(id);
+                        if (itAll == g_dlgInitStringsList.end()) return;
+                        auto itS = itAll->second.find(ctlID);
+                        if (itS == itAll->second.end()) return;
+                        std::string pick;
+                        for (size_t i = 1; i < itS->second.size(); ++i) {
+                            const std::string& s = itS->second[i];
+                            if (!s.empty() && isalnum((unsigned char)s[0]) && s.size() <= 30)
+                                pick = s;
+                        }
+                        if (!pick.empty()) pChild->SetWindowText(pick.c_str());
+                        return;
                     }
-                }
+                    auto itDlg = g_dlgInitStrings.find(id);
+                    if (itDlg != g_dlgInitStrings.end()) {
+                        auto itCtl = itDlg->second.find(ctlID);
+                        // RERUN: dlg 289's RStaticDate (1227) sits fully under the
+                        // phase-strip listbox in z-order — the real OCX never shows
+                        // this caption (verified against retail). Don't apply it.
+                        if (itCtl != itDlg->second.end() &&
+                            !(id == 289 && ctlID == 1227)) {
+                            pChild->SetWindowText(itCtl->second.c_str());
+                        }
+                    }
+                };
+                applyDlgInitText(ctl.id);
 
                 // RERUN: Apply OCX property blob to Rowan listboxes. The persisted
                 // stream tail is: two ID dwords, a DWORD version(9), then property
@@ -4551,7 +4688,7 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                 auto itRW = g_dlgInitWords.find(id);
                 if (itRW != g_dlgInitWords.end()) {
                     auto itW = itRW->second.find(ctl.id);
-                    if (itW != itRW->second.end() && getenv("ROWAN_DEBUG_RADIO"))
+                    if (itW != itRW->second.end() && RowanDbgRadio())
                         fprintf(stderr, "[rradio-blob] dlg=%d ctl=%d words=%zu w4=%lx w5=%lx\n",
                             id, ctl.id, itW->second.size(),
                             itW->second.size()>4 ? (itW->second[4]&0xffff) : 0,
@@ -4571,7 +4708,7 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                         else if (w.size() >= 14 &&
                                  (w[4] & 0xffff) == 0x0008 && (w[5] & 0xffff) == 0) {
                             CRRadio* pR = dynamic_cast<CRRadio*>(pChild);
-                            if (getenv("ROWAN_DEBUG_RADIO"))
+                            if (RowanDbgRadio())
                                 fprintf(stderr, "[rradio-blob] apply dlg=%d ctl=%d pChild=%p radio=%p\n",
                                     id, ctl.id, (void*)pChild, (void*)pR);
                             if (pR) {
@@ -4605,9 +4742,9 @@ BOOL CDialog::Create(int id, CWnd* pParent)
         CRect dr; GetWindowRect(&dr);
         fprintf(stderr, "[layout] dlg=%d screen=%d,%d-%d,%d dlgrect=%d,%d-%d,%d\n",
             id, dr.left, dr.top, dr.right, dr.bottom,
-            m_pTemplate->x * g_dluX, m_pTemplate->y * g_dluY,
-            (m_pTemplate->x + m_pTemplate->cx) * g_dluX,
-            (m_pTemplate->y + m_pTemplate->cy) * g_dluY);
+            (int)(m_pTemplate->x * g_dluX), (int)(m_pTemplate->y * g_dluY),
+            (int)((m_pTemplate->x + m_pTemplate->cx) * g_dluX),
+            (int)((m_pTemplate->y + m_pTemplate->cy) * g_dluY));
         for (const auto& ctl : m_pTemplate->controls) {
             CWnd* pC = GetDlgItem(ctl.id);
             CRect r;
@@ -5261,11 +5398,26 @@ void CView::OnPaint()
 //CBitmap
 BOOL CBitmap::LoadBitmap(UINT resourceID)
 {
-    // Convert resource ID → filename
+    // Rowan OCX glyph bitmaps ship as loose files; their resource IDs only
+    // collide across OCXs that never call LoadBitmap, so a flat map is safe.
+    static const struct { UINT id; const char* file; } ocxBitmaps[] = {
+        { 201, "ocxres/NO.BMP" },        // rtickbox IDB_NO
+        { 202, "ocxres/YES.BMP" },       // rtickbox IDB_YES
+        { 213, "ocxres/HILITE.BMP" },    // rtabs IDB_TABUP
+        { 214, "ocxres/UNHILITE.BMP" },  // rtabs IDB_TABDOWN
+    };
     char filename[64];
-    snprintf(filename, sizeof(filename), "%u.bmp", resourceID);
+    const char* path = nullptr;
+    for (const auto& e : ocxBitmaps)
+        if (e.id == resourceID) { path = e.file; break; }
+    if (path)
+        snprintf(filename, sizeof(filename), "%s", path);
+    else
+        snprintf(filename, sizeof(filename), "%u.bmp", resourceID);
 
-    std::cout << "[DEBUG] Loading bitmap: " << filename << "... ";
+    static const bool bmpDbg = RowanDbgBmp();
+    if (bmpDbg)
+        std::cout << "[DEBUG] Loading bitmap: " << filename << "... ";
 
     SDL_Surface* surface = SDL_LoadBMP(filename);
     
@@ -5310,10 +5462,34 @@ BOOL CBitmap::DeleteObject()
     }
     if (m_hObject)
     {
-        SDL_FreeSurface((SDL_Surface*)m_hObject);
+        if (!m_borrowedHandle)
+            SDL_FreeSurface((SDL_Surface*)m_hObject);
         m_hObject = nullptr;
+        m_borrowedHandle = false;
     }
     return TRUE;
+}
+
+// Stable non-owning wrappers so SelectObject keeps a valid pointer even
+// when other handles are wrapped later (IconDescUI::LoadInstances).
+CBitmap* CBitmap::FromHandle(HBITMAP h)
+{
+    static std::unordered_map<HBITMAP, CBitmap*> s_wrappers;
+    if (!h) return nullptr;
+    auto it = s_wrappers.find(h);
+    if (it != s_wrappers.end()) return it->second;
+    CBitmap* b = new CBitmap();
+    b->m_hObject = (void*)h;
+    b->m_borrowedHandle = true;
+    SDL_Surface* s = (SDL_Surface*)h;
+    b->info.bmType = 0;
+    b->info.bmWidth = s->w;
+    b->info.bmHeight = s->h;
+    b->info.bmWidthBytes = s->pitch;
+    b->info.bmBitsPixel = s->format->BitsPerPixel;
+    b->info.bmBits = s->pixels;
+    s_wrappers[h] = b;
+    return b;
 }
 
 SDL_Texture* CBitmap::GetTexture(SDL_Renderer* renderer)
@@ -5658,11 +5834,18 @@ int EnumFontFamiliesEx(HDC, LOGFONT* lpLogFont, FONTENUMPROC proc, long lParam, 
     return proc(&elf, nullptr, TRUETYPE_FONTTYPE, lParam);
 }
 
-// Raw-handle GDI entry points used by BoB's map view. The SDL backend draws
-// through WindowBackend surfaces; until the T120 artwork path lands these are
-// safe no-ops.
-int SetDIBitsToDevice(HDC, int, int, DWORD, DWORD, int, int, UINT, UINT,
-                      const void*, const BITMAPINFO*, UINT) { return 0; }
+// Raw-handle GDI entry points used by BoB's map view. The stub's HDC is the
+// CDC* itself (see CWnd::BeginPaint), so forward to the member implementation —
+// without this the campaign map never blits its 256x256 tiles.
+int SetDIBitsToDevice(HDC hdc, int xDest, int yDest, DWORD w, DWORD h,
+                      int xSrc, int ySrc, UINT uStartScan, UINT cScanLines,
+                      const void* lpvBits, const BITMAPINFO* lpbmi, UINT fuColorUse)
+{
+    CDC* pDC = (CDC*)hdc;
+    if (!pDC) return 0;
+    return pDC->SetDIBitsToDevice(xDest, yDest, w, h, xSrc, ySrc,
+                                  uStartScan, cScanLines, lpvBits, lpbmi, fuColorUse);
+}
 HDC GetDC(HWND)              { return nullptr; }
 int ReleaseDC(HWND, HDC)     { return 0; }
 
@@ -5755,11 +5938,65 @@ HWND GetCapture()            { return g_capture; }
 HWND SetCapture(HWND h)      { HWND old = g_capture; g_capture = h; return old; }
 BOOL ReleaseCapture()        { g_capture = nullptr; return TRUE; }
 
-// DIB upload — the T120 artwork pipeline owns real bitmap ingestion.
-HBITMAP CreateDIBitmap(HDC, const BITMAPINFOHEADER*, DWORD, const void*,
-                       const BITMAPINFO*, UINT)
+// DIB upload — builds an SDL_Surface from raw DIB bits. Icon sheets and the
+// T120 artwork pipeline arrive this way (IconDescUI::LoadInstances).
+HBITMAP CreateDIBitmap(HDC, const BITMAPINFOHEADER* bmih, DWORD flInit,
+                       const void* pjBits, const BITMAPINFO* pbmi, UINT fuColorUse)
 {
-    return nullptr;
+    if (!bmih || !pbmi) return nullptr;
+    int w = bmih->biWidth;
+    int h = bmih->biHeight;
+    bool bottomUp = h > 0;
+    h = h < 0 ? -h : h;
+    int bpp = bmih->biBitCount;
+    if (w <= 0 || h <= 0) return nullptr;
+
+    Uint32 fmt;
+    switch (bpp) {
+    case 8:  fmt = SDL_PIXELFORMAT_INDEX8;    break;
+    case 16: fmt = SDL_PIXELFORMAT_RGB565;    break;
+    case 24: fmt = SDL_PIXELFORMAT_BGR24;     break;
+    case 32: fmt = SDL_PIXELFORMAT_BGRX8888;  break;
+    default: return nullptr;
+    }
+    SDL_Surface* s = SDL_CreateRGBSurfaceWithFormat(0, w, h, bpp, fmt);
+    if (!s) return nullptr;
+
+    if (bpp == 8) {
+        int ncol = bmih->biClrUsed ? (int)bmih->biClrUsed : 256;
+        SDL_Color colors[256];
+        for (int i = 0; i < ncol && i < 256; ++i) {
+            colors[i].r = pbmi->bmiColors[i].rgbRed;
+            colors[i].g = pbmi->bmiColors[i].rgbGreen;
+            colors[i].b = pbmi->bmiColors[i].rgbBlue;
+            colors[i].a = 255;
+        }
+        SDL_SetPaletteColors(s->format->palette, colors, 0, ncol < 256 ? ncol : 256);
+    }
+
+    if ((flInit & CBM_INIT) && pjBits) {
+        const BYTE* src = (const BYTE*)pjBits;
+        std::vector<BYTE> rle;
+        int srcPitch;
+        bool srcTopDown;
+        if (bmih->biCompression == 1 /*BI_RLE8*/ && bpp == 8) {
+            DWORD sz = bmih->biSizeImage ? bmih->biSizeImage : (DWORD)(w * h);
+            if (!rle8_decode(src, sz, w, h, rle)) { SDL_FreeSurface(s); return nullptr; }
+            src = rle.data();           // decoder emits top-down rows
+            srcPitch = w;
+            srcTopDown = true;
+        } else {
+            int bytesPerPx = bpp / 8;
+            srcPitch = ((w * bytesPerPx) + 3) & ~3;
+            srcTopDown = !bottomUp;
+        }
+        int rowBytes = w * (bpp / 8);
+        for (int row = 0; row < h; ++row) {
+            int srcRow = srcTopDown ? row : h - 1 - row;
+            memcpy((BYTE*)s->pixels + row * s->pitch, src + srcRow * srcPitch, rowBytes);
+        }
+    }
+    return (HBITMAP)s;
 }
 
 int SetStretchBltMode(HDC, int) { return 0; }

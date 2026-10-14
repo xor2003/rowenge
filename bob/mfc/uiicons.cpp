@@ -227,3 +227,14 @@ bool	IconDescUI::AndIcon(CDC* target,const CPoint& p,Alignment ax,Alignment ay)
 	return true;
 }
 
+
+// RERUN: flat entry point for the MFC stub's CRButton path — wraps an
+// IconsUI+state value in an IconDescUI and blits it through the shared icon
+// sheet (MaskIcon AND/OR). Weak-linked from migalley/MFC/RBUTTON.CPP.
+extern "C" bool RowanUIDrawIcon(void* cdc, long iconsui, int x, int y)
+{
+	if (!cdc || !iconsui || (iconsui & ICON_PAGE_MASK) < ICON_PAGE_BASE)
+		return false;
+	IconDescUI icon((IconsUI)iconsui);
+	return icon.MaskIcon((CDC*)cdc, CPoint(x, y));
+}

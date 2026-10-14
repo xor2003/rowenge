@@ -64,6 +64,25 @@ public:
 	void SetPassWord(BOOL ispassword);
 	BOOL SetSearchValueOption(long min, long max, long current);
 	BOOL SetPlayerNegPriceOption(long min, long max, long current);
+
+// RERUN: real in-process state — the IDispatch bodies were no-ops, so the
+// control never stored a list, index or value and never painted.
+public:
+	std::vector<CString> m_list;
+	long m_index = 0;
+	long m_min = 0, m_max = 0, m_currentValue = 0;
+	long m_repeatDelay = 0;
+	BYTE m_SpinState = 0;		// STATE_VALUE=2, STATE_PRICE=1, STATE_SEARCHVALUE=3
+	long m_FontNum = 0;
+	OLE_COLOR m_foreColor = RGB(255,255,255);
+	BOOL m_bMouseDown = FALSE;
+	BOOL m_bDownHalf = FALSE;
+
+protected:
+	afx_msg void OnPaint();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	DECLARE_MESSAGE_MAP()
 };
 #pragma pack(pop)
 #endif
