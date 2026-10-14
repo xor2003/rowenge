@@ -228,9 +228,11 @@ void CRRadio::OnPaint()
     int buttonRadius = buttonHeight / 4; // Default for circular radio buttons
     int textOffset = buttonRadius * 2 + 4; // Initial offset for circles
 
-    // RERUN: If cols is 1 but rect is wider than tall, assume horizontal intent
+    // RERUN: If cols is 1 but rect is wider than tall, assume horizontal intent.
+    // BoB honors the persisted Cols verbatim (IDD_RAFDIRECTIVE's Patrol-size
+    // radio is 114x55 yet stacks 3 items vertically at Cols=1).
     int cols = m_cols;
-    if (cols == 1 && rect.Width() > rect.Height() * 2 && m_buttons.size() > 1)
+    if (!g_rowanGameIsBoB && cols == 1 && rect.Width() > rect.Height() * 2 && m_buttons.size() > 1)
         cols = m_buttons.size();
     if (cols < 1) cols = 1;
 

@@ -435,6 +435,9 @@ protected: \
 #define DT_NOPREFIX         0x00000800
 #define DT_INTERNAL         0x00001000
 
+#define ETO_OPAQUE          0x0002
+#define ETO_CLIPPED         0x0004
+
 #define DISPID_BACKCOLOR        (-501)
 #define DISPID_FORECOLOR        (-513)
 #define DISPID_FONT             (-512)

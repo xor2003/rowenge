@@ -105,14 +105,12 @@ void CRStatic::SetCaption(LPCTSTR propVal)
 
 OLE_COLOR CRStatic::GetForeColor()
 {
-	OLE_COLOR result;
-	GetProperty(DISPID_FORECOLOR, VT_I4, (void*)&result);
-	return result;
+	return (OLE_COLOR)m_foreColor;
 }
 
 void CRStatic::SetForeColor(OLE_COLOR propVal)
 {
-	SetProperty(DISPID_FORECOLOR, VT_I4, propVal);
+	m_foreColor = (long)propVal;
 }
 
 BOOL CRStatic::GetUpdateCaption()
@@ -254,16 +252,34 @@ void CRStatic::OnPaint()
     if (!text.IsEmpty())
     {
         dc.SetBkMode(TRANSPARENT);
-        dc.SetTextColor(RGB(173, 216, 230)); // RERUN: Force light blue text
+        // RERUN: rstaticc.cpp::OnDraw uses TranslateColor(GetForeColor()) —
+        // the persisted OLE_COLOR is a plain BGR COLORREF for BoB statics
+        // (0x00f0d8ba→pale blue labels, 0x0000c8ff→amber headers). Fall back
+        // to the legacy light blue when no blob supplied a color.
+        const COLORREF fore = (m_foreColor >= 0)
+            ? (COLORREF)(m_foreColor & 0xffffff)
+            : RGB(173, 216, 230);
 
         UINT format = DT_WORDBREAK;
         DWORD style = GetStyle();
         if (style & SS_CENTER) format |= DT_CENTER;
         else if (style & SS_RIGHT) format |= DT_RIGHT;
         else format |= DT_LEFT;
-        
-        format |= DT_VCENTER;
-		//std::cout << "[DEBUG] CRStatic::OnPaint: Drawing text '" << text << "' with font num " << m_fontNum << std::endl;
+
+        // Real OCX draws top-aligned (DT_LEFT+DT_WORDBREAK, no vcenter) —
+        // wrapped tails clip past the control bottom instead of squeezing.
+        format |= g_rowanGameIsBoB ? DT_TOP : DT_VCENTER;
+        // Negative FontNum embosses: two shadow passes at GetShadow offsets
+        // (+1,+1)/(+1,+2) then the fore glyph — same as CRCombo/RButton.
+        if (m_fontNum < 0)
+        {
+            dc.SetTextColor(RGB(56, 25, 4));
+            CRect s1 = rect; s1.OffsetRect(1, 1);
+            dc.DrawText(text, s1, format);
+            CRect s2 = rect; s2.OffsetRect(1, 2);
+            dc.DrawText(text, s2, format);
+        }
+        dc.SetTextColor(fore);
         dc.DrawText(text, rect, format);
     }
     

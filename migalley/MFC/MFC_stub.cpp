@@ -10,6 +10,7 @@
 #include <sstream>
 #include <regex>
 #include <unistd.h>
+#include <execinfo.h>
 #include <string>
 #include <sstream>
 #include <map>
@@ -46,6 +47,7 @@ float g_dluY = 1.5;
 
 // Forward declaration for composition logic
 static void PaintChildrenRecursive(HWND parentHwnd, SDL_Renderer* renderer, int parentAbsX, int parentAbsY, int depth);
+static void PaintAboveSiblings(HWND hWnd, SDL_Renderer* renderer, int absX, int absY);
 
 // WINSMACK.CPP: arms the skip flag while a smack video is playing.
 // Weak default — mig's WINSMACK.CPP strong-def overrides at link; consumers
@@ -1177,7 +1179,22 @@ BOOL DispatchMessage(const MSG* msg)
             while (root && root->isChild && root->parent)
                 root = backend_from_hwnd(root->parent->GetSafeHwnd());
             if (root && root->renderer && !DDPrimaryActive()) {
-                PaintChildrenRecursive((HWND)msg->hwnd, root->renderer, 0, 0, 0);
+                int absX = 0, absY = 0;
+                for (CWnd* p = backend->owner; p; ) {
+                    absX += (int)p->m_rect.left;
+                    absY += (int)p->m_rect.top;
+                    CWnd* pp = p->GetParent();
+                    if (!pp) {
+                        WindowBackend* pbe = backend_from_hwnd(p->GetSafeHwnd());
+                        pp = pbe ? pbe->parent : nullptr;
+                    }
+                    if (pp == p) break;
+                    p = pp;
+                }
+                PaintChildrenRecursive((HWND)msg->hwnd, root->renderer, absX, absY, 0);
+                // Repaint siblings stacked above the painted window so a
+                // dirty low window can't overdraw higher ones (z-order).
+                PaintAboveSiblings((HWND)msg->hwnd, root->renderer, absX, absY);
                 SDL_RenderPresent(root->renderer);
             }
             // Clear dirty state even when DDraw owns presentation —
@@ -1754,6 +1771,12 @@ int CDC::DrawText(const CString& str, const CRect& rect, UINT nFormat)
         if (surf) {
             SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer, surf);
             if (tex) {
+                static int s_dbgText = getenv("ROWAN_DEBUG_TEXT") ? 1 : 0;
+                if (s_dbgText) {
+                    SDL_Rect vp; SDL_RenderGetViewport(m_renderer, &vp);
+                    std::cout << "[text-wrap] '" << str.c_str() << "' @ " << (vp.x + rect.left) << "," << (vp.y + rect.top)
+                              << " vp=" << vp.x << "," << vp.y << "+" << vp.w << "x" << vp.h << std::endl;
+                }
                 int x = rect.left;
                 int y = rect.top;
                 // Simple alignment support
@@ -2310,6 +2333,13 @@ void CDC::TextOut(int x, int y, const char* str, int len)
 
     SDL_Color color = { (Uint8)GetRValue(m_textColor), (Uint8)GetGValue(m_textColor), (Uint8)GetBValue(m_textColor), 255 };
     std::string s(str, len);
+    static int s_dbgText = getenv("ROWAN_DEBUG_TEXT") ? 1 : 0;
+    if (s_dbgText) {
+        SDL_Rect vp; SDL_RenderGetViewport(m_renderer, &vp);
+        std::cout << "[text] '" << s << "' @ " << (vp.x + x) << "," << (vp.y + y)
+                  << " vp=" << vp.x << "," << vp.y << "+" << vp.w << "x" << vp.h
+                  << " fonth=" << TTF_FontHeight(font) << std::endl;
+    }
     SDL_Surface* surf = TTF_RenderText_Solid(font, s.c_str(), color);
     if (surf) {
         if (m_bkMode == OPAQUE) {
@@ -2693,14 +2723,23 @@ void CWnd::ScreenToClient(POINT* pt) const
 void CWnd::ScreenToClient(LPRECT r) const
 {
     if (!r) return;
-    ScreenToClient((POINT*)&r->left);
-    ScreenToClient((POINT*)&r->right);
+    // RERUN: can't cast &r->left/&r->right to POINT* — on LP64 POINT is
+    // {long,long}=16B while RECT is {int x4}=16B, so the alias pairs
+    // (left,top) as x and (right,bottom) as y and corrupts the rect.
+    POINT tl{ r->left, r->top }, br{ r->right, r->bottom };
+    ScreenToClient(&tl);
+    ScreenToClient(&br);
+    r->left = (LONG)tl.x; r->top = (LONG)tl.y;
+    r->right = (LONG)br.x; r->bottom = (LONG)br.y;
 }
 void CWnd::ClientToScreen(LPRECT r) const
 {
     if (!r) return;
-    ClientToScreen((POINT*)&r->left);
-    ClientToScreen((POINT*)&r->right);
+    POINT tl{ r->left, r->top }, br{ r->right, r->bottom };
+    ClientToScreen(&tl);
+    ClientToScreen(&br);
+    r->left = (LONG)tl.x; r->top = (LONG)tl.y;
+    r->right = (LONG)br.x; r->bottom = (LONG)br.y;
 }
 void CWnd::ClientToScreen(POINT* pt) const
 {
@@ -3377,44 +3416,56 @@ CWnd* CWnd::GetEventParent()
 
 void CWnd::FireEvent(int eventID, long l1, long l2, LPCTSTR text, int index)
 {
-    CWnd* pParent = GetEventParent();
-    if (!pParent) return;
+    // RERUN: our sink maps don't chain to a C++ base map like real MFC, and
+    // the macro's baseClass is usually CDialog (not the real parent class).
+    // IDJ_TITLE handlers live on RDialog's map — leaf dialogs (RAFDirectives)
+    // don't register them — so for the title strip keep walking the window
+    // ancestor chain until the enclosing RDEmptyD sheet resolves the event
+    // via its inherited RDialog sink map.
+    CWnd* pNext;
+    int depth = 0;
+    for (CWnd* pParent = GetEventParent(); pParent && depth < 32; pParent = pNext, ++depth)
+    {
+        // BoB defines IDJ_TITLE as 21 (bob_overlay/resource.h), MiG as 1001 —
+        // accept either so title-strip events reach the sheet's sink map.
+        pNext = (m_nID == IDJ_TITLE || m_nID == 21) ? pParent->GetParent() : nullptr;
+        if (pNext == pParent) pNext = nullptr;
+        const AFX_EVENTSINKMAP* pMap = pParent->GetSinkMap();
+        if (!pMap) continue;
 
-    const AFX_EVENTSINKMAP* pMap = pParent->GetSinkMap();
-    if (!pMap) return;
-
-    for (; pMap->idFirst != 0; ++pMap) {
-        if (m_nID >= pMap->idFirst && m_nID <= pMap->idLast && pMap->eventid == eventID) {
-            // Found the handler. Dispatch based on param string from ON_EVENT macro.
-            if (strcmp(pMap->params, VTS_NONE) == 0) {
-                typedef void (CCmdTarget::*Func)();
-                Func f = (Func)pMap->pfn;
-                (pParent->*f)();
-            } else if (strcmp(pMap->params, VTS_BSTR) == 0) {
-                typedef void (CCmdTarget::*Func)(LPCTSTR);
-                Func f = (Func)pMap->pfn;
-                (pParent->*f)(text);
-            } else if (strcmp(pMap->params, VTS_I4) == 0) {
-                typedef void (CCmdTarget::*Func)(long);
-                Func f = (Func)pMap->pfn;
-                (pParent->*f)(l1);
-            } else if (strcmp(pMap->params, VTS_I4 VTS_I4) == 0) {
-                typedef void (CCmdTarget::*Func)(long, long);
-                Func f = (Func)pMap->pfn;
-                (pParent->*f)(l1, l2);
-            } else if (strcmp(pMap->params, VTS_BSTR VTS_I2) == 0) {
-                typedef void (CCmdTarget::*Func)(LPCTSTR, short);
-                Func f = (Func)pMap->pfn;
-                (pParent->*f)(text, (short)index);
-            } else if (strcmp(pMap->params, VTS_I4 VTS_BSTR VTS_I2) == 0) {
-                typedef void (CCmdTarget::*Func)(long, LPCTSTR, short);
-                Func f = (Func)pMap->pfn;
-                (pParent->*f)(l1, text, (short)index);
-            } else {
-                std::cout << "[FireEvent] unhandled params '" << pMap->params
-                          << "' for ctrl " << m_nID << " event " << eventID << std::endl;
+        for (; pMap->idFirst != 0; ++pMap) {
+            if (m_nID >= pMap->idFirst && m_nID <= pMap->idLast && pMap->eventid == eventID) {
+                // Found the handler. Dispatch based on param string from ON_EVENT macro.
+                if (strcmp(pMap->params, VTS_NONE) == 0) {
+                    typedef void (CCmdTarget::*Func)();
+                    Func f = (Func)pMap->pfn;
+                    (pParent->*f)();
+                } else if (strcmp(pMap->params, VTS_BSTR) == 0) {
+                    typedef void (CCmdTarget::*Func)(LPCTSTR);
+                    Func f = (Func)pMap->pfn;
+                    (pParent->*f)(text);
+                } else if (strcmp(pMap->params, VTS_I4) == 0) {
+                    typedef void (CCmdTarget::*Func)(long);
+                    Func f = (Func)pMap->pfn;
+                    (pParent->*f)(l1);
+                } else if (strcmp(pMap->params, VTS_I4 VTS_I4) == 0) {
+                    typedef void (CCmdTarget::*Func)(long, long);
+                    Func f = (Func)pMap->pfn;
+                    (pParent->*f)(l1, l2);
+                } else if (strcmp(pMap->params, VTS_BSTR VTS_I2) == 0) {
+                    typedef void (CCmdTarget::*Func)(LPCTSTR, short);
+                    Func f = (Func)pMap->pfn;
+                    (pParent->*f)(text, (short)index);
+                } else if (strcmp(pMap->params, VTS_I4 VTS_BSTR VTS_I2) == 0) {
+                    typedef void (CCmdTarget::*Func)(long, LPCTSTR, short);
+                    Func f = (Func)pMap->pfn;
+                    (pParent->*f)(l1, text, (short)index);
+                } else {
+                    std::cout << "[FireEvent] unhandled params '" << pMap->params
+                              << "' for ctrl " << m_nID << " event " << eventID << std::endl;
+                }
+                return; // Assume one handler per event
             }
-            break; // Assume one handler per event
         }
     }
 }
@@ -4822,6 +4873,132 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                                 pC->SetFontNum(fontNum);
                             }
                         }
+                        // RERUN: RButton persist blob (version 11) — verified
+                        // against CRButtonCtrl::DoPropExchange on
+                        // IDD_RAFDIRECTIVE's IDJ_TITLE and tickboxes.
+                        // Byte layout after the 12B header:
+                        //   len+stockCaption (e.g. "IDS_NONE"/"IDS_DIRECTIVES")
+                        //   ForeColor dword, BackColor dword (stock props)
+                        //   MovesParent B, FontNum D, CloseButton B,
+                        //   TickButton B, ShowShadow B, ShadowColor D
+                        //   len+String(caption), ResourceNumber D,
+                        //   NormalFileNum D, PressedFileNum D,
+                        //   len+NormalName, len+PressedName, hint strings…
+                        else if ((w[4] & 0xffff) == 0x000b && (w[5] & 0xffff) == 0) {
+                            if (CRButton* pB = dynamic_cast<CRButton*>(pChild)) {
+                                std::vector<BYTE> bb;
+                                bb.reserve(w.size() * 2);
+                                for (long v : w) {
+                                    bb.push_back((BYTE)(v & 0xff));
+                                    bb.push_back((BYTE)((v >> 8) & 0xff));
+                                }
+                                auto rprint = [&](size_t i, size_t n) {
+                                    for (size_t k = 0; k < n; ++k)
+                                        if (bb[i + k] < 32 || bb[i + k] > 126) return false;
+                                    return true;
+                                };
+                                size_t cap = std::string::npos;
+                                for (size_t i = 12; i + 2 < bb.size() && i < 28; ++i) {
+                                    size_t L = bb[i];
+                                    if (L >= 1 && L <= 40 && i + 1 + L <= bb.size() &&
+                                        rprint(i + 1, L)) { cap = i; break; }
+                                }
+                                if (cap != std::string::npos) {
+                                    size_t p = cap + 1 + bb[cap];
+                                    if (p + 8 + 12 <= bb.size()) {
+                                        long fore = (long)(bb[p] | (bb[p+1]<<8) | (bb[p+2]<<16) | ((long)bb[p+3]<<24));
+                                        long back = (long)(bb[p+4] | (bb[p+5]<<8) | (bb[p+6]<<16) | ((long)bb[p+7]<<24));
+                                        size_t f = p + 8;
+                                        int  moves     = bb[f];
+                                        long fontNum   = (long)(int)(bb[f+1] | (bb[f+2]<<8) | (bb[f+3]<<16) | ((long)bb[f+4]<<24));
+                                        int  closeB    = bb[f+5];
+                                        int  tickB     = bb[f+6];
+                                        int  showSh    = bb[f+7];
+                                        long shadowCol = (long)(bb[f+8] | (bb[f+9]<<8) | (bb[f+10]<<16) | ((long)bb[f+11]<<24));
+                                        size_t q = f + 12;
+                                        CString caption;
+                                        if (q < bb.size()) {
+                                            size_t cl = bb[q];
+                                            if (cl && q + 1 + cl <= bb.size() && rprint(q + 1, cl))
+                                                caption = CString(std::string((const char*)&bb[q + 1], cl));
+                                            q += 1 + cl;
+                                        }
+                                        long resnum = 0, normalFN = 0, pressedFN = 0;
+                                        if (q + 12 <= bb.size()) {
+                                            resnum    = (long)(bb[q] | (bb[q+1]<<8) | (bb[q+2]<<16) | ((long)bb[q+3]<<24));
+                                            normalFN  = (long)(bb[q+4] | (bb[q+5]<<8) | (bb[q+6]<<16) | ((long)bb[q+7]<<24));
+                                            pressedFN = (long)(bb[q+8] | (bb[q+9]<<8) | (bb[q+10]<<16) | ((long)bb[q+11]<<24));
+                                        }
+                                        if (RowanDbgRadio())
+                                            fprintf(stderr, "[rbtn-blob] dlg=%d ctl=%d fore=%08lx back=%08lx moves=%d font=%ld close=%d tick=%d show=%d shadow=%08lx cap='%s' res=%ld nf=%ld pf=%ld\n",
+                                                id, ctl.id, fore, back, moves, fontNum, closeB, tickB, showSh,
+                                                shadowCol, (const char*)caption, resnum, normalFN, pressedFN);
+                                        pB->SetForeColor((OLE_COLOR)fore);
+                                        pB->SetBackColor((OLE_COLOR)back);
+                                        pB->SetFontNum(fontNum);
+                                        pB->SetMovesParent(moves);
+                                        pB->SetCloseButton(closeB);
+                                        pB->SetTickButton(tickB);
+                                        pB->SetHelpButton(closeB || tickB);
+                                        pB->SetShowShadow(showSh);
+                                        pB->SetShadowColor((unsigned long)shadowCol);
+                                        if (!caption.IsEmpty())
+                                            pB->SetString(caption);
+                                        pB->SetResourceNumber(resnum);
+                                        if (normalFN) pB->SetNormalFileNum(normalFN);
+                                        if (pressedFN) pB->SetPressedFileNum(pressedFN);
+                                    }
+                                }
+                            }
+                        }
+                        // RERUN: RStatic persist blob (version 10). Byte layout
+                        // after the marker dwords: len-prefixed IDS_/FIL_
+                        // string, ForeColor dword, signed FontNum dword,
+                        // len-prefixed caption — verified on IDD_RAFDIRECTIVE
+                        // (labels 0x00f0d8ba/-7, headers 0x0000c8ff/-8).
+                        else if ((w[4] & 0xffff) == 0x000a && (w[5] & 0xffff) == 0) {
+                            if (CRStatic* pS = dynamic_cast<CRStatic*>(pChild)) {
+                                std::vector<BYTE> bb;
+                                bb.reserve(w.size() * 2);
+                                for (long v : w) {
+                                    bb.push_back((BYTE)(v & 0xff));
+                                    bb.push_back((BYTE)((v >> 8) & 0xff));
+                                }
+                                long fore = -1, font = 0;
+                                // Anchor on the caption: a len-prefixed copy of the
+                                // control's text; fields sit 8/4 bytes before it.
+                                CString cap; pChild->GetWindowText(cap);
+                                size_t pos = std::string::npos;
+                                if (!cap.IsEmpty()) {
+                                    const char* cs = (const char*)cap;
+                                    size_t cl = strlen(cs);
+                                    for (size_t i = 12; i + 1 + cl <= bb.size(); ++i)
+                                        if (bb[i] == cl && !memcmp(&bb[i + 1], cs, cl)) { pos = i; }
+                                }
+                                if (pos == std::string::npos) {
+                                    // Fallback: len-prefixed IDS_/FIL_ run —
+                                    // fields follow it directly.
+                                    for (size_t i = 13; i + 8 < bb.size(); ++i) {
+                                        if (memcmp(&bb[i], "IDS_", 4) && memcmp(&bb[i], "FIL_", 4))
+                                            continue;
+                                        size_t j = i;
+                                        while (j < bb.size() &&
+                                               (isupper(bb[j]) || isdigit(bb[j]) || bb[j] == '_'))
+                                            ++j;
+                                        if (bb[i - 1] == j - i && j + 8 <= bb.size()) { pos = j + 8; break; }
+                                    }
+                                }
+                                if (pos != std::string::npos && pos >= 8) {
+                                    fore = (long)(bb[pos - 8] | (bb[pos - 7] << 8) | (bb[pos - 6] << 16) | (bb[pos - 5] << 24));
+                                    font = (long)(int)(bb[pos - 4] | (bb[pos - 3] << 8) | (bb[pos - 2] << 16) | (bb[pos - 1] << 24));
+                                    if (RowanDbgRadio())
+                                        fprintf(stderr, "[rstatic-blob] dlg=%d ctl=%d fore=%08lx font=%ld cap='%s'\n",
+                                            id, ctl.id, (unsigned long)fore, font, (const char*)cap);
+                                    pS->SetForeColor((OLE_COLOR)fore);
+                                    pS->SetFontNum(font);
+                                }
+                            }
+                        }
                     }
                 }
             } else {
@@ -5067,6 +5244,58 @@ void CFrameWnd::AttachView(CView* pView)
     pView->m_pParent = this;
     pView->m_hWnd = m_hWnd;
     pView->m_rect = CRect(0, 0, m_rect.Width(), m_rect.Height()); // RERUN: View is at 0,0 in client coords
+}
+
+// RERUN: repaint siblings stacked above hWnd at every ancestor level.
+// A dirty low window repainting via its own WM_PAINT can overdraw higher
+// windows (war-room teletype over the modal Directives dialog); walking the
+// parent children lists upward restores the z-order a full z-sorted pass
+// would produce.
+static void PaintAboveSiblings(HWND hWnd, SDL_Renderer* renderer, int absX, int absY)
+{
+    static const bool dbgAbove = getenv("ROWAN_DEBUG_PAINTWHO") != nullptr;
+    WindowBackend* be = backend_from_hwnd(hWnd);
+    if (!be || !be->owner) return;
+    // The backend children lists follow CWnd parentage (hittestParent at
+    // Create), with be->parent covering the routed top-level-dialog case.
+    CWnd* parent = be->owner->GetParent();
+    if (!parent) parent = be->parent;
+    if (!parent) return;
+    WindowBackend* parentBe = backend_from_hwnd(parent->GetSafeHwnd());
+    if (!parentBe) return;
+    int pAbsX = absX - (be->owner ? (int)be->owner->m_rect.left : 0);
+    int pAbsY = absY - (be->owner ? (int)be->owner->m_rect.top : 0);
+    auto& ch = parentBe->children;
+    auto it = std::find(ch.begin(), ch.end(), hWnd);
+    if (it == ch.end()) return;
+    CRect mine = be->owner->m_rect;
+    for (++it; it != ch.end(); ++it)
+    {
+        WindowBackend* sbe = backend_from_hwnd(*it);
+        if (sbe && sbe->visible && sbe->owner)
+        {
+            // Only the overlap matters — skip siblings that can't cover hWnd.
+            CRect sr = sbe->owner->m_rect;
+            if (sr.right <= mine.left || sr.left >= mine.right ||
+                sr.bottom <= mine.top || sr.top >= mine.bottom)
+                continue;
+            int sAbsX = pAbsX + (int)sr.left;
+            int sAbsY = pAbsY + (int)sr.top;
+            if (dbgAbove)
+                fprintf(stderr, "[above] %p(tid=%d %s) -> repaint %p(tid=%d %s) @%d,%d\n",
+                    hWnd, be->owner->m_nID, typeid(*be->owner).name(),
+                    *it, sbe->owner->m_nID, typeid(*sbe->owner).name(), sAbsX, sAbsY);
+            SDL_Rect oldVp;
+            SDL_RenderGetViewport(renderer, &oldVp);
+            SDL_Rect vp { sAbsX, sAbsY, (int)sr.Width(), (int)sr.Height() };
+            SDL_RenderSetViewport(renderer, &vp);
+            sbe->owner->SendMessage(WM_PAINT, 0, 0);
+            SDL_RenderSetViewport(renderer, &oldVp);
+            PaintChildrenRecursive(*it, renderer, sAbsX, sAbsY, 1);
+            sbe->needsRepaint = false;
+        }
+    }
+    PaintAboveSiblings(parent->GetSafeHwnd(), renderer, pAbsX, pAbsY);
 }
 
 static void PaintChildrenRecursive(HWND parentHwnd, SDL_Renderer* renderer, int parentAbsX, int parentAbsY, int depth = 0)

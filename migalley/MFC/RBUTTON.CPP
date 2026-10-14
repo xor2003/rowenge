@@ -75,6 +75,7 @@ questions about this file may be asked at http://www.simhq.com/
 #include "MIGVIEW.H"
 #include "RTOOLBAR.H" //RERUN for CRToolBar check
 #include "FILEMAN.H" //RERUN for fileblock
+#include "title_icons.h" //RERUN: OCX title-strip glyphs (BYE/TICK/HELP up+down)
 
 static bool RowanDbgBmp()   { static const bool b = getenv("ROWAN_DEBUG_BMP")   != nullptr; return b; }
 
@@ -238,6 +239,31 @@ void CRButton::SetCloseButton(BOOL bClose)
 BOOL CRButton::GetCloseButton()
 {
 	return m_bCloseButton;
+}
+
+void CRButton::SetTickButton(BOOL bTick)
+{
+	m_bTickButton = bTick;
+}
+
+void CRButton::SetMovesParent(BOOL bMoves)
+{
+	m_bMovesParent = bMoves;
+}
+
+void CRButton::SetShowShadow(BOOL bShow)
+{
+	m_bShowShadow = bShow;
+}
+
+void CRButton::SetShadowColor(unsigned long col)
+{
+	m_ulShadowColor = col;
+}
+
+void CRButton::SetResourceNumber(long resnum)
+{
+	m_iResourceNumber = resnum;
 }
 
 long CRButton::GetFontNum()
@@ -406,9 +432,121 @@ void CRButton::OnPaint()
 	{
 	}
 
+	// RERUN: Rowan OCX GetParentWndInfo — runs once on first access (OnDraw,
+	// GetString, mouse). ResourceNumber resolves through the parent's
+	// WM_GETSTRING and unconditionally replaces m_string; a 0/IDS_NONE resnum
+	// clears it. The alignment lives in the resnum's top byte.
+	if (m_iResourceNumber)
+	{
+		m_iTitleAlign = (m_iResourceNumber >> 24) & 0xff;
+		long res = m_iResourceNumber & 0x00ffffff;
+		char workspace[100] = {99};
+		CWnd* p = GetParent();
+		if (res != 8 /*IDS_NONE*/ && p) {
+			p->SendMessage(WM_GETSTRING, res, (LPARAM)workspace);
+			if (workspace[0] != 99)
+				m_sCaption = workspace;
+		}
+		else if (res == 8)
+			m_sCaption = "";
+		m_iResourceNumber = 0;
+	}
+
 	CString text = m_sCaption;
 	if (text.IsEmpty())
 		GetWindowText(text);
+
+	// RERUN: Rowan OCX title strip (rbuttonc.cpp::OnDraw). Icons pack at the
+	// right edge (close, tick, help — 26px stride), caption centers unless it
+	// would overlap them (then x=32 fallback / ellipsized). Shadow = two
+	// ShadowColor passes at (+s,+s+1) then (+s,+s).
+	if (m_bMovesParent)
+	{
+		// RERUN: the strip must span the parent's client width (UpdateTitle's
+		// contract), but RDialog resizes the dialog after that ran, leaving a
+		// stale width — re-pin it here so icons/hit zones track the real edge.
+		if (CWnd* p = GetParent())
+		{
+			CRect pr; p->GetClientRect(&pr);
+			if (pr.Width() > 0 && m_rect.Width() != pr.Width())
+			{
+				MoveWindow(m_rect.left, m_rect.top, pr.Width(), m_rect.Height());
+				rect.right = rect.left + pr.Width();
+			}
+		}
+		const int ICONWIDTH = 26;
+		int offset = 0;
+		int iconY = rect.top + (rect.Height() / 2) - 16;
+		SDL_Renderer* ren = (SDL_Renderer*)dc.m_renderer;
+		auto drawIcon = [&](const RowanTitleIcon& up, const RowanTitleIcon& down, bool pressed) {
+			const RowanTitleIcon& ic = pressed ? down : up;
+			if (!ren) return;
+			SDL_Surface* s = SDL_CreateRGBSurfaceWithFormatFrom(
+				(void*)ic.rgba, ic.w, ic.h, 32, ic.w * 4, SDL_PIXELFORMAT_RGBA32);
+			if (!s) return;
+			SDL_Texture* t = SDL_CreateTextureFromSurface(ren, s);
+			SDL_FreeSurface(s);
+			if (!t) return;
+			SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND);
+			SDL_Rect dst = { rect.right - ICONWIDTH - offset, iconY, ic.w, ic.h };
+			offset += ICONWIDTH;
+			SDL_RenderCopy(ren, t, nullptr, &dst);
+			SDL_DestroyTexture(t);
+		};
+		if (m_bCloseButton) drawIcon(g_titleIcon_byeUp, g_titleIcon_byeDown, m_titleZone == Z_Close && m_bMouseDown);
+		if (m_bTickButton)  drawIcon(g_titleIcon_tickUp, g_titleIcon_tickDown, m_titleZone == Z_Tick && m_bMouseDown);
+		if (m_bHelpButton)  drawIcon(g_titleIcon_helpUp, g_titleIcon_helpDown, m_titleZone == Z_Help && m_bMouseDown);
+
+		if (!text.IsEmpty())
+		{
+			dc.SetBkMode(TRANSPARENT);
+			CFont* pOldFont = nullptr;
+			if (GetParent())
+			{
+				CFont* pNewFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(m_iFontNum));
+				if (pNewFont)
+					pOldFont = dc.SelectObject(pNewFont);
+			}
+			TEXTMETRIC tm; memset(&tm, 0, sizeof(tm)); dc.GetTextMetrics(&tm);
+			int newheight = tm.tmHeight + 4;   // +4 when MovesParent (OCX)
+			int width = dc.GetTextExtent(text).cx;
+			int xoffset = (rect.Width() / 2) - (width / 2);
+			if (m_iTitleAlign == 1)
+				xoffset = 3;
+			else if (m_iTitleAlign == 2)
+				xoffset = rect.Width() - (width + 3);
+			BOOL bClipped = FALSE;
+			CRect clipbox = rect;
+			int fullstopswidth = dc.GetTextExtent("...").cx;
+			if (width && width > rect.Width() - offset - 32)
+			{
+				bClipped = TRUE;
+				clipbox = CRect(rect.left, rect.top, rect.right - offset - fullstopswidth, rect.bottom);
+			}
+			if (xoffset < 32 || xoffset + width > rect.Width() - offset - 32)
+				xoffset = 32;
+			int so = tm.tmHeight < 25 ? 1 : tm.tmHeight / 25;
+			int yoffset = rect.top + (rect.bottom / 2) - (newheight / 2);
+			if (m_bShowShadow)
+			{
+				dc.SetTextColor((COLORREF)m_ulShadowColor);
+				dc.ExtTextOut(xoffset + so, yoffset + so + 1, ETO_CLIPPED, &clipbox, text, NULL);
+				if (bClipped)
+					dc.TextOut(rect.right - offset - fullstopswidth + so, yoffset + so + 1, "...");
+				dc.ExtTextOut(xoffset + so, yoffset + so, ETO_CLIPPED, &clipbox, text, NULL);
+				if (bClipped)
+					dc.TextOut(rect.right - offset - fullstopswidth + so, yoffset + so, "...");
+			}
+			OLE_COLOR cap = (m_bPressed && m_ulBackColor) ? m_ulBackColor : m_ulForeColor;
+			dc.SetTextColor(cap ? cap : RGB(255, 255, 255));
+			dc.ExtTextOut(xoffset, yoffset, ETO_CLIPPED, &clipbox, text, NULL);
+			if (bClipped)
+				dc.TextOut(rect.right - offset - fullstopswidth, yoffset, "...");
+			if (pOldFont)
+				dc.SelectObject(pOldFont);
+		}
+		return;
+	}
 
 	// RERUN: Heuristic to decide if we should draw text.
 	// If the parent is a toolbar and the button has an icon, suppress text (it's likely a tooltip).
@@ -458,7 +596,7 @@ void CRButton::OnPaint()
 	{
 		int btnSize = rect.Height();
 		int x = rect.right - btnSize;
-		
+
 		dc.SetBkMode(TRANSPARENT);
 		dc.SetTextColor(RGB(0, 0, 0)); // Black text for buttons
 
@@ -473,7 +611,7 @@ void CRButton::OnPaint()
 			int cx = btnRect.CenterPoint().x;
 			int cy = btnRect.CenterPoint().y;
 			dc.MoveTo(cx - 5, cy); dc.LineTo(cx - 2, cy + 3); dc.LineTo(cx + 5, cy - 4);
-			
+
 			x -= btnSize;
 		}
 
@@ -486,43 +624,48 @@ void CRButton::OnPaint()
 	}
 }
 
+// RERUN: Rowan OCX GetPressMouseOver — the title-strip buttons pack at the
+// right edge (ICONWIDTH 26): Close rightmost, then Tick, then Help. A button
+// only exists when its flags say so, and Help is derived from Close||Tick.
+TitleZone CRButton::GetTitleZone(const CRect& rc, CPoint pt) const
+{
+	if (pt.x < rc.left || pt.x > rc.right || pt.y < rc.top || pt.y > rc.bottom)
+		return Z_NotPressed;
+	if (pt.x > rc.right - 26)
+	{
+		if (m_bCloseButton) return Z_Close;
+		else if (m_bTickButton) return Z_Tick;
+		else if (m_bHelpButton) return Z_Help;
+	}
+	else if (pt.x > rc.right - 52)
+	{
+		if (m_bTickButton && m_bCloseButton) return Z_Tick;
+		if (m_bHelpButton && (m_bCloseButton || m_bTickButton)) return Z_Help;
+	}
+	else if (pt.x > rc.right - 78)
+	{
+		if (m_bHelpButton && m_bTickButton && m_bCloseButton) return Z_Help;
+	}
+	return Z_Pressed;
+}
+
 void CRButton::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (m_bDisabled) return;
 
 	if (m_bMovesParent && GetParent())
 	{
-		// RERUN: This is a title bar. Check if the click is on the Help/Close buttons
-		// before initiating a drag.
-		bool isDrag = true; // Assume drag unless a button is hit.
+		// RERUN: title strip — buttons first, otherwise the bar drags the dialog.
 		CRect clientRect;
 		GetClientRect(clientRect);
-		int btnSize = clientRect.Height();
-		int currentX = clientRect.right;
-
-		if (m_bCloseButton) {
-			currentX -= btnSize;
-			CRect closeRect(currentX, 0, currentX + btnSize, btnSize);
-			if (closeRect.PtInRect(point)) {
-				isDrag = false;
-			}
-		}
-
-		if (isDrag && m_bHelpButton) {
-			currentX -= btnSize;
-			CRect helpRect(currentX, 0, currentX + btnSize, btnSize);
-			if (helpRect.PtInRect(point)) {
-				isDrag = false;
-			}
-		}
-
-		if (isDrag) {
-			// Forward the mouse-down message to the parent RDialog to initiate a drag.
+		m_titleZone = GetTitleZone(clientRect, point);
+		if (m_titleZone == Z_Pressed || m_titleZone == Z_NotPressed)
+		{
 			CPoint parentPoint = point;
 			ClientToScreen(&parentPoint);
 			GetParent()->ScreenToClient(&parentPoint);
 			GetParent()->SendMessage(WM_LBUTTONDOWN, nFlags, MAKELPARAM(parentPoint.x, parentPoint.y));
-			return; // Prevent default button click behavior.
+			return;
 		}
 	}
 
@@ -540,8 +683,28 @@ void CRButton::OnLButtonUp(UINT nFlags, CPoint point)
 	m_bMouseDown = FALSE;
 	ReleaseCapture();
 
-	// RERUN: Handle Title Bar Button Clicks
-	if (m_bCloseButton || m_bHelpButton)
+	// RERUN: title-strip buttons (rbuttonc.cpp::OnLButtonUp):
+	// Close -> FireCancel (event 2), Tick -> FireOK (event 3),
+	// Help -> WM_COMMAND ID_HELP on the parent.
+	if (m_bMovesParent)
+	{
+		CRect clientRect;
+		GetClientRect(clientRect);
+		TitleZone up = GetTitleZone(clientRect, point);
+		TitleZone down = m_titleZone;
+		m_titleZone = Z_NotPressed;
+		if (up == down)   // OCX: press only fires if released on the same zone
+		{
+			switch (up)
+			{
+			case Z_Close: FireEvent(2); return;
+			case Z_Tick:  FireEvent(3); return;
+			case Z_Help:  if (GetParent()) GetParent()->SendMessage(WM_COMMAND, ID_HELP, 0); return;
+			default: break;
+			}
+		}
+	}
+	else if (m_bCloseButton || m_bHelpButton)
 	{
 		CRect rect;
 		GetClientRect(rect);

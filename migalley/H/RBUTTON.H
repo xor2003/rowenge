@@ -15,6 +15,9 @@
 #pragma pack()	// re-assert: an included header may have leaked pack(1) on its first parse
 // CRButton wrapper class
 
+// RERUN: title-strip hit zones (rbuttonc.cpp::GetPressMouseOver order)
+enum TitleZone { Z_NotPressed, Z_Pressed, Z_Close, Z_Tick, Z_Help };
+
 class CRButton : public DlgItem
 {
 protected:
@@ -38,6 +41,8 @@ protected:
 	BOOL m_bUpdateCaption;
 	int m_iFontNum;
 	int m_iResourceNumber;
+	int m_iTitleAlign = 0;
+	TitleZone m_titleZone = Z_NotPressed;
 	int m_iIconEnum;
 	CString m_sIconName;
 	unsigned long m_ulShadowColor;
@@ -70,6 +75,11 @@ public:
 	BOOL GetHelpButton();
 	void SetCloseButton(BOOL bClose);
 	BOOL GetCloseButton();
+	void SetTickButton(BOOL bTick);
+	void SetMovesParent(BOOL bMoves);
+	void SetShowShadow(BOOL bShow);
+	void SetShadowColor(unsigned long);
+	void SetResourceNumber(long);
 	long GetFontNum();
 	void SetFontNum(long);
 	void SetButtonMetadata(int iconEnum, const char* iconName);
@@ -80,6 +90,7 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnEnable(BOOL bEnable);
+	TitleZone GetTitleZone(const CRect& rc, CPoint pt) const;
 	DECLARE_MESSAGE_MAP()
 };
 #pragma pack(pop)

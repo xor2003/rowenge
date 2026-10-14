@@ -1094,10 +1094,10 @@ def decode_full_dlginitt_entry(ctrl_name, msg, data_len, flags, words, name_to_i
 
     result["icon"] = icon_name
 
-    # If no identifiers or other strings were found, it's likely a config block.
-    # Add the raw words from the tail for inspection.
-    if not result["identifiers"] and not other_strings:
-        result["raw_words"] = [f"0x{w:04x}" for w in tail]
+    # Always include the raw tail words: persisted OCX properties
+    # (ForeColor/FontNum/Style/etc.) live here and the stub decodes them
+    # at dialog create time.
+    result["raw_words"] = [f"0x{w:04x}" for w in tail]
 
     return result
 

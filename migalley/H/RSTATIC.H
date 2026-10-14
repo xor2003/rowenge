@@ -22,6 +22,7 @@ class CRStatic : public DlgItem // RERUN DlgItem is the real base class for all 
 protected:
 	int m_fontNum = 0; // Default font
 	int m_resourceNum = 0;
+	long m_foreColor = -1; // RERUN: persisted OLE_COLOR; -1 = unset (legacy cyan fallback)
 
 	DECLARE_DYNCREATE(CRStatic)
 public:
