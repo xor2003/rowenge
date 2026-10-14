@@ -3493,6 +3493,7 @@ void DPlay::Process_PM_VisitorUpdate(char* message)
 
 bool DPlay::Process_PM_NeedResync()
 {
+	{static bool _dd=getenv("ROWAN_DPLAY_DEBUG")!=0;if(_dd){fprintf(stderr,"[nr] needresync st=%d J=%d rp=%d\n",H2H_Player[mySlot].status,(int)Joining,(int)ResyncPhase);fflush(stderr);}}
 	if (H2H_Player[mySlot].status==CPS_3D && !Joining)
 	{
 		if (!ResyncPhase)

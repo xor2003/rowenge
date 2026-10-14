@@ -652,6 +652,7 @@ void	Aggregator::GetAllMessages()
 // got a delta packet from player
 
 					RecPacket=(LPACPACKET)Buffer;
+					{static bool _dd=getenv("ROWAN_DPLAY_DEBUG")!=0;static int _c=0;if(_dd&&(_c++%20)==0){fprintf(stderr,"[agg] rx from=%u slot=%d cnt=%d id=%x aggfc=%d\n",from,n,RecPacket->Count,RecPacket->IDCode,(int)AggFrameCount);fflush(stderr);}}
 
 					Log("Aggframe=%d : Received %d from %d\n",AggFrameCount,RecPacket->Count,from);
 
@@ -738,6 +739,7 @@ void	Aggregator::MakeAndSendAggPacket()
 		{
 			if (!(RecBits&(1<<n)) && ReservePackets[n].NumEntries()>0)
 			{
+				{static bool _dd=getenv("ROWAN_DPLAY_DEBUG")!=0;if(_dd){fprintf(stderr,"[aggsc] slot=%d ents=%d curr_cnt=%d curr_id=%x aggfc=%d time=%d\n",n,ReservePackets[n].NumEntries(),ReservePackets[n].GetCurr()->Count,ReservePackets[n].GetCurr()->IDCode,(int)AggFrameCount,(int)time);fflush(stderr);}}
 // if we havent got a packet for this player yet and there is one in buffer......
 
 				RecPacket=ReservePackets[n].GetCurr();
@@ -756,7 +758,17 @@ void	Aggregator::MakeAndSendAggPacket()
 					{
 						RecPacket=ReservePackets[n].GetCurr();
 
-						if (RecPacket->Count==AggFrameCount)
+// RERUN: during sync (!buffer) the only packets in flight are DUMMYPACKETs
+// and INITPACKs - liveness tokens, not ordered deltas. Requiring
+// Count==AggFrameCount exactly deadlocks whenever a player's frame cadence
+// differs from the aggregator's send cadence (always true on fast
+// LAN/loopback - agg floods at RateDivider while players answer once per
+// render frame). Accept any sync packet as this player's contribution to
+// the current frame; ordered matching still applies to real packets via
+// the buffer==TRUE path.
+						if (RecPacket->Count==AggFrameCount
+						||  RecPacket->IDCode==DPlay::PIDC_DUMMYPACKET
+						||  RecPacket->IDCode==DPlay::PIDC_INITPACK)
 						{
 // if we have found packet for this frame copy and continue
 

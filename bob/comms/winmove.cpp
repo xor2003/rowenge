@@ -180,6 +180,9 @@ bool	DPlay::CommsGameSync()
 {
 	if (Implemented)
 	{
+		{static bool _dd=getenv("ROWAN_DPLAY_DEBUG")!=0;static int _dc=0;
+		if(_dd&&(_dc++%50)==0){fprintf(stderr,"[sync] RP=%d WP=%d sy=%d cs=%d rb=%d J=%d CP=%d my=%u agg=%u grp=%u slot=%d st0=%d st1=%d st2=%d st3=%d\n",
+			(int)ResyncPhase,(int)WorldSyncPhase,(int)synched,(int)csync,(int)resyncbar,(int)Joining,(int)CurrPlayers,(unsigned)myDPlayID,(unsigned)aggID,(unsigned)playergroupID,(int)mySlot,(int)H2H_Player[0].status,(int)H2H_Player[1].status,(int)H2H_Player[2].status,(int)H2H_Player[3].status);fflush(stderr);}}
 		if (realfirsttimein)
 		{
 			realfirsttimein=FALSE;
@@ -2717,6 +2720,7 @@ void	DPlay::BeginSyncPhase()
 	fclose(fp);
 #endif
 
+	{static bool _dd=getenv("ROWAN_DPLAY_DEBUG")!=0;if(_dd){fprintf(stderr,"[bsp] BeginSyncPhase init=%d rp=%d ss=%d cs=%d CP=%d\n",(int)Initiator,(int)ResyncPhase,(int)synched,(int)csync,CurrPlayers);fflush(stderr);}}
 	ResyncPhase=TRUE;
 	WorldSyncPhase=FALSE;
 	ResetState();
@@ -2934,8 +2938,18 @@ Bool	DPlay::InitSyncPhase()
 
 				ExpandAggPacket(&packet,(LPAGGSENDPACKET)Buffer);
 
+				{static bool _dd=getenv("ROWAN_DPLAY_DEBUG")!=0;if(_dd){fprintf(stderr,"[isp] aggpk Cnt=%d myFC=%d p0id=%x p1id=%x p0cnt=%d\n",packet.Count,FrameCount,packet.player[0].IDCode,packet.player[1].IDCode,packet.player[0].Count);fflush(stderr);}}
 				got=true;
-				break;
+// RERUN: do NOT break on the first agg packet. The aggregator floods the
+// group with a fresh AGGSENDPACKET every send tick; consuming only the
+// oldest leaves FrameCount chasing a stale Count while AggFrameCount races
+// ahead, so the dummy echo never lands and the barrier never clears
+// (visible only on a fast loopback/LAN transport - modem-paced delivery
+// masked it). Drain all queued agg packets and keep the newest; stop early
+// once a packet carries our dummy echo so the count check can succeed.
+				ULong myslot=DPID2Slot(myDPlayID);
+				if (myslot!=MAXPLAYERS && packet.player[myslot].IDCode==PIDC_DUMMYPACKET)
+					break;
 		}
 		else
 		{
@@ -3055,21 +3069,12 @@ Bool	DPlay::InitSyncPhase()
 				else
 				{
 // initial big catchup
-					if (first)
-					{
-						first=false;
-						FrameCount=packet.Count+1;
-					}
-					else
-					if (IgnoreFrameIncs==0)
-					{
-						FrameCount=packet.Count;
-						IgnoreFrameIncs=6;
-					}
-					else
-					{
-						IgnoreFrameIncs--;
-					}
+// RERUN: always snap to packet.Count+1 when behind. The original marched
+// +1/frame via IgnoreFrameIncs, which assumed render rate ~= agg send rate
+// (true on modem-era hardware; untrue on our faster/slower native loop) -
+// behind forever meant dummies never had Count==AggFrameCount and sync
+// never completed. +1 aims the next dummy at the next agg frame exactly.
+					FrameCount=packet.Count+1;
 				}
 			}
 			FrameCount++;
@@ -3125,7 +3130,12 @@ Bool	DPlay::SecondSyncPhase()
 			ExpandAggPacket(&packet,(LPAGGSENDPACKET)Buffer);
 
 			got=true;
-			break;
+// RERUN: drain all queued agg packets and keep the newest (see InitSyncPhase);
+// stop early once our INITPACK echo is present so it can't be junked by a
+// following data packet.
+			ULong myslot=DPID2Slot(myDPlayID);
+			if (myslot!=MAXPLAYERS && packet.player[myslot].IDCode==PIDC_INITPACK)
+				break;
 		}
 		else
 		{
@@ -3186,6 +3196,7 @@ Bool	DPlay::SecondSyncPhase()
 	FILE* sp=fopen("resync.txt","at");
 	fprintf(sp,"\nGot Agg Packet\n");
 #endif
+	{static bool _dd=getenv("ROWAN_DPLAY_DEBUG")!=0;if(_dd){fprintf(stderr,"[ssp] got=%d p0id=%x pkcnt=%d myFC=%d\n",(int)got,packet.player[0].IDCode,packet.Count,FrameCount);fflush(stderr);}}
 	num=0;
 	for (n=0;n<MAXPLAYERS;n++)
 	{
@@ -3207,6 +3218,7 @@ Bool	DPlay::SecondSyncPhase()
 	fprintf(sp,"got %d CP %d\n",num,CurrPlayers);
 	fclose(sp);
 #endif
+	{static bool _dd=getenv("ROWAN_DPLAY_DEBUG")!=0;if(_dd){fprintf(stderr,"[ssp] num=%d CP=%d p0id=%x\n",num,CurrPlayers,packet.player[0].IDCode);fflush(stderr);}}
 	if (num==CurrPlayers)
  	{
 // everybody is ready, start gameplay

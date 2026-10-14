@@ -201,7 +201,12 @@ void CDPlayNet::enqueue(DPXID from, DPXID to, const void* data, size_t len) {
 }
 
 void CDPlayNet::enqueueSysMsg(const void* blob, size_t len) {
-    enqueue(DPXID_SYSMSG, DPXID_ALLPLAYERS, blob, len);
+    /* real DPlay queues a copy of each system message on EVERY player.
+       One shared to=ALLPLAYERS copy gets stolen by whichever Receive runs
+       first (e.g. the aggregator player draining its queue would eat a
+       DESTROYPLAYER meant for the game loop) — so enqueue per player. */
+    for (auto& kv : localPlayers)
+        enqueue(DPXID_SYSMSG, kv.first, blob, len);
 }
 
 /* sysmsg blobs (real DPMSG layouts) */
@@ -252,18 +257,27 @@ HRESULT CDPlayNet::hostRoute(Conn* src, DPXID from, DPXID to, const uint8_t* dat
     bool local = false;
     {
         if (to == DPXID_ALLPLAYERS) {
-            local = true;
+            /* broadcast: every player gets a copy addressed to it -
+               EXCEPT the sender. The game counts on no self-echo
+               (resync 'needed' masks out the sender's own bit, so an
+               echo of its own PID_RESYNC would wedge the count). */
             for (auto& c : conns)
-                if (c.get() != src)                 /* sender doesn't get its own broadcast back */
-                    targets.push_back({c.get(), DPXID_ALLPLAYERS});
+                for (DPXID p : c->players)
+                    if (p != from)
+                        sendMsgToWire(c.get(), from, p, data, len);
+            for (auto& kv : localPlayers)
+                if (kv.first != from)
+                    enqueue(from, kv.first, data, len);
+            local = false;
         } else if (groups.count(to)) {              /* group address */
-            /* every conn owning a member gets one copy (to=that member) */
+            /* every conn owning a member gets one copy (to=that member);
+               the sender player never gets its own group message back */
             for (auto& c : conns) {
                 for (DPXID p : groups[to])
-                    if (connOwnsPlayer(c.get(), p)) { targets.push_back({c.get(), p}); break; }
+                    if (p != from && connOwnsPlayer(c.get(), p)) { targets.push_back({c.get(), p}); break; }
             }
             for (DPXID p : groups[to])
-                if (localPlayers.count(p))
+                if (p != from && localPlayers.count(p))
                     enqueue(from, p, data, len);
             local = false;   /* already enqueued per-member */
         } else if (localPlayers.count(to)) {
@@ -273,6 +287,9 @@ HRESULT CDPlayNet::hostRoute(Conn* src, DPXID from, DPXID to, const uint8_t* dat
                 if (connOwnsPlayer(c.get(), to)) { targets.push_back({c.get(), to}); break; }
         }
     }
+    DPNLOG("route from=%u to=%u len=%zu local=%d targets=%zu pid=%08x\n",
+           from, to, len, (int)local, targets.size(),
+           len >= 4 ? *(const uint32_t*)data : 0);
     if (local) enqueue(from, to, data, len);
     for (auto& t : targets) sendMsgToWire(t.first, from, t.second, data, len);
     return DPX_OK;
@@ -324,6 +341,7 @@ void CDPlayNet::acceptLoop() {
 
 void CDPlayNet::hostDestroyRemotePlayers(Conn* c) {
     /* remove all of conn's players/groups, broadcast DESTROY sysmsgs */
+    DPNLOG("conn teardown: %zu remote players\n", c->players.size());
     std::vector<DPXID> gone(c->players.begin(), c->players.end());
     for (DPXID p : gone) {
         for (auto& g : groups) g.second.erase(p);
@@ -383,9 +401,11 @@ void CDPlayNet::connRecvLoop(std::shared_ptr<Conn> c) {
         }
         case W_ADDG:
             groups[h.to].insert(h.from);
+            DPNLOG("wire addplayer g=%u p=%u members=%zu\n", h.to, h.from, groups[h.to].size());
             break;
         case W_DELG:
             groups[h.to].erase(h.from);
+            DPNLOG("wire delplayer g=%u p=%u\n", h.to, h.from);
             break;
         case W_DESTROY: {
             DPXID p = h.from;
@@ -458,6 +478,8 @@ void CDPlayNet::clientRecvLoop(int fd) {
         std::unique_lock<std::mutex> lk(mtx);
         switch (h.type) {
         case W_MSG:
+            DPNLOG("recv from=%u to=%u len=%u pid=%08x\n",
+                   h.from, h.to, h.len, h.len >= 4 ? *(const uint32_t*)pl.data() : 0);
             enqueue(h.from, h.to, pl.data(), pl.size());
             break;
         case W_SYSMSG:
@@ -778,6 +800,7 @@ HRESULT CDPlayNet::CreateGroup(DPXID* out, LPVOID, LPVOID, uint32_t, uint32_t) {
 HRESULT CDPlayNet::AddPlayerToGroup(DPXID group, DPXID player) {
     std::unique_lock<std::mutex> lk(mtx);
     groups[group].insert(player);
+    DPNLOG("addplayer g=%u p=%u members=%zu\n", group, player, groups[group].size());
     if (!isHost && hostConn && hostConn->fd >= 0) {
         int fd = hostConn->fd;
         lk.unlock();
@@ -790,6 +813,7 @@ HRESULT CDPlayNet::DeletePlayerFromGroup(DPXID group, DPXID player) {
     std::unique_lock<std::mutex> lk(mtx);
     auto it = groups.find(group);
     if (it != groups.end()) it->second.erase(player);
+    DPNLOG("delplayer g=%u p=%u\n", group, player);
     if (!isHost && hostConn && hostConn->fd >= 0) {
         int fd = hostConn->fd;
         lk.unlock();
@@ -854,6 +878,9 @@ HRESULT CDPlayNet::Receive(DPXID* pFrom, DPXID* pTo, uint32_t flags,
         *pFrom = it->from;
         *pTo = it->to;
         *pLen = (uint32_t)it->data.size();
+        DPNLOG("deq from=%u to=%u len=%u q=%zu pid=%08x\n",
+               it->from, it->to, (uint32_t)it->data.size(), queue.size(),
+               it->data.size() >= 4 ? *(const uint32_t*)it->data.data() : 0);
         if (!(flags & DPX_RECV_PEEK))
             queue.erase(it);
         return DPX_OK;
