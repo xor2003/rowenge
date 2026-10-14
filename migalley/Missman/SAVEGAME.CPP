@@ -1846,6 +1846,22 @@ void	SupplyTree::Load(BIStream& bis)
 	for (SupplyRoute* route=FirstRoute;route->next!=route;route=route->next)
 		bis>>*route;
 }
+#pragma pack(push,1)
+//RERUN: on-disk SuperBattleNode record — serialized by the 32-bit build
+//(4-byte enums and pointers). Runtime pointer fields are stale in the
+//blob; kept as ULong placeholders and ignored on load.
+struct	SuperBattleNodeRec
+{
+	ULong	mainuid;
+	SLong	mainids;
+	struct	{ ULong left,right; SLong nonlinks; ULong leftnode,rightnode; } flanks;
+	struct	{ SLong terrain; ULong waitreinforcehere,attackmain,defendmain,retreatfromhere; ULong uid; ULong occupier; } in,out;
+	struct	{ ULong uid,homeapproach,homeretreat,awayapproach,awayretreat; SLong redtransportmethodname; } innerlink;
+	ULong	occupier,innode,firstoutnode;
+};
+#pragma pack(pop)
+static_assert(sizeof(SuperBattleNodeRec)==120,"SuperBattleNode disk record size drifted");
+
 int		BattleStruct::LoadBattleNodes(FileNum f)
 {
 	usednodes=0;
@@ -1853,10 +1869,43 @@ int		BattleStruct::LoadBattleNodes(FileNum f)
 	{
 		fileblock b(f);
 		SuperBattleDesc::Header* header=(SuperBattleDesc::Header*)b.getdata();
-		SuperBattleNode* src=(SuperBattleNode*) ((char*)b.getdata()+sizeof(SuperBattleDesc::Header));
-		usednodes=(b.getsize()-sizeof(SuperBattleDesc::Header))/sizeof(SuperBattleNode);
+		const SuperBattleNodeRec* src=(const SuperBattleNodeRec*) ((const char*)b.getdata()+sizeof(SuperBattleDesc::Header));
+		usednodes=(b.getsize()-sizeof(SuperBattleDesc::Header))/sizeof(SuperBattleNodeRec);
+		if (usednodes>MAXNODES)
+			usednodes=MAXNODES;
 		for (int i=0;i<usednodes;i++)
-			nodelist[i]=src[i];
+		{
+			const SuperBattleNodeRec& s=src[i];
+			SuperBattleNode& d=nodelist[i];
+			d.mainuid=(UniqueID)s.mainuid;
+			d.mainids=s.mainids;
+			d.flanks.left=(UniqueID)s.flanks.left;
+			d.flanks.right=(UniqueID)s.flanks.right;
+			d.flanks.nonlinks=(SuperBattleNode::FlankLink::NonLinks)s.flanks.nonlinks;
+			d.flanks.leftnode=d.flanks.rightnode=NULL;
+			d.in.terrain=(SuperBattleNode::IntraLink::TerrainType)s.in.terrain;
+			d.in.waitreinforcehere=(FileNum)s.in.waitreinforcehere;
+			d.in.attackmain=(FileNum)s.in.attackmain;
+			d.in.defendmain=(FileNum)s.in.defendmain;
+			d.in.retreatfromhere=(FileNum)s.in.retreatfromhere;
+			d.in.uid=(UniqueID)s.in.uid;
+			d.in.occupier=NULL;
+			d.out.terrain=(SuperBattleNode::IntraLink::TerrainType)s.out.terrain;
+			d.out.waitreinforcehere=(FileNum)s.out.waitreinforcehere;
+			d.out.attackmain=(FileNum)s.out.attackmain;
+			d.out.defendmain=(FileNum)s.out.defendmain;
+			d.out.retreatfromhere=(FileNum)s.out.retreatfromhere;
+			d.out.uid=(UniqueID)s.out.uid;
+			d.out.occupier=NULL;
+			d.innerlink.uid=(UniqueID)s.innerlink.uid;
+			d.innerlink.homeapproach=(FileNum)s.innerlink.homeapproach;
+			d.innerlink.homeretreat=(FileNum)s.innerlink.homeretreat;
+			d.innerlink.awayapproach=(FileNum)s.innerlink.awayapproach;
+			d.innerlink.awayretreat=(FileNum)s.innerlink.awayretreat;
+			d.innerlink.redtransportmethodname=s.innerlink.redtransportmethodname;
+			d.occupier=NULL;
+			d.innode=d.firstoutnode=NULL;
+		}
 		for (int i=0;i<usednodes;i++)
 		{
 			if (nodelist[i].mainuid==header->awayreinforceleft)
@@ -1872,6 +1921,9 @@ void	BattleStruct::LinkBattleNodes()
 	for (int i=0;i<usednodes;i++)
 	{	//left/right/in pointers
 		nodelist[i].firstoutnode=NULL;
+		nodelist[i].innode=NULL;				//RERUN: reset all link
+		nodelist[i].flanks.leftnode=NULL;		//pointers — unmatched uids
+		nodelist[i].flanks.rightnode=NULL;		//must not leave stale data
 		nodelist[i].occupier=NULL;
 		nodelist[i].in.occupier=NULL;
 		nodelist[i].out.occupier=NULL;
