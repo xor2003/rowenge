@@ -60,6 +60,7 @@ public:
 	void SetCaption(LPCTSTR);
 	long GetFontNum();
 	void SetFontNum(long);
+	void SetStyleProps(long foreColor, long style, long listboxLen); // RERUN persist blob
 	long GetListboxLength();
 	void SetListboxLength(long);
 	BOOL GetCircularStyle();

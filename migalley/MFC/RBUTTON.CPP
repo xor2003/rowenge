@@ -298,25 +298,39 @@ void CRButton::OnPaint()
 	}
 	// RERUN HACK END
 
-	// RERUN: BoB glyph buttons (tickboxes, map-filter icons) persist an IconsUI
-	// sheet index in m_iIconEnum rather than a FileNum: <0x10000 is a page-1
-	// entry index, 0x1xxxx arrives already page-tagged. FileNum metadata (e.g.
-	// IDC_AUTHORISE=27299) keeps the artwork path. Mirrors rbuttonc.cpp's
-	// `filenum >= ICON_PAGE_1` split and ICON_SELECT_* state offsets.
+	// RERUN: BoB — retail keeps a single m_NormalFileNum: the persist blob
+	// seeds it (e.g. IDC_PILOTEDFLAG=ICONsUI 0x10047) and the game overwrites
+	// it via SetNormalFileNum (CSQuickLine sets B_ICON_LW_FIGHTER=0x10038).
+	// Runtime value wins; the persisted metadata (m_iIconEnum) is the
+	// fallback. Values >=0x10000 are IconsUI glyph ids (IconDescUI::MaskIcon);
+	// small positive values are bare iconlist indices -> promote to page 1;
+	// the rest are real FileNums handled by the bitmap path below.
 	bool iconGlyphDrawn = false;
-	if (g_rowanGameIsBoB && m_iIconEnum != 0 &&
-	    (m_iIconEnum < 0x10000 || (m_iIconEnum & 0xff0000) != 0))
+	if (g_rowanGameIsBoB)
 	{
-		long iu = m_iIconEnum;
-		if (iu < 0x10000) iu |= 0x10000;          // ICON_PAGE_1
-		if (m_bDisabled)          iu |= 0x4000000; // ICON_SELECT_4
-		else if (m_bMouseDown)    iu |= 0x2000000; // ICON_SELECT_2
-		else if (m_bPressed)      iu |= 0x1000000; // ICON_SELECT_1
-		if (RowanUIDrawIcon)
-			iconGlyphDrawn = RowanUIDrawIcon(&dc, iu, 0, 0);
+		long filenum = (m_nNormalFileNum != FIL_NULL) ? (long)m_nNormalFileNum
+		                                            : (long)m_iIconEnum;
+		if (filenum > 0 && filenum < 0x200) filenum |= 0x10000;  // ICON_PAGE_1
+		if (filenum >= 0x10000)
+		{
+			long iu = filenum;
+			if (m_bDisabled)          iu |= 0x4000000; // ICON_SELECT_4
+			else if (m_bMouseDown)    iu |= 0x2000000; // ICON_SELECT_2
+			else if (m_bPressed)      iu |= 0x1000000; // ICON_SELECT_1
+			if (RowanUIDrawIcon)
+				iconGlyphDrawn = RowanUIDrawIcon(&dc, iu, 0, 0);
+			if (!iconGlyphDrawn) filenum = FIL_NULL;
+		}
+		if (!iconGlyphDrawn && m_iIconEnum != 0 &&
+		    filenum > 0 && filenum < 0x10000 &&
+		    m_nNormalFileNum == FIL_NULL)
+		{
+			m_nNormalFileNum = (FileNum)(filenum + 2);
+			m_nDisabledFileNum = (FileNum)filenum;
+			m_nPressedFileNum = (FileNum)(filenum + 1);
+		}
 	}
-
-	if (m_iIconEnum != 0 && !iconGlyphDrawn)
+	else if (m_iIconEnum != 0)
 	{
 		m_nNormalFileNum = (FileNum)(m_iIconEnum + 2);
 		m_nDisabledFileNum = (FileNum)m_iIconEnum;

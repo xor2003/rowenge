@@ -78,6 +78,9 @@ questions about this file may be asked at http://www.simhq.com/
 
 static bool RowanDbgRadio() { static const bool b = getenv("ROWAN_DEBUG_RADIO") != nullptr; return b; }
 
+// BoB exports this from uiicons.cpp; weak so MiG (which lacks it) still links.
+extern "C" __attribute__((weak)) bool RowanUIDrawIcon(void* cdc, long iconsui, int x, int y);
+
 /////////////////////////////////////////////////////////////////////////////
 // CRRadio
 
@@ -197,6 +200,8 @@ void CRRadio::OnPaint()
     CRect rect;
     GetClientRect(rect);
 
+    RowanBlitParentArt(&dc, this); // OCX transparency: parent art under the row
+
     CFont* pFont = nullptr; // Initialize pFont to nullptr
 
     // Send WM_GETGLOBALFONT to the parent window, allowing it to handle font retrieval
@@ -236,11 +241,18 @@ void CRRadio::OnPaint()
     memset(&tm, 0, sizeof(tm));
     dc.GetTextMetrics(&tm);
     int aveCharWidth = (tm.tmAveCharWidth > 0) ? tm.tmAveCharWidth : textSize.cx / 2;
+    // BoB: GDI raster fonts report aveCharWidth ≈ height/2 (~10px for the
+    // OCX's font 9); our TTF under-reports (9) which pulls trailing columns
+    // into view that retail clips past the control edge.
+    if (g_rowanGameIsBoB && tm.tmHeight / 2 > aveCharWidth)
+        aveCharWidth = tm.tmHeight / 2;
     int colWidth = (m_colWidth > 0) ? m_colWidth * aveCharWidth : rect.Width() / cols;
     int rowHeight = (tm.tmHeight > 0) ? tm.tmHeight * m_colWidth / 10 + 2 : buttonHeight;
     // Our TTF faces run wider than the retail raster fonts the OCX was tuned
     // for; clamp the pitch so trailing columns stay inside the control.
-    if (colWidth * cols > rect.Width())
+    // BoB: keep the persisted pitch — the OCX lets trailing columns clip
+    // (IDD_SQUICKMISSION's 4th radio sits past the 325-unit control edge).
+    if (!g_rowanGameIsBoB && colWidth * cols > rect.Width())
         colWidth = rect.Width() / cols;
     if (colWidth < 1) colWidth = 1;
     if (rowHeight < buttonHeight) rowHeight = buttonHeight;
@@ -297,6 +309,20 @@ void CRRadio::OnPaint()
                               pBits, pInfo, DIB_RGB_COLORS, SRCCOPY);
                 textOffset = frameW + 4; // Adjust textOffset based on bitmap width + padding
             }
+        }
+        else if (g_rowanGameIsBoB && RowanUIDrawIcon)
+        {
+            // OCX glyph: ICON_BIGTICK (0x1000f) always; selected adds
+            // ICON_SELECT_1 (0x1000000), disabled uses _3/_4. Icon is 32px
+            // and text always starts at x+32 (rradioc.cpp::OnDraw).
+            long icon = 0x1000f;
+            if (!IsWindowEnabled())
+                icon += ((long)i == m_currentSelection) ? 0x4000000 : 0x3000000;
+            else if ((long)i == m_currentSelection)
+                icon += 0x1000000;
+            int iconY = y + ((int)tm.tmHeight - 32) / 2;
+            RowanUIDrawIcon(&dc, icon, x, iconY);
+            textOffset = 32;
         }
         else
         {
@@ -357,9 +383,11 @@ void CRRadio::OnLButtonDown(UINT nFlags, CPoint point)
 
     // Same layout math as OnPaint — ColumnWidth is in average-char units.
     int aveCharWidth = (tm.tmAveCharWidth > 0) ? tm.tmAveCharWidth : textSize.cx / 2;
+    if (g_rowanGameIsBoB && tm.tmHeight / 2 > aveCharWidth)
+        aveCharWidth = tm.tmHeight / 2;
     int colWidth = (m_colWidth > 0) ? m_colWidth * aveCharWidth : rect.Width() / cols;
     int rowHeight = (tm.tmHeight > 0) ? tm.tmHeight * m_colWidth / 10 + 2 : buttonHeight;
-    if (colWidth * cols > rect.Width())
+    if (!g_rowanGameIsBoB && colWidth * cols > rect.Width())
         colWidth = rect.Width() / cols;
     if (colWidth < 1) colWidth = 1;
     if (rowHeight < buttonHeight) rowHeight = buttonHeight;

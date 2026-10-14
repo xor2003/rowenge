@@ -227,18 +227,26 @@ void CREdit::OnPaint()
 	CRect rect;
 	GetClientRect(&rect);
 
-	// Fill background - typically white for an edit box
-	dc.FillSolidRect(rect, RGB(255, 255, 255));
-	// Draw a border
-	dc.SelectStockObject(BLACK_PEN);
-	dc.MoveTo(rect.left, rect.top);
-	dc.LineTo(rect.right - 1, rect.top);
-	dc.LineTo(rect.right - 1, rect.bottom - 1);
-	dc.LineTo(rect.left, rect.bottom - 1);
-	dc.LineTo(rect.left, rect.top);
+	RowanBlitParentArt(&dc, this); // OCX transparency: parent art under the field
 
-	// Set text color
-	dc.SetTextColor(m_foreColor);
+	// RERUN: the OCX paints no background and no border — the parent's
+	// artwork shows through (reditctl.cpp::OnDraw blits the art first; the
+	// visible field edges in retail are part of the artwork itself).
+	if (!g_rowanGameIsBoB)
+	{
+		dc.SelectStockObject(BLACK_PEN);
+		dc.MoveTo(rect.left, rect.top);
+		dc.LineTo(rect.right - 1, rect.top);
+		dc.LineTo(rect.right - 1, rect.bottom - 1);
+		dc.LineTo(rect.left, rect.bottom - 1);
+		dc.LineTo(rect.left, rect.top);
+	}
+
+	// Set text color — unset fore renders as BoB's chrome yellow (the OCX
+	// stock ForeColor prop resolves through the game's palette; retail BoB
+	// edit text is pure 255,255,0 on the artwork).
+	dc.SetTextColor(m_foreColor ? m_foreColor
+	                            : (g_rowanGameIsBoB ? (OLE_COLOR)0x0000ffff : 0));
 	dc.SetBkMode(TRANSPARENT); // So background of text is not drawn
 
 	// Get and set font

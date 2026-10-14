@@ -76,8 +76,16 @@ questions about this file may be asked at http://www.simhq.com/
 #include "RESOURCE.H" //RERUN
 #include "MIGVIEW.H" //RERUN for GetFullPanel
 
+static bool RowanDbgBmp() { static const bool b = getenv("ROWAN_DEBUG_BMP") != nullptr; return b; }
+
+// BoB exports this from uiicons.cpp; weak so MiG (which lacks it) still links.
+extern "C" __attribute__((weak)) bool RowanUIDrawIcon(void* cdc, long iconsui, int x, int y);
+
 struct RComboData {
     int fontNum = 2; // Default font
+    long foreColor = 0x0000ffff; // BoB chrome text renders yellow (255,255,0)
+    long style = 0;            // Combo_Square — combo_styles[0] in rcomboc.cpp
+    long listboxLen = 200;
 };
 
 static std::map<CWnd*, RComboData> g_rcombo_data;
@@ -142,6 +150,24 @@ long CRCombo::GetFontNum()
 void CRCombo::SetFontNum(long propVal)
 {
 	GetData(this).fontNum = propVal;
+}
+
+// RERUN: persisted-blob accessors — rcomboc.cpp's ComboStyle fields live in
+// the DLGINIT words, applied by the stub after Create.
+void CRCombo::SetStyleProps(long foreColor, long style, long listboxLen)
+{
+	RComboData& d = GetData(this);
+	// w6..7 is the persisted OLE_COLOR (verified vs rcomboc.cpp::OnDraw
+	// fontcol=TranslateColor(GetForeColor()) — 0x00ffff00 renders yellow on
+	// the Parameters sheet; 0xb8ffff00 renders the light glyph + yellow
+	// shadow on the Sim screen — the shadow pass uses the raw dword's RGB).
+	d.foreColor = foreColor;
+	d.style = style;
+	if (getenv("ROWAN_DEBUG_COMBO"))
+		fprintf(stderr, "[rcombo] %p SetStyleProps fore=%08lx style=%ld len=%ld dlg=%d\n",
+			(void*)this, (unsigned long)foreColor, style, listboxLen,
+			GetParent() ? (int)GetParent()->GetDlgCtrlID() : -1);
+	if (listboxLen > 0) { d.listboxLen = listboxLen; m_listboxLength = listboxLen; }
 }
 
 long CRCombo::GetListboxLength()
@@ -222,6 +248,9 @@ void CRCombo::SetFileNumMain(long propVal)
 void CRCombo::AddString(LPCTSTR text)
 {
 	// Add the string to the internal list
+    if (RowanDbgBmp())
+        fprintf(stderr, "[combo-add] ctl=%d this=%p text='%s'\n",
+            GetDlgCtrlID(), (void*)this, text ? text : "(null)");
     m_items.push_back(text);
 }
 
@@ -300,15 +329,29 @@ void CRCombo::ResetContent() {
     Invalidate();
 }
 
+// RERUN: rcomboc.cpp combo_styles[] — cliptextr/clipliner/clipselr/rhsicon/
+// icondown/dorhsline per persisted Style (0=Square,1=Round,2=Big,3=SquareC,
+// 4=SquareR,5=Art).
+struct RowanComboStyle { int cliptextr, clipliner, clipselr; long rhsicon; int icondown; bool dorhsline; int margin; };
+static const RowanComboStyle kRowanComboStyles[6] = {
+    { 17, 1, 17, 0x10012 /*ICON_SPINDOWN*/,        9, true,  3 }, // Square
+    { 22, 20, 22, 0x10014 /*ICON_COMBO_BIG_ROUND*/, 0, false, 3 }, // Round
+    { 25, 1, 25, 0x10014 /*ICON_COMBO_BIG_ROUND*/, 2, true,  5 }, // Big
+    { 17, 1, 17, 0x10012,                           9, true,  3 }, // SquareC
+    { 17, 1, 17, 0x10012,                           9, true,  3 }, // SquareR
+    { 32, 1, 32, 0 /*ICON_NO_ICON*/,                0, true,  3 }, // Art
+};
+
 void CRCombo::OnPaint()
 {
     CPaintDC dc(this);
     CRect rect;
     GetClientRect(rect);
 
-    // Simple "Rowan Combo" look: Yellow text on dark background, or standard gray
-    //dc.FillSolidRect(rect, RGB(64, 64, 64));
-    dc.Draw3dRect(rect, RGB(255, 255, 255), RGB(0, 0, 0));
+    RowanBlitParentArt(&dc, this); // OCX transparency: parent art under the field
+
+    const RComboData& d = GetData(this);
+    const RowanComboStyle& S = kRowanComboStyles[(d.style >= 0 && d.style < 6) ? d.style : 0];
 
     CString text;
     GetWindowText(text);
@@ -319,22 +362,87 @@ void CRCombo::OnPaint()
     CFont* pFont = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT, abs(GetFontNum()));
     if (pFont) dc.SelectObject(pFont);
 
-    dc.SetTextColor(RGB(255, 255, 0)); // Yellow text
+    dc.SetTextColor((COLORREF)d.foreColor);
     dc.SetBkMode(TRANSPARENT);
-    
-    CRect textRect(rect.left + 2, rect.top + 2, rect.right - 20, rect.bottom - 2);
+
+    CRect textRect(rect.left + S.margin, rect.top + 2, rect.right - S.cliptextr, rect.bottom - 2);
+    // rcomboc.cpp ExtTextOut: a negative FontNum means embossed text — two
+    // shadow passes at GetShadow offsets (+1,+1) and (+1,+2), then the fore
+    // glyph on top. The persisted OLE_COLOR stores RRGGBB (0xffff00=yellow
+    // shadow on both sheets); TranslateColor(fore) yields the glyph colour —
+    // plain RGB on Parameters (yellow), a system-palette light cream on the
+    // Sim screen (0xb8ffff00).
+    if (g_rowanGameIsBoB)
+    {
+        const COLORREF rgb = (COLORREF)(((d.foreColor >> 16) & 0xff) |
+                                       (d.foreColor & 0xff00) |
+                                       ((d.foreColor & 0xff) << 16));
+        const COLORREF fore = (d.foreColor & 0xff000000)
+            ? RGB(251, 241, 118)                    // sampled retail cream
+            : rgb;
+        if (d.fontNum < 0)
+        {
+            // Retail's m_ShadowColor=RGB(0,0,0) snaps through the sheet's
+            // 8-bit palette to a dark warm brown — sampled from retail.
+            dc.SetTextColor(RGB(56, 25, 4));
+            CRect s1 = textRect; s1.OffsetRect(1, 1);
+            dc.DrawText(text, s1, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+            CRect s2 = textRect; s2.OffsetRect(1, 2);
+            dc.DrawText(text, s2, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+        }
+        dc.SetTextColor(fore);
+    }
     dc.DrawText(text, textRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
-    // Draw a small arrow on the right
-    dc.FillSolidRect(rect.right - 16, rect.top + 2, 14, rect.Height() - 4, RGB(128, 128, 128));
-    dc.Draw3dRect(rect.right - 16, rect.top + 2, 14, rect.Height() - 4, RGB(255, 255, 255), RGB(0, 0, 0));
+    // Border: AXC_DARKEDGE top/left, AXC_LITEDGE bottom (+right when the
+    // style draws the rhs line) — axcolors.h insets over the artwork.
+    if (g_rowanGameIsBoB)
+    {
+        const COLORREF dark = IsWindowEnabled() ? RGB(0, 8, 49) : RGB(179, 194, 226);
+        const COLORREF lite = IsWindowEnabled() ? RGB(148, 148, 206) : RGB(179, 194, 226);
+        dc.FillSolidRect(rect.left, rect.top, rect.right - S.clipliner - rect.left, 1, dark);
+        dc.FillSolidRect(rect.left, rect.top, 1, rect.Height(), dark);
+        dc.FillSolidRect(rect.left, rect.bottom - 1, rect.right - S.clipliner - rect.left, 1, lite);
+        if (S.dorhsline)
+            dc.FillSolidRect(rect.right - S.clipliner, rect.top, 1, rect.Height(), lite);
+    }
+    else
+        dc.Draw3dRect(rect, RGB(255, 255, 255), RGB(0, 0, 0));
+
+    // Draw the arrow glyph — retail blits the style's icon-sheet entry at
+    // (right-cliptextr, icondown); gray 3D fallback where unlinked (MiG).
+    if (S.rhsicon
+        && (!RowanUIDrawIcon
+            || !RowanUIDrawIcon(&dc, S.rhsicon,
+                                rect.right - S.cliptextr, rect.top + S.icondown))) {
+        dc.FillSolidRect(rect.right - 16, rect.top + 2, 14, rect.Height() - 4, RGB(128, 128, 128));
+        dc.Draw3dRect(rect.right - 16, rect.top + 2, 14, rect.Height() - 4, RGB(255, 255, 255), RGB(0, 0, 0));
+    }
 }
 
 void CRCombo::OnLButtonDown(UINT nFlags, CPoint point) {
-    // Implement dropdown behavior here
-    // This is a simplified version - a real dropdown would require a popup window
-    //  to display the options.
-    // CWnd::OnLButtonDown(nFlags, point); // RERUN: Do not call base, it captures the mouse
+    // RERUN: mirror rcomboc.cpp::OnLButtonDown — a click in the field body
+    // cycles to the next entry; only a click in the right ~16px arrow strip
+    // (S->clipselr in Combo_Round) opens the dropdown list.
+    CRect crc;
+    GetClientRect(crc);
+    const RowanComboStyle& S = kRowanComboStyles[(GetData(this).style >= 0 && GetData(this).style < 6) ? GetData(this).style : 0];
+    if (point.x <= crc.right - S.clipselr) {
+        if (!m_items.empty()) {
+            int row = GetIndex() + 1;
+            if (row >= (int)m_items.size()) row = 0;
+            SetCurSel(row);
+            if (GetParent()) {
+                const std::string text = m_items[row];
+                FireEvent(1, (long)GetDlgCtrlID(), 0, text.c_str(), row);
+                GetParent()->SendMessage(WM_COMMAND,
+                    MAKEWPARAM(GetDlgCtrlID(), 1 /*CBN_SELCHANGE*/), (LPARAM)m_hWnd);
+            }
+            Invalidate();
+        }
+        return;
+    }
+
     if (GetParent()) {
         // RERUN: If dropdown is already visible, just hide it and do nothing else.
         if (m_dropDown && m_dropDown->IsWindowVisible()) {
@@ -360,10 +468,25 @@ void CRCombo::OnLButtonDown(UINT nFlags, CPoint point) {
     for (size_t i = 0; i < m_items.size(); ++i) {
         m_dropDown->AddString(m_items[i].c_str());
     }
+    if (RowanDbgBmp()) {
+        fprintf(stderr, "[combo] ctl=%d items=%zu\n", GetDlgCtrlID(), m_items.size());
+        for (size_t i = 0; i < m_items.size(); ++i)
+            fprintf(stderr, "[combo]   [%zu] '%s'\n", i, m_items[i].c_str());
+    }
     m_dropDown->SetCurSel(m_curSel);
 
-    CRect comboRect;
-    GetWindowRect(&comboRect); // Gets screen coordinates
+    // RERUN: the dropdown is a top-level popup so it needs screen coords.
+    // GetWindowRect's backend-parent walk misses offsets for DDX'd controls;
+    // sum m_rect up the CWnd parent chain (same way paint composites).
+    CRect comboRect = m_rect;
+    for (CWnd* p = GetParent(); p; p = p->GetParent()) {
+        comboRect.left += p->m_rect.left;   comboRect.right  += p->m_rect.left;
+        comboRect.top  += p->m_rect.top;    comboRect.bottom += p->m_rect.top;
+    }
+    if (RowanDbgBmp())
+        fprintf(stderr, "[combo] screenRect=%ld,%ld-%ld,%ld\n",
+            (long)comboRect.left, (long)comboRect.top,
+            (long)comboRect.right, (long)comboRect.bottom);
 
     int itemCount = m_items.size();
     int dropWidth = comboRect.Width();

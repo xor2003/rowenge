@@ -119,9 +119,18 @@ void CRTabs::OnPaint() {
     GetClientRect(&rect);
 
     // std::cout << "[CRTabs] OnPaint: " << GetData(this).tabs.size() << " tabs. Rect: " << rect.left << "," << rect.top << "," << rect.right << "," << rect.bottom << std::endl;
-    
-    // Draw background
-    dc.FillSolidRect(rect, RGB(192, 192, 192));
+
+    if (g_rowanGameIsBoB)
+    {
+        // The real OCX is transparent — it never paints a background,
+        // and returns immediately when the tab list is empty.
+        if (GetData(this).tabs.empty())
+            return;
+        RowanBlitParentArt(&dc, this);
+    }
+    else
+        // Draw background
+        dc.FillSolidRect(rect, RGB(192, 192, 192));
     
     TabsData& data = GetData(this);
     

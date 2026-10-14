@@ -2679,4 +2679,10 @@ extern bool g_rowanGameIsBoB;
 // fatal inside fileman, so BoB-facing paint code must filter first.
 bool RowanFileNumSafe(long fnum);
 
+// Rowan OCX transparency: every control begins its OnDraw by blitting the
+// parent's artwork underneath itself (rcomboc.cpp/rradioc.cpp/reditctl.cpp).
+// Our stub controls must do the same or repaints leave stale pixels over the
+// transparent fields. No-op when the parent has no artwork.
+void RowanBlitParentArt(class CDC* dc, class CWnd* wnd);
+
 #pragma pack(pop)

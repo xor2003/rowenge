@@ -1100,6 +1100,13 @@ BOOL PeekMessage(MSG* msg, HWND hwnd, UINT min, UINT max, UINT remove)
             WindowBackend& be = pair.second;
             if (be.needsRepaint && be.owner) {
                 if (be.visible) {
+                    static bool dbgPaintWho = getenv("ROWAN_DEBUG_PAINTWHO") != nullptr;
+                    if (dbgPaintWho)
+                        fprintf(stderr, "[paintwho] hwnd=%p tid=%d id=%d type=%s rect=%ld,%ld-%ld,%ld\n",
+                            (void*)pair.first, be.templateID, be.owner->m_nID,
+                            typeid(*be.owner).name(),
+                            (long)be.owner->m_rect.left, (long)be.owner->m_rect.top,
+                            (long)be.owner->m_rect.right, (long)be.owner->m_rect.bottom);
                     MSG paintMsg = {};
                     paintMsg.hwnd = pair.first;
                     paintMsg.message = WM_PAINT;
@@ -1936,11 +1943,23 @@ BOOL CDC::BitBlt(int x, int y, int cx, int cy,
             if (dstA) SDL_FreeSurface(dstA);
             return FALSE;
         }
+        // RERUN: child controls paint inside SDL_RenderSetViewport — all DC
+        // coords are control-local, but SDL_RenderReadPixels takes raw
+        // renderer pixels. Without the viewport offset the readback grabbed
+        // the screen's top-left corner and the combined result painted as an
+        // opaque dark box under MaskIcon glyphs (BoB radio BIGTICKs).
         SDL_Rect drect{ x, y, cx, cy };
         bool got = false;
         if (m_renderer)
-            got = (SDL_RenderReadPixels(m_renderer, &drect, SDL_PIXELFORMAT_ARGB8888,
+        {
+            SDL_Rect rrect = drect;
+            SDL_Rect vp;
+            SDL_RenderGetViewport(m_renderer, &vp);
+            rrect.x += vp.x;
+            rrect.y += vp.y;
+            got = (SDL_RenderReadPixels(m_renderer, &rrect, SDL_PIXELFORMAT_ARGB8888,
                                         dstA->pixels, dstA->pitch) == 0);
+        }
         else if (m_targetSurface) {
             SDL_SetSurfaceBlendMode(dstA, SDL_BLENDMODE_NONE);
             got = (SDL_BlitSurface(m_targetSurface, &drect, dstA, nullptr) == 0);
@@ -2123,6 +2142,41 @@ int CDC::SetDIBitsToDevice(int xDest, int yDest, DWORD w, DWORD h, int xSrc, int
         SDL_FreeSurface(surface);
     }
     return cScanLines;
+}
+
+// RERUN: Rowan OCX transparency — every control's OnDraw first blits the
+// parent's artwork into its own rect (rcomboc.cpp::OnDraw, rradioc.cpp,
+// reditctl.cpp), so a repaint never leaves stale pixels where the field is
+// "transparent". Same message chain the OCXs use: WM_GETARTWORK /
+// WM_GETXYOFFSET / WM_GETFILE / WM_RELEASELASTFILE on the parent.
+void RowanBlitParentArt(CDC* dc, CWnd* wnd)
+{
+    if (!dc || !wnd || !g_rowanGameIsBoB) return;
+    static bool dbgArt = getenv("ROWAN_DEBUG_PAINT") != nullptr;
+    CWnd* parent = wnd->GetParent();
+    if (!parent) { if (dbgArt) std::cout << "[parentart] no parent" << std::endl; return; }
+    long artnum = parent->SendMessage(WM_GETARTWORK, 0, 0);
+    if (!artnum) { if (dbgArt) std::cout << "[parentart] parent=" << parent->m_nID << " artnum=0" << std::endl; return; }
+    long offsets = parent->SendMessage(WM_GETXYOFFSET, 0, 0);
+    // offsets = art origin inside the parent's client space; wnd->m_rect is
+    // the control's origin in that same space → art offset in control coords.
+    int offx = (short)(offsets & 0xffff) - wnd->m_rect.left;
+    int offy = (short)((offsets >> 16) & 0xffff) - wnd->m_rect.top;
+    BYTE* pData = (BYTE*)parent->SendMessage(WM_GETFILE, artnum, 0);
+    if (dbgArt) std::cout << "[parentart] parent=" << parent->m_nID << " artnum=" << std::hex << artnum << std::dec
+                          << " wndrect=" << wnd->m_rect.left << "," << wnd->m_rect.top
+                          << " off=" << offx << "," << offy
+                          << " data=" << (pData ? "ok" : "null") << std::endl;
+    if (pData && pData[0] == 'B' && pData[1] == 'M')
+    {
+        BITMAPFILEHEADER* pFile = (BITMAPFILEHEADER*)pData;
+        BITMAPINFO* pInfo = (BITMAPINFO*)(pData + sizeof(BITMAPFILEHEADER));
+        BYTE* bits = pData + pFile->bfOffBits;
+        dc->SetDIBitsToDevice(offx, offy,
+            pInfo->bmiHeader.biWidth, pInfo->bmiHeader.biHeight,
+            0, 0, 0, pInfo->bmiHeader.biHeight, bits, pInfo, DIB_RGB_COLORS);
+    }
+    parent->SendMessage(WM_RELEASELASTFILE, 0, 0);
 }
 
 int StretchDIBits(HDC hdc, int xDest, int yDest, int nDestWidth, int nDestHeight, int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, const VOID *lpBits, const BITMAPINFO *lpbmi, UINT iUsage, DWORD dwRop)
@@ -3630,14 +3684,25 @@ void CListBox::OnPaint() {
     CRect rect;
     GetClientRect(&rect);
     // RERUN: Fill the entire background once to handle areas with no items.
-    // Only fill for dropdowns (which need opaque background); main menus use transparent lists over artwork.
-    if (m_pComboOwner) {
-        dc.FillSolidRect(rect, RGB(255, 255, 255)); 
+    // Dropdowns get a translucent dark backdrop over the artwork (matching
+    // the retail RCombo popup: yellow items, white selection, photos behind);
+    // main menus use fully transparent lists over artwork.
+    if (m_pComboOwner && dc.m_renderer) {
+        SDL_SetRenderDrawBlendMode(dc.m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(dc.m_renderer, 0, 0, 0, 110);
+        SDL_Rect bg = { rect.left, rect.top, rect.Width(), rect.Height() };
+        SDL_RenderFillRect(dc.m_renderer, &bg);
+        SDL_SetRenderDrawBlendMode(dc.m_renderer, SDL_BLENDMODE_NONE);
+    } else if (g_rowanGameIsBoB) {
+        // Transparent BoB listbox: redraw the parent artwork so removed
+        // items don't ghost over the field.
+        RowanBlitParentArt(&dc, this);
     }
     
     int itemHeight = GetItemHeight(); // This gets the height correctly based on the font
     if (itemHeight <= 0) itemHeight = 24; // RERUN: Safety check to prevent divide by zero
-    if (m_pComboOwner) std::cout << "[CRCombo] Painting dropdown with " << m_items.size() << " items. Height=" << itemHeight << std::endl;
+    static const bool lbDbg = RowanDbgBmp();
+    if (m_pComboOwner && lbDbg) std::cout << "[CRCombo] Painting dropdown with " << m_items.size() << " items. Height=" << itemHeight << std::endl;
     
     // RERUN: Safety check for vector corruption (unreasonably large size)
     if (m_items.size() > 10000) {
@@ -3682,16 +3747,16 @@ void CListBox::OnPaint() {
         if (y >= rect.Height()) break; // Stop drawing if we run out of space
 
         CRect itemRect(0, y, rect.Width(), y + itemHeight); // RERUN FIX: Corrected bottom coordinate
-        if (i == m_curSel) {
+        if (m_pComboOwner) {
+            // Retail RCombo popup: selection is white text, others yellow, no band
+            dc.SetTextColor(i == m_curSel ? RGB(255, 255, 255)
+                            : (i == m_hotSel ? RGB(255, 255, 255) : RGB(255, 255, 0)));
+        } else if (i == m_curSel) {
             dc.FillSolidRect(itemRect, RGB(0, 0, 128)); // Blue for selected
             dc.SetTextColor(RGB(255, 255, 255));
         } else if (i == m_hotSel) {
             // RERUN: Add visual marker for hot-tracked item
             dc.FillSolidRect(itemRect, RGB(230, 230, 250)); // Lavender for hot-track
-            dc.SetTextColor(RGB(0, 0, 0));
-        } else if (m_pComboOwner) {
-            // Dropdown items need opaque background
-            dc.FillSolidRect(itemRect, RGB(255, 255, 255));
             dc.SetTextColor(RGB(0, 0, 0));
         } else {
             // Transparent listbox (main menu): Don't fill background.
@@ -3977,6 +4042,26 @@ void AFXAPI DDX_Control(CDataExchange* pDX, int nIDC, CWnd& rControl)
                         // Apply initial string from DLGINIT if it exists
                         if (!g_dlgInitStrings[dlgID][nIDC].empty()) {
                             rControl.SetWindowText(g_dlgInitStrings[dlgID][nIDC].c_str());
+                        }
+                        // RERUN: persist blob — same layout as the template-child
+                        // path (ForeColor w6..7, FontNum w9..10, ListboxLen w11..12,
+                        // Style w13..14).
+                        auto itRW = g_dlgInitWords.find(dlgID);
+                        if (itRW != g_dlgInitWords.end()) {
+                            auto itW = itRW->second.find(nIDC);
+                            if (itW != itRW->second.end()) {
+                                const std::vector<long>& w = itW->second;
+                                if (w.size() >= 15 && (w[4] & 0xffff) == 0x004a &&
+                                    (w[5] & 0xffff) == 0) {
+                                    CRCombo* pC = static_cast<CRCombo*>(&rControl);
+                                    long foreColor = (long)((w[6] & 0xffff) | ((w[7] & 0xffff) << 16));
+                                    long fontNum   = (long)(int)((w[9] & 0xffff) | ((w[10] & 0xffff) << 16));
+                                    long listLen   = (long)((w[11] & 0xffff) | ((w[12] & 0xffff) << 16));
+                                    long style     = (long)((w[13] & 0xffff) | ((w[14] & 0xffff) << 16));
+                                    pC->SetStyleProps(foreColor, style, listLen);
+                                    pC->SetFontNum(fontNum);
+                                }
+                            }
                         }
                     } else {
                         // RERUN: Improved warning message for unhandled control types with metadata.
@@ -4722,6 +4807,21 @@ BOOL CDialog::Create(int id, CWnd* pParent)
                                 pR->SetColumnWidth(colWidth);
                             }
                         }
+                        // RERUN: RCombo persist blob — ForeColor at w6..7,
+                        // FontNum (signed) at w9..10, ListboxLength at w11..12,
+                        // Style at w13..14 (decoded vs rcomboc.cpp::DoPropExchange
+                        // on IDD_SQUICKMISSION's family/mission combos).
+                        else if (w.size() >= 15 && (w[4] & 0xffff) == 0x004a &&
+                                 (w[5] & 0xffff) == 0) {
+                            if (CRCombo* pC = dynamic_cast<CRCombo*>(pChild)) {
+                                long foreColor = (long)((w[6] & 0xffff) | ((w[7] & 0xffff) << 16));
+                                long fontNum   = (long)(int)((w[9] & 0xffff) | ((w[10] & 0xffff) << 16));
+                                long listLen   = (long)((w[11] & 0xffff) | ((w[12] & 0xffff) << 16));
+                                long style     = (long)((w[13] & 0xffff) | ((w[14] & 0xffff) << 16));
+                                pC->SetStyleProps(foreColor, style, listLen);
+                                pC->SetFontNum(fontNum);
+                            }
+                        }
                     }
                 }
             } else {
@@ -4805,9 +4905,27 @@ void CDialog::OnPaint()
     CPaintDC dc(this);
     if (!SendMessage(WM_ERASEBKGND, (WPARAM)&dc, 0))
     {
-        CRect r;
-        GetClientRect(r);
-        dc.FillSolidRect(r, RGB(192,192,192));
+        // BoB child dialogs (e.g. IDD_SQUICKSET squadron rows) are
+        // transparent over the parent's artwork — blit it instead of the
+        // gray fill or unused rows paint as solid bars.
+        if (!g_rowanGameIsBoB || !m_pParent)
+        {
+            CRect r;
+            GetClientRect(r);
+            static bool dbgFill = getenv("ROWAN_DEBUG_FILL") != nullptr;
+            dc.FillSolidRect(r, dbgFill ? RGB(255,0,255) : RGB(192,192,192));
+        }
+        else
+        {
+            static bool dbgDlgPaint = getenv("ROWAN_DEBUG_PAINT") != nullptr;
+            if (dbgDlgPaint) {
+                std::cout << "[dlgpaint] dlg=" << m_nID << " rect=" << m_rect.left << "," << m_rect.top
+                          << "-" << m_rect.right << "," << m_rect.bottom
+                          << " parent=" << (m_pParent ? m_pParent->m_nID : -1)
+                          << " style=" << std::hex << m_dwStyle << std::dec << std::endl;
+            }
+            RowanBlitParentArt(&dc, this);
+        }
     }
 }
 
