@@ -298,8 +298,8 @@ BOOL CMIGApp::InitInstance()
 	{	//1st time in read registry...
 #if 0 // RERUN, no reading in windows registry
 		HKEY k;
-		DWORD type;
-		unsigned char buff[10];
+		DWORD type=0;
+		unsigned char buff[10]={0};
 		DWORD size=9;
 		RegOpenKeyEx( 
 				HKEY_CURRENT_USER,

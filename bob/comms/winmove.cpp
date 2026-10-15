@@ -4942,7 +4942,7 @@ Bool	DPlay::GetGameDetails()
 //------------------------------------------------------------------------------
 void	DPlay::SendGameDetailsRequest()
 {
-	GAMEDETAILS pack;
+	GAMEDETAILS pack={0};
 
 	ULong retries=10;
 

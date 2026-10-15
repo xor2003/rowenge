@@ -272,6 +272,10 @@ Bool DPlay::UISelectServiceProvider(char* servicename)
 	if (res!=DP_OK)
 		return FALSE;
 
+	if (const char* s=getenv("ROWAN_DPLAY_TIMEOUT_SCALE"))
+		if (ULong n=(ULong)atoi(s))
+			CommsTimeoutLength*=n;
+
 	return TRUE;
 }
 
@@ -2097,8 +2101,8 @@ Bool	DPlay::ReceiveNextMessageToMe(char*&data, ULong& len, ULong& from,ULong fla
 //------------------------------------------------------------------------------
 void	DPlay::SendGameDetails(ULong from)
 {
-	GAMEDETAILS pack;
-	GENERIC	cpack;
+	GAMEDETAILS pack={0};
+	GENERIC	cpack={0};
 
 	if (Host)
 	{
@@ -2257,7 +2261,7 @@ Bool	DPlay::AllPlayersHaveSlots()
 //------------------------------------------------------------------------------
 void	DPlay::SendCS(UByte* info,ULong size, Bool init)
 {
-	GENERIC g;
+	GENERIC g={0};
 	ULong n;
 
 	if (!init)
@@ -2301,7 +2305,7 @@ void	DPlay::SendCS(UByte* info,ULong size, Bool init)
 
 	ULong	index=0;
 	ULong	copysize;
-	CSSTRUCPART csp;
+	CSSTRUCPART csp={0};
 	UByteP ptr=info;
 
 	while (numpackets--)
@@ -2424,7 +2428,7 @@ Bool	DPlay::GetCS()
 //------------------------------------------------------------------------------
 void	DPlay::SendCSRequest()
 {
-	GENERIC p;
+	GENERIC p={0};
 	p.PacketID=PID_CSQUICKREQUEST;
 	ULong retries=10;
 
