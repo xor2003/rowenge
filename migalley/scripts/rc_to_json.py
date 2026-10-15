@@ -73,8 +73,9 @@ def parse_quoted_string(s: str):
         return None, s
     text = m.group(1)
     rest = s[m.end():]
-    # Unescape \" and \\ etc.
-    text = bytes(text, 'utf-8').decode('unicode_escape')
+    # Unescape \" and \\ etc. (byte-safe: leaves non-ASCII untouched)
+    esc = {'n':'\n','t':'\t','r':'\r','"':'"','\\':'\\','0':'\0'}
+    text = re.sub(r'\\(.)', lambda m: esc.get(m.group(1), m.group(1)), text)
     return text, rest.lstrip()
 
 def parse_int(s: str):
@@ -1216,8 +1217,13 @@ def parse_menu_block(lines, idx, name_to_id, id_to_name):
 # ------------------------------------------------------------
 
 def parse_rc(path, name_to_id, id_to_name):
-    with path.open(encoding='latin-1', errors='ignore') as f:
-        raw_lines = f.readlines()
+    raw = path.read_bytes()
+    m = re.search(rb'code_page\s*\(\s*(\d+)\s*\)', raw[:65536])
+    enc = 'latin-1'
+    if m:
+        enc = {'1251':'cp1251','1252':'cp1252','932':'cp932','949':'cp949',
+               '950':'cp950','65001':'utf-8'}.get(m.group(1).decode(), 'latin-1')
+    raw_lines = raw.decode(enc, errors='ignore').splitlines(True)
 
     result = {
         "file": str(path),

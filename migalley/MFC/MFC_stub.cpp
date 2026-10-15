@@ -43,6 +43,14 @@
 static bool RowanDbgBmp()   { static const bool b = getenv("ROWAN_DEBUG_BMP")   != nullptr; return b; }
 static bool RowanDbgRadio() { static const bool b = getenv("ROWAN_DEBUG_RADIO") != nullptr; return b; }
 
+// Optional UI language override: ROWAN_LANG=ru loads <GAME>_RC_ru.json
+// alongside/instead of <GAME>_RC.json, and steers fonts toward Cyrillic.
+const char* RowanLang()
+{
+    const char* l = getenv("ROWAN_LANG");
+    return (l && *l) ? l : nullptr;
+}
+
 float g_dluX = 1.5; // 1.5 to 2 is typical for 8pt font
 float g_dluY = 1.5;
 
@@ -250,7 +258,16 @@ static std::string GetSystemFontPath(const char* faceName = nullptr, bool bold =
     else if (italic)    libSuffix = "-Italic";
 
     std::vector<std::string> candidates;
-    if (family == "Intel") {
+    const char* lang = RowanLang();
+    bool wantCyrillic = lang && (strstr(lang,"ru") || strstr(lang,"RU")
+                      || strstr(lang,"be") || strstr(lang,"uk") || strstr(lang,"bg"));
+    if (family == "Intel" && wantCyrillic) {
+        // Intel.ttf predates Unicode Cyrillic; Liberation Sans is
+        // metrically closest (Arial-like, narrower than DejaVu).
+        candidates.push_back("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
+        candidates.push_back("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf");
+        candidates.push_back("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf");
+    } else if (family == "Intel") {
         candidates.push_back("./INTEL.TTF");
         candidates.push_back("./Intel.ttf");
         candidates.push_back("/usr/share/fonts/Intel/Intel.ttf");
@@ -1772,9 +1789,9 @@ int CDC::DrawText(const CString& str, const CRect& rect, UINT nFormat)
         Uint32 wrapLength = rect.Width();
         if (wrapLength <= 0) wrapLength = 100; 
 
-        SDL_Surface* surf = TTF_RenderText_Blended_Wrapped(font, str.c_str(), color, wrapLength);
+        SDL_Surface* surf = TTF_RenderUTF8_Blended_Wrapped(font, str.c_str(), color, wrapLength);
         if (!surf) {
-             surf = TTF_RenderText_Solid(font, str.c_str(), color);
+             surf = TTF_RenderUTF8_Solid(font, str.c_str(), color);
         }
         if (surf) {
             SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer, surf);
@@ -2355,7 +2372,7 @@ void CDC::TextOut(int x, int y, const char* str, int len)
                   << " vp=" << vp.x << "," << vp.y << "+" << vp.w << "x" << vp.h
                   << " fonth=" << TTF_FontHeight(font) << std::endl;
     }
-    SDL_Surface* surf = TTF_RenderText_Solid(font, s.c_str(), color);
+    SDL_Surface* surf = TTF_RenderUTF8_Solid(font, s.c_str(), color);
     if (surf) {
         if (m_bkMode == OPAQUE) {
             SDL_SetRenderDrawColor(m_renderer, GetRValue(m_bkColor), GetGValue(m_bkColor), GetBValue(m_bkColor), 255);
@@ -4406,6 +4423,7 @@ void ParseRCFile(const std::string& filename)
 // loaded below. Lets shared UI code skip MiG Alley specific artwork hacks.
 bool g_rowanGameIsBoB = false;
 
+
 // Filter for fields that mix FileNums and BoB icon-table indices: fileman
 // treats an out-of-range FileNum as fatal, so paint code validates first.
 // namenumberedfilelessfail returns "//", NULL, or a path with an empty
@@ -4425,13 +4443,23 @@ void LoadDialogTemplates()
         "MIG_RC.json", "./MIG_RC.json", "./MigAlley/MIG_RC.json",
         "BOB_RC.json", "./BOB_RC.json", "./Bob/BOB_RC.json"
     };
-    for (const char* p : paths) {
+    std::vector<std::string> trypaths;
+    if (const char* lang = RowanLang()) {
+        for (const char* p : paths) {
+            std::string base(p);
+            size_t dot = base.rfind(".json");
+            if (dot != std::string::npos)
+                trypaths.push_back(base.substr(0, dot) + "_" + lang + ".json");
+        }
+    }
+    for (const char* p : paths) trypaths.push_back(p);
+    for (const auto& p : trypaths) {
         std::ifstream f(p);
         if (f.good()) {
             std::cout << "[MFC_stub] Loading dialog templates from " << p << std::endl;
-            if (strstr(p, "BOB_RC.json"))
+            if (strstr(p.c_str(), "BOB_RC"))
                 g_rowanGameIsBoB = true;
-            ParseRCFile(p);
+            ParseRCFile(p.c_str());
             return;
         }
     }
