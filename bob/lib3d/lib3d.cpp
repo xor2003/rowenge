@@ -87,17 +87,12 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 //#include "afxwin.h"
 #include <math.h>
-//DEADCODE MS 02/02/00 typedef	bool	GUID;
 //xor #include "dosdefs.h"
 #include <objbase.h>
 #include <stdio.h>
 
 
-//DEADCODE MS 02/02/00 #include <initguid.h>
 #include <ddraw.h>
-//DeadCode JON 27Sep00 //#define LINEAR_Z_FIX
-//DeadCode JON 27Sep00 //#define NON_LIN_Z_FIX
-//DeadCode JON 27Sep00 #define NON_LIN_Z_ADD
 #define _INSIDE_LIB3D_
 
 #include "lib3d.h"
@@ -229,16 +224,12 @@ static	int	noPolysDebug;
 // cheat to include
 //#include "flagsw.cpp"
 
-//DeadCode JON 21Aug00 D3DVALUE SPolygon::zFiddle=0.0;
 
 ULong Lib3D::refCnt=0;
 
 D3DDEVICEDESC7 Lib3D::selectedDevice= {0};
 WORD Lib3D::polyVerts[MAX_VERTICES];
-//DEADCODE JON 5/19/00 DWORD Lib3D::polyVertCount=0xFFFFFFFF;
 DWORD Lib3D::vertexType;
-//DEADCODE JON 5/19/00 R3DVERTEX *Lib3D::polyVertArray;
-//DEADCODE JON 5/24/00 R3DTLVERTEX *Lib3D::polyVertArrayTL;
 VPDESC Lib3D::vpDesc;
 
 R3DMATRIX Lib3D::IDENTITY(	1.f, 0.f, 0.f, 0.f,
@@ -246,14 +237,9 @@ R3DMATRIX Lib3D::IDENTITY(	1.f, 0.f, 0.f, 0.f,
                             0.f, 0.f, 1.f, 0.f,
                             0.f, 0.f, 0.f, 1.f);
 
-//DeadCode JON 13Oct00 ULong Lib3D::fastSqrtTable[0x10000];
 
 HRESULT Lib3D::lastError=S_OK;
 
-//DEADCODE JON 5/25/00 R3DVERTEX	Lib3D::vertArray[MAX_VERTICES];
-//DEADCODE JON 5/25/00 R3DVERTEX2	Lib3D::vertArray2[MAX_VERTICES];
-//DEADCODE JON 5/25/00 R3DVERTEX3	Lib3D::vertArray3[MAX_VERTICES];
-//DEADCODE JON 5/24/00 R3DTLVERTEX	Lib3D::tlVertArray[MAX_VERTICES];
 UByte Lib3D::fogTable[1024];
 R3DCOLOUR Lib3D::lightingTable[256];
 R3DCOLOUR Lib3D::specularTable[256];
@@ -269,19 +255,6 @@ AlphaBlendTypes	Lib3D::lastBlendType;
 D3DZBUFFERTYPE	Lib3D::prefZType;								//RJS 17May00
 
 
-//DeadCode JON 7Sep00 Lib3D::NaffDriverID Lib3D::naffDriverTable[]=
-//DeadCode JON 7Sep00 {
-//DeadCode JON 7Sep00 	{Lib3D::ND_FireGL1KPro,	{0xD7B71EAC,0x7E47,0x11CF,{0x15,0x7A,0x27,0x21,0xA4,0xC2,0xC9,0x35}}},
-//DeadCode JON 7Sep00 	{Lib3D::ND_ATIRagePro,	{0xD7B71EE2,0x0402,0x11CF,{0x87,0x6A,0x01,0x20,0xA5,0xC2,0xC9,0x35}}},
-//DeadCode JON 7Sep00 	{Lib3D::ND_FireGL1KPro	,{0xD7B71EAC,0x7E47,0x11CF,{0x15,0x7A,0x27,0x21,0xA4,0xC2,0xC9,0x35}}},
-//DeadCode JON 7Sep00 	{Lib3D::ND_RivaTNT		,{0xD7B71E3E,0x4360,0x11CF,{0x65,0x72,0x40,0x07,0xA7,0xC2,0xC9,0x35}}},
-//DeadCode JON 7Sep00 	{Lib3D::ND_RivaTNT		,{0xD7B71E3E,0x4360,0x11CF,{0x80,0x63,0x01,0x20,0xA5,0xC2,0xC9,0x35}}},
-//DeadCode JON 7Sep00 	{Lib3D::ND_GeoForce256	,{0xD7B71E3E,0x4240,0x11CF,{0xD1,0x62,0x01,0x20,0xB3,0xC2,0xC9,0x35}}},
-//DeadCode JON 7Sep00 	{Lib3D::ND_GeoForce256	,{0xD7B71E3E,0x4240,0x11CF,{0xC0,0x62,0x01,0x20,0xB3,0xC2,0xC9,0x35}}},
-//DeadCode JON 7Sep00 	{Lib3D::ND_SavagePro3	,{0xD7B75DD3,0xC962,0x11CF,{0xC1,0x2F,0x23,0xAA,0xA6,0xC2,0xC9,0x35}}}
-//DeadCode JON 7Sep00 };
-//DeadCode JON 7Sep00
-//DeadCode JON 7Sep00 int Lib3D::ND_Max = sizeof( Lib3D::naffDriverTable )/sizeof( Lib3D::NaffDriverID );
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		SineCosine
@@ -452,10 +425,6 @@ inline ULong Lib3D::GenGuardBandClipCode( const SVertex* pV, const D3DVALUE sz, 
     if ( (prevFlags&CLIP_TOP) && ( pV->sy > (sz*guardBandModTop) ) )
         clipCode+=CLIP_TOP;
 
-//DeadCode JON 12Jun00 	if (pV->sx < -sz)			clipCode+=CLIP_LEFT;
-//DeadCode JON 12Jun00 	else if (pV->sx > sz)		clipCode+=CLIP_RIGHT;
-//DeadCode JON 12Jun00 	if (pV->sy < -sz)			clipCode+=CLIP_BOTTOM;
-//DeadCode JON 12Jun00 	else if ( pV->sy > sz )		clipCode+=CLIP_TOP;
 
     return clipCode;
 }
@@ -473,7 +442,6 @@ inline bool Lib3D::GuardBandClipTest(SPolygon *poly)
         {
             D3DVALUE sz;
             FP_BITS(sz)=FP_ABS_BITS(pV->hw);
-//DeadCode  28Oct00 			sz*=guardBandMod;
 
             polyCode |= InlineGenGuardBandClipCode( pV, sz, (pV->clipcode&CLIP_LRTB) );
 
@@ -894,20 +862,6 @@ inline HRESULT Lib3D::PerformSlowCopy(LPDIRECTDRAWSURFACE7 pDst,LPDIRECTDRAWSURF
                 *lpDst2++=MaskAndRot(*lpSrc2,rMShift,gMShift,bMShift,rmask,gmask,bmask)
                 |UWord(dstAMask?(amask?UWord(MagicRotate(aMShift,*lpSrc2)&amask):dstAMask):0);
 
-//DEADCODE JON 5/11/00 					r=redShift==0?r:redShift<0?r>>-redShift:r<<redShift;							//JON 5/11/00
-//DEADCODE JON 5/11/00 					INT3;																								//JON 5/11/00
-//DEADCODE JON 5/11/00 					r=MagicRotate( rMShift, a&ddsdSrc.ddpfPixelFormat.dwRBitMask)&ddsdDst.ddpfPixelFormat.dwRBitMask;	//JON 5/11/00
-//DEADCODE JON 5/11/00 					INT3;																								//JON 5/11/00
-//DEADCODE JON 5/11/00 					g=a&ddsdSrc.ddpfPixelFormat.dwGBitMask;																//JON 5/11/00
-//DEADCODE JON 5/11/00 //					g=greenShift==0?g:greenShift<0?g>>-greenShift:g<<greenShift;										//JON 5/11/00
-//DEADCODE JON 5/11/00 					g=MagicRotate( gMShift, g );																		//JON 5/11/00
-//DEADCODE JON 5/11/00 					g=g&ddsdDst.ddpfPixelFormat.dwGBitMask;																//JON 5/11/00
-//DEADCODE JON 5/11/00 					b=a&ddsdSrc.ddpfPixelFormat.dwBBitMask;																//JON 5/11/00
-//DEADCODE JON 5/11/00 //					b=blueShift==0?b:blueShift<0?b>>-blueShift:b<<blueShift;											//JON 5/11/00
-//DEADCODE JON 5/11/00 					b=MagicRotate( bMShift, b );																		//JON 5/11/00
-//DEADCODE JON 5/11/00 					b=b&ddsdDst.ddpfPixelFormat.dwBBitMask;																//JON 5/11/00
-//DEADCODE JON 5/11/00 					*lpDst2++=r|g|b;																					//JON 5/11/00
-//DEADCODE JON 5/11/00
                 lpSrc2+=scale; // this does the x scaling down if needed... - skip the unwanted pixels
             }
             lpSrc=(UWord*)(uintptr_t(lpSrc)+lPitch);
@@ -931,17 +885,6 @@ inline HRESULT Lib3D::PerformSlowCopy(LPDIRECTDRAWSURFACE7 pDst,LPDIRECTDRAWSURF
                 *lpDst2++=MaskAndRot(*lpSrc2,rMShift,gMShift,bMShift,rmask,gmask,bmask)
                 |UWord(dstAMask?(amask?UWord(MagicRotate(aMShift,*lpSrc2)&amask):dstAMask):0);
 //setUWValue(	MaskAndRot(getULValue(lpSrc2),rMShift,gMShift,bMShift,rmask,gmask,bmask), lpDst2++ );
-//DEADCODE JON 5/11/00 					ULong a,r,g,b;
-//DEADCODE JON 5/11/00 					a=*lpSrc2;
-//DEADCODE JON 5/11/00 //					r=redShift==0?r:redShift<0?r>>-redShift:r<<redShift;
-//DEADCODE JON 5/11/00 					INT3;
-//DEADCODE JON 5/11/00 					r=MagicRotate( rMShift,a&ddsdSrc.ddpfPixelFormat.dwRBitMask)&ddsdDst.ddpfPixelFormat.dwRBitMask;
-//DEADCODE JON 5/11/00 					INT3;
-//DEADCODE JON 5/11/00 //					g=greenShift==0?g:greenShift<0?g>>-greenShift:g<<greenShift;
-//DEADCODE JON 5/11/00 					g=MagicRotate( gMShift, a&ddsdSrc.ddpfPixelFormat.dwGBitMask )&ddsdDst.ddpfPixelFormat.dwGBitMask;
-//DEADCODE JON 5/11/00 //					b=blueShift==0?b:blueShift<0?b>>-blueShift:b<<blueShift;
-//DEADCODE JON 5/11/00 					b=MagicRotate( bMShift, a&ddsdSrc.ddpfPixelFormat.dwBBitMask)&ddsdDst.ddpfPixelFormat.dwBBitMask;
-//DEADCODE JON 5/11/00 					*lpDst2++=UWord(r|g|b);
                 lpSrc2+=scale; // this does the x scaling down if needed... - skip the unwanted pixels
             }
             lpSrc=(ULong*)(uintptr_t(lpSrc)+lPitch);
@@ -959,161 +902,6 @@ inline HRESULT Lib3D::PerformSlowCopy(LPDIRECTDRAWSURFACE7 pDst,LPDIRECTDRAWSURF
 }
 
 
-//DEADCODE JON 5/11/00 HRESULT Lib3D::PerformSlowCopy(LPDIRECTDRAWSURFACE7 pDst,LPDIRECTDRAWSURFACE7 pSrc,LPRECT rect)
-//DEADCODE JON 5/11/00 {
-//DEADCODE JON 5/11/00 	// Create a system memory surface with the same dimensions as the destination surface
-//DEADCODE JON 5/11/00 	// but with the same pixel format as the source surface
-//DEADCODE JON 5/11/00 	DDSURFACEDESC2 ddsdSrc,ddsdDst,ddsdSys;
-//DEADCODE JON 5/11/00 	LPDIRECTDRAWSURFACE7 pSys;
-//DEADCODE JON 5/11/00 	ZeroMemory(&ddsdSys,sizeof(ddsdSys));
-//DEADCODE JON 5/11/00 	ddsdSrc.dwSize=
-//DEADCODE JON 5/11/00 		ddsdDst.dwSize=
-//DEADCODE JON 5/11/00 		ddsdSys.dwSize=sizeof(ddsdSrc);
-//DEADCODE JON 5/11/00 	pSrc->GetSurfaceDesc(&ddsdSrc);
-//DEADCODE JON 5/11/00 	pDst->GetSurfaceDesc(&ddsdDst);
-//DEADCODE JON 5/11/00 	ddsdSys.dwFlags=DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT;
-//DEADCODE JON 5/11/00 	ddsdSys.ddsCaps.dwCaps=DDSCAPS_SYSTEMMEMORY|DDSCAPS_OFFSCREENPLAIN;
-//DEADCODE JON 5/11/00 	ddsdSys.dwWidth=ddsdDst.dwWidth;
-//DEADCODE JON 5/11/00 	ddsdSys.dwHeight=ddsdDst.dwHeight;
-//DEADCODE JON 5/11/00 	ddsdSys.ddpfPixelFormat=ddsdSrc.ddpfPixelFormat;
-//DEADCODE JON 5/11/00 	pDD7->CreateSurface(&ddsdSys,&pSys,NULL);
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	// Copy from the source surface to the destination surface with scaling
-//DEADCODE JON 5/11/00 	pSys->Lock(NULL,&ddsdSys,DDLOCK_SURFACEMEMORYPTR|DDLOCK_WAIT,NULL);
-//DEADCODE JON 5/11/00 	pSrc->Lock(NULL,&ddsdSrc,DDLOCK_SURFACEMEMORYPTR|DDLOCK_WAIT,NULL);
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 //tempcode
-//DEADCODE JON 5/11/00 //tempcode	pSrc->Unlock(NULL);
-//DEADCODE JON 5/11/00 //tempcode	pSys->Unlock(NULL);
-//DEADCODE JON 5/11/00 //tempcode
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	DWORD swidth=rect==NULL?ddsdSrc.dwWidth:rect->right-rect->left;
-//DEADCODE JON 5/11/00 	for (DWORD scale(1);swidth!=ddsdSys.dwWidth;scale<<=1,swidth>>=1);
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	DWORD lPitch=ddsdSrc.lPitch*scale;
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	switch (ddsdSys.ddpfPixelFormat.dwRGBBitCount)
-//DEADCODE JON 5/11/00 	{
-//DEADCODE JON 5/11/00 	case 16:
-//DEADCODE JON 5/11/00 		{
-//DEADCODE JON 5/11/00 			UWord *lpSrc=(UWord*)ddsdSrc.lpSurface;
-//DEADCODE JON 5/11/00 			UWord *lpSys=(UWord*)ddsdSys.lpSurface;
-//DEADCODE JON 5/11/00 			for (DWORD y=ddsdSys.dwHeight;y>0;y--)
-//DEADCODE JON 5/11/00 			{
-//DEADCODE JON 5/11/00 				UWord *lpSrc2=lpSrc;
-//DEADCODE JON 5/11/00 				UWord *lpSys2=lpSys;
-//DEADCODE JON 5/11/00 				for (DWORD x=ddsdSys.dwWidth;x>0;x--)
-//DEADCODE JON 5/11/00 				{
-//DEADCODE JON 5/11/00 					*lpSys2++=*lpSrc2;
-//DEADCODE JON 5/11/00 					lpSrc2+=scale;
-//DEADCODE JON 5/11/00 				}
-//DEADCODE JON 5/11/00 				lpSrc=(UWord*)(ULong(lpSrc)+lPitch);
-//DEADCODE JON 5/11/00 				lpSys=(UWord*)(ULong(lpSys)+ddsdSys.lPitch);
-//DEADCODE JON 5/11/00 			}
-//DEADCODE JON 5/11/00 		}
-//DEADCODE JON 5/11/00 		break;
-//DEADCODE JON 5/11/00 	case 32:
-//DEADCODE JON 5/11/00 		{
-//DEADCODE JON 5/11/00 			ULong *lpSrc=(ULong*)ddsdSrc.lpSurface;
-//DEADCODE JON 5/11/00 			ULong *lpSys=(ULong*)ddsdSys.lpSurface;
-//DEADCODE JON 5/11/00 			for (DWORD y=ddsdSys.dwHeight;y>0;y--)
-//DEADCODE JON 5/11/00 			{
-//DEADCODE JON 5/11/00 				ULong *lpSrc2=lpSrc;
-//DEADCODE JON 5/11/00 				ULong *lpSys2=lpSys;
-//DEADCODE JON 5/11/00 				for (DWORD x=ddsdSys.dwWidth;x>0;x--)
-//DEADCODE JON 5/11/00 				{
-//DEADCODE JON 5/11/00 					*lpSys2++=*lpSrc2;
-//DEADCODE JON 5/11/00 					lpSrc2+=scale;
-//DEADCODE JON 5/11/00 				}
-//DEADCODE JON 5/11/00 				lpSrc=(ULong*)(ULong(lpSrc)+lPitch);
-//DEADCODE JON 5/11/00 				lpSys=(ULong*)(ULong(lpSys)+ddsdSys.lPitch);
-//DEADCODE JON 5/11/00 			}
-//DEADCODE JON 5/11/00 		}
-//DEADCODE JON 5/11/00 		break;
-//DEADCODE JON 5/11/00 	}
-//DEADCODE JON 5/11/00 //tempcode
-//DEADCODE JON 5/11/00 	pSrc->Unlock(NULL);
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	// Copy from the system surface to the destination surface with color conversion (dest is always 16 bit)
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	SWord redShift,greenShift,blueShift;
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	redShift=	GET_BIT_POS32(ddsdDst.ddpfPixelFormat.dwRBitMask)-GET_BIT_POS32(ddsdSys.ddpfPixelFormat.dwRBitMask);
-//DEADCODE JON 5/11/00 	greenShift=	GET_BIT_POS32(ddsdDst.ddpfPixelFormat.dwGBitMask)-GET_BIT_POS32(ddsdSys.ddpfPixelFormat.dwGBitMask);
-//DEADCODE JON 5/11/00 	blueShift=	GET_BIT_POS32(ddsdDst.ddpfPixelFormat.dwBBitMask)-GET_BIT_POS32(ddsdSys.ddpfPixelFormat.dwBBitMask);
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	pDst->Lock(NULL,&ddsdDst,DDLOCK_SURFACEMEMORYPTR|DDLOCK_WAIT,NULL);
-//DEADCODE JON 5/11/00 //tempcode
-//DEADCODE JON 5/11/00 //tempcode	pDst->Unlock(NULL);
-//DEADCODE JON 5/11/00 //tempcode
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	switch (ddsdSys.ddpfPixelFormat.dwRGBBitCount)
-//DEADCODE JON 5/11/00 	{
-//DEADCODE JON 5/11/00 	case 16:
-//DEADCODE JON 5/11/00 		{
-//DEADCODE JON 5/11/00 			UWord *lpSys=(UWord*)ddsdSys.lpSurface;
-//DEADCODE JON 5/11/00 			UWord *lpDst=(UWord*)ddsdDst.lpSurface;
-//DEADCODE JON 5/11/00 			for (DWORD y=ddsdDst.dwHeight;y>0;y--)
-//DEADCODE JON 5/11/00 			{
-//DEADCODE JON 5/11/00 				UWord *lpSys2=lpSys;
-//DEADCODE JON 5/11/00 				UWord *lpDst2=lpDst;
-//DEADCODE JON 5/11/00 				for (DWORD x=ddsdDst.dwWidth;x>0;x--)
-//DEADCODE JON 5/11/00 				{
-//DEADCODE JON 5/11/00 					UWord a,r,g,b;
-//DEADCODE JON 5/11/00 					a=*lpSys2++;
-//DEADCODE JON 5/11/00 					r=a&ddsdSys.ddpfPixelFormat.dwRBitMask;
-//DEADCODE JON 5/11/00 					r=redShift==0?r:redShift<0?r>>-redShift:r<<redShift;
-//DEADCODE JON 5/11/00 					r=r&ddsdDst.ddpfPixelFormat.dwRBitMask;
-//DEADCODE JON 5/11/00 					g=a&ddsdSys.ddpfPixelFormat.dwGBitMask;
-//DEADCODE JON 5/11/00 					g=greenShift==0?g:greenShift<0?g>>-greenShift:g<<greenShift;
-//DEADCODE JON 5/11/00 					g=g&ddsdDst.ddpfPixelFormat.dwGBitMask;
-//DEADCODE JON 5/11/00 					b=a&ddsdSys.ddpfPixelFormat.dwBBitMask;
-//DEADCODE JON 5/11/00 					b=blueShift==0?b:blueShift<0?b>>-blueShift:b<<blueShift;
-//DEADCODE JON 5/11/00 					b=b&ddsdDst.ddpfPixelFormat.dwBBitMask;
-//DEADCODE JON 5/11/00 					*lpDst2++=r|g|b;
-//DEADCODE JON 5/11/00 				}
-//DEADCODE JON 5/11/00 				lpSys=(UWord*)(ULong(lpSys)+ddsdSys.lPitch);
-//DEADCODE JON 5/11/00 				lpDst=(UWord*)(ULong(lpDst)+ddsdDst.lPitch);
-//DEADCODE JON 5/11/00 			}
-//DEADCODE JON 5/11/00 		}
-//DEADCODE JON 5/11/00 		break;
-//DEADCODE JON 5/11/00 	case 32:
-//DEADCODE JON 5/11/00 		{
-//DEADCODE JON 5/11/00 			ULong *lpSys=(ULong*)ddsdSys.lpSurface;
-//DEADCODE JON 5/11/00 			UWord *lpDst=(UWord*)ddsdDst.lpSurface;
-//DEADCODE JON 5/11/00 			for (DWORD y=ddsdDst.dwHeight;y>0;y--)
-//DEADCODE JON 5/11/00 			{
-//DEADCODE JON 5/11/00 				ULong *lpSys2=lpSys;
-//DEADCODE JON 5/11/00 				UWord *lpDst2=lpDst;
-//DEADCODE JON 5/11/00 				for (DWORD x=ddsdDst.dwWidth;x>0;x--)
-//DEADCODE JON 5/11/00 				{
-//DEADCODE JON 5/11/00 					ULong a,r,g,b;
-//DEADCODE JON 5/11/00 					a=*lpSys2++;
-//DEADCODE JON 5/11/00 					r=a&ddsdSys.ddpfPixelFormat.dwRBitMask;
-//DEADCODE JON 5/11/00 					r=redShift==0?r:redShift<0?r>>-redShift:r<<redShift;
-//DEADCODE JON 5/11/00 					r=r&ddsdDst.ddpfPixelFormat.dwRBitMask;
-//DEADCODE JON 5/11/00 					g=a&ddsdSys.ddpfPixelFormat.dwGBitMask;
-//DEADCODE JON 5/11/00 					g=greenShift==0?g:greenShift<0?g>>-greenShift:g<<greenShift;
-//DEADCODE JON 5/11/00 					g=g&ddsdDst.ddpfPixelFormat.dwGBitMask;
-//DEADCODE JON 5/11/00 					b=a&ddsdSys.ddpfPixelFormat.dwBBitMask;
-//DEADCODE JON 5/11/00 					b=blueShift==0?b:blueShift<0?b>>-blueShift:b<<blueShift;
-//DEADCODE JON 5/11/00 					b=b&ddsdDst.ddpfPixelFormat.dwBBitMask;
-//DEADCODE JON 5/11/00 					*lpDst2++=UWord(r|g|b);
-//DEADCODE JON 5/11/00 				}
-//DEADCODE JON 5/11/00 				lpSys=(ULong*)(ULong(lpSys)+ddsdSys.lPitch);
-//DEADCODE JON 5/11/00 				lpDst=(UWord*)(ULong(lpDst)+ddsdDst.lPitch);
-//DEADCODE JON 5/11/00 			}
-//DEADCODE JON 5/11/00 		}
-//DEADCODE JON 5/11/00 		break;
-//DEADCODE JON 5/11/00 	}
-//DEADCODE JON 5/11/00 //tempcode
-//DEADCODE JON 5/11/00 	pDst->Unlock(NULL);
-//DEADCODE JON 5/11/00 //tempcode
-//DEADCODE JON 5/11/00 	pSys->Unlock(NULL);
-//DEADCODE JON 5/11/00 	pSys->Release();
-//DEADCODE JON 5/11/00
-//DEADCODE JON 5/11/00 	return S_OK;
-//DEADCODE JON 5/11/00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		Lib3D
@@ -1122,14 +910,6 @@ inline HRESULT Lib3D::PerformSlowCopy(LPDIRECTDRAWSURFACE7 pDst,LPDIRECTDRAWSURF
 //
 //------------------------------------------------------------------------------
 Lib3D::Lib3D()
-//DeadCode JON 18Jul00 :	num1024Textures( *landTextureBandSize ),
-//DeadCode JON 18Jul00 	num512Textures( *(landTextureBandSize+1) ),
-//DeadCode JON 18Jul00 	num256Textures( *(landTextureBandSize+2*sizeof(SLong)) ),
-//DeadCode JON 18Jul00 	num128Textures( *(landTextureBandSize+3*sizeof(SLong)) ),
-//DeadCode JON 18Jul00 	num64Textures( *(landTextureBandSize+4*sizeof(SLong)) ),
-//DeadCode JON 18Jul00 	num32Textures( *(landTextureBandSize+5*sizeof(SLong)) ),
-//DeadCode JON 18Jul00 	num16Textures( *(landTextureBandSize+6*sizeof(SLong)) ),
-//DeadCode JON 18Jul00 	num8Textures( *(landTextureBandSize+7*sizeof(SLong)) )
     :zFactor(SPolygon::zFactor)
 {
     bufferPass = 0;														//JON 30Oct00
@@ -1161,6 +941,9 @@ Lib3D::Lib3D()
     for (i=NUM_PALETTES-1; i>=0; trnsPalLookUp[i]=NULL,i--);
     textureQuality=HINT_FULL_RES_TEXTURE;
     textureBlending=HINT_TRILINEAR;
+    flags=Flags(0);
+    pDDS7LandZB=pDDS7MirrorZB=NULL;
+    paletteTable=NULL;
 //TempCode JON 13Oct00 	BuildSqrtTable();
     // fill the last vertex table with the dummy vertex.
     for (i=0; i<=MAX_DOPOINTS; i++ )
@@ -1283,9 +1066,6 @@ BOOL WINAPI Lib3D::DDEnumCallbackEx(GUID FAR *pGuid,LPSTR szDesc,LPSTR szName,LP
 //------------------------------------------------------------------------------
 HRESULT WINAPI Lib3D::EnumModesCallback2(LPDDSURFACEDESC2 pDDSD,LPVOID pContext)
 {
-//DeadCode JON 6Oct00 	if (pDDSD->dwWidth<512 ||
-//DeadCode JON 6Oct00 		pDDSD->dwWidth*3!=pDDSD->dwHeight*4)
-//DeadCode JON 6Oct00 		return DDENUMRET_OK;							//abort if display mode not 4x3 >= 512x384
     if (pDDSD->dwWidth<512 || pDDSD->dwHeight<384 )
         return DDENUMRET_OK;							//abort if display mode not >= 512x384
 
@@ -1305,7 +1085,6 @@ HRESULT WINAPI Lib3D::EnumModesCallback2(LPDDSURFACEDESC2 pDDSD,LPVOID pContext)
 
     //ram required for display
     ULong whMul=pDDSD->dwWidth*pDDSD->dwHeight;
-//DeadCode JON 6Sep00 	ULong scrnMem=(2*1024*1024)+((whMul*pDDSD->ddpfPixelFormat.dwRGBBitCount)>>2);
     ULong scrnMem=pDDSD->lPitch*pDDSD->dwHeight;
     ULong zb16Mem=(scrnMem<<1)+(whMul<<1)+MINIMUM_TEXTURE_RAM_REQUIRED;
     ULong zb24Mem=(scrnMem<<1)+(whMul*3)+MINIMUM_TEXTURE_RAM_REQUIRED;
@@ -1412,8 +1191,6 @@ struct	ZBufferList
 
 HRESULT CALLBACK Lib3D::EnumZBufferCallback(LPDDPIXELFORMAT pddpf,LPVOID pContext)
 {
-//DeadCode JON 4Jul00 	LPDDPIXELFORMAT pospf;
-//DeadCode JON 4Jul00 	ULong flags;
 
     if (pddpf->dwFlags&DDPF_ZBUFFER)
     {
@@ -1434,62 +1211,6 @@ HRESULT CALLBACK Lib3D::EnumZBufferCallback(LPDDPIXELFORMAT pddpf,LPVOID pContex
     }
     return 	DDENUMRET_OK;
 }
-//DeadCode JIM 22Jun100 HRESULT CALLBACK Lib3D::EnumZBufferCallback(LPDDPIXELFORMAT pddpf,LPVOID pContext)
-//DeadCode JIM 22Jun100 {
-//DeadCode JIM 22Jun100 	LPDDPIXELFORMAT pospf;
-//DeadCode JIM 22Jun100 	ULong flags;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 	if ( fixZbuffer != true )
-//DeadCode JIM 22Jun100 		flags = selectedMode.flags;
-//DeadCode JIM 22Jun100 	else
-//DeadCode JIM 22Jun100 		flags = DDMode::MF_16BITZBUFFER;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 	if (pddpf->dwFlags==DDPF_ZBUFFER)
-//DeadCode JIM 22Jun100 	{
-//DeadCode JIM 22Jun100 		pospf=(LPDDPIXELFORMAT)pContext;
-//DeadCode JIM 22Jun100 		switch (flags)
-//DeadCode JIM 22Jun100 		{
-//DeadCode JIM 22Jun100 		case DDMode::MF_16BITZBUFFER:
-//DeadCode JIM 22Jun100 			if (pddpf->dwZBufferBitDepth==16)
-//DeadCode JIM 22Jun100 			{
-//DeadCode JIM 22Jun100 				*pospf=*pddpf;
-//DeadCode JIM 22Jun100 				return D3DENUMRET_CANCEL;
-//DeadCode JIM 22Jun100 			}
-//DeadCode JIM 22Jun100 			break;
-//DeadCode JIM 22Jun100 		case DDMode::MF_24BITZBUFFER:
-//DeadCode JIM 22Jun100 			if (pddpf->dwZBufferBitDepth==24)
-//DeadCode JIM 22Jun100 			{
-//DeadCode JIM 22Jun100 				*pospf=*pddpf;
-//DeadCode JIM 22Jun100 				return D3DENUMRET_CANCEL;
-//DeadCode JIM 22Jun100 			}
-//DeadCode JIM 22Jun100 			else if (pddpf->dwZBufferBitDepth==16)
-//DeadCode JIM 22Jun100 			{
-//DeadCode JIM 22Jun100 				*pospf=*pddpf;
-//DeadCode JIM 22Jun100 			}
-//DeadCode JIM 22Jun100 			break;
-//DeadCode JIM 22Jun100 		case DDMode::MF_32BITZBUFFER:
-//DeadCode JIM 22Jun100 			if (pddpf->dwZBufferBitDepth==32)
-//DeadCode JIM 22Jun100 			{
-//DeadCode JIM 22Jun100 				*pospf=*pddpf;
-//DeadCode JIM 22Jun100 				return D3DENUMRET_CANCEL;
-//DeadCode JIM 22Jun100 			}
-//DeadCode JIM 22Jun100 			else if (pospf->dwSize==0)
-//DeadCode JIM 22Jun100 			{
-//DeadCode JIM 22Jun100 				if (pddpf->dwZBufferBitDepth>=16)
-//DeadCode JIM 22Jun100 					*pospf=*pddpf;
-//DeadCode JIM 22Jun100 			}
-//DeadCode JIM 22Jun100 			else
-//DeadCode JIM 22Jun100 			{
-//DeadCode JIM 22Jun100 				if (pddpf->dwZBufferBitDepth<32 &&
-//DeadCode JIM 22Jun100 					pddpf->dwZBufferBitDepth>=16 &&
-//DeadCode JIM 22Jun100 					pddpf->dwZBufferBitDepth>pospf->dwZBufferBitDepth)
-//DeadCode JIM 22Jun100 					*pospf=*pddpf;
-//DeadCode JIM 22Jun100 			}
-//DeadCode JIM 22Jun100 			break;
-//DeadCode JIM 22Jun100 		}
-//DeadCode JIM 22Jun100 	}
-//DeadCode JIM 22Jun100 	return D3DENUMRET_OK;
-//DeadCode JIM 22Jun100 }
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1603,10 +1324,6 @@ HRESULT CALLBACK Lib3D::EnumTextureFormatsCallback(LPDDPIXELFORMAT pddpf,LPVOID 
                  (pddpf->dwFlags&DDPF_ALPHAPIXELS)!=0 &&
                  (pddpf->dwRGBBitCount==16))
         {
-//DeadCode JON 15Nov00 			if ((tf->dwFlags&DDPF_RGB)==0)
-//DeadCode JON 15Nov00 				*tf=*pddpf;
-//DeadCode JON 15Nov00 			else if (COUNT_BITS(tf->dwRGBAlphaBitMask)<COUNT_BITS(pddpf->dwRGBAlphaBitMask))
-//DeadCode JON 15Nov00 				*tf=*pddpf;
             if ((tf->dwFlags&DDPF_RGB)==0)
             {
                 *tf=*pddpf; // this is the first slightly suitable one available...
@@ -1626,10 +1343,6 @@ HRESULT CALLBACK Lib3D::EnumTextureFormatsCallback(LPDDPIXELFORMAT pddpf,LPVOID 
                     (pddpf->dwFlags&DDPF_ALPHAPIXELS)!=0 &&
                     (pddpf->dwRGBBitCount==16))
             {
-//DeadCode JON 15Nov00 				if ((tf->dwFlags&DDPF_RGB)==0)
-//DeadCode JON 15Nov00 					*tf=*pddpf;
-//DeadCode JON 15Nov00 				else if (COUNT_BITS(tf->dwRGBAlphaBitMask)<COUNT_BITS(pddpf->dwRGBAlphaBitMask))
-//DeadCode JON 15Nov00 					*tf=*pddpf;
                 if ((tf->dwFlags&DDPF_RGB)==0)
                 {
                     *tf=*pddpf; // this is the first slightly suitable one available...
@@ -1723,32 +1436,6 @@ void Lib3D::EnumerateDriverModes(DDDriver& ddDriver)
         {
             memcopy( ddDriver.desc, devID.szDescription, MAX_TEXT_LENGTH );
             ddDriver.desc[MAX_TEXT_LENGTH-1]=0;
-//DeadCode JON 6Sep00 		printf("Three Dee info\n\nDriver Name: ");
-//DeadCode JON 6Sep00 		printf( devID.szDriver );
-//DeadCode JON 6Sep00 		printf( "\nDriver Description: " );
-//DeadCode JON 6Sep00 		printf( devID.szDescription );
-//DeadCode JON 6Sep00 		printf( "\n" );
-//DeadCode JON 6Sep00 		printf( "Driver Version: %i (Product %i, Version %i, SubVer %i, Build %i \n",
-//DeadCode JON 6Sep00 				devID.liDriverVersion,
-//DeadCode JON 6Sep00 				HIWORD(devID.liDriverVersion.HighPart),
-//DeadCode JON 6Sep00 				LOWORD(devID.liDriverVersion.HighPart),
-//DeadCode JON 6Sep00 				HIWORD(devID.liDriverVersion.LowPart),
-//DeadCode JON 6Sep00 				LOWORD(devID.liDriverVersion.LowPart)
-//DeadCode JON 6Sep00 				);
-//DeadCode JON 6Sep00 		printf( "VendorID   : %x\n", devID.dwVendorId );
-//DeadCode JON 6Sep00 		printf( "DeviceID   : %x\n", devID.dwDeviceId );
-//DeadCode JON 6Sep00 		printf( "SubSysID   : %x\n", devID.dwSubSysId );
-//DeadCode JON 6Sep00 		printf( "Revision ID: %x\n", devID.dwRevision );
-//DeadCode JON 6Sep00
-//DeadCode JON 6Sep00 		GUID tD = devID.guidDeviceIdentifier;
-//DeadCode JON 6Sep00
-//DeadCode JON 6Sep00 		printf( "GUID       : %x-%x-%x-{%x-%x-%x-%x-%x-%x-%x-%x}\n",
-//DeadCode JON 6Sep00 				tD.Data1, tD.Data2, tD.Data3,
-//DeadCode JON 6Sep00 				tD.Data4[0], tD.Data4[1], tD.Data4[2], tD.Data4[3],
-//DeadCode JON 6Sep00 				tD.Data4[4], tD.Data4[5], tD.Data4[6], tD.Data4[7]
-//DeadCode JON 6Sep00 				);
-//DeadCode JON 6Sep00
-//DeadCode JON 6Sep00 		printf( "HWQuality  : %i\n", devID.dwWHQLLevel );
 
         }
         //get available video memory to decide whether a mode should be allowed
@@ -1971,8 +1658,6 @@ HRESULT	Lib3D::SetDriverAndMode(const HDRIVER& hDriver,const HMODE& hMode,const 
     else
         zSMALL=0.25/double(ULong(1<<18)-1);
 
-//DeadCode JON 21Aug00 	if ( prefZType == D3DZB_USEW )
-//DeadCode JON 21Aug00 		zSMALL*=4;
 
     FillFogTable(1.9,2.0);
 
@@ -2127,7 +1812,6 @@ HRESULT	Lib3D::_SetDriverAndMode(const HDRIVER& hDriver,const HMODE& hMode,const
         for (; i>=0; i--) // search for a suitable zbuffer format
         {
             if (enumresult.list[i].dwZBufferBitDepth
-//DeadCode JON 28Sep00 					&& ( !fixZbuffer || enumresult.list[i].dwZBufferBitDepth <=16 )	// if fix zbuffer use a lower one
                )
             {
                 ddsd.ddpfPixelFormat.dwFlags=enumresult.list[i].dwFlags;
@@ -2198,8 +1882,6 @@ HRESULT	Lib3D::_SetDriverAndMode(const HDRIVER& hDriver,const HMODE& hMode,const
     }
 
 
-//DeadCode JON 28Sep00 	ULong dwRenderWidth=selectedMode.ddsd.dwWidth;
-//DeadCode JON 28Sep00 	ULong dwRenderHeight=selectedMode.ddsd.dwHeight;
     D3DVIEWPORT7 vp= {0,0,dwRenderWidth,dwRenderHeight,0.0f,1.0f};
     if ((lastError=pD3DDEV7->SetViewport(&vp))!=D3D_OK)
     {
@@ -2231,11 +1913,6 @@ HRESULT	Lib3D::_SetDriverAndMode(const HDRIVER& hDriver,const HMODE& hMode,const
     if ((ddc.dwCaps2&DDCAPS2_NOPAGELOCKREQUIRED)==0)	flags=Flags(flags|F_PAGELOCK);
     else												flags=Flags(flags&~F_PAGELOCK);
 
-//deadcode	if ((ddc.dwCaps2&DDCAPS2_CANMANAGETEXTURE)==0 ||
-//deadcode		(ddc.dwCaps2&DDCAPS2_TEXMANINNONLOCALVIDMEM)==0)
-//deadcode		flags=Flags(flags|F_CANTMANAGETEXTURES);
-//deadcode	else
-//deadcode		flags=Flags(flags&~F_CANTMANAGETEXTURES);
 
     primarySurfaceDesc.dwSize=sizeof(DDSURFACEDESC2);
     if ((lastError=pDDSP7->GetSurfaceDesc(&primarySurfaceDesc))!=DD_OK)
@@ -2340,13 +2017,11 @@ HRESULT	Lib3D::_SetDriverAndMode(const HDRIVER& hDriver,const HMODE& hMode,const
     renderMode=HINT_3DRENDER;
 
 #ifdef _NO_CLIPPING_RESIZE
-//DeadCode  28Oct00 	guardBandMod = CLIP_RESIZE_FACTOR;
     hwClip = false;
 #else
 #ifndef _NO_GUARDBAND_CLIPPING_
     if ( selectedDevice.dvGuardBandRight >= 10.f )
     {
-        //DeadCode JON 12Jun00 		hwClipFlag=F_NULL;  // we don't ever need to do any clipping - never set the clipflag
         // now we need to calculate a value to have hw multiplied by.
         float sx, sy, cx, cy;
         GetViewPort( sx, sy, cx, cy );
@@ -2356,34 +2031,6 @@ HRESULT	Lib3D::_SetDriverAndMode(const HDRIVER& hDriver,const HMODE& hMode,const
         guardBandModTop = (selectedDevice.dvGuardBandTop/sy)*0.99f;
         guardBandModBottom = -((selectedDevice.dvGuardBandBottom+sy)/sy)*0.99f;
 
-//DeadCode JON 28Oct00 		float bandScale, bandScaleOther;
-//DeadCode JON 28Oct00
-//DeadCode JON 28Oct00 		bandScale = -(selectedDevice.dvGuardBandLeft/sx)*0.99f;
-//DeadCode JON 28Oct00 		bandScaleOther = ((selectedDevice.dvGuardBandRight-sx)/sx)*0.99f;
-//DeadCode JON 28Oct00 		if ( bandScaleOther < bandScale )
-//DeadCode JON 28Oct00 			bandScale = bandScaleOther;
-//DeadCode JON 28Oct00 		bandScaleOther = (selectedDevice.dvGuardBandTop/sy)*0.99f;
-//DeadCode JON 28Oct00 		if ( bandScaleOther < bandScale )
-//DeadCode JON 28Oct00 			bandScale = bandScaleOther;
-//DeadCode JON 28Oct00 		bandScaleOther = -((selectedDevice.dvGuardBandBottom+sy)/sy)*0.99f;
-//DeadCode JON 28Oct00 		if ( bandScaleOther < bandScale )
-//DeadCode JON 28Oct00 			bandScale = bandScaleOther;
-//DeadCode JON 28Oct00
-//DeadCode JON 28Oct00 		if ( bandScale > 2.0f )
-//DeadCode JON 28Oct00 		{
-//DeadCode JON 28Oct00 			guardBandMod = bandScale;
-//DeadCode JON 28Oct00 			hwClip = true;
-//DeadCode JON 28Oct00 		} else
-//DeadCode JON 28Oct00 		{
-//DeadCode JON 28Oct00 			hwClip = false;
-//DeadCode JON 28Oct00 		}
-//DeadCode JON 28Oct00 		float bandClipScaleVert = (selectedDevice.dvGuardBandRight/sx)*0.95f;
-//DeadCode JON 28Oct00 		float bandClipScaleHoriz = (selectedDevice.dvGuardBandTop/sy)*0.95f;
-//DeadCode JON 28Oct00 		if ( bandClipScaleVert > bandClipScaleHoriz ) // use the smaller
-//DeadCode JON 28Oct00 			guardBandMod = bandClipScaleHoriz;
-//DeadCode JON 28Oct00 		else
-//DeadCode JON 28Oct00 			guardBandMod = bandClipScaleVert;
-//DeadCode  28Oct00 		hwClip = true;
     }
     else
         hwClip = false;
@@ -2391,8 +2038,6 @@ HRESULT	Lib3D::_SetDriverAndMode(const HDRIVER& hDriver,const HMODE& hMode,const
     hwClip = false;
 #endif
 #endif
-//DeadCode JON 12Jun00 	else
-//DeadCode JON 12Jun00 	hwClipFlag=F_NOCLIPPING; // we may need to clip
 //dvGuardBandLeft, dvGuardBandTop, dvGuardBandRight, and dvGuardBandBottom
     //let the kludges begin!
     HandleNaffDriver();
@@ -2412,20 +2057,9 @@ HRESULT	Lib3D::_SetDriverAndMode(const HDRIVER& hDriver,const HMODE& hMode,const
     }
 
 
-//deadcode	if ((flags&F_CANTMANAGETEXTURES)==0)
     pD3D7->EvictManagedTextures();
 
 
-//DeadCode CSB 12Jul00 	LPDIRECTDRAWCOLORCONTROL colCont;
-//DeadCode CSB 12Jul00 	HRESULT hr = pDDSP7->QueryInterface( IID_IDirectDrawColorControl, (LPVOID*)&colCont );
-//DeadCode CSB 12Jul00 	char* errordesc;
-//DeadCode CSB 12Jul00 	GetErrorDesc( hr, errordesc );
-//DeadCode CSB 12Jul00
-//DeadCode CSB 12Jul00
-//DeadCode CSB 12Jul00 	DDCOLORCONTROL colContDesc;
-//DeadCode CSB 12Jul00 	colContDesc.dwSize = sizeof( DDCOLORCONTROL );
-//DeadCode CSB 12Jul00
-//DeadCode CSB 12Jul00 	colCont->GetColorControls( &colContDesc );
 
     return lastError;
 }
@@ -2608,7 +2242,6 @@ HRESULT Lib3D::SetPaletteTable(UByte* pPalettes)
 #else
     if (pPalettes==NULL) return lastError=DDERR_GENERIC;
 
-//DeadCode JON 26Sep00 	memcopy(paletteTable,pPalettes,256*3*NUM_PALETTES);
     paletteTable = pPalettes;
 
 #ifdef _NOBBLE_BRIGHTERSHAPE
@@ -2693,7 +2326,6 @@ HRESULT Lib3D::BeginScene(const HRENDERTARGET & hRenderTarget)
     addNewTransMat=true;
     fRecalcClipPlanes=true;
 
-//DeadCode JON 6Sep00 	FillFogTable(fogStart,fogEnd);
 
     lightflag=LF_AMBIENT;
     edgeAlias=HINT_ALIASNONE;
@@ -2705,11 +2337,9 @@ HRESULT Lib3D::BeginScene(const HRENDERTARGET & hRenderTarget)
     gLightingDesc.ambientRGB=
         gLightingDesc.lowRGB=
             gLightingDesc.highRGB=0;
-//DeadCode JON 11Sep00 	gLightingDesc.specularPower=0.f;
     gLightingDesc.lowDot=
         gLightingDesc.highDot=123456.f;
 
-//DeadCode JON 20Sep00 	lightModeFlag = 0;
     lightModeCount = 0;
 
     AllocResetPool();
@@ -2840,12 +2470,9 @@ inline HRESULT Lib3D::_BeginScene(const HRENDERTARGET & hRenderTarget)
                 }
                 index-=landTextureBandSize[i];
             }
-//DeadCode JON 16Oct00 			D3DVALUE textureDimension = D3DVALUE(1024>>index);
             ULong textureDimension = ULong(1024>>index);
-//DeadCode JON 16Oct00 			landRect.right=landRect.bottom=textureDimension;
             globTextureTypeFlags|=LANDSCAPE_TEXTURE;
             lightflag=LF_LIGHTSOURCE;
-//DeadCode JON 25Sep00 			flags=Flags(flags|F_NOCLIPPING); // turn off clipping
             flags=Flags(flags&~F_NOCLIPPING); // no make sure it is on actually
             if ( flags&F_TEXTURECANBERENDERTARGET )
             {
@@ -2921,9 +2548,7 @@ inline HRESULT Lib3D::_BeginScene(const HRENDERTARGET & hRenderTarget)
                 }
                 index-=landTextureBandSize[i];
             }
-//DeadCode JON 16Oct00 			D3DVALUE textureDimension = D3DVALUE(1024>>index);
             ULong textureDimension = ULong(1024>>index);
-//DeadCode JON 16Oct00 			landRect.right=landRect.bottom = textureDimension;
             if ( flags&F_TEXTURECANBERENDERTARGET )
             {
                 landRect.left=
@@ -2954,7 +2579,6 @@ inline HRESULT Lib3D::_BeginScene(const HRENDERTARGET & hRenderTarget)
                 //end of center on the screen
             }
             D3DVIEWPORT7 vp= {landRect.left,landRect.top,textureDimension,textureDimension,0,1.0f};
-//DeadCode JON 16Oct00 			D3DVIEWPORT7 vp={0.f,0.f,textureDimension,textureDimension,0.0f,1.0f};
             lastError=pD3DDEV7->SetViewport(&vp);
             lastError=pD3DDEV7->Clear(0,NULL,D3DCLEAR_ZBUFFER,0,1,0);
             break;
@@ -3020,12 +2644,6 @@ HRESULT Lib3D::EndScene()
 		{
 			RenderPlainPolyList(plainPolys);
 		}
-		//DeadCode JON 21Aug00 		for ( int i=NUM_Z_LAYERS-1; i>=0; i-- )
-		//DeadCode JON 21Aug00 		for ( int i=0; i<NUM_Z_LAYERS; i++ )
-		//DeadCode JON 21Aug00 		{
-		//DeadCode JON 21Aug00 			if (texturedPolys[i]!=NULL)
-		//DeadCode JON 21Aug00 				RenderPolyList(texturedPolys[i]);
-		//DeadCode JON 21Aug00 		}
 		if (texturedPolys != NULL)
 			RenderPolyList(texturedPolys);
 		if (transparentPolys != NULL)
@@ -3036,7 +2654,6 @@ HRESULT Lib3D::EndScene()
 	//TempCode JON 18Sep00 		InlineSetCurrentMaterial( hLastMaterial, IS_PLAIN );
 	//TempCode JON 18Sep00 		pD3DDEV7->SetRenderState(D3DRENDERSTATE_EDGEANTIALIAS,TRUE);
 	//TempCode JON 18Sep00 		RenderLineList(aliasLineList);
-	//TempCode JON 18Sep00 //DeadCode JON 23Aug00 		pD3DDEV7->SetRenderState(D3DRENDERSTATE_EDGEANTIALIAS,FALSE);
 	//TempCode JON 18Sep00 	}
 	//	if (transparentPolys!=NULL)	RenderTPolyList(transparentPolys);
 
@@ -3065,21 +2682,18 @@ HRESULT Lib3D::PushMatrix(const HMATRIX& hMatrix)
         if (projMatStackPos>=MATRIX_STACK_SIZE)
             return lastError=DDERR_GENERIC;
         projectionMatrix[projMatStackPos]=projectionMatrix[projMatStackPos-1];
-//DeadCode JON 19Sep00 		projMatBits[projMatStackPos]=projMatBits[projMatStackPos-1];
         break;
     case MATRIX_VIEWER:
         viewMatStackPos++;
         if (viewMatStackPos>=MATRIX_STACK_SIZE)
             return lastError=DDERR_GENERIC;
         viewerMatrix[viewMatStackPos]=viewerMatrix[viewMatStackPos-1];
-//DeadCode JON 19Sep00 		viewMatBits[viewMatStackPos]=viewMatBits[viewMatStackPos-1];
         break;
     case MATRIX_OBJECT:
         objMatStackPos++;
         if (objMatStackPos>=MATRIX_STACK_SIZE)
             return lastError=DDERR_GENERIC;
         objectMatrix[objMatStackPos]=objectMatrix[objMatStackPos-1];
-//DeadCode JON 19Sep00 		objMatBits[objMatStackPos]=objMatBits[objMatStackPos-1];
         break;
     default:
         return lastError=DDERR_INVALIDPARAMS;
@@ -3183,11 +2797,6 @@ HRESULT Lib3D::SetMatrix(const HMATRIX& hMatrix,const R3DMATRIX& mat)
         return DDERR_INVALIDPARAMS;
     }
 
-//DEADCODE JON 5/11/00 	if ( !MatrixEqu( *pMat, mat ) )
-//DEADCODE JON 5/11/00 	{
-//DEADCODE JON 5/11/00 		fCombineMatrices=true;
-//DEADCODE JON 5/11/00 		*pMat=mat;
-//DEADCODE JON 5/11/00 	}
     fRecalcClipPlanes=fCombineMatrices;
     return S_OK;
 }
@@ -3230,7 +2839,6 @@ HRESULT Lib3D::LoadIdentity(const HMATRIX& hMatrix)
     {
     case MATRIX_PROJECTION:
         pMat=projectionMatrix+projMatStackPos;
-//DeadCode JON 19Sep00 		projMatBits[projMatStackPos]=M_IDENTITY;
         if ( !MatrixEqu( *pMat, IDENTITY ) )
         {
             fCombineMatrices=true;
@@ -3239,7 +2847,6 @@ HRESULT Lib3D::LoadIdentity(const HMATRIX& hMatrix)
         break;
     case MATRIX_VIEWER:
         pMat=viewerMatrix+viewMatStackPos;
-//DeadCode JON 19Sep00 		viewMatBits[viewMatStackPos]=M_IDENTITY;
         if ( !MatrixEqu( *pMat, IDENTITY ) )
         {
             fCombineMatrices=true;
@@ -3248,7 +2855,6 @@ HRESULT Lib3D::LoadIdentity(const HMATRIX& hMatrix)
         break;
     case MATRIX_OBJECT:
         pMat=objectMatrix+objMatStackPos;
-//DeadCode JON 19Sep00 		objMatBits[objMatStackPos]=M_IDENTITY;
         if ( !MatrixEqu( *pMat, IDENTITY ) )
         {
             fCombineMatrices=updateLightVecs=true;
@@ -3262,11 +2868,6 @@ HRESULT Lib3D::LoadIdentity(const HMATRIX& hMatrix)
             *pMat=IDENTITY;
         }
     }
-//DEADCODE JON 5/11/00 	if ( !MatrixEqu( *pMat, IDENTITY ) )
-//DEADCODE JON 5/11/00 	{
-//DEADCODE JON 5/11/00 		fCombineMatrices=true;
-//DEADCODE JON 5/11/00 		*pMat=IDENTITY;
-//DEADCODE JON 5/11/00 	}
     fRecalcClipPlanes=fCombineMatrices;
     return S_OK;
 }
@@ -3279,7 +2880,6 @@ HRESULT Lib3D::LoadIdentity(const HMATRIX& hMatrix)
 HRESULT Lib3D::Rotate(const HMATRIX& hMatrix,const HAXIS& hAxis,const Angles& rotation)
 {
     R3DMATRIX *pMat;
-//DeadCode JON 19Sep00 	ULong *pBit,bit;
     D3DTRANSFORMSTATETYPE trnsStateType;
 
     if (UWord(rotation)==0)
@@ -3289,26 +2889,21 @@ HRESULT Lib3D::Rotate(const HMATRIX& hMatrix,const HAXIS& hAxis,const Angles& ro
     {
     case MATRIX_PROJECTION:
         pMat=projectionMatrix+projMatStackPos;
-//DeadCode JON 19Sep00 		pBit=projMatBits+projMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_PROJECTION;
         fCombineMatrices=true;
         break;
     case MATRIX_VIEWER:
         pMat=viewerMatrix+viewMatStackPos;
-//DeadCode JON 19Sep00 		pBit=viewMatBits+viewMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_VIEW;
         fCombineMatrices=true;
         break;
     case MATRIX_OBJECT:
         pMat=objectMatrix+objMatStackPos;
-//DeadCode JON 19Sep00 		pBit=objMatBits+objMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_WORLD;
         fCombineMatrices=updateLightVecs=true;
         break;
     default:
         pMat=(R3DMATRIX*)hMatrix;
-//DeadCode JON 19Sep00 		bit=MatrixFlags(pMat);
-//DeadCode JON 19Sep00 		pBit=&bit;
     }
     D3DVALUE sine,cosine,temp;
     SineCosine(rotation,&sine,&cosine);
@@ -3359,7 +2954,6 @@ HRESULT Lib3D::Rotate(const HMATRIX& hMatrix,const HAXIS& hAxis,const Angles& ro
     default:
         return lastError=DDERR_INVALIDPARAMS;
     }
-//DeadCode JON 19Sep00 	*pBit=MatrixFlags(pMat);
     fRecalcClipPlanes=fCombineMatrices;
     return S_OK;
 }
@@ -3376,33 +2970,27 @@ HRESULT Lib3D::Scale(const HMATRIX& hMatrix,const D3DVALUE& scaleFactor)
     return S_OK;
 #else
     R3DMATRIX *pMat;
-//DeadCode JON 19Sep00 	ULong *pBit,bit;
     D3DTRANSFORMSTATETYPE trnsStateType;
     ULong fpb;
     switch (hMatrix)
     {
     case MATRIX_PROJECTION:
         pMat=projectionMatrix+projMatStackPos;
-//DeadCode JON 19Sep00 		pBit=projMatBits+projMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_PROJECTION;
         fCombineMatrices=true;
         break;
     case MATRIX_VIEWER:
         pMat=viewerMatrix+viewMatStackPos;
-//DeadCode JON 19Sep00 		pBit=viewMatBits+viewMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_VIEW;
         fCombineMatrices=true;
         break;
     case MATRIX_OBJECT:
         pMat=objectMatrix+objMatStackPos;
-//DeadCode JON 19Sep00 		pBit=objMatBits+objMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_WORLD;
         fCombineMatrices=updateLightVecs=true;
         break;
     default:
         pMat=(R3DMATRIX*)hMatrix;
-//DeadCode JON 19Sep00 		bit=MatrixFlags(pMat);
-//DeadCode JON 19Sep00 		pBit=&bit;
     }
     fpb=FP_BITS(scaleFactor);
     if (fpb)
@@ -3438,7 +3026,6 @@ HRESULT Lib3D::Scale(const HMATRIX& hMatrix,const D3DVALUE& scaleFactor)
         FP_BITS(pMat->_42)=0;
         FP_BITS(pMat->_43)=0;
     }
-//DeadCode JON 19Sep00 	*pBit=MatrixFlags(pMat);
     fRecalcClipPlanes=fCombineMatrices;
     return S_OK;
 #endif
@@ -3456,33 +3043,27 @@ HRESULT Lib3D::Scale(const HMATRIX& hMatrix,const D3DVECTOR& scaleVector)
     return S_OK;
 #else
     R3DMATRIX *pMat;
-//DeadCode JON 19Sep00 	ULong *pBit,bit;
     D3DTRANSFORMSTATETYPE trnsStateType;
     ULong fpb;
     switch (hMatrix)
     {
     case MATRIX_PROJECTION:
         pMat=projectionMatrix+projMatStackPos;
-//DeadCode JON 19Sep00 		pBit=projMatBits+projMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_PROJECTION;
         fCombineMatrices=true;
         break;
     case MATRIX_VIEWER:
         pMat=viewerMatrix+viewMatStackPos;
-//DeadCode JON 19Sep00 		pBit=viewMatBits+viewMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_VIEW;
         fCombineMatrices=true;
         break;
     case MATRIX_OBJECT:
         pMat=objectMatrix+objMatStackPos;
-//DeadCode JON 19Sep00 		pBit=objMatBits+objMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_WORLD;
         fCombineMatrices=updateLightVecs=true;
         break;
     default:
         pMat=(R3DMATRIX*)hMatrix;
-//DeadCode JON 19Sep00 		bit=MatrixFlags(pMat);
-//DeadCode JON 19Sep00 		pBit=&bit;
     }
     fpb=FP_BITS(scaleVector.dvX);
     if (fpb)
@@ -3538,7 +3119,6 @@ HRESULT Lib3D::Scale(const HMATRIX& hMatrix,const D3DVECTOR& scaleVector)
         FP_BITS(pMat->_33)=0;
         FP_BITS(pMat->_43)=0;
     }
-//DeadCode JON 19Sep00 	*pBit=MatrixFlags(pMat);
     fRecalcClipPlanes=fCombineMatrices;
     return S_OK;
 #endif
@@ -3552,33 +3132,27 @@ HRESULT Lib3D::Scale(const HMATRIX& hMatrix,const D3DVECTOR& scaleVector)
 HRESULT Lib3D::Translate(const HMATRIX& hMatrix,const D3DVECTOR& translateVector)
 {
     R3DMATRIX *pMat;
-//DeadCode JON 19Sep00 	ULong *pBit,bit;
     D3DTRANSFORMSTATETYPE trnsStateType;
     ULong fpb;
     switch (hMatrix)
     {
     case MATRIX_PROJECTION:
         pMat=projectionMatrix+projMatStackPos;
-//DeadCode JON 19Sep00 		pBit=projMatBits+projMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_PROJECTION;
         fCombineMatrices=true;
         break;
     case MATRIX_VIEWER:
         pMat=viewerMatrix+viewMatStackPos;
-//DeadCode JON 19Sep00 		pBit=viewMatBits+viewMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_VIEW;
         fCombineMatrices=true;
         break;
     case MATRIX_OBJECT:
         pMat=objectMatrix+objMatStackPos;
-//DeadCode JON 19Sep00 		pBit=objMatBits+objMatStackPos;
         trnsStateType=D3DTRANSFORMSTATE_WORLD;
         fCombineMatrices=updateLightVecs=true;
         break;
     default:
         pMat=(R3DMATRIX*)hMatrix;
-//DeadCode JON 19Sep00 		bit=MatrixFlags(pMat);
-//DeadCode JON 19Sep00 		pBit=&bit;
     }
     fpb=FP_BITS(translateVector.dvX);
     if (fpb)
@@ -3634,7 +3208,6 @@ HRESULT Lib3D::Translate(const HMATRIX& hMatrix,const D3DVECTOR& translateVector
             pMat->_43+=pMat->_44*translateVector.dvZ;
         }
     }
-//DeadCode JON 19Sep00 	*pBit=MatrixFlags(pMat);
     fRecalcClipPlanes=fCombineMatrices;
     return S_OK;
 }
@@ -3664,12 +3237,6 @@ HRESULT Lib3D::BodyToScreen(const R3DVERTEX& vertex,D3DVALUE& screenx,D3DVALUE& 
     D3DVALUE cx,cy;
     GetViewPort( sx, sy, cx, cy );
 
-//DeadCode JON 15Nov00 	pD3DDEV7->GetViewport(&vp);
-//DeadCode JON 15Nov00
-//DeadCode JON 15Nov00 	sx=D3DVALUE(vp.dwWidth>>1);
-//DeadCode JON 15Nov00 	sy=-D3DVALUE(vp.dwHeight>>1);
-//DeadCode JON 15Nov00 	cx=D3DVALUE(vp.dwX)+sx;
-//DeadCode JON 15Nov00 	cy=D3DVALUE(vp.dwY)-sy;
 
     D3DVALUE sz;
     sz=1./transformed.rhw;
@@ -3697,26 +3264,20 @@ HRESULT Lib3D::Transform(const HMATRIX& hMatrix,DoPointStruc& vertex)
     return S_OK;
 #else
     R3DMATRIX *pMat;
-//DeadCode JON 19Sep00 	ULong flags;
     switch (hMatrix)
     {
     case MATRIX_PROJECTION:
         pMat=projectionMatrix+projMatStackPos;
-//DeadCode JON 19Sep00 		flags=projMatBits[projMatStackPos];
         break;
     case MATRIX_VIEWER:
         pMat=viewerMatrix+viewMatStackPos;
-//DeadCode JON 19Sep00 		flags=viewMatBits[viewMatStackPos];
         break;
     case MATRIX_OBJECT:
         pMat=objectMatrix+objMatStackPos;
-//DeadCode JON 19Sep00 		flags=objMatBits[objMatStackPos];
         break;
     default:
         pMat=(R3DMATRIX*)hMatrix;
-//DeadCode JON 19Sep00 		flags=MatrixFlags(pMat);
     }
-//DeadCode JON 19Sep00 	if (flags==M_IDENTITY) return lastError=S_OK;
     if ( (*pMat)==IDENTITY )
         return lastError=S_OK;
 
@@ -4108,50 +3669,6 @@ HRESULT Lib3D::BackProjectViewCone(COORDS3D* viewCone)
 //Date			Fri 26 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DeadCode JON 19Sep00 ULong Lib3D::MatrixFlags(R3DMATRIX* pMat)
-//DeadCode JON 19Sep00 {
-//DeadCode JON 19Sep00 	ULong flags,zbit,obit,*ptr;
-//DeadCode JON 19Sep00 	flags=0;
-//DeadCode JON 19Sep00 	ptr=(ULong*)pMat;
-//DeadCode JON 19Sep00 	zbit=1;
-//DeadCode JON 19Sep00 	obit=1<<16;
-//DeadCode JON 19Sep00 	for (int i=16;i!=0;i--)
-//DeadCode JON 19Sep00 	{
-//DeadCode JON 19Sep00 		if (*ptr==0)				flags+=zbit;
-//DeadCode JON 19Sep00 		else if (*ptr==FP_ONE_BITS)	flags+=obit;
-//DeadCode JON 19Sep00 		zbit<<=1;
-//DeadCode JON 19Sep00 		obit<<=1;
-//DeadCode JON 19Sep00 		ptr++;
-//DeadCode JON 19Sep00 	}
-//DeadCode JON 19Sep00 	return flags;
-//DeadCode JON 19Sep00 }
-//DeadCode JON 7Sep00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JON 7Sep00 //Procedure		CombineTranspMat
-//DeadCode JON 7Sep00 //Author		Jon
-//DeadCode JON 7Sep00 //Date			Fri 11 Feb 2000
-//DeadCode JON 7Sep00 //
-//DeadCode JON 7Sep00 //------------------------------------------------------------------------------
-//DeadCode JON 7Sep00 void Lib3D::CombineTranspMat()
-//DeadCode JON 7Sep00 {
-//DeadCode JON 7Sep00 	D3DVALUE *pA,*pB,*pM;
-//DeadCode JON 7Sep00 	ULong x,*px;
-//DeadCode JON 7Sep00 	SLong i,j,k;
-//DeadCode JON 7Sep00 	for (x=16,px=(ULong*)&transpMatrix[++transMatPos];x!=0;*px++=ULong(0),x--)
-//DeadCode JON 7Sep00 	{/*clear matrix*/}
-//DeadCode JON 7Sep00
-//DeadCode JON 7Sep00 	// build the combination of world and viewer matrix and store
-//DeadCode JON 7Sep00 	pA=(D3DVALUE*)(objectMatrix+objMatStackPos);
-//DeadCode JON 7Sep00 	pB=(D3DVALUE*)(viewerMatrix+viewMatStackPos);
-//DeadCode JON 7Sep00 	pM=(D3DVALUE*)&transpMatrix[transMatPos];
-//DeadCode JON 7Sep00
-//DeadCode JON 7Sep00 	for (i=3;i>=0;i--)
-//DeadCode JON 7Sep00 		for (j=3;j>=0;j--)
-//DeadCode JON 7Sep00 			for (k=3;k>=0;k--)
-//DeadCode JON 7Sep00 				pM[4*i+j]+=pA[4*i+k]*pB[4*k+j];
-//DeadCode JON 7Sep00
-//DeadCode JON 7Sep00
-//DeadCode JON 7Sep00 	addNewTransMat=false;
-//DeadCode JON 7Sep00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		CombineMatrices
 //Author		Paul.
@@ -4160,18 +3677,12 @@ HRESULT Lib3D::BackProjectViewCone(COORDS3D* viewCone)
 //------------------------------------------------------------------------------
 void Lib3D::CombineMatrices()
 {
-//DeadCode JON 7Sep00 	R3DMATRIX tmp;
     R3DMATRIX_VAL *pA,*pB;
     pA=(R3DMATRIX_VAL*)(objectMatrix+objMatStackPos);
     pB=(R3DMATRIX_VAL*)(viewerMatrix+viewMatStackPos);
-    //DeadCode JON 7Sep00 	MatMulCEqAxB_AisRot_BisRot(((D3DVALUE*)&tmp),pA,pB);
     MatMulCEqAxB_AisRot_BisRot(((R3DMATRIX_VAL*)&objViewMatrix),pA,pB);
     clippingMatrix=*(projectionMatrix+projMatStackPos);
-//DeadCode JON 7Sep00 	MatMulCEqAxB_AisRot_BisPerspective(((D3DVALUE*)&combinedMatrix),((D3DVALUE*)&tmp),((D3DVALUE*)&clippingMatrix));
     MatMulCEqAxB_AisRot_BisPerspective(((R3DMATRIX_VAL*)&combinedMatrix),((R3DMATRIX_VAL*)&objViewMatrix),((R3DMATRIX_VAL*)&clippingMatrix));
-//DeadCode JON 21Aug00 	MatMulCEqAxB(((D3DVALUE*)&combinedMatrix),((D3DVALUE*)&tmp),((D3DVALUE*)&clippingMatrix));
-//DeadCode JON 21Aug00 #pragma warnmsg ( "are you sure" )
-//DeadCode JON 19Sep00 	combMatBits=MatrixFlags(&combinedMatrix);
     fCombineMatrices=false;
 }
 
@@ -4281,7 +3792,6 @@ HRESULT Lib3D::VisibleCheck(DoPointStruc* v,ULong num,ULong* res)
     for (SLong i=SLong(num-1); i>=0; i--)
     {
         D3DTLVERTEX tv;
-//DEADCODE JON 5/24/00 		Transform((D3DVERTEX*)v,&tv,&combinedMatrix);
         Transform(&v->getR3DVert(),&tv,&combinedMatrix);
         *res=ClipCodeFBLRTB(&tv);
         v++;
@@ -4353,7 +3863,6 @@ HRESULT Lib3D::VisibleCheck(D3DVECTOR* pos,D3DVALUE* rad,ULong num,ULong* res)
                 v2.rhw-=radMatrix._14;
                 newcode=ClipCodeFBLRTB(&v2);
                 outcode&=newcode;
-//DeadCode JON 15Aug00 				if (0!=outcode)
                 {
                     v2=v;
                     v2.sx+=radMatrix._21;
@@ -4389,7 +3898,6 @@ HRESULT Lib3D::VisibleCheck(D3DVECTOR* pos,D3DVALUE* rad,ULong num,ULong* res)
                                 v2.rhw-=radMatrix._34;
                                 newcode=ClipCodeFBLRTB(&v2);
                                 outcode&=newcode;
-//DeadCode RJS 20Mar00 								*res=outcode;
                             }
                         }
                     }
@@ -4441,53 +3949,6 @@ inline HRESULT Lib3D::_SetProjectionMatrix(const Angles& fov,const D3DVALUE& asp
     lastError=S_OK;
 
     R3DMATRIX *pMat;
-//DeadCode JON 21Aug00 	{
-//DeadCode JON 21Aug00 		D3DVALUE Q,w,h;
-//DeadCode JON 21Aug00 		D3DVALUE sin_fov,cos_fov;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 		SineCosine(fov>>1,&sin_fov,&cos_fov);
-//DeadCode JON 21Aug00 		w=D3DVALUE(cos_fov/sin_fov);
-//DeadCode JON 21Aug00 		h=4.f/3.f*w;
-//DeadCode JON 21Aug00 		Q=Zf/(Zf-Zn);
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 		D3DVALUE B = (Zn)/( (Zn/Zf)-1.0 );
-//DeadCode JON 21Aug00 		D3DVALUE A = -B/Zn;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 //		const D3DVALUE gMin[] = { 0.0,0.002,0.004 };
-//DeadCode JON 21Aug00 //		const D3DVALUE gMax[] = { 0.096,0.098,1.0 };
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 		const D3DVALUE gMin[] = { 0.004,0.002,0.0 };
-//DeadCode JON 21Aug00 		const D3DVALUE gMax[] = { 1.0,0.098,0.096 };
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 //TempCode JON 21Aug00 		const D3DVALUE gMin[] = { 0.3,0.3,0.3 };
-//DeadCode JON 21Aug00 //TempCode JON 21Aug00 		const D3DVALUE gMax[] = { 0.8,0.8,0.8 };
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 		int oldpos = projMatStackPos;
-//DeadCode JON 21Aug00 		int stackoffset = projMatStackPos%MATRIX_STACK_SIZE;
-//DeadCode JON 21Aug00 		for ( int i = 0; i<NUM_Z_LAYERS; i++ )
-//DeadCode JON 21Aug00 		{
-//DeadCode JON 21Aug00 			projMatStackPos = stackoffset+MATRIX_STACK_SIZE*i;
-//DeadCode JON 21Aug00 			pMat=projectionMatrix+projMatStackPos;
-//DeadCode JON 21Aug00 			*pMat=IDENTITY;
-//DeadCode JON 21Aug00 			pMat->_11=w;
-//DeadCode JON 21Aug00 			pMat->_22=h;
-//DeadCode JON 21Aug00 			pMat->_43=-Zn*Q;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 			D3DVALUE A1, B1;
-//DeadCode JON 21Aug00 			B1 = (gMax[i]-gMin[i])/( (1.0/Zf) - (1.0/Zn) );
-//DeadCode JON 21Aug00 			A1 = (gMin[i]-(B1/Zn));
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 			pMat->_33=A1;
-//DeadCode JON 21Aug00 			pMat->_43=B1;
-//DeadCode JON 21Aug00 			pMat->_34=1.0;
-//DeadCode JON 21Aug00 			pMat->_44=0.0;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 			projMatBits[projMatStackPos]=MatrixFlags(pMat);
-//DeadCode JON 21Aug00 		}
-//DeadCode JON 21Aug00 		projMatStackPos = oldpos;
-//DeadCode JON 21Aug00 	}
     pMat = projectionMatrix+projMatStackPos;
     if ( prefZType == D3DZB_USEW )
     {
@@ -4497,7 +3958,6 @@ inline HRESULT Lib3D::_SetProjectionMatrix(const Angles& fov,const D3DVALUE& asp
 
         SineCosine(fov>>1,&sin_fov,&cos_fov);
         w=R3DMATRIX_VAL(cos_fov/sin_fov);
-//DeadCode JON 6Oct00 		h=4.f/3.f*w;
         h=aspect*w;
         Q=Zf/(Zf-Zn);
         *pMat=IDENTITY;
@@ -4516,7 +3976,6 @@ inline HRESULT Lib3D::_SetProjectionMatrix(const Angles& fov,const D3DVALUE& asp
 
         SineCosine(fov>>1,&sin_fov,&cos_fov);
         w=R3DMATRIX_VAL(cos_fov/sin_fov);
-//DeadCode JON 6Oct00 		h=4.f/3.f*w;
         h=aspect*w;
 //		Q=Zf/(Zf-Zn);
         *pMat=IDENTITY;
@@ -4524,7 +3983,6 @@ inline HRESULT Lib3D::_SetProjectionMatrix(const Angles& fov,const D3DVALUE& asp
         pMat->_22=h;
 //		pMat->_43=-Zn*Q;
 
-//DeadCode JON 28Sep00 		const R3DMATRIX_VAL M = 1.0-/*SPolygon::*/(zFiddle*1.1); // the maximum z value generated..
         const R3DMATRIX_VAL M = 1.0-((zFiddle*D3DVALUE(NUM_Z_LAYERS-1))+(zFiddle/3.0f)); // the maximum z value generated..
         R3DMATRIX_VAL B = (Zn*M)/( (Zn/Zf)-1.0 );
         R3DMATRIX_VAL A = -B/Zn;
@@ -4539,7 +3997,6 @@ inline HRESULT Lib3D::_SetProjectionMatrix(const Angles& fov,const D3DVALUE& asp
     backProjectX = -1.0/pMat->_11;
     backProjectY = -1.0/pMat->_22;
 
-//DeadCode JON 19Sep00 	projMatBits[projMatStackPos]=MatrixFlags(pMat);
 
     fCombineMatrices=true;
     if ((flags&F_INSCENE)!=0 && !noFog )
@@ -4566,12 +4023,7 @@ inline HRESULT Lib3D::_SetProjectionMatrix(const Angles& fov,const D3DVALUE& asp
             // upload the projection matrix for non tnl cards as they may need this for fogging
             D3DMATRIX projMat = *pMat;
             lastError=pD3DDEV7->SetTransform(D3DTRANSFORMSTATE_PROJECTION,&projMat);
-//DeadCode JON 22Aug00 		if (selectedDevice.dpcTriCaps.dwRasterCaps&D3DPRASTERCAPS_FOGTABLE)
 
-//DeadCode JON 22Aug00 		if ( !(flags&F_VERTEXFOG) )
-//DeadCode JON 22Aug00 		{
-//DeadCode JON 24Aug00 		static D3DVALUE lastFogStart = -10000.0;
-//DeadCode JON 24Aug00 		static D3DVALUE lastFogEnd = -10000.0;
 
             if ( curFogStart != lastFogStart || curFogEnd != lastFogEnd )
             {
@@ -4579,7 +4031,6 @@ inline HRESULT Lib3D::_SetProjectionMatrix(const Angles& fov,const D3DVALUE& asp
                 lastFogEnd = curFogEnd;
                 ChangeRenderStateFog( curFogStart, curFogEnd );
             }
-//DeadCode JON 22Aug00 		}
         }
     }
     return lastError;
@@ -4608,7 +4059,6 @@ HRESULT Lib3D::SetAmbientLighting(LIGHTINGDESC lightDesc)
     return S_OK;
 #else
 
-//DeadCode JON 27Jul00 	lightModeFlag=(~lightModeFlag)&LIGHTMODE_FLAG;
     NextLmFlag();
 
 #ifndef	NO_HARD_TNL
@@ -4628,7 +4078,6 @@ HRESULT Lib3D::SetAmbientLighting(LIGHTINGDESC lightDesc)
         ULong startlight;
         ULong tLowRGB = lightDesc.lowRGB;
         ULong tHighRGB = lightDesc.highRGB;
-//DEADCODE JON 3/30/00 		startlight=lightDesc.lowRGB;
         lb=(tLowRGB&0xFF)<<16;
         tLowRGB>>=8;
         lg=(tLowRGB&0xFF)<<16;
@@ -4645,11 +4094,9 @@ HRESULT Lib3D::SetAmbientLighting(LIGHTINGDESC lightDesc)
         for (int i=0; i<256; i++)
         {
             lightingTable[i]=RGBMake(UByte(lr>>16),UByte(lg>>16),UByte(lb>>16));
-//DEADCODE JON 3/30/00 			lightingTable[i]=startlight;
             lr+=dr;
             lg+=dg;
             lb+=db;
-//DEADCODE JON 3/30/00 			startlight=RGBMake(UByte(lr>>16),UByte(lg>>16),UByte(lb>>16));
         }
     }
     if (gLightingDesc.lowDot!=lightDesc.lowDot ||
@@ -4659,20 +4106,13 @@ HRESULT Lib3D::SetAmbientLighting(LIGHTINGDESC lightDesc)
         gLightBase=-lightDesc.lowDot;
         gLightScale=255.f/delta;
     }
-//DeadCode JON 11Sep00 	if (gLightingDesc.specularPower!=lightDesc.specularPower)
     if ( gLightingDesc.specularRGB.all != lightDesc.specularRGB.all )
     {
         specularTable[0] = 0x00000000;
-//DeadCode JON 11Sep00 		float redMax = 255.f;
-//DeadCode JON 11Sep00 		float greenMax = 224.f;
-//DeadCode JON 11Sep00 		float blueMax = 192.f;
         float redMax = lightDesc.specularRGB.red;
         float greenMax = lightDesc.specularRGB.green;
         float blueMax = lightDesc.specularRGB.blue;
         specularTable[255]=0;
-//DeadCode JON 11Sep00 		specularTable[255].red=redMax;
-//DeadCode JON 11Sep00 		specularTable[255].green=greenMax;
-//DeadCode JON 11Sep00 		specularTable[255].blue=blueMax;
         specularTable[255]= lightDesc.specularRGB;
         for ( int i = 1; i < 255; i++ )
         {
@@ -4846,8 +4286,6 @@ HRESULT Lib3D::SetGlobal(const TOGGLES& tog,ULong* val)
     {
     case TOGGLE_TRANSPARENT_ZBIAS:
     {
-//DeadCode JON 3Oct00 		if ( prefZType == D3DZB_USEW )
-//DeadCode JON 3Oct00 			return S_OK;
 
         ULong oldV = tZBias;
         tZBias = *val;
@@ -4879,13 +4317,8 @@ HRESULT Lib3D::SetGlobal(const TOGGLES& tog,ULong* val)
         else
 #endif
         {
-//DeadCode JON 21Aug00 ULong oldV = texturedPolysP - texturedPolys;
             ULong oldV = zBias;
             zBias = *val;
-//DeadCode JON 21Aug00 			texturedPolysP = texturedPolys+zBias;
-//DeadCode JON 21Aug00 			textPolyVCntP = textPolyVCnt+zBias;
-//DeadCode JON 21Aug00 			projMatStackPos=(projMatStackPos%MATRIX_STACK_SIZE)+MATRIX_STACK_SIZE*(*val);
-//DeadCode JON 21Aug00 			fCombineMatrices=true;
             *val = oldV;
         }
     }
@@ -4893,8 +4326,6 @@ HRESULT Lib3D::SetGlobal(const TOGGLES& tog,ULong* val)
     case TOGGLE_GLOBALALPHA:
     {
         UByte oldA;
-//DeadCode JON 14Jun00 		oldA = 0xFF-globAlpha;
-//DeadCode JON 14Jun00 		globAlpha = 0xFF-UByte( *val );
         oldA = globAlpha;
         globAlpha = UByte( *val );
         *val=ULong(oldA);
@@ -4950,11 +4381,7 @@ HRESULT Lib3D::IncGlobal(const TOGGLES& tog)
         else
 #endif
         {
-//DeadCode JON 21Aug00 			texturedPolysP++;
-//DeadCode JON 21Aug00 			textPolyVCntP++;
             zBias++;
-            //DeadCode JON 21Aug00 			projMatStackPos+=MATRIX_STACK_SIZE;
-//DeadCode JON 21Aug00 			fCombineMatrices=true;
         }
     }
     break;
@@ -4989,11 +4416,7 @@ HRESULT Lib3D::DecGlobal(const TOGGLES& tog)
         else
 #endif
         {
-//DeadCode JON 21Aug00 			texturedPolysP--;
-//DeadCode JON 21Aug00 			textPolyVCntP--;
             zBias--;
-//DeadCode JON 21Aug00 			projMatStackPos-=MATRIX_STACK_SIZE;
-//DeadCode JON 21Aug00 			fCombineMatrices=true;
         }
     }
     break;
@@ -5685,6 +5108,12 @@ inline HRESULT Lib3D::_CreateTextureMap(MAPDESC *pMapDesc,LPDIRECTDRAWSURFACE7 &
         CloseDown();
         return lastError;
     }
+	if (getenv("ROWAN_IMAPDBG"))
+	fprintf(stderr,"[TEXMAP] surf=%p body=%p %dx%d fmt=%x a=%x src=%dx%d\n",
+		(void*)pDDSTemp,(void*)pMapDesc->body,(int)scaledW,(int)scaledH,
+		(unsigned)pPixelFmt->dwRGBBitCount,(unsigned)pPixelFmt->dwRGBAlphaBitMask,
+		(int)pMapDesc->w,(int)pMapDesc->h);
+
     ZeroMemory(&ddsd,sizeof(ddsd));
     ddsd.dwSize=sizeof(ddsd);
     ddsd.dwFlags=DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT|DDSD_CAPS|DDSD_MIPMAPCOUNT|DDSD_TEXTURESTAGE;//|DDSD_CKSRCBLT;
@@ -5806,23 +5235,12 @@ inline HRESULT Lib3D::_CreateTextureMap(MAPDESC *pMapDesc,LPDIRECTDRAWSURFACE7 &
 
     }
 
-//DeadCode JON 11Jul00 	for (	/*pDDSTarget->AddRef(),*/lastError=pDDSTarget->GetAttachedSurface(&ddscaps,&pDDSMipLevel);
-//DeadCode JON 11Jul00 			lastError==DD_OK && pDDSMipLevel!=NULL;
-//DeadCode JON 11Jul00 			/*pDDSTarget->Release(),*/pDDSTarget=pDDSMipLevel,lastError=pDDSTarget->GetAttachedSurface(&ddscaps,&pDDSMipLevel) )
-//DeadCode JON 11Jul00 		{
-//DeadCode JON 11Jul00 #ifndef SOFT_MIPMAP
-//DeadCode JON 11Jul00 			pDDSMipLevel->Blt(NULL,pDDSTarget,NULL,DDBLT_WAIT|DDBLT_ASYNC,NULL);
-//DeadCode JON 11Jul00 #else
-//DeadCode JON 11Jul00 			MakeMipLevel(pDDSTarget,pDDSMipLevel);
-//DeadCode JON 11Jul00 #endif
-//DeadCode JON 11Jul00 		}
 
     if (flags&F_PAGELOCK)
         pDDSTemp->PageUnlock(0);
 
     pDDSTemp->Release();
 
-//DeadCode JON 07Mar100 	pddsTexture=pDDSTarget;
 
     if (pPalette==&pTmpPal && (pPixelFmt->dwFlags&DDPF_PALETTEINDEXED8)==0)
         delete[](UWord*)pTmpPal;
@@ -5957,88 +5375,6 @@ HRESULT Lib3D::SetMaterial(const HMATERIAL& hMaterial)
 //TEMPCODE JIM 23/05/00 		if ( (int)hLastMaterial.p[0] == 0 )
 //TEMPCODE JIM 23/05/00 			INT3;
 
-//DEADCODE JON 5/10/00 	if (hMaterial.f==0x00)	//plain color material
-//DEADCODE JON 5/10/00 	{
-//DEADCODE JON 5/10/00 //DEADCODE JON 5/10/00 		hLastMaterial.mathandle=hLastMaterial.c;
-//DEADCODE JON 5/10/00 	}
-//DEADCODE JON 5/10/00 	else
-//DEADCODE JON 5/10/00 	{
-//DEADCODE JON 5/10/00 		//check to see whether this material contains textures that need to be uploaded
-//DEADCODE JON 5/10/00 		for (int i=flags&F_CANTBLENDTEXTURES?0:hMaterial.f-1;i>=0;i--)
-//DEADCODE JON 5/10/00 		{
-//DEADCODE JON 5/10/00 			if (hMaterial.p[i]!=NULL && hMaterial.p[i]->hTextureMap==0 || textureTable[hMaterial.p[i]->hTextureMap]==NULL)
-//DEADCODE JON 5/10/00 			{
-//DEADCODE JON 5/10/00 				//for non-texture manage version -
-//DEADCODE JON 5/10/00 				// check how much video memory is available
-//DEADCODE JON 5/10/00 				// if < some figure then clear out the current set after
-//DEADCODE JON 5/10/00 				// rendering any polys that are already buffered
-//DEADCODE JON 5/10/00 /*/deadcode				if (flags&F_CANTMANAGETEXTURES)
-//DEADCODE JON 5/10/00 				{
-//DEADCODE JON 5/10/00 					DDSCAPS2 ddscaps;
-//DEADCODE JON 5/10/00 					ZeroMemory(&ddscaps,sizeof(ddscaps));
-//DEADCODE JON 5/10/00 					ddscaps.dwCaps=DDSCAPS_TEXTURE|DDSCAPS_VIDEOMEMORY|DDSCAPS_LOCALVIDMEM;
-//DEADCODE JON 5/10/00 //deadcode					DWORD avail;
-//DEADCODE JON 5/10/00 //deadcode					DWORD total;
-//DEADCODE JON 5/10/00 //deadcode					pDD7->GetAvailableVidMem(&ddscaps,&total,&avail);
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 //deadcode					char debStr[256];
-//DEADCODE JON 5/10/00 //deadcode					sprintf(debStr,"TMEM=%dbytes\tFMEM=%dbytes\n",total,avail);
-//DEADCODE JON 5/10/00 //deadcode					OutputDebugString(debStr);
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 					g_usedRAM+=EstimateTextureRAM(hMaterial.p[i]);
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 					if (gFreeRAM-g_usedRAM<65536*4)
-//DEADCODE JON 5/10/00 					{
-//DEADCODE JON 5/10/00 						g_usedRAM=EstimateTextureRAM(hMaterial.p[i]);
-//DEADCODE JON 5/10/00 						if (texturedPolys!=NULL)
-//DEADCODE JON 5/10/00 							RenderPolyList(texturedPolys);
-//DEADCODE JON 5/10/00 						if (transparentPolys!=NULL)
-//DEADCODE JON 5/10/00 							RenderTPolyList(transparentPolys);
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 						texturedPolys=NULL;
-//DEADCODE JON 5/10/00 						transparentPolys=NULL;
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 						pD3DDEV7->EndScene();
-//DEADCODE JON 5/10/00 						pD3DDEV7->BeginScene();
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 //						if (textureBlending==HINT_TRILINEAR)
-//DEADCODE JON 5/10/00 //							textureBlending=HINT_BILINEAR;
-//DEADCODE JON 5/10/00 //						else if (textureQuality==HINT_FULL_RES_TEXTURE)
-//DEADCODE JON 5/10/00 //							textureQuality=HINT_HALF_RES_TEXTURE;
-//DEADCODE JON 5/10/00 //						else if (textureQuality==HINT_HALF_RES_TEXTURE)
-//DEADCODE JON 5/10/00 //							textureQuality=HINT_QUARTER_RES_TEXTURE;
-//DEADCODE JON 5/10/00 //						else if (textureQuality==HINT_QUARTER_RES_TEXTURE)
-//DEADCODE JON 5/10/00 //							textureQuality=HINT_EIGHTH_RES_TEXTURE;
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 						for (int i=MAX_TEXTURES-1;i>=0;i--)
-//DEADCODE JON 5/10/00 							if (textureTable[i]!=NULL)
-//DEADCODE JON 5/10/00 							{
-//DEADCODE JON 5/10/00 								textureTable[i]->Release();
-//DEADCODE JON 5/10/00 								textureTable[i]=NULL;
-//DEADCODE JON 5/10/00 							}
-//DEADCODE JON 5/10/00 					}
-//DEADCODE JON 5/10/00 				}
-//DEADCODE JON 5/10/00 //deadcode*/
-//DEADCODE JON 5/10/00 				for (int j=MAX_TEXTURES-1;j>0 && textureTable[j]!=NULL;j--)
-//DEADCODE JON 5/10/00 				{/* search for next free texture slot */}
-//DEADCODE JON 5/10/00 				if (!j)
-//DEADCODE JON 5/10/00 				{
-//DEADCODE JON 5/10/00 					INT3; // run out of textures!!!
-//DEADCODE JON 5/10/00 					CloseDown();
-//DEADCODE JON 5/10/00 					return DDERR_GENERIC;
-//DEADCODE JON 5/10/00 				}
-//DEADCODE JON 5/10/00 				hMaterial.p[i]->hTextureMap=HTEXTUREMAP(j);
-//DEADCODE JON 5/10/00 				if ((hr=CreateTextureMap(hMaterial.p[i],textureTable[hMaterial.p[i]->hTextureMap],i))!=D3D_OK)
-//DEADCODE JON 5/10/00 				{
-//DEADCODE JON 5/10/00 					CloseDown();
-//DEADCODE JON 5/10/00 					return hr;
-//DEADCODE JON 5/10/00 				}
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 			} // end of is that texture blank
-//DEADCODE JON 5/10/00 		}
-//DEADCODE JON 5/10/00
-//DEADCODE JON 5/10/00 //DEADCODE JON 5/10/00 		hLastMaterial.mathandle=hLastMaterial.p[0]->hTextureMap;
-//DEADCODE JON 5/10/00 	}
     return DD_OK;
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -6097,8 +5433,6 @@ HRESULT Lib3D::CreateTexture(MAPDESC* pMapDesc,const TCFLAGS& tcFlag)
         {
             ddsd.ddpfPixelFormat=texFmt[TF_LAND];
             ddsd.ddsCaps.dwCaps=DDSCAPS_TEXTURE;
-//deadcode			if (flags&F_CANTMANAGETEXTURES)	ddsd.ddsCaps.dwCaps|=DDSCAPS_LOCALVIDMEM|DDSCAPS_VIDEOMEMORY;
-//deadcode			else
             ddsd.ddsCaps.dwCaps2=DDSCAPS2_D3DTEXTUREMANAGE;
 
         }
@@ -6196,7 +5530,6 @@ HRESULT Lib3D::UploadTexture(/*const UWord& ht*/)
         break;
     case RENDERTARGET_LANDSCAPE:
 #ifndef NDEBUG
-//DeadCode JON 17Sep00 	if (ht >= MAX_LAND_TEXTURES)
         if (hCurrentRenderTarget.getInstance() >= MAX_LAND_TEXTURES)
             INT3;
 #endif
@@ -6208,11 +5541,7 @@ HRESULT Lib3D::UploadTexture(/*const UWord& ht*/)
         NODEFAULT;
     }
 
-//DeadCode JON 16Oct00 	ddsd.dwSize=sizeof(ddsd);
-//DeadCode JON 16Oct00 	lastError=pdst->GetSurfaceDesc(&ddsd);
 #ifndef NDEBUG
-//DeadCode JON 17Sep00 	if ( landRect.bottom != ddsd.dwHeight )
-//DeadCode JON 17Sep00 		INT3;
 #endif
 
     if (lastError!=DD_OK)
@@ -6278,7 +5607,6 @@ HRESULT Lib3D::UploadTexture(/*const UWord& ht*/)
     	}
     	psrc->Release();
     */
-    //DeadCode JON 11Jul00 	countRefs( psrc );
 
 //TEMPCODE JON 5/15/00 	if (hr!=DD_OK)
 //TEMPCODE JON 5/15/00 		CloseDown();
@@ -6373,15 +5701,8 @@ HRESULT Lib3D::AllocateLandscapeTextures()
     SLandTextureTable landTextureTable[]=
     {
 //tempcode		{0,0,{2,	8,	16,	32,	64,	128,	4,	0},	HINT_FULL_RES_TEXTURE,		HINT_TRILINEAR},
-//DeadCode JON 31Jan100 		{0,0,{4,	8,	16,	32,	64,	128,	4,	0},	HINT_FULL_RES_TEXTURE,		HINT_TRILINEAR},
 //tempcode		{0,0,{1,	4,	8,	40,	64,	128,	11,	0},	HINT_FULL_RES_TEXTURE,		HINT_TRILINEAR},
 //tempcode		{0,0,{0,	1,	4,	8,	40,	64,		128,11},HINT_FULL_RES_TEXTURE,		HINT_TRILINEAR},
-//DeadCode JON 18Jul00 		{0,0,{0,	0,	4,	8,	40,	64,		128,12},HINT_FULL_RES_TEXTURE,		HINT_TRILINEAR},
-//DeadCode JON 18Jul00 		{0,0,{0,	0,	4,	8,	40,	64,		128,12},HINT_FULL_RES_TEXTURE,		HINT_BILINEAR},
-//DeadCode JON 18Jul00 		{0,0,{0,	0,	1,	10,	41,	64,		128,12},HINT_HALF_RES_TEXTURE,		HINT_TRILINEAR},
-//DeadCode JON 18Jul00 		{0,0,{0,	0,	1,	10,	41,	64,		128,12},HINT_HALF_RES_TEXTURE,		HINT_BILINEAR},
-//DeadCode JON 18Jul00 		{0,0,{0,	0,	0,	4,	42,	70,		128,12},HINT_QUARTER_RES_TEXTURE,	HINT_TRILINEAR},
-//DeadCode JON 18Jul00 		{0,0,{0,	0,	0,	4,	42,	70,		128,12},HINT_QUARTER_RES_TEXTURE,	HINT_BILINEAR}
 //				1024512	256	128	64	32	8	4
         {0,0,{	0,	0,	6,	10,	44,	64,	100,32},HINT_FULL_RES_TEXTURE,		HINT_TRILINEAR},
 //TempCode JON 5Sep00 		{0,0,{	0,	0,	256, 0,	 0,  0,   0, 0},HINT_FULL_RES_TEXTURE,		HINT_TRILINEAR},
@@ -6463,18 +5784,9 @@ HRESULT Lib3D::AllocateLandscapeTextures()
     ZeroMemory(&ddscaps,sizeof(ddscaps));
     ddscaps.dwCaps=DDSCAPS_TEXTURE;
 
-//DeadCode JON 10Jul00 	DDCAPS ddcaps;
-//DeadCode JON 10Jul00 	ZeroMemory(&ddcaps,sizeof(ddcaps));
-//DeadCode JON 10Jul00 	ddcaps.dwSize=sizeof(ddcaps);
-//DeadCode JON 10Jul00
-//DeadCode JON 10Jul00 	pDD7->GetCaps(&ddcaps,NULL);
 
-//deadcode	if (flags&F_CANTMANAGETEXTURES)
-//deadcode		ddscaps.dwCaps+=DDSCAPS_VIDEOMEMORY|DDSCAPS_LOCALVIDMEM;
 
     lastError=pDD7->GetAvailableVidMem(&ddscaps,&totalRAM,&freeRAM);
-//DeadCode JON 5Sep00 	gFreeRAM=freeRAM>>1;
-//DeadCode JON 5Sep00 	g_usedRAM=0;
     if (lastError!=DD_OK)
     {
         CloseDown();
@@ -6542,7 +5854,6 @@ HRESULT Lib3D::AllocateLandscapeTextures()
 
     masterTextureBlending = textureBlending;
     textureQuality=masterTextureQuality=pLTT->textureQuality;
-//DeadCode JON 25Jul00 	textureBlending=masterTextureBlending=pLTT->textureBlending;
 //	selectedDevice.dwMaxTextureWidth=
 //		selectedDevice.dwMaxTextureHeight=maximumWH;
 
@@ -6561,18 +5872,6 @@ HRESULT Lib3D::AllocateLandscapeTextures()
         ddsd.ddpfPixelFormat=texFmt[TF_LANDINIT];
         ddsd.ddsCaps.dwCaps=DDSCAPS_TEXTURE|DDSCAPS_3DDEVICE|DDSCAPS_VIDEOMEMORY|DDSCAPS_LOCALVIDMEM;
         lastError=pDD7->CreateSurface(&ddsd,&pDDS7LandRT,NULL);
-//DeadCode JON 17Aug00 		if ((selectedDevice.dpcTriCaps.dwRasterCaps&D3DPRASTERCAPS_ZBUFFERLESSHSR)==0)
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 			DDSURFACEDESC2 zbsd;
-//DeadCode JON 17Aug00 			zbsd.dwSize=sizeof(zbsd);
-//DeadCode JON 17Aug00 			hr=pDDSZ7->GetSurfaceDesc(&zbsd);
-//DeadCode JON 17Aug00 			zbsd.dwFlags=DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT;
-//DeadCode JON 17Aug00 			zbsd.ddsCaps.dwCaps=DDSCAPS_ZBUFFER|DDSCAPS_VIDEOMEMORY|DDSCAPS_LOCALVIDMEM;
-//DeadCode JON 17Aug00 			zbsd.dwWidth=zbsd.dwHeight=pLTT->biggestWH;
-//DeadCode JON 17Aug00 			hr=pDD7->CreateSurface(&zbsd,&pDDS7LandZB,NULL);
-//DeadCode JON 17Aug00 			hr=pDDS7LandRT->AddAttachedSurface(pDDS7LandZB);
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 		else pDDS7LandZB=NULL;
 
         // mirror render target...
         ddsd.dwWidth=mirrorRect.right;
@@ -6608,14 +5907,6 @@ HRESULT Lib3D::AllocateLandscapeTextures()
         pDDS7LandZB=pDDS7MirrorZB=pDDSZ7;
     }
 
-//DeadCode JON 18Jul00 	num1024Textures=pLTT->num[0];
-//DeadCode JON 18Jul00 	num512Textures=pLTT->num[1];
-//DeadCode JON 18Jul00 	num256Textures=pLTT->num[2];
-//DeadCode JON 18Jul00 	num128Textures=pLTT->num[3];
-//DeadCode JON 18Jul00 	num64Textures=pLTT->num[4];
-//DeadCode JON 18Jul00 	num32Textures=pLTT->num[5];
-//DeadCode JON 18Jul00 	num16Textures=pLTT->num[6];
-//DeadCode JON 18Jul00 	num8Textures=pLTT->num[7];
 
     {
         for ( int j=0, cumV=0; j< LAND_TEXT_BANDS; j++ )
@@ -6654,8 +5945,6 @@ HRESULT Lib3D::AllocateLandscapeTextures()
 #endif
     if (flags&F_CANTMANAGETEXTURES)
         INT3;
-//deadcode	if (flags&F_CANTMANAGETEXTURES)	ddsd.ddsCaps.dwCaps|=DDSCAPS_LOCALVIDMEM|DDSCAPS_VIDEOMEMORY;
-//deadcode	else
 //	ddsd.ddsCaps.dwCaps2=DDSCAPS2_D3DTEXTUREMANAGE;
 
 #ifndef _NO_LANDSCAPE_MIPMAPS
@@ -6726,10 +6015,6 @@ HRESULT Lib3D::FreeLandscapeTextures()
 HRESULT Lib3D::GetLandscapeTextureCount(SLong& n0,SLong& n1,SLong& n2,SLong& n3,
                                         SLong& n4,SLong& n5,SLong& n6,SLong& n7)
 {
-//DeadCode JON 18Jul00 	n0=num1024Textures;	n1=num512Textures;
-//DeadCode JON 18Jul00 	n2=num256Textures;	n3=num128Textures;
-//DeadCode JON 18Jul00 	n4=num64Textures;	n5=num32Textures;
-//DeadCode JON 18Jul00 	n6=num16Textures;	n7=num8Textures;
     n0 = landTextureBandSize[0];
     n1 = landTextureBandSize[1];
     n2 = landTextureBandSize[2];
@@ -6820,27 +6105,6 @@ HRESULT Lib3D::AllocateLandscapeTexture(UWord reqRez,UWord& tHndl)
     tHndl = NULL_LAND_TEXT_REF;
     return DDERR_GENERIC;
 
-//DeadCode JON 18Jul00 	tHndl=0;
-//DeadCode JON 18Jul00 	if (reqRez>0)	tHndl+=num1024Textures;
-//DeadCode JON 18Jul00 	if (reqRez>1)	tHndl+=num512Textures;
-//DeadCode JON 18Jul00 	if (reqRez>2)	tHndl+=num256Textures;
-//DeadCode JON 18Jul00 	if (reqRez>3)	tHndl+=num128Textures;
-//DeadCode JON 18Jul00 	if (reqRez>4)	tHndl+=num64Textures;
-//DeadCode JON 18Jul00 	if (reqRez>5)	tHndl+=num32Textures;
-//DeadCode JON 18Jul00 	if (reqRez>6)	tHndl+=num16Textures;
-//DeadCode JON 18Jul00 	if (reqRez>7)	return DDERR_INVALIDPARAMS;
-//DeadCode JON 18Jul00 	UWord scnHndl=tHndl;
-//DeadCode JON 18Jul00 	while (landTextRec[scnHndl] && scnHndl<256) scnHndl++;
-//DeadCode JON 18Jul00 	if (scnHndl==256)
-//DeadCode JON 18Jul00 	{
-//DeadCode JON 18Jul00 		scnHndl=tHndl;
-//DeadCode JON 18Jul00 		while (landTextRec[scnHndl] && scnHndl) scnHndl--;
-//DeadCode JON 18Jul00 		if (0==scnHndl)
-//DeadCode JON 18Jul00 			return DDERR_GENERIC;
-//DeadCode JON 18Jul00 	}
-//DeadCode JON 18Jul00 	tHndl=scnHndl;
-//DeadCode JON 18Jul00 	landTextRec[tHndl]=0xFF;
-//DeadCode JON 18Jul00 	return S_OK;
 #endif
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -6858,7 +6122,6 @@ HRESULT Lib3D::SetMaterial(UWord ht,MAPDESC *pmap)
         return SetMaterial( HMATERIAL( landscapeTexture, pmap ) );
 #endif
     HMATERIAL hMaterial;
-//DeadCode JON 31Aug00 	hMaterial.tsH[0]=hMaterial.tsW[0]=255.f/(256.f*256.f);
     hMaterial.isMasked=0;
     hMaterial.isLand=0xFFFFFFFF^ULong(ht);
     hMaterial.uniqueTextID = ht|TIT_LANDSCAPE;
@@ -6907,25 +6170,8 @@ HRESULT Lib3D::SetMaterial(UWord ht,MAPDESC *pmap)
 #endif
 
 //	#pragma message ( __HERE__ "to optimize move this to set landscape material section" )
-//DeadCode JON 18Jul00 	SLong *numbers[8] = {	&num1024Textures,	&num512Textures,
-//DeadCode JON 18Jul00 							&num256Textures,	&num128Textures,
-//DeadCode JON 18Jul00 							&num64Textures,		&num32Textures,
-//DeadCode JON 18Jul00 							&num16Textures,		&num8Textures };
 
-//DeadCode JON 5Sep00 	SLong index;
-//DeadCode JON 5Sep00 	index=SLong(hLastMaterial.isLand^0xFFFFFFFFUL);
 
-//DeadCode JON 31Aug00 	for (int i=0;i<8;i++)
-//DeadCode JON 31Aug00 	{
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 		if (index<*numbers[i])
-//DeadCode JON 31Aug00 		if ( index<landTextureBandSize[i] )
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 			index=i;
-//DeadCode JON 31Aug00 			break;
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 		index-=*numbers[i];
-//DeadCode JON 31Aug00 		index-=landTextureBandSize[i];
-//DeadCode JON 31Aug00 	}
 //TempCode JON 31Aug00 	D3DVALUE pixelSH;
 //TempCode JON 31Aug00 	//landscapeTextScaleX = scW;
 //TempCode JON 31Aug00
@@ -6937,24 +6183,7 @@ HRESULT Lib3D::SetMaterial(UWord ht,MAPDESC *pmap)
 //TempCode JON 31Aug00 	landscapeTextScaleX=(landscapeTextScaleX-2*pixelSH)/(landscapeTextScaleX*landscapeTextScaleX);
 //TempCode JON 31Aug00 	landscapeTextOffsetY=landscapeTextOffsetX;
 //TempCode JON 31Aug00 	landscapeTextScaleY=landscapeTextScaleX;
-//DeadCode JON 5Sep00 						for ( int band = 7; landTextureBandBase[band] > index ; band-- )
-//DeadCode JON 5Sep00 						{ /*search*/ }
-//DeadCode JON 5Sep00
-//DeadCode JON 5Sep00 						landscapeTextOffset = D3DVALUE( 1<<(6+band) );
-//DeadCode JON 4Sep00 //	landscapeTextOffsetX=D3DVALUE( 1<<(10-band) );
-//DeadCode JON 4Sep00 //	landscapeTextScaleX=D3DVALUE( 1<<(6+band) );
-//DeadCode JON 4Sep00 //	landscapeTextScaleX=1.f/(255.f); // -1 as it removes the very edge
-//DeadCode JON 4Sep00 	static float scale = (255.f/(256.f*256.f));//1.f/256.f;
-//DeadCode JON 4Sep00 	static float offset = 1.f/512.f;
-//DeadCode JON 4Sep00 //	static float scale = 1.f/128.f;//1.f/256.f;
-//DeadCode JON 4Sep00 //	static float offset = -128.f/512.f;
-//DeadCode JON 4Sep00 	landscapeTextScaleX=scale;
-//DeadCode JON 4Sep00 	landscapeTextOffsetX=offset;
-//DeadCode JON 4Sep00 	landscapeTextOffsetY=landscapeTextOffsetX;
-//DeadCode JON 4Sep00 	landscapeTextScaleY=landscapeTextScaleX;
 
-//DeadCode JON 5Sep00 const D3DVALUE landscapeTextScale = 255.f/(256.f*256.f);
-//DeadCode JON 5Sep00 const D3DVALUE landscapeTextOffset = 1.f/512.f;
 
 
     curMatTextureTypeFlags = globTextureTypeFlags|hLastMaterial.f|LANDSCAPE_TEXTURE;
@@ -6968,10 +6197,6 @@ HRESULT Lib3D::SetMaterial(UWord ht,MAPDESC *pmap)
 //Date			Thu 25 Nov p1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 HRESULT Lib3D::BeginStrip(const ULong& numVerts,R3DVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	return BeginPoly(numVerts,pVertArray);
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BeginFan (3D vers)
 //Author		Paul.
@@ -6979,10 +6204,6 @@ HRESULT Lib3D::SetMaterial(UWord ht,MAPDESC *pmap)
 //
 //------------------------------------------------------------------------------
 //#pragma message ( __HERE__ "begin fan" )
-//DEADCODE JON 5/19/00 HRESULT Lib3D::BeginFan(const ULong& numVerts,R3DVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	return BeginPoly(numVerts,pVertArray);
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BeginPoly (3D vers)
 //Author		Paul.
@@ -6990,52 +6211,12 @@ HRESULT Lib3D::SetMaterial(UWord ht,MAPDESC *pmap)
 //
 //------------------------------------------------------------------------------
 //#pragma message ( __HERE__ "begin poly" )
-//DEADCODE JON 5/19/00 inline HRESULT Lib3D::BeginPoly(const ULong& numVerts,R3DVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	HRESULT hr;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	vertexType=D3DFVF_R3DVERTEX;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 #ifndef NDEBUG
-//DEADCODE JON 5/19/00 	if (polyVertCount!=0xFFFFFFFF)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		INT3;
-//DEADCODE JON 5/19/00 		return DDERR_GENERIC;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	if (numVerts<3 || numVerts>MAX_VERTICES)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		INT3;
-//DEADCODE JON 5/19/00 		return DDERR_INVALIDPARAMS;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 #endif
-//DEADCODE JON 5/19/00 	if ((flags&Flags(F_TNL+F_TNL_EMULATION))!=0)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		SPolygon* spolygon;
-//DEADCODE JON 5/19/00 		ALLOCATE_POLYGON_TNL( spolygon, numVerts );
-//DEADCODE JON 5/19/00 		pVertArray=(R3DVERTEX*)spolygon->pVertexList;
-//DEADCODE JON 5/19/00 		polyVertArray=pVertArray;
-//DEADCODE JON 5/19/00 		polyVertCount=numVerts;
-//DEADCODE JON 5/19/00 		return S_OK;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	if (hLastMaterial.f<=1)			pVertArray=vertArray;
-//DEADCODE JON 5/19/00 	else if (hLastMaterial.f==2)	pVertArray=(R3DVERTEX*)vertArray2;
-//DEADCODE JON 5/19/00 	else if (hLastMaterial.f==3)	pVertArray=(R3DVERTEX*)vertArray3;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	polyVertCount=numVerts;
-//DEADCODE JON 5/19/00 	polyVertArray=pVertArray;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	return S_OK;
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BeginStrip (3D vers)
 //Author		Paul.
 //Date			Thu 25 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 HRESULT Lib3D::BeginStrip(const HMATERIAL& hMaterial,const ULong& numVerts,R3DVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	return BeginPoly(hMaterial,numVerts,pVertArray);
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BeginFan (3D vers)
 //Author		Paul.
@@ -7054,10 +6235,6 @@ Lib3DPoint* Lib3D::BeginFan( const ULong &vertexCount )
     return _BeginPoly( vertexCount );
 }
 
-//DEADCODE JON 5/19/00 HRESULT Lib3D::BeginFan(const HMATERIAL& hMaterial,const ULong& numVerts,R3DVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	return BeginPoly(hMaterial,numVerts,pVertArray);
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BeginPoly (3D vers)
 //Author		Paul.
@@ -7110,106 +6287,24 @@ inline Lib3DPoint* Lib3D::_BeginPoly( const ULong vertexCount )
     return (Lib3DPoint*)currentPoly->pVertexList;
 }
 
-//DEADCODE JON 5/19/00 HRESULT Lib3D::BeginPoly(const HMATERIAL& hMaterial,const ULong& numVerts,R3DVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	HRESULT hr;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	vertexType=D3DFVF_R3DVERTEX;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 #ifndef NDEBUG
-//DEADCODE JON 5/19/00 	if (polyVertCount!=0xFFFFFFFF)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		INT3;
-//DEADCODE JON 5/19/00 		return DDERR_GENERIC;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	if (numVerts<3 || numVerts>MAX_VERTICES)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		INT3;
-//DEADCODE JON 5/19/00 		return DDERR_INVALIDPARAMS;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 #endif
-//DEADCODE JON 5/19/00 	if ((hr=SetMaterial(hMaterial))!=DD_OK) return hr;					//PD 28Feb2000
-//DEADCODE JON 5/19/00 	if ((flags&Flags(F_TNL+F_TNL_EMULATION))!=0)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		SPolygon* spolygon;
-//DEADCODE JON 5/19/00 		ALLOCATE_POLYGON_TNL( spolygon, numVerts );
-//DEADCODE JON 5/19/00 		pVertArray=(R3DVERTEX*)spolygon->pVertexList;
-//DEADCODE JON 5/19/00 		polyVertArray=pVertArray;
-//DEADCODE JON 5/19/00 		polyVertCount=numVerts;
-//DEADCODE JON 5/19/00 		return S_OK;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	else
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		if (hLastMaterial.f<=1)			pVertArray=vertArray;
-//DEADCODE JON 5/19/00 		else if (hLastMaterial.f==2)	pVertArray=(R3DVERTEX*)vertArray2;
-//DEADCODE JON 5/19/00 		else if (hLastMaterial.f==3)	pVertArray=(R3DVERTEX*)vertArray3;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	polyVertCount=numVerts;
-//DEADCODE JON 5/19/00 	polyVertArray=pVertArray;
-//DEADCODE JON 5/19/00 	return S_OK;
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BeginStrip (2D vers)
 //Author		Paul.
 //Date			Thu 25 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 HRESULT Lib3D::BeginStrip(const HMATERIAL& hMaterial,const ULong& numVerts,R3DTLVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	return BeginPoly(hMaterial,numVerts,pVertArray);
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BeginFan (2D vers)
 //Author		Paul.
 //Date			Thu 25 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 HRESULT Lib3D::BeginFan(const HMATERIAL& hMaterial,const ULong& numVerts,R3DTLVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	return BeginPoly(hMaterial,numVerts,pVertArray);
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BeginPoly (2D vers)
 //Author		Paul.
 //Date			Thu 11 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 HRESULT Lib3D::BeginPoly(const HMATERIAL& hMaterial,const ULong& numVerts,R3DTLVERTEX*& pVertArray)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	HRESULT hr;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	vertexType=D3DFVF_R3DTLVERTEX;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if (polyVertCount!=0xFFFFFFFF) return DDERR_GENERIC;
-//DEADCODE JON 5/19/00 	if (numVerts<3 || numVerts>MAX_VERTICES) return DDERR_INVALIDPARAMS;
-//DEADCODE JON 5/19/00 	if ((hr=SetMaterial(hMaterial))!=DD_OK) return hr;						//PD 28Feb2000
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if ((flags&Flags(F_TNL+F_TNL_EMULATION))!=0)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		lpD3DVB7=gpD3DVB7;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 		if (hLastMaterial.f==0)
-//DEADCODE JON 5/19/00 			hr=lpD3DVB7->Lock(DDLOCK_WRITEONLY|DDLOCK_SURFACEMEMORYPTR|DDLOCK_DISCARDCONTENTS,
-//DEADCODE JON 5/19/00 							(LPVOID*)&pVertArray,NULL);
-//DEADCODE JON 5/19/00 		else
-//DEADCODE JON 5/19/00 			hr=lpD3DVB7->Lock(DDLOCK_SURFACEMEMORYPTR|DDLOCK_DISCARDCONTENTS,
-//DEADCODE JON 5/19/00 							(LPVOID*)&pVertArray,NULL);
-//DEADCODE JON 5/19/00 		if (hr!=D3D_OK)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			CloseDown();
-//DEADCODE JON 5/19/00 			return hr;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	else
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		pVertArray=tlVertArray;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	polyVertCount=numVerts;
-//DEADCODE JON 5/19/00 	polyVertArrayTL=pVertArray;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	return S_OK;
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ScaleTextureCoordinates
 //Author		Paul.
@@ -7217,224 +6312,6 @@ inline Lib3DPoint* Lib3D::_BeginPoly( const ULong vertexCount )
 //
 //------------------------------------------------------------------------------
 
-//DeadCode JON 31Aug00 void Lib3D::ScaleTextureCoordinates(const HMATERIAL& mat, SPolygon* sPolygon )//R3DVERTEX* pr3dv,ULong vertCnt)
-//DeadCode JON 31Aug00 {
-//DeadCode JON 31Aug00 	if (mat.isLand)
-//DeadCode JON 31Aug00 	{
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 		SLong *numbers[8] = {	&num1024Textures,	&num512Textures,
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 								&num256Textures,	&num128Textures,
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 								&num64Textures,		&num32Textures,
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 								&num16Textures,		&num8Textures };
-//DeadCode JON 31Aug00 		SLong index;
-//DeadCode JON 31Aug00 		index=SLong(mat.isLand^0xFFFFFFFFUL);
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 		for (int i=0;i<8;i++)
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 			if ( index<landTextureBandSize[i] )
-//DeadCode JON 31Aug00 			{
-//DeadCode JON 31Aug00 				index=i;
-//DeadCode JON 31Aug00 				break;
-//DeadCode JON 31Aug00 			}
-//DeadCode JON 31Aug00 			index-=landTextureBandSize[i];
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 		for (int i=0;i<8;i++)
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 		{
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 			if (index<*numbers[i])
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 			{
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 				index=i;
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 				break;
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 			}
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 			index-=*numbers[i];
-//DeadCode JON 31Aug00 //DeadCode JON 18Jul00 		}
-//DeadCode JON 31Aug00 		D3DVALUE pixelSH;
-//DeadCode JON 31Aug00 		D3DVALUE scW,ofW;
-//DeadCode JON 31Aug00 		D3DVALUE scH,ofH;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 		pixelSH=(index==0)?.125f:(index==1)?.25f:(index==2)?.5f:D3DVALUE(1<<(index-3));
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 		ofW=mat.tsW[0];
-//DeadCode JON 31Aug00 		scW=1.f/ofW;
-//DeadCode JON 31Aug00 		ofW*=pixelSH;	//*.5f;
-//DeadCode JON 31Aug00 		scW=(scW-2*pixelSH)/(scW*scW);
-//DeadCode JON 31Aug00 		ofH=ofW;
-//DeadCode JON 31Aug00 		scH=scW;
-//DeadCode JON 31Aug00 //		for (i=0;i<vertCnt;i++)
-//DeadCode JON 31Aug00 //		{
-//DeadCode JON 31Aug00 //			pr3dv[i].tu=scW*D3DVALUE(pr3dv[i].ix)+ofW;
-//DeadCode JON 31Aug00 //			pr3dv[i].tv=scH*D3DVALUE(pr3dv[i].iy)+ofH;
-//DeadCode JON 31Aug00 //		}
-//DeadCode JON 31Aug00 		switch (mat.f)
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 		case 3:
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			R3DVERTEX3 *pr3dv3=(R3DVERTEX3*)pr3dv;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			D3DVALUE tsW=mat.tsW[2];
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			D3DVALUE tsH=mat.tsH[2];
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			for (int i=0;i<vertCnt;i++)
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 //				pr3dv3[i].tu =mat.tsW[0]*pr3dv3[i].ix;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 //				pr3dv3[i].tv =mat.tsH[0]*pr3dv3[i].iy;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv3[i].tu=scW*D3DVALUE(pr3dv3[i].ix)+ofW;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv3[i].tv=scH*D3DVALUE(pr3dv3[i].iy)+ofH;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv3[i].tu1=mat.tsW[1]*pr3dv3[i].ix1;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv3[i].tv1=mat.tsH[1]*pr3dv3[i].iy1;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv3[i].tu2=mat.tsW[2]*pr3dv3[i].ix2;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv3[i].tv2=mat.tsH[2]*pr3dv3[i].iy2;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			}
-//DeadCode JON 31Aug00 			SVertex* curVert = sPolygon->pVertexList;
-//DeadCode JON 31Aug00 			for ( int i = sPolygon->vertexcount; i!=0; i-- )
-//DeadCode JON 31Aug00 			{
-//DeadCode JON 31Aug00 				curVert->tu = scW*D3DVALUE(curVert->ix)+ofW;
-//DeadCode JON 31Aug00 				curVert->tv = scH*D3DVALUE(curVert->iy)+ofH;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 				curVert->tu1=mat.tsW[1]*curVert->ix1;
-//DeadCode JON 31Aug00 				curVert->tv1=mat.tsH[1]*curVert->iy1;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 				curVert->tu2=mat.tsW[2]*curVert->ix2;
-//DeadCode JON 31Aug00 				curVert->tv2=mat.tsH[2]*curVert->iy2;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 //DEADCODE JON 5/25/00 				curVert=curVert->pNext;
-//DeadCode JON 31Aug00 				curVert++;
-//DeadCode JON 31Aug00 			}
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00 		break;
-//DeadCode JON 31Aug00 		case 2:
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			R3DVERTEX2 *pr3dv2=(R3DVERTEX2*)pr3dv;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			for (int i=0;i<vertCnt;i++)
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 //				pr3dv2[i].tu =mat.tsW[0]*pr3dv2[i].ix;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 //				pr3dv2[i].tv =mat.tsH[0]*pr3dv2[i].iy;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv2[i].tu=scW*D3DVALUE(pr3dv2[i].ix)+ofW;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv2[i].tv=scH*D3DVALUE(pr3dv2[i].iy)+ofH;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv2[i].tu1=mat.tsW[1]*pr3dv2[i].ix1;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv2[i].tv1=mat.tsH[1]*pr3dv2[i].iy1;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			}
-//DeadCode JON 31Aug00 			SVertex* curVert = sPolygon->pVertexList;
-//DeadCode JON 31Aug00 			for ( int i = sPolygon->vertexcount; i!=0; i-- )
-//DeadCode JON 31Aug00 			{
-//DeadCode JON 31Aug00 				curVert->tu = scW*D3DVALUE(curVert->ix)+ofW;
-//DeadCode JON 31Aug00 				curVert->tv = scH*D3DVALUE(curVert->iy)+ofH;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 				curVert->tu1=mat.tsW[1]*curVert->ix1;
-//DeadCode JON 31Aug00 				curVert->tv1=mat.tsH[1]*curVert->iy1;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 //DEADCODE JON 5/25/00 				curVert=curVert->pNext;
-//DeadCode JON 31Aug00 				curVert++;
-//DeadCode JON 31Aug00 			}
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00 		break;
-//DeadCode JON 31Aug00 		case 1:
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 //			D3DVALUE tsW=mat.tsW[0];
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 //			D3DVALUE tsH=mat.tsH[0];
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			for (int i=0;i<vertCnt;i++)
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 //				pr3dv[i].tu=tsW*pr3dv[i].ix;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 //				pr3dv[i].tv=tsH*pr3dv[i].iy;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv[i].tu=scW*D3DVALUE(pr3dv[i].ix)+ofW;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 				pr3dv[i].tv=scH*D3DVALUE(pr3dv[i].iy)+ofH;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			}
-//DeadCode JON 31Aug00 			SVertex* curVert = sPolygon->pVertexList;
-//DeadCode JON 31Aug00 			for ( int i = sPolygon->vertexcount; i!=0; i-- )
-//DeadCode JON 31Aug00 			{
-//DeadCode JON 31Aug00 				curVert->tu = scW*D3DVALUE(curVert->ix)+ofW;
-//DeadCode JON 31Aug00 				curVert->tv = scH*D3DVALUE(curVert->iy)+ofH;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 //DEADCODE JON 5/25/00 				curVert=curVert->pNext;
-//DeadCode JON 31Aug00 				curVert++;
-//DeadCode JON 31Aug00 			}
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00 		break;
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 		return;
-//DeadCode JON 31Aug00 	}
-//DeadCode JON 31Aug00 	switch (mat.f)
-//DeadCode JON 31Aug00 	{
-//DeadCode JON 31Aug00 	case 3:
-//DeadCode JON 31Aug00 	{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		R3DVERTEX3 *pr3dv3=(R3DVERTEX3*)pr3dv;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		D3DVALUE tsW=mat.tsW[2];
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		D3DVALUE tsH=mat.tsH[2];
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		for (int i=0;i<vertCnt;i++)
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv3[i].tu =mat.tsW[0]*pr3dv3[i].ix;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv3[i].tv =mat.tsH[0]*pr3dv3[i].iy;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv3[i].tu1=mat.tsW[1]*pr3dv3[i].ix1;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv3[i].tv1=mat.tsH[1]*pr3dv3[i].iy1;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv3[i].tu2=mat.tsW[2]*pr3dv3[i].ix2;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv3[i].tv2=mat.tsH[2]*pr3dv3[i].iy2;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		}
-//DeadCode JON 31Aug00 		SVertex* curVert = sPolygon->pVertexList;
-//DeadCode JON 31Aug00 		for ( int i = sPolygon->vertexcount; i!=0; i-- )
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 			curVert->tu=mat.tsW[0]*curVert->ix;
-//DeadCode JON 31Aug00 			curVert->tv=mat.tsH[0]*curVert->iy;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 			curVert->tu1=mat.tsW[1]*curVert->ix1;
-//DeadCode JON 31Aug00 			curVert->tv1=mat.tsH[1]*curVert->iy1;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 			curVert->tu2=mat.tsW[2]*curVert->ix2;
-//DeadCode JON 31Aug00 			curVert->tv2=mat.tsH[2]*curVert->iy2;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 //DEADCODE JON 5/25/00 			curVert=curVert->pNext;
-//DeadCode JON 31Aug00 			curVert++;
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 	}
-//DeadCode JON 31Aug00 	break;
-//DeadCode JON 31Aug00 	case 2:
-//DeadCode JON 31Aug00 	{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		R3DVERTEX2 *pr3dv2=(R3DVERTEX2*)pr3dv;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		for (int i=0;i<vertCnt;i++)
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv2[i].tu =mat.tsW[0]*pr3dv2[i].ix;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv2[i].tv =mat.tsH[0]*pr3dv2[i].iy;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv2[i].tu1=mat.tsW[1]*pr3dv2[i].ix1;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv2[i].tv1=mat.tsH[1]*pr3dv2[i].iy1;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		}
-//DeadCode JON 31Aug00 		SVertex* curVert = sPolygon->pVertexList;
-//DeadCode JON 31Aug00 		for ( int i = sPolygon->vertexcount; i!=0; i-- )
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 			curVert->tu=mat.tsW[0]*curVert->ix;
-//DeadCode JON 31Aug00 			curVert->tv=mat.tsH[0]*curVert->iy;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 			curVert->tu1=mat.tsW[1]*curVert->ix1;
-//DeadCode JON 31Aug00 			curVert->tv1=mat.tsH[1]*curVert->iy1;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 //DEADCODE JON 5/25/00 			curVert=curVert->pNext;
-//DeadCode JON 31Aug00 			curVert++;
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 	}
-//DeadCode JON 31Aug00 	break;
-//DeadCode JON 31Aug00 	case 1:
-//DeadCode JON 31Aug00 	{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		D3DVALUE tsW=mat.tsW[0];
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		D3DVALUE tsH=mat.tsH[0];
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		for (int i=0;i<vertCnt;i++)
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		{
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv[i].tu=tsW*pr3dv[i].ix;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 			pr3dv[i].tv=tsH*pr3dv[i].iy;
-//DeadCode JON 31Aug00 //DEADCODE JON 5/19/00 		}
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 		SVertex* curVert = sPolygon->pVertexList;
-//DeadCode JON 31Aug00 		for ( int i = sPolygon->vertexcount; i!=0; i-- )
-//DeadCode JON 31Aug00 		{
-//DeadCode JON 31Aug00 			curVert->tu=mat.tsW[0]*curVert->ix;
-//DeadCode JON 31Aug00 			curVert->tv=mat.tsH[0]*curVert->iy;
-//DeadCode JON 31Aug00
-//DeadCode JON 31Aug00 //DEADCODE JON 5/25/00 			curVert=curVert->pNext;
-//DeadCode JON 31Aug00 			curVert++;
-//DeadCode JON 31Aug00 		}
-//DeadCode JON 31Aug00 	}
-//DeadCode JON 31Aug00 	break;
-//DeadCode JON 31Aug00 	}
-//DeadCode JON 31Aug00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		EndStrip
@@ -7442,23 +6319,6 @@ inline Lib3DPoint* Lib3D::_BeginPoly( const ULong vertexCount )
 //Date			Thu 25 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 HRESULT Lib3D::EndStrip()
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	INT3;
-//DEADCODE JON 5/19/00 	HRESULT hr=S_OK;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if (vertexType!=D3DFVF_R3DVERTEX)
-//DEADCODE JON 5/19/00 		return DDERR_GENERIC;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if (polyVertCount==0xFFFFFFFF)
-//DEADCODE JON 5/19/00 		return DDERR_GENERIC;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if (hLastMaterial.f)
-//DEADCODE JON 5/19/00 		ScaleTextureCoordinates(hLastMaterial,polyVertArray,polyVertCount);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	polyVertCount=0xFFFFFFFF;
-//DEADCODE JON 5/19/00 	return hr;
-//DEADCODE JON 5/19/00 }
 
 void CopyTextCoords( SVertex* sVertex, D3DVERTEX *pv, ULong SizeOfVertex )
 {
@@ -7468,11 +6328,6 @@ void CopyTextCoords( SVertex* sVertex, D3DVERTEX *pv, ULong SizeOfVertex )
     {
         sVertex->tu1=((R3DVERTEX2*)pv)->tu1;
         sVertex->tv1=((R3DVERTEX2*)pv)->tv1;
-//DeadCode JON 30Oct00 			if (SizeOfVertex>sizeof(R3DVERTEX2))
-//DeadCode JON 30Oct00 			{
-//DeadCode JON 30Oct00 				sVertex->tu2=((R3DVERTEX3*)pv)->tu2;
-//DeadCode JON 30Oct00 				sVertex->tv2=((R3DVERTEX3*)pv)->tv2;
-//DeadCode JON 30Oct00 			}
     }												// end of save all
 }
 
@@ -7485,7 +6340,6 @@ inline void Lib3D::TransformVertexAsRequired( SVertex* sVertex, const ULong flag
     int num = sVertex->info.getDoPointNum();
     // test for all valid
 
-//DeadCode JON 15Jun00 	if ( sVertex->info.isAllValid() )
     if ( (flags&ALL_VALID)==ALL_VALID )
     {
         // right quick test
@@ -7539,40 +6393,6 @@ inline void Lib3D::TransformVertexAsRequired( SVertex* sVertex, const ULong flag
             switch ( flags&TEXTURE_COUNT_MASK )
             {
             case 3:
-//DeadCode JON 30Oct00 #ifndef _NO_VERTEX_SHARING
-//DeadCode JON 30Oct00
-//DeadCode JON 30Oct00 				if ( flags&TEXTURE_COORDS )
-//DeadCode JON 30Oct00 				{ // no need to transform
-//DeadCode JON 30Oct00 					memcopy( &sVertex->tu, &lastDoPoint[ num ]->tu, 2*sizeof( D3DVALUE ) );
-//DeadCode JON 30Oct00 				} else
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 				{
-//DeadCode JON 30Oct00 //DeadCode JON 4Sep00 					sVertex->tu = landscapeTextScaleX*D3DVALUE(sVertex->ix)+landscapeTextOffsetX;
-//DeadCode JON 30Oct00 //DeadCode JON 4Sep00 					sVertex->tv = landscapeTextScaleY*D3DVALUE(sVertex->iy)+landscapeTextOffsetY;
-//DeadCode JON 30Oct00 					sVertex->tu = landscapeTextScale*D3DVALUE(sVertex->ix)+landscapeTextOffset;
-//DeadCode JON 30Oct00 					sVertex->tv = landscapeTextScale*D3DVALUE(sVertex->iy)+landscapeTextOffset;
-//DeadCode JON 30Oct00 				}
-//DeadCode JON 30Oct00 #ifndef _NO_VERTEX_SHARING
-//DeadCode JON 30Oct00 				if ( flags&TEXTURE1_COORDS )
-//DeadCode JON 30Oct00 				{ // no need to transform
-//DeadCode JON 30Oct00 					memcopy( &sVertex->tu1, &lastDoPoint[ num ]->tu1, 2*sizeof( D3DVALUE ) );
-//DeadCode JON 30Oct00 				} else
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 				{
-//DeadCode JON 30Oct00 					sVertex->tu1=hLastMaterial.tsW[1]*sVertex->ix1;
-//DeadCode JON 30Oct00 					sVertex->tv1=hLastMaterial.tsH[1]*sVertex->iy1;
-//DeadCode JON 30Oct00 				}
-//DeadCode JON 30Oct00 #ifndef _NO_VERTEX_SHARING
-//DeadCode JON 30Oct00 				if ( flags&TEXTURE2_COORDS )
-//DeadCode JON 30Oct00 				{ // no need to transform
-//DeadCode JON 30Oct00 					memcopy( &sVertex->tu2, &lastDoPoint[ num ]->tu2, 2*sizeof( D3DVALUE ) );
-//DeadCode JON 30Oct00 				} else
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 				{
-//DeadCode JON 30Oct00 					sVertex->tu2=hLastMaterial.tsW[2]*sVertex->ix2;
-//DeadCode JON 30Oct00 					sVertex->tv2=hLastMaterial.tsH[2]*sVertex->iy2;
-//DeadCode JON 30Oct00 				}
-//DeadCode JON 30Oct00 				break;
             case 2:
 #ifndef _NO_VERTEX_SHARING
                 if ( flags&TEXTURE_COORDS )
@@ -7583,8 +6403,6 @@ inline void Lib3D::TransformVertexAsRequired( SVertex* sVertex, const ULong flag
                 else
 #endif
                 {
-//DeadCode JON 4Sep00 					sVertex->tu = landscapeTextScaleX*D3DVALUE(sVertex->ix)+landscapeTextOffsetX;
-//DeadCode JON 4Sep00 					sVertex->tv = landscapeTextScaleY*D3DVALUE(sVertex->iy)+landscapeTextOffsetY;
                     sVertex->tu = landscapeTextScale*D3DVALUE(sVertex->ix)+landscapeTextOffset;
                     sVertex->tv = landscapeTextScale*D3DVALUE(sVertex->iy)+landscapeTextOffset;
                 }
@@ -7611,8 +6429,6 @@ inline void Lib3D::TransformVertexAsRequired( SVertex* sVertex, const ULong flag
                 else
 #endif
                 {
-//DeadCode JON 4Sep00 					sVertex->tu = landscapeTextScaleX*D3DVALUE(sVertex->ix)+landscapeTextOffsetX;
-//DeadCode JON 4Sep00 					sVertex->tv = landscapeTextScaleY*D3DVALUE(sVertex->iy)+landscapeTextOffsetY;
                     sVertex->tu = landscapeTextScale*D3DVALUE(sVertex->ix)+landscapeTextOffset;
                     sVertex->tv = landscapeTextScale*D3DVALUE(sVertex->iy)+landscapeTextOffset;
                 }
@@ -7628,37 +6444,6 @@ inline void Lib3D::TransformVertexAsRequired( SVertex* sVertex, const ULong flag
             switch ( flags&TEXTURE_COUNT_MASK )
             {
             case 3:
-//DeadCode JON 30Oct00 #ifndef _NO_VERTEX_SHARING
-//DeadCode JON 30Oct00 				if ( flags&TEXTURE_COORDS )
-//DeadCode JON 30Oct00 				{ // no need to transform
-//DeadCode JON 30Oct00 					memcopy( &sVertex->tu, &lastDoPoint[ num ]->tu, 2*sizeof( D3DVALUE ) );
-//DeadCode JON 30Oct00 				} else
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 				{
-//DeadCode JON 30Oct00 					sVertex->tu=hLastMaterial.tsW[0]*sVertex->ix;
-//DeadCode JON 30Oct00 					sVertex->tv=hLastMaterial.tsH[0]*sVertex->iy;
-//DeadCode JON 30Oct00 				}
-//DeadCode JON 30Oct00 #ifndef _NO_VERTEX_SHARING
-//DeadCode JON 30Oct00 				if ( flags&TEXTURE1_COORDS )
-//DeadCode JON 30Oct00 				{ // no need to transform
-//DeadCode JON 30Oct00 					memcopy( &sVertex->tu1, &lastDoPoint[ num ]->tu1, 2*sizeof( D3DVALUE ) );
-//DeadCode JON 30Oct00 				} else
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 				{
-//DeadCode JON 30Oct00 					sVertex->tu1=hLastMaterial.tsW[1]*sVertex->ix1;
-//DeadCode JON 30Oct00 					sVertex->tv1=hLastMaterial.tsH[1]*sVertex->iy1;
-//DeadCode JON 30Oct00 				}
-//DeadCode JON 30Oct00 #ifndef _NO_VERTEX_SHARING
-//DeadCode JON 30Oct00 				if ( flags&TEXTURE2_COORDS )
-//DeadCode JON 30Oct00 				{ // no need to transform
-//DeadCode JON 30Oct00 					memcopy( &sVertex->tu2, &lastDoPoint[ num ]->tu2, 2*sizeof( D3DVALUE ) );
-//DeadCode JON 30Oct00 				} else
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 				{
-//DeadCode JON 30Oct00 					sVertex->tu2=hLastMaterial.tsW[2]*sVertex->ix2;
-//DeadCode JON 30Oct00 					sVertex->tv2=hLastMaterial.tsH[2]*sVertex->iy2;
-//DeadCode JON 30Oct00 				}
-//DeadCode JON 30Oct00 				break;
             case 2:
 #ifndef _NO_VERTEX_SHARING
                 if ( flags&TEXTURE_COORDS )
@@ -7718,14 +6503,6 @@ inline void Lib3D::TransformVertexAsRequired( SVertex* sVertex, const ULong flag
         {
             // yeah
             sVertex->Transform( &combinedMatrix );
-//DeadCode JON 19Jun00 			if ( (flags&DO_SW_FOG) // we need to set the fog
-//DeadCode JON 19Jun00 				&& (flags&LIGHT_NORMAL) && (flags&TEXTURE_COUNT_MASK) != 0 )  // the light/colour won't change
-//DeadCode JON 19Jun00 			{
-//DeadCode JON 19Jun00 //				ULong index=ULong(1023.f*pp->hw/farZPlane);
-//DeadCode JON 19Jun00 //				pp->specular&=0x00FFFFFF;
-//DeadCode JON 19Jun00 //				pp->specular|=ULong(fogTable[index])<<24;
-//DeadCode JON 19Jun00 				SetColAlpha( sVertex->specular, fogTable[ F2UL_Round( 1023.f*sVertex->hw/farZPlane) ] );
-//DeadCode JON 19Jun00 			}
         }
 
         // has the lighting information changed (and is it a textured poly? )
@@ -7738,7 +6515,6 @@ inline void Lib3D::TransformVertexAsRequired( SVertex* sVertex, const ULong flag
             if ( sVertex->color.all != lastDoPoint[num]->color.all )
                 NOP;
 #endif
-//DeadCode JON 2Oct00 			memcopy( &sVertex->nx, &lastDoPoint[num]->nx, 3*sizeof( D3DVALUE ) );
             sVertex->color = lastDoPoint[num]->color;
             sVertex->specular = lastDoPoint[num]->specular;
             if ( (flags&DO_SW_FOG) && !(flags&WORLD_COORDS) )
@@ -7815,7 +6591,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
         }
         else
         {
-//DeadCode JON 21Aug00 			ADD_POLYGON(*texturedPolysP,sPolygon);
             ADD_POLYGON(texturedPolys,sPolygon);
         }
 
@@ -7898,7 +6673,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
 
 //TempCode JON 13Sep00 			end.incPosY( (size) );
 //TempCode JON 13Sep00 			DrawLine(HMATERIAL(127),*curPoint, end); // red line, y axis
-//DeadCode JON 13Sep00 			end.incPosY( -(size) );
 
             end.incPosZ( (size) );
             DrawLine(HMATERIAL(144),*curPoint, end); // blue line, z axis
@@ -7999,59 +6773,16 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
         //TempCode JON 15Jun00 		curCol &= 0x00FFFFFF;
         curLF = LIGHTFLAG(curLF + LF_MAPCOLBIT);
     }
-//DeadCode JON 15Jun00 	else
-//DeadCode JON 15Jun00 	{
-//DeadCode JON 15Jun00 		matCol = COL_NULL;
-//DeadCode JON 15Jun00 	}
 
 #ifndef NDEBUG
     if ( hLastMaterial.f > 3 ) // illegal texture count
         INT3;
 #endif
-//DeadCode JON 4Sep00 	ULong textureTypeFlags = hLastMaterial.f;
     ULong textureTypeFlags = curMatTextureTypeFlags;
-//DeadCode JON 4Sep00 	if ( hLastMaterial.isLand )
-//DeadCode JON 4Sep00 	{
-//DeadCode JON 4Sep00 		textureTypeFlags |= LANDSCAPE_TEXTURE;
-//DeadCode JON 4Sep00
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 #pragma message ( __HERE__ "to optimize move this to set landscape material section" )
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		SLong *numbers[8] = {	&num1024Textures,	&num512Textures,
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 								&num256Textures,	&num128Textures,
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 								&num64Textures,		&num32Textures,
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 								&num16Textures,		&num8Textures };
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		SLong index;
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		index=SLong(hLastMaterial.isLand^0xFFFFFFFFUL);
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		for (int i=0;i<8;i++)
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		{
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 			if (index<*numbers[i])
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 			{
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 				index=i;
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 				break;
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 			}
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 			index-=*numbers[i];
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		}
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		D3DVALUE pixelSH;
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		//landscapeTextScaleX = scW;
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		pixelSH=(index==0)?.125f:(index==1)?.25f:(index==2)?.5f:D3DVALUE(1<<(index-3));
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		landscapeTextOffsetX=hLastMaterial.tsW[0];
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		landscapeTextScaleX=1.f/landscapeTextOffsetX;
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		landscapeTextOffsetX*=pixelSH;	//*.5f;
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		landscapeTextScaleX=(landscapeTextScaleX-2*pixelSH)/(landscapeTextScaleX*landscapeTextScaleX);
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		landscapeTextOffsetY=landscapeTextOffsetX;
-//DeadCode JON 4Sep00 //DeadCode JON 15Jun00 		landscapeTextScaleY=landscapeTextScaleX;
-//DeadCode JON 4Sep00 	}
 
-//DeadCode JON 4Sep00 	if (flags&F_VERTEXFOG)
-//DeadCode JON 4Sep00 	{
-//DeadCode JON 4Sep00 		textureTypeFlags+=DO_SW_FOG;
-//DeadCode JON 4Sep00 	}
 
 //#pragma warnmsg ( "put me back" )
 //	if (renderMode==HINT_2DRENDER)// || (flags&F_NOCLIPPING)!=0)
-//DeadCode JON 25Sep00 	if ((flags&F_NOCLIPPING)!=0)
     if (renderMode==HINT_2DRENDER)
     {
         // 2D clipping...
@@ -8060,11 +6791,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
 #ifndef _NO_VERTEX_SHARING
             int num = sVertex->info.getDoPointNum();
 
-//DeadCode JON 2Oct00 #ifdef _TEST_VERTEX_SHARING
-//DeadCode JON 2Oct00 			SVertex toCompare;
-//DeadCode JON 2Oct00 			memcopy( &toCompare, sVertex, sizeof( SVertex ) );
-//DeadCode JON 2Oct00 		    InlineVertexTransform( &toCompare, ALL_INVALID+textureTypeFlags, curLF );
-//DeadCode JON 2Oct00 #endif
 
             ULong flags = sVertex->info.getFlags();
             if ( num == 0 )
@@ -8075,10 +6801,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
             {
                 flags&=~(
                            (
-//DeadCode JON 20Sep00 							  (
-//DeadCode JON 20Sep00 								( ( lightModeFlag^lastDoPoint[ num ]->info.getFlags() ) >>LIGHTMODESHIFT ) //has the lightcols changed
-//DeadCode JON 20Sep00 							  )
-//DeadCode JON 20Sep00 						      & LIGHT_NORMAL
                                (lastDoPoint[ num ]->info.getLightModeCount() == lightModeCount)?0:LIGHT_NORMAL
                            ) |
                            (
@@ -8086,13 +6808,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
                                // if the last was plain colour then set all textcoords and light normal
                            )
                        );
-//DeadCode JON 27Jul00 				flags&=~(
-//DeadCode JON 27Jul00 						  (
-//DeadCode JON 27Jul00 							( ( lightModeFlag^lastDoPoint[ num ]->info.getFlags() ) >>LIGHTMODESHIFT ) | //has the lightcols changed
-//DeadCode JON 27Jul00 							( lastDoPoint[num]->info.getFlags()>>PLAINCOLSHIFT ) // was the last plain col
-//DeadCode JON 27Jul00 						  )
-//DeadCode JON 27Jul00 					      & LIGHT_NORMAL
-//DeadCode JON 27Jul00 					);
             }
 #else
             ULong flags=ALL_INVALID;
@@ -8101,10 +6816,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
 
             InlineVertexTransform( sVertex, flags, curLF );
 
-//DeadCode JON 2Oct00 #ifdef _TEST_VERTEX_SHARING
-//DeadCode JON 2Oct00 			if ( !MemCmp( sVertex, &toCompare, sizeof( SVertex ) ) )
-//DeadCode JON 2Oct00 				NOP;
-//DeadCode JON 2Oct00 #endif
 
 #ifndef _NO_VERTEX_SHARING
             lastDoPoint[ num ] = sVertex;
@@ -8133,9 +6844,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
 #ifndef _NO_VERTEX_SHARING
             int num = sVertex->info.getDoPointNum();
 
-//DeadCode JON 26Oct00 #pragma warnmsg ( "remove me" )
-//DeadCode JON 26Oct00 			if ( num == 38 )
-//DeadCode JON 26Oct00 				NOP;
 
 
 #ifdef _TEST_VERTEX_SHARING
@@ -8175,12 +6883,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
 
                 flags&=~(
                            (
-//DeadCode JON 20Sep00 							  (
-//DeadCode JON 20Sep00 								( ( lightModeFlag^lastDoPoint[ num ]->info.getFlags() ) >>LIGHTMODESHIFT ) | //has the lightcols changed
-//DeadCode JON 20Sep00 								( ( lightModeFlag^lastDoPoint[ num ]->info.getFlags() ) >>LIGHTMODESHIFT1 ) | //has the lightcols changed
-//DeadCode JON 20Sep00 								( ( lightModeFlag^lastDoPoint[ num ]->info.getFlags() ) >>LIGHTMODESHIFT2 ) //has the lightcols changed
-//DeadCode JON 20Sep00 							  )
-//DeadCode JON 20Sep00 						      & LIGHT_NORMAL
                                (lastDoPoint[ num ]->info.getLightModeCount() == lightModeCount)?0:LIGHT_NORMAL
                            ) |
                            (
@@ -8191,10 +6893,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
 
             }
 #else
-//DeadCode JON 26Oct00 #pragma warnmsg ( "remove me" )
-//DeadCode JON 26Oct00 			int num = sVertex->info.getDoPointNum();
-//DeadCode JON 26Oct00 			if ( num == 38 )
-//DeadCode JON 26Oct00 				NOP;
 
             ULong flags=ALL_INVALID;
 #endif
@@ -8224,10 +6922,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
 //TempCode JON 2Oct00 					)
             )
             {
-//DeadCode JON 20Sep00  				ULong lmFlag = LIGHTMODE_FLAG;
-//DeadCode JON 20Sep00 				ULong lmFlag1 = LIGHTMODE_FLAG1;
-//DeadCode JON 20Sep00 				ULong lmFlag2 = LIGHTMODE_FLAG2;
-//DeadCode JON 20Sep00 				ULong pcFlag = PLAINCOL_FLAG;
 
                 NOP;
 
@@ -8243,7 +6937,6 @@ inline HRESULT Lib3D::PrepareForClipping( void  )
             lastDoPoint[ num ] = sVertex;
             // set the lightmode stuff
             sVertex->info.clearLightModeFlags();
-//DeadCode JON 20Sep00 			sVertex->info.addToFlags( lightModeFlag );
             sVertex->info.setLightModeCount( lightModeCount );
 #endif
             // link the poly...
@@ -8282,9 +6975,6 @@ HRESULT Lib3D::EndFan()
     if ( currentPoly->orcode==0 && currentPoly->andcode==0 )
 #endif
     {
-//DeadCode JON 28Oct00 		if (	currentPoly->orcode!=0 &&
-//DeadCode JON 28Oct00 				( GuardBandClipTest(currentPoly) || (currentPoly->orcode&~CLIP_LRTB) )
-//DeadCode JON 28Oct00 			) // is any of the poly clipped
         if ( currentPoly->orcode!=0 ) // is any of the poly clipped
         {
             if (renderMode==HINT_2DRENDER)
@@ -8357,8 +7047,6 @@ HRESULT Lib3D::EndFan()
                             else
                                 AddPolyToList( newTri );
                         }
-//DEADCODE JON 05/06/00 						else
-//DEADCODE JON 05/06/00 							DISCARD_POLYGON( newTri );
                     } // end of loop all triangles in fan
 
                 } // end of can it be treated as a poly?
@@ -8436,8 +7124,6 @@ HRESULT Lib3D::EndFan()
                                 else
                                     AddPolyToList( newTri );
                             }
-//DEADCODE JON 05/06/00 						else
-//DEADCODE JON 05/06/00 							DISCARD_POLYGON( newTri );
                         } // end of loop all triangles in fan
 
                     } // end of can it be treated as a poly?
@@ -8513,8 +7199,6 @@ HRESULT Lib3D::EndFan()
                                 else
                                     AddPolyToList( newTri );
                             }
-//DEADCODE JON 05/06/00 						else
-//DEADCODE JON 05/06/00 							DISCARD_POLYGON( newTri );
                         } // end of loop all triangles in fan
 
                     } // end of can it be treated as a poly?
@@ -8530,15 +7214,9 @@ HRESULT Lib3D::EndFan()
 
         }
 
-//DEADCODE JON 05/06/00 		if (currentPoly->vertexcount>2)
-//DEADCODE JON 05/06/00 		{
 
         AddPolyToList( currentPoly );
 
-//DEADCODE JON 05/06/00 		} else
-//DEADCODE JON 05/06/00 		{
-//DEADCODE JON 05/06/00 			DISCARD_POLYGON(currentPoly);
-//DEADCODE JON 05/06/00 		}
     }
     else
     {
@@ -8587,21 +7265,16 @@ inline void Lib3D::GetViewPort( D3DVALUE &sx, D3DVALUE &sy, D3DVALUE &cx, D3DVAL
 //#pragma message ( __HERE__ "inline me" )
 inline void Lib3D::AddPolyToList( SPolygon* sPolygon )
 {
-//DEADCODE JON 6/2/00 	D3DVALUE sx,sy;
-//DEADCODE JON 6/2/00 	D3DVALUE cx,cy;
-//DEADCODE JON 6/2/00 	GetViewPort( pD3DDEV7, sx, sy, cx, cy );
 
 //	CALC_FOG(sPolygon);  // 2/3 if needed
     if (sPolygon->material.f==0)
     {
 
-//DeadCode JON 14Jun00 		if ( globAlpha==0x00 )
         if ( globAlpha==0xFF )
         {
             // this is solid
             if (renderMode == HINT_3DRENDER)
             {
-                //DEADCODE JON 5/25/00 			PROJECT(sPolygon,cx,cy,sx,sy);
                 sPolygon->projectType = STANDARD_PROJECT+zBias;
             }
             else
@@ -8628,7 +7301,6 @@ inline void Lib3D::AddPolyToList( SPolygon* sPolygon )
         else
         {
             // transparent plain poly... oh what fun
-//DeadCode JON 17Aug00 			sPolygon->material.materialFlags+=IS_ALPHA;
             if (renderMode == HINT_3DRENDER)
             {
                 sPolygon->projectType = STANDARD_PROJECT+zBias;
@@ -8643,40 +7315,25 @@ inline void Lib3D::AddPolyToList( SPolygon* sPolygon )
             ADD_POLYGON(transparentPolys,sPolygon);
         }
     }
-//DeadCode JON 14Jun00 	else if (sPolygon->material.isMasked==0 && globAlpha==0x00 )
     else if (sPolygon->material.isMasked==0 && globAlpha==0xFF )
     {
         if (renderMode == HINT_3DRENDER)
         {
-//DEADCODE JON 5/25/00 			PROJECT(sPolygon,cx,cy,sx,sy);
             sPolygon->projectType = STANDARD_PROJECT+zBias;
-//DEADCODE JON 5/25/00 			R3DVERTEX3 tmp[ 20 ];
-//DEADCODE JON 5/25/00 			R3DVERTEX3 *tmp1 = tmp;
-//DEADCODE JON 5/25/00 			tmp1 = sPolygon->CopyToVertexBuffer( tmp1 ,cx,cy,sx,sy, zFactor );
-//DEADCODE JON 5/25/00 			int num = tmp1-tmp;
-//DEADCODE JON 5/25/00
-//DEADCODE JON 5/25/00 			PROJECT(sPolygon,cx,cy,sx,sy);
 
         }
         else
         {
-//DEADCODE JON 5/25/00 			PROJECT_2D(sPolygon,cx,cy,sx,sy);
             sPolygon->projectType = PROJECT_2D;
             sPolygon->zDepth2d = zDepth2d;
         }
 //#pragma warnmsg( "re-instate" )
-//DeadCode JON 21Aug00 		if (*textPolyVCntP+sPolygon->vertexcount>=1024)
         if (textPolyVCnt+sPolygon->vertexcount>=1024)
         {
-//DeadCode JON 21Aug00 			*textPolyVCntP=0;
-//DeadCode JON 21Aug00 			RenderPolyList(*texturedPolysP);
-//DeadCode JON 21Aug00 			*texturedPolysP=NULL;
             textPolyVCnt=0;
             RenderPolyList(texturedPolys);
             texturedPolys=NULL;
         }
-//DeadCode JON 21Aug00 		*textPolyVCntP+=sPolygon->vertexcount;
-//DeadCode JON 21Aug00 		ADD_POLYGON(*texturedPolysP,sPolygon);
         textPolyVCnt+=sPolygon->vertexcount;
         ADD_POLYGON(texturedPolys,sPolygon);
         AddEdgeAliasing(sPolygon);
@@ -8686,19 +7343,16 @@ inline void Lib3D::AddPolyToList( SPolygon* sPolygon )
         // transparent type
         if (renderMode == HINT_3DRENDER)
         {
-//DEADCODE JON 5/25/00 			PROJECT_SETZ(sPolygon,cx,cy,sx,sy);
             sPolygon->projectType = STANDARD_PROJECT+zBias;
             sPolygon->CalcTransZ(zFactor,tZBias_f);
         }
         else
         {
-//DEADCODE JON 5/25/00 			PROJECT_2D(sPolygon,cx,cy,sx,sy);
             sPolygon->projectType = PROJECT_2D;
             sPolygon->zDepth2d = zDepth2d;
             sPolygon->SetTrans2DZ(zBuffer2d);
 //TEMPCODE JON 6/1/00 			ADD_POLYGON(transparentPolys,sPolygon);
         }
-//DeadCode JON 17Aug00 		sPolygon->material.materialFlags+=IS_ALPHA;
         ADD_POLYGON(transparentPolys,sPolygon);
     }
 }
@@ -8761,122 +7415,6 @@ HRESULT Lib3D::EndPoly()
 //Date			Fri 3 Dec 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 HRESULT Lib3D::EndPolyR3DTLVERTEX()
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	HRESULT hr;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if (polyVertCount==0xFFFFFFFF)
-//DEADCODE JON 5/19/00 		return DDERR_GENERIC;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if (hLastMaterial.f)
-//DEADCODE JON 5/19/00 		for (int i=hLastMaterial.f-1;i>=0;i--)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			R3DVERTEX *ptr=polyVertArray;
-//DEADCODE JON 5/19/00 			D3DVALUE tsW=hLastMaterial.tsW[i];
-//DEADCODE JON 5/19/00 			D3DVALUE tsH=hLastMaterial.tsH[i];
-//DEADCODE JON 5/19/00 			for (DWORD j=polyVertCount;j!=0;j--)
-//DEADCODE JON 5/19/00 			{
-//DEADCODE JON 5/19/00 				ptr->tu=tsW*D3DVALUE(ptr->ix);
-//DEADCODE JON 5/19/00 				ptr->tv=tsH*D3DVALUE(ptr->iy);
-//DEADCODE JON 5/19/00 				ptr++;
-//DEADCODE JON 5/19/00 			}
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 	if ((flags&Flags(F_TNL+F_TNL_EMULATION))!=0)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		if (fCombineMatrices)
-//DEADCODE JON 5/19/00 			if ( (hr=TNLUploadMatrixes()) !=S_OK )
-//DEADCODE JON 5/19/00 				return hr;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 		if ((hr=lpD3DVB7->Unlock())!=D3D_OK)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			CloseDown();
-//DEADCODE JON 5/19/00 			return hr;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 		hr=pD3DDEV7->DrawIndexedPrimitiveVB(D3DPT_TRIANGLEFAN,lpD3DVB7,0,polyVertCount,polyVerts,polyVertCount,0);
-//DEADCODE JON 5/19/00 		if (hr!=D3D_OK)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			CloseDown();
-//DEADCODE JON 5/19/00 			return hr;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 		lpD3DVB7=NULL;
-//DEADCODE JON 5/19/00 		polyVertCount=0xFFFFFFFF;
-//DEADCODE JON 5/19/00 		return S_OK;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	D3DVIEWPORT7 vp;
-//DEADCODE JON 5/19/00 	if ((hr=pD3DDEV7->GetViewport(&vp))!=D3D_OK)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		CloseDown();
-//DEADCODE JON 5/19/00 		return hr;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	ULong *clipFlags=new ULong[polyVertCount<<3];
-//DEADCODE JON 5/19/00 	ULong *polyIndex=new ULong[polyVertCount<<3];
-//DEADCODE JON 5/19/00 	ULong *ccf=clipFlags;
-//DEADCODE JON 5/19/00 	R3DTLVERTEX *pv=polyVertArrayTL;
-//DEADCODE JON 5/19/00 	ULong orcode=0L;
-//DEADCODE JON 5/19/00 	ULong andcode=0xFFFFFFFF;
-//DEADCODE JON 5/19/00 	ULong outcode;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	vpDesc.left=D3DVALUE(vp.dwX);
-//DEADCODE JON 5/19/00 	vpDesc.right=vpDesc.left+D3DVALUE(vp.dwWidth-1);
-//DEADCODE JON 5/19/00 	vpDesc.top=D3DVALUE(vp.dwY);
-//DEADCODE JON 5/19/00 	vpDesc.bottom=vpDesc.top+D3DVALUE(vp.dwHeight-1);
-//DEADCODE JON 5/19/00 	for (SLong i=polyVertCount-1;i>=0;i--)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 	 	polyIndex[i]=i;
-//DEADCODE JON 5/19/00 		if (pv->sx<vpDesc.left)			outcode=CLIP_LEFT;
-//DEADCODE JON 5/19/00 		else if (pv->sx>vpDesc.right)	outcode=CLIP_RIGHT;
-//DEADCODE JON 5/19/00 		else							outcode=0L;
-//DEADCODE JON 5/19/00 		if (pv->sy<vpDesc.top)			outcode|=CLIP_TOP;
-//DEADCODE JON 5/19/00 		else if (pv->sy>vpDesc.bottom)	outcode|=CLIP_BOTTOM;
-//DEADCODE JON 5/19/00 		*ccf++=outcode;
-//DEADCODE JON 5/19/00 		orcode|=outcode;
-//DEADCODE JON 5/19/00 		andcode&=outcode;
-//DEADCODE JON 5/19/00 		pv++;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	if (andcode==0L)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 	 	if (orcode!=0L)
-//DEADCODE JON 5/19/00 			GenericPolyClip(polyVertArrayTL,clipFlags,polyVertCount,polyIndex);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 		if (polyVertCount>2)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			D3DVIEWPORT7 vp;
-//DEADCODE JON 5/19/00 			lpD3DVB7=gpD3DVB7;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			R3DTLVERTEX *ptlv;
-//DEADCODE JON 5/19/00 			hr=lpD3DVB7->Lock(DDLOCK_WRITEONLY|DDLOCK_SURFACEMEMORYPTR|DDLOCK_DISCARDCONTENTS,(LPVOID*)&ptlv,NULL);
-//DEADCODE JON 5/19/00 			if (hr!=D3D_OK)
-//DEADCODE JON 5/19/00 			{
-//DEADCODE JON 5/19/00 				delete[]polyIndex;
-//DEADCODE JON 5/19/00 				CloseDown();
-//DEADCODE JON 5/19/00 				return hr;
-//DEADCODE JON 5/19/00 			}
-//DEADCODE JON 5/19/00 			ULong *index=polyIndex;
-//DEADCODE JON 5/19/00 			for (i=polyVertCount;i!=0;i--)
-//DEADCODE JON 5/19/00 			{
-//DEADCODE JON 5/19/00 				pv=polyVertArrayTL+*index++;
-//DEADCODE JON 5/19/00 				*ptlv=*pv;
-//DEADCODE JON 5/19/00 				ptlv++;
-//DEADCODE JON 5/19/00 			}
-//DEADCODE JON 5/19/00 			if ((hr=lpD3DVB7->Unlock())!=D3D_OK ||
-//DEADCODE JON 5/19/00 				(hr=pD3DDEV7->DrawIndexedPrimitiveVB(D3DPT_TRIANGLEFAN,lpD3DVB7,0,polyVertCount,polyVerts,polyVertCount,0))!=D3D_OK)
-//DEADCODE JON 5/19/00 			{
-//DEADCODE JON 5/19/00 				delete[]polyIndex;
-//DEADCODE JON 5/19/00 				CloseDown();
-//DEADCODE JON 5/19/00 				return hr;
-//DEADCODE JON 5/19/00 			}
-//DEADCODE JON 5/19/00 			lpD3DVB7=NULL;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	polyVertCount=0xFFFFFFFF;
-//DEADCODE JON 5/19/00 	delete[]clipFlags;
-//DEADCODE JON 5/19/00 	delete[]polyIndex;
-//DEADCODE JON 5/19/00 	return S_OK;
-//DEADCODE JON 5/19/00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		VertexSetCols
@@ -8884,73 +7422,6 @@ HRESULT Lib3D::EndPoly()
 //Date			Web 29 Mar 2000
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 void Lib3D::VertexSetCols( SVertex* sVertex, const D3DVERTEX* pv, const D3DCOLOR matCol )
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	switch ( lightflag )
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		case LF_SPECULAR: // please impement me
-//DEADCODE JON 5/19/00 		case LF_LIGHTING:
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			D3DVALUE v=gLightScale*(gLightBase+DotProduct(pv->nx,pv->ny,pv->nz,sunTX,sunTY,sunTZ));
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			sVertex->color=lightingTable[F2UB_Clip(v)];
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			sVertex->specular=0x00000000;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 		break;
-//DEADCODE JON 5/19/00 		case LF_ALPHA:
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			D3DVALUE v=gLightScale*(gLightBase+DotProduct(pv->nx,pv->ny,pv->nz,sunTX,sunTY,sunTZ));
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			UByte alpha;
-//DEADCODE JON 5/19/00 			alpha = 255 - F2UB_Clip(v);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			sVertex->color=0xAAFFFFFF;  // the AA is the alpha - about to be set
-//DEADCODE JON 5/19/00 			SetColAlpha( sVertex->color, alpha );
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			sVertex->specular=0x00000000;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 		break;
-//DEADCODE JON 5/19/00 		case LF_AMBIENT:
-//DEADCODE JON 5/19/00 			sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			// alternative glob alpha fix
-//DEADCODE JON 5/19/00 			SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			sVertex->specular=0x00000000;
-//DEADCODE JON 5/19/00 		break;
-//DEADCODE JON 5/19/00 		case LF_VERTEX:
-//DEADCODE JON 5/19/00 			sVertex->color = ((R3DVERTEX*)pv)->vertexCol;
-//DEADCODE JON 5/19/00 		break;
-//DEADCODE JON 5/19/00 		case LF_FONT:											//RJS 10May00
-//DEADCODE JON 5/19/00 			sVertex->color=gFontColour;  // the AA is the alpha - about to be set
-//DEADCODE JON 5/19/00 			SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/19/00 			sVertex->specular=0x00000000;
-//DEADCODE JON 5/19/00 		break;
-//DEADCODE JON 5/19/00 		case LF_LIGHTSOURCE:
-//DEADCODE JON 5/19/00 		default:
-//DEADCODE JON 5/19/00 			sVertex->color=0xAAFFFFFF;  // the AA is the alpha - about to be set
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			// alternative glob alpha fix
-//DEADCODE JON 5/19/00 			SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 			sVertex->specular=0x00000000;
-//DEADCODE JON 5/19/00 		break;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	// now set the colour values 4 plain coloured polys
-//DEADCODE JON 5/19/00 	if ( matCol != COL_NULL )
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		SetColLighting( sVertex->color, &matCol, globAlpha );
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 }
 
 //#pragma message ( __HERE__ "inline me" )
 
@@ -9216,11 +7687,6 @@ vec.x = x; vec.y = y; vec.z = z;}
     NODEFAULT;
     }
 
-//DeadCode JON 15Jun00 	// now set the colour values 4 plain coloured polys
-//DeadCode JON 15Jun00 	if ( curCol != COL_NULL )
-//DeadCode JON 15Jun00 	{
-//DeadCode JON 15Jun00 		SetColLighting( sVertex->color, curCol, globAlpha );
-//DeadCode JON 15Jun00 	}
 }
 
 
@@ -9232,25 +7698,8 @@ vec.x = x; vec.y = y; vec.z = z;}
 //------------------------------------------------------------------------------
 inline void Lib3D::ClipSetCols(SVertex* &vi, SVertex* &vo, SVertex* &vc, double &frac )
 {
-//DEADCODE JON 4/18/00 	if ( lightflag == LF_VERTEX )
-//DEADCODE JON 4/18/00 		return;
 
-//DEADCODE JON 6/5/00 	switch ( lightflag )
-//DEADCODE JON 6/5/00 	{
-//DEADCODE JON 6/5/00 		case LF_SPECULAR: // please implement me
-//DEADCODE JON 6/5/00 		case LF_LIGHTING:
-//DEADCODE JON 6/5/00 		case LF_VERTEX:
-//DEADCODE JON 6/5/00 		{
 
-//DeadCode JON 11Sep00 			UByte la, lr, lg, lb;
-//DeadCode JON 11Sep00 			UByte ha, hr, hg, hb;
-//DeadCode JON 11Sep00 			GetColARGB( vi->color, la, lr, lg, lb );
-//DeadCode JON 11Sep00 			GetColARGB( vo->color, ha, hr, hg, hb );
-//DeadCode JON 11Sep00 			SetCol( vc->color,
-//DeadCode JON 11Sep00 					la + UByte( D3DVALUE( ha - la ) * frac ),
-//DeadCode JON 11Sep00 					lr + UByte( D3DVALUE( hr - lr ) * frac ),
-//DeadCode JON 11Sep00 					lg + UByte( D3DVALUE( hg - lg ) * frac ),
-//DeadCode JON 11Sep00 					lb + UByte( D3DVALUE( hb - lb ) * frac ) );
     vc->color = vi->color;
     vc->color.interpRGBA( vo->color, frac );
 
@@ -9270,14 +7719,7 @@ inline void Lib3D::ClipSetCols(SVertex* &vi, SVertex* &vo, SVertex* &vc, double 
         if ( (hLastMaterial.materialFlags)&IS_SPECULAR )
             INT3;
     }
-//DeadCode JON 11Sep00 			else
-//DeadCode JON 11Sep00 			{
-//DeadCode JON 11Sep00 				vc->specular=0x00000000;
-//DeadCode JON 11Sep00 			}
     // average the fog...
-//DeadCode JON 1Aug00 			lr = GetColAlpha( vi->specular );
-//DeadCode JON 1Aug00 			hr = GetColAlpha( vo->specular );
-//DeadCode JON 1Aug00 			SetColAlpha( vc->specular, lr + UByte( D3DVALUE( hr - lr ) * frac ) );
 //			if ( flags&DO_SW_FOG )
 //			{
 //				SetColAlpha( vc->specular, fogTable[ F2UL_Round( 1023.f*vc->hw/farZPlane) ] );
@@ -9285,52 +7727,6 @@ inline void Lib3D::ClipSetCols(SVertex* &vi, SVertex* &vo, SVertex* &vc, double 
 //			}
 
 
-//DEADCODE JON 6/5/00 		}
-//DEADCODE JON 6/5/00 		break;
-//DEADCODE JON 6/5/00 		case LF_ALPHA:
-//DEADCODE JON 6/5/00 		{
-//DEADCODE JON 6/5/00 			D3DVALUE li=D3DVALUE(GetColAlpha(vi->color));
-//DEADCODE JON 6/5/00 			D3DVALUE lo=D3DVALUE(GetColAlpha(vo->color));
-//DEADCODE JON 6/5/00 			D3DVALUE lc=li+frac*(lo-li);
-//DEADCODE JON 6/5/00 			UByte alpha;
-//DEADCODE JON 6/5/00 //DEADCODE JON 5/8/00 			if (lc<0.f)
-//DEADCODE JON 6/5/00 //DEADCODE JON 5/8/00 				alpha = 255;
-//DEADCODE JON 6/5/00 //DEADCODE JON 5/8/00 			else if (lc>255.f)
-//DEADCODE JON 6/5/00 //DEADCODE JON 5/8/00 				alpha = 0;
-//DEADCODE JON 6/5/00 //DEADCODE JON 5/8/00 			else
-//DEADCODE JON 6/5/00 //DEADCODE JON 5/8/00 			{
-//DEADCODE JON 6/5/00 //DEADCODE JON 5/8/00 				alpha = 255 - F2UL_Round( lc );
-//DEADCODE JON 6/5/00 //DEADCODE JON 5/8/00 			}
-//DEADCODE JON 6/5/00 			alpha = 255 - F2UB_Clip( lc );
-//DEADCODE JON 6/5/00
-//DEADCODE JON 6/5/00 			vc->color=0xAAFFFFFF;  // AA is the alpha val about to be filled
-//DEADCODE JON 6/5/00 			vc->specular=0x00000000;
-//DEADCODE JON 6/5/00
-//DEADCODE JON 6/5/00 			SetColAlpha( vc->color, alpha );
-//DEADCODE JON 6/5/00 		}
-//DEADCODE JON 6/5/00 		break;
-//DEADCODE JON 6/5/00 		case LF_AMBIENT:
-//DEADCODE JON 6/5/00 //DEADCODE JON 3/29/00 			vc->color=0xAAFFFFFF;  // AA is the alpha val about to be filled
-//DEADCODE JON 6/5/00 			vc->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 6/5/00 			vc->specular=0x00000000;
-//DEADCODE JON 6/5/00 			// alternative glob alpha fix
-//DEADCODE JON 6/5/00 			SetColAlpha( vc->color, globAlpha );
-//DEADCODE JON 6/5/00 		break;
-//DEADCODE JON 6/5/00 		case LF_FONT:											//RJS 10May00
-//DEADCODE JON 6/5/00 			vc->color=gFontColour;
-//DEADCODE JON 6/5/00 			vc->specular=0x00000000;
-//DEADCODE JON 6/5/00 			// alternative glob alpha fix
-//DEADCODE JON 6/5/00 			SetColAlpha( vc->color, globAlpha );
-//DEADCODE JON 6/5/00 		break;
-//DEADCODE JON 6/5/00 		default:
-//DEADCODE JON 6/5/00 		case LF_LIGHTSOURCE:
-//DEADCODE JON 6/5/00 			vc->color=0xAAFFFFFF;  // AA is the alpha val about to be filled
-//DEADCODE JON 6/5/00 			vc->specular=0x00000000;
-//DEADCODE JON 6/5/00 			// alternative glob alpha fix
-//DEADCODE JON 6/5/00 			SetColAlpha( vc->color, globAlpha );
-//DEADCODE JON 6/5/00 		break;
-//DEADCODE JON 6/5/00 	}
-//DEADCODE JON 6/5/00
 
 }
 
@@ -9358,17 +7754,11 @@ void Lib3D::ClipToFront(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numTextu
     frac=(nearZPlane-zi)/(zo-zi);
     vc->sx=Interp(xi,xo,frac);
     vc->sy=Interp(yi,yo,frac);
-//DeadCode JON 29Aug00 	vc->sz=0.f;
     vc->sz=zNearClip;
     vc->hw=nearZPlane;
     switch (numTextures)
     {
-//DeadCode JON 1Aug00 		default:
-//DeadCode JON 1Aug00 			INT3;
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -9410,12 +7800,7 @@ void Lib3D::ClipToBack(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numTextur
     vc->hw=farZPlane;
     switch (numTextures)
     {
-//DeadCode JON 1Aug00 		default:
-//DeadCode JON 1Aug00 			INT3;
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -9481,12 +7866,7 @@ void Lib3D::ClipToTop(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numTexture
     vc->sz=zc;
     switch (numTextures)
     {
-//DeadCode JON 1Aug00 		default:
-//DeadCode JON 1Aug00 			INT3;
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -9553,12 +7933,7 @@ void Lib3D::ClipToBottom(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numText
     vc->sz=zc;
     switch (numTextures)
     {
-//DeadCode JON 1Aug00 		default:
-//DeadCode JON 1Aug00 			INT3;
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -9626,12 +8001,7 @@ void Lib3D::ClipToLeft(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numTextur
     vc->sz=zc;
     switch (numTextures)
     {
-//DeadCode JON 1Aug00 		default:
-//DeadCode JON 1Aug00 			INT3;
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -9696,12 +8066,7 @@ void Lib3D::ClipToRight(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numTextu
     vc->sz=zc;
     switch (numTextures)
     {
-//DeadCode JON 1Aug00 		default:
-//DeadCode JON 1Aug00 			INT3;
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -10015,246 +8380,30 @@ void Lib3D::GenericLineClip(SLine *line)//,ULong numTextures)
 //Date			Tue 30 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 void Lib3D::ClipToLeft(R3DTLVERTEX *pIn,R3DTLVERTEX *pOut,R3DTLVERTEX *pClip,ULong *pClipFlag)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	D3DVALUE frac=(vpDesc.left-pIn->sx)/(pOut->sx-pIn->sx);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->sx)=FP_BITS(vpDesc.left);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->sy)=FP_BITS(pIn->sy);
-//DEADCODE JON 5/19/00 	pClip->sy+=frac*(pOut->sy-pIn->sy);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->tu)=FP_BITS(pIn->tu);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->tv)=FP_BITS(pIn->tv);
-//DEADCODE JON 5/19/00 	pClip->tu+=frac*(pOut->tu-pIn->tu);
-//DEADCODE JON 5/19/00 	pClip->tv+=frac*(pOut->tv-pIn->tv);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if (pClip->sy<vpDesc.top)			*pClipFlag=CLIP_TOP;
-//DEADCODE JON 5/19/00 	else if (pClip->sy>vpDesc.bottom)	*pClipFlag=CLIP_BOTTOM;
-//DEADCODE JON 5/19/00 	else								*pClipFlag=0L;
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ClipToRight
 //Author		Paul.
 //Date			Tue 30 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 void Lib3D::ClipToRight(R3DTLVERTEX *pIn,R3DTLVERTEX *pOut,R3DTLVERTEX *pClip,ULong *pClipFlag)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	D3DVALUE frac=(vpDesc.right-pIn->sx)/(pOut->sx-pIn->sx);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->sx)=FP_BITS(vpDesc.right);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->sy)=FP_BITS(pIn->sy);
-//DEADCODE JON 5/19/00 	pClip->sy+=frac*(pOut->sy-pIn->sy);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->tu)=FP_BITS(pIn->tu);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->tv)=FP_BITS(pIn->tv);
-//DEADCODE JON 5/19/00 	pClip->tu+=frac*(pOut->tu-pIn->tu);
-//DEADCODE JON 5/19/00 	pClip->tv+=frac*(pOut->tv-pIn->tv);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	if (pClip->sy<vpDesc.top)			*pClipFlag=CLIP_TOP;
-//DEADCODE JON 5/19/00 	else if (pClip->sy>vpDesc.bottom)	*pClipFlag=CLIP_BOTTOM;
-//DEADCODE JON 5/19/00 	else								*pClipFlag=0L;
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ClipToTop
 //Author		Paul.
 //Date			Tue 30 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 void Lib3D::ClipToTop(R3DTLVERTEX *pIn,R3DTLVERTEX *pOut,R3DTLVERTEX *pClip,ULong *pClipFlag)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	D3DVALUE frac=(vpDesc.top-pIn->sy)/(pOut->sy-pIn->sy);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->sx)=FP_BITS(pIn->sx);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->sy)=FP_BITS(vpDesc.top);
-//DEADCODE JON 5/19/00 	pClip->sx+=frac*(pOut->sx-pIn->sx);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->tu)=FP_BITS(pIn->tu);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->tv)=FP_BITS(pIn->tv);
-//DEADCODE JON 5/19/00 	pClip->tu+=frac*(pOut->tu-pIn->tu);
-//DEADCODE JON 5/19/00 	pClip->tv+=frac*(pOut->tv-pIn->tv);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	*pClipFlag=0L;
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ClipToBottom
 //Author		Paul.
 //Date			Tue 30 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 void Lib3D::ClipToBottom(R3DTLVERTEX *pIn,R3DTLVERTEX *pOut,R3DTLVERTEX *pClip,ULong *pClipFlag)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	D3DVALUE frac=(vpDesc.bottom-pIn->sy)/(pOut->sy-pIn->sy);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->sx)=FP_BITS(pIn->sx);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->sy)=FP_BITS(vpDesc.bottom);
-//DEADCODE JON 5/19/00 	pClip->sx+=frac*(pOut->sx-pIn->sx);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->tu)=FP_BITS(pIn->tu);
-//DEADCODE JON 5/19/00 	FP_BITS(pClip->tv)=FP_BITS(pIn->tv);
-//DEADCODE JON 5/19/00 	pClip->tu+=frac*(pOut->tu-pIn->tu);
-//DEADCODE JON 5/19/00 	pClip->tv+=frac*(pOut->tv-pIn->tv);
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	*pClipFlag=0L;
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GenericPolyClip
 //Author		Paul.
 //Date			Tue 30 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/19/00 void Lib3D::GenericPolyClip(R3DTLVERTEX *pVerts,ULong *pClipFlags,ULong& numVerts,ULong *pVertList)
-//DEADCODE JON 5/19/00 {
-//DEADCODE JON 5/19/00 	ULong newVertCount=0L;
-//DEADCODE JON 5/19/00 	ULong oriVertCount=numVerts;
-//DEADCODE JON 5/19/00 	ULong newVertInsert=oriVertCount;
-//DEADCODE JON 5/19/00 	ULong *pAVertList=new ULong[numVerts<<3];
-//DEADCODE JON 5/19/00 	ULong i;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	ULong curIndex,nxtIndex;
-//DEADCODE JON 5/19/00 	R3DTLVERTEX *pCur,*pNxt;
-//DEADCODE JON 5/19/00 	nxtIndex=*pVertList;
-//DEADCODE JON 5/19/00 	pNxt=pVerts+nxtIndex;
-//DEADCODE JON 5/19/00 	pVertList[oriVertCount]=*pVertList;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	for (i=0;i<oriVertCount;i++)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		curIndex=nxtIndex;
-//DEADCODE JON 5/19/00 		pCur=pNxt;
-//DEADCODE JON 5/19/00 		nxtIndex=pVertList[i+1];
-//DEADCODE JON 5/19/00 		pNxt=pVerts+nxtIndex;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 		if ((pClipFlags[curIndex]&CLIP_LEFT)==0)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			pAVertList[newVertCount++]=curIndex;
-//DEADCODE JON 5/19/00 			if ((pClipFlags[nxtIndex]&CLIP_LEFT)!=0)
-//DEADCODE JON 5/19/00 			{
-//DEADCODE JON 5/19/00 				ClipToLeft(pCur,pNxt,pVerts+newVertInsert,pClipFlags+newVertInsert);
-//DEADCODE JON 5/19/00 				pAVertList[newVertCount++]=newVertInsert;
-//DEADCODE JON 5/19/00 				newVertInsert++;
-//DEADCODE JON 5/19/00 			}
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 		else if ((pClipFlags[nxtIndex]&CLIP_LEFT)==0)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			ClipToLeft(pNxt,pCur,pVerts+newVertInsert,pClipFlags+newVertInsert);
-//DEADCODE JON 5/19/00 			pAVertList[newVertCount++]=newVertInsert;
-//DEADCODE JON 5/19/00 			newVertInsert++;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	if (newVertCount<3)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		numVerts=0L;
-//DEADCODE JON 5/19/00 		delete[]pAVertList;
-//DEADCODE JON 5/19/00 		return;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	oriVertCount=newVertCount;
-//DEADCODE JON 5/19/00 	newVertCount=0L;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	nxtIndex=*pAVertList;
-//DEADCODE JON 5/19/00 	pNxt=pVerts+nxtIndex;
-//DEADCODE JON 5/19/00 	pAVertList[oriVertCount]=*pAVertList;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	for (i=0;i<oriVertCount;i++)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		curIndex=nxtIndex;
-//DEADCODE JON 5/19/00 		pCur=pNxt;
-//DEADCODE JON 5/19/00 		nxtIndex=pAVertList[i+1];
-//DEADCODE JON 5/19/00 		pNxt=pVerts+nxtIndex;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 		if ((pClipFlags[curIndex]&CLIP_RIGHT)==0)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			pVertList[newVertCount++]=curIndex;
-//DEADCODE JON 5/19/00 			if ((pClipFlags[nxtIndex]&CLIP_RIGHT)!=0)
-//DEADCODE JON 5/19/00 			{
-//DEADCODE JON 5/19/00 				ClipToRight(pCur,pNxt,pVerts+newVertInsert,pClipFlags+newVertInsert);
-//DEADCODE JON 5/19/00 				pVertList[newVertCount++]=newVertInsert;
-//DEADCODE JON 5/19/00 				newVertInsert++;
-//DEADCODE JON 5/19/00 			}
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 		else if ((pClipFlags[nxtIndex]&CLIP_RIGHT)==0)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			ClipToRight(pNxt,pCur,pVerts+newVertInsert,pClipFlags+newVertInsert);
-//DEADCODE JON 5/19/00 			pVertList[newVertCount++]=newVertInsert;
-//DEADCODE JON 5/19/00 			newVertInsert++;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	if (newVertCount<3)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		numVerts=0L;
-//DEADCODE JON 5/19/00 		delete[]pAVertList;
-//DEADCODE JON 5/19/00 		return;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	oriVertCount=newVertCount;
-//DEADCODE JON 5/19/00 	newVertCount=0L;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	nxtIndex=*pVertList;
-//DEADCODE JON 5/19/00 	pNxt=pVerts+nxtIndex;
-//DEADCODE JON 5/19/00 	pVertList[oriVertCount]=*pVertList;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	for (i=0;i<oriVertCount;i++)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		curIndex=nxtIndex;
-//DEADCODE JON 5/19/00 		pCur=pNxt;
-//DEADCODE JON 5/19/00 		nxtIndex=pVertList[i+1];
-//DEADCODE JON 5/19/00 		pNxt=pVerts+nxtIndex;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 		if ((pClipFlags[curIndex]&CLIP_TOP)==0)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			pAVertList[newVertCount++]=curIndex;
-//DEADCODE JON 5/19/00 			if ((pClipFlags[nxtIndex]&CLIP_TOP)!=0)
-//DEADCODE JON 5/19/00 			{
-//DEADCODE JON 5/19/00 				ClipToTop(pCur,pNxt,pVerts+newVertInsert,pClipFlags+newVertInsert);
-//DEADCODE JON 5/19/00 				pAVertList[newVertCount++]=newVertInsert;
-//DEADCODE JON 5/19/00 				newVertInsert++;
-//DEADCODE JON 5/19/00 			}
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 		else if ((pClipFlags[nxtIndex]&CLIP_TOP)==0)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			ClipToTop(pNxt,pCur,pVerts+newVertInsert,pClipFlags+newVertInsert);
-//DEADCODE JON 5/19/00 			pAVertList[newVertCount++]=newVertInsert;
-//DEADCODE JON 5/19/00 			newVertInsert++;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	if (newVertCount<3)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		numVerts=0L;
-//DEADCODE JON 5/19/00 		delete[]pAVertList;
-//DEADCODE JON 5/19/00 		return;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	oriVertCount=newVertCount;
-//DEADCODE JON 5/19/00 	newVertCount=0L;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	nxtIndex=*pAVertList;
-//DEADCODE JON 5/19/00 	pNxt=pVerts+nxtIndex;
-//DEADCODE JON 5/19/00 	pAVertList[oriVertCount]=*pAVertList;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 	for (i=0;i<oriVertCount;i++)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		curIndex=nxtIndex;
-//DEADCODE JON 5/19/00 		pCur=pNxt;
-//DEADCODE JON 5/19/00 		nxtIndex=pAVertList[i+1];
-//DEADCODE JON 5/19/00 		pNxt=pVerts+nxtIndex;
-//DEADCODE JON 5/19/00
-//DEADCODE JON 5/19/00 		if ((pClipFlags[curIndex]&CLIP_BOTTOM)==0)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			pVertList[newVertCount++]=curIndex;
-//DEADCODE JON 5/19/00 			if ((pClipFlags[nxtIndex]&CLIP_BOTTOM)!=0)
-//DEADCODE JON 5/19/00 			{
-//DEADCODE JON 5/19/00 				ClipToBottom(pCur,pNxt,pVerts+newVertInsert,pClipFlags+newVertInsert);
-//DEADCODE JON 5/19/00 				pVertList[newVertCount++]=newVertInsert;
-//DEADCODE JON 5/19/00 				newVertInsert++;
-//DEADCODE JON 5/19/00 			}
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 		else if ((pClipFlags[nxtIndex]&CLIP_BOTTOM)==0)
-//DEADCODE JON 5/19/00 		{
-//DEADCODE JON 5/19/00 			ClipToBottom(pNxt,pCur,pVerts+newVertInsert,pClipFlags+newVertInsert);
-//DEADCODE JON 5/19/00 			pVertList[newVertCount++]=newVertInsert;
-//DEADCODE JON 5/19/00 			newVertInsert++;
-//DEADCODE JON 5/19/00 		}
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	if (newVertCount<3)
-//DEADCODE JON 5/19/00 		numVerts=0L;
-//DEADCODE JON 5/19/00 	delete[]pAVertList;
-//DEADCODE JON 5/19/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		DrawSphere
 //Author		Paul.
@@ -10280,7 +8429,6 @@ HRESULT Lib3D::DrawSphere(	const HMATERIAL& hMaterial,	//texture
         return DDERR_GENERIC;
 #endif
     if ((lastError=SetMaterial(hMaterial))!=DD_OK) return lastError;
-//DeadCode JON 20Oct00 	if (hMaterial.tsW[0]!=0) // assume this is always the case
     {
         fu0=(D3DVALUE(u0)+0.5)*hMaterial.tsW[0];						//RJS 22Sep00
         fu1=(D3DVALUE(u1)-0.5)*hMaterial.tsW[0];						//RJS 22Sep00
@@ -10288,9 +8436,6 @@ HRESULT Lib3D::DrawSphere(	const HMATERIAL& hMaterial,	//texture
         fv1=(D3DVALUE(v1)-0.5)*hMaterial.tsH[0];						//RJS 22Sep00
     }
 
-//DEADCODE JON 5/22/00 	R3DVERTEX* polyVertArray=vertArray;
-//DEADCODE JON 5/22/00 	*polyVertArray=vertex;
-//DEADCODE JON 5/22/00 	D3DVERTEX *pv=(D3DVERTEX *)polyVertArray;
 //	SPolygon *sPolygon;
 
     ALLOCATE_POLYGON_NOLINK(currentPoly,4);
@@ -10298,239 +8443,21 @@ HRESULT Lib3D::DrawSphere(	const HMATERIAL& hMaterial,	//texture
 
     *sVertex = vertex;
 
-//DeadCode JON 13Sep00 	sVertex->Transform( objectMatrix+objMatStackPos );
-//DEADCODE JON 5/22/00  	Transform(pv,&sVertex->d3dtlvert,objectMatrix+objMatStackPos);
     // 	D3DVALUE w;
 // 	w=1/sVertex->rhw;
-//DEADCODE JON 5/22/00  	pv[0].x=sVertex->sx;//*w;
-//DEADCODE JON 5/22/00  	pv[0].y=sVertex->sy;//*w;
-//DEADCODE JON 5/22/00  	pv[0].z=sVertex->sz;//*w;
 
-//DeadCode JON 13Sep00 	sVertex->Transform( viewerMatrix+viewMatStackPos );
     if (fCombineMatrices) CombineMatrices();
 
     sVertex->Transform( &objViewMatrix );
-//DEADCODE JON 5/22/00 	Transform(pv,&sVertex->d3dtlvert,viewerMatrix+viewMatStackPos);
 // 	w=1/sVertex->rhw;
-//DEADCODE JON 5/22/00 	pv[0].x=sVertex->sx;//*w;
-//DEADCODE JON 5/22/00 	pv[0].y=sVertex->sy;//*w;
-//DEADCODE JON 5/22/00 	pv[0].z=sVertex->sz;//*w;
 
     D3DVALUE rad = radius;
-//DEADCODE JON 5/22/00  	VolumetricSphere(pv[0],rad);
     sVertex->VolumetricSphere( rad );
 
     return _DrawSphereTransformed( rad, roll, fu0, fv0, fu1, fv1 );
 #endif
 }
 
-//DeadCode JIM 22Jun100 This is the start of some code to do masked clipping of spheres
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 HRESULT Lib3D::_BufferSphereTransformed( const D3DVALUE rad, const Angles roll,
-//DeadCode JIM 22Jun100 										const D3DVALUE fu0,const D3DVALUE fv0,	//texture coords for tl corner
-//DeadCode JIM 22Jun100 										const D3DVALUE fu1,const D3DVALUE fv1)	//texture coords for br corner )
-//DeadCode JIM 22Jun100 {
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	pv[1]=pv[0];
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	pv[2]=pv[0];
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	pv[3]=pv[0];
-//DeadCode JIM 22Jun100 	SVertex *sVertex=currentPoly->pVertexList;
-//DeadCode JIM 22Jun100 	currentPoly->vertexcount=rad;
-//DeadCode JIM 22Jun100 	sVertex[0].pNext = &sVertex[1];
-//DeadCode JIM 22Jun100 	sVertex[1] = *sVertex;
-//DeadCode JIM 22Jun100 	sVertex[1].pNext = &sVertex[2];
-//DeadCode JIM 22Jun100 	sVertex[2] = *sVertex;
-//DeadCode JIM 22Jun100 	sVertex[2].pNext = &sVertex[3];
-//DeadCode JIM 22Jun100 	sVertex[3] = *sVertex;
-//DeadCode JIM 22Jun100 	sVertex[3].pNext = sVertex;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 	if (Test_Rot || 0==roll)
-//DeadCode JIM 22Jun100 		{
-//DeadCode JIM 22Jun100 			sVertex[3].x-=rad;	sVertex[3].y-=rad;
-//DeadCode JIM 22Jun100 			sVertex[2].x+=rad;	sVertex[2].y-=rad;
-//DeadCode JIM 22Jun100 			sVertex[1].x+=rad;	sVertex[1].y+=rad;
-//DeadCode JIM 22Jun100 			sVertex[0].x-=rad;	sVertex[0].y+=rad;
-//DeadCode JIM 22Jun100 		}
-//DeadCode JIM 22Jun100 		else
-//DeadCode JIM 22Jun100 		{
-//DeadCode JIM 22Jun100 			D3DVALUE sine,cosine;
-//DeadCode JIM 22Jun100 			SineCosine(roll,&sine,&cosine);
-//DeadCode JIM 22Jun100 			sine*=rad;
-//DeadCode JIM 22Jun100 			cosine*=rad;
-//DeadCode JIM 22Jun100 			sVertex[3].x+=-cosine+sine;	sVertex[3].y+=-sine-cosine;
-//DeadCode JIM 22Jun100 			sVertex[2].x+=cosine+sine;	sVertex[2].y+=sine-cosine;
-//DeadCode JIM 22Jun100 			sVertex[1].x+=cosine-sine;	sVertex[1].y+=sine+cosine;
-//DeadCode JIM 22Jun100 			sVertex[0].x+=-cosine-sine;	sVertex[0].y+=-sine+cosine;
-//DeadCode JIM 22Jun100 		}
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 	R3DMATRIX *pMat=projectionMatrix+projMatStackPos;
-//DeadCode JIM 22Jun100 	ULong		theColour = gLightingDesc.ambientRGB;
-//DeadCode JIM 22Jun100 	SetColAlpha( theColour, globAlpha );
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	Transform(pv,&sVertex->d3dtlvert,pMat);
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 	sVertex->Transform( pMat );
-//DeadCode JIM 22Jun100 	sVertex->tu=fu0;
-//DeadCode JIM 22Jun100 	sVertex->tv=fv0;
-//DeadCode JIM 22Jun100 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DeadCode JIM 22Jun100 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DeadCode JIM 22Jun100 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DeadCode JIM 22Jun100 	sVertex->color = theColour;
-//DeadCode JIM 22Jun100 	sVertex->specular=0x00000000;
-//DeadCode JIM 22Jun100 	sVertex->clipcode=ClipCodeFBLRTB( sVertex );
-//DeadCode JIM 22Jun100 	currentPoly->andcode&=sVertex->clipcode;
-//DeadCode JIM 22Jun100 	currentPoly->orcode|=sVertex->clipcode;
-//DeadCode JIM 22Jun100 	sVertex=sVertex->pNext;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	Transform(pv+1,&sVertex->d3dtlvert,pMat);
-//DeadCode JIM 22Jun100 	sVertex->Transform( pMat );
-//DeadCode JIM 22Jun100 	sVertex->tu=fu1;
-//DeadCode JIM 22Jun100 	sVertex->tv=fv0;
-//DeadCode JIM 22Jun100 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DeadCode JIM 22Jun100 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DeadCode JIM 22Jun100 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DeadCode JIM 22Jun100 	sVertex->color = theColour;
-//DeadCode JIM 22Jun100 	sVertex->specular=0x00000000;
-//DeadCode JIM 22Jun100 	sVertex->clipcode=ClipCodeFBLRTB( sVertex );
-//DeadCode JIM 22Jun100 	currentPoly->andcode&=sVertex->clipcode;
-//DeadCode JIM 22Jun100 	currentPoly->orcode|=sVertex->clipcode;
-//DeadCode JIM 22Jun100 	sVertex=sVertex->pNext;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	Transform(pv+2,&sVertex->d3dtlvert,pMat);
-//DeadCode JIM 22Jun100 	sVertex->Transform( pMat );
-//DeadCode JIM 22Jun100 	sVertex->tu=fu1;
-//DeadCode JIM 22Jun100 	sVertex->tv=fv1;
-//DeadCode JIM 22Jun100 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DeadCode JIM 22Jun100 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DeadCode JIM 22Jun100 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DeadCode JIM 22Jun100 	sVertex->color = theColour;
-//DeadCode JIM 22Jun100 	sVertex->specular=0x00000000;
-//DeadCode JIM 22Jun100 	sVertex->clipcode=ClipCodeFBLRTB( sVertex );
-//DeadCode JIM 22Jun100 	currentPoly->andcode&=sVertex->clipcode;
-//DeadCode JIM 22Jun100 	currentPoly->orcode|=sVertex->clipcode;
-//DeadCode JIM 22Jun100 	sVertex=sVertex->pNext;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	Transform(pv+3,&sVertex->d3dtlvert,pMat);
-//DeadCode JIM 22Jun100 	sVertex->Transform( pMat );
-//DeadCode JIM 22Jun100 	sVertex->tu=fu0;
-//DeadCode JIM 22Jun100 	sVertex->tv=fv1;
-//DeadCode JIM 22Jun100 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DeadCode JIM 22Jun100 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DeadCode JIM 22Jun100 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DeadCode JIM 22Jun100 	sVertex->color = theColour;
-//DeadCode JIM 22Jun100 	sVertex->specular=0x00000000;
-//DeadCode JIM 22Jun100 	sVertex->clipcode=ClipCodeFBLRTB( sVertex );
-//DeadCode JIM 22Jun100 	currentPoly->andcode&=sVertex->clipcode;
-//DeadCode JIM 22Jun100 	currentPoly->orcode|=sVertex->clipcode;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 	//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	for (int i=4;i!=0;i--)
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	{
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	 	sVertex->clipcode=ClipCodeFBLRTB( sVertex );
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 		sPolygon->andcode&=sVertex->clipcode;
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 		sPolygon->orcode|=sVertex->clipcode;
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 		sVertex=sVertex->pNext;
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/22/00 	}
-//DeadCode JIM 22Jun100 	if (currentPoly->andcode==0)
-//DeadCode JIM 22Jun100 	{
-//DeadCode JIM 22Jun100 #ifdef	_SHAPE_DEBUG_
-//DeadCode JIM 22Jun100 	noPolysDebug++;
-//DeadCode JIM 22Jun100 #endif
-//DeadCode JIM 22Jun100 //TEMPCODE JIM 09/06/00 	 	if (currentPoly->orcode!=0)
-//DeadCode JIM 22Jun100 //TEMPCODE JIM 09/06/00 			GenericPolyClip(currentPoly/*,SizeOfVertex*/);
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 		if (currentPoly->vertexcount>2)
-//DeadCode JIM 22Jun100 		{
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 			D3DVIEWPORT7 vp;
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 			pD3DDEV7->GetViewport(&vp);
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 			D3DVALUE sx,sy;
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 			D3DVALUE cx,cy;
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 			sx=D3DVALUE(vp.dwWidth>>1);
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 			sy=-D3DVALUE(vp.dwHeight>>1);
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 			cx=D3DVALUE(vp.dwX)+sx;
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 			cy=D3DVALUE(vp.dwY)-sy;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 /*			if (sPolygon->material.f==0)			//can never be plain...
-//DeadCode JIM 22Jun100 			{
-//DeadCode JIM 22Jun100 				if (renderMode == HINT_3DRENDER)
-//DeadCode JIM 22Jun100 				{
-//DeadCode JIM 22Jun100 					PROJECT(sPolygon,cx,cy,sx,sy);
-//DeadCode JIM 22Jun100 				}
-//DeadCode JIM 22Jun100 				else
-//DeadCode JIM 22Jun100 				{
-//DeadCode JIM 22Jun100 					PROJECT_2D(sPolygon,cx,cy,sx,sy);
-//DeadCode JIM 22Jun100 				}
-//DeadCode JIM 22Jun100 				ADD_POLYGON(plainPolys,sPolygon);
-//DeadCode JIM 22Jun100 			}
-//DeadCode JIM 22Jun100 			else*/
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 			if (Test_Flag || currentPoly->material.isMasked==0)
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 			{
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				if (renderMode == HINT_3DRENDER)
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				{
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 					PROJECT(currentPoly,cx,cy,sx,sy);
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 					currentPoly->projectType=STANDARD_PROJECT;
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				}
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				else
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				{
-//DeadCode JIM 22Jun100 //DEADCODE JON 5/25/00 					PROJECT_2D(currentPoly,cx,cy,sx,sy);
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 					currentPoly->projectType=PROJECT_2D;
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 					currentPoly->zDepth2d = zDepth2d;
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				}
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				ADD_POLYGON(localspheres,currentPoly);
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				AddEdgeAliasing(currentPoly);
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 			}
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 			else
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 			{  //its transparent
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				if (renderMode == HINT_3DRENDER)
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				{
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 //DEADCODE JON 5/25/00 					PROJECT_SPHERE(currentPoly,cx,cy,sx,sy);//,rad);	//RJS 12May00
-//DeadCode JIM 22Jun100 					currentPoly->projectType=SPHERE_PROJECT;
-//DeadCode JIM 22Jun100 					currentPoly->CalcTransZ( zFactor );
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				}
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				else
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				{
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 //DEADCODE JON 5/25/00 					PROJECT_2D(currentPoly,cx,cy,sx,sy);
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 					currentPoly->projectType=PROJECT_2D;
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 					currentPoly->zDepth2d = zDepth2d;
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 					currentPoly->CalcTrans2DZ();
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 				}
-//DeadCode JIM 22Jun100 				ADD_POLYGON(localspheres,currentPoly);
-//DeadCode JIM 22Jun100 //DEADCODE JIM 09/06/00 			}
-//DeadCode JIM 22Jun100 		}
-//DeadCode JIM 22Jun100 	}
-//DeadCode JIM 22Jun100 	else
-//DeadCode JIM 22Jun100 	{
-//DeadCode JIM 22Jun100 		DISCARD_POLYGON(currentPoly);
-//DeadCode JIM 22Jun100 	}
-//DeadCode JIM 22Jun100 //	polyVertCount=0xFFFFFFFF;
-//DeadCode JIM 22Jun100 	return S_OK;
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 }
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 HRESULT	 Lib3D::_DrawBufferedSpheres()
-//DeadCode JIM 22Jun100 {
-//DeadCode JIM 22Jun100 	int	offset=ULong(&localspheres->zbuffer)-ULong(localspheres);
-//DeadCode JIM 22Jun100 	localspheres=(SPolygon*)RadixSortAscending((radix_sort_t*)localspheres,offset);
-//DeadCode JIM 22Jun100 	SPolygon*  addsphere=localspheres;
-//DeadCode JIM 22Jun100 	SWord	StringLineArr[4000],*StringLine=&StringLineArr[2000];
-//DeadCode JIM 22Jun100 	//At this stage I don't have screen X,Y,Z, but Body
-//DeadCode JIM 22Jun100 	//Need to build up an 'exclusion zone' arround each sphere as it is added
-//DeadCode JIM 22Jun100 	//But why bother?
-//DeadCode JIM 22Jun100
-//DeadCode JIM 22Jun100 	while (addsphere)
-//DeadCode JIM 22Jun100 	{
-//DeadCode JIM 22Jun100 		currentPoly=addsphere;
-//DeadCode JIM 22Jun100 		addsphere=addsphere->pNext;
-//DeadCode JIM 22Jun100 		if (currentPoly->orcode!=0)
-//DeadCode JIM 22Jun100 			GenericPolyClip(currentPoly/*,SizeOfVertex*/);
-//DeadCode JIM 22Jun100 		if (currentPoly->vertexcount>2)
-//DeadCode JIM 22Jun100 			ADD_POLYGON(transparentPolys,currentPoly);
-//DeadCode JIM 22Jun100 	}
-//DeadCode JIM 22Jun100 	return S_OK;
-//DeadCode JIM 22Jun100 }
-//DeadCode JIM 22Jun100
 
 //#pragma message( __HERE__ "inline me" )
 inline HRESULT Lib3D::_DrawSphereTransformed( const D3DVALUE rad, const Angles roll,
@@ -10542,9 +8469,6 @@ inline HRESULT Lib3D::_DrawSphereTransformed( const D3DVALUE rad, const Angles r
     return S_OK;
 #else
 
-//DEADCODE JON 5/22/00 	pv[1]=pv[0];
-//DEADCODE JON 5/22/00 	pv[2]=pv[0];
-//DEADCODE JON 5/22/00 	pv[3]=pv[0];
     SVertex *sVertex=currentPoly->pVertexList;
 
     if (lightflag == LF_LIGHTSOURCE)									//RJS 22Sep00
@@ -10600,16 +8524,7 @@ inline HRESULT Lib3D::_DrawSphereTransformed( const D3DVALUE rad, const Angles r
     }
 
     R3DMATRIX *pMat=projectionMatrix+projMatStackPos;
-//DeadCode RJS 22Sep00 	R3DCOLOUR		theColour;										//RJS 07Sep00
-//DeadCode RJS 22Sep00 																//RJS 07Sep00
-//DeadCode RJS 22Sep00 	if (lightflag == LF_LIGHTSOURCE)							//RJS 07Sep00
-//DeadCode RJS 22Sep00 		theColour = 0xAAFFFFFF;									//RJS 07Sep00
-//DeadCode RJS 22Sep00 	else														//RJS 07Sep00
-//DeadCode RJS 22Sep00 		theColour = gLightingDesc.ambientRGB;					//RJS 07Sep00
-//DeadCode RJS 22Sep00
-//DeadCode RJS 22Sep00 	SetColAlpha( theColour, globAlpha );
 
-//DEADCODE JON 5/22/00 	Transform(pv,&sVertex->d3dtlvert,pMat);
 
     sVertex->Transform( pMat );
     sVertex->tu=fu0;
@@ -10619,7 +8534,6 @@ inline HRESULT Lib3D::_DrawSphereTransformed( const D3DVALUE rad, const Angles r
     currentPoly->orcode|=sVertex->clipcode;
     sVertex=sVertex->pNext;
 
-//DEADCODE JON 5/22/00 	Transform(pv+1,&sVertex->d3dtlvert,pMat);
     sVertex->Transform( pMat );
     sVertex->tu=fu1;
     sVertex->tv=fv0;
@@ -10628,7 +8542,6 @@ inline HRESULT Lib3D::_DrawSphereTransformed( const D3DVALUE rad, const Angles r
     currentPoly->orcode|=sVertex->clipcode;
     sVertex=sVertex->pNext;
 
-//DEADCODE JON 5/22/00 	Transform(pv+2,&sVertex->d3dtlvert,pMat);
     sVertex->Transform( pMat );
     sVertex->tu=fu1;
     sVertex->tv=fv1;
@@ -10637,7 +8550,6 @@ inline HRESULT Lib3D::_DrawSphereTransformed( const D3DVALUE rad, const Angles r
     currentPoly->orcode|=sVertex->clipcode;
     sVertex=sVertex->pNext;
 
-//DEADCODE JON 5/22/00 	Transform(pv+3,&sVertex->d3dtlvert,pMat);
     sVertex->Transform( pMat );
     sVertex->tu=fu0;
     sVertex->tv=fv1;
@@ -10645,16 +8557,7 @@ inline HRESULT Lib3D::_DrawSphereTransformed( const D3DVALUE rad, const Angles r
     currentPoly->andcode&=sVertex->clipcode;
     currentPoly->orcode|=sVertex->clipcode;
 
-    //DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DeadCode RJS 22Sep00 	CALC_FOG( currentPoly );
 
-//DEADCODE JON 5/22/00 	for (int i=4;i!=0;i--)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 	 	sVertex->clipcode=ClipCodeFBLRTB( sVertex );
-//DEADCODE JON 5/22/00 		sPolygon->andcode&=sVertex->clipcode;
-//DEADCODE JON 5/22/00 		sPolygon->orcode|=sVertex->clipcode;
-//DEADCODE JON 5/22/00 		sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00 	}
     if (currentPoly->andcode==0)
     {
 #ifdef	_SHAPE_DEBUG_
@@ -10668,14 +8571,12 @@ inline HRESULT Lib3D::_DrawSphereTransformed( const D3DVALUE rad, const Angles r
             //its always transparent
             if (renderMode == HINT_3DRENDER)
             {
-                //DEADCODE JON 5/25/00 					PROJECT_SPHERE(currentPoly,cx,cy,sx,sy);//,rad);	//RJS 12May00
                 currentPoly->projectType=SPHERE_PROJECT+zBias;
                 currentPoly->CalcTransZ( zFactor, 0.0f );
 //				currentPoly->CalcTransZ(zFactor,tZBias_f); // don't ever do a bias on these...
             }
             else
             {
-                //DEADCODE JON 5/25/00 					PROJECT_2D(currentPoly,cx,cy,sx,sy);
                 currentPoly->projectType=PROJECT_2D;
                 currentPoly->zDepth2d = zDepth2d;
                 currentPoly->SetTrans2DZ(zBuffer2d);
@@ -10720,7 +8621,6 @@ HRESULT Lib3D::DrawTransformedSphere (
         return DDERR_GENERIC;
 #endif
     if ((lastError=SetMaterial(hMaterial))!=DD_OK) return lastError;
-//DeadCode JON 20Oct00 	if (hMaterial.tsW[0]!=0) // assume this is always the case
     {
         fu0=(D3DVALUE(u0)+0.5)*hMaterial.tsW[0];						//RJS 22Sep00
         fu1=(D3DVALUE(u1)-0.5)*hMaterial.tsW[0];						//RJS 22Sep00
@@ -10733,144 +8633,6 @@ HRESULT Lib3D::DrawTransformedSphere (
 
     return _DrawSphereTransformed( rad, roll, fu0, fv0, fu1, fv1 );
 
-//DEADCODE JON 5/22/00 	pv[1]=pv[0];
-//DEADCODE JON 5/22/00 	pv[2]=pv[0];
-//DEADCODE JON 5/22/00 	pv[3]=pv[0];
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	if (0==roll)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 		pv[3].x-=rad;	pv[3].y-=rad;
-//DEADCODE JON 5/22/00 		pv[2].x+=rad;	pv[2].y-=rad;
-//DEADCODE JON 5/22/00 		pv[1].x+=rad;	pv[1].y+=rad;
-//DEADCODE JON 5/22/00 		pv[0].x-=rad;	pv[0].y+=rad;
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00 	else
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 		D3DVALUE sine,cosine;
-//DEADCODE JON 5/22/00 		SineCosine(roll,&sine,&cosine);
-//DEADCODE JON 5/22/00 		sine*=rad;
-//DEADCODE JON 5/22/00 		cosine*=rad;
-//DEADCODE JON 5/22/00 		pv[3].x+=-cosine+sine;	pv[3].y+=-sine-cosine;
-//DEADCODE JON 5/22/00 		pv[2].x+=cosine+sine;	pv[2].y+=sine-cosine;
-//DEADCODE JON 5/22/00 		pv[1].x+=cosine-sine;	pv[1].y+=sine+cosine;
-//DEADCODE JON 5/22/00 		pv[0].x+=-cosine-sine;	pv[0].y+=-sine+cosine;
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	R3DMATRIX *pMat=projectionMatrix+projMatStackPos;
-//DEADCODE JON 5/22/00 	ULong		theColour = gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 	SetColAlpha( theColour, globAlpha );
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	Transform(pv,&sVertex->d3dtlvert,pMat);
-//DEADCODE JON 5/22/00 	sVertex->tu=fu0;
-//DEADCODE JON 5/22/00 	sVertex->tv=fv0;
-//DEADCODE JON 5/22/00 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/22/00 	sVertex->color = theColour;
-//DEADCODE JON 5/22/00 	sVertex->specular=0x00000000;
-//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	Transform(pv+1,&sVertex->d3dtlvert,pMat);
-//DEADCODE JON 5/22/00 	sVertex->tu=fu1;
-//DEADCODE JON 5/22/00 	sVertex->tv=fv0;
-//DEADCODE JON 5/22/00 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/22/00 	sVertex->color = theColour;
-//DEADCODE JON 5/22/00 	sVertex->specular=0x00000000;
-//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	Transform(pv+2,&sVertex->d3dtlvert,pMat);
-//DEADCODE JON 5/22/00 	sVertex->tu=fu1;
-//DEADCODE JON 5/22/00 	sVertex->tv=fv1;
-//DEADCODE JON 5/22/00 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/22/00 	sVertex->color = theColour;
-//DEADCODE JON 5/22/00 	sVertex->specular=0x00000000;
-//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	Transform(pv+3,&sVertex->d3dtlvert,pMat);
-//DEADCODE JON 5/22/00 	sVertex->tu=fu0;
-//DEADCODE JON 5/22/00 	sVertex->tv=fv1;
-//DEADCODE JON 5/22/00 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/22/00 	sVertex->color = theColour;
-//DEADCODE JON 5/22/00 	sVertex->specular=0x00000000;
-//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	for (int i=4;i!=0;i--)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 	 	sVertex->clipcode=ClipCodeFBLRTB(&sVertex->d3dtlvert);
-//DEADCODE JON 5/22/00 		sPolygon->andcode&=sVertex->clipcode;
-//DEADCODE JON 5/22/00 		sPolygon->orcode|=sVertex->clipcode;
-//DEADCODE JON 5/22/00 		sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00 	if (sPolygon->andcode==0)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 #ifdef	_SHAPE_DEBUG_
-//DEADCODE JON 5/22/00 	noPolysDebug++;
-//DEADCODE JON 5/22/00 #endif
-//DEADCODE JON 5/22/00 	 	if (sPolygon->orcode!=0)
-//DEADCODE JON 5/22/00 			GenericPolyClip(sPolygon);
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 		if (sPolygon->vertexcount>2)
-//DEADCODE JON 5/22/00 		{
-//DEADCODE JON 5/22/00 			D3DVIEWPORT7 vp;
-//DEADCODE JON 5/22/00 			pD3DDEV7->GetViewport(&vp);
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 			D3DVALUE sx,sy;
-//DEADCODE JON 5/22/00 			D3DVALUE cx,cy;
-//DEADCODE JON 5/22/00 			sx=D3DVALUE(vp.dwWidth>>1);
-//DEADCODE JON 5/22/00 			sy=-D3DVALUE(vp.dwHeight>>1);
-//DEADCODE JON 5/22/00 			cx=D3DVALUE(vp.dwX)+sx;
-//DEADCODE JON 5/22/00 			cy=D3DVALUE(vp.dwY)-sy;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 /*			if (sPolygon->material.f==0)			//can never be plain
-//DEADCODE JON 5/22/00 			{
-//DEADCODE JON 5/22/00 				if (renderMode == HINT_3DRENDER)
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				else
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT_2D(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				ADD_POLYGON(plainPolys,sPolygon);
-//DEADCODE JON 5/22/00 			}
-//DEADCODE JON 5/22/00 			else*/ if (sPolygon->material.isMasked==0)
-//DEADCODE JON 5/22/00 			{
-//DEADCODE JON 5/22/00 				if (renderMode == HINT_3DRENDER)
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				else
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT_2D(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				ADD_POLYGON(texturedPolys,sPolygon);
-//DEADCODE JON 5/22/00 				AddEdgeAliasing(sPolygon);
-//DEADCODE JON 5/22/00 			}
-//DEADCODE JON 5/22/00 			else
-//DEADCODE JON 5/22/00 			{
-//DEADCODE JON 5/22/00 				if (renderMode == HINT_3DRENDER)
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT_SPHERE(sPolygon,cx,cy,sx,sy);//,0);//this causes problems
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				else
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT_2D(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				ADD_POLYGON(transparentPolys,sPolygon);
-//DEADCODE JON 5/22/00 			}
-//DEADCODE JON 5/22/00 		}
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00 	else
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 		DISCARD_POLYGON(sPolygon);
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00 	return S_OK;
 #endif
 }
 
@@ -10880,7 +8642,6 @@ HRESULT Lib3D::DrawTransformedSphere (
 //Date			Thu 11 Nov 1999
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/22/00 HRESULT Lib3D::DrawLine(const HMATERIAL& hMaterial,const R3DVERTEX& v0,const R3DVERTEX& v1)
 HRESULT Lib3D::DrawLine(const HMATERIAL& hMaterial,const DoPointStruc& v0,const DoPointStruc& v1)
 {
 #ifdef _NOT_IN_SAMPLE
@@ -11029,12 +8790,6 @@ HRESULT Lib3D::DrawLine(const HMATERIAL& hMaterial,const DoPointStruc& v0,const 
     D3DVALUE cx,cy;
     GetViewPort( sx, sy, cx, cy );
 
-//DeadCode JON 15Nov00 	pD3DDEV7->GetViewport(&vp);
-//DeadCode JON 15Nov00
-//DeadCode JON 15Nov00 	sx=D3DVALUE(vp.dwWidth>>1);
-//DeadCode JON 15Nov00 	sy=-D3DVALUE(vp.dwHeight>>1);
-//DeadCode JON 15Nov00 	cx=D3DVALUE(vp.dwX)+sx;
-//DeadCode JON 15Nov00 	cy=D3DVALUE(vp.dwY)-sy;
 
     PROJECT_LINE(sLine,cx,cy,sx,sy);
 
@@ -11107,53 +8862,6 @@ HRESULT Lib3D::DrawTransformedLine(const HMATERIAL& hMaterial,const DoPointStruc
 //Date			Thu 13 Jan 2000
 //
 //------------------------------------------------------------------------------
-//DEADCODE JON 5/22/00 HRESULT Lib3D::DrawLine(const HMATERIAL& hMaterial,const R3DTLVERTEX& v0,const R3DTLVERTEX& v1)
-//DEADCODE JON 5/22/00 {
-//DEADCODE JON 5/22/00 	HRESULT hr;
-//DEADCODE JON 5/22/00 	R3DVERTEX* pVertArray;
-//DEADCODE JON 5/22/00 	D3DVERTEXBUFFERDESC vertBufDesc;
-//DEADCODE JON 5/22/00 	LPDIRECT3DVERTEXBUFFER7 pD3DVB7;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	if ((flags&Flags(F_TNL+F_TNL_EMULATION))!=0)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 		return S_OK;  // please implement!!!
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	SLine *sLine;
-//DEADCODE JON 5/22/00 	sLine=(SLine*)Alloc(sizeof(SLine));
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	D3DTLVERTEX *v;
-//DEADCODE JON 5/22/00 	D3DCOLOR lineCol;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	if ( hMaterial.f==0 )
-//DEADCODE JON 5/22/00 	{ // the material is plain colour
-//DEADCODE JON 5/22/00 		lineCol = RGB_MAKE(	paletteTable[3*hMaterial.c],	//RED
-//DEADCODE JON 5/22/00 							paletteTable[3*hMaterial.c+1],	//GREEN
-//DEADCODE JON 5/22/00 							paletteTable[3*hMaterial.c+2]);	//BLUE
-//DEADCODE JON 5/22/00 	} else
-//DEADCODE JON 5/22/00 	{ // it is texture mapped - use the font colour as default
-//DEADCODE JON 5/22/00 		lineCol = 0xFFFFFFFF;
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	if ( lightflag == LF_AMBIENT || lightflag == LF_LIGHTING || lightflag == LF_SPECULAR )
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 		SetColLighting( lineCol, gLightingDesc.ambientRGB );
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	v=(D3DTLVERTEX*)&v0;
-//DEADCODE JON 5/22/00 	sLine->vertices[0]=*v;
-//DEADCODE JON 5/22/00 	sLine->vertices[0].color=lineCol;
-//DEADCODE JON 5/22/00 	sLine->vertices[0].specular=0xFF000000;
-//DEADCODE JON 5/22/00 	v=(D3DTLVERTEX*)&v1;
-//DEADCODE JON 5/22/00 	sLine->vertices[1]=*v;
-//DEADCODE JON 5/22/00 	sLine->vertices[1].color=lineCol;
-//DEADCODE JON 5/22/00 	sLine->vertices[1].specular=0xFF000000;
-//DEADCODE JON 5/22/00 	sLine->material=hMaterial;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	sLine->pNext=lineList;
-//DEADCODE JON 5/22/00 	lineList=sLine;
-//DEADCODE JON 5/22/00 	return S_OK;
-//DEADCODE JON 5/22/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		DrawPoint
 //Author		Paul.
@@ -11169,11 +8877,9 @@ HRESULT Lib3D::DrawPoint(const HMATERIAL& hMaterial,const DoPointStruc& v0)
 
 //	R3DVERTEX3(sPoint->vertex) = v0.getR3DVert();
     memcpy( &sPoint->vertex, &v0, sizeof( SVertex ) );
-//DeadCode JON 19Oct00 	Transform(&v0,&sPoint->vertex,&combinedMatrix);
     sPoint->vertex.Transform( &combinedMatrix );
     sPoint->vertex.clipcode=ClipCodeFBLRTB(&sPoint->vertex);
 
-//DeadCode JON 19Oct00 	sPoint->vertex.clipcode=ClipCodeFBLRTB(&sPoint->vertex);
 
     if (sPoint->vertex.clipcode!=0)
     {
@@ -11211,12 +8917,6 @@ HRESULT Lib3D::DrawPoint(const HMATERIAL& hMaterial,const DoPointStruc& v0)
     D3DVALUE cx,cy;
     GetViewPort( sx, sy, cx, cy );
 
-//DeadCode JON 15Nov00 	pD3DDEV7->GetViewport(&vp);
-//DeadCode JON 15Nov00
-//DeadCode JON 15Nov00 	sx=D3DVALUE(vp.dwWidth>>1);
-//DeadCode JON 15Nov00 	sy=-D3DVALUE(vp.dwHeight>>1);
-//DeadCode JON 15Nov00 	cx=D3DVALUE(vp.dwX)+sx;
-//DeadCode JON 15Nov00 	cy=D3DVALUE(vp.dwY)-sy;
 
     PROJECT_POINT(&sPoint->vertex,cx,cy,sx,sy);
 
@@ -11234,13 +8934,6 @@ HRESULT Lib3D::DrawTransformedPoint(const HMATERIAL& hMaterial,const DoPointStru
 
 //	R3DVERTEX3(sPoint->vertex) = v0.getR3DVert();
     memcpy( &sPoint->vertex, &v0, sizeof( SVertex ) );
-//DeadCode JON 19Oct00 	sPoint->vertex.clipcode=ClipCodeFBLRTB(&sPoint->vertex);
-//DeadCode JON 19Oct00
-//DeadCode JON 19Oct00 	if (sPoint->vertex.clipcode!=0)
-//DeadCode JON 19Oct00 	{
-//DeadCode JON 19Oct00 		AllocDiscard((char*)sPoint);
-//DeadCode JON 19Oct00 		return S_OK;
-//DeadCode JON 19Oct00 	}
 
     D3DCOLOR pointCol;
     if ( hMaterial.f==0 && hMaterial.c != 254)
@@ -11305,12 +8998,10 @@ HRESULT	Lib3D::GiveHint(const HINTS& hint)
         edgeAlias=masterEdgeAlias==HINT_ALIASEDGES?hint:HINT_ALIASNONE;
         break;
     case HINT_2DRENDER:
-//DeadCode JON 25Sep00 		flags=Flags(flags|F_NOCLIPPING); // turn off clipping
         lightflag=LF_LIGHTSOURCE;
         renderMode=hint;
         break;
     case HINT_3DRENDER:
-//DeadCode JON 25Sep00 		flags=Flags(flags&~F_NOCLIPPING); // turn on clipping
         renderMode=hint;
         break;
     default:
@@ -11345,23 +9036,15 @@ HRESULT Lib3D::DrawCylinder(const HMATERIAL& hMaterial,	//texture
         return DDERR_GENERIC;
 #endif
     if ((lastError=SetMaterial(hMaterial))!=DD_OK) return lastError;
-//DeadCode JON 20Oct00 	if (hMaterial.tsW[0]!=0) // assume this is always the case
     {
         fu0=D3DVALUE(u0)*hMaterial.tsW[0];
         fu1=D3DVALUE(u1)*hMaterial.tsW[0];
         fv0=D3DVALUE(v0)*hMaterial.tsH[0];
         fv1=D3DVALUE(v1)*hMaterial.tsH[0];
     }
-//DEADCODE JON 5/22/00 	R3DVERTEX *polyVertArray=vertArray;
-//DEADCODE JON 5/22/00 	*polyVertArray=vertex0;
-//DEADCODE JON 5/22/00 	polyVertArray[2]=vertex1;
-//DEADCODE JON 5/22/00 	D3DVERTEX *pv=(D3DVERTEX *)polyVertArray;
 
-//DEADCODE JON 5/22/00 	SPolygon *sPolygon;
-//DEADCODE JON 5/22/00 	ALLOCATE_POLYGON(sPolygon,4);
     ALLOCATE_POLYGON_NOLINK( currentPoly, 4 );
 
-//DEADCODE JON 5/22/00 	SVertex *sVertex=sPolygon->pVertexList;
     SVertex *sVertex=currentPoly->pVertexList;
     sVertex[0]=vertex0;
     sVertex[2]=vertex1;
@@ -11369,17 +9052,11 @@ HRESULT Lib3D::DrawCylinder(const HMATERIAL& hMaterial,	//texture
     if (fCombineMatrices) CombineMatrices();							//RJS 22Sep00
     //RJS 22Sep00
     sVertex->Transform( &objViewMatrix );								//RJS 22Sep00
-//DeadCode RJS 22Sep00 	sVertex->Transform(	objectMatrix+objMatStackPos );
-//DeadCode RJS 22Sep00 	sVertex->Transform(	viewerMatrix+viewMatStackPos );
 
     sVertex[2].Transform( &objViewMatrix );								//RJS 22Sep00
-//DeadCode RJS 22Sep00 	sVertex[2].Transform( objectMatrix+objMatStackPos );
-//DeadCode RJS 22Sep00 	sVertex[2].Transform( viewerMatrix+viewMatStackPos );
 
     D3DVALUE	xoff, yoff;
 
-//DEADCODE JON 5/22/00 	pv[1]=pv[0];
-//DEADCODE JON 5/22/00 	pv[3]=pv[2];
     sVertex[1]=sVertex[0];
     sVertex[3]=sVertex[2];
     sVertex[0].pNext=&sVertex[1];
@@ -11401,7 +9078,6 @@ HRESULT Lib3D::DrawCylinder(const HMATERIAL& hMaterial,	//texture
     Float	opposite = sVertex[0].x*rhz0 - sVertex[2].x*rhz2;			//RJS 10Aug00
     if (opposite || adjacent)
     {
-//DeadCode RJS 10Aug00 		SWord	sin_ang,cos_ang;
         Float	angle;
 //#ifdef __GNUC__
         angle=atan2(opposite,adjacent);
@@ -11414,8 +9090,6 @@ HRESULT Lib3D::DrawCylinder(const HMATERIAL& hMaterial,	//texture
         			fstp	angle
         		}
 #endif*/
-//DeadCode RJS 10Aug00 		angle *= 10430.37835047;
-//DeadCode RJS 10Aug00 		SWord	angleofcyl = SWord(angle)-16384;
 
     D3DVALUE sine,cosine;
     SineCosine_Radian(D3DVALUE(angle-1.57079632),&sine,&cosine);
@@ -11458,7 +9132,6 @@ HRESULT Lib3D::_DrawTransformedCylinder( const D3DVALUE fu0, const D3DVALUE fv0,
 
     SetColAlpha( theColour, globAlpha );
 
-//DEADCODE JON 5/22/00 	Transform(pv,&sVertex->d3dtlvert,pMat);
     sVertex->Transform( pMat );
     sVertex->tu=fu0;
     sVertex->tv=fv0;
@@ -11470,7 +9143,6 @@ HRESULT Lib3D::_DrawTransformedCylinder( const D3DVALUE fu0, const D3DVALUE fv0,
     currentPoly->orcode|=sVertex->clipcode;
     sVertex=sVertex->pNext;
 
-//DEADCODE JON 5/22/00 	Transform(pv+1,&sVertex->d3dtlvert,pMat);
     sVertex->Transform( pMat );
 
     sVertex->tu=fu1;
@@ -11483,7 +9155,6 @@ HRESULT Lib3D::_DrawTransformedCylinder( const D3DVALUE fu0, const D3DVALUE fv0,
     currentPoly->orcode|=sVertex->clipcode;
     sVertex=sVertex->pNext;
 
-//DEADCODE JON 5/22/00 	Transform(pv+2,&sVertex->d3dtlvert,pMat);
     sVertex->Transform( pMat );
     sVertex->tu=fu1;
     sVertex->tv=fv1;
@@ -11495,7 +9166,6 @@ HRESULT Lib3D::_DrawTransformedCylinder( const D3DVALUE fu0, const D3DVALUE fv0,
     currentPoly->orcode|=sVertex->clipcode;
     sVertex=sVertex->pNext;
 
-//DEADCODE JON 5/22/00 	Transform(pv+3,&sVertex->d3dtlvert,pMat);
     sVertex->Transform( pMat );
     sVertex->tu=fu0;
     sVertex->tv=fv1;
@@ -11507,15 +9177,7 @@ HRESULT Lib3D::_DrawTransformedCylinder( const D3DVALUE fu0, const D3DVALUE fv0,
     currentPoly->orcode|=sVertex->clipcode;
     sVertex=sVertex->pNext;
 
-//DeadCode RJS 22Sep00 	CALC_FOG( currentPoly );
 
-//DEADCODE JON 5/22/00 	for (int i=4;i!=0;i--)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 	 	sVertex->clipcode=ClipCodeFBLRTB(sVertex);
-//DEADCODE JON 5/22/00 		sPolygon->andcode&=sVertex->clipcode;
-//DEADCODE JON 5/22/00 		sPolygon->orcode|=sVertex->clipcode;
-//DEADCODE JON 5/22/00 		sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00 	}
     if (currentPoly->andcode==0)
     {
 #ifdef	_SHAPE_DEBUG_
@@ -11529,14 +9191,12 @@ HRESULT Lib3D::_DrawTransformedCylinder( const D3DVALUE fu0, const D3DVALUE fv0,
             //its transparent
             if (renderMode == HINT_3DRENDER)
             {
-//DEADCODE JON 5/25/00 					PROJECT_SPHERE(currentPoly,cx,cy,sx,sy);//,rad);	//RJS 12May00
                 currentPoly->projectType=STANDARD_PROJECT+zBias;	//RJS 06Jun00
                 currentPoly->CalcTransZ( zFactor, 0.0f );
 //				currentPoly->CalcTransZ(zFactor,tZBias_f); // don't ever do a bias on these...
             }
             else
             {
-//DEADCODE JON 5/25/00 					PROJECT_2D(currentPoly,cx,cy,sx,sy);
                 currentPoly->projectType=PROJECT_2D;
                 currentPoly->zDepth2d = zDepth2d;
                 currentPoly->SetTrans2DZ(zBuffer2d);
@@ -11604,7 +9264,6 @@ HRESULT Lib3D::CylinderOffsets(	const DoPointStruc& vertex0,	//p0
     Float	opposite = pv[0].x*rz0 - pv[1].x*rz1;						//RJS 10Aug00
     if (opposite || adjacent)
     {
-//DeadCode RJS 10Aug00 		SWord	sin_ang,cos_ang;
         Float	angle;
 //#ifdef __GNUC__
         angle=atan2(opposite,adjacent);
@@ -11618,8 +9277,6 @@ HRESULT Lib3D::CylinderOffsets(	const DoPointStruc& vertex0,	//p0
                         }
 #endif*/
 
-//DeadCode RJS 10Aug00 		angle *= 10430.37835047;
-//DeadCode RJS 10Aug00 		SWord	angleofcyl = SWord(angle)-16384;
 
     D3DVALUE sine,cosine;
     SineCosine_Radian(D3DVALUE(angle-1.57079632),&sine,&cosine);
@@ -11667,19 +9324,13 @@ else
         return DDERR_GENERIC;
 #endif
     if ((lastError=SetMaterial(hMaterial))!=DD_OK) return lastError;
-//DeadCode JON 20Oct00 	if (hMaterial.tsW[0]!=0) // assume this is always the case
     {
         fu0=D3DVALUE(u0)*hMaterial.tsW[0];
         fu1=D3DVALUE(u1)*hMaterial.tsW[0];
         fv0=D3DVALUE(v0)*hMaterial.tsH[0];
         fv1=D3DVALUE(v1)*hMaterial.tsH[0];
     }
-//DEADCODE JON 5/22/00 	R3DVERTEX* polyVertArray=vertArray;
-//DEADCODE JON 5/22/00 	*polyVertArray=vertex0;
-//DEADCODE JON 5/22/00 	polyVertArray[2]=vertex1;
-//DEADCODE JON 5/22/00 	D3DVERTEX *pv=(D3DVERTEX *)polyVertArray;
 
-//DEADCODE JON 5/22/00 	SPolygon *sPolygon;
 
     ALLOCATE_POLYGON(currentPoly,4);
     SVertex *sVertex=currentPoly->pVertexList;
@@ -11688,8 +9339,6 @@ else
     sVertex[2] = vertex1;
 
     // Dup. up top and bottom vertices
-//DEADCODE JON 5/22/00 	pv[3] = pv[2];	// bottom
-//DEADCODE JON 5/22/00 	pv[1] = pv[0];	// top
 
     sVertex[1]=sVertex[0];
     sVertex[3]=sVertex[2];
@@ -11722,123 +9371,6 @@ else
     return _DrawTransformedCylinder( fu0, fv0, fu1, fv1 );
 #endif
 }
-//DEADCODE JON 5/22/00 	R3DMATRIX *pMat=projectionMatrix+projMatStackPos;
-//DEADCODE JON 5/22/00 	ULong		theColour = gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 	SetColAlpha( theColour, globAlpha );
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	Transform(pv,&sVertex->d3dtlvert,pMat);
-//DEADCODE JON 5/22/00 	sVertex->tu=fu1;
-//DEADCODE JON 5/22/00 	sVertex->tv=fv0;
-//DEADCODE JON 5/22/00 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/22/00 	sVertex->color = theColour;
-//DEADCODE JON 5/22/00 	sVertex->specular=0x00000000;
-//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	Transform(pv+1,&sVertex->d3dtlvert,pMat);
-//DEADCODE JON 5/22/00 	sVertex->tu=fu1;
-//DEADCODE JON 5/22/00 	sVertex->tv=fv1;
-//DEADCODE JON 5/22/00 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/22/00 	sVertex->color = theColour;
-//DEADCODE JON 5/22/00 	sVertex->specular=0x00000000;
-//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	Transform(pv+2,&sVertex->d3dtlvert,pMat);
-//DEADCODE JON 5/22/00 	sVertex->tu=fu0;
-//DEADCODE JON 5/22/00 	sVertex->tv=fv1;
-//DEADCODE JON 5/22/00 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/22/00 	sVertex->color = theColour;
-//DEADCODE JON 5/22/00 	sVertex->specular=0x00000000;
-//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	Transform(pv+3,&sVertex->d3dtlvert,pMat);
-//DEADCODE JON 5/22/00 	sVertex->tu=fu0;
-//DEADCODE JON 5/22/00 	sVertex->tv=fv0;
-//DEADCODE JON 5/22/00 //DEADCODE JON 3/29/00 	sVertex->color=0xFFFFFFFF;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	sVertex->color=gLightingDesc.ambientRGB;
-//DEADCODE JON 5/22/00 //DEADCODE RJS 4/28/00 	SetColAlpha( sVertex->color, globAlpha );
-//DEADCODE JON 5/22/00 	sVertex->color = theColour;
-//DEADCODE JON 5/22/00 	sVertex->specular=0x00000000;
-//DEADCODE JON 5/22/00 	sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	for (int i=4;i!=0;i--)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 	 	sVertex->clipcode=ClipCodeFBLRTB(&sVertex->d3dtlvert);
-//DEADCODE JON 5/22/00 		sPolygon->andcode&=sVertex->clipcode;
-//DEADCODE JON 5/22/00 		sPolygon->orcode|=sVertex->clipcode;
-//DEADCODE JON 5/22/00 		sVertex=sVertex->pNext;
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00 	if (sPolygon->andcode==0)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 #ifdef	_SHAPE_DEBUG_
-//DEADCODE JON 5/22/00 	noPolysDebug++;
-//DEADCODE JON 5/22/00 #endif
-//DEADCODE JON 5/22/00 	 	if (sPolygon->orcode!=0)
-//DEADCODE JON 5/22/00 			GenericPolyClip(sPolygon);
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 		if (sPolygon->vertexcount>2)
-//DEADCODE JON 5/22/00 		{
-//DEADCODE JON 5/22/00 			D3DVIEWPORT7 vp;
-//DEADCODE JON 5/22/00 			pD3DDEV7->GetViewport(&vp);
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 			D3DVALUE sx,sy;
-//DEADCODE JON 5/22/00 			D3DVALUE cx,cy;
-//DEADCODE JON 5/22/00 			sx=D3DVALUE(vp.dwWidth>>1);
-//DEADCODE JON 5/22/00 			sy=-D3DVALUE(vp.dwHeight>>1);
-//DEADCODE JON 5/22/00 			cx=D3DVALUE(vp.dwX)+sx;
-//DEADCODE JON 5/22/00 			cy=D3DVALUE(vp.dwY)-sy;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 /*			if (sPolygon->material.f==0)
-//DEADCODE JON 5/22/00 			{
-//DEADCODE JON 5/22/00 				if (renderMode == HINT_3DRENDER)
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				else
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT_2D(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				ADD_POLYGON(plainPolys,sPolygon);
-//DEADCODE JON 5/22/00 			}
-//DEADCODE JON 5/22/00 			else*/ if (sPolygon->material.isMasked==0)
-//DEADCODE JON 5/22/00 			{
-//DEADCODE JON 5/22/00 				if (renderMode == HINT_3DRENDER)
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				else
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT_2D(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				ADD_POLYGON(texturedPolys,sPolygon);
-//DEADCODE JON 5/22/00 				AddEdgeAliasing(sPolygon);
-//DEADCODE JON 5/22/00 			}
-//DEADCODE JON 5/22/00 			else
-//DEADCODE JON 5/22/00 			{
-//DEADCODE JON 5/22/00 				if (renderMode == HINT_3DRENDER)
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT_SETZ(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				else
-//DEADCODE JON 5/22/00 				{
-//DEADCODE JON 5/22/00 					PROJECT_2D(sPolygon,cx,cy,sx,sy);
-//DEADCODE JON 5/22/00 				}
-//DEADCODE JON 5/22/00 				ADD_POLYGON(transparentPolys,sPolygon);
-//DEADCODE JON 5/22/00 			}
-//DEADCODE JON 5/22/00 		}
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00 	else
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 		DISCARD_POLYGON(sPolygon);
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	return S_OK;
-//DEADCODE JON 5/22/00 }
 
 char* getRefCount( void* tmp )
 {
@@ -12054,7 +9586,6 @@ void Lib3D::CloseDown(bool could_be_legit)
         GetErrorDesc( lastError, ErrorDesc );
     }
 
-//DeadCode JON 20Oct00 	ULong count = 0;
     if (pD3D7)		 													//JON 10Jul00
     {
         pD3D7->EvictManagedTextures();
@@ -12077,9 +9608,6 @@ void Lib3D::CloseDown(bool could_be_legit)
         DeRefAndNULL( IUnknownPtrRef( pDDS7MirrorZB ) );
         MonoPrintAt( 5, monoline++, "released mirror z                   " );
 // no need to free the mirror texture - it's been done already with the other textures...
-//DeadCode JON 17Aug00 		MonoPrintAt( 0, monoline, getRefCount(  pDDS7MirrorRT ) );
-//DeadCode JON 17Aug00 		DeRefAndNULL( IUnknownPtrRef( pDDS7MirrorRT ) );
-//DeadCode JON 17Aug00 		MonoPrintAt( 5, monoline++, "released mirror                  " );
 
     }
 
@@ -12132,117 +9660,6 @@ void Lib3D::CloseDown(bool could_be_legit)
 #endif
 
     CloseDiags();
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 //	Mono_Text.ClsMono();
-//DeadCode CSB 21Jul00 //	int monoline = 0;
-//DeadCode CSB 21Jul00 //	Mono_Text.PrintAt( 0, monoline++, (UByte*)"entered closedown                     " );
-//DeadCode CSB 21Jul00 //	char *ErrorDesc;
-//DeadCode CSB 21Jul00 //	GetErrorDesc( lastError, ErrorDesc );
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 	ULong count = 0;
-//DeadCode CSB 21Jul00 	if (pD3D7)		 													//JON 10Jul00
-//DeadCode CSB 21Jul00 	{
-//DeadCode CSB 21Jul00 		pD3D7->EvictManagedTextures();
-//DeadCode CSB 21Jul00 	}
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 	if (pDD7)	// direct draw object
-//DeadCode CSB 21Jul00 	{
-//DeadCode CSB 21Jul00 		pDD7->SetCooperativeLevel(hwTop,DDSCL_NORMAL);
-//DeadCode CSB 21Jul00 		DeRefAndNULL( IUnknownPtrRef( pDD7 ) );
-//DeadCode CSB 21Jul00 	}
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 	if (pD3D7)	// D3D Object
-//DeadCode CSB 21Jul00 	{
-//DeadCode CSB 21Jul00 //		DeRefAndNULL( IUnknownPtrRef( pD3D7 ) );
-//DeadCode CSB 21Jul00 		count=pD3D7->Release();
-//DeadCode CSB 21Jul00 		pD3D7=NULL;
-//DeadCode CSB 21Jul00 	}
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 //	DeRefAndNULL( IUnknownPtrRef( pD3DDEV7 ) ); //D3D device
-//DeadCode CSB 21Jul00 	if ( pD3DDEV7 != NULL )
-//DeadCode CSB 21Jul00 	{
-//DeadCode CSB 21Jul00 		if ( (flags&F_WINDOWED) )
-//DeadCode CSB 21Jul00 			count =pD3DDEV7->Release();
-//DeadCode CSB 21Jul00 		pD3DDEV7=NULL;
-//DeadCode CSB 21Jul00 	}
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 	if (flags&F_WINDOWED)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 	{
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if (gpD3DVB7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		{
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			count=gpD3DVB7->Release();
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			gpD3DVB7=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		}
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if (gpD3DVBL7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		{
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			count=gpD3DVBL7->Release();
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			gpD3DVBL7=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		}
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if (pD3DDEV7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		{
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			count=pD3DDEV7->Release();
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pD3DDEV7=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		}
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if (pD3D7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		{
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 //deadcode			if ((flags&F_CANTMANAGETEXTURES)==0)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pD3D7->EvictManagedTextures();
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			count=pD3D7->Release();
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pD3D7=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		}
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 //		if (pDDS7LandRT != pDDSB7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if ((flags&F_TEXTURECANBERENDERTARGET)!=0)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		{
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pDDS7LandZB=NULL; //remove the z buffer for the landscape textures
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			while (pDDS7LandRT->Release()>0);
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pDDS7LandRT=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		}
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if (pDDSZ7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pDDSZ7=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if (pDDSB7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			while (pDDSB7->Release()>0);
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		pDDSB7=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if (pDDSP7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		{
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			count=pDDSP7->Release();
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pDDSP7=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		}
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		if (pDD7)
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		{
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pDD7->SetCooperativeLevel(hwTop,DDSCL_NORMAL);
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			count=pDD7->Release();
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			while ( count )
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 				count=pDD7->Release();
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 			pDD7=NULL;
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 		}
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 	}
-//DeadCode CSB 21Jul00 //TempCode JON 13Jul00 	else
-//DeadCode CSB 21Jul00 	{
-//DeadCode CSB 21Jul00 		DeRefAndNULL( IUnknownPtrRef( gpD3DVB7 ) ); //glob vertex buffer
-//DeadCode CSB 21Jul00 		DeRefAndNULL( IUnknownPtrRef( gpD3DVBL7 ) ); //line vertex buffer
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 		if ((flags&F_TEXTURECANBERENDERTARGET)!=0)	 //JON 15Jun00
-//DeadCode CSB 21Jul00 		{
-//DeadCode CSB 21Jul00 			DeRefAndNULL( IUnknownPtrRef( pDDS7LandZB ) );
-//DeadCode CSB 21Jul00 			DeRefAndNULL( IUnknownPtrRef( pDDS7LandRT ) );
-//DeadCode CSB 21Jul00 			DeRefAndNULL( IUnknownPtrRef( pDDS7MirrorZB ) );
-//DeadCode CSB 21Jul00 			DeRefAndNULL( IUnknownPtrRef( pDDS7MirrorRT ) );
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 		}
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 		DeRefAndNULL( IUnknownPtrRef( pDDSZ7 ) ); // back buffer zbuffer
-//DeadCode CSB 21Jul00 		DeRefAndNULL( IUnknownPtrRef( pDDSB7 ) ); // back buffer
-//DeadCode CSB 21Jul00 		DeRefAndNULL( IUnknownPtrRef( pDDSP7 ) ); // primary surface
-//DeadCode CSB 21Jul00
-//DeadCode CSB 21Jul00 	}
-//DeadCode CSB 21Jul00 //DeadCode JON 11Jul00 	pDD7=NULL;
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		RenderPointList
@@ -12292,20 +9709,9 @@ void Lib3D::RenderLineList(SLine *pHead)
     INT3;
 #else
     SLine *pCur;
-//DEADCODE RJS 4/17/00 static	D3DTLVERTEX  pInsPOO[1024];
     D3DTLVERTEX *pIns;
-//DEADCODE RJS 4/17/00 	D3DTLVERTEX3 *pIns;
-//DeadCode RJS 06Jun100 	HRESULT hr;
     ULong vertcnt;
     lpD3DVB7=gpD3DVBL7;												//RJS 17Apr00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	// Force the Z-Buffer State
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZENABLE, TRUE );	//RJS 17May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,TRUE);//RJS 17May00
-//DeadCode JON 17Aug00   	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZFUNC,D3DCMP_LESSEQUAL);//RJS 17May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZENABLE, prefZType );//RJS 17May00
 //TempCode JON 31Oct00 	InlineSetCurrentMaterial( hLastMaterial, IS_PLAIN );
 
     while (pHead!=NULL)
@@ -12315,25 +9721,18 @@ void Lib3D::RenderLineList(SLine *pHead)
 //		GetErrorDesc( hr, ErrorDesc );
         vertcnt=0;
         pCur=pHead;
-//DEADCODE RJS 4/17/00 		pIns = pInsPOO;
         while (vertcnt<1023 && pCur!=NULL)
         {
             *pIns++=D3DTLVERTEX(pCur->vertices[0].getR3DVert());
             *pIns++=D3DTLVERTEX(pCur->vertices[1].getR3DVert());
 
-//DeadCode JON 23Aug00 			*pIns++ = pCur->vertices[0];
-//DeadCode JON 23Aug00 			*pIns++ = pCur->vertices[1];
-//DEADCODE RJS 4/17/00 			*pIns++=pCur->vertices[0]3;
-//DEADCODE RJS 4/17/00 			*pIns++=pCur->vertices[1]3;
             pCur=pCur->pNext;
             vertcnt+=2;
         }
 
         lastError=lpD3DVB7->Unlock();
-//DeadCode JON 30Oct00 		lastError=pD3DDEV7->SetTexture(0,NULL);
 
         lastError=pD3DDEV7->DrawPrimitiveVB(D3DPT_LINELIST,lpD3DVB7,0,vertcnt,0);
-//DEADCODE RJS 4/17/00 		hr=pD3DDEV7->DrawPrimitive(D3DPT_LINELIST,D3DFVF_TLVERTEX,pInsPOO,vertcnt,0);
 
         pHead=pCur;
     }
@@ -12773,8 +10172,6 @@ HRESULT Lib3D::SetUpRenderBlocks( void )
     // render block 1 - landscape texture, dither/sea animation...
     if ( !(flags&F_CANTBLENDTEXTURES) ) // keep same if we can't do this...
     {
-//deadcode JON 16/03/01			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-//deadcode JON 16/03/01			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_CURRENT );
         lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_TEXTURE );
         lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_CURRENT );
         lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_ADDSIGNED );
@@ -13137,126 +10534,6 @@ inline void Lib3D::ChangeRenderStateFog( float curFogStart, float curFogEnd )
 //------------------------------------------------------------------------------
 
 //#pragma warnmsg ( "inline me" )
-//DeadCode JON 17Aug00 inline void Lib3D::SetTransCurrentMaterial(const HMATERIAL& mat)
-//DeadCode JON 17Aug00 {
-//DeadCode JON 17Aug00 //DeadCode JON 14Jun00 	materialMapped.diffuse.dvA=
-//DeadCode JON 17Aug00 //DeadCode JON 14Jun00 		materialMapped.ambient.dvA=D3DVALUE(mat.c)*(1/255.f);
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	if (mat.f)													//RJS 06Jun00
-//DeadCode JON 17Aug00 	{
-//DeadCode JON 17Aug00 		if (mat.p[0]->blendType != lastBlendType)
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 			lastBlendType = AlphaBlendTypes(mat.p[0]->blendType);
-//DeadCode JON 17Aug00 			switch (lastBlendType)
-//DeadCode JON 17Aug00 			{
-//DeadCode JON 17Aug00 			case BLEND_SRCALPHA_DESTSOLID:
-//DeadCode JON 17Aug00 //Temp				pD3DDEV7->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_SRCALPHA);
-//DeadCode JON 17Aug00 				lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
-//DeadCode JON 17Aug00 			break;
-//DeadCode JON 17Aug00 			default:
-//DeadCode JON 17Aug00 			case BLEND_SRCALPHA_DESTINVSRCALPHA:
-//DeadCode JON 17Aug00 //Temp				pD3DDEV7->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_SRCALPHA);
-//DeadCode JON 17Aug00 				lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_INVSRCALPHA);
-//DeadCode JON 17Aug00 			break;
-//DeadCode JON 17Aug00 			}
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 	}
-//DeadCode JON 17Aug00 	else
-//DeadCode JON 17Aug00 	{
-//DeadCode JON 17Aug00 		// Plain Colour will always use the same blend...
-//DeadCode JON 17Aug00 		if (lastBlendType != BLEND_SRCALPHA_DESTINVSRCALPHA)
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 			lastBlendType = BLEND_SRCALPHA_DESTINVSRCALPHA;
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_INVSRCALPHA);
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 	}
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	CheckValidDevice( pD3DDEV7 );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	SetCurrentMaterial( mat );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	if ( mat.f == 0 )
-//DeadCode JON 17Aug00 	{
-//DeadCode JON 17Aug00 		pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG2 );
-//DeadCode JON 17Aug00 	}
-//DeadCode JON 17Aug00 }
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 //#pragma warnmsg ( "inline me" )
-//DeadCode JON 17Aug00 inline void Lib3D::SetPlainMaterial(/*const HMATERIAL& mat*/)
-//DeadCode JON 17Aug00 {
-//DeadCode JON 17Aug00 //DeadCode RJS 06Jun100 	HRESULT hr;
-//DeadCode JON 17Aug00 //	SetCurrentLighting();
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	// plain col poly
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_LIGHTING,TRUE);
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_SPECULARENABLE,FALSE);
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->LightEnable(0,TRUE);
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTexture(0,NULL);
-//DeadCode JON 17Aug00 //DEADCODE JON 5/9/00 	hr=pD3DDEV7->SetMaterial(&materialTable[mat.c]);
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 #ifndef NDEBUG
-//DeadCode JON 17Aug00 	CheckValidDevice( pD3DDEV7 );
-//DeadCode JON 17Aug00 #endif
-//DeadCode JON 17Aug00 }
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 //#pragma warnmsg ( "inline me" )
-//DeadCode JON 17Aug00 inline void Lib3D::SetAntiAliasing( const HMATERIAL& mat )
-//DeadCode JON 17Aug00 {
-//DeadCode JON 17Aug00 	if ( mat.isMasked==MSK_MASKED )
-//DeadCode JON 17Aug00 	{
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFG_POINT);
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFG_POINT);
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MAGFILTER,D3DTFG_POINT);
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MINFILTER,D3DTFG_POINT);
-//DeadCode JON 17Aug00 	} else
-//DeadCode JON 17Aug00 	{
-//DeadCode JON 17Aug00 		switch (textureBlending)
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 		case HINT_NOBLEND:
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFG_POINT);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFG_POINT);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MAGFILTER,D3DTFG_POINT);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MINFILTER,D3DTFG_POINT);
-//DeadCode JON 17Aug00 			break;
-//DeadCode JON 17Aug00 		case HINT_TRILINEAR:
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MIPFILTER,D3DTFP_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 //TEMPCODE JON 4/6/00 			hr=pD3DDEV7->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFG_ANISOTROPIC );//D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 //TEMPCODE JON 4/6/00 			hr=pD3DDEV7->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFG_ANISOTROPIC );//D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MIPFILTER,D3DTFP_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MAGFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MINFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 	//		hr=pD3DDEV7->SetTextureStageState(0,D3DTSS_MAXANISOTROPY ,2 );
-//DeadCode JON 17Aug00 			break;
-//DeadCode JON 17Aug00 		case HINT_BILINEAR:
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 //DeadCode RDH 28Jun100 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00 //DeadCode RDH 28Jun100 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00 //DeadCode RDH 28Jun100 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 //DeadCode RDH 28Jun100 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 //DeadCode RDH 28Jun100 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MAGFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 //DeadCode RDH 28Jun100 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MINFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 //DeadCode RDH 28Jun100 			break;
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MAGFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MINFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			break;
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 	}
-//DeadCode JON 17Aug00 }
 
 //#pragma warnmsg ( "inline me" )
 inline void Lib3D::SetCurrentMaterial(const HMATERIAL& mat, const ULong flags)
@@ -13352,130 +10629,6 @@ inline void Lib3D::SetCurrentMaterial(const HMATERIAL& mat, const ULong flags)
         lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_SPECULARENABLE,FALSE);
     }
 
-//DeadCode JON 17Aug00 //	HRESULT hr;
-//DeadCode JON 17Aug00 	SetCurrentLighting();
-//DeadCode JON 17Aug00 #ifdef	_NOTEXTURES_
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_SELECTARG2 );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 #else
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
-//DeadCode JON 17Aug00 #endif
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );		//ATI cards only accept TEXTURE in COLORARG1
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );	//JON 3/23/00
-//DeadCode JON 17Aug00 //	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_SUBTRACT );
-//DeadCode JON 17Aug00 //	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1 );
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
-//DeadCode JON 17Aug00 //	CheckValidDevice( pD3DDEV7 );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	SetAntiAliasing( mat );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	if (mat.isLand)
-//DeadCode JON 17Aug00 	{
-//DeadCode JON 17Aug00 #ifndef NO_HARD_TNL
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetMaterial(&materialMapped);
-//DeadCode JON 17Aug00 #endif
-//DeadCode JON 17Aug00 		ULong landTextureIndex;
-//DeadCode JON 17Aug00 		landTextureIndex=mat.isLand^0xFFFFFFFF;
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetTexture(0,landTextures[landTextureIndex]);
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 		lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_CLAMP);
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 		if (mat.p[1]!=NULL && !(flags&F_CANTBLENDTEXTURES))
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 //TempCode JON 25Jul00 			lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_SELECTARG2 );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTexture( 1, textureTable[mat.p[1]->hTextureMap] );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_TEXTURE );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_ADDSIGNED );
-//DeadCode JON 17Aug00 //			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_ADD );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_CURRENT );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 //DeadCode JON 2Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MAGFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 //DeadCode JON 2Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MINFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 //DeadCode JON 26Jul00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 2, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 2, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 		else
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 		return;
-//DeadCode JON 17Aug00 	}
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	SLong opt;
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	if (mat.f)
-//DeadCode JON 17Aug00 	{
-//DeadCode JON 17Aug00 		opt=flags&F_CANTBLENDTEXTURES?1:mat.f;
-//DeadCode JON 17Aug00 		for (SLong index=opt-1;index>=0;index--)
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTexture(index,textureTable[mat.p[index]->hTextureMap]);
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 	}
-//DeadCode JON 17Aug00 	else opt=0;
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 	switch ( opt )
-//DeadCode JON 17Aug00 	{
-//DeadCode JON 17Aug00 	case 0:	// plain col poly (should be dealt wiv elsewhere but just incase
-//DeadCode JON 17Aug00 			// it could be transparent...
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 			SetPlainMaterial(/* mat */);
-//DeadCode JON 17Aug00 #ifndef NDEBUG
-//DeadCode JON 17Aug00 //			INT3;
-//DeadCode JON 17Aug00 #endif
-//DeadCode JON 17Aug00 //DEADCODE JON 5/9/00 			hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_LIGHTING,TRUE);
-//DeadCode JON 17Aug00 //DEADCODE JON 5/9/00 			hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_SPECULARENABLE,FALSE);
-//DeadCode JON 17Aug00 //DEADCODE JON 5/9/00 			hr=pD3DDEV7->LightEnable(0,TRUE);
-//DeadCode JON 17Aug00 //DEADCODE JON 5/9/00 			hr=pD3DDEV7->SetTexture(0,NULL);
-//DeadCode JON 17Aug00 //DEADCODE JON 5/9/00 			hr=pD3DDEV7->SetMaterial(&materialTable[mat.c]);
-//DeadCode JON 17Aug00 //DEADCODE JON 5/9/00 			hr=pD3DDEV7->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 //DEADCODE JON 5/9/00 			hr=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 		break;
-//DeadCode JON 17Aug00 	case 1: // textured
-//DeadCode JON 17Aug00 #ifndef NO_HARD_TNL
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetMaterial(&materialMapped);
-//DeadCode JON 17Aug00 #endif
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 		break;
-//DeadCode JON 17Aug00 	case 2: // double textured - i.e clouds
-//DeadCode JON 17Aug00 		{
-//DeadCode JON 17Aug00 #ifndef NO_HARD_TNL
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetMaterial(&materialMapped);
-//DeadCode JON 17Aug00 #endif
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_BLENDTEXTUREALPHA);	//MODULATE );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_CURRENT );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1 );
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MAGFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MINFILTER,D3DTFG_LINEAR);
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState(1,D3DTSS_MIPFILTER,D3DTFP_NONE);
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 2, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 			lastError=pD3DDEV7->SetTextureStageState( 2, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-//DeadCode JON 17Aug00 		}
-//DeadCode JON 17Aug00 		break;
-//DeadCode JON 17Aug00 	default:
-//DeadCode JON 17Aug00 		break;
-//DeadCode JON 17Aug00 	}
-//DeadCode JON 17Aug00
-//DeadCode JON 17Aug00 #ifndef NDEBUG
-//DeadCode JON 17Aug00 	CheckValidDevice( pD3DDEV7 );
-//DeadCode JON 17Aug00 #endif
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		RenderPolyList
@@ -13491,42 +10644,16 @@ void Lib3D::RenderPolyList(SPolygon* &pHead)
     ULong offset;
 
     int	i;
-//DeadCode RJS 06Jun100 	HRESULT hr;
 
     D3DVALUE sx, sy, cx, cy;
     GetViewPort( /*pD3DDEV7,*/ sx, sy, cx, cy );
 
-//DeadCode JON 17Aug00 // Force the Z-Buffer State
-//DeadCode JON 17Aug00 //??	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZENABLE, TRUE );	//RJS 17May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,TRUE);//RJS 17May00
-//DeadCode JON 17Aug00   	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZFUNC,D3DCMP_LESSEQUAL);//RJS 17May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZENABLE, prefZType );//RJS 17May00
 
-//DeadCode JON 21Aug00 	ULong zBias = &pHead - texturedPolys;
-//DeadCode JON 21Aug00 	D3DVALUE zAdd;
-//DeadCode JON 21Aug00 	if ( zBias >=0 && zBias < NUM_Z_LAYERS )
-//DeadCode JON 21Aug00 		zAdd = zSMALL * (zBias<<2);
 //	else
 //		zAdd = 0.0;
 
 
-//DeadCode JON 21Aug00 	R3DMATRIX* pMat = projectionMatrix+((projMatStackPos%MATRIX_STACK_SIZE)+(MATRIX_STACK_SIZE*zBias));
-//DeadCode JON 21Aug00 	lastError=pD3DDEV7->SetTransform(D3DTRANSFORMSTATE_PROJECTION,pMat);
 
-//DeadCode JON 21Aug00 	switch ( zBias )
-//DeadCode JON 21Aug00 	{
-//DeadCode JON 21Aug00 	case 0:
-//DeadCode JON 21Aug00 //		return;
-//DeadCode JON 21Aug00 		break;
-//DeadCode JON 21Aug00 	case 1:
-//DeadCode JON 21Aug00 		return;
-//DeadCode JON 21Aug00 		break;
-//DeadCode JON 21Aug00 	case 2:
-//DeadCode JON 21Aug00 //		return;
-//DeadCode JON 21Aug00 		break;
-//DeadCode JON 21Aug00 	NODEFAULT;
-//DeadCode JON 21Aug00 	}
-//DeadCode JON 21Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZBIAS , zBias );
 
 //#define DO_INDEXED_VB
 
@@ -13632,17 +10759,9 @@ void Lib3D::RenderPlainPolyList(SPolygon *pHead)
     D3DVALUE sx, sy, cx, cy;
     GetViewPort( /*pD3DDEV7,*/ sx, sy, cx, cy );
 
-//DeadCode JON 17Aug00 // Force the Z-Buffer State
-//DeadCode JON 17Aug00 //??	hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZENABLE, TRUE );	//RJS 17May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,TRUE);//RJS 17May00
-//DeadCode JON 17Aug00   	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZFUNC,D3DCMP_LESSEQUAL);//RJS 17May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZENABLE, prefZType );//RJS 17May00
 
 
     lpD3DVB7=gpD3DVB7;
-//DeadCode JON 17Aug00 	SetPlainMaterial();
-//DeadCode JON 17Aug00 	HMATERIAL* curmat=&pHead->material;
-//DeadCode JON 17Aug00 	InlineSetCurrentMaterial( *curmat, ULong( curmat->materialFlags) );
     InlineSetCurrentMaterial( hLastMaterial, IS_PLAIN );
     pTail=pHead;
     while (pHead!=NULL)
@@ -13674,12 +10793,6 @@ void Lib3D::RenderPlainPolyList(SPolygon *pHead)
         }
         while (pTail!=pCur)
         {
-//DEADCODE JON 5/25/00 			pSVert=pCur->pVertexList;
-//DEADCODE JON 5/25/00 		  	for (i=pCur->vertexcount;i>0;i--)
-//DEADCODE JON 5/25/00 			{
-//DEADCODE JON 5/25/00 			 	*pIns++=pSVert->getR3DVert();
-//DEADCODE JON 5/25/00 				pSVert=pSVert->pNext;
-//DEADCODE JON 5/25/00 			}
             pIns = pCur->CopyToVertexBuffer( pIns, cx, cy, sx, sy );
             pCur=pCur->pNext;
         }
@@ -13696,11 +10809,6 @@ void Lib3D::RenderPlainPolyList(SPolygon *pHead)
         vertcnt=0;
         while (pTail!=pCur)
         {
-//DEADCODE JON 5/9/00 			if (!SamePlainMaterial(pCur->material,curmat))
-//DEADCODE JON 5/9/00 			{
-//DEADCODE JON 5/9/00 			 	curmat=pCur->material;
-//DEADCODE JON 5/9/00 				SetPlainMaterial(/*curmat*/);
-//DEADCODE JON 5/9/00 			}
             verttot=pCur->vertexcount;
             lastError=pD3DDEV7->DrawPrimitiveVB(D3DPT_TRIANGLEFAN,lpD3DVB7,vertcnt,verttot,0);
             vertcnt+=verttot;
@@ -13748,22 +10856,13 @@ void Lib3D::RenderTPolyList(SPolygon *pHead)
 //	hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_SRCALPHA);
 //	hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
 
-//DeadCode JON 17Aug00 	lastBlendType = BLEND_SRCALPHA_DESTINVSRCALPHA;					//RJS 16May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_SRCALPHA);		//how much is put on top
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_INVSRCALPHA);	//how much shows through underneath
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,TRUE);
 
 // Force the Z-Buffer State
 //??	hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZENABLE, TRUE );	//RJS 17May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,FALSE);//RJS 17May00
-//DeadCode JON 17Aug00   	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZFUNC,D3DCMP_LESSEQUAL);//RJS 17May00
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZENABLE, prefZType );//RJS 17May00
 
-//DeadCode JON 17Aug00 	CheckValidDevice( pD3DDEV7 );
 
     curmat=pHead->material;
     InlineSetCurrentMaterial(curmat, ULong(curmat.materialFlags)+IS_ALPHA );
-//DeadCode JON 17Aug00 	SetTransCurrentMaterial(curmat);
 
     pTail=pHead;
     while (pHead!=NULL) // step thru all poly's
@@ -13837,71 +10936,9 @@ void Lib3D::RenderTPolyList(SPolygon *pHead)
         pHead=pTail;
     }
 
-//DeadCode JON 30Oct00 	while (pHead!=NULL)
-//DeadCode JON 30Oct00 	{
-//DeadCode JON 30Oct00 		vertcnt=0;
-//DeadCode JON 30Oct00 		pCur=pHead;
-//DeadCode JON 30Oct00 		while (pTail!=NULL)
-//DeadCode JON 30Oct00 		{
-//DeadCode JON 30Oct00 			vertcnt+=pTail->vertexcount;
-//DeadCode JON 30Oct00 			if (vertcnt>1024) break;
-//DeadCode JON 30Oct00 			pTail=pTail->pNext;
-//DeadCode JON 30Oct00 		}
-//DeadCode JON 30Oct00 		lastError=lpD3DVB7->Lock(DDLOCK_WRITEONLY|DDLOCK_SURFACEMEMORYPTR|DDLOCK_DISCARDCONTENTS,(LPVOID*)&pIns,NULL);
-//DeadCode JON 30Oct00 #ifndef NDEBUG
-//DeadCode JON 30Oct00 		if ( lastError != 0 )
-//DeadCode JON 30Oct00 		{
-//DeadCode JON 30Oct00 			char *errorDesc;
-//DeadCode JON 30Oct00 			GetErrorDesc( lastError, errorDesc );
-//DeadCode JON 30Oct00 			INT3;
-//DeadCode JON 30Oct00 		} else
-//DeadCode JON 30Oct00 		{
-//DeadCode JON 30Oct00 //			INT3;
-//DeadCode JON 30Oct00 		}
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 		while (pTail!=pCur)
-//DeadCode JON 30Oct00 		{
-//DeadCode JON 30Oct00 //DEADCODE JON 5/25/00 			pSVert=pCur->pVertexList;
-//DeadCode JON 30Oct00 //DEADCODE JON 5/25/00 		  	for (i=pCur->vertexcount
-//DeadCode JON 30Oct00 //DEADCODE JON 5/25/00 				pSVert=pSVert->pNext;;i>0;i--)
-//DeadCode JON 30Oct00 //DEADCODE JON 5/25/00 			{
-//DeadCode JON 30Oct00 //DEADCODE JON 5/25/00 			 	*pIns++=pSVert->getR3DVert();;
-//DeadCode JON 30Oct00 //DEADCODE JON 5/25/00 			}
-//DeadCode JON 30Oct00 			pIns = pCur->CopyToVertexBuffer( pIns, cx, cy, sx, sy );
-//DeadCode JON 30Oct00 			pCur=pCur->pNext;
-//DeadCode JON 30Oct00 		}
-//DeadCode JON 30Oct00 		lastError=lpD3DVB7->Unlock();
-//DeadCode JON 30Oct00
-//DeadCode JON 30Oct00 		pCur=pHead;
-//DeadCode JON 30Oct00 		vertcnt=0;
-//DeadCode JON 30Oct00 		while (pTail!=pCur)
-//DeadCode JON 30Oct00 		{
-//DeadCode JON 30Oct00 			if (!SameTransMat(pCur->material,curmat))
-//DeadCode JON 30Oct00 			{
-//DeadCode JON 30Oct00 			 	curmat=pCur->material;
-//DeadCode JON 30Oct00 //DeadCode JON 17Aug00 				SetTransCurrentMaterial(curmat);
-//DeadCode JON 30Oct00 				InlineSetCurrentMaterial(curmat, ULong(pCur->material.materialFlags)+IS_ALPHA );
-//DeadCode JON 30Oct00 			}
-//DeadCode JON 30Oct00 			verttot=pCur->vertexcount;
-//DeadCode JON 30Oct00 			lastError=pD3DDEV7->DrawPrimitiveVB(D3DPT_TRIANGLEFAN,lpD3DVB7,vertcnt,verttot,0);
-//DeadCode JON 30Oct00 #ifndef NDEBUG
-//DeadCode JON 30Oct00 			if ( lastError != 0 )
-//DeadCode JON 30Oct00 			{
-//DeadCode JON 30Oct00 				char *errorDesc;
-//DeadCode JON 30Oct00 				GetErrorDesc( lastError, errorDesc );
-//DeadCode JON 30Oct00 			}
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 			vertcnt+=verttot;
-//DeadCode JON 30Oct00 			pCur=pCur->pNext;
-//DeadCode JON 30Oct00 		}
-//DeadCode JON 30Oct00 		pHead=pTail;
-//DeadCode JON 30Oct00 	}
     lpD3DVB7=NULL;
 
-//DeadCode JON 17Aug00 	EnableFogging(true);
 
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,FALSE);
-//DeadCode JON 17Aug00 	lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,TRUE);//RJS 17May00
 #endif
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -13941,30 +10978,6 @@ void Lib3D::EnableFogging(bool fEnable)
 		INT3;
 		return;
 	}
-//DeadCode JON 24Jul00 	HRESULT hr;
-//DeadCode JON 24Jul00 #ifndef _FORCE_SW_FOG_ // try for hardware fog
-//DeadCode JON 24Jul00 	if (fEnable && (selectedDevice.dpcTriCaps.dwRasterCaps&D3DPRASTERCAPS_FOGTABLE)!=0)
-//DeadCode JON 24Jul00 	{
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE,D3DFOG_LINEAR);
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE,D3DFOG_NONE);
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGENABLE,TRUE);
-//DeadCode JON 24Jul00 	}
-//DeadCode JON 24Jul00 	else if (fEnable && (selectedDevice.dpcTriCaps.dwRasterCaps&D3DPRASTERCAPS_FOGVERTEX)!=0)
-//DeadCode JON 24Jul00 	{
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE,D3DFOG_NONE);
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE,D3DFOG_LINEAR);
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGENABLE,TRUE);
-//DeadCode JON 24Jul00 	}
-//DeadCode JON 24Jul00 	else hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGENABLE,FALSE);
-//DeadCode JON 24Jul00 #else // software fog only
-//DeadCode JON 24Jul00 	if (fEnable && (selectedDevice.dpcTriCaps.dwRasterCaps&D3DPRASTERCAPS_FOGVERTEX)!=0)
-//DeadCode JON 24Jul00 	{
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE,D3DFOG_NONE);
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE,D3DFOG_LINEAR);
-//DeadCode JON 24Jul00 		hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGENABLE,TRUE);
-//DeadCode JON 24Jul00 	}
-//DeadCode JON 24Jul00 	else hr=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGENABLE,FALSE);
-//DeadCode JON 24Jul00 #endif
 #ifndef _NO_FOG_
     static bool lastFog = false;
 
@@ -13975,17 +10988,6 @@ void Lib3D::EnableFogging(bool fEnable)
 
     if ( fEnable )
     {
-//DeadCode JON 22Aug00 		if ( flags&F_VERTEXFOG )
-//DeadCode JON 22Aug00 		{ // vertex fog mode
-//DeadCode JON 22Aug00 			lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE,D3DFOG_NONE);
-//DeadCode JON 22Aug00 			lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE,D3DFOG_LINEAR);
-//DeadCode JON 22Aug00 			lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGENABLE,TRUE);
-//DeadCode JON 22Aug00 		} else
-//DeadCode JON 22Aug00 		{
-//DeadCode JON 22Aug00 			lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE,D3DFOG_LINEAR);
-//DeadCode JON 22Aug00 			lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE,D3DFOG_NONE);
-//DeadCode JON 22Aug00 			lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGENABLE,TRUE);
-//DeadCode JON 22Aug00 		}
         lastError=pD3DDEV7->SetRenderState(D3DRENDERSTATE_FOGENABLE,TRUE);
     }
     else
@@ -14219,7 +11221,6 @@ HRESULT Lib3D::HandleNaffDriver()
                 }
                 if ( curr != NULL )
                 {
-//DeadCode JON 10Oct00 							texFmt[format] = *curr;
                     texFmt[TF_LAND] = *curr;
                     texFmt[TF_LANDINIT] = *curr;
                 }
@@ -14460,117 +11461,6 @@ HRESULT Lib3D::HandleNaffDriver()
 #endif
     return S_OK;
 
-//DeadCode JON 16Aug00 	// values got from 3dinfo.exe
-//DeadCode JON 16Aug00 	const DWORD Riva_TNT		= 0x0020;
-//DeadCode JON 16Aug00 	const DWORD Riva_TNT2		= 0x0028;
-//DeadCode JON 16Aug00 	const DWORD GeForce			= 0x0100;
-//DeadCode JON 16Aug00 	const DWORD GeForce2		= 0x0150;
-//DeadCode JON 16Aug00 	const DWORD ATI_Rage_Pro	= 0x4742;
-//DeadCode JON 16Aug00 	const DWORD ATI_Radeon		= 0x5144;
-//DeadCode JON 16Aug00 	const DWORD FireGL_1KPro	= 0x3D07;
-//DeadCode JON 16Aug00 	const DWORD S3_Savage4		= 0x8A22;
-//DeadCode JON 16Aug00 	const DWORD Voodoo2			= 0x0002;
-//DeadCode JON 16Aug00 	const DWORD VoodooBanshee	= 0x0003;
-//DeadCode JON 16Aug00 	const DWORD Voodoo3			= 0x0005;
-//DeadCode JON 16Aug00 	const DWORD Voodoo5			= 0x0009;
-//DeadCode JON 16Aug00
-//DeadCode JON 16Aug00 	// Check this driver against a list of known broken drivers
-//DeadCode JON 16Aug00
-//DeadCode JON 16Aug00 	flags=Flags(flags&~F_STIPPLEALPHA);
-//DeadCode JON 16Aug00
-//DeadCode JON 16Aug00 //	flags=Flags(flags|F_CANTBLENDTEXTURES);
-//DeadCode JON 16Aug00
-//DeadCode JON 16Aug00
-//DeadCode JON 16Aug00 	switch ( devID.dwDeviceId )
-//DeadCode JON 16Aug00 	{
-//DeadCode JON 16Aug00 	case ATI_Radeon:
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_VERTEXFOG);
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_SLOWCOPY);
-//DeadCode JON 16Aug00 		SetNoRenderToTexture();
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	case Voodoo2:
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_CANTBLENDTEXTURES);
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_VERTEXFOG);
-//DeadCode JON 16Aug00 		SetNoRenderToTexture();
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	case VoodooBanshee:
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_VERTEXFOG);
-//DeadCode JON 16Aug00 		SetNoRenderToTexture();
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	case Voodoo5:
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_VERTEXFOG);
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	case Voodoo3:
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_CANTBLENDTEXTURES);
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_VERTEXFOG);
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	case FireGL_1KPro:
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_VSLOWCOPY);
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_STIPPLEALPHA);
-//DeadCode JON 16Aug00 		SetNoRenderToTexture();
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	case ATI_Rage_Pro:
-//DeadCode JON 16Aug00 		selectedDevice.dwMaxTextureWidth=256;
-//DeadCode JON 16Aug00 		selectedDevice.dwMaxTextureHeight=256;
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_SLOWCOPY);
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	case GeForce2:
-//DeadCode JON 16Aug00 	case GeForce:
-//DeadCode JON 16Aug00 	case Riva_TNT2:
-//DeadCode JON 16Aug00 	case Riva_TNT:
-//DeadCode JON 16Aug00 //		flags=Flags(flags|F_SLOWCOPY);
-//DeadCode JON 16Aug00 //		SetNoRenderToTexture();
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	case S3_Savage4:
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_SLOWCOPY);
-//DeadCode JON 16Aug00 //DeadCode JON 3Jul00 		flags=Flags(flags&~F_TEXTURECANBERENDERTARGET);
-//DeadCode JON 16Aug00 		SetNoRenderToTexture();
-//DeadCode JON 16Aug00 		if (	(selectedDevice.dpcTriCaps.dwRasterCaps&D3DPRASTERCAPS_WBUFFER)//RJS 06Jun00
-//DeadCode JON 16Aug00 			&&	(currentZBufferDepth < 24)	)
-//DeadCode JON 16Aug00 			prefZType = D3DZB_USEW;
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	default:
-//DeadCode JON 16Aug00 		break;
-//DeadCode JON 16Aug00 	}
-//DeadCode JON 16Aug00
-//DeadCode JON 16Aug00 #ifdef _FORCE_SW_FOG_
-//DeadCode JON 16Aug00 		flags=Flags(flags|F_VERTEXFOG);
-//DeadCode JON 16Aug00 #endif
-//DeadCode JON 16Aug00
-//DeadCode JON 16Aug00 	if (selectedDevice.dwMaxTextureWidth==0)	selectedDevice.dwMaxTextureWidth=256;
-//DeadCode JON 16Aug00 	if (selectedDevice.dwMaxTextureHeight==0)	selectedDevice.dwMaxTextureHeight=256;
-//DeadCode JON 16Aug00 	return S_OK;
-//DeadCode JON 16Aug00
-//DEADCODE JON 5/4/00 	NaffDriver nd=(NaffDriver)ND_Max;
-//DEADCODE JON 5/4/00
-//DEADCODE JON 5/4/00 	for (int i=0;i<ND_Max;i++)
-//DEADCODE JON 5/4/00 	{
-//DEADCODE JON 5/4/00 		GUID FAR *pGuid=(GUID FAR*)&naffDriverTable[i].ndGuid;
-//DEADCODE JON 5/4/00 		if (*pGuid==devID.guidDeviceIdentifier)
-//DEADCODE JON 5/4/00 		{
-//DEADCODE JON 5/4/00 			nd=naffDriverTable[i].naffDriver;
-//DEADCODE JON 5/4/00 			break;
-//DEADCODE JON 5/4/00 		}
-//DEADCODE JON 5/4/00 	}
-//DEADCODE JON 5/4/00
-//DEADCODE JON 5/4/00 	switch (nd)
-//DEADCODE JON 5/4/00 	{
-//DEADCODE JON 5/4/00 	case ND_FireGL1KPro:
-//DEADCODE JON 5/4/00 		flags=Flags(flags|F_VSLOWCOPY);
-//DEADCODE JON 5/4/00 		flags=Flags(flags|F_STIPPLEALPHA);
-//DEADCODE JON 5/4/00 		flags=Flags(flags&~F_TEXTURECANBERENDERTARGET);
-//DEADCODE JON 5/4/00 		break;
-//DEADCODE JON 5/4/00 	case ND_ATIRagePro:
-//DEADCODE JON 5/4/00 		selectedDevice.dwMaxTextureWidth=256;
-//DEADCODE JON 5/4/00 		selectedDevice.dwMaxTextureHeight=256;
-//DEADCODE JON 5/4/00 	case ND_GeoForce256:
-//DEADCODE JON 5/4/00 	case ND_RivaTNT:
-//DEADCODE JON 5/4/00 		flags=Flags(flags|F_SLOWCOPY);
-//DEADCODE JON 5/4/00 		flags=Flags(flags&~F_TEXTURECANBERENDERTARGET);
-//DEADCODE JON 5/4/00 		break;
-//DEADCODE JON 5/4/00 	default:
-//DEADCODE JON 5/4/00 		break;
-//DEADCODE JON 5/4/00 	}
 
 //	flags=Flags(flags|F_VSLOWCOPY);
 //	flags=Flags(flags|F_SLOWCOPY);
@@ -15626,35 +12516,6 @@ HRESULT	Lib3D::BackgroundImage( BITMAPFILEHEADER* pFile )
 
     }
 
-//DEADCODE JON 6/8/00 	if ( pInfo->bmiHeader.biBitCount != 24 )
-//DEADCODE JON 6/8/00 		INT3;
-//DEADCODE JON 6/8/00 //	if ( ddsd.ddpfPixelFormat.dwRGBBitCount != 16 )
-//DEADCODE JON 6/8/00 //		INT3;
-//DEADCODE JON 6/8/00
-//DEADCODE JON 6/8/00 	// lock the back buffer
-//DEADCODE JON 6/8/00 //	UByte* tempOut = new UByte[ ddsd.dwHeight * ddsd.lPitch ];// make a fake output
-//DEADCODE JON 6/8/00
-//DEADCODE JON 6/8/00 	pDDSB7->Lock(NULL,&ddsd,DDLOCK_WRITEONLY|DDLOCK_SURFACEMEMORYPTR|DDLOCK_WAIT,NULL);
-//DEADCODE JON 6/8/00 	SoftwareImageCopy( pData,							// source data
-//DEADCODE JON 6/8/00 					   pInfo->bmiHeader.biWidth,				// source width
-//DEADCODE JON 6/8/00 					   -pInfo->bmiHeader.biHeight,				// source height,
-//DEADCODE JON 6/8/00 					   24,								// source bitcount
-//DEADCODE JON 6/8/00 					   0xFF0000,//pInfoHdr->bV4RedMask,			// source r mask,
-//DEADCODE JON 6/8/00 					   0xFF00,//pInfoHdr->bV4GreenMask,			//		   g
-//DEADCODE JON 6/8/00 					   0xFF,//pInfoHdr->bV4BlueMask,			//		   b
-//DEADCODE JON 6/8/00 					   (24/8)*pInfo->bmiHeader.biWidth,			// source pitch.
-//DEADCODE JON 6/8/00 					   /*tempOut,*/ ddsd.lpSurface,					// dest data
-//DEADCODE JON 6/8/00 					   pInfo->bmiHeader.biWidth,				// dest width
-//DEADCODE JON 6/8/00 					   pInfo->bmiHeader.biHeight,				// dest height,
-//DEADCODE JON 6/8/00 					   ddsd.ddpfPixelFormat.dwRGBBitCount,	// dest bitcount
-//DEADCODE JON 6/8/00 					   ddsd.ddpfPixelFormat.dwRBitMask, // dest. r mask
-//DEADCODE JON 6/8/00 					   ddsd.ddpfPixelFormat.dwGBitMask, // dest. g mask
-//DEADCODE JON 6/8/00 					   ddsd.ddpfPixelFormat.dwBBitMask, // dest. b mask
-//DEADCODE JON 6/8/00 					   ddsd.lPitch						// dest pitch
-//DEADCODE JON 6/8/00 		);
-//DEADCODE JON 6/8/00 	pDDSB7->Unlock(NULL);
-//DEADCODE JON 6/8/00
-//DEADCODE JON 6/8/00 //	delete[] tempOut;
 
     return lastError;
 #endif
@@ -15704,17 +12565,6 @@ HRESULT Lib3D::DoFade( D3DCOLOR fadeCol, UByte fadeDepth )
 
     static PolyDefs _polys[_polyCnt]= {{8,1,0},{8,2,1},{8,3,2},{8,4,3},{8,5,4},{8,6,5},{8,7,6},{8,0,7}};
 
-//DEADCODE JON 6/1/00 	D3DVIEWPORT7 vp;
-//DEADCODE JON 6/1/00 #pragma message ( __HERE__ "fixfades" )
-//DEADCODE JON 6/1/00 	pD3DDEV7->GetViewport(&vp);
-//DEADCODE JON 6/1/00
-//DEADCODE JON 6/1/00 	D3DVALUE sx,sy;
-//DEADCODE JON 6/1/00 	D3DVALUE cx,cy;
-//DEADCODE JON 6/1/00 	sx=D3DVALUE(vp.dwWidth>>1);
-//DEADCODE JON 6/1/00 	sy=-D3DVALUE(vp.dwHeight>>1);
-//DEADCODE JON 6/1/00 	cx=D3DVALUE(vp.dwX)+sx;
-//DEADCODE JON 6/1/00 	cy=D3DVALUE(vp.dwY)-sy;
-//DEADCODE JON 6/1/00
 
     SPolygon *sPolygon;
     SVertex *sVertex;
@@ -15724,8 +12574,6 @@ HRESULT Lib3D::DoFade( D3DCOLOR fadeCol, UByte fadeDepth )
         ALLOCATE_POLYGON(sPolygon,3);
         sPolygon->zbuffer=1;
 
-//DEADCODE JON 6/1/00 		sPolygon->material=HMATERIAL(UByte(120));//set a fake material
-//DEADCODE JON 5/10/00 		sPolygon->material.uniqueTextId = (120&TIT_PLAIN); //shouldn't need
         sPolygon->material = NULL_MATERIAL;
         sPolygon->material.materialFlags = IS_PLAIN;
         sPolygon->projectType = PROJECT_2D;
@@ -15834,16 +12682,6 @@ HRESULT Lib3D::DoWhiteOut( const D3DCOLOR& fadeCol, const UByte& fadeDepth, cons
 
     static PolyDefs _polys[_polyCnt]= {{8,1,0},{8,2,1},{8,3,2},{8,4,3},{8,5,4},{8,6,5},{8,7,6},{8,0,7}};
 
-//DEADCODE JON 6/1/00 	D3DVIEWPORT7 vp;
-//DEADCODE JON 6/1/00 #pragma message ( __HERE__ "fixfades" )
-//DEADCODE JON 6/1/00 	pD3DDEV7->GetViewport(&vp);
-//DEADCODE JON 6/1/00
-//DEADCODE JON 6/1/00 	D3DVALUE sx,sy;
-//DEADCODE JON 6/1/00 	D3DVALUE cx,cy;
-//DEADCODE JON 6/1/00 	sx=D3DVALUE(vp.dwWidth>>1);
-//DEADCODE JON 6/1/00 	sy=-D3DVALUE(vp.dwHeight>>1);
-//DEADCODE JON 6/1/00 	cx=D3DVALUE(vp.dwX)+sx;
-//DEADCODE JON 6/1/00 	cy=D3DVALUE(vp.dwY)-sy;
 
     SPolygon *sPolygon;
     SVertex *sVertex;
@@ -15852,8 +12690,6 @@ HRESULT Lib3D::DoWhiteOut( const D3DCOLOR& fadeCol, const UByte& fadeDepth, cons
     {
         ALLOCATE_POLYGON(sPolygon,3);
         sPolygon->zbuffer=1;
-//DEADCODE JON 6/1/00 		sPolygon->material=HMATERIAL(UByte(120));//set a fake material
-//DEADCODE JON 5/10/00 		sPolygon->material.mathandle = 120; //shouldn't need
         sPolygon->material = NULL_MATERIAL;
         sPolygon->material.materialFlags = IS_PLAIN;
         sPolygon->projectType = PROJECT_2D;
@@ -15969,7 +12805,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
         return DDERR_GENERIC;
 #endif
     if ((lastError=SetMaterial(hMaterial))!=DD_OK) return lastError;
-//DeadCode JON 20Oct00 	if (hMaterial.tsW[0]!=0) // assume this is always the case
     {
 // Adding a 0.5 pixel border gets rid of the scruffy edges...
         fu0=(D3DVALUE(u0)+0.5)*hMaterial.tsW[0];						//RJS 17Sep00
@@ -15981,18 +12816,12 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
     ALLOCATE_POLYGON_NOLINK(currentPoly,10);
     SVertex *sVertex=currentPoly->pVertexList;
 
-//DeadCode JON 6Sep00 	*sVertex = vertex;
 
-//DeadCode RJS 19Jun00 //Transform the centre point...
-//DeadCode RJS 19Jun00
-//DeadCode RJS 19Jun00 	sVertex->Transform( objectMatrix+objMatStackPos );
-//DeadCode RJS 19Jun00 	sVertex->Transform( viewerMatrix+viewMatStackPos );
 
 // The centre point has already been transformed... we just want the translation
     sVertex->x = objectMatrix[objMatStackPos]._41;
     sVertex->y = objectMatrix[objMatStackPos]._42;
     sVertex->z = objectMatrix[objMatStackPos]._43;
-//DeadCode JON 31Aug00 	sVertex->rhw = objectMatrix[objMatStackPos]._44;
 
     if (sVertex->z > 1.0)												//RJS 19Jun00
     {
@@ -16054,7 +12883,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu1;
         sVertex->tv=fv1;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16064,7 +12892,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu0;
         sVertex->tv=fv1;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16074,7 +12901,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu0;
         sVertex->tv=fv0;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16084,7 +12910,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu1;
         sVertex->tv=fv0;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16094,7 +12919,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu0;
         sVertex->tv=fv0;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16104,7 +12928,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu0;
         sVertex->tv=fv1;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16114,7 +12937,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu0;
         sVertex->tv=fv0;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16124,7 +12946,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu1;
         sVertex->tv=fv0;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16134,7 +12955,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu0;
         sVertex->tv=fv0;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16144,7 +12964,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 
         sVertex->Transform( pMat );
         sVertex->z=zSMALL;
-//DeadCode JON 31Aug00 		sVertex->z = sVertex->hw;										//JON 28Jul00
         sVertex->tu=fu0;
         sVertex->tv=fv1;
         sVertex->clipcode=ClipCodeLRTB( sVertex );
@@ -16174,8 +12993,6 @@ HRESULT Lib3D::DrawQuadSphere(	const HMATERIAL& hMaterial,	//texture
 //TempCode JON 6Sep00 						currentPoly->projectType=PROJECT_2D;
 //TempCode JON 6Sep00 						currentPoly->zDepth2d = zDepth2d;
 //TempCode JON 6Sep00 					}
-//TempCode JON 6Sep00 //DeadCode JON 21Aug00 					ADD_POLYGON(*texturedPolysP,currentPoly);
-//TempCode JON 6Sep00 //DeadCode JON 21Aug00 					AddEdgeAliasing(currentPoly);
 //TempCode JON 6Sep00 					ADD_POLYGON(texturedPolys,currentPoly);
 //TempCode JON 6Sep00 					AddEdgeAliasing(currentPoly);
 //TempCode JON 6Sep00 				}
@@ -16240,7 +13057,6 @@ HRESULT Lib3D::DrawPivotedSphere(	const HMATERIAL& hMaterial,	//texture
         return DDERR_GENERIC;
 #endif
     if ((lastError=SetMaterial(hMaterial))!=DD_OK) return lastError;
-//DeadCode JON 20Oct00 	if (hMaterial.tsW[0]!=0) // assume this is always the case
     {
         fu0=(D3DVALUE(u0)+0.5)*hMaterial.tsW[0];						//RJS 22Sep00
         fu1=(D3DVALUE(u1)-0.5)*hMaterial.tsW[0];						//RJS 22Sep00
@@ -16256,8 +13072,6 @@ HRESULT Lib3D::DrawPivotedSphere(	const HMATERIAL& hMaterial,	//texture
     if (fCombineMatrices) CombineMatrices();							//RJS 22Sep00
     //RJS 22Sep00
     sVertex->Transform( &objViewMatrix );								//RJS 22Sep00
-//DeadCode RJS 22Sep00 	sVertex->Transform( objectMatrix+objMatStackPos );
-//DeadCode RJS 22Sep00 	sVertex->Transform( viewerMatrix+viewMatStackPos );
 
     D3DVALUE radx = radius;
     D3DVALUE rady;
@@ -16372,7 +13186,6 @@ HRESULT Lib3D::DrawPivotedSphere(	const HMATERIAL& hMaterial,	//texture
                     currentPoly->projectType=PROJECT_2D;
                     currentPoly->zDepth2d = zDepth2d;
                 }
-//DeadCode JON 21Aug00 				ADD_POLYGON(*texturedPolysP,currentPoly);
                 ADD_POLYGON(texturedPolys,currentPoly);
                 AddEdgeAliasing(currentPoly);
             }
@@ -16421,14 +13234,11 @@ HRESULT Lib3D::SetMirrorTexture( const HMATERIAL& mat )
     mirrorRect.bottom = mirrorTexture.p[0]->h;
     mirrorRect.right = mirrorTexture.p[0]->w;
 
-//DeadCode JON 7Nov00 	if (flags&F_TEXTURECANBERENDERTARGET)
-//DeadCode JON 7Nov00 	{
     if ( textureTable[ mat.p[0]->hTextureMap ] != pDDS7Mirror )
     {
         textureTable[ mat.p[0]->hTextureMap ]->Release();
         textureTable[ mat.p[0]->hTextureMap ] = pDDS7Mirror;
     }
-//DeadCode JON 7Nov00 	}
     return S_OK;
 #endif
 }
@@ -16574,9 +13384,6 @@ void Lib3D::ClipToTop2D(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numTextu
     switch (numTextures)
     {
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -16617,9 +13424,6 @@ void Lib3D::ClipToBottom2D(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numTe
     switch (numTextures)
     {
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -16660,9 +13464,6 @@ void Lib3D::ClipToRight2D(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numTex
     switch (numTextures)
     {
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -16703,9 +13504,6 @@ void Lib3D::ClipToLeft2D(SVertex *vi,SVertex *vo,SVertex *vc,const ULong numText
     switch (numTextures)
     {
         NODEFAULT;
-//DeadCode JON 30Oct00 		case 3:
-//DeadCode JON 30Oct00 			vc->tu2=Interp(vi->tu2,vo->tu2,frac);
-//DeadCode JON 30Oct00 			vc->tv2=Interp(vi->tv2,vo->tv2,frac);
     case 2:
         vc->tu1=Interp(vi->tu1,vo->tu1,frac);
         vc->tv1=Interp(vi->tv1,vo->tv1,frac);
@@ -16845,11 +13643,7 @@ void	Lib3D::SetMasterShading( LIGHTFLAG& lf )							//JON 29Sep00
                 cur=nxt;
                 nxt=nxt->pNext;
                 SLine *line=(SLine*)Alloc(sizeof(SLine));
-//DeadCode JON 15Nov00 				line->andcode=
-//DeadCode JON 15Nov00 					line->orcode=0;
                 line->material=hM;
-//DEADCODE JON 5/24/00 				line->vertices[0]=cur->d3dtlvert;
-//DEADCODE JON 5/24/00 				line->vertices[1]=nxt->d3dtlvert;
                 line->vertices[0]=*cur;
                 line->vertices[1]=*nxt;
 
@@ -16906,53 +13700,7 @@ void	Lib3D::SetMasterShading( LIGHTFLAG& lf )							//JON 29Sep00
         (p1)->projectType+=w_16bit;
     }
 
-//DEADCODE JON 5/25/00 	inline void PROJECT_SETZ( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
-//DEADCODE JON 5/25/00 	{
-//DEADCODE JON 5/25/00 		SVertex *pp=(p1)->pVertexList;
-//DEADCODE JON 5/25/00 		D3DVALUE ztot=0.f;
-//DEADCODE JON 5/25/00 		for (int q=(p1)->vertexcount;q>0;q--)
-//DEADCODE JON 5/25/00 		{
-//DEADCODE JON 5/25/00 			D3DVALUE sz;
-//DEADCODE JON 5/25/00 			sz=1/pp->hw;
-//DEADCODE JON 5/25/00 #ifdef	_WBUFFERTEST_
-//DEADCODE JON 5/25/00 			pp->rhw=sz*.001;
-//DEADCODE JON 5/25/00 #else
-//DEADCODE JON 5/25/00 			pp->rhw=sz;
-//DEADCODE JON 5/25/00 #endif
-//DEADCODE JON 5/25/00 			pp->sx=pp->sx*sz*(sx)+(cx);
-//DEADCODE JON 5/25/00 			pp->sy=pp->sy*sz*(sy)+(cy);
-//DEADCODE JON 5/25/00 //DEADCODE JON 4/12/00 			pp->sz*=sz;
-//DEADCODE JON 5/25/00 			pp->sz*=zFactor;
-//DEADCODE JON 5/25/00 			ztot+=pp->sz;
-//DEADCODE JON 5/25/00 #ifdef	_ZBUFFERTEST_
-//DEADCODE JON 5/25/00 			pp->sz = 0;
-//DEADCODE JON 5/25/00 #endif
-//DEADCODE JON 5/25/00 			pp=pp->pNext;
-//DEADCODE JON 5/25/00 		}
-//DEADCODE JON 5/25/00 		ztot/=D3DVALUE((p1)->vertexcount);
-//DEADCODE JON 5/25/00 		(p1)->zbuffer=FPNormToLong(ztot);
-//DEADCODE JON 5/25/00 	}
 
-//DEADCODE JON 5/25/00 	inline void PROJECT_SPHERE( SPolygon* p1, const D3DVALUE& cx, const D3DVALUE& cy, const D3DVALUE& sx, const D3DVALUE& sy)//, const D3DVALUE& radius)
-//DEADCODE JON 5/25/00 	{
-//DEADCODE JON 5/25/00 		//All points are on the same plane...
-//DEADCODE JON 5/25/00 		SVertex		*pp=(p1)->pVertexList;
-//DEADCODE JON 5/25/00 		D3DVALUE	toScreen = 1./pp->hw;
-//DEADCODE JON 5/25/00 //		D3DVALUE	shiftedrhw = 1./(pp->rhw - radius);
-//DEADCODE JON 5/25/00 		D3DVALUE	toScreenX = toScreen*sx;
-//DEADCODE JON 5/25/00 		D3DVALUE	toScreenY = toScreen*sy;
-//DEADCODE JON 5/25/00 		D3DVALUE	sz = pp->sz*zFactor;//(pp->sz-radius)*zFactor;
-//DEADCODE JON 5/25/00
-//DEADCODE JON 5/25/00 		for (int q=(p1)->vertexcount;q>0;q--)
-//DEADCODE JON 5/25/00 		{
-//DEADCODE JON 5/25/00 			pp->rhw=toScreen;//shiftedrhw;
-//DEADCODE JON 5/25/00 			pp->sx=(pp->sx*toScreenX)+(cx);
-//DEADCODE JON 5/25/00 			pp->sy=(pp->sy*toScreenY)+(cy);
-//DEADCODE JON 5/25/00 			pp->sz=sz;
-//DEADCODE JON 5/25/00 			pp=pp->pNext;
-//DEADCODE JON 5/25/00 		}
-//DEADCODE JON 5/25/00 		(p1)->zbuffer=FPNormToLong(sz);
-//DEADCODE JON 5/25/00 	}
 
     inline void Lib3D::PROJECT_LINE( SLine* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
     {
@@ -17008,28 +13756,6 @@ void	Lib3D::SetMasterShading( LIGHTFLAG& lf )							//JON 29Sep00
         }
     }
 
-//DeadCode JON 27Sep00 	inline void PROJECT( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
-//DeadCode JON 27Sep00 	{
-//DeadCode JON 27Sep00 		SVertex *pp=(p1)->pVertexList;
-//DeadCode JON 27Sep00 		for (int q=(p1)->vertexcount;q>0;q--)
-//DeadCode JON 27Sep00 		{
-//DeadCode JON 27Sep00 			D3DVALUE sz;
-//DeadCode JON 27Sep00 			sz=1./pp->hw;
-//DeadCode JON 27Sep00 #ifdef	_WBUFFERTEST_
-//DeadCode JON 27Sep00 			pp->rhw=sz*.001;
-//DeadCode JON 27Sep00 #else
-//DeadCode JON 27Sep00 			pp->rhw=sz;
-//DeadCode JON 27Sep00 #endif
-//DeadCode JON 27Sep00 			pp->sx=pp->sx*sz*(sx)+(cx);
-//DeadCode JON 27Sep00 			pp->sy=pp->sy*sz*(sy)+(cy);
-//DeadCode JON 27Sep00 #ifndef LINEAR_Z_FIX
-//DeadCode JON 27Sep00 	 		pp->sz*=sz;
-//DeadCode JON 27Sep00 #else
-//DeadCode JON 27Sep00 			pp->sz*=zFactor;
-//DeadCode JON 27Sep00 #endif
-//DeadCode JON 27Sep00 			pp=pp->pNext;
-//DeadCode JON 27Sep00 		}
-//DeadCode JON 27Sep00 	}
 
     inline void Lib3D::PROJECT( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
     {
@@ -17060,20 +13786,6 @@ void	Lib3D::SetMasterShading( LIGHTFLAG& lf )							//JON 29Sep00
     }
 
 
-//DEADCODE JON 5/25/00 	inline void PROJECT_2D( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
-//DEADCODE JON 5/25/00 	{
-//DEADCODE JON 5/25/00 		SVertex *pp=(p1)->pVertexList;
-//DEADCODE JON 5/25/00 		for (int q=(p1)->vertexcount;q>0;q--)
-//DEADCODE JON 5/25/00 		{
-//DEADCODE JON 5/25/00 			pp->rhw=1.0f-zDepth2d;
-//DEADCODE JON 5/25/00 			pp->sz=zDepth2d;
-//DEADCODE JON 5/25/00 			pp->sx=pp->sx*(sx)+(cx);
-//DEADCODE JON 5/25/00 			pp->sy=pp->sy*(sy)+(cy);
-//DEADCODE JON 5/25/00 //DEADCODE JON 4/13/00 			pp->color=0xFFFFFF;
-//DEADCODE JON 5/25/00 			pp=pp->pNext;
-//DEADCODE JON 5/25/00 		}
-//DEADCODE JON 5/25/00 		(p1)->zbuffer=0;
-//DEADCODE JON 5/25/00 	}
 
 //TempCode JON 14Jul00 	inline void PROJECT_2DSETCOL( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
 //TempCode JON 14Jul00 	{
@@ -17126,7 +13838,6 @@ inline ULong Lib3D::InlineGenGuardBandClipCode( const SVertex* pV, const D3DVALU
 	ULong retVal;
 	switch ( prevFlags )
 	{
-//DeadCode JON 12Jun00 		case 0:		retVal = GenGuardBandClipCode( pV, sz, 0 );
 		case 0:		retVal = 0;break;
 		case 1:		retVal = GenGuardBandClipCode( pV, sz, 1 ); break;
 		case 2:		retVal = GenGuardBandClipCode( pV, sz, 2 ); break;
@@ -17736,518 +14447,6 @@ inline void Lib3D::InlineVertexTransform( SVertex* sVertex, const ULong flags, c
 		case 509: TransformVertexAsRequired( sVertex, 509, curLF ); break;
 		case 510: TransformVertexAsRequired( sVertex, 510, curLF ); break;
 		case 511: TransformVertexAsRequired( sVertex, 511, curLF ); break;
-//DeadCode JON 30Oct00 		case 512: TransformVertexAsRequired( sVertex, 512, curLF ); break;
-//DeadCode JON 30Oct00 		case 513: TransformVertexAsRequired( sVertex, 513, curLF ); break;
-//DeadCode JON 30Oct00 		case 514: TransformVertexAsRequired( sVertex, 514, curLF ); break;
-//DeadCode JON 30Oct00 		case 515: TransformVertexAsRequired( sVertex, 515, curLF ); break;
-//DeadCode JON 30Oct00 		case 516: TransformVertexAsRequired( sVertex, 516, curLF ); break;
-//DeadCode JON 30Oct00 		case 517: TransformVertexAsRequired( sVertex, 517, curLF ); break;
-//DeadCode JON 30Oct00 		case 518: TransformVertexAsRequired( sVertex, 518, curLF ); break;
-//DeadCode JON 30Oct00 		case 519: TransformVertexAsRequired( sVertex, 519, curLF ); break;
-//DeadCode JON 30Oct00 		case 520: TransformVertexAsRequired( sVertex, 520, curLF ); break;
-//DeadCode JON 30Oct00 		case 521: TransformVertexAsRequired( sVertex, 521, curLF ); break;
-//DeadCode JON 30Oct00 		case 522: TransformVertexAsRequired( sVertex, 522, curLF ); break;
-//DeadCode JON 30Oct00 		case 523: TransformVertexAsRequired( sVertex, 523, curLF ); break;
-//DeadCode JON 30Oct00 		case 524: TransformVertexAsRequired( sVertex, 524, curLF ); break;
-//DeadCode JON 30Oct00 		case 525: TransformVertexAsRequired( sVertex, 525, curLF ); break;
-//DeadCode JON 30Oct00 		case 526: TransformVertexAsRequired( sVertex, 526, curLF ); break;
-//DeadCode JON 30Oct00 		case 527: TransformVertexAsRequired( sVertex, 527, curLF ); break;
-//DeadCode JON 30Oct00 		case 528: TransformVertexAsRequired( sVertex, 528, curLF ); break;
-//DeadCode JON 30Oct00 		case 529: TransformVertexAsRequired( sVertex, 529, curLF ); break;
-//DeadCode JON 30Oct00 		case 530: TransformVertexAsRequired( sVertex, 530, curLF ); break;
-//DeadCode JON 30Oct00 		case 531: TransformVertexAsRequired( sVertex, 531, curLF ); break;
-//DeadCode JON 30Oct00 		case 532: TransformVertexAsRequired( sVertex, 532, curLF ); break;
-//DeadCode JON 30Oct00 		case 533: TransformVertexAsRequired( sVertex, 533, curLF ); break;
-//DeadCode JON 30Oct00 		case 534: TransformVertexAsRequired( sVertex, 534, curLF ); break;
-//DeadCode JON 30Oct00 		case 535: TransformVertexAsRequired( sVertex, 535, curLF ); break;
-//DeadCode JON 30Oct00 		case 536: TransformVertexAsRequired( sVertex, 536, curLF ); break;
-//DeadCode JON 30Oct00 		case 537: TransformVertexAsRequired( sVertex, 537, curLF ); break;
-//DeadCode JON 30Oct00 		case 538: TransformVertexAsRequired( sVertex, 538, curLF ); break;
-//DeadCode JON 30Oct00 		case 539: TransformVertexAsRequired( sVertex, 539, curLF ); break;
-//DeadCode JON 30Oct00 		case 540: TransformVertexAsRequired( sVertex, 540, curLF ); break;
-//DeadCode JON 30Oct00 		case 541: TransformVertexAsRequired( sVertex, 541, curLF ); break;
-//DeadCode JON 30Oct00 		case 542: TransformVertexAsRequired( sVertex, 542, curLF ); break;
-//DeadCode JON 30Oct00 		case 543: TransformVertexAsRequired( sVertex, 543, curLF ); break;
-//DeadCode JON 30Oct00 		case 544: TransformVertexAsRequired( sVertex, 544, curLF ); break;
-//DeadCode JON 30Oct00 		case 545: TransformVertexAsRequired( sVertex, 545, curLF ); break;
-//DeadCode JON 30Oct00 		case 546: TransformVertexAsRequired( sVertex, 546, curLF ); break;
-//DeadCode JON 30Oct00 		case 547: TransformVertexAsRequired( sVertex, 547, curLF ); break;
-//DeadCode JON 30Oct00 		case 548: TransformVertexAsRequired( sVertex, 548, curLF ); break;
-//DeadCode JON 30Oct00 		case 549: TransformVertexAsRequired( sVertex, 549, curLF ); break;
-//DeadCode JON 30Oct00 		case 550: TransformVertexAsRequired( sVertex, 550, curLF ); break;
-//DeadCode JON 30Oct00 		case 551: TransformVertexAsRequired( sVertex, 551, curLF ); break;
-//DeadCode JON 30Oct00 		case 552: TransformVertexAsRequired( sVertex, 552, curLF ); break;
-//DeadCode JON 30Oct00 		case 553: TransformVertexAsRequired( sVertex, 553, curLF ); break;
-//DeadCode JON 30Oct00 		case 554: TransformVertexAsRequired( sVertex, 554, curLF ); break;
-//DeadCode JON 30Oct00 		case 555: TransformVertexAsRequired( sVertex, 555, curLF ); break;
-//DeadCode JON 30Oct00 		case 556: TransformVertexAsRequired( sVertex, 556, curLF ); break;
-//DeadCode JON 30Oct00 		case 557: TransformVertexAsRequired( sVertex, 557, curLF ); break;
-//DeadCode JON 30Oct00 		case 558: TransformVertexAsRequired( sVertex, 558, curLF ); break;
-//DeadCode JON 30Oct00 		case 559: TransformVertexAsRequired( sVertex, 559, curLF ); break;
-//DeadCode JON 30Oct00 		case 560: TransformVertexAsRequired( sVertex, 560, curLF ); break;
-//DeadCode JON 30Oct00 		case 561: TransformVertexAsRequired( sVertex, 561, curLF ); break;
-//DeadCode JON 30Oct00 		case 562: TransformVertexAsRequired( sVertex, 562, curLF ); break;
-//DeadCode JON 30Oct00 		case 563: TransformVertexAsRequired( sVertex, 563, curLF ); break;
-//DeadCode JON 30Oct00 		case 564: TransformVertexAsRequired( sVertex, 564, curLF ); break;
-//DeadCode JON 30Oct00 		case 565: TransformVertexAsRequired( sVertex, 565, curLF ); break;
-//DeadCode JON 30Oct00 		case 566: TransformVertexAsRequired( sVertex, 566, curLF ); break;
-//DeadCode JON 30Oct00 		case 567: TransformVertexAsRequired( sVertex, 567, curLF ); break;
-//DeadCode JON 30Oct00 		case 568: TransformVertexAsRequired( sVertex, 568, curLF ); break;
-//DeadCode JON 30Oct00 		case 569: TransformVertexAsRequired( sVertex, 569, curLF ); break;
-//DeadCode JON 30Oct00 		case 570: TransformVertexAsRequired( sVertex, 570, curLF ); break;
-//DeadCode JON 30Oct00 		case 571: TransformVertexAsRequired( sVertex, 571, curLF ); break;
-//DeadCode JON 30Oct00 		case 572: TransformVertexAsRequired( sVertex, 572, curLF ); break;
-//DeadCode JON 30Oct00 		case 573: TransformVertexAsRequired( sVertex, 573, curLF ); break;
-//DeadCode JON 30Oct00 		case 574: TransformVertexAsRequired( sVertex, 574, curLF ); break;
-//DeadCode JON 30Oct00 		case 575: TransformVertexAsRequired( sVertex, 575, curLF ); break;
-//DeadCode JON 30Oct00 		case 576: TransformVertexAsRequired( sVertex, 576, curLF ); break;
-//DeadCode JON 30Oct00 		case 577: TransformVertexAsRequired( sVertex, 577, curLF ); break;
-//DeadCode JON 30Oct00 		case 578: TransformVertexAsRequired( sVertex, 578, curLF ); break;
-//DeadCode JON 30Oct00 		case 579: TransformVertexAsRequired( sVertex, 579, curLF ); break;
-//DeadCode JON 30Oct00 		case 580: TransformVertexAsRequired( sVertex, 580, curLF ); break;
-//DeadCode JON 30Oct00 		case 581: TransformVertexAsRequired( sVertex, 581, curLF ); break;
-//DeadCode JON 30Oct00 		case 582: TransformVertexAsRequired( sVertex, 582, curLF ); break;
-//DeadCode JON 30Oct00 		case 583: TransformVertexAsRequired( sVertex, 583, curLF ); break;
-//DeadCode JON 30Oct00 		case 584: TransformVertexAsRequired( sVertex, 584, curLF ); break;
-//DeadCode JON 30Oct00 		case 585: TransformVertexAsRequired( sVertex, 585, curLF ); break;
-//DeadCode JON 30Oct00 		case 586: TransformVertexAsRequired( sVertex, 586, curLF ); break;
-//DeadCode JON 30Oct00 		case 587: TransformVertexAsRequired( sVertex, 587, curLF ); break;
-//DeadCode JON 30Oct00 		case 588: TransformVertexAsRequired( sVertex, 588, curLF ); break;
-//DeadCode JON 30Oct00 		case 589: TransformVertexAsRequired( sVertex, 589, curLF ); break;
-//DeadCode JON 30Oct00 		case 590: TransformVertexAsRequired( sVertex, 590, curLF ); break;
-//DeadCode JON 30Oct00 		case 591: TransformVertexAsRequired( sVertex, 591, curLF ); break;
-//DeadCode JON 30Oct00 		case 592: TransformVertexAsRequired( sVertex, 592, curLF ); break;
-//DeadCode JON 30Oct00 		case 593: TransformVertexAsRequired( sVertex, 593, curLF ); break;
-//DeadCode JON 30Oct00 		case 594: TransformVertexAsRequired( sVertex, 594, curLF ); break;
-//DeadCode JON 30Oct00 		case 595: TransformVertexAsRequired( sVertex, 595, curLF ); break;
-//DeadCode JON 30Oct00 		case 596: TransformVertexAsRequired( sVertex, 596, curLF ); break;
-//DeadCode JON 30Oct00 		case 597: TransformVertexAsRequired( sVertex, 597, curLF ); break;
-//DeadCode JON 30Oct00 		case 598: TransformVertexAsRequired( sVertex, 598, curLF ); break;
-//DeadCode JON 30Oct00 		case 599: TransformVertexAsRequired( sVertex, 599, curLF ); break;
-//DeadCode JON 30Oct00 		case 600: TransformVertexAsRequired( sVertex, 600, curLF ); break;
-//DeadCode JON 30Oct00 		case 601: TransformVertexAsRequired( sVertex, 601, curLF ); break;
-//DeadCode JON 30Oct00 		case 602: TransformVertexAsRequired( sVertex, 602, curLF ); break;
-//DeadCode JON 30Oct00 		case 603: TransformVertexAsRequired( sVertex, 603, curLF ); break;
-//DeadCode JON 30Oct00 		case 604: TransformVertexAsRequired( sVertex, 604, curLF ); break;
-//DeadCode JON 30Oct00 		case 605: TransformVertexAsRequired( sVertex, 605, curLF ); break;
-//DeadCode JON 30Oct00 		case 606: TransformVertexAsRequired( sVertex, 606, curLF ); break;
-//DeadCode JON 30Oct00 		case 607: TransformVertexAsRequired( sVertex, 607, curLF ); break;
-//DeadCode JON 30Oct00 		case 608: TransformVertexAsRequired( sVertex, 608, curLF ); break;
-//DeadCode JON 30Oct00 		case 609: TransformVertexAsRequired( sVertex, 609, curLF ); break;
-//DeadCode JON 30Oct00 		case 610: TransformVertexAsRequired( sVertex, 610, curLF ); break;
-//DeadCode JON 30Oct00 		case 611: TransformVertexAsRequired( sVertex, 611, curLF ); break;
-//DeadCode JON 30Oct00 		case 612: TransformVertexAsRequired( sVertex, 612, curLF ); break;
-//DeadCode JON 30Oct00 		case 613: TransformVertexAsRequired( sVertex, 613, curLF ); break;
-//DeadCode JON 30Oct00 		case 614: TransformVertexAsRequired( sVertex, 614, curLF ); break;
-//DeadCode JON 30Oct00 		case 615: TransformVertexAsRequired( sVertex, 615, curLF ); break;
-//DeadCode JON 30Oct00 		case 616: TransformVertexAsRequired( sVertex, 616, curLF ); break;
-//DeadCode JON 30Oct00 		case 617: TransformVertexAsRequired( sVertex, 617, curLF ); break;
-//DeadCode JON 30Oct00 		case 618: TransformVertexAsRequired( sVertex, 618, curLF ); break;
-//DeadCode JON 30Oct00 		case 619: TransformVertexAsRequired( sVertex, 619, curLF ); break;
-//DeadCode JON 30Oct00 		case 620: TransformVertexAsRequired( sVertex, 620, curLF ); break;
-//DeadCode JON 30Oct00 		case 621: TransformVertexAsRequired( sVertex, 621, curLF ); break;
-//DeadCode JON 30Oct00 		case 622: TransformVertexAsRequired( sVertex, 622, curLF ); break;
-//DeadCode JON 30Oct00 		case 623: TransformVertexAsRequired( sVertex, 623, curLF ); break;
-//DeadCode JON 30Oct00 		case 624: TransformVertexAsRequired( sVertex, 624, curLF ); break;
-//DeadCode JON 30Oct00 		case 625: TransformVertexAsRequired( sVertex, 625, curLF ); break;
-//DeadCode JON 30Oct00 		case 626: TransformVertexAsRequired( sVertex, 626, curLF ); break;
-//DeadCode JON 30Oct00 		case 627: TransformVertexAsRequired( sVertex, 627, curLF ); break;
-//DeadCode JON 30Oct00 		case 628: TransformVertexAsRequired( sVertex, 628, curLF ); break;
-//DeadCode JON 30Oct00 		case 629: TransformVertexAsRequired( sVertex, 629, curLF ); break;
-//DeadCode JON 30Oct00 		case 630: TransformVertexAsRequired( sVertex, 630, curLF ); break;
-//DeadCode JON 30Oct00 		case 631: TransformVertexAsRequired( sVertex, 631, curLF ); break;
-//DeadCode JON 30Oct00 		case 632: TransformVertexAsRequired( sVertex, 632, curLF ); break;
-//DeadCode JON 30Oct00 		case 633: TransformVertexAsRequired( sVertex, 633, curLF ); break;
-//DeadCode JON 30Oct00 		case 634: TransformVertexAsRequired( sVertex, 634, curLF ); break;
-//DeadCode JON 30Oct00 		case 635: TransformVertexAsRequired( sVertex, 635, curLF ); break;
-//DeadCode JON 30Oct00 		case 636: TransformVertexAsRequired( sVertex, 636, curLF ); break;
-//DeadCode JON 30Oct00 		case 637: TransformVertexAsRequired( sVertex, 637, curLF ); break;
-//DeadCode JON 30Oct00 		case 638: TransformVertexAsRequired( sVertex, 638, curLF ); break;
-//DeadCode JON 30Oct00 		case 639: TransformVertexAsRequired( sVertex, 639, curLF ); break;
-//DeadCode JON 30Oct00 		case 640: TransformVertexAsRequired( sVertex, 640, curLF ); break;
-//DeadCode JON 30Oct00 		case 641: TransformVertexAsRequired( sVertex, 641, curLF ); break;
-//DeadCode JON 30Oct00 		case 642: TransformVertexAsRequired( sVertex, 642, curLF ); break;
-//DeadCode JON 30Oct00 		case 643: TransformVertexAsRequired( sVertex, 643, curLF ); break;
-//DeadCode JON 30Oct00 		case 644: TransformVertexAsRequired( sVertex, 644, curLF ); break;
-//DeadCode JON 30Oct00 		case 645: TransformVertexAsRequired( sVertex, 645, curLF ); break;
-//DeadCode JON 30Oct00 		case 646: TransformVertexAsRequired( sVertex, 646, curLF ); break;
-//DeadCode JON 30Oct00 		case 647: TransformVertexAsRequired( sVertex, 647, curLF ); break;
-//DeadCode JON 30Oct00 		case 648: TransformVertexAsRequired( sVertex, 648, curLF ); break;
-//DeadCode JON 30Oct00 		case 649: TransformVertexAsRequired( sVertex, 649, curLF ); break;
-//DeadCode JON 30Oct00 		case 650: TransformVertexAsRequired( sVertex, 650, curLF ); break;
-//DeadCode JON 30Oct00 		case 651: TransformVertexAsRequired( sVertex, 651, curLF ); break;
-//DeadCode JON 30Oct00 		case 652: TransformVertexAsRequired( sVertex, 652, curLF ); break;
-//DeadCode JON 30Oct00 		case 653: TransformVertexAsRequired( sVertex, 653, curLF ); break;
-//DeadCode JON 30Oct00 		case 654: TransformVertexAsRequired( sVertex, 654, curLF ); break;
-//DeadCode JON 30Oct00 		case 655: TransformVertexAsRequired( sVertex, 655, curLF ); break;
-//DeadCode JON 30Oct00 		case 656: TransformVertexAsRequired( sVertex, 656, curLF ); break;
-//DeadCode JON 30Oct00 		case 657: TransformVertexAsRequired( sVertex, 657, curLF ); break;
-//DeadCode JON 30Oct00 		case 658: TransformVertexAsRequired( sVertex, 658, curLF ); break;
-//DeadCode JON 30Oct00 		case 659: TransformVertexAsRequired( sVertex, 659, curLF ); break;
-//DeadCode JON 30Oct00 		case 660: TransformVertexAsRequired( sVertex, 660, curLF ); break;
-//DeadCode JON 30Oct00 		case 661: TransformVertexAsRequired( sVertex, 661, curLF ); break;
-//DeadCode JON 30Oct00 		case 662: TransformVertexAsRequired( sVertex, 662, curLF ); break;
-//DeadCode JON 30Oct00 		case 663: TransformVertexAsRequired( sVertex, 663, curLF ); break;
-//DeadCode JON 30Oct00 		case 664: TransformVertexAsRequired( sVertex, 664, curLF ); break;
-//DeadCode JON 30Oct00 		case 665: TransformVertexAsRequired( sVertex, 665, curLF ); break;
-//DeadCode JON 30Oct00 		case 666: TransformVertexAsRequired( sVertex, 666, curLF ); break;
-//DeadCode JON 30Oct00 		case 667: TransformVertexAsRequired( sVertex, 667, curLF ); break;
-//DeadCode JON 30Oct00 		case 668: TransformVertexAsRequired( sVertex, 668, curLF ); break;
-//DeadCode JON 30Oct00 		case 669: TransformVertexAsRequired( sVertex, 669, curLF ); break;
-//DeadCode JON 30Oct00 		case 670: TransformVertexAsRequired( sVertex, 670, curLF ); break;
-//DeadCode JON 30Oct00 		case 671: TransformVertexAsRequired( sVertex, 671, curLF ); break;
-//DeadCode JON 30Oct00 		case 672: TransformVertexAsRequired( sVertex, 672, curLF ); break;
-//DeadCode JON 30Oct00 		case 673: TransformVertexAsRequired( sVertex, 673, curLF ); break;
-//DeadCode JON 30Oct00 		case 674: TransformVertexAsRequired( sVertex, 674, curLF ); break;
-//DeadCode JON 30Oct00 		case 675: TransformVertexAsRequired( sVertex, 675, curLF ); break;
-//DeadCode JON 30Oct00 		case 676: TransformVertexAsRequired( sVertex, 676, curLF ); break;
-//DeadCode JON 30Oct00 		case 677: TransformVertexAsRequired( sVertex, 677, curLF ); break;
-//DeadCode JON 30Oct00 		case 678: TransformVertexAsRequired( sVertex, 678, curLF ); break;
-//DeadCode JON 30Oct00 		case 679: TransformVertexAsRequired( sVertex, 679, curLF ); break;
-//DeadCode JON 30Oct00 		case 680: TransformVertexAsRequired( sVertex, 680, curLF ); break;
-//DeadCode JON 30Oct00 		case 681: TransformVertexAsRequired( sVertex, 681, curLF ); break;
-//DeadCode JON 30Oct00 		case 682: TransformVertexAsRequired( sVertex, 682, curLF ); break;
-//DeadCode JON 30Oct00 		case 683: TransformVertexAsRequired( sVertex, 683, curLF ); break;
-//DeadCode JON 30Oct00 		case 684: TransformVertexAsRequired( sVertex, 684, curLF ); break;
-//DeadCode JON 30Oct00 		case 685: TransformVertexAsRequired( sVertex, 685, curLF ); break;
-//DeadCode JON 30Oct00 		case 686: TransformVertexAsRequired( sVertex, 686, curLF ); break;
-//DeadCode JON 30Oct00 		case 687: TransformVertexAsRequired( sVertex, 687, curLF ); break;
-//DeadCode JON 30Oct00 		case 688: TransformVertexAsRequired( sVertex, 688, curLF ); break;
-//DeadCode JON 30Oct00 		case 689: TransformVertexAsRequired( sVertex, 689, curLF ); break;
-//DeadCode JON 30Oct00 		case 690: TransformVertexAsRequired( sVertex, 690, curLF ); break;
-//DeadCode JON 30Oct00 		case 691: TransformVertexAsRequired( sVertex, 691, curLF ); break;
-//DeadCode JON 30Oct00 		case 692: TransformVertexAsRequired( sVertex, 692, curLF ); break;
-//DeadCode JON 30Oct00 		case 693: TransformVertexAsRequired( sVertex, 693, curLF ); break;
-//DeadCode JON 30Oct00 		case 694: TransformVertexAsRequired( sVertex, 694, curLF ); break;
-//DeadCode JON 30Oct00 		case 695: TransformVertexAsRequired( sVertex, 695, curLF ); break;
-//DeadCode JON 30Oct00 		case 696: TransformVertexAsRequired( sVertex, 696, curLF ); break;
-//DeadCode JON 30Oct00 		case 697: TransformVertexAsRequired( sVertex, 697, curLF ); break;
-//DeadCode JON 30Oct00 		case 698: TransformVertexAsRequired( sVertex, 698, curLF ); break;
-//DeadCode JON 30Oct00 		case 699: TransformVertexAsRequired( sVertex, 699, curLF ); break;
-//DeadCode JON 30Oct00 		case 700: TransformVertexAsRequired( sVertex, 700, curLF ); break;
-//DeadCode JON 30Oct00 		case 701: TransformVertexAsRequired( sVertex, 701, curLF ); break;
-//DeadCode JON 30Oct00 		case 702: TransformVertexAsRequired( sVertex, 702, curLF ); break;
-//DeadCode JON 30Oct00 		case 703: TransformVertexAsRequired( sVertex, 703, curLF ); break;
-//DeadCode JON 30Oct00 		case 704: TransformVertexAsRequired( sVertex, 704, curLF ); break;
-//DeadCode JON 30Oct00 		case 705: TransformVertexAsRequired( sVertex, 705, curLF ); break;
-//DeadCode JON 30Oct00 		case 706: TransformVertexAsRequired( sVertex, 706, curLF ); break;
-//DeadCode JON 30Oct00 		case 707: TransformVertexAsRequired( sVertex, 707, curLF ); break;
-//DeadCode JON 30Oct00 		case 708: TransformVertexAsRequired( sVertex, 708, curLF ); break;
-//DeadCode JON 30Oct00 		case 709: TransformVertexAsRequired( sVertex, 709, curLF ); break;
-//DeadCode JON 30Oct00 		case 710: TransformVertexAsRequired( sVertex, 710, curLF ); break;
-//DeadCode JON 30Oct00 		case 711: TransformVertexAsRequired( sVertex, 711, curLF ); break;
-//DeadCode JON 30Oct00 		case 712: TransformVertexAsRequired( sVertex, 712, curLF ); break;
-//DeadCode JON 30Oct00 		case 713: TransformVertexAsRequired( sVertex, 713, curLF ); break;
-//DeadCode JON 30Oct00 		case 714: TransformVertexAsRequired( sVertex, 714, curLF ); break;
-//DeadCode JON 30Oct00 		case 715: TransformVertexAsRequired( sVertex, 715, curLF ); break;
-//DeadCode JON 30Oct00 		case 716: TransformVertexAsRequired( sVertex, 716, curLF ); break;
-//DeadCode JON 30Oct00 		case 717: TransformVertexAsRequired( sVertex, 717, curLF ); break;
-//DeadCode JON 30Oct00 		case 718: TransformVertexAsRequired( sVertex, 718, curLF ); break;
-//DeadCode JON 30Oct00 		case 719: TransformVertexAsRequired( sVertex, 719, curLF ); break;
-//DeadCode JON 30Oct00 		case 720: TransformVertexAsRequired( sVertex, 720, curLF ); break;
-//DeadCode JON 30Oct00 		case 721: TransformVertexAsRequired( sVertex, 721, curLF ); break;
-//DeadCode JON 30Oct00 		case 722: TransformVertexAsRequired( sVertex, 722, curLF ); break;
-//DeadCode JON 30Oct00 		case 723: TransformVertexAsRequired( sVertex, 723, curLF ); break;
-//DeadCode JON 30Oct00 		case 724: TransformVertexAsRequired( sVertex, 724, curLF ); break;
-//DeadCode JON 30Oct00 		case 725: TransformVertexAsRequired( sVertex, 725, curLF ); break;
-//DeadCode JON 30Oct00 		case 726: TransformVertexAsRequired( sVertex, 726, curLF ); break;
-//DeadCode JON 30Oct00 		case 727: TransformVertexAsRequired( sVertex, 727, curLF ); break;
-//DeadCode JON 30Oct00 		case 728: TransformVertexAsRequired( sVertex, 728, curLF ); break;
-//DeadCode JON 30Oct00 		case 729: TransformVertexAsRequired( sVertex, 729, curLF ); break;
-//DeadCode JON 30Oct00 		case 730: TransformVertexAsRequired( sVertex, 730, curLF ); break;
-//DeadCode JON 30Oct00 		case 731: TransformVertexAsRequired( sVertex, 731, curLF ); break;
-//DeadCode JON 30Oct00 		case 732: TransformVertexAsRequired( sVertex, 732, curLF ); break;
-//DeadCode JON 30Oct00 		case 733: TransformVertexAsRequired( sVertex, 733, curLF ); break;
-//DeadCode JON 30Oct00 		case 734: TransformVertexAsRequired( sVertex, 734, curLF ); break;
-//DeadCode JON 30Oct00 		case 735: TransformVertexAsRequired( sVertex, 735, curLF ); break;
-//DeadCode JON 30Oct00 		case 736: TransformVertexAsRequired( sVertex, 736, curLF ); break;
-//DeadCode JON 30Oct00 		case 737: TransformVertexAsRequired( sVertex, 737, curLF ); break;
-//DeadCode JON 30Oct00 		case 738: TransformVertexAsRequired( sVertex, 738, curLF ); break;
-//DeadCode JON 30Oct00 		case 739: TransformVertexAsRequired( sVertex, 739, curLF ); break;
-//DeadCode JON 30Oct00 		case 740: TransformVertexAsRequired( sVertex, 740, curLF ); break;
-//DeadCode JON 30Oct00 		case 741: TransformVertexAsRequired( sVertex, 741, curLF ); break;
-//DeadCode JON 30Oct00 		case 742: TransformVertexAsRequired( sVertex, 742, curLF ); break;
-//DeadCode JON 30Oct00 		case 743: TransformVertexAsRequired( sVertex, 743, curLF ); break;
-//DeadCode JON 30Oct00 		case 744: TransformVertexAsRequired( sVertex, 744, curLF ); break;
-//DeadCode JON 30Oct00 		case 745: TransformVertexAsRequired( sVertex, 745, curLF ); break;
-//DeadCode JON 30Oct00 		case 746: TransformVertexAsRequired( sVertex, 746, curLF ); break;
-//DeadCode JON 30Oct00 		case 747: TransformVertexAsRequired( sVertex, 747, curLF ); break;
-//DeadCode JON 30Oct00 		case 748: TransformVertexAsRequired( sVertex, 748, curLF ); break;
-//DeadCode JON 30Oct00 		case 749: TransformVertexAsRequired( sVertex, 749, curLF ); break;
-//DeadCode JON 30Oct00 		case 750: TransformVertexAsRequired( sVertex, 750, curLF ); break;
-//DeadCode JON 30Oct00 		case 751: TransformVertexAsRequired( sVertex, 751, curLF ); break;
-//DeadCode JON 30Oct00 		case 752: TransformVertexAsRequired( sVertex, 752, curLF ); break;
-//DeadCode JON 30Oct00 		case 753: TransformVertexAsRequired( sVertex, 753, curLF ); break;
-//DeadCode JON 30Oct00 		case 754: TransformVertexAsRequired( sVertex, 754, curLF ); break;
-//DeadCode JON 30Oct00 		case 755: TransformVertexAsRequired( sVertex, 755, curLF ); break;
-//DeadCode JON 30Oct00 		case 756: TransformVertexAsRequired( sVertex, 756, curLF ); break;
-//DeadCode JON 30Oct00 		case 757: TransformVertexAsRequired( sVertex, 757, curLF ); break;
-//DeadCode JON 30Oct00 		case 758: TransformVertexAsRequired( sVertex, 758, curLF ); break;
-//DeadCode JON 30Oct00 		case 759: TransformVertexAsRequired( sVertex, 759, curLF ); break;
-//DeadCode JON 30Oct00 		case 760: TransformVertexAsRequired( sVertex, 760, curLF ); break;
-//DeadCode JON 30Oct00 		case 761: TransformVertexAsRequired( sVertex, 761, curLF ); break;
-//DeadCode JON 30Oct00 		case 762: TransformVertexAsRequired( sVertex, 762, curLF ); break;
-//DeadCode JON 30Oct00 		case 763: TransformVertexAsRequired( sVertex, 763, curLF ); break;
-//DeadCode JON 30Oct00 		case 764: TransformVertexAsRequired( sVertex, 764, curLF ); break;
-//DeadCode JON 30Oct00 		case 765: TransformVertexAsRequired( sVertex, 765, curLF ); break;
-//DeadCode JON 30Oct00 		case 766: TransformVertexAsRequired( sVertex, 766, curLF ); break;
-//DeadCode JON 30Oct00 		case 767: TransformVertexAsRequired( sVertex, 767, curLF ); break;
-//DeadCode JON 30Oct00 		case 768: TransformVertexAsRequired( sVertex, 768, curLF ); break;
-//DeadCode JON 30Oct00 		case 769: TransformVertexAsRequired( sVertex, 769, curLF ); break;
-//DeadCode JON 30Oct00 		case 770: TransformVertexAsRequired( sVertex, 770, curLF ); break;
-//DeadCode JON 30Oct00 		case 771: TransformVertexAsRequired( sVertex, 771, curLF ); break;
-//DeadCode JON 30Oct00 		case 772: TransformVertexAsRequired( sVertex, 772, curLF ); break;
-//DeadCode JON 30Oct00 		case 773: TransformVertexAsRequired( sVertex, 773, curLF ); break;
-//DeadCode JON 30Oct00 		case 774: TransformVertexAsRequired( sVertex, 774, curLF ); break;
-//DeadCode JON 30Oct00 		case 775: TransformVertexAsRequired( sVertex, 775, curLF ); break;
-//DeadCode JON 30Oct00 		case 776: TransformVertexAsRequired( sVertex, 776, curLF ); break;
-//DeadCode JON 30Oct00 		case 777: TransformVertexAsRequired( sVertex, 777, curLF ); break;
-//DeadCode JON 30Oct00 		case 778: TransformVertexAsRequired( sVertex, 778, curLF ); break;
-//DeadCode JON 30Oct00 		case 779: TransformVertexAsRequired( sVertex, 779, curLF ); break;
-//DeadCode JON 30Oct00 		case 780: TransformVertexAsRequired( sVertex, 780, curLF ); break;
-//DeadCode JON 30Oct00 		case 781: TransformVertexAsRequired( sVertex, 781, curLF ); break;
-//DeadCode JON 30Oct00 		case 782: TransformVertexAsRequired( sVertex, 782, curLF ); break;
-//DeadCode JON 30Oct00 		case 783: TransformVertexAsRequired( sVertex, 783, curLF ); break;
-//DeadCode JON 30Oct00 		case 784: TransformVertexAsRequired( sVertex, 784, curLF ); break;
-//DeadCode JON 30Oct00 		case 785: TransformVertexAsRequired( sVertex, 785, curLF ); break;
-//DeadCode JON 30Oct00 		case 786: TransformVertexAsRequired( sVertex, 786, curLF ); break;
-//DeadCode JON 30Oct00 		case 787: TransformVertexAsRequired( sVertex, 787, curLF ); break;
-//DeadCode JON 30Oct00 		case 788: TransformVertexAsRequired( sVertex, 788, curLF ); break;
-//DeadCode JON 30Oct00 		case 789: TransformVertexAsRequired( sVertex, 789, curLF ); break;
-//DeadCode JON 30Oct00 		case 790: TransformVertexAsRequired( sVertex, 790, curLF ); break;
-//DeadCode JON 30Oct00 		case 791: TransformVertexAsRequired( sVertex, 791, curLF ); break;
-//DeadCode JON 30Oct00 		case 792: TransformVertexAsRequired( sVertex, 792, curLF ); break;
-//DeadCode JON 30Oct00 		case 793: TransformVertexAsRequired( sVertex, 793, curLF ); break;
-//DeadCode JON 30Oct00 		case 794: TransformVertexAsRequired( sVertex, 794, curLF ); break;
-//DeadCode JON 30Oct00 		case 795: TransformVertexAsRequired( sVertex, 795, curLF ); break;
-//DeadCode JON 30Oct00 		case 796: TransformVertexAsRequired( sVertex, 796, curLF ); break;
-//DeadCode JON 30Oct00 		case 797: TransformVertexAsRequired( sVertex, 797, curLF ); break;
-//DeadCode JON 30Oct00 		case 798: TransformVertexAsRequired( sVertex, 798, curLF ); break;
-//DeadCode JON 30Oct00 		case 799: TransformVertexAsRequired( sVertex, 799, curLF ); break;
-//DeadCode JON 30Oct00 		case 800: TransformVertexAsRequired( sVertex, 800, curLF ); break;
-//DeadCode JON 30Oct00 		case 801: TransformVertexAsRequired( sVertex, 801, curLF ); break;
-//DeadCode JON 30Oct00 		case 802: TransformVertexAsRequired( sVertex, 802, curLF ); break;
-//DeadCode JON 30Oct00 		case 803: TransformVertexAsRequired( sVertex, 803, curLF ); break;
-//DeadCode JON 30Oct00 		case 804: TransformVertexAsRequired( sVertex, 804, curLF ); break;
-//DeadCode JON 30Oct00 		case 805: TransformVertexAsRequired( sVertex, 805, curLF ); break;
-//DeadCode JON 30Oct00 		case 806: TransformVertexAsRequired( sVertex, 806, curLF ); break;
-//DeadCode JON 30Oct00 		case 807: TransformVertexAsRequired( sVertex, 807, curLF ); break;
-//DeadCode JON 30Oct00 		case 808: TransformVertexAsRequired( sVertex, 808, curLF ); break;
-//DeadCode JON 30Oct00 		case 809: TransformVertexAsRequired( sVertex, 809, curLF ); break;
-//DeadCode JON 30Oct00 		case 810: TransformVertexAsRequired( sVertex, 810, curLF ); break;
-//DeadCode JON 30Oct00 		case 811: TransformVertexAsRequired( sVertex, 811, curLF ); break;
-//DeadCode JON 30Oct00 		case 812: TransformVertexAsRequired( sVertex, 812, curLF ); break;
-//DeadCode JON 30Oct00 		case 813: TransformVertexAsRequired( sVertex, 813, curLF ); break;
-//DeadCode JON 30Oct00 		case 814: TransformVertexAsRequired( sVertex, 814, curLF ); break;
-//DeadCode JON 30Oct00 		case 815: TransformVertexAsRequired( sVertex, 815, curLF ); break;
-//DeadCode JON 30Oct00 		case 816: TransformVertexAsRequired( sVertex, 816, curLF ); break;
-//DeadCode JON 30Oct00 		case 817: TransformVertexAsRequired( sVertex, 817, curLF ); break;
-//DeadCode JON 30Oct00 		case 818: TransformVertexAsRequired( sVertex, 818, curLF ); break;
-//DeadCode JON 30Oct00 		case 819: TransformVertexAsRequired( sVertex, 819, curLF ); break;
-//DeadCode JON 30Oct00 		case 820: TransformVertexAsRequired( sVertex, 820, curLF ); break;
-//DeadCode JON 30Oct00 		case 821: TransformVertexAsRequired( sVertex, 821, curLF ); break;
-//DeadCode JON 30Oct00 		case 822: TransformVertexAsRequired( sVertex, 822, curLF ); break;
-//DeadCode JON 30Oct00 		case 823: TransformVertexAsRequired( sVertex, 823, curLF ); break;
-//DeadCode JON 30Oct00 		case 824: TransformVertexAsRequired( sVertex, 824, curLF ); break;
-//DeadCode JON 30Oct00 		case 825: TransformVertexAsRequired( sVertex, 825, curLF ); break;
-//DeadCode JON 30Oct00 		case 826: TransformVertexAsRequired( sVertex, 826, curLF ); break;
-//DeadCode JON 30Oct00 		case 827: TransformVertexAsRequired( sVertex, 827, curLF ); break;
-//DeadCode JON 30Oct00 		case 828: TransformVertexAsRequired( sVertex, 828, curLF ); break;
-//DeadCode JON 30Oct00 		case 829: TransformVertexAsRequired( sVertex, 829, curLF ); break;
-//DeadCode JON 30Oct00 		case 830: TransformVertexAsRequired( sVertex, 830, curLF ); break;
-//DeadCode JON 30Oct00 		case 831: TransformVertexAsRequired( sVertex, 831, curLF ); break;
-//DeadCode JON 30Oct00 		case 832: TransformVertexAsRequired( sVertex, 832, curLF ); break;
-//DeadCode JON 30Oct00 		case 833: TransformVertexAsRequired( sVertex, 833, curLF ); break;
-//DeadCode JON 30Oct00 		case 834: TransformVertexAsRequired( sVertex, 834, curLF ); break;
-//DeadCode JON 30Oct00 		case 835: TransformVertexAsRequired( sVertex, 835, curLF ); break;
-//DeadCode JON 30Oct00 		case 836: TransformVertexAsRequired( sVertex, 836, curLF ); break;
-//DeadCode JON 30Oct00 		case 837: TransformVertexAsRequired( sVertex, 837, curLF ); break;
-//DeadCode JON 30Oct00 		case 838: TransformVertexAsRequired( sVertex, 838, curLF ); break;
-//DeadCode JON 30Oct00 		case 839: TransformVertexAsRequired( sVertex, 839, curLF ); break;
-//DeadCode JON 30Oct00 		case 840: TransformVertexAsRequired( sVertex, 840, curLF ); break;
-//DeadCode JON 30Oct00 		case 841: TransformVertexAsRequired( sVertex, 841, curLF ); break;
-//DeadCode JON 30Oct00 		case 842: TransformVertexAsRequired( sVertex, 842, curLF ); break;
-//DeadCode JON 30Oct00 		case 843: TransformVertexAsRequired( sVertex, 843, curLF ); break;
-//DeadCode JON 30Oct00 		case 844: TransformVertexAsRequired( sVertex, 844, curLF ); break;
-//DeadCode JON 30Oct00 		case 845: TransformVertexAsRequired( sVertex, 845, curLF ); break;
-//DeadCode JON 30Oct00 		case 846: TransformVertexAsRequired( sVertex, 846, curLF ); break;
-//DeadCode JON 30Oct00 		case 847: TransformVertexAsRequired( sVertex, 847, curLF ); break;
-//DeadCode JON 30Oct00 		case 848: TransformVertexAsRequired( sVertex, 848, curLF ); break;
-//DeadCode JON 30Oct00 		case 849: TransformVertexAsRequired( sVertex, 849, curLF ); break;
-//DeadCode JON 30Oct00 		case 850: TransformVertexAsRequired( sVertex, 850, curLF ); break;
-//DeadCode JON 30Oct00 		case 851: TransformVertexAsRequired( sVertex, 851, curLF ); break;
-//DeadCode JON 30Oct00 		case 852: TransformVertexAsRequired( sVertex, 852, curLF ); break;
-//DeadCode JON 30Oct00 		case 853: TransformVertexAsRequired( sVertex, 853, curLF ); break;
-//DeadCode JON 30Oct00 		case 854: TransformVertexAsRequired( sVertex, 854, curLF ); break;
-//DeadCode JON 30Oct00 		case 855: TransformVertexAsRequired( sVertex, 855, curLF ); break;
-//DeadCode JON 30Oct00 		case 856: TransformVertexAsRequired( sVertex, 856, curLF ); break;
-//DeadCode JON 30Oct00 		case 857: TransformVertexAsRequired( sVertex, 857, curLF ); break;
-//DeadCode JON 30Oct00 		case 858: TransformVertexAsRequired( sVertex, 858, curLF ); break;
-//DeadCode JON 30Oct00 		case 859: TransformVertexAsRequired( sVertex, 859, curLF ); break;
-//DeadCode JON 30Oct00 		case 860: TransformVertexAsRequired( sVertex, 860, curLF ); break;
-//DeadCode JON 30Oct00 		case 861: TransformVertexAsRequired( sVertex, 861, curLF ); break;
-//DeadCode JON 30Oct00 		case 862: TransformVertexAsRequired( sVertex, 862, curLF ); break;
-//DeadCode JON 30Oct00 		case 863: TransformVertexAsRequired( sVertex, 863, curLF ); break;
-//DeadCode JON 30Oct00 		case 864: TransformVertexAsRequired( sVertex, 864, curLF ); break;
-//DeadCode JON 30Oct00 		case 865: TransformVertexAsRequired( sVertex, 865, curLF ); break;
-//DeadCode JON 30Oct00 		case 866: TransformVertexAsRequired( sVertex, 866, curLF ); break;
-//DeadCode JON 30Oct00 		case 867: TransformVertexAsRequired( sVertex, 867, curLF ); break;
-//DeadCode JON 30Oct00 		case 868: TransformVertexAsRequired( sVertex, 868, curLF ); break;
-//DeadCode JON 30Oct00 		case 869: TransformVertexAsRequired( sVertex, 869, curLF ); break;
-//DeadCode JON 30Oct00 		case 870: TransformVertexAsRequired( sVertex, 870, curLF ); break;
-//DeadCode JON 30Oct00 		case 871: TransformVertexAsRequired( sVertex, 871, curLF ); break;
-//DeadCode JON 30Oct00 		case 872: TransformVertexAsRequired( sVertex, 872, curLF ); break;
-//DeadCode JON 30Oct00 		case 873: TransformVertexAsRequired( sVertex, 873, curLF ); break;
-//DeadCode JON 30Oct00 		case 874: TransformVertexAsRequired( sVertex, 874, curLF ); break;
-//DeadCode JON 30Oct00 		case 875: TransformVertexAsRequired( sVertex, 875, curLF ); break;
-//DeadCode JON 30Oct00 		case 876: TransformVertexAsRequired( sVertex, 876, curLF ); break;
-//DeadCode JON 30Oct00 		case 877: TransformVertexAsRequired( sVertex, 877, curLF ); break;
-//DeadCode JON 30Oct00 		case 878: TransformVertexAsRequired( sVertex, 878, curLF ); break;
-//DeadCode JON 30Oct00 		case 879: TransformVertexAsRequired( sVertex, 879, curLF ); break;
-//DeadCode JON 30Oct00 		case 880: TransformVertexAsRequired( sVertex, 880, curLF ); break;
-//DeadCode JON 30Oct00 		case 881: TransformVertexAsRequired( sVertex, 881, curLF ); break;
-//DeadCode JON 30Oct00 		case 882: TransformVertexAsRequired( sVertex, 882, curLF ); break;
-//DeadCode JON 30Oct00 		case 883: TransformVertexAsRequired( sVertex, 883, curLF ); break;
-//DeadCode JON 30Oct00 		case 884: TransformVertexAsRequired( sVertex, 884, curLF ); break;
-//DeadCode JON 30Oct00 		case 885: TransformVertexAsRequired( sVertex, 885, curLF ); break;
-//DeadCode JON 30Oct00 		case 886: TransformVertexAsRequired( sVertex, 886, curLF ); break;
-//DeadCode JON 30Oct00 		case 887: TransformVertexAsRequired( sVertex, 887, curLF ); break;
-//DeadCode JON 30Oct00 		case 888: TransformVertexAsRequired( sVertex, 888, curLF ); break;
-//DeadCode JON 30Oct00 		case 889: TransformVertexAsRequired( sVertex, 889, curLF ); break;
-//DeadCode JON 30Oct00 		case 890: TransformVertexAsRequired( sVertex, 890, curLF ); break;
-//DeadCode JON 30Oct00 		case 891: TransformVertexAsRequired( sVertex, 891, curLF ); break;
-//DeadCode JON 30Oct00 		case 892: TransformVertexAsRequired( sVertex, 892, curLF ); break;
-//DeadCode JON 30Oct00 		case 893: TransformVertexAsRequired( sVertex, 893, curLF ); break;
-//DeadCode JON 30Oct00 		case 894: TransformVertexAsRequired( sVertex, 894, curLF ); break;
-//DeadCode JON 30Oct00 		case 895: TransformVertexAsRequired( sVertex, 895, curLF ); break;
-//DeadCode JON 30Oct00 		case 896: TransformVertexAsRequired( sVertex, 896, curLF ); break;
-//DeadCode JON 30Oct00 		case 897: TransformVertexAsRequired( sVertex, 897, curLF ); break;
-//DeadCode JON 30Oct00 		case 898: TransformVertexAsRequired( sVertex, 898, curLF ); break;
-//DeadCode JON 30Oct00 		case 899: TransformVertexAsRequired( sVertex, 899, curLF ); break;
-//DeadCode JON 30Oct00 		case 900: TransformVertexAsRequired( sVertex, 900, curLF ); break;
-//DeadCode JON 30Oct00 		case 901: TransformVertexAsRequired( sVertex, 901, curLF ); break;
-//DeadCode JON 30Oct00 		case 902: TransformVertexAsRequired( sVertex, 902, curLF ); break;
-//DeadCode JON 30Oct00 		case 903: TransformVertexAsRequired( sVertex, 903, curLF ); break;
-//DeadCode JON 30Oct00 		case 904: TransformVertexAsRequired( sVertex, 904, curLF ); break;
-//DeadCode JON 30Oct00 		case 905: TransformVertexAsRequired( sVertex, 905, curLF ); break;
-//DeadCode JON 30Oct00 		case 906: TransformVertexAsRequired( sVertex, 906, curLF ); break;
-//DeadCode JON 30Oct00 		case 907: TransformVertexAsRequired( sVertex, 907, curLF ); break;
-//DeadCode JON 30Oct00 		case 908: TransformVertexAsRequired( sVertex, 908, curLF ); break;
-//DeadCode JON 30Oct00 		case 909: TransformVertexAsRequired( sVertex, 909, curLF ); break;
-//DeadCode JON 30Oct00 		case 910: TransformVertexAsRequired( sVertex, 910, curLF ); break;
-//DeadCode JON 30Oct00 		case 911: TransformVertexAsRequired( sVertex, 911, curLF ); break;
-//DeadCode JON 30Oct00 		case 912: TransformVertexAsRequired( sVertex, 912, curLF ); break;
-//DeadCode JON 30Oct00 		case 913: TransformVertexAsRequired( sVertex, 913, curLF ); break;
-//DeadCode JON 30Oct00 		case 914: TransformVertexAsRequired( sVertex, 914, curLF ); break;
-//DeadCode JON 30Oct00 		case 915: TransformVertexAsRequired( sVertex, 915, curLF ); break;
-//DeadCode JON 30Oct00 		case 916: TransformVertexAsRequired( sVertex, 916, curLF ); break;
-//DeadCode JON 30Oct00 		case 917: TransformVertexAsRequired( sVertex, 917, curLF ); break;
-//DeadCode JON 30Oct00 		case 918: TransformVertexAsRequired( sVertex, 918, curLF ); break;
-//DeadCode JON 30Oct00 		case 919: TransformVertexAsRequired( sVertex, 919, curLF ); break;
-//DeadCode JON 30Oct00 		case 920: TransformVertexAsRequired( sVertex, 920, curLF ); break;
-//DeadCode JON 30Oct00 		case 921: TransformVertexAsRequired( sVertex, 921, curLF ); break;
-//DeadCode JON 30Oct00 		case 922: TransformVertexAsRequired( sVertex, 922, curLF ); break;
-//DeadCode JON 30Oct00 		case 923: TransformVertexAsRequired( sVertex, 923, curLF ); break;
-//DeadCode JON 30Oct00 		case 924: TransformVertexAsRequired( sVertex, 924, curLF ); break;
-//DeadCode JON 30Oct00 		case 925: TransformVertexAsRequired( sVertex, 925, curLF ); break;
-//DeadCode JON 30Oct00 		case 926: TransformVertexAsRequired( sVertex, 926, curLF ); break;
-//DeadCode JON 30Oct00 		case 927: TransformVertexAsRequired( sVertex, 927, curLF ); break;
-//DeadCode JON 30Oct00 		case 928: TransformVertexAsRequired( sVertex, 928, curLF ); break;
-//DeadCode JON 30Oct00 		case 929: TransformVertexAsRequired( sVertex, 929, curLF ); break;
-//DeadCode JON 30Oct00 		case 930: TransformVertexAsRequired( sVertex, 930, curLF ); break;
-//DeadCode JON 30Oct00 		case 931: TransformVertexAsRequired( sVertex, 931, curLF ); break;
-//DeadCode JON 30Oct00 		case 932: TransformVertexAsRequired( sVertex, 932, curLF ); break;
-//DeadCode JON 30Oct00 		case 933: TransformVertexAsRequired( sVertex, 933, curLF ); break;
-//DeadCode JON 30Oct00 		case 934: TransformVertexAsRequired( sVertex, 934, curLF ); break;
-//DeadCode JON 30Oct00 		case 935: TransformVertexAsRequired( sVertex, 935, curLF ); break;
-//DeadCode JON 30Oct00 		case 936: TransformVertexAsRequired( sVertex, 936, curLF ); break;
-//DeadCode JON 30Oct00 		case 937: TransformVertexAsRequired( sVertex, 937, curLF ); break;
-//DeadCode JON 30Oct00 		case 938: TransformVertexAsRequired( sVertex, 938, curLF ); break;
-//DeadCode JON 30Oct00 		case 939: TransformVertexAsRequired( sVertex, 939, curLF ); break;
-//DeadCode JON 30Oct00 		case 940: TransformVertexAsRequired( sVertex, 940, curLF ); break;
-//DeadCode JON 30Oct00 		case 941: TransformVertexAsRequired( sVertex, 941, curLF ); break;
-//DeadCode JON 30Oct00 		case 942: TransformVertexAsRequired( sVertex, 942, curLF ); break;
-//DeadCode JON 30Oct00 		case 943: TransformVertexAsRequired( sVertex, 943, curLF ); break;
-//DeadCode JON 30Oct00 		case 944: TransformVertexAsRequired( sVertex, 944, curLF ); break;
-//DeadCode JON 30Oct00 		case 945: TransformVertexAsRequired( sVertex, 945, curLF ); break;
-//DeadCode JON 30Oct00 		case 946: TransformVertexAsRequired( sVertex, 946, curLF ); break;
-//DeadCode JON 30Oct00 		case 947: TransformVertexAsRequired( sVertex, 947, curLF ); break;
-//DeadCode JON 30Oct00 		case 948: TransformVertexAsRequired( sVertex, 948, curLF ); break;
-//DeadCode JON 30Oct00 		case 949: TransformVertexAsRequired( sVertex, 949, curLF ); break;
-//DeadCode JON 30Oct00 		case 950: TransformVertexAsRequired( sVertex, 950, curLF ); break;
-//DeadCode JON 30Oct00 		case 951: TransformVertexAsRequired( sVertex, 951, curLF ); break;
-//DeadCode JON 30Oct00 		case 952: TransformVertexAsRequired( sVertex, 952, curLF ); break;
-//DeadCode JON 30Oct00 		case 953: TransformVertexAsRequired( sVertex, 953, curLF ); break;
-//DeadCode JON 30Oct00 		case 954: TransformVertexAsRequired( sVertex, 954, curLF ); break;
-//DeadCode JON 30Oct00 		case 955: TransformVertexAsRequired( sVertex, 955, curLF ); break;
-//DeadCode JON 30Oct00 		case 956: TransformVertexAsRequired( sVertex, 956, curLF ); break;
-//DeadCode JON 30Oct00 		case 957: TransformVertexAsRequired( sVertex, 957, curLF ); break;
-//DeadCode JON 30Oct00 		case 958: TransformVertexAsRequired( sVertex, 958, curLF ); break;
-//DeadCode JON 30Oct00 		case 959: TransformVertexAsRequired( sVertex, 959, curLF ); break;
-//DeadCode JON 30Oct00 		case 960: TransformVertexAsRequired( sVertex, 960, curLF ); break;
-//DeadCode JON 30Oct00 		case 961: TransformVertexAsRequired( sVertex, 961, curLF ); break;
-//DeadCode JON 30Oct00 		case 962: TransformVertexAsRequired( sVertex, 962, curLF ); break;
-//DeadCode JON 30Oct00 		case 963: TransformVertexAsRequired( sVertex, 963, curLF ); break;
-//DeadCode JON 30Oct00 		case 964: TransformVertexAsRequired( sVertex, 964, curLF ); break;
-//DeadCode JON 30Oct00 		case 965: TransformVertexAsRequired( sVertex, 965, curLF ); break;
-//DeadCode JON 30Oct00 		case 966: TransformVertexAsRequired( sVertex, 966, curLF ); break;
-//DeadCode JON 30Oct00 		case 967: TransformVertexAsRequired( sVertex, 967, curLF ); break;
-//DeadCode JON 30Oct00 		case 968: TransformVertexAsRequired( sVertex, 968, curLF ); break;
-//DeadCode JON 30Oct00 		case 969: TransformVertexAsRequired( sVertex, 969, curLF ); break;
-//DeadCode JON 30Oct00 		case 970: TransformVertexAsRequired( sVertex, 970, curLF ); break;
-//DeadCode JON 30Oct00 		case 971: TransformVertexAsRequired( sVertex, 971, curLF ); break;
-//DeadCode JON 30Oct00 		case 972: TransformVertexAsRequired( sVertex, 972, curLF ); break;
-//DeadCode JON 30Oct00 		case 973: TransformVertexAsRequired( sVertex, 973, curLF ); break;
-//DeadCode JON 30Oct00 		case 974: TransformVertexAsRequired( sVertex, 974, curLF ); break;
-//DeadCode JON 30Oct00 		case 975: TransformVertexAsRequired( sVertex, 975, curLF ); break;
-//DeadCode JON 30Oct00 		case 976: TransformVertexAsRequired( sVertex, 976, curLF ); break;
-//DeadCode JON 30Oct00 		case 977: TransformVertexAsRequired( sVertex, 977, curLF ); break;
-//DeadCode JON 30Oct00 		case 978: TransformVertexAsRequired( sVertex, 978, curLF ); break;
-//DeadCode JON 30Oct00 		case 979: TransformVertexAsRequired( sVertex, 979, curLF ); break;
-//DeadCode JON 30Oct00 		case 980: TransformVertexAsRequired( sVertex, 980, curLF ); break;
-//DeadCode JON 30Oct00 		case 981: TransformVertexAsRequired( sVertex, 981, curLF ); break;
-//DeadCode JON 30Oct00 		case 982: TransformVertexAsRequired( sVertex, 982, curLF ); break;
-//DeadCode JON 30Oct00 		case 983: TransformVertexAsRequired( sVertex, 983, curLF ); break;
-//DeadCode JON 30Oct00 		case 984: TransformVertexAsRequired( sVertex, 984, curLF ); break;
-//DeadCode JON 30Oct00 		case 985: TransformVertexAsRequired( sVertex, 985, curLF ); break;
-//DeadCode JON 30Oct00 		case 986: TransformVertexAsRequired( sVertex, 986, curLF ); break;
-//DeadCode JON 30Oct00 		case 987: TransformVertexAsRequired( sVertex, 987, curLF ); break;
-//DeadCode JON 30Oct00 		case 988: TransformVertexAsRequired( sVertex, 988, curLF ); break;
-//DeadCode JON 30Oct00 		case 989: TransformVertexAsRequired( sVertex, 989, curLF ); break;
-//DeadCode JON 30Oct00 		case 990: TransformVertexAsRequired( sVertex, 990, curLF ); break;
-//DeadCode JON 30Oct00 		case 991: TransformVertexAsRequired( sVertex, 991, curLF ); break;
-//DeadCode JON 30Oct00 		case 992: TransformVertexAsRequired( sVertex, 992, curLF ); break;
-//DeadCode JON 30Oct00 		case 993: TransformVertexAsRequired( sVertex, 993, curLF ); break;
-//DeadCode JON 30Oct00 		case 994: TransformVertexAsRequired( sVertex, 994, curLF ); break;
-//DeadCode JON 30Oct00 		case 995: TransformVertexAsRequired( sVertex, 995, curLF ); break;
-//DeadCode JON 30Oct00 		case 996: TransformVertexAsRequired( sVertex, 996, curLF ); break;
-//DeadCode JON 30Oct00 		case 997: TransformVertexAsRequired( sVertex, 997, curLF ); break;
-//DeadCode JON 30Oct00 		case 998: TransformVertexAsRequired( sVertex, 998, curLF ); break;
-//DeadCode JON 30Oct00 		case 999: TransformVertexAsRequired( sVertex, 999, curLF ); break;
-//DeadCode JON 30Oct00 		case 1000: TransformVertexAsRequired( sVertex, 1000, curLF ); break;
-//DeadCode JON 30Oct00 		case 1001: TransformVertexAsRequired( sVertex, 1001, curLF ); break;
-//DeadCode JON 30Oct00 		case 1002: TransformVertexAsRequired( sVertex, 1002, curLF ); break;
-//DeadCode JON 30Oct00 		case 1003: TransformVertexAsRequired( sVertex, 1003, curLF ); break;
-//DeadCode JON 30Oct00 		case 1004: TransformVertexAsRequired( sVertex, 1004, curLF ); break;
-//DeadCode JON 30Oct00 		case 1005: TransformVertexAsRequired( sVertex, 1005, curLF ); break;
-//DeadCode JON 30Oct00 		case 1006: TransformVertexAsRequired( sVertex, 1006, curLF ); break;
-//DeadCode JON 30Oct00 		case 1007: TransformVertexAsRequired( sVertex, 1007, curLF ); break;
-//DeadCode JON 30Oct00 		case 1008: TransformVertexAsRequired( sVertex, 1008, curLF ); break;
-//DeadCode JON 30Oct00 		case 1009: TransformVertexAsRequired( sVertex, 1009, curLF ); break;
-//DeadCode JON 30Oct00 		case 1010: TransformVertexAsRequired( sVertex, 1010, curLF ); break;
-//DeadCode JON 30Oct00 		case 1011: TransformVertexAsRequired( sVertex, 1011, curLF ); break;
-//DeadCode JON 30Oct00 		case 1012: TransformVertexAsRequired( sVertex, 1012, curLF ); break;
-//DeadCode JON 30Oct00 		case 1013: TransformVertexAsRequired( sVertex, 1013, curLF ); break;
-//DeadCode JON 30Oct00 		case 1014: TransformVertexAsRequired( sVertex, 1014, curLF ); break;
-//DeadCode JON 30Oct00 		case 1015: TransformVertexAsRequired( sVertex, 1015, curLF ); break;
-//DeadCode JON 30Oct00 		case 1016: TransformVertexAsRequired( sVertex, 1016, curLF ); break;
-//DeadCode JON 30Oct00 		case 1017: TransformVertexAsRequired( sVertex, 1017, curLF ); break;
-//DeadCode JON 30Oct00 		case 1018: TransformVertexAsRequired( sVertex, 1018, curLF ); break;
-//DeadCode JON 30Oct00 		case 1019: TransformVertexAsRequired( sVertex, 1019, curLF ); break;
-//DeadCode JON 30Oct00 		case 1020: TransformVertexAsRequired( sVertex, 1020, curLF ); break;
-//DeadCode JON 30Oct00 		case 1021: TransformVertexAsRequired( sVertex, 1021, curLF ); break;
-//DeadCode JON 30Oct00 		case 1022: TransformVertexAsRequired( sVertex, 1022, curLF ); break;
-//DeadCode JON 30Oct00 		case 1023: TransformVertexAsRequired( sVertex, 1023, curLF ); break;
 	NODEFAULT;
 	}
 }
