@@ -409,6 +409,7 @@ struct IDirect3DDevice7 {
         memset(lightEnabled,0,sizeof(lightEnabled));
         memset(recRS,0,sizeof(recRS));
         memset(recSS,0,sizeof(recSS));
+        memset(rastMem,0,sizeof(rastMem));
         recTex=0;
         // DX7 render-state defaults (the ones the pipeline consults).
         renderStates[D3DRENDERSTATE_ZFUNC]=D3DCMP_LESSEQUAL;
@@ -448,7 +449,8 @@ struct IDirect3DDevice7 {
     void SyncRast();
    // First three virtuals = IUnknown layout (see ddraw.h header note).
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv) {
-        if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return D3D_OK;
+        if(!ppv)return DDERR_INVALIDPARAMS;
+        *ppv=this; AddRef(); return D3D_OK;
     }
     virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
     virtual ULONG Release() { if(__atomic_sub_fetch(&refCnt,1,__ATOMIC_SEQ_CST)==0){delete this;return 0;} return refCnt; }

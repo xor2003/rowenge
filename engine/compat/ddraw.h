@@ -30,7 +30,7 @@
 struct IDirectDrawPalette {
     PALETTEENTRY entries[256];
     ULONG refCnt;
-    IDirectDrawPalette() : refCnt(1) {}
+    IDirectDrawPalette() : refCnt(1) { memset(entries,0,sizeof(entries)); }
     virtual HRESULT QueryInterface(REFIID, LPVOID* ppv)
         { if(!ppv)return DDERR_INVALIDPARAMS; *ppv=this; AddRef(); return DD_OK; }
     virtual ULONG AddRef() { return __atomic_add_fetch(&refCnt,1,__ATOMIC_SEQ_CST); }
@@ -205,7 +205,8 @@ struct IDirectDrawSurface7 {
         return DD_OK;
     }
     HRESULT Unlock(LPRECT) { RowanVkWriteSync(this);
-                             if(IsPrimary()) RowanDDPresent(this); return DD_OK; }
+                             if(IsPrimary()) RowanDDPresent(this);
+                             return DD_OK; }
 
     HRESULT GetSurfaceDesc(LPDDSURFACEDESC2 lpDdsd) {
         if(!lpDdsd) return DDERR_INVALIDPARAMS;
@@ -344,10 +345,16 @@ struct IDirectDrawSurface7 {
 
     HRESULT SetPalette(LPDIRECTDRAWPALETTE p) {
         RowanVkWriteSync(this);         // palette drives texture unpack
-        if(p) p->AddRef(); if(pal) pal->Release(); pal=p; return DD_OK;
+        if(p) p->AddRef();
+        if(pal) pal->Release();
+        pal=p;
+        return DD_OK;
     }
     HRESULT SetClipper(LPDIRECTDRAWCLIPPER c) {
-        if(c) c->AddRef(); if(clip) clip->Release(); clip=c; return DD_OK;
+        if(c) c->AddRef();
+        if(clip) clip->Release();
+        clip=c;
+        return DD_OK;
     }
     HRESULT GetDC(HDC*) { return DDERR_UNSUPPORTED; }   // no GDI on 3D surfaces
     HRESULT ReleaseDC(HDC) { return DD_OK; }
@@ -455,7 +462,8 @@ struct IDirectDraw7 {
                 DDSURFACEDESC2 md=dd;
                 md.dwWidth  = dd.dwWidth  ? (dd.dwWidth  >> lv ? dd.dwWidth  >> lv : 1) : 1;
                 md.dwHeight = dd.dwHeight ? (dd.dwHeight >> lv ? dd.dwHeight >> lv : 1) : 1;
-                if(md.dwWidth==0) md.dwWidth=1; if(md.dwHeight==0) md.dwHeight=1;
+                if(md.dwWidth==0) md.dwWidth=1;
+                if(md.dwHeight==0) md.dwHeight=1;
                 md.dwMipMapCount=0;
                 md.ddsCaps.dwCaps&=~DDSCAPS_COMPLEX;
                 md.ddsCaps.dwCaps2|=DDSCAPS2_MIPMAPSUBLEVEL;
@@ -478,7 +486,8 @@ struct IDirectDraw7 {
         return DD_OK;
     }
     HRESULT GetAvailableVidMem(LPDDSCAPS2, LPDWORD total, LPDWORD free_) {
-        if(total)*total=64*1024*1024; if(free_)*free_=48*1024*1024;
+        if(total)*total=64*1024*1024;
+        if(free_)*free_=48*1024*1024;
         return DD_OK;
     }
     HRESULT GetDeviceIdentifier(LPDDDEVICEIDENTIFIER2 id, DWORD) {

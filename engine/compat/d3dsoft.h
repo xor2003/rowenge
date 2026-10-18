@@ -43,7 +43,9 @@ struct PixFmt {                      // unpack/pack a surface pixel via masks
     DWORD bits, rM, gM, bM, aM;
     int   rS, gS, bS, aS, rW, gW, bW, aW;   // shift + field width
 };
-inline int lowbit(DWORD m){int s=0;if(m)while(!(m&1)){m>>=1;s++;}return s;}
+inline int lowbit(DWORD m){int s=0;
+if(m)while(!(m&1)){m>>=1;s++;}
+return s;}
 inline int nbits (DWORD m){int n=0;while(m){n+=m&1;m>>=1;}return n;}
 inline void DecodePF(const DDPIXELFORMAT& p, PixFmt& f){
     f.rM=p.dwRBitMask; f.gM=p.dwGBitMask; f.bM=p.dwBBitMask; f.aM=p.dwRGBAlphaBitMask;
@@ -86,7 +88,8 @@ R7INLINE void WritePx(IDirectDrawSurface7* s,DWORD x,DWORD y,DWORD v){
 // z-buffer access — the z surface's ZBufferBitDepth drives width.
 R7INLINE int ZBits(const IDirectDrawSurface7* z){
     DWORD d=z->desc.ddpfPixelFormat.dwZBufferBitDepth;
-    if(!d)d=z->desc.ddpfPixelFormat.dwRGBBitCount; return d?(int)d:16;
+    if(!d)d=z->desc.ddpfPixelFormat.dwRGBBitCount;
+    return d?(int)d:16;
 }
 R7INLINE DWORD ReadZ(const IDirectDrawSurface7* z,DWORD x,DWORD y){
     const BYTE*p=(const BYTE*)z->desc.lpSurface+y*z->desc.lPitch;
@@ -197,7 +200,8 @@ inline void BuildEnv(const State& st,PixEnv& e){
     e.zbPitch=st.zb?(int)st.zb->desc.lPitch:0;
     e.ze=st.rs[D3DRENDERSTATE_ZENABLE];
     e.zwe=st.rs[D3DRENDERSTATE_ZWRITEENABLE];
-    e.zfn=st.rs[D3DRENDERSTATE_ZFUNC]; if(!e.zfn)e.zfn=D3DCMP_LESSEQUAL;
+    e.zfn=st.rs[D3DRENDERSTATE_ZFUNC];
+    if(!e.zfn)e.zfn=D3DCMP_LESSEQUAL;
     e.zbias=st.rs[D3DRENDERSTATE_ZBIAS];
     e.persp=st.rs[D3DRENDERSTATE_TEXTUREPERSPECTIVE];
     e.spec=st.rs[D3DRENDERSTATE_SPECULARENABLE];
@@ -207,7 +211,8 @@ inline void BuildEnv(const State& st,PixEnv& e){
     e.fogTMode=st.rs[D3DRENDERSTATE_FOGTABLEMODE];
     e.fogVMode=st.rs[D3DRENDERSTATE_FOGVERTEXMODE];
     e.fogCol=st.fogCol; e.fogStart=st.fogStart; e.fogEnd=st.fogEnd;
-    e.sb=st.rs[D3DRENDERSTATE_SRCBLEND]; if(!e.sb)e.sb=D3DBLEND_ONE;
+    e.sb=st.rs[D3DRENDERSTATE_SRCBLEND];
+    if(!e.sb)e.sb=D3DBLEND_ONE;
     e.db=st.rs[D3DRENDERSTATE_DESTBLEND];
     e.tf=st.rs[D3DRENDERSTATE_TEXTUREFACTOR];
     e.nStage=0;
@@ -216,13 +221,15 @@ inline void BuildEnv(const State& st,PixEnv& e){
         if(cop==D3DTOP_DISABLE&&aop==D3DTOP_DISABLE)break;
         PixEnv::TS& t=e.ts[e.nStage++];
         t.s=st.tex[i].s; t.f=st.tex[i].f;
-        DWORD addr=st.ss[i][D3DTSS_ADDRESS]; if(!addr)addr=D3DTADDRESS_WRAP;
+        DWORD addr=st.ss[i][D3DTSS_ADDRESS];
+        if(!addr)addr=D3DTADDRESS_WRAP;
         t.addr=addr;
         t.bilin=st.ss[i][D3DTSS_MAGFILTER]==D3DTFG_LINEAR
               ||st.ss[i][D3DTSS_MINFILTER]==D3DTFG_LINEAR
               ||st.ss[i][D3DTSS_MAGFILTER]==D3DTFG_ANISOTROPIC
               ||st.ss[i][D3DTSS_MINFILTER]==D3DTFG_ANISOTROPIC;
-        t.tci=st.ss[i][D3DTSS_TEXCOORDINDEX]&3; if(t.tci>2)t.tci=2;
+        t.tci=st.ss[i][D3DTSS_TEXCOORDINDEX]&3;
+        if(t.tci>2)t.tci=2;
         t.cop=cop; t.aop=aop;
         t.ca1=st.ss[i][D3DTSS_COLORARG1]; t.ca2=st.ss[i][D3DTSS_COLORARG2];
         t.aa1=st.ss[i][D3DTSS_ALPHAARG1]; t.aa2=st.ss[i][D3DTSS_ALPHAARG2];
@@ -259,7 +266,8 @@ inline void BuildEnv(const State& st,PixEnv& e){
         }
     }
 #ifdef ROWAN_PERF_TRACE
-    {static bool once=false; if(!once){once=true;
+    {static bool once=false;
+    if(!once){once=true;
       const PixEnv::TS&t=e.ts[0];
       fprintf(stderr,"[env] fast=%u nStage=%d rtBpp=%d rM=%lx t.s=%p bpp=%d lut=%p bilin=%u tci=%u addr=%u wP=%u hP=%u cop=%u ca1=%lx ca2=%lx aop=%u aa1=%lx persp=%u ze=%u\n",
       e.fast,e.nStage,e.rtBpp,(unsigned long)e.rtf.rM,(void*)t.s,t.bpp,(void*)t.lut,t.bilin,t.tci,t.addr,t.wPow2,t.hPow2,t.cop,(unsigned long)t.ca1,(unsigned long)t.ca2,t.aop,(unsigned long)t.aa1,e.persp,e.ze);}}
@@ -356,7 +364,12 @@ R7INLINE DWORD BlendOp(DWORD op,DWORD a1,DWORD a2){
         case D3DTOP_MODULATE4X:R=4*r*r2/255;G=4*g*g2/255;B=4*b*b2/255;break;
         default:                R=r*r2/255;G=g*g2/255;B=b*b2/255;break; // MODULATE(2X)
     }
-    if(R<0)R=0;if(R>255)R=255;if(G<0)G=0;if(G>255)G=255;if(B<0)B=0;if(B>255)B=255;
+    if(R<0)R=0;
+    if(R>255)R=255;
+    if(G<0)G=0;
+    if(G>255)G=255;
+    if(B<0)B=0;
+    if(B>255)B=255;
     return (R<<16)|(G<<8)|B;
 }
 R7INLINE DWORD BlendOpAlpha(DWORD op,DWORD a1,DWORD a2){
@@ -724,16 +737,23 @@ inline void DrawTri(const State& st,const Vert A,const Vert B,const Vert C){
         float py=y+0.5f;
         // w_i(x) = w_i + dwx_i*(x-ix0) >= 0  ->  x >= ix0 - w_i/dwx_i (dwx>0)
         double lo=ix0, hi=ix1;
-        if(dwx0>0){double b=ix0-rw0/dwx0;if(b>lo)lo=b;}
-        else if(dwx0<0){double b=ix0-rw0/dwx0;if(b<hi)hi=b;}
+        if(dwx0>0){double b=ix0-rw0/dwx0;
+        if(b>lo)lo=b;}
+        else if(dwx0<0){double b=ix0-rw0/dwx0;
+        if(b<hi)hi=b;}
         else if(rw0<0)goto nrow;
-        if(dwx1>0){double b=ix0-rw1/dwx1;if(b>lo)lo=b;}
-        else if(dwx1<0){double b=ix0-rw1/dwx1;if(b<hi)hi=b;}
+        if(dwx1>0){double b=ix0-rw1/dwx1;
+        if(b>lo)lo=b;}
+        else if(dwx1<0){double b=ix0-rw1/dwx1;
+        if(b<hi)hi=b;}
         else if(rw1<0)goto nrow;
-        if(dwx2>0){double b=ix0-rw2/dwx2;if(b>lo)lo=b;}
-        else if(dwx2<0){double b=ix0-rw2/dwx2;if(b<hi)hi=b;}
+        if(dwx2>0){double b=ix0-rw2/dwx2;
+        if(b>lo)lo=b;}
+        else if(dwx2<0){double b=ix0-rw2/dwx2;
+        if(b<hi)hi=b;}
         else if(rw2<0)goto nrow;
-        if(lo<ix0)lo=ix0; if(hi>ix1)hi=ix1;
+        if(lo<ix0)lo=ix0;
+        if(hi>ix1)hi=ix1;
         if(lo<=hi){
             int xs=(int)ceil(lo), xe=(int)floor(hi);
             for(int i=0;i<IC_N;i++)
@@ -754,7 +774,8 @@ inline void DrawTri(const State& st,const Vert A,const Vert B,const Vert C){
                   (unsigned long long)(tPix/tN),(unsigned long long)(tInt/tN));
                   tPix=tInt=tN=0;tt0=tw;}
 #else
-                PixE(e,x,y,cur);if(perf)pCov++;
+                PixE(e,x,y,cur);
+                if(perf)pCov++;
 #ifdef __SSE2__
                 {_mm_storeu_ps(cur+0,_mm_add_ps(_mm_loadu_ps(cur+0),_mm_loadu_ps(dx+0)));
                  _mm_storeu_ps(cur+4,_mm_add_ps(_mm_loadu_ps(cur+4),_mm_loadu_ps(dx+4)));
@@ -806,8 +827,10 @@ inline void EmitPrim(const State& st,D3DPRIMITIVETYPE pt,const Vert* v,DWORD n){
         if(sscanf(dumpR,"%d,%d,%d,%d",&x0,&y0,&x1,&y1)==4){
             float mnx=1e30f,mny=1e30f,mxx=-1e30f,mxy=-1e30f;
             for(DWORD i=0;i<n;i++){
-                if(v[i].x<mnx)mnx=v[i].x; if(v[i].x>mxx)mxx=v[i].x;
-                if(v[i].y<mny)mny=v[i].y; if(v[i].y>mxy)mxy=v[i].y;}
+                if(v[i].x<mnx)mnx=v[i].x;
+                if(v[i].x>mxx)mxx=v[i].x;
+                if(v[i].y<mny)mny=v[i].y;
+                if(v[i].y>mxy)mxy=v[i].y;}
             if(mxx>x0&&mnx<x1&&mxy>y0&&mny<y1){
                 IDirectDrawSurface7*t=st.tex[0].s;
                 fprintf(stderr,"[PRIM] pt=%d n=%d x[%d..%d] y[%d..%d] cm=%u zb=%p tex0=%p %ux%u/%u col0=%08lx spec0=%08lx rhw0=%g z0=%g cop=%u ca1=%x ca2=%x aop=%u aa1=%x aa2=%x ablend=%u",
@@ -831,6 +854,54 @@ inline void EmitPrim(const State& st,D3DPRIMITIVETYPE pt,const Vert* v,DWORD n){
                 if(getenv("ROWAN_DUMPV"))
                     for(DWORD i=0;i<n;i++)
                         fprintf(stderr," v%u(%g,%g r%g z%g u%g v%g)",i,v[i].x,v[i].y,v[i].rhw,v[i].z,v[i].u[0],v[i].v[0]);
+                if(getenv("ROWAN_DUMPTEX")&&t&&t->desc.lpSurface){
+                    const Surf& ts=st.tex[0];
+                    int tw=(int)t->desc.dwWidth, th=(int)t->desc.dwHeight;
+                    int tbpp=(int)(t->desc.ddpfPixelFormat.dwRGBBitCount
+                            ?t->desc.ddpfPixelFormat.dwRGBBitCount:32);
+                    const BYTE* tsur=(const BYTE*)t->desc.lpSurface;
+                    int tpit=(int)t->desc.lPitch;
+                    for(DWORD i=0;i<n&&i<4;i++){
+                        int tx=(int)(v[i].u[0]*tw), ty=(int)(v[i].v[0]*th);
+                        if(tx<0)tx=0;
+                        if(tx>=tw)tx=tw-1;
+                        if(ty<0)ty=0;
+                        if(ty>=th)ty=th-1;
+                        const BYTE* r=tsur+ty*tpit;
+                        DWORD raw=tbpp==16?(DWORD)((const uint16_t*)r)[tx]
+                                 :tbpp==8?(DWORD)r[tx]:((const DWORD*)r)[tx];
+                        fprintf(stderr," tex%u[%d,%d]=%08lx",i,tx,ty,
+                            (unsigned long)UnpackPxS(t,ts.f,raw));
+                    }
+                    // black-row profile: fraction of zero/lum<8 texels per
+                    // 16-row band across the prim's v range
+                    float vmn=1e30f,vmx=-1e30f,umn=1e30f,umx=-1e30f;
+                    for(DWORD i=0;i<n;i++){
+                        if(v[i].v[0]<vmn)vmn=v[i].v[0];
+                        if(v[i].v[0]>vmx)vmx=v[i].v[0];
+                        if(v[i].u[0]<umn)umn=v[i].u[0];
+                        if(v[i].u[0]>umx)umx=v[i].u[0];}
+                    int y0=(int)(vmn*th), y1=(int)(vmx*th);
+                    int x0=(int)(umn*tw), x1=(int)(umx*tw);
+                    if(y0<0)y0=0;
+                    if(y1>=th)y1=th-1;
+                    if(x0<0)x0=0;
+                    if(x1>=tw)x1=tw-1;
+                    fprintf(stderr," rows:");
+                    for(int y=y0;y<=y1;y+=8){
+                        int dark=0,tot=0;
+                        for(int x=x0;x<=x1;x+=4){
+                            const BYTE* r=tsur+y*tpit;
+                            DWORD raw=tbpp==16?(DWORD)((const uint16_t*)r)[x]
+                                     :tbpp==8?(DWORD)r[x]:((const DWORD*)r)[x];
+                            DWORD c=UnpackPxS(t,ts.f,raw);
+                            int lum=((c>>16)&255)+((c>>8)&255)+(c&255);
+                            tot++;
+                            if(lum<24)dark++;
+                        }
+                        fprintf(stderr," %d:%d/%d",y,dark,tot);
+                    }
+                }
                 fprintf(stderr,"\n");
             }
         }
@@ -964,7 +1035,7 @@ inline HRESULT IDirect3DDevice7::CreateStateBlock(D3DSTATEBLOCKTYPE st, LPDWORD 
     if(st!=D3DSBT_ALL && st!=D3DSBT_PIXELSTATE && st!=D3DSBT_VERTEXSTATE)
         return DDERR_INVALIDPARAMS;
     RowanSBlock* b=new RowanSBlock;
-    RowanSBlock cur;
+    RowanSBlock cur={};
     memcpy(cur.rs,renderStates,sizeof(cur.rs));
     memcpy(cur.ss,stageStates,sizeof(cur.ss));
     memcpy(cur.tex,textures,sizeof(cur.tex));
@@ -1086,8 +1157,10 @@ inline HRESULT IDirect3DDevice7::Clear(DWORD nRect,LPD3DRECT rects,DWORD flags,
     LONG sw=(LONG)renderTarget->desc.dwWidth, sh=(LONG)renderTarget->desc.dwHeight;
     for(DWORD i=0;i<nv;i++){
         D3DRECT r=nRect?rects[i]:full;
-        if(r.x1<0)r.x1=0; if(r.y1<0)r.y1=0;
-        if(r.x2>sw)r.x2=sw; if(r.y2>sh)r.y2=sh;
+        if(r.x1<0)r.x1=0;
+        if(r.y1<0)r.y1=0;
+        if(r.x2>sw)r.x2=sw;
+        if(r.y2>sh)r.y2=sh;
         if((flags&D3DCLEAR_TARGET)&&renderTarget->desc.lpSurface){
             DWORD px=Rast7::Pack(col,pf);
             for(LONG y=r.y1;y<r.y2;y++)
@@ -1192,16 +1265,25 @@ inline HRESULT RowanBltFormat(IDirectDrawSurface7* dst, LPRECT dstR,
     }
     DWORD sbits=src->desc.ddpfPixelFormat.dwRGBBitCount?src->desc.ddpfPixelFormat.dwRGBBitCount:32;
     DWORD smask=sbits>=32?0xffffffffu:((1u<<sbits)-1);
+    if(getenv("ROWAN_DUMPBLT")&&dy>=560)
+        fprintf(stderr,"[BLT] dst=(%d,%d %ux%u) src=(%d,%d %ux%u) srcsurf=%ux%u/%u dstsurf=%ux%u/%u key=%u\n",
+            (int)dx,(int)dy,(unsigned)dstW,(unsigned)dstH,(int)sx0,(int)sy0,(unsigned)srcW,(unsigned)srcH,
+            (unsigned)src->desc.dwWidth,(unsigned)src->desc.dwHeight,(unsigned)sbits,
+            (unsigned)dst->desc.dwWidth,(unsigned)dst->desc.dwHeight,
+            (unsigned)dst->desc.ddpfPixelFormat.dwRGBBitCount,(unsigned)keyed);
     for(DWORD y=0;y<dstH;y++){
-        LONG ddy=dy+(LONG)y; if(ddy<0||ddy>=(LONG)dst->desc.dwHeight) continue;
+        LONG ddy=dy+(LONG)y;
+        if(ddy<0||ddy>=(LONG)dst->desc.dwHeight) continue;
         DWORD sy=(DWORD)sy0+y*srcH/dstH;
         if(sy>=src->desc.dwHeight) continue;
         for(DWORD x=0;x<dstW;x++){
-            LONG ddx=dx+(LONG)x; if(ddx<0||ddx>=(LONG)dst->desc.dwWidth) continue;
+            LONG ddx=dx+(LONG)x;
+            if(ddx<0||ddx>=(LONG)dst->desc.dwWidth) continue;
             DWORD sx=(DWORD)sx0+x*srcW/dstW;
             if(sx>=src->desc.dwWidth) continue;
             DWORD raw=Rast7::ReadPx(src,sx,sy);
-            if(keyed){DWORD v=raw&smask;if(v>=klo&&v<=khi)continue;}
+            if(keyed){DWORD v=raw&smask;
+            if(v>=klo&&v<=khi)continue;}
             DWORD c=Rast7::UnpackPx(ss,raw);
             Rast7::WritePx(dst,(DWORD)ddx,(DWORD)ddy,Rast7::Pack(c,df));
         }

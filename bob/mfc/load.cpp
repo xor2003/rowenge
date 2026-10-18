@@ -259,8 +259,14 @@ void	CLoad::MakeFileList()
 		buffer[strlen(buffer)-afterstar]=0;
 	if (ffh!=-1)
 	{
-		do{
+		char listed[64][260]; int listedcount=0;	//RERUN: case-alias symlinks
+		do{											//list the same file twice
 			int count=loadsavediscriminator.AllowFile(dirname,filedesc.name);
+			bool dup=false;
+			for (int i=0;i<listedcount;i++)
+				if (!stricmp(listed[i],filedesc.name)) {dup=true;break;}
+			if (dup) count=0;
+			else if (listedcount<64) { strncpy(listed[listedcount],filedesc.name,259); listed[listedcount][259]=0; listedcount++; }
 			if (count>0)
 			{
 				listempty=false;

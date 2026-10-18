@@ -89,7 +89,17 @@ Diary	Squad_Diary;
 
 BOStream&	operator<<(BOStream&	bo, Diary::Master* dptr)
 {
-	bo.write((char*)dptr,sizeof(*dptr));
+	//RERUN: save image is the Win32 layout - pointer members occupy 4 bytes
+	//and carry no meaning on load (readers reallocate every table).
+	ULong	ptrPlaceholder=0;
+	bo<<ptrPlaceholder<<dptr->playertablenext<<dptr->playertablemax;
+	bo<<ptrPlaceholder<<dptr->squadtablenext<<dptr->squadtablemax;
+	bo<<ptrPlaceholder<<dptr->intercepttablenext<<dptr->intercepttablemax;
+	bo<<ptrPlaceholder<<dptr->gruppentablenext<<dptr->gruppentablemax;
+	bo<<ptrPlaceholder<<dptr->raidpacknext<<dptr->raidpackmax;
+	bo<<ptrPlaceholder<<dptr->raidgroupnext<<dptr->raidgroupmax;
+	bo<<ptrPlaceholder<<dptr->prevplayerdesc<<dptr->nextplayerdesc<<dptr->maxplayerdesc;
+	bo<<dptr->playerIsGruppen;
 	bo.write((char*)dptr->gruppentable,dptr->gruppentablemax*sizeof(dptr->gruppentable[0]));
 	bo.write((char*)dptr->squadtable,dptr->squadtablemax*sizeof(dptr->squadtable[0]));
 	bo.write((char*)dptr->intercepttable,dptr->intercepttablemax*sizeof(dptr->intercepttable[0]));
@@ -102,7 +112,17 @@ BOStream&	operator<<(BOStream&	bo, Diary::Master* dptr)
 
 BIStream&	operator>>(BIStream&	bi, Diary::Master* dptr)
 {
-	bi.read((char*)dptr,sizeof(*dptr));
+	//RERUN: Win32 image - 4B pointer placeholders, then ints + bool.
+	//Keeps retail .bsl saves loadable and the same layout on write.
+	ULong	ptrPlaceholder;
+	bi>>ptrPlaceholder>>dptr->playertablenext>>dptr->playertablemax;
+	bi>>ptrPlaceholder>>dptr->squadtablenext>>dptr->squadtablemax;
+	bi>>ptrPlaceholder>>dptr->intercepttablenext>>dptr->intercepttablemax;
+	bi>>ptrPlaceholder>>dptr->gruppentablenext>>dptr->gruppentablemax;
+	bi>>ptrPlaceholder>>dptr->raidpacknext>>dptr->raidpackmax;
+	bi>>ptrPlaceholder>>dptr->raidgroupnext>>dptr->raidgroupmax;
+	bi>>ptrPlaceholder>>dptr->prevplayerdesc>>dptr->nextplayerdesc>>dptr->maxplayerdesc;
+	bi>>dptr->playerIsGruppen;
 	dptr->gruppentable = new Diary::Gruppen[dptr->gruppentablemax];
 	if (dptr->gruppentable)
 		bi.read((char*)dptr->gruppentable,dptr->gruppentablemax*sizeof(Diary::Gruppen));
@@ -143,7 +163,6 @@ static	int	endStatusLookUp[]=
 	IDS_EFS_LandedOtherAF,		//EFS_LandedOtherAF,
 	IDS_EFS_LandedField,			//EFS_LandedField,
 	IDS_EFS_DitchedField,			//EFS_DitchedField,
-//DeadCode RJS 30Oct00 	{IDS_EFS_BadCrashAF,					//EFS_BadCrashAF,
 	IDS_EFS_ACLOST,			//EFS_ACLOST,
 	IDS_EFS_KIA,				//EFS_KIA,
 	IDS_EFS_BadCrashAF,			//EFS_BadCrashAF,
@@ -575,21 +594,6 @@ int		Diary::AllocateSquadron(SLong intercept, SLong squadnum)
 int		Diary::AllocateIntercept(SLong raidgroup, SLong takeOffTime)
 {
 	int		index;
-//DeadCode RJS 29Aug00 	ULong	raidpackindex = diaryptr->raidgrouptable[raidgroup].diaryraidpackindex;
-//DeadCode RJS 29Aug00 	bool	foundone = false;
-//DeadCode RJS 29Aug00
-//DeadCode RJS 29Aug00 	for (index=diaryptr->raidpacktable[raidpackindex].firstinterceptrec;index<diaryptr->intercepttablenext;index++)
-//DeadCode RJS 29Aug00 	{
-//DeadCode RJS 29Aug00 		if (diaryptr->intercepttable[index].diaryraidindex == raidgroup)
-//DeadCode RJS 29Aug00 		{
-//DeadCode RJS 29Aug00 			foundone = true;
-//DeadCode RJS 29Aug00 			break;
-//DeadCode RJS 29Aug00 		}
-//DeadCode RJS 29Aug00 	}
-//DeadCode RJS 29Aug00
-//DeadCode RJS 29Aug00 	if (!foundone)
-//DeadCode RJS 29Aug00 	{
-//DeadCode RJS 7Sep00 		RaidPack*	packptr = GetRaidPack(&diaryptr->raidgrouptable[raidgroup]);
 
 		diaryptr->intercepttablenext++;
 		index = diaryptr->intercepttablenext;
@@ -601,9 +605,6 @@ int		Diary::AllocateIntercept(SLong raidgroup, SLong takeOffTime)
 		diaryptr->intercepttable[index].firstsquadronrec = UWord(diaryptr->squadtablenext+1);
 		diaryptr->intercepttable[index].takeofftime = takeOffTime;		//RJS 7Sep00
 
-//DeadCode RJS 7Sep00 		if (packptr)
-//DeadCode RJS 7Sep00 			diaryptr->intercepttable[index].takeofftime = packptr->takeofftime;
-//DeadCode RJS 29Aug00 	}
 
 	return index;
 }
@@ -710,7 +711,6 @@ int		Diary::AllocatePlayer(SLong	diaryentry,bool isLW)
 	diaryptr->playerIsGruppen = isLW;			//RJS 18Feb00
 
 	diaryptr->playertable[index].diarysquadindex = UWord(diaryentry&DIARYMASK);
-//DeadCode RJS 18Feb00	diaryptr->playertable[index].isGruppen = isLW;
 	diaryptr->playertable[index].descriptionstringindex = UWord(AllocateDesc());
 
 	return index;
@@ -783,7 +783,6 @@ void	Diary::CreateLWEntry(Profile*	theProfile)
 		UniqueID		doglegloc = theProfile->doglegloc;
 		int				nosquads = theProfile->squadlist;
 		Profile::Squad*	squaddy = &theProfile->squadlist[0];
-//DeadCode JIM 20Oct00 		SLong			notargets = 0;
 		const SLong			maxtargets = Profile::MAX_TARGETS+Profile::MAX_NEGTARGETS;
 		SLong			raidgroup;
 		SLong			raidgroupsize;
@@ -802,18 +801,8 @@ void	Diary::CreateLWEntry(Profile*	theProfile)
 			{
 				raidgroupids[trgno]=0xffff;
 
-//DEADCODE DAW 15/05/00 			if (theProfile->packagetarget[trgno].currentid == UID_NULL)
-//DEADCODE DAW 15/05/00 				break;
-//DEADCODE DAW 15/05/00 			else
-//DEADCODE DAW 15/05/00 			{
-//DEADCODE DAW 15/05/00 				raidgroupids[trgno] = AllocateRaidGroup(raidpack);
-//DEADCODE DAW 15/05/00 				diaryptr->raidgrouptable[raidgroupids[trgno]].target = theProfile->packagetarget[trgno].currentid;
-//DEADCODE DAW 15/05/00 				diaryptr->raidgrouptable[raidgroupids[trgno]].targettime = theProfile->primarytargetETA + theProfile->playerETAdelta;
-//DEADCODE DAW 15/05/00 				notargets++;
-//DEADCODE DAW 15/05/00 			}
 			}
 
-//DEADCODE DAW 15/05/00 		if (notargets)
 			{
 				for (int squadcnt = 0; squadcnt < nosquads; squadcnt++)
 				{
@@ -864,38 +853,6 @@ void	Diary::CreateLWEntry(Profile*	theProfile)
 					}
 
 					AllocateGruppen(squaddy->squadnum,raidgroupno,gruppenindex);	//RJS 16Nov00
-//DeadCode RJS 16Nov00 					if (AllocateGruppen(squaddy->squadnum,raidgroupno,gruppenindex))	//RJS 16Nov00
-//DeadCode RJS 16Nov00 					{
-//DeadCode RJS 16Nov00 						// New one...
-//DeadCode RJS 16Nov00 						MissType	misstype = MT_RECON;				//RJS 20Oct00
-//DeadCode RJS 16Nov00
-//DeadCode RJS 16Nov00 						switch (squaddy->method)
-//DeadCode RJS 16Nov00 						{
-//DeadCode RJS 16Nov00 						case Profile::AM_PATROL:	//raf only
-//DeadCode RJS 16Nov00 						case Profile::AM_INTERCEPT:	//raf only
-//DeadCode RJS 16Nov00 							break;
-//DeadCode RJS 16Nov00 						case Profile::AM_RECON:
-//DeadCode RJS 16Nov00 							misstype = MT_RECON;
-//DeadCode RJS 16Nov00 							break;
-//DeadCode RJS 16Nov00 						case Profile::AM_DIVEBOMB:
-//DeadCode RJS 16Nov00 						case Profile::AM_LEVELBOMB:
-//DeadCode RJS 16Nov00 							misstype = MT_RAID;
-//DeadCode RJS 16Nov00 							break;
-//DeadCode RJS 16Nov00 						default:
-//DeadCode RJS 16Nov00 						{
-//DeadCode RJS 16Nov00 							if (squaddy->method >= Profile::AM_DETACHED)
-//DeadCode RJS 16Nov00 							{
-//DeadCode RJS 16Nov00 								if (squaddy->method < Profile::AM_ATTACHED)
-//DeadCode RJS 16Nov00 									misstype = MT_ESCORT;
-//DeadCode RJS 16Nov00 								else
-//DeadCode RJS 16Nov00 									misstype = MT_CLOSEESCORT;
-//DeadCode RJS 16Nov00 							}
-//DeadCode RJS 16Nov00 						}
-//DeadCode RJS 16Nov00 						break;
-//DeadCode RJS 16Nov00 						}
-//DeadCode RJS 16Nov00
-//DeadCode RJS 16Nov00 						diaryptr->raidgrouptable[raidgroupno].misstype = misstype;
-//DeadCode RJS 16Nov00 					}
 
 					diaryptr->gruppentable[gruppenindex].noaclaunched += squaddy->numacoriginal;
 
@@ -904,7 +861,6 @@ void	Diary::CreateLWEntry(Profile*	theProfile)
 				}
 			}
 			theProfile->firstsquaddiaryentry=theProfile->squadlist[0].diaryentry;
-//DeadCode JIM 16Sep00 			delete [] raidgroupids;
 		}
 	}
 }
@@ -939,10 +895,8 @@ void	Diary::CreateRAFEntry(Profile*	startProfile, SLong packno)
 // Create only 1 instance of the intercept...
 		if (nosquads)											//RJS 29Aug00
 		{
-//DeadCode RJS 5Oct00 			UniqueID	target = thisProfile->packagetarget[squaddy->targetindex];
 			UniqueID	target = thisProfile->packagetarget[1];
 
-//DeadCode RJS 20Oct00 			interceptno = -1;
 		//	if (target)
 			{
 				int	lwpack,sqnum;
@@ -962,21 +916,6 @@ void	Diary::CreateRAFEntry(Profile*	startProfile, SLong packno)
 						Profile& lwpk = Todays_Packages.pack[lwpack];
 
 						tmpSquad = &lwpk.squadlist[sqnum];
-//DeadCode RJS 5Oct00 					}
-//DeadCode RJS 5Oct00 				}
-//DeadCode RJS 5Oct00
-//DeadCode RJS 5Oct00 				tmpProfile = startProfile;
-//DeadCode RJS 5Oct00 				for (int profcnt=0;profcnt<Profile::MAX_PACKS;profcnt++)
-//DeadCode RJS 5Oct00 				{
-//DeadCode RJS 5Oct00 					if (	(tmpProfile->packagestatus != Profile::PS_SPARE)
-//DeadCode RJS 5Oct00 						&&	(profcnt != packno)								)
-//DeadCode RJS 5Oct00 					{
-//DeadCode RJS 5Oct00 						tmpnosquads = tmpProfile->squadlist;
-//DeadCode RJS 5Oct00 						tmpSquad = &tmpProfile->squadlist[0];
-//DeadCode RJS 5Oct00 						for (int tmpsno=0; tmpsno < tmpnosquads; tmpsno++)
-//DeadCode RJS 5Oct00 						{
-//DeadCode RJS 5Oct00 							if (tmpSquad->instance == target)
-//DeadCode RJS 5Oct00 							{
 								gruppenindex = tmpSquad->diaryentry;
 								if (gruppenindex != 0xFFFFFFFF)
 								{
@@ -986,16 +925,7 @@ void	Diary::CreateRAFEntry(Profile*	startProfile, SLong packno)
 									acIndex = lwpk.squadlist.AcBitsFirstSquad();					//RDH 12/05/00
 									diaryptr->intercepttable[interceptno].leadthere = ((acIndex&1)==1);	//RDH 12/05/00
 								}
-//DeadCode RJS 5Oct00 								break;
-//DeadCode RJS 5Oct00 							}
-//DeadCode RJS 5Oct00
-//DeadCode RJS 5Oct00 							tmpSquad++;
-//DeadCode RJS 5Oct00 						}
-//DeadCode RJS 5Oct00
-//DeadCode RJS 5Oct00 						if (tmpsno < tmpnosquads)
-//DeadCode RJS 5Oct00 							break;
 					}
-//DeadCode RJS 5Oct00 					tmpProfile++;
 				}
 			}
 
@@ -1538,24 +1468,6 @@ Diary::Squadron*	Diary::GetNextSquadron(Diary::Squadron*	ptr)
 //------------------------------------------------------------------------------
 Diary::Player*	Diary::CreatePlayer(SquadronBase*	sptr)
 {
-//DEADCODE RDH 17/05/00 	char			index =	tp.hipack;
-//DEADCODE RDH 17/05/00 	Player*			playerptr = NULL;
-//DEADCODE RDH 17/05/00 	Profile*		packptr = &tp[index];
-//DEADCODE RDH 17/05/00
-//DEADCODE RDH 17/05/00 	if (packptr->packagestatus != Profile::PS_SPARE)
-//DEADCODE RDH 17/05/00 	{
-//DEADCODE RDH 17/05/00 		int				sqindex = tp.hisquad;
-//DEADCODE RDH 17/05/00 		SLong			newplayer = -1;
-//DEADCODE RDH 17/05/00 		Profile::Squad*	squaddy = &packptr->squadlist[sqindex];
-//DEADCODE RDH 17/05/00
-//DEADCODE RDH 17/05/00 		if (squaddy->diaryentry != 0xFFFFFFFF)
-//DEADCODE RDH 17/05/00 			newplayer = AllocatePlayer(SLong(squaddy->diaryentry),(squaddy->squadnum>=SQ_LW_START));
-//DEADCODE RDH 17/05/00
-//DEADCODE RDH 17/05/00 		if (newplayer != -1)
-//DEADCODE RDH 17/05/00 			playerptr = &diaryptr->playertable[diaryptr->playertablenext];
-//DEADCODE RDH 17/05/00
-//DEADCODE RDH 17/05/00 		lastplayerstatus = EFS_NULL;
-//DEADCODE RDH 17/05/00 	}
 
 	Player*			playerptr = NULL;
 	if (!_Replay.Playback)												//RJS 21Jun00
@@ -1943,7 +1855,6 @@ void		Diary::SetDiaryText(Player* ptr,const char* externalcopy)	//RDH 24/02/00
  			if (nocharsneeded >= buffersize)
 				nocharsneeded = buffersize-1;
 
-//DEADCODE RDH 24/02/00 			externalcopy[nocharsneeded] = 0;	//RDH 24/02/00
 
 			if (	(buffersize > D1DAY_PLAYERDESC)
 				&&	(ptr->descriptionstringindex == diaryptr->nextplayerdesc)	)
@@ -2687,12 +2598,6 @@ void	Diary::CreateQuickEntry(ULong*, ULong*, ULong*, int, UWord	target)
 		for (squadno=PT_BRIT_FLYABLE; squadno < PT_GER_FLYABLE; squadno++)
 			AllocateSquadron(interceptno,Node_Data[SquadNum(squadno)].squadron);
 
-//DeadCode JIM 6Nov00 		raidgroup = AllocateRaidGroup(raidpack);
-//DeadCode JIM 6Nov00
-//DeadCode JIM 6Nov00 		diaryptr->raidgrouptable[raidgroup].target = (UniqueID)target;
-//DeadCode JIM 6Nov00 		diaryptr->raidgrouptable[raidgroup].targettime = 0;
-//DeadCode JIM 6Nov00 		diaryptr->raidgrouptable[raidgroup].misstype = MT_RAID;			//RJS 4Sep00
-//DeadCode JIM 6Nov00 		diaryptr->raidgrouptable[raidgroup].firstgruppenrec = diaryptr->gruppentablenext + 1;//RJS 14Sep00
 
 		for (squadno=PT_LW_BOMBERS; squadno < PT_VEHICLES; squadno++)
 			AllocateGruppen(Node_Data[SquadNum(squadno)].squadron,raidgroup,gruppenindex);
@@ -2942,44 +2847,6 @@ void	Diary::ArrivedAtTarget(ULong	diaryIndex, void*	target)
 //------------------------------------------------------------------------------
 void	Diary::FillEndOfDayReport(Player* ptr)
 {
-//DeadCode RJS 16Nov00 	if (ptr)
-//DeadCode RJS 16Nov00 	{
-//DeadCode RJS 16Nov00 		if (ptr->descriptionstringindex != DIARY_EMPTYINDEX)
-//DeadCode RJS 16Nov00 		{
-//DeadCode RJS 16Nov00 			char*	textptr = &diaryptr->playerdescspace[ptr->descriptionstringindex];
-//DeadCode RJS 16Nov00 			if (	textptr
-//DeadCode RJS 16Nov00 				&&	(textptr[0] == 0)	)
-//DeadCode RJS 16Nov00 			{
-//DeadCode RJS 16Nov00 				CString	endOfDay = "";
-//DeadCode RJS 16Nov00 				CString	concatString;
-//DeadCode RJS 16Nov00
-//DeadCode RJS 16Nov00 				if (ptr->howendedmission != EFS_NULL)					//RJS 10Nov00
-//DeadCode RJS 16Nov00 					concatString.LoadString(endStatusLookUp[ptr->howendedmission]);
-//DeadCode RJS 16Nov00 				else
-//DeadCode RJS 16Nov00 					concatString = "";
-//DeadCode RJS 16Nov00
-//DeadCode RJS 16Nov00 				if (trainingReport != SCRIPT_NULL)
-//DeadCode RJS 16Nov00 				{
-//DeadCode RJS 16Nov00 					PhraseBuffer	phrasebuff;
-//DeadCode RJS 16Nov00 					UWord			randval = Math_Lib.rnd();
-//DeadCode RJS 16Nov00
-//DeadCode RJS 16Nov00 					_Radio.ExpandMessage(phrasebuff,trainingReport,randval,TargetIndexes(),NULL,NULL,NULL);
-//DeadCode RJS 16Nov00
-//DeadCode RJS 16Nov00 					_MsgBuffer.PhraseToString(endOfDay,phrasebuff);
-//DeadCode RJS 16Nov00
-//DeadCode RJS 16Nov00 					if (ptr->howendedmission != EFS_NULL)
-//DeadCode RJS 16Nov00 					{
-//DeadCode RJS 16Nov00 						endOfDay += "\n";
-//DeadCode RJS 16Nov00 						endOfDay += concatString;
-//DeadCode RJS 16Nov00 					}
-//DeadCode RJS 16Nov00 				}
-//DeadCode RJS 16Nov00 				else
-//DeadCode RJS 16Nov00 					endOfDay = concatString;
-//DeadCode RJS 16Nov00
-//DeadCode RJS 16Nov00 				SetDiaryText(ptr,(const char*)endOfDay);
-//DeadCode RJS 16Nov00 			}
-//DeadCode RJS 16Nov00 		}
-//DeadCode RJS 16Nov00 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

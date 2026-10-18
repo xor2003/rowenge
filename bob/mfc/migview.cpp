@@ -95,9 +95,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //Supposedly in the windows header file. Ho hum!
 #define FIELDOFFSET(type, field)    ((intptr_t)&(((type *)0)->field))
 
-//DeadCode RDH 16Mar100 MAKEFIELD(UniqueID,UID_NULL,IllegalSepID);
-//DEADCODE RDH 29/02/00 #include "package.h"
-//DEADCODE DAW 14/03/00 MAKEFIELD(UniqueID,UID_NULL,IllegalSepID);	//UniqueIDField
 #ifdef _DEBUG
 //#define new DEBUG_NEW
 #ifndef	THIS_FILE_DEFINED
@@ -211,7 +208,6 @@ CMIGView::CMIGView()
 //	m_bridgesChecked = FALSE;
 
 	m_doIexist=0;
-//DEADCODE RDH 07/12/99 	m_zoom = ZOOMTHRESHOLD2+0.0001;	//1.02320;//1.11625; // initial zoom position
 	m_zoom = Save_Data.defaultzoom+0.0001;
 	if (m_zoom < ZOOMMIN)
 		m_zoom = ZOOMTHRESHOLD2+0.0001;
@@ -226,7 +222,6 @@ CMIGView::CMIGView()
 //	m_bDontUpdateBitmaps=FALSE;
 	m_drawing=FALSE;
 	m_pfileblock=NULL;
-//DEADCODE ROD 16/12/99 	m_iconradius=12;
 	m_mapdlg.m_view=this;
 }
 
@@ -479,7 +474,6 @@ bool	CMainFrame::MakeToolMenu(CPoint point,int helpdialindex)
 	secondary.Detach();
 	menu.AppendMenu(MF_STRING,1030,RESSTRING(MESSAGES));
 	menu.AppendMenu(MF_STRING,1040+(helpdialindex%10),RESSTRING(PHRASE_HELPSHORT));
-//DEADCODE RDH 12/05/00 	menu.AppendMenu(MF_STRING,1030,RESSTRING(MAPSCALE));
 	CWnd* pWndPopupOwner = this;
 	while (pWndPopupOwner->GetStyle() & WS_CHILD)
 		pWndPopupOwner = pWndPopupOwner->GetParent();
@@ -511,15 +505,9 @@ void CMIGView::OnContextMenu(CWnd*, CPoint point)
 		}
 
 		CMenu menu;
-//DEADCODE RDH 10/05/00 		VERIFY(menu.CreatePopupMenu());
-//DEADCODE RDH 10/05/00 		menu.AppendMenu(MF_STRING|MF_ENABLED,ID_POPUP_ZOOM_OUT,RESSTRING(ZOOMOUT));
-//DEADCODE RDH 10/05/00 		menu.AppendMenu(MF_STRING|MF_ENABLED,ID_POPUP_ZOOM_IN,RESSTRING(ZOOMIN));
-//DEADCODE RDH 10/05/00 		CMenu* pPopup=&menu;
 
 		VERIFY(menu.LoadMenu(CG_IDR_POPUP_MIG_ALLEY_MFCVIEW));
 		CMenu* pPopup=menu.GetSubMenu(0);
-//DEADCODE RDH 10/05/00 		int state=pPopup->GetMenuState(ID_POPUP_ZOOM_IN, MF_BYCOMMAND ); 
-//DEADCODE RDH 10/05/00 		state=pPopup->GetMenuState(ID_POPUP_ZOOM_OUT, MF_BYCOMMAND ); 
 		if (m_zoom >= ZOOMMAX)
 			pPopup->EnableMenuItem(ID_POPUP_ZOOM_IN,MF_GRAYED | MF_BYCOMMAND);
 		else
@@ -530,8 +518,6 @@ void CMIGView::OnContextMenu(CWnd*, CPoint point)
 		else
 			pPopup->EnableMenuItem(ID_POPUP_ZOOM_OUT,MF_ENABLED | MF_BYCOMMAND);
 
-//DEADCODE RDH 10/05/00 
-//DEADCODE RDH 10/05/00 		ASSERT(pPopup != NULL);
 		CWnd* pWndPopupOwner = this;
 		while (pWndPopupOwner->GetStyle() & WS_CHILD)
 			pWndPopupOwner = pWndPopupOwner->GetParent();
@@ -552,8 +538,6 @@ void CMIGView::ZoomToUID(UniqueID uid, double zoom)
 	p=Persons2::ConvertPtrUID(uid);
 	ASSERT(p);
 	ScreenXY(p,px,py,0,0);
-//DEADCODE JIM 06/12/99 	px=((p->World.X*m_zoom)/65536)-(384*m_zoom);
-//DEADCODE JIM 06/12/99 	py=(1792*m_zoom)-((p->World.Z*m_zoom)/65536);
 	CRect rect;
 	GetClientRect(rect);
 	// Zoom to centre of client window if toolbar used
@@ -615,35 +599,6 @@ void	CMIGView::ScreenXY(ItemBasePtr p,int&px,int&py,int scrollx,int scrolly)
 		ScreenXY(&info_airgrpPtr(*p)->knownposition,px,py,scrollx,scrolly);
 	else
 		ScreenXY(&p->World,px,py,scrollx,scrolly);
-//DeadCode JIM 8Nov00 	if (p->Status.size>=ITEMSIZE)
-//DeadCode JIM 8Nov00 	{
-//DeadCode JIM 8Nov00 		ItemPtr q=*p;
-//DeadCode JIM 8Nov00 		if (q->SGT)
-//DeadCode JIM 8Nov00 		{
-//DeadCode JIM 8Nov00 			ItemBasePtr p2=Persons2::ConvertPtrUID(q->SGT);
-//DeadCode JIM 8Nov00 			if (p2->World.X==p->World.X && p2->World.Z==p->World.Z)
-//DeadCode JIM 8Nov00 			{
-//DeadCode JIM 8Nov00 				enum	{SMALLICONSIZE=24,SMALLICONRADIUS=12,LARGEICONRADIUS=36,CENTRE2CENTRE=SMALLICONRADIUS*3};
-//DeadCode JIM 8Nov00 				if (!nextpoint)
-//DeadCode JIM 8Nov00 					for (int i=0,offset=-CENTRE2CENTRE;i<3;i++,offset+=SMALLICONSIZE)
-//DeadCode JIM 8Nov00 					{
-//DeadCode JIM 8Nov00 						bandpoints[i].p.x=CENTRE2CENTRE;	bandpoints[i].p.y=offset;			//RHS
-//DeadCode JIM 8Nov00 						bandpoints[i+3].p.x=-offset;		bandpoints[i+3].p.y=CENTRE2CENTRE;	//BOTTOM
-//DeadCode JIM 8Nov00 						bandpoints[i+6].p.x=-CENTRE2CENTRE;	bandpoints[i+6].p.y=-offset;		//LHS
-//DeadCode JIM 8Nov00 						bandpoints[i+9].p.x=offset;			bandpoints[i+9].p.y=-CENTRE2CENTRE;	//TOP
-//DeadCode JIM 8Nov00 					}
-//DeadCode JIM 8Nov00 				UniqueIDBand b=Persons2::getbandfromUID(p->uniqueID.count);
-//DeadCode JIM 8Nov00 				bandpoints[nextpoint].b=b;
-//DeadCode JIM 8Nov00 				int	entry;
-//DeadCode JIM 8Nov00 				for (entry=0;bandpoints[entry].b!=b;entry++)
-//DeadCode JIM 8Nov00 				{}
-//DeadCode JIM 8Nov00 				if (entry==nextpoint && entry!=11)
-//DeadCode JIM 8Nov00 					nextpoint++;
-//DeadCode JIM 8Nov00 				px+=bandpoints[entry].p.x;
-//DeadCode JIM 8Nov00 				py+=bandpoints[entry].p.y;
-//DeadCode JIM 8Nov00 			}
-//DeadCode JIM 8Nov00 		}
-//DeadCode JIM 8Nov00 	}
 }
 int	CMIGView::WorldXY(int& wx,int& wz,int sx,int sy)
 {
@@ -658,11 +613,6 @@ int	CMIGView::WorldXY(Coords3D& w,int sx,int sy)
 }
 
 
-//DEADCODE AMM 15/12/99 void	CMIGView::DrawIcon(HDC hDC,int px,int py,BYTE* pData,BITMAPINFO* pInfo)
-//DEADCODE AMM 15/12/99 {
-//DEADCODE AMM 15/12/99 	SetDIBitsToDevice(hDC,px-m_scrollpoint.x-m_iconradius,py-m_scrollpoint.y-m_iconradius+1,m_iconradius*2,m_iconradius*2,
-//DEADCODE AMM 15/12/99 		0,0,0,m_iconradius*2,pData,pInfo,DIB_RGB_COLORS);
-//DEADCODE AMM 15/12/99 }
 void CMIGView::LollyOut(CDC* pDC,int x,int y,CString shortname)
 {
 	if (shortname.GetLength()>3 && (shortname[1]==' ' || shortname[2]==' '))
@@ -759,10 +709,6 @@ void CMIGView::DrawIconExtra(CDC* pDC,int px,int py,IconsUI	f,UniqueID	i, bool h
 					int	sqlinemin=Todays_Packages[packnum].RaidNumEntriesMinSq(raidline);
 					firstsquadoriginal=Todays_Packages[packnum][sqlinemin].numacoriginal;
 					int	sqlinemax=Todays_Packages[packnum].RaidNumEntriesMaxSq(raidline);
-//DEADCODE RDH 29/02/00 					int	sqlinemin=Todays_Packages[packnum].raidnumentries[raidline-1].squadliststart,
-//DEADCODE RDH 29/02/00 						sqlinemax=numsquads;
-//DEADCODE RDH 29/02/00 					if (sqlinemax>Todays_Packages[packnum].raidnumentries[raidline+1].squadliststart)
-//DEADCODE RDH 29/02/00 						sqlinemax=Todays_Packages[packnum].raidnumentries[raidline+1].squadliststart;
 					for(;sqlinemax>=sqlinemin;sqlinemax--)
 						if (Todays_Packages[packnum][sqlinemax].playercansee)
 							totalac+=Todays_Packages[packnum][sqlinemax].numacleft;
@@ -812,10 +758,6 @@ void CMIGView::DrawIconExtra(CDC* pDC,int px,int py,IconsUI	f,UniqueID	i, bool h
 											CPoint lolypos(px,py-bigqwh.y);
 											smalllolypop.MaskIcon(pDC,lolypos);		  //Squadron
 									
-	//DEADCODE RDH 12/05/00 										CString shortname;shortname.Format("%c",('A'+acindexfirstsquad/3));
-	//DEADCODE RDH 12/05/00 										pDC->TextOut(lolypos.x+LOLYBORDERX,lolypos.y+LOLYBORDERY,shortname);
-	//DEADCODE RDH 12/05/00 										acdown-=3;
-	//DEADCODE RDH 12/05/00 										acindexfirstsquad+=3;
 											px+=bigqwh.x/3;
 										}
 									}
@@ -823,7 +765,6 @@ void CMIGView::DrawIconExtra(CDC* pDC,int px,int py,IconsUI	f,UniqueID	i, bool h
 								else
 								{	//Draw row of lolypops
 									CPoint lolypos(px,py+1-bigqwh.y);
-//DeadCode JIM 20Oct00 									int tx=px;
 									lolypos.x-=ICONWH.x/2+3;
 									{
 										biglolypop.MaskIcon(pDC,lolypos);		  //Squadron
@@ -885,15 +826,6 @@ void CMIGView::DrawIconExtra(CDC* pDC,int px,int py,IconsUI	f,UniqueID	i, bool h
 						px=backupmain.x;
 						px-=ICONWH.x/2;
 						CString	forcesize;
-	//DEADCODE RDH 01/03/00 					if (Todays_Packages.localplayer==NAT_BLUE)	 //Estimate number if german
-	//DEADCODE RDH 01/03/00 					{
-	//DEADCODE RDH 01/03/00 						if (totalac>50)
-	//DEADCODE RDH 01/03/00 							totalac-=totalac%50;
-	//DEADCODE RDH 01/03/00 						else
-	//DEADCODE RDH 01/03/00 							totalac-=totalac%10;
-	//DEADCODE RDH 01/03/00 						forcesize.Format("%i+",totalac);
-	//DEADCODE RDH 01/03/00 					}
-	//DEADCODE RDH 01/03/00 					else
 							forcesize.Format("%2i",totalac);
 	//( int x, int y, UINT nOptions, LPCRECT lpRect, const CString& str, LPINT lpDxWidths );
 						if (hilight)
@@ -917,15 +849,6 @@ void CMIGView::DrawIconExtra(CDC* pDC,int px,int py,IconsUI	f,UniqueID	i, bool h
 						forcesize.Format(CSprintf(raidletter, Todays_Packages[packnum].raidnumentries[raidline].raidnum));
 
 
-	//DEADCODE RDH 13/04/00 					if (Todays_Packages.localplayer!=NAT_BLUE)
-	//DEADCODE RDH 13/04/00 						if (!Todays_Packages[packnum].raidnumentries[raidline].detector)
-	//DEADCODE RDH 13/04/00 //DEADCODE RDH 12/04/00 						if (Todays_Packages[packnum].raidnumentries[raidline].detector>=Profile::CHBASE)
-	//DEADCODE RDH 13/04/00 							forcesize.Format("X%03i",Todays_Packages[packnum].raidnumentries[raidline].raidnum);
-	//DEADCODE RDH 13/04/00 						else
-	//DEADCODE RDH 13/04/00 							forcesize.Format("H%03i",Todays_Packages[packnum].raidnumentries[raidline].raidnum);
-	//DEADCODE RDH 13/04/00 					else
-	//DEADCODE RDH 13/04/00 						forcesize.Format("R%i",Todays_Packages[packnum].raidnumentries[raidline].raidnum);
-	//DEADCODE RDH 13/04/00 
 
 						if (hilight)
 							pDC->SetTextColor(RGB(55,55,55));
@@ -961,10 +884,7 @@ void CMIGView::DrawIconExtra(CDC* pDC,int px,int py,IconsUI	f,UniqueID	i, bool h
 						//Get heading... Currently reading from route
  						if (Save_Data.mapfilters[FILT_LWARROWS])
 						{
-//DeadCode JIM 11Nov00 							Coords3D* positions=Todays_Packages[packnum].raidnumentries[raidline].prevpositions;
-//DeadCode JIM 20Oct00 							ScreenXY(positions,px,py,-m_scrollpoint.x,-m_scrollpoint.y);
 							ANGLES angle=a->knownhdg+ANGLES_180Deg;
-//DeadCode JIM 11Nov00 							angle=Math_Lib.HighArcTan(positions[1].X-positions[0].X,positions[1].Z-positions[0].Z);
 							double s,c;
 							Math_Lib.high_sin_cos(angle,s,c);
 							CPen* oldpen;
@@ -1047,27 +967,12 @@ void	CMIGView::DrawIcon(CDC* pDC,int px,int py,IconsUI f)
 	}	   
 	else
 	{
-//DEADCODE AMM 15/12/99 
-//DEADCODE AMM 15/12/99 		fileblock	block(f);
-//DEADCODE AMM 15/12/99 		BYTE*				pData=(BYTE*)getdata(block);
-//DEADCODE AMM 15/12/99 		BITMAPFILEHEADER*	pFile=(BITMAPFILEHEADER*)pData;
-//DEADCODE AMM 15/12/99 		BITMAPINFO*			pInfo=(BITMAPINFO*)(pData+sizeof(BITMAPFILEHEADER));
-//DEADCODE AMM 15/12/99 		pData+=pFile->bfOffBits;
-//DEADCODE AMM 15/12/99 		DrawIcon(hDC,px,py,pData,pInfo);
 	}
 }				
 void	CMIGView::DrawIconText(CDC* pDC,int px,int py,UniqueID u, bool hilight)
 {
 	CString s;
 //Done in gettargname itself
-//DEADCODE DAW 10/03/00 	if (u>=SagBAND && u<SagBANDEND)
-//DEADCODE DAW 10/03/00 	{
-//DEADCODE DAW 10/03/00 		//find pack from sag
-//DEADCODE DAW 10/03/00 		int pack = 0;
-//DEADCODE DAW 10/03/00 		Todays_Packages.GetACSquadEntry(u,pack);
-//DEADCODE DAW 10/03/00 		Profile& pk = Todays_Packages.pack[pack];
-//DEADCODE DAW 10/03/00 		s = CSprintf("F%i", pk.raidnumentries[0].raidnum);
-//DEADCODE DAW 10/03/00 	}else
 
 	IconsUI i =IconsUI( RDialog::m_pView->DrawIconTest( NULL, u, hilight,false));
 	if (i)
@@ -1123,8 +1028,6 @@ void	CMIGView::DrawIconText(CDC* pDC,int px,int py,UniqueID u, bool hilight)
 //////////////////////////////////////////////////////////////////////
 void	CMapDlg::InvalidateIconExtra(int px,int py,ItemBasePtr p,IconsUI i)
 {
-//DeadCode JIM 9Oct00 	#define ARROW_FIX 35
-//DeadCode JIM 9Oct00 	#define ARROW_RAD 25
 	IconDescUI ICON=i;
 	CPoint ICONWH=ICON.WH();
 	if (ICONWH.x>40)
@@ -1139,13 +1042,10 @@ void	CMapDlg::InvalidateIconExtra(int px,int py,ItemBasePtr p,IconsUI i)
 				if (Todays_Packages.GetACSquadEntry(p->uniqueID.count,packnum,sqline))
 				{
 					int	raidline=Todays_Packages[packnum].GetRaidIndFromSquadEntry(sqline);
-//DeadCode JIM 20Oct00 					Coords3D* positions=Todays_Packages[packnum].raidnumentries[raidline].prevpositions;
-//DeadCode JIM 20Oct00 					RDialog::m_pView->ScreenXY(positions,px,py,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
 
 					if (Todays_Packages[packnum].attackmethod<Profile::AM_LWPACKS)
 					{	//Refresh lolipops
  						IconDescUI	biglolypop(ICON_SQUAREPADDLE);
-//DeadCode JIM 20Oct00 						int	squads=Todays_Packages[packnum].squadlist;
 						ICONWH.x+=biglolypop.WH().x/2;
 						py-=ICONWH.y/2;
 						InvalidateRect(CRect(px-ICONWH.x/2,py-biglolypop.WH().y,px+ICONWH.x/2+1,py));
@@ -1232,10 +1132,6 @@ void CMIGView::Zoom(CPoint screenpoint,bool redrawscalebar)
 	CPoint prevscroll=m_scrollpoint;
 	if (m_zoom<ZOOMMIN) m_zoom=ZOOMMIN;
 	if (m_zoom>ZOOMMAX) m_zoom=ZOOMMAX;
-//DEADCODE ROD 16/12/99 	if	(m_zoom>ZOOMTHRESHOLD2)
-//DEADCODE ROD 16/12/99 		m_iconradius=12;
-//DEADCODE ROD 16/12/99 	else 
-//DEADCODE ROD 16/12/99 		m_iconradius=3;
 
 	if (m_zoom<ZOOMTHRESHOLD3)
 		{
@@ -1250,11 +1146,6 @@ void CMIGView::Zoom(CPoint screenpoint,bool redrawscalebar)
 //TEMPCODE AMM 13/01/00 				TRACE("Zoom reset: %f --> %f",m_zoom,newzoom);
 			m_zoom=newzoom;
 		}
-//DeadCode RDH 30Mar99 	m_scrollpoint += screenpoint;
-//DeadCode RDH 30Mar99 	m_scrollpoint = CPoint(m_scrollpoint.x*(m_zoom/m_oldzoom),m_scrollpoint.y*(m_zoom/m_oldzoom));
-//DeadCode RDH 30Mar99 	m_scrollpoint -= screenpoint;
-//DeadCode RDH 30Mar99 	m_size.cx=m_size.cx*(m_zoom/m_oldzoom);
-//DeadCode RDH 30Mar99 	m_size.cy=m_size.cy*(m_zoom/m_oldzoom);
 
 
 	CRect rect;
@@ -1301,33 +1192,6 @@ void CMIGView::Zoom(CPoint screenpoint,bool redrawscalebar)
 
 void CMIGView::PlotFrontLine(CDC* pDC)
 {
-//DEADCODE JIM 16/11/99 	ItemBasePtr pt;
-//DEADCODE JIM 16/11/99 	int px,py;
-//DEADCODE JIM 16/11/99 	
-//DEADCODE JIM 16/11/99 	CPen pen (PS_SOLID,4,RGB(252,156,12));
-//DEADCODE JIM 16/11/99 	CPen* oldpen=pDC->SelectObject(&pen);
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	pt=Persons2::ConvertPtrUID(UniqueID(SupplyTree::WestRoute.frontline->forward->suppliee->associated_item));
-//DEADCODE JIM 16/11/99 	if (pt)
-//DEADCODE JIM 16/11/99 	{
-//DEADCODE JIM 16/11/99 		ScreenXY(pt->World.X,pt->World.Z,px,py,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 		pDC->MoveTo(px,py);
-//DEADCODE JIM 16/11/99 		pt=Persons2::ConvertPtrUID(UniqueID(SupplyTree::CentralRoute.frontline->forward->suppliee->associated_item));
-//DEADCODE JIM 16/11/99 		if (pt)
-//DEADCODE JIM 16/11/99 		{
-//DEADCODE JIM 16/11/99 			ScreenXY(pt->World.X,pt->World.Z,px,py,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 			pDC->LineTo(px,py);
-//DEADCODE JIM 16/11/99 			pt=Persons2::ConvertPtrUID(UniqueID(SupplyTree::EastRoute.frontline->forward->suppliee->associated_item));
-//DEADCODE JIM 16/11/99 			if (pt)
-//DEADCODE JIM 16/11/99 			{
-//DEADCODE JIM 16/11/99 				ScreenXY(pt->World.X,pt->World.Z,px,py,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 				pDC->LineTo(px,py);
-//DEADCODE JIM 16/11/99 			}
-//DEADCODE JIM 16/11/99 		}
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	}
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	pDC->SelectObject(oldpen);
 }
 //////////////////////////////////////////////////////////////////////
 //
@@ -1586,151 +1450,10 @@ void CMIGView::PlotLine(CDC* pDC, UniqueID thiswp,UniqueID nextwp,BOOL japanwp)
 
 //debug details that can be drawn on map:
 #ifndef	NDEBUG
-//DEADCODE DAW 29/01/00 void CMIGView::PlotMainRoute(CDC* pDC, SupplyLine* SL, int red, int green, int blue)
-//DEADCODE DAW 29/01/00 {
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	CPen pen (PS_SOLID,8,RGB(red,green,blue));
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	CPen  pen00(PS_SOLID,1,RGB(255,255,255)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen01(PS_SOLID,1,RGB(255,100,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen02(PS_SOLID,2,RGB(255,100,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen03(PS_SOLID,3,RGB(255,100,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen04(PS_SOLID,4,RGB(255,100,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen05(PS_SOLID,5,RGB(255,100,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen06(PS_SOLID,6,RGB(255,100,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen07(PS_SOLID,7,RGB(255,100,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen11(PS_SOLID,1,RGB(100,255,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen12(PS_SOLID,2,RGB(100,255,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen13(PS_SOLID,3,RGB(100,255,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen14(PS_SOLID,4,RGB(100,255,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen15(PS_SOLID,5,RGB(100,255,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen16(PS_SOLID,6,RGB(100,255,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen17(PS_SOLID,7,RGB(100,255,100)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen21(PS_SOLID,1,RGB(100,100,255)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen22(PS_SOLID,2,RGB(100,100,255)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen23(PS_SOLID,3,RGB(100,100,255)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen24(PS_SOLID,4,RGB(100,100,255)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen25(PS_SOLID,5,RGB(100,100,255)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen26(PS_SOLID,6,RGB(100,100,255)),
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  pen27(PS_SOLID,7,RGB(100,100,255));
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		  CPen* penlist[3][7]=
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 			{
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				{&pen01,&pen02,&pen03,&pen04,&pen05,&pen06,&pen07},
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				{&pen11,&pen12,&pen13,&pen14,&pen15,&pen16,&pen17},
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				{&pen21,&pen22,&pen23,&pen24,&pen25,&pen26,&pen27},
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 			};
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	CPen* oldpen=pDC->SelectObject(&pen);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	SupplyNode*  currnode = SL->firstnode;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	SupplyRoute*  currroute;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	ItemBasePtr pt1,pt2;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	int px1,py1,px2,py2,px3,py3;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	pt1=Persons2::ConvertPtrUID(UniqueID(SL->firstnode->associated_item));
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	ScreenXY(pt1->World.X,pt1->World.Z,px1,py1,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	pDC->MoveTo(px1,py1);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	int count = 0;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	while (			(count < 80)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				&&	(currnode->forward != NULL)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 			)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //or should this be new ?
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 // no comments so I cannot tell
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 // commented out version crashes on entry to the map
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //Old_Code DAW 26Nov98 	while (			(count < 80)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //Old_Code DAW 26Nov98 				&&	(currnode->forward->suppliee != NULL)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //Old_Code DAW 26Nov98 			)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	{
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		currroute = currnode->forward;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		pt2=Persons2::ConvertPtrUID(UniqueID(currroute->suppliee->associated_item));
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		ScreenXY(pt2->World.X,pt2->World.Z,px2,py2,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		pDC->LineTo(px2,py2);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		for (int i=0;i<3;i++)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 			if (currnode->forward->suppliee->route[i])
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 			{
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				int proper=0,good=0,bad=0;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				for (SupplyRoute* sr=currnode->forward->suppliee->route[i];sr;sr=sr->alternateroute)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				{
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 					if (currnode->associated_item==UID_MyBlSeoul)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 						currnode=currnode;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 					if (sr->populateBF || (proper&&sr->associated_brdg))
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 						proper+=sr->maxcapacitysummer;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 					else
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 						if (sr->maxcapacitysummer>80)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 							bad+=sr->maxcapacitysummer;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 						else
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 							if (sr->maxcapacitysummer!=0)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 								good+=1;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				}
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				bad/=80;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				proper/=80;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				pt2=Persons2::ConvertPtrUID(UniqueID(currnode->forward->suppliee->route[i]->supplier->associated_item));
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				ScreenXY(pt2->World.X,pt2->World.Z,px3,py3,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				if (bad)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 					if (proper)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 						pDC->SelectObject(penlist[0][bad+good-1]);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 					else
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 						pDC->SelectObject(penlist[1][bad+good-1]);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				else
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 					if (good)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 						pDC->SelectObject(penlist[2][good-1]);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 					else
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 						pDC->SelectObject(&pen00);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				pDC->LineTo(px3,py3);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				pDC->MoveTo(px2,py2);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 				pDC->SelectObject(&pen);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 			}
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //TEMPCODE JIM 28/06/99 		if (currroute->suppliee->route[0]!=currroute)
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //TEMPCODE JIM 28/06/99 		{
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //TEMPCODE JIM 28/06/99 			pt2=Persons2::ConvertPtrUID(UniqueID(currroute->suppliee->route[0]->supplier->associated_item));
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //TEMPCODE JIM 28/06/99 			ScreenXY(pt2->World.X,pt2->World.Z,px3,py3,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //TEMPCODE JIM 28/06/99 			pDC->LineTo(px3,py3);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //TEMPCODE JIM 28/06/99 			pDC->MoveTo(px2,py2);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 //TEMPCODE JIM 28/06/99 		}
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		currnode = currroute->suppliee;		
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 		count++;
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	}
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 	pDC->SelectObject(oldpen);
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 
-//DEADCODE DAW 29/01/00 //DEADCODE JIM 16/11/99 
-//DEADCODE DAW 29/01/00 }
 #endif
 /*
 void CMIGView::PlotAirfields(CDC* pDC)
 {
-//DeadCode JIM 30Nov99 	CPen pen (PS_SOLID,1,RGB(255,255,255));
-//DeadCode JIM 30Nov99 	CPen* oldpen=pDC->SelectObject(&pen);
-//DeadCode JIM 30Nov99 
-//DeadCode JIM 30Nov99 	ItemBasePtr pt1,pt2;
-//DeadCode JIM 30Nov99 	int px1,py1,px2,py2;
-//DeadCode JIM 30Nov99 
-//DeadCode JIM 30Nov99 	SupplyNode* currnode;
-//DeadCode JIM 30Nov99 	currnode = SupplyTree::FirstNode;
-//DeadCode JIM 30Nov99 	while (currnode->type != LASTONE)
-//DeadCode JIM 30Nov99 	{
-//DeadCode JIM 30Nov99 		pt1=Persons2::ConvertPtrUID(UniqueID(currnode->associated_item));
-//DeadCode JIM 30Nov99 		ScreenXY(pt1->World.X,pt1->World.Z,px1,py1,-m_scrollpoint.x,-m_scrollpoint.y);
-//DeadCode JIM 30Nov99 		for (int i = 0; i< 3; i++)
-//DeadCode JIM 30Nov99 		{
-//DeadCode JIM 30Nov99  			if (m_mapdlg.m_buttonid == currnode->airfield[i])
-//DeadCode JIM 30Nov99  			{
-//DeadCode JIM 30Nov99  				pDC->MoveTo(px1,py1);
-//DeadCode JIM 30Nov99 				if (currnode->airfield[i])
-//DeadCode JIM 30Nov99  				{
-//DeadCode JIM 30Nov99  					pt2=Persons2::ConvertPtrUID(UniqueID(currnode->airfield[i]));
-//DeadCode JIM 30Nov99  					ScreenXY(pt2->World.X,pt2->World.Z,px2,py2,-m_scrollpoint.x,-m_scrollpoint.y);
-//DeadCode JIM 30Nov99 					pDC->LineTo(px2,py2);
-//DeadCode JIM 30Nov99  				}
-//DeadCode JIM 30Nov99  			}
-//DeadCode JIM 30Nov99 
-//DeadCode JIM 30Nov99 		
-//DeadCode JIM 30Nov99 		currnode = currnode->next;
-//DeadCode JIM 30Nov99 	};
-//DeadCode JIM 30Nov99 
-//DeadCode JIM 30Nov99 
-//DeadCode JIM 30Nov99 
-//DeadCode JIM 30Nov99 	pDC->SelectObject(oldpen);
-//DeadCode JIM 30Nov99 
 }
 
 */
@@ -1789,114 +1512,11 @@ void CMIGView::PlotAirfields(CDC* pDC)
 	}
 	pDC->SelectObject(oldpen);
 
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	ItemBasePtr pt1,pt2;
-//DEADCODE JIM 16/11/99 	int px1,py1,px2,py2;
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 		SWord i = 0;
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	while (SupplyTree::airfieldinfo[i].nationality != NAT_ALIGN)
-//DEADCODE JIM 16/11/99 	{
-//DEADCODE JIM 16/11/99  			if (m_mapdlg.m_buttonid == SupplyTree::airfieldinfo[i].airfield)
-//DEADCODE JIM 16/11/99  			{
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 				CPen pen (PS_SOLID,3,RGB(0,0,255));
-//DEADCODE JIM 16/11/99 				CPen* oldpen=pDC->SelectObject(&pen);
-//DEADCODE JIM 16/11/99 				
-//DEADCODE JIM 16/11/99 				pt1=Persons2::ConvertPtrUID(UniqueID(SupplyTree::airfieldinfo[i].airfield));
-//DEADCODE JIM 16/11/99 				ScreenXY(pt1->World.X,pt1->World.Z,px1,py1,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 	
-//DEADCODE JIM 16/11/99 				pDC->MoveTo(px1,py1);
-//DEADCODE JIM 16/11/99 				pt2=Persons2::ConvertPtrUID(UniqueID(SupplyTree::airfieldinfo[i].northnodes[0]->associated_item));
-//DEADCODE JIM 16/11/99 				ScreenXY(pt2->World.X,pt2->World.Z,px2,py2,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 				pDC->LineTo(px2,py2);
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 				pDC->MoveTo(px1,py1);
-//DEADCODE JIM 16/11/99 				pt2=Persons2::ConvertPtrUID(UniqueID(SupplyTree::airfieldinfo[i].northnodes[1]->associated_item));
-//DEADCODE JIM 16/11/99 				ScreenXY(pt2->World.X,pt2->World.Z,px2,py2,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 				pDC->LineTo(px2,py2);
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 				CPen pen2 (PS_SOLID,3,RGB(255,0,0));
-//DEADCODE JIM 16/11/99 				pDC->SelectObject(&pen2);
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 				pDC->MoveTo(px1,py1);
-//DEADCODE JIM 16/11/99 				pt2=Persons2::ConvertPtrUID(UniqueID(SupplyTree::airfieldinfo[i].southnodes[0]->associated_item));
-//DEADCODE JIM 16/11/99 				ScreenXY(pt2->World.X,pt2->World.Z,px2,py2,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 				pDC->LineTo(px2,py2);
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 				pDC->MoveTo(px1,py1);
-//DEADCODE JIM 16/11/99 				pt2=Persons2::ConvertPtrUID(UniqueID(SupplyTree::airfieldinfo[i].southnodes[1]->associated_item));
-//DEADCODE JIM 16/11/99 				ScreenXY(pt2->World.X,pt2->World.Z,px2,py2,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 				pDC->LineTo(px2,py2);
-//DEADCODE JIM 16/11/99 				pDC->SelectObject(oldpen);
-//DEADCODE JIM 16/11/99 			}
-//DEADCODE JIM 16/11/99 			i++;
-//DEADCODE JIM 16/11/99 			
-//DEADCODE JIM 16/11/99 	};
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	
-//DEADCODE JIM 16/11/99 
 }
 
 
 void CMIGView::PlotSupplyingRoutes(CDC* pDC)
 {
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	ItemBasePtr pt1,pt2;
-//DEADCODE JIM 16/11/99 	int px1,py1,px2,py2;
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	CPen	pen (PS_SOLID,1,RGB(255,0,0));
-//DEADCODE JIM 16/11/99 	CPen* oldpen;
-//DEADCODE JIM 16/11/99 	;
-//DEADCODE JIM 16/11/99 	oldpen=pDC->SelectObject(&pen);
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 	SupplyNode* currnode;
-//DEADCODE JIM 16/11/99 	currnode = SupplyTree::FirstNode;
-//DEADCODE JIM 16/11/99 	while (currnode->type != LASTONE)
-//DEADCODE JIM 16/11/99 	{
-//DEADCODE JIM 16/11/99 		pt1=Persons2::ConvertPtrUID(UniqueID(currnode->associated_item));
-//DEADCODE JIM 16/11/99 		ScreenXY(pt1->World.X,pt1->World.Z,px1,py1,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 		for (int i = 0; i< 3; i++)
-//DEADCODE JIM 16/11/99 		{
-//DEADCODE JIM 16/11/99 			
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			if (currnode->supplyline == &SupplyTree::WestRoute)
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			{
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 				CPen pen (PS_SOLID,1,RGB(255,0,0));
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 				oldpen=pDC->SelectObject(&pen);
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			}
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			if (currnode->supplyline == &SupplyTree::CentralRoute)
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			{
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 				CPen pen (PS_SOLID,1,RGB(0,255,0));
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 				oldpen=pDC->SelectObject(&pen);
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			}
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			if (currnode->supplyline == &SupplyTree::EastRoute)
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			{
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 				CPen pen (PS_SOLID,1,RGB(0,0,255));
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 				oldpen=pDC->SelectObject(&pen);
-//DEADCODE JIM 16/11/99 //DEADCODE DAW 14/05/99 			}
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 			pDC->MoveTo(px1,py1);
-//DEADCODE JIM 16/11/99 			if (currnode->route[i])
-//DEADCODE JIM 16/11/99 			{
-//DEADCODE JIM 16/11/99 				pt2=Persons2::ConvertPtrUID(UniqueID(currnode->route[i]->supplier->associated_item));
-//DEADCODE JIM 16/11/99 				ScreenXY(pt2->World.X,pt2->World.Z,px2,py2,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE JIM 16/11/99 			}
-//DEADCODE JIM 16/11/99 			if (currnode->supplyline == &SupplyTree::WestRoute)
-//DEADCODE JIM 16/11/99 				pDC->LineTo(px2,py2);
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 		}
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 		
-//DEADCODE JIM 16/11/99 		
-//DEADCODE JIM 16/11/99 		currnode = currnode->next;
-//DEADCODE JIM 16/11/99 	};
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99    pDC->SelectObject(oldpen);
-//DEADCODE JIM 16/11/99 
-//DEADCODE JIM 16/11/99  
-//DEADCODE JIM 16/11/99 
 }
 #endif
 #ifndef NDEBUG
@@ -1905,7 +1525,6 @@ void	PlotInvalidateBoxes(CDC*	pDC)
 	for (int pennum=0;pennum<debugboxmem.lastline;pennum++)
 	{
 		CPen pen(PS_SOLID,1,COLORREF(debugboxmem.debuglineRGB[pennum&7]));
-//DeadCode JIM 20Oct00 		bool	gotone=false;
 		debugboxmem.debuglineRGB[pennum&7]+=0x1000;
 		CPen* oldpen=pDC->SelectObject(&pen);
 		for (int box=0;box<debugboxmem.lastbox;box++)
@@ -2025,7 +1644,6 @@ void CMIGView::PlotRoutes(CDC* pDC,UniqueID onlythrough)
 		PlotTakeOffRoute(pDC, Todays_Packages.hipack, Todays_Packages.hisquad, true,onlythrough);
 		PlotTargetRoute(pDC, Todays_Packages.hipack, Todays_Packages[Todays_Packages.hipack][Todays_Packages.hisquad].WaveNum(), true,onlythrough);
 	}
-//DeadCode RDH 16Mar100 		PlotTargetRoute(pDC, Todays_Packages.hipack, Todays_Packages[Todays_Packages.hipack][Todays_Packages.hisquad].WaveNum(), true,onlythrough);
 
 }
 #define NEWICONSYSTEM	  XX
@@ -2234,7 +1852,6 @@ void	PackageList::SetVisibilityFlags()
 					{	//None drawn if raid not visible
 						int s=Todays_Packages[p].RaidNumEntriesMinSq(r);
 						Profile::Squad* sl=&Todays_Packages[p][s];
-//DeadCode JIM 25Sep00 						int	max=Todays_Packages[p].RaidNumEntriesMaxSq(r)+1;
 						int	totalac=0;
 						while (!sl->playercansee || sl->status==Profile::PS_COMPLETE)
 						{
@@ -2301,10 +1918,8 @@ void	PackageList::SetVisibilityFlags()
 			//now do waypoints
 			//There are different flags depending on side
 			//But it is all to do with which packages are viewed.
-//DEADCODE DAW 02/06/00 			if (isRAF)
 			limitscope
 			{
-//DeadCode JIM 20Oct00 				UniqueID uwp=Todays_Packages[p].route;
 				bool drawwps=false;
 				if ((Todays_Packages[p].attackmethod&Profile::AM_GROUPMASK)==Profile::AM_RAF)
 					if (Todays_Packages[p].attackmethod==Profile::AM_PATROL)
@@ -2386,7 +2001,6 @@ void	PackageList::SetVisibilityFlags()
 							do{
 								wp->SetHilight(wp->VCS_AFTER);
 								wp=*Persons2::ConvertPtrUID(wp->nextwp);
-//DEADCODE DAW 02/06/00 								wp->SetHilight(wp->VCS_BEFORE);
 							}while (wp->uid!=-SGR_WPP_EscRendezvous);
 						}
 						elseif (drawwps)
@@ -2394,7 +2008,6 @@ void	PackageList::SetVisibilityFlags()
 							do{
 								wp->SetDraw(wp->VCS_AFTER);
 								wp=*Persons2::ConvertPtrUID(wp->nextwp);
-//DEADCODE DAW 02/06/00 								wp->SetDraw(wp->VCS_BEFORE);
 							}while (wp->uid!=-SGR_WPP_EscRendezvous);
 
 						}
@@ -2498,7 +2111,6 @@ void	PackageList::SetVisibilityFlags()
 							)
 						{	//flag up to fighter RV as hilighted
 							do{
-//DEADCODE DAW 02/06/00 								wp->SetHilight(wp->VCS_AFTER);
 								wp=*Persons2::ConvertPtrUID(wp->nextwp);
 								wp->SetHilight(wp->VCS_BEFORE);
 							}while (wp->wpact!=wpdisperseno);
@@ -2506,7 +2118,6 @@ void	PackageList::SetVisibilityFlags()
 						elseif (drawwps)
 						{	//flag up to fighter RV as draw
 							do{
-//DEADCODE DAW 02/06/00 								wp->SetDraw(wp->VCS_AFTER);
 								wp=*Persons2::ConvertPtrUID(wp->nextwp);
 								wp->SetDraw(wp->VCS_BEFORE);
 							}while (wp->wpact!=wpdisperseno);
@@ -2524,7 +2135,6 @@ void	PackageList::SetVisibilityFlags()
 
 					//ok.. now do landing. Last wp in each batch must not have AFTER set
 					lastwave=ENABLE_COMPLEX_VAL;
-//DeadCode JIM 11Aug00 					wp=*Persons2::ConvertPtrUID(wp->nextwp);
 					info_waypoint* prevwp=NULL;
 					if (drawwps)
 						while (wp)
@@ -2611,8 +2221,6 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,bool ref
 				info_waypoint* wp=*p;//Persons2::ConvertPtrUID(i);
 				info_base::VisibilityCondition	
 					vc1=wp->GetVC(wp->VCS_ICON);
-//DeadCode JIM 3Oct00 				,
-//DeadCode JIM 3Oct00 					vc2=wp->GetVC(wp->VCS_AFTER);
 				
 				if (vc1&wp->VC_KNOWN)	//&vc2
 					if (refresh)
@@ -2625,89 +2233,6 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,bool ref
 							filenum = ICON_WP;
 						else
 						{}
-//DEADCODE DAW 03/06/00 
-//DEADCODE DAW 03/06/00 				int pack, wave, g;
-//DEADCODE DAW 03/06/00 				//PROBLEM!!! THE TARGET WAYPOINT IS USED BY A NUMBER OF SQUADRONS!!!!
-//DEADCODE DAW 03/06/00 				Profile::GetPackageFromWP(i, pack);
-//DEADCODE DAW 03/06/00 
-//DEADCODE DAW 03/06/00 				if  (		(		(Todays_Packages.hipack == pack)
-//DEADCODE DAW 03/06/00 								&&	(	(		(Todays_Packages[Todays_Packages.hipack].attackmethod >= Profile::AM_LWPACKS)
-//DEADCODE DAW 03/06/00 											&&	(RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DEADCODE DAW 03/06/00 										)
-//DEADCODE DAW 03/06/00 										||
-//DEADCODE DAW 03/06/00 										(		(Todays_Packages[Todays_Packages.hipack].attackmethod < Profile::AM_LWPACKS)
-//DEADCODE DAW 03/06/00 											&&	(RFullPanelDial::gameside != RFullPanelDial::SIDE_LW)
-//DEADCODE DAW 03/06/00 										)
-//DEADCODE DAW 03/06/00 									)
-//DEADCODE DAW 03/06/00 							)
-//DEADCODE DAW 03/06/00 							||
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 							(		(		(Todays_Packages[pack].attackmethod > Profile::AM_INTERCEPT)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 										&&	(Save_Data.mapfilters[FILT_LWROUTELINES])
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 									)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 									||
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 									(	(
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 												(		(Todays_Packages[pack].attackmethod == Profile::AM_PATROL)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 													&&	(Save_Data.mapfilters[FILT_RAFPATROLS])
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 												)	
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 												||
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 												(		(Todays_Packages[pack].attackmethod == Profile::AM_INTERCEPT)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 													&&	(Save_Data.mapfilters[FILT_RAFINTERCEPTS])
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 												)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 											
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 											)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 									)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 									||	(hilight)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 13/03/00 							 )
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 							(		(Save_Data.mapfilters[FILT_ROUTES])
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 								||	(hilight)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 							)
-//DEADCODE DAW 03/06/00 							(		(Todays_Packages.localplayer == NAT_RAF)
-//DEADCODE DAW 03/06/00 								&&	(	(		(Todays_Packages[pack].attackmethod == Profile::AM_PATROL)
-//DEADCODE DAW 03/06/00 											&&	(Save_Data.mapfilters[FILT_RAFPATROLS])
-//DEADCODE DAW 03/06/00 										)
-//DEADCODE DAW 03/06/00 										||
-//DEADCODE DAW 03/06/00 										(		(Todays_Packages[pack].attackmethod == Profile::AM_INTERCEPT)
-//DEADCODE DAW 03/06/00 											&&	(Save_Data.mapfilters[FILT_RAFINTERCEPTS])
-//DEADCODE DAW 03/06/00 										)
-//DEADCODE DAW 03/06/00 
-//DEADCODE DAW 03/06/00 									)
-//DEADCODE DAW 03/06/00 							)	
-//DEADCODE DAW 03/06/00 							||
-//DEADCODE DAW 03/06/00 							(		(Todays_Packages.localplayer != NAT_RAF)					
-//DEADCODE DAW 03/06/00 								&&	(	(		(Todays_Packages[pack].attackmethod < Profile::AM_DETACHED)
-//DEADCODE DAW 03/06/00 											&&	(Save_Data.mapfilters[FILT_BOMBERS])
-//DEADCODE DAW 03/06/00 										)	
-//DEADCODE DAW 03/06/00 										||
-//DEADCODE DAW 03/06/00 										(		(Todays_Packages[pack].attackmethod >= Profile::AM_DETACHED)
-//DEADCODE DAW 03/06/00 											&&	(Save_Data.mapfilters[FILT_RECONN])
-//DEADCODE DAW 03/06/00 										)
-//DEADCODE DAW 03/06/00 									)
-//DEADCODE DAW 03/06/00 							)
-//DEADCODE DAW 03/06/00 				)
-//DEADCODE DAW 03/06/00 
-//DEADCODE DAW 03/06/00 				{
-//DEADCODE DAW 03/06/00 					info_waypoint* wp=*Persons2::ConvertPtrUID(i);
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 					if  (		(		(Save_Data.mapfilters[FILT_MAINWP])
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 									||	(hilight)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 								)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 							&&	((wp->applygroup==ENABLE_COMPLEX_VAL))
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 						)
-//DEADCODE DAW 03/06/00 					if  ((wp->applygroup==ENABLE_COMPLEX_VAL))
-//DEADCODE DAW 03/06/00 					{
-//DEADCODE DAW 03/06/00 						filenum = ICON_WP;
-//DEADCODE DAW 03/06/00 //DEADCODE JIM 16/12/99 						SETFILE(ICON_MAINWP);
-//DEADCODE DAW 03/06/00 					}
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 					if  (		(		(Save_Data.mapfilters[FILT_SUBWP])
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 									||	(hilight)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 								)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 							&&	((wp->applygroup!=ENABLE_COMPLEX_VAL))
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 						)
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 					{
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 						filenum = ICON_WP;
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 //DEADCODE JIM 16/12/99 						SETFILE(ICON_SUBWP);
-//DEADCODE DAW 03/06/00 //DEADCODE RDH 07/01/00 					}
-//DEADCODE DAW 03/06/00 				}
 				break;
 			}
 			case		BarrageBalloonBAND:
@@ -2809,7 +2334,6 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,bool ref
 				}
 				break;
 			}
-//DeadCode JIM 10Sep00 The above should not interfere with Rod's edits that go below:
 			case		AircraftFactoryBAND:
 			{
 				TargetGroup* g=Node_Data[i];
@@ -2952,61 +2476,6 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,bool ref
 					filenum = ICON_AF_BOMBER;
 				break;
 			}
-//DEADCODE JIM 12/06/00 			case		TakeOffPosBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		TaxiBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		SectorOpsBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum=ICON_NO_ICON;									//RDH 06/03/00
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		AfHangarBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		AfStaffBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		AfStoresBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		AfFieldBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		AfNoScoreBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		EventBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		RunwaySBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
-//DEADCODE JIM 12/06/00 			case		RunwayEBAND:
-//DEADCODE JIM 12/06/00 			{
-//DEADCODE JIM 12/06/00 				filenum = ICON_TICK;
-//DEADCODE JIM 12/06/00 				break;
-//DEADCODE JIM 12/06/00 			}
 			case		SagBAND:	
 			{
 				info_itemS* ac=*Persons2::ConvertPtrUID(i);
@@ -3026,19 +2495,9 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,bool ref
 				int packnum,sqline;
 				if (Todays_Packages.GetACSquadEntry(i,packnum,sqline))
 				{
-//DEADCODE DAW 03/06/00 					int raidline = Todays_Packages[packnum].GetRaidIndFromSquadEntry(sqline);
-//DEADCODE DAW 03/06/00 					int	sqlinemin=Todays_Packages[packnum].RaidNumEntriesMinSq(raidline);
-//DEADCODE DAW 03/06/00 					if (		(Todays_Packages[packnum].raidnumentries[raidline].detector)
-//DEADCODE DAW 03/06/00 							&&	(		((Todays_Packages[packnum].attackmethod < Profile::AM_LWPACKS)	&&	(Save_Data.mapfilters[FILT_RAFSAG]))
-//DEADCODE DAW 03/06/00 									||	((Todays_Packages[packnum].attackmethod >= Profile::AM_LWPACKS)	&&	(Save_Data.mapfilters[FILT_LWSAG]))									
-//DEADCODE DAW 03/06/00 								)
-//DEADCODE DAW 03/06/00 						)
 					{
 						if (Save_Data.lwplots == PL_REALISTIC)
 						{
-	//DEADCODE RDH 14/04/00 						int raidline = Todays_Packages[packnum].GetRaidIndFromSquadEntry(sqline);
-	//DEADCODE RDH 14/04/00 						int	sqlinemin=Todays_Packages[packnum].RaidNumEntriesMinSq(raidline);
-//DEADCODE DAW 03/06/00  							if (sqline == sqlinemin)
 							{
 								if (Todays_Packages[packnum].attackmethod>=Profile::AM_LWPACKS)
 									filenum = ICON_BIGLW;
@@ -3117,8 +2576,6 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,bool ref
 
 
 		}
-//DEADCODE RDH 05/01/00 #ifdef NEWICONSYSTEM
-//DeadCode RDH 12Nov100 #pragma warnmsg("Icon select Add")
 		if (hilight && filenum)
 			filenum=IconsUI(filenum+ICON_SELECT_3);
 
@@ -3287,11 +2744,16 @@ void CMIGView::UpdateBitmaps(CDC* pDC,CRect bounds)
 		}
 		startfile=startfilescales[filestart];
 	}
+	if (zoomsquaresize<1)
+	{
+		fprintf(stderr,"[map] UpdateBitmaps: zoomsquaresize=%d mzoom=%g scroll=%ld,%ld\n",
+			zoomsquaresize,mzoom,(long)m_scrollpoint.x,(long)m_scrollpoint.y);
+		zoomsquaresize=1;
+	}
 	int startx=m_scrollpoint.x/zoomsquaresize;
 	int starty=m_scrollpoint.y/zoomsquaresize;
 	const int squaresize=256; // size of one side of bitmap
 	CRect rect=bounds;													//DAW 13/03/00
-//DEADCODE DAW 13/03/00 	GetClientRect(rect);  // top left is always 0,0
 //	CDC* pDC;
 //	pDC = m_mapdlg.GetDC();
 	HDC hDC;
@@ -3505,17 +2967,9 @@ void CMIGView::UpdateBitmaps(CDC* pDC,CRect bounds)
 		pDC->FillSolidRect(CRect(0,m_size.cy,rect.right,rect.bottom),
 							RGB(0,0,0));//180,200,200));
 	// now draw the icons...
-//DEADCODE ROD 16/12/99 	UniqueIDField redUIDs;
-//DEADCODE JIM 16/11/99 	SupplyTree::FillNatForUID(redUIDs);
 
-//DEADCODE ROD 16/12/99 	FileNum  FL_Icon[100];//AmberBattleNodeBANDEND-AmberBattleNodeBAND]; //RJS 16/11/99
-//DEADCODE JIM 16/11/99 	if (m_zoom > ZOOMTHRESHOLDFRONTLINE)
-//DEADCODE JIM 16/11/99 		SupplyTree::FillFLS_Icons(FL_Icon);
 
-//DEADCODE JIM 16/11/99 	if (Save_Data.mapfilters[FILT_FRONTLINE])
-//DEADCODE JIM 16/11/99 		PlotFrontLine(pDC);
 
-//DEADCODE DAW 14/03/00 	DrawIcons(pDC,bounds);//,redUIDs, FL_Icon);
 	// now plot the routes...
 	PlotRoutes(pDC);
 	if (m_mapdlg.m_LButtonDown && m_mapdlg.m_bDragging && m_mapdlg.m_buttonid)
@@ -3525,32 +2979,14 @@ void CMIGView::UpdateBitmaps(CDC* pDC,CRect bounds)
 	ItemBasePtr p;
 	int px,py;
 	p=Persons2::ConvertPtrUID(UniqueID(m_mapdlg.m_hintid));
-//DeadCode DAW 05Jun00 	FileNum  f;
-//DeadCode DAW 05Jun00 	f = DrawIconTest(p, UniqueID(m_mapdlg.m_hintid), false);//,redUIDs,FL_Icon);
 	if (	(p))//	&& (f))										//DAW 05Jun00
 	{
 		ScreenXY(p,px,py,0,0);
-//DeadCode DAW 05Jun00 		pDC->SetBkColor(RGB(255,255,255));
-//DeadCode DAW 05Jun00 		pDC->SetTextColor(RGB(0,0,0));
-//DeadCode DAW 05Jun00 		int uidband=Persons2::getbandfromUID(UniqueID(m_mapdlg.m_hintid));
 
-//DEADCODE RJS 16/11/99 		if (uidband == AmberBattleNodeBAND)
-//DEADCODE RJS 16/11/99 		{
-//DEADCODE RJS 16/11/99 			TeamDef		*team=SupplyTree::WestRoute.groundbattle.FindTeamAtLocation(UniqueID(m_mapdlg.m_hintid));
-//DEADCODE RJS 16/11/99 			if (!team) 
-//DEADCODE RJS 16/11/99 				team=SupplyTree::CentralRoute.groundbattle.FindTeamAtLocation(UniqueID(m_mapdlg.m_hintid));
-//DEADCODE RJS 16/11/99 			else if (!team) 
-//DEADCODE RJS 16/11/99 				team=SupplyTree::EastRoute.groundbattle.FindTeamAtLocation(UniqueID(m_mapdlg.m_hintid));
-//DEADCODE RJS 16/11/99 			if (team)
-//DEADCODE RJS 16/11/99 				DrawIconText(pDC,px,py,LoadResString(team->forcename));
-//DEADCODE RJS 16/11/99 
-//DEADCODE RJS 16/11/99 			
-//DEADCODE RJS 16/11/99 		}else
 			DrawIconText(pDC,px,py,UniqueID(m_mapdlg.m_hintid), m_mapdlg.m_buttonid==m_mapdlg.m_hintid);
 	}
 
 	PlotDebugInfo(pDC);
-//DEADCODE JIM 29/05/99 	m_oldzoom=m_zoom;
 	m_drawing=FALSE;
 }
 /*
@@ -3712,16 +3148,6 @@ void CMIGView::OnMove(int x, int y)
 {
 	CView::OnMove(x, y);
 	
-//DEADCODE DAW 07/05/99 	// TODO: Add your message handler code here
-//DEADCODE DAW 07/05/99 	if (m_doIexist>2)
-//DEADCODE DAW 07/05/99 	{
-//DEADCODE DAW 07/05/99 		if (m_pfullpane) m_pfullpane->UpdateSize();
-//DEADCODE DAW 07/05/99 		if (m_currentpage==0) m_mapdlg.Invalidate();
-//DEADCODE DAW 07/05/99 //DeadCode JIM 15Jul98 		UpdateBitmaps();
-//DEADCODE DAW 07/05/99 //DeadCode JIM 15Jul98 		if (m_pfullpane) m_pfullpane->UpdateSize();
-//DEADCODE DAW 07/05/99 		RecalcLayout();
-//DEADCODE DAW 07/05/99 	}
-//DEADCODE DAW 07/05/99 //	UpdateScrollbars();
 	
 }
 
@@ -3732,8 +3158,6 @@ void CMIGView::OnSize(UINT nType, int cx, int cy)
 	{
 		if (m_pfullpane) m_pfullpane->UpdateSize();
 		if (m_currentpage==0) m_mapdlg.Invalidate();
-//DeadCode JIM 15Jul98 		UpdateBitmaps();
-//DeadCode JIM 15Jul98 		if (m_pfullpane) m_pfullpane->UpdateSize();
 	}
 	UpdateScrollbars();
 	m_doIexist++; // window only exists after it has been initially sized twice.
@@ -3742,7 +3166,6 @@ void CMIGView::OnSize(UINT nType, int cx, int cy)
 BOOL CMIGView::OnEraseBkgnd(CDC* pDC) 
 {
 	if (m_currentpage!=0)
-//DEADCODE JIM 19/06/99 		if (Rtestsh1::Start3d(Rtestsh1::S3D_DONEBACK))
 		{
 			CRect rect;
 			GetClientRect(rect);
@@ -3751,10 +3174,6 @@ BOOL CMIGView::OnEraseBkgnd(CDC* pDC)
 	return TRUE;
 }
 
-//DEADCODE JIM 04/04/00 void CMIGView::OnChangeToTitle() 
-//DEADCODE JIM 04/04/00 {
-//DEADCODE JIM 04/04/00 	LaunchFullPane(&RFullPanelDial::introsmack);
-//DEADCODE JIM 04/04/00 }
 
 void CMIGView::OnLButtonDown(UINT nFlags, CPoint point) 
 {
@@ -3784,7 +3203,6 @@ void CMIGView::LaunchMap(bool firsttime)
 
 	_Miles.GoingToMapScreen();											//RJS 6Oct00
 
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("LaunchMap<"));
 
 ///	Persons4::StartUpMapWorld();		//do whenever we go to the map screen
 	m_pfullpane->DestroyWindow();
@@ -3798,9 +3216,7 @@ void CMIGView::LaunchMap(bool firsttime)
 	m_mapdlg.BringWindowToTop();
 	m_mapdlg.Invalidate();
 	UpdateScrollbars();
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP(">LaunchMap"));
 
-//DeadCode JIM 15Jul98 	Persons4::StartUpMapWorld();		//do whenever we go to the map screen
 //	Persons4::ShutDownMapWorld();		//do whenever we come off the map screen
 }
 
@@ -3817,10 +3233,6 @@ void CMIGView::LaunchFullPane(FullScreen * startscreen,SaveData::ResUI reqres)
 //	else
 //		main->m_wndSystemBox->InDialAncestor()->ShowWindow(SW_HIDE);		  //JIM 14/06/99
 	main->CloseToolChildren();
-//DEADCODE RDH 09/11/99 	main->m_toolbar1.CloseLoggedChildren();
-//DEADCODE RDH 09/11/99 	main->m_toolbar2.CloseLoggedChildren();
-//DEADCODE RDH 09/11/99 	main->m_toolbar3.CloseLoggedChildren();
-//DEADCODE RDH 09/11/99 	main->m_toolbar4.CloseLoggedChildren();
 //	main->m_toolbar5.CloseLoggedChildren();
 	m_mapdlg.ShowWindow(SW_HIDE);
 #endif
@@ -3893,29 +3305,6 @@ void	CMIGView::SetHiLightInfo(int pack, int squadline, UniqueID wp, bool fullgro
 
 
 
-//DEADCODE RDH 07/01/00 	fullgroup|=(Todays_Packages.hipack!=pack);
-//DEADCODE RDH 07/01/00 	if (Todays_Packages.hipack!=-1)
-//DEADCODE RDH 07/01/00 		if (fullgroup)
-//DEADCODE RDH 07/01/00 		{
-//DEADCODE RDH 07/01/00 			for (int sq=0,maxsq=Todays_Packages[Todays_Packages.hipack].squadlist;sq!=maxsq;sq++)
-//DEADCODE RDH 07/01/00 				PlotRoute(NULL, Todays_Packages.hipack,sq,false);
-//DEADCODE RDH 07/01/00 //DEADCODE DAW 26/11/99 			PlotRoute(NULL, Todays_Packages.hipack, Todays_Packages.hiwave, 1, false);
-//DEADCODE RDH 07/01/00 //DEADCODE DAW 26/11/99 			PlotRoute(NULL, Todays_Packages.hipack, Todays_Packages.hiwave, 2, false);
-//DEADCODE RDH 07/01/00 		}
-//DEADCODE RDH 07/01/00 		else
-//DEADCODE RDH 07/01/00 			PlotRoute(NULL, Todays_Packages.hipack, Todays_Packages.hisquad, false);
-//DEADCODE RDH 07/01/00 	Todays_Packages.hipack = pack;
-//DEADCODE RDH 07/01/00 	Todays_Packages.hisquad = squadline;
-//DEADCODE RDH 07/01/00 	Todays_Packages.hiwp = wp;
-//DEADCODE RDH 07/01/00 	RDialog::m_pView->m_mapdlg.ResetIcon(Todays_Packages.hiwp);
-//DEADCODE RDH 07/01/00 
-//DEADCODE RDH 07/01/00 	if (fullgroup)
-//DEADCODE RDH 07/01/00 	{
-//DEADCODE RDH 07/01/00 		for (int sq=0,maxsq=Todays_Packages[pack].squadlist;sq!=maxsq;sq++)
-//DEADCODE RDH 07/01/00 				PlotRoute(NULL, pack,sq,false);
-//DEADCODE RDH 07/01/00 	}
-//DEADCODE RDH 07/01/00 	else
-//DEADCODE RDH 07/01/00 		PlotRoute(NULL, pack, squadline,true);
 
 }			  
 
@@ -3974,26 +3363,6 @@ LRESULT CMIGView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	// TODO: Add your specialized code here and/or call the base class
 	
 	int rv= CView::DefWindowProc(message, wParam, lParam);
-//deadcode JIM 18/06/01		switch (message)
-//deadcode JIM 18/06/01		{
-//deadcode JIM 18/06/01		case	WM_NCCREATE:			case	WM_PARENTNOTIFY:
-//deadcode JIM 18/06/01		case	WM_NCCALCSIZE:			case	0x04c8:	//MCIWNDM_NOTIFY:
-//deadcode JIM 18/06/01		case	WM_CREATE:				case	WM_NCPAINT:
-//deadcode JIM 18/06/01		case	WM_SIZE:				case	WM_SETCURSOR:
-//deadcode JIM 18/06/01		case	WM_MOVE:				case	WM_SETFONT:
-//deadcode JIM 18/06/01		case	WM_INITDIALOG:			case	WM_DISPLAYCHANGE:
-//deadcode JIM 18/06/01		case	WM_CTLCOLORSTATIC:		case	WM_IDLEUPDATECMDUI: //363
-//deadcode JIM 18/06/01		case	WM_GETFONT:				case	WM_KILLFOCUS:
-//deadcode JIM 18/06/01		case	WM_WINDOWPOSCHANGING:	case	WM_STYLECHANGING:
-//deadcode JIM 18/06/01		case	WM_SHOWWINDOW:			case	WM_STYLECHANGED:
-//deadcode JIM 18/06/01		case	WM_PAINT:				case	WM_SETFOCUS:
-//deadcode JIM 18/06/01		case	WM_WINDOWPOSCHANGED:	//
-//deadcode JIM 18/06/01		case	 WM_NCHITTEST:			//
-//deadcode JIM 18/06/01	
-//deadcode JIM 18/06/01	
-//deadcode JIM 18/06/01	
-//deadcode JIM 18/06/01			return rv;
-//deadcode JIM 18/06/01		}
 	return rv;
 }
 

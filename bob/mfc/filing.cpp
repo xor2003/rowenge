@@ -141,9 +141,17 @@ bool	CFiling::LoadGame(CString	fname)
 
 	bis>>Miss_Man;	//THIS IS THE LOAD
 	m_pView->m_zoom=Save_Data.currzoom;
+	if (m_pView->m_zoom<ZOOMMIN || m_pView->m_zoom>ZOOMMAX)
+	{
+		m_pView->m_zoom=Save_Data.defaultzoom+0.0001;
+		if (m_pView->m_zoom<ZOOMMIN)
+			m_pView->m_zoom=ZOOMTHRESHOLD2+0.0001;
+	}
 	m_pView->m_oldzoom=m_pView->m_zoom;
 	m_pView->m_size.cx=Save_Data.currmapx;
 	m_pView->m_size.cy=Save_Data.currmapy;
+	if (m_pView->m_size.cx<=0 || m_pView->m_size.cy<=0)
+		m_pView->m_size.cx=m_pView->m_size.cy=256*4*m_pView->m_zoom-5;
 	m_pView->m_scrollpoint.x=Save_Data.currmapx2;
 	m_pView->m_scrollpoint.y=Save_Data.currmapy2;
 	m_pView->UpdateScrollbars();
@@ -162,7 +170,6 @@ bool	CFiling::LoadGame(CString	fname)
 		IconDescUI::LoadInstances(::GetDC(NULL),ICON_SET_1_LW);
 	}
 
-//Deadcode JIM 17Nov00	Node_Data.BuildTargetTable();
 
 	RFullPanelDial::SetTitleText();
 
@@ -234,15 +241,9 @@ void CFiling::OnOK()
 			m_pView->m_currentpage=1;
 			main->CloseToolChildren(this);
 			m_pView->m_currentpage=0;
-//DeadCode JIM 18Oct00 			main->m_toolbar1.CloseLoggedChildren(this);							  //RDH 27/05/99
-//DeadCode JIM 18Oct00 			main->m_toolbar2.CloseLoggedChildren(this);							  //RDH 27/05/99
-//DeadCode JIM 18Oct00 			main->m_toolbar3.CloseLoggedChildren(this);							  //RDH 27/05/99
-//DeadCode JIM 18Oct00 			main->m_toolbar4.CloseLoggedChildren(this);							  //RDH 27/05/99
-//DEADCODE RDH 08/11/99 			main->m_toolbar5.CloseLoggedChildren(this);							  //RDH 27/05/99
 			LoadGame(selectedfile);								//JIM 13Jul99
 			m_pView->m_mapdlg.Invalidate();									  //RDH 27/05/99
  			main->m_titlebar.Redraw();										  //RDH 27/05/99
-//DeadCode JIM 18Oct00 			CMainFrame* pmainwnd=(CMainFrame*)AfxGetMainWnd();				  //RDH 27/05/99
 			main->UpdateToolbars(false);										  //RDH 27/05/99
 
 

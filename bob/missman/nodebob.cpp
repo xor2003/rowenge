@@ -75,7 +75,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #define F_SOUNDS												//DAW 05Aug96
 #define F_COMMON
 #include	"files.g"		//NON-GRAPHICS FILES				//JIM 14May96
-//DeadCode JIM 30Apr96 #include	"miss_man.h"										//DAW 17Jan96
 //#include	"ui.h"
 #include	"uniqueid.h"  
 #include "flyinit.h"													//RDH 07/03/00
@@ -118,8 +117,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 const	UniqueID
 
 UID_FA_CastleBromwich		=UID_FA_BrooklandsVickers,
-//DeadCode MS 04Feb00 UID_AF_NEWCASTLE	=UID_NB_Portsmouth,
-//DeadCode MS 04Feb00 UID_AF_STEVAL			=UID_NB_Portsmouth,	
 UID_DUMMY	=UID_NULL;
 
 
@@ -152,7 +149,6 @@ UID_DUMMY	=UID_NULL;
 				IDS_SECTOR_Y,
 				IDS_SECTOR_Z,
 	};
-	//DEADCODE RDH 09/12/99 enum	{	IDS_GROUP_10,IDS_GROUP_11,IDS_GROUP_12,IDS_GROUP_13	};
 
 
 
@@ -281,7 +277,6 @@ UID_DUMMY	=UID_NULL;
 
 	/*name*/{UID_AF_HAWKINGE,
 	/*real*/	TT_FIGHTERAF,TP_PRIMARYCOASTALAF,0,AB(MED,NONE),
-//DeadCode MS 15Nov00 	/*false*/	TT_FIGHTERAF,TP_SECONDARYCOASTALAF,-1,
 	/*false*/	TT_FIGHTERAF,TP_PRIMARYCOASTALAF,-1,
 	/*turn pt*/	{UID_NV_DUNGENESS,UID_NV_SOUTHGOODWIN,UID_NV_VARNELIGHTSHIP},
 	/*sec trg*/	{UID_AF_LYMPNE,UID_CH_Rye,UID_CH_Dover,UID_DK_Dover,UID_CL_Foreness},
@@ -446,25 +441,6 @@ UID_DUMMY	=UID_NULL;
 	/*main*/	UID_AF_FILTON,
 			},
 
-//DEADCODE DAW 18/02/00 	/*name*/{UID_AF_STEVAL,
-//DEADCODE DAW 18/02/00 	/*real*/	TT_FIGHTERAF,TP_SECONDARYINLANDAF,0,AB(LOW,MED),
-//DEADCODE DAW 18/02/00 	/*false*/	TT_FIGHTERAF,TP_SECONDARYINLANDAF,-1,
-//DEADCODE DAW 18/02/00 	/*turn pt*/	{UID_NULL},
-//DEADCODE DAW 18/02/00 	/*sec trg*/	{UID_CL_DryTree,UID_IN_Falmouth,UID_CL_RameHead,UID_DK_Plymouth,UID_CH_HawksTor},
-//DEADCODE DAW 18/02/00 	/*damage*/ 	&DR_SmallAF,
-//DEADCODE DAW 18/02/00 	/*dates*/		{DAM_NONE},
-//DEADCODE DAW 18/02/00 	/*bfield*/	 FIL_1_AFSTEVAL,
-//DEADCODE DAW 18/02/00 	/*detail*/	{FIL_1_M1STEVAL},
-//DEADCODE DAW 18/02/00 	/*detail2*/	{FIL_NULL},
-//DEADCODE DAW 18/02/00 	/*taxi*/	FIL_1_TXSTEVAL,
-//DEADCODE DAW 18/02/00 	/*maxonaf*/	2,
-//DEADCODE DAW 18/02/00 	/*nextsat*/	UID_NULL,
-//DEADCODE DAW 18/02/00 	/*loc*/		LOC_N_LON,
-//DEADCODE DAW 18/02/00 	/*zeros*/	{0,0,0},
-//DEADCODE DAW 18/02/00 	/*main*/	UID_AF_FILTON,
-//DEADCODE DAW 18/02/00 			},
-//DEADCODE DAW 18/02/00 
-//DEADCODE DAW 18/02/00 
 	//------------------------
 	//MIDDLE WALLOP SECTOR SATELLITES
 
@@ -587,7 +563,6 @@ UID_DUMMY	=UID_NULL;
 	/*sec trg*/	{UID_AF_CROYDON,UID_AF_BIGGINHILL},
 	/*damage*/ 	&DR_LargeAF,
 //TempCode MS 05Oct00 	/*dates*/	{DAM(OUT,0Aug,18),DAM(NONE,0Aug,21),DAM(LOW,0Sept,2),DAM(NONE,0Sept,3)},
-//DeadCode MS 15Nov100 	/*dates*/	{DAM(LOW,0Aug,23)},
 	/*dates*/	{DAM_NONE},									//MS 15Nov00
 	/*bfield*/	 FIL_1_AFKENLEY,
 	/*detail*/	{FIL_1_M1KENLEY},
@@ -606,7 +581,6 @@ UID_DUMMY	=UID_NULL;
 	/*real*/	TT_FIGHTERAF,TP_PRIMARYINLANDAF,0,AAA_HIGH,
 	/*false*/	TT_FIGHTERAF,TP_SECONDARYINLANDAF,-1,
 	/*turn pt*/	{UID_CV_MAIDSTONE,UID_CV_TUNBRIDGEWELLS,UID_CanveyIsland},
-//DeadCode MS 15Oct00 	/*sec trg*/	{UID_AF_STAPLEFORD,UID_AF_NORTHWEALD,UID_IN_Beckton,UID_IN_ThamesHaven,UID_IN_Purfleet},
 	/*sec trg*/	{UID_AF_STAPLEFORD,UID_AF_NORTHWEALD},
 	/*damage*/ 	&DR_LargeAF,
 //TempCode MS 05Oct00 	/*dates*/		{DAM(LOW,0Aug,31),DAM(NONE,0Aug,31),DAM(LOW,0Sept,2),DAM(NONE,0Sept,3)},
@@ -928,16 +902,6 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_NULL},
 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_AF_Crechy,
-//DeadCode MS 10Mar00 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_GERMAN,TP_PRIMARYINLANDAF,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_SmallAF,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_GFCRECHY,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_NULL},
-//DeadCode MS 10Mar00 			},
 
 	/*name*/{UID_AF_Desvres,
 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,DEF_LW_C,
@@ -1058,16 +1022,6 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_NULL},
 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_AF_PasdeCalais,
-//DeadCode MS 10Mar00 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_GERMAN,TP_PRIMARYINLANDAF,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_SmallAF,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_GFPASDEC,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_NULL},
-//DeadCode MS 10Mar00 			},
 
 	/*name*/{UID_AF_Tramecourt,
 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,DEF_LW_C,
@@ -1105,16 +1059,6 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_NULL},
 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_AF_Brest,
-//DeadCode MS 10Mar00 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_GERMAN,TP_PRIMARYINLANDAF,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_SmallAF,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_GFBREST,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_NULL},
-//DeadCode MS 10Mar00 		},
 
 	/*name*/{UID_AF_Caen,
 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,DEF_LW_SW,
@@ -1193,16 +1137,6 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_NULL},
 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_AF_Angers,
-//DeadCode MS 10Mar00 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_GERMAN,TP_PRIMARYINLANDAF,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_SmallAF,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_GFANGERS,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_NULL},
-//DeadCode MS 10Mar00 			},
 
 	/*name*/{UID_AF_Lannion,
 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,DEF_LW_SW,
@@ -1328,16 +1262,6 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_NULL},
 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_AF_LeCulot,
-//DeadCode MS 10Mar00 	/*real*/	TT_GERMANBOMBERAF,TP_PRIMARYINLANDAF,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_GERMANBOMBERAF,TP_PRIMARYINLANDAF,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_SmallAF,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_GFLECULO,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_NULL},
-//DeadCode MS 10Mar00 			},
 
 	/*name*/{UID_AF_Lille,
 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,DEF_LW_C,
@@ -1518,16 +1442,6 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_NULL},
 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_AF_Tours,
-//DeadCode MS 10Mar00 	/*real*/	TT_GERMANBOMBERAF,TP_PRIMARYINLANDAF,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_GERMANBOMBERAF,TP_PRIMARYINLANDAF,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_SmallAF,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_GFTOURS,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_NULL}
-//DeadCode MS 10Mar00 		},
 
 	/*name*/{UID_AF_Villacoublay,
 	/*real*/	TT_GERMAN,TP_PRIMARYINLANDAF,0,DEF_LW_SE,
@@ -1685,16 +1599,6 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_1_M1FORD},
 			},
 	//LANDMARKS ------------------------------------------
-//DeadCode MS 02Feb00 	/*name*/{UID_IN_Thorpe,
-//DeadCode MS 02Feb00 	/*real*/	TT_LANDMARK,TP_LANDMARK,0,AAA_NONE,
-//DeadCode MS 02Feb00 	/*false*/	TT_LANDMARK,TP_LANDMARK,-1,
-//DeadCode MS 02Feb00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 02Feb00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 02Feb00 	/*damage*/ 	&DR_Normal,
-//DeadCode MS 02Feb00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 02Feb00 	/*bfield*/	 FIL_1_INTHORPE,
-//DeadCode MS 02Feb00 	/*detail*/	{FIL_1_M1THORPE},
-//DeadCode MS 02Feb00 			},
 
 	/*name*/{UID_CV_CHICHESTER,
 	/*real*/	TT_LANDMARK,TP_LANDMARK,0,AAA_NONE,
@@ -1816,16 +1720,6 @@ UID_DUMMY	=UID_NULL;
 	/*bfield*/	 FIL_NULL,
 	/*detail*/	{FIL_NULL},
 			},
-//DeadCode MS 12May00 	/*name*/{UID_CV_CROYDON,
-//DeadCode MS 12May00 	/*real*/	TT_LANDMARK,TP_LANDMARK,0,AAA_NONE,
-//DeadCode MS 12May00 	/*false*/	TT_LANDMARK,TP_LANDMARK,-1,
-//DeadCode MS 12May00 	/*turn pt*/	{UID_NV_TONGUE,UID_NV_DUNGENESS,UID_CV_HASTINGS},
-//DeadCode MS 12May00 	/*sec trg*/	{UID_CV_REDHILL,UID_CV_TUNBRIDGEWELLS,UID_CV_MAIDSTONE,UID_CV_SOUTHENDONSEA},
-//DeadCode MS 12May00 	/*damage*/ 	&DR_Normal,
-//DeadCode MS 12May00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 12May00 	/*bfield*/	 FIL_NULL,
-//DeadCode MS 12May00 	/*detail*/	{FIL_NULL},
-//DeadCode MS 12May00 			},
 	/*name*/{UID_CV_BRANDON,
 	/*real*/	TT_LANDMARK,TP_LANDMARK,0,AAA_NONE,
 	/*false*/	TT_LANDMARK,TP_LANDMARK,-1,
@@ -2989,27 +2883,7 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_NULL},
 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_CL_Carnanton,
-//DeadCode MS 10Mar00 	/*real*/	TT_CHAINLOW,TP_RADAR,0,AB(LOW,NONE),
-//DeadCode MS 10Mar00 	/*false*/	TT_AS_KNOWN,TP_RADAR,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_IN_Falmouth,UID_CL_DryTree,UID_CL_RameHead},//,UID_AF_STEVAL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_SmallRadar,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_RDCARNAN,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_NULL},
-//DeadCode MS 10Mar00 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_CL_DryTree,
-//DeadCode MS 10Mar00 	/*real*/	TT_CHAINLOW,TP_RADAR,0,AB(LOW,NONE),
-//DeadCode MS 10Mar00 	/*false*/	TT_AS_KNOWN,TP_RADAR,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_IN_Falmouth,UID_CL_RameHead},//UID_CL_Carnanton,UID_AF_STEVAL,//MS 10Mar00
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_SmallRadar,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_RDDRYTR,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_NULL},
-//DeadCode MS 10Mar00 			},		
 
 	/*name*/{UID_CL_Dunwich,
 	/*real*/	TT_CHAINLOW,TP_RADAR,0,AB(LOW,NONE),
@@ -3305,16 +3179,6 @@ UID_DUMMY	=UID_NULL;
 
 	II_TargetGroup	NodeData::notfacts[]=
 	{
-//DeadCode MS 02Feb00 	/*name*/{UID_FA_Woolwich,
-//DeadCode MS 02Feb00 	/*real*/	TT_ARMAMENTS,TP_FACTORY,0,AB(LOW,NONE),
-//DeadCode MS 02Feb00 	/*false*/	TT_ARMAMENTS,TP_FACTORY,-1,
-//DeadCode MS 02Feb00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 02Feb00 	/*sec trg*/	{UID_AF_KENLEY,UID_AF_BIGGINHILL,UID_AF_GRAVESEND,UID_AF_WESTMALLING,UID_IN_Maidstone},
-//DeadCode MS 02Feb00 	/*damage*/ 	&DR_LargeFactory,
-//DeadCode MS 02Feb00 	/*dates*/		{DAM(OUT,0Sept,7)},
-//DeadCode MS 02Feb00 	/*bfield*/	 FIL_1_INWOOLWI,
-//DeadCode MS 02Feb00 	/*detail*/	{FIL_1_MBWOOLWI},	//No!!!!!
-//DeadCode MS 02Feb00 			},
 
 	/*name*/{UID_DK_Bournemouth,
 	/*real*/	TT_DOCKS,TP_GR11_PORT_LP,0,AB(LOW,LOW),
@@ -3429,7 +3293,6 @@ UID_DUMMY	=UID_NULL;
 	/*real*/	TT_DOCKS,TP_SMALLRESOURCE,0,LON(HIGH,HIGH),
 	/*false*/	TT_AS_KNOWN,TP_SMALLRESOURCE,-1,
 	/*turn pt*/	{UID_NV_DUNGENESS,UID_Northfleet,UID_CV_TUNBRIDGEWELLS},
-//DeadCode MS 15Oct00 	/*sec trg*/	{UID_IN_ThamesHaven,UID_IN_Purfleet,UID_IN_Beckton,UID_FA_Woolwich,UID_DK_RoyalAlbert},
 	/*sec trg*/	{UID_NULL},
 	/*damage*/ 	&DR_LargeFactory,
 	/*dates*/		{DAM(MED,0Sept,7)},
@@ -3550,16 +3413,6 @@ UID_DUMMY	=UID_NULL;
 	/*detail*/	{FIL_1_MBMAIDST},
 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_IN_Thorpe,
-//DeadCode MS 10Mar00 	/*real*/	TT_INDUSTRY,TP_SMALLRESOURCE,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_AS_KNOWN,TP_AS_KNOWN,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_LargeFactory,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_INTHORPE,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_1_MBTHORPE},
-//DeadCode MS 10Mar00 			},
 
 	/*name*/{UID_NB_Portsmouth,
 	/*real*/	TT_NAVALBASE,TP_NAVALBASE,0,AB(MED,MED),
@@ -3578,7 +3431,6 @@ UID_DUMMY	=UID_NULL;
 	/*turn pt*/	{UID_NULL},
 	/*sec trg*/	{UID_DK_Weymouth,UID_AF_WARMWELL,UID_DK_Bournemouth},
 	/*damage*/ 	&DR_LargeFactory,
-//DeadCode MS 15Oct00 	/*dates*/		{DAM(MED,0Aug,11),DAM(LOW,0Sept,15)},
 	/*dates*/		{DAM(MED,0Aug,11)},
 	/*bfield*/	 FIL_1_INPORTLA,
 	/*detail*/	{FIL_1_MBPORTLA},
@@ -3657,7 +3509,6 @@ UID_DUMMY	=UID_NULL;
 	/*real*/	TT_DOCKS,TP_SMALLRESOURCE,0,LON(HIGH,LOW),
 	/*false*/	TT_AS_KNOWN,TP_SMALLRESOURCE,-1,
 	/*turn pt*/	{UID_NV_NORTHGOODWIN,UID_Cranbrook,UID_NV_SOUTHFORELAND},
-//DeadCode MS 15Oct00 	/*sec trg*/	{UID_DK_Sheerness,UID_DK_Limehouse,UID_IN_Purfleet,UID_IN_ThamesHaven},
 	/*sec trg*/	{UID_DK_Sheerness,UID_IN_Purfleet,UID_IN_ThamesHaven},
 	/*damage*/ 	&DR_LargeFactory,
 	/*dates*/		{DAM_NONE},
@@ -3666,37 +3517,7 @@ UID_DUMMY	=UID_NULL;
 			},
 
 
-//DeadCode MS 10Mar00 	/*name*/{UID_IN_Falmouth,
-//DeadCode MS 10Mar00 	/*real*/	TT_INDUSTRY,TP_LARGERESOURCE,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_INDUSTRY,TP_FACTORY,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_CL_DryTree,UID_CL_RameHead,UID_DK_Plymouth},//UID_AF_STEVAL,
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_LargeFactory,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_INFALMOU,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_1_MBFALMOU},
-//DeadCode MS 10Mar00 			},
 
-//DeadCode MS 10Mar00 	/*name*/{UID_IN_Rochfield,
-//DeadCode MS 10Mar00 	/*real*/	TT_INDUSTRY,TP_SMALLRESOURCE,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_INDUSTRY,TP_FACTORY,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_LargeFactory,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_INROCHFI,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_1_MBROCHFI},
-//DeadCode MS 10Mar00 			},
-//DeadCode MS 10Mar00 	/*name*/{UID_DK_Pembroke,
-//DeadCode MS 10Mar00 	/*real*/	TT_DOCKS,TP_SMALLRESOURCE,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_INDUSTRY,TP_FACTORY,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_LargeFactory,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM(LOW,0Aug,19)},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_INPEMBRO,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_1_MBPEMBRO},
-//DeadCode MS 10Mar00 			},
 		//next item:
 
 
@@ -3717,7 +3538,6 @@ UID_DUMMY	=UID_NULL;
 	/*bfield*/	 FIL_1_FTVICKER,
 	/*detail*/	{FIL_1_MBVICKER},
 	/*per wk*/	45,	//norm,dest,disp
-//DeadCode DAW 18Feb00 	/*limits*/			60,	5,	50
 			},
 
 	/*name*/{UID_FA_BristolAeroplane,
@@ -3730,14 +3550,12 @@ UID_DUMMY	=UID_NULL;
 	/*bfield*/	 FIL_1_FTPLANE,
 	/*detail*/	{FIL_1_MBPLANE},
 	/*per wk*/	45,	//norm,dest,disp
-//DeadCode DAW 18Feb00 	/*limits*/			60,	5,	50
 			},
 
 	/*name*/{UID_FA_ShortsBros,
 	/*real*/	TT_STIRLING,TP_BOMBERFACTORY,0,AB(MED,LOW),
 	/*false*/	TT_UNKNOWNAIRCRAFT,TP_FACTORY,-1,
 	/*turn pt*/	{UID_CV_CANTERBURY,UID_Cranbrook,UID_CV_TUNBRIDGEWELLS},
-//DeadCode MS 15Oct00 	/*sec trg*/	{UID_AF_GRAVESEND,UID_DK_TILBURY,UID_DK_Sheerness,UID_AF_ROCHFORD},
 	/*sec trg*/	{UID_AF_GRAVESEND,UID_DK_Sheerness,UID_AF_ROCHFORD},
 	/*damage*/ 	&DR_LargeFactory,
 //TempCode MS 05Oct00 	/*dates*/		{DAM(MED,0Aug,15),DAM(NONE,0Aug,20),DAM(LOW,0Sept,4)},
@@ -3745,7 +3563,6 @@ UID_DUMMY	=UID_NULL;
 	/*bfield*/	 FIL_1_FTSHORTS,
 	/*detail*/	{FIL_1_MBSHORTS},
 	/*per wk*/	45,	//norm,dest,disp
-//DeadCode DAW 18Feb00 	/*limits*/			60,	5,	50
 			},
 
 	/*name*/{UID_FA_Parnall,
@@ -3758,7 +3575,6 @@ UID_DUMMY	=UID_NULL;
 	/*bfield*/	 FIL_1_FTPARNAL,
 	/*detail*/	{FIL_1_MBPARNAL},
 	/*per wk*/	45,	//norm,dest,disp
-//DeadCode DAW 18Feb00 	/*limits*/			60,	5,	50
 			},
 
 	/*name*/{UID_FA_Hatfield,
@@ -3771,7 +3587,6 @@ UID_DUMMY	=UID_NULL;
 	/*bfield*/	 FIL_1_FTHATFIE,
 	/*detail*/	{FIL_1_MBHATFIE},
 	/*per wk*/	45,	//norm,dest,disp
-//DeadCode DAW 18Feb00 	/*limits*/			60,	5,	50
 			},
 	/*name*/{UID_FA_Rootes,
 	/*real*/	TT_BOMBERPARTS,TP_BOMBERFACTORY,0,AB(HIGH,HIGH),
@@ -3783,7 +3598,6 @@ UID_DUMMY	=UID_NULL;
 	/*bfield*/	 FIL_1_FTROOTES,
 	/*detail*/	{FIL_1_MBROOTES},
 	/*per wk*/	45,	//norm,dest,disp
-//DeadCode DAW 18Feb00 	/*limits*/			60,	5,	50
 			},
 
 	/*name*/{UID_FA_BoultonPaul,
@@ -3806,18 +3620,6 @@ UID_DUMMY	=UID_NULL;
 
 	II_TargetFactory		NodeData::factories[]=
 	{
-//DeadCode MS 10Mar00 	/*name*/{UID_FA_Coventry,
-//DeadCode MS 10Mar00 	/*real*/	TT_ARMAMENTS,TP_FACTORY,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_UNKNOWNAIRCRAFT,TP_OTHERFACTORY,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_LargeFactory,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_FTDAG,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_1_MBDAG},
-//DeadCode MS 10Mar00 	/*per wk*/	45,	//norm,dest,disp
-//DeadCode MS 10Mar00 	/*limits*/			60,	5,	50
-//DeadCode MS 10Mar00 			},
 
 	/*name*/{UID_FA_Woolwich,
 	/*real*/	TT_ARMAMENTS,TP_FACTORY,0,LON(HIGH,MED),
@@ -3911,7 +3713,6 @@ UID_DUMMY	=UID_NULL;
 			},
 
 	/*name*/{UID_FA_KingstonHawker,
-//DeadCode MS 13Oct00 	/*real*/	TT_HURRASSEMBLY,TP_FIGHTERFACTORY,0,LON(LOW,HIGH),
 	/*real*/	TT_HURRASSEMBLY,TP_FIGHTERFACTORY,0,AB(MED,LOW),
 	/*false*/	TT_UNKNOWNAIRCRAFT,TP_FACTORY,-1,
 	/*turn pt*/	{UID_CV_REDHILL,UID_Witley,UID_Crawley},
@@ -3938,7 +3739,6 @@ UID_DUMMY	=UID_NULL;
 			},
 
 	/*name*/{UID_FA_Vauxhall,
-//DeadCode MS 13Oct00 	/*real*/	TT_ARMAMENTS,TP_COMPONENTFACTORY,0,LON(LOW,HIGH),
 	/*real*/	TT_ARMAMENTS,TP_FACTORY,0,AB(MED,LOW),
 	/*false*/	TT_CARS,TP_FACTORY,-1,
 	/*turn pt*/	{UID_NULL},
@@ -3955,7 +3755,6 @@ UID_DUMMY	=UID_NULL;
 	/*real*/	TT_SPITPARTS,TP_COMPONENTFACTORY,0,AB(MED,MED),
 	/*false*/	TT_UNKNOWNAIRCRAFT,TP_FACTORY,-1,
 	/*turn pt*/	{UID_CV_CANTERBURY,UID_Cranbrook,UID_CV_TUNBRIDGEWELLS},
-//DeadCode MS 15Oct00 	/*sec trg*/	{UID_AF_GRAVESEND,UID_DK_TILBURY,UID_DK_Sheerness,UID_AF_ROCHFORD},
 	/*sec trg*/	{UID_AF_GRAVESEND,UID_DK_Sheerness,UID_AF_ROCHFORD},
 	/*damage*/ 	&DR_LargeFactory,
 	/*dates*/		{DAM_NONE},
@@ -4016,18 +3815,6 @@ UID_DUMMY	=UID_NULL;
 	/*per wk*/	10,	//norm,dest,disp							//MS 02Nov00
 	/*limits*/			10,	2,	8								//MS 02Nov00
 			},
-//DeadCode MS 10Mar00 	/*name*/{UID_FA_Weybridge,
-//DeadCode MS 10Mar00 	/*real*/	TT_SPITASSEMBLY,TP_FACTORY,0,AB(LOW,HIGH),
-//DeadCode MS 10Mar00 	/*false*/	TT_INDUSTRY,TP_OTHERFACTORY,-1,
-//DeadCode MS 10Mar00 	/*turn pt*/	{UID_NULL,UID_CV_GUILFORD,UID_NB_Portsmouth},
-//DeadCode MS 10Mar00 	/*sec trg*/	{UID_FA_BrooklandsHawker,UID_FA_BrooklandsHawker,UID_AF_CROYDON,UID_AF_KENLEY,UID_AF_BIGGINHILL},
-//DeadCode MS 10Mar00 	/*damage*/ 	&DR_LargeFactory,
-//DeadCode MS 10Mar00 	/*dates*/		{DAM_NONE},
-//DeadCode MS 10Mar00 	/*bfield*/	 FIL_1_FTWEYBRI,
-//DeadCode MS 10Mar00 	/*detail*/	{FIL_1_MBWEYBRI},
-//DeadCode MS 10Mar00 	/*per wk*/	45,	//norm,dest,disp
-//DeadCode MS 10Mar00 	/*limits*/			60,	5,	50
-//DeadCode MS 10Mar00 			},
 
 	/*name*/{UID_FA_Westland,
 	/*real*/	TT_SPITPARTS,TP_COMPONENTFACTORY,0,AB(LOW,LOW),
@@ -4063,51 +3850,6 @@ UID_DUMMY	=UID_NULL;
 
 	II_TargetConvoy			NodeData::convoys[]=
 	{
-//DEADCODE RJS 03/02/00 	/*name*/{UID_NULL,
-//DEADCODE RJS 03/02/00 	/*real*/	TT_CONVOY,TP_CONVOY,0,AB(LOW,LOW),
-//DEADCODE RJS 03/02/00 	/*false*/	TT_AS_KNOWN,TP_AS_KNOWN,-1,
-//DEADCODE RJS 03/02/00 	/*turn pt*/	{UID_NULL},
-//DEADCODE RJS 03/02/00 	/*sec trg*/	{UID_NULL},
-//DEADCODE RJS 03/02/00 	/*damage*/ 	&DR_Convoy,
-//DEADCODE RJS 03/02/00 	/*dates*/		{DAM(NONE,0July,12),DAM(NONE,0July,13),DAM(NONE,0July,14)},
-//DEADCODE RJS 03/02/00 	/*bfield*/	 FIL_CVY_BREAD
-//DEADCODE RJS 03/02/00 			},
-//DeadCode MS 24Jul00 	/*name*/{UID_CONV_D1C1,
-//DeadCode MS 24Jul00 	/*real*/	TT_CONVOY,TP_CONVOY,0,AB(LOW,LOW),
-//DeadCode MS 24Jul00 	/*false*/	TT_AS_KNOWN,TP_AS_KNOWN,-1,
-//DeadCode MS 24Jul00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 24Jul00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 24Jul00 	/*damage*/ 	&DR_Convoy,
-//DeadCode MS 24Jul00 	/*dates*/		{DATE(0July,12),DATE(0July,13),DATE(0July,14)},
-//DeadCode MS 24Jul00 	/*bfield*/	 FIL_1_D1C1
-//DeadCode MS 24Jul00 			},
-//DeadCode MS 24Jul00 	/*name*/{UID_CONV_1,
-//DeadCode MS 24Jul00 	/*real*/	TT_CONVOY,TP_CONVOY,0,AB(LOW,LOW),
-//DeadCode MS 24Jul00 	/*false*/	TT_AS_KNOWN,TP_AS_KNOWN,-1,
-//DeadCode MS 24Jul00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 24Jul00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 24Jul00 	/*damage*/ 	&DR_Convoy,
-//DeadCode MS 24Jul00 	/*dates*/		{DATE(0July,11),DATE(0July,12)},
-//DeadCode MS 24Jul00 	/*bfield*/	 FIL_1_CVY1
-//DeadCode MS 24Jul00 			},
-//DeadCode MS 24Jul00 	/*name*/{UID_CONV_2,
-//DeadCode MS 24Jul00 	/*real*/	TT_CONVOY,TP_CONVOY,0,AB(LOW,LOW),
-//DeadCode MS 24Jul00 	/*false*/	TT_AS_KNOWN,TP_AS_KNOWN,-1,
-//DeadCode MS 24Jul00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 24Jul00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 24Jul00 	/*damage*/ 	&DR_Convoy,
-//DeadCode MS 24Jul00 	/*dates*/		{DATE(0July,11),DATE(0July,12)},
-//DeadCode MS 24Jul00 	/*bfield*/	 FIL_1_CVY2
-//DeadCode MS 24Jul00 			},
-//DeadCode MS 24Jul00 	/*name*/{UID_CONV_3,
-//DeadCode MS 24Jul00 	/*real*/	TT_CONVOY,TP_CONVOY,0,AB(LOW,LOW),
-//DeadCode MS 24Jul00 	/*false*/	TT_AS_KNOWN,TP_AS_KNOWN,-1,
-//DeadCode MS 24Jul00 	/*turn pt*/	{UID_NULL},
-//DeadCode MS 24Jul00 	/*sec trg*/	{UID_NULL},
-//DeadCode MS 24Jul00 	/*damage*/ 	&DR_Convoy,
-//DeadCode MS 24Jul00 	/*dates*/		{DATE(0July,11),DATE(0July,12)},
-//DeadCode MS 24Jul00 	/*bfield*/	 FIL_1_CVY3
-//DeadCode MS 24Jul00 			},
 	/*name*/{UID_CVY_G1_A,
 	/*real*/	TT_CONVOY,TP_CONVOY,0,AB(LOW,LOW),
 	/*false*/	TT_AS_KNOWN,TP_AS_KNOWN,-1,
@@ -5723,7 +5465,6 @@ II_Gruppen				NodeData::germsquadinst[]=
 	/*markings*/	Squadron::NO_FLYING,LWB_MARK(F,1,H),
 	/*geshwader*/	WN_KG_76,
 	/*gruppen*/		GN_1
-//DEADCODE RDH 27/04/00 	/*gruppen*/		GN_1,Gruppen::BUSY_IN_EUROPE
 				},
 
 	/*squad*/	{SQ_KG_76_2,
@@ -5737,7 +5478,6 @@ II_Gruppen				NodeData::germsquadinst[]=
 	/*markings*/	Squadron::NO_FLYING,LWB_MARK(F,1,M),
 	/*geshwader*/	WN_KG_76,
 	/*gruppen*/		GN_2
-//DEADCODE RDH 27/04/00 	/*gruppen*/		GN_2,Gruppen::BUSY_IN_EUROPE
 				},
 
 	/*squad*/	{SQ_KG_76_3,
@@ -5751,7 +5491,6 @@ II_Gruppen				NodeData::germsquadinst[]=
 	/*markings*/	Squadron::NO_FLYING,LWB_MARK(F,1,R),
 	/*geshwader*/	WN_KG_76,
 	/*gruppen*/		GN_3
-//DEADCODE RDH 27/04/00 	/*gruppen*/		GN_3,Gruppen::BUSY_IN_EUROPE
 				},
 
 	/*squad*/	{SQ_JG_2_1,
@@ -6227,19 +5966,6 @@ Geshwader				NodeData::germwaderinst[]=
 };
 ProductionAC	NodeData::production[PT_BADMAX]=
 {
-//DeadCode MS 02Nov00 	/*spitA*/		{SQ_ZERO,25,25,	93,HR06},
-//DeadCode MS 02Nov00 	/*PT_SPIT_B,*/	{SQ_ZERO,0,0,},
-//DeadCode MS 02Nov00 	/*PT_HURR_A,*/	{SQ_ZERO,25,25,	123,HR06+MIN10},
-//DeadCode MS 02Nov00 	/*PT_HURR_B,*/	{SQ_ZERO,0,0,},
-//DeadCode MS 02Nov00 	/*PT_DEFIANT*/	{SQ_ZERO},
-//DeadCode MS 02Nov00 	/*PT_BLEN,*/	{SQ_ZERO},
-//DeadCode MS 02Nov00 	/*PT_ME109*/	{SQ_ZERO,23,23,	190,HR06+MIN20},
-//DeadCode MS 02Nov00 	/*PT_ME110,*/	{SQ_ZERO,35,35,	170,HR06+MIN30},
-//DeadCode MS 02Nov00 	/*PT_JU87,*/	{SQ_ZERO},
-//DeadCode MS 02Nov00 	/*PT_DO17*/		{SQ_ZERO,15,15,	250,HR06+MIN40},
-//DeadCode MS 02Nov00 	/*PT_JU88*/		{SQ_ZERO,35,35,	150,HR06+MIN50},
-//DeadCode MS 02Nov00 	/*PT_HE111,*/	{SQ_ZERO,20,20,	200,HR07},
-//DeadCode MS 02Nov00 	/*PT_HE59,*/	{SQ_ZERO}
 
 //35 for spit and 62 for Hurricane
 //Rate is based on 15 hr days and 7 day weeks= 107*60 = 6400 mins. LW figures are not recalculated
@@ -6435,16 +6161,9 @@ void	TargetGroup::FixInitialStatusLW()
 		knownstatus=TS_FLAG_UNKNOWN;
 
 }
-//DeadCode JIM 3Jul00 void	TargetGroup::FixInitialStatusRAF()
-//DeadCode JIM 3Jul00 {
-//DeadCode JIM 3Jul00 	falsetargtype=truetargtype;
-//DeadCode JIM 3Jul00 	knownstatus=truestatus;
-//DeadCode JIM 3Jul00 	falsepriority=truepriority;
-//DeadCode JIM 3Jul00 }
 void	TargetGroup::SetDamage(UByte newlevel,bool reduceifnegative,UniqueID reportsuccess)
 {	
 	//Kill this group
-//DEADCODE JON 16/05/00 	Node_Data.CheckTargetLoaded(uid);
 	Dead_Stream.FakeDamage(uid,newlevel,reduceifnegative);
 	//Set displayed statuses
 	if (IsA(TSS_TargetAirfield))
@@ -6508,17 +6227,39 @@ UniqueID	 TargetFighterField::getsectoruid()
 	else
 		return uid;
 }
+//RERUN: II_* structs embed DamageRate* damagerates. The save image is the
+//Win32 layout where the pointer occupies 4 bytes holding the original exe's
+//static-table address - meaningless on load, so the resident pointer is kept
+//and a 4-byte placeholder streams at its wire offset.
+template<class T>	BIStream&	NodeLoad(BIStream&bis,T* t,DamageRate** dr)
+{
+	size_t	drofs=(char*)dr-(char*)t;
+	bis.read((char*)t,(int)drofs);
+	ULong	deadptr;
+	bis>>deadptr;
+	bis.read((char*)dr+sizeof(void*),(int)(sizeof(T)-drofs-sizeof(void*)));
+	return bis;
+}
+template<class T>	BOStream&	NodeSave(BOStream&bos,T* t,DamageRate** dr)
+{
+	size_t	drofs=(char*)dr-(char*)t;
+	bos.write((char*)t,(int)drofs);
+	ULong	ptrplaceholder=0;
+	bos<<ptrplaceholder;
+	bos.write((char*)dr+sizeof(void*),(int)(sizeof(T)-drofs-sizeof(void*)));
+	return bos;
+}
 void	NodeData::Load(BIStream&bis)
 {
-	{for (II_TargetSateliteField* t=satelites;	t->Base().uid;t=t->Next())	bis.Transfer(t);}
-	{for (II_TargetSectorField*	t=sectors;		t->Base().uid;t=t->Next())	bis.Transfer(t);}
+	{for (II_TargetSateliteField* t=satelites;	t->Base().uid;t=t->Next())	NodeLoad(bis,t,&t->parentinst.parentinst.damagerates);}
+	{for (II_TargetSectorField*	t=sectors;		t->Base().uid;t=t->Next())	NodeLoad(bis,t,&t->parentinst.parentinst.damagerates);}
 	{for (II_TargetNoDetail*	t=nodetails;	t->Base().uid;t=t->Next())	bis.Transfer(t);}
-	{for (II_TargetGroup*		t=groups;		t->Base().uid;t=t->Next())	bis.Transfer(t);}
-	{for (II_TargetRadar*		t=radars;		t->Base().uid;t=t->Next())	bis.Transfer(t);}
-	{for (II_TargetGroup*		t=notfacts;		t->Base().uid;t=t->Next())	bis.Transfer(t);}
-	{for (II_TargetFakeFactory* t=fakefacts;	t->Base().uid;t=t->Next())	bis.Transfer(t);}
-	{for (II_TargetFactory*		t=factories;	t->Base().uid;t=t->Next())	bis.Transfer(t);}
-	{for (II_TargetConvoy*		t=convoys;		t->Base().uid;t=t->Next())	bis.Transfer(t);}
+	{for (II_TargetGroup*		t=groups;		t->Base().uid;t=t->Next())	NodeLoad(bis,t,&t->damagerates);}
+	{for (II_TargetRadar*		t=radars;		t->Base().uid;t=t->Next())	NodeLoad(bis,t,&t->parentinst.damagerates);}
+	{for (II_TargetGroup*		t=notfacts;		t->Base().uid;t=t->Next())	NodeLoad(bis,t,&t->damagerates);}
+	{for (II_TargetFakeFactory* t=fakefacts;	t->Base().uid;t=t->Next())	NodeLoad(bis,t,&t->parentinst.damagerates);}
+	{for (II_TargetFactory*		t=factories;	t->Base().uid;t=t->Next())	NodeLoad(bis,t,&t->parentinst.parentinst.damagerates);}
+	{for (II_TargetConvoy*		t=convoys;		t->Base().uid;t=t->Next())	NodeLoad(bis,t,&t->parentinst.damagerates);}
 
 	{for (II_BritSquadron*	t=britsquadinst;	t->Base().squadron;t=t->Next())	bis.Transfer(t);}
 	{for (II_Gruppen*		t=germsquadinst;	t->Base().squadron;t=t->Next())	bis.Transfer(t);}
@@ -6535,15 +6276,15 @@ void	NodeData::Load(BIStream&bis)
 }
 void	NodeData::Save(BOStream&bos)
 {
-	{for (II_TargetSateliteField* t=satelites;	t->Base().uid;t=t->Next())		bos.Transfer(t);}
-	{for (II_TargetSectorField*	t=sectors;		t->Base().uid;t=t->Next())		bos.Transfer(t);}
+	{for (II_TargetSateliteField* t=satelites;	t->Base().uid;t=t->Next())		NodeSave(bos,t,&t->parentinst.parentinst.damagerates);}
+	{for (II_TargetSectorField*	t=sectors;		t->Base().uid;t=t->Next())		NodeSave(bos,t,&t->parentinst.parentinst.damagerates);}
 	{for (II_TargetNoDetail*	t=nodetails;	t->Base().uid;t=t->Next())		bos.Transfer(t);}
-	{for (II_TargetGroup*		t=groups;		t->Base().uid;t=t->Next())		bos.Transfer(t);}
-	{for (II_TargetRadar*		t=radars;		t->Base().uid;t=t->Next())		bos.Transfer(t);}
-	{for (II_TargetGroup*		t=notfacts;		t->Base().uid;t=t->Next())		bos.Transfer(t);}
-	{for (II_TargetFakeFactory* t=fakefacts;	t->Base().uid;t=t->Next())		bos.Transfer(t);}
-	{for (II_TargetFactory*		t=factories;	t->Base().uid;t=t->Next())		bos.Transfer(t);}
-	{for (II_TargetConvoy*		t=convoys;		t->Base().uid;t=t->Next())		bos.Transfer(t);}
+	{for (II_TargetGroup*		t=groups;		t->Base().uid;t=t->Next())		NodeSave(bos,t,&t->damagerates);}
+	{for (II_TargetRadar*		t=radars;		t->Base().uid;t=t->Next())		NodeSave(bos,t,&t->parentinst.damagerates);}
+	{for (II_TargetGroup*		t=notfacts;		t->Base().uid;t=t->Next())		NodeSave(bos,t,&t->damagerates);}
+	{for (II_TargetFakeFactory* t=fakefacts;	t->Base().uid;t=t->Next())		NodeSave(bos,t,&t->parentinst.damagerates);}
+	{for (II_TargetFactory*		t=factories;	t->Base().uid;t=t->Next())		NodeSave(bos,t,&t->parentinst.parentinst.damagerates);}
+	{for (II_TargetConvoy*		t=convoys;		t->Base().uid;t=t->Next())		NodeSave(bos,t,&t->parentinst.damagerates);}
 
 	{for (II_BritSquadron*	t=britsquadinst;	t->Base().squadron;t=t->Next())	bos.Transfer(t);}
 	{for (II_Gruppen*		t=germsquadinst;	t->Base().squadron;t=t->Next())	bos.Transfer(t);}
@@ -6568,10 +6309,8 @@ Squadron&	NodeData::operator [](SquadNum sq)
 		case	SQ_QM109:	return	Node_Data.gruppe[SQ_JG_3_1-SQ_LW_START-1];	
 		case	SQ_QM110:	return	Node_Data.gruppe[SQ_ZG_26_1-SQ_LW_START-1];
 		case	SQ_QM87:	return	Node_Data.gruppe[SQ_SG_1_1-SQ_LW_START-1];	
-//DEADCODE AMM 03/03/00 		case	SQ_QM17:	return	Node_Data.gruppe[SQ_KG_3_1-SQ_LW_START-1];
 		case	SQ_QM17:	return	Node_Data.gruppe[SQ_KG_2_1-SQ_LW_START-1];
 		case	SQ_QM88:	return	Node_Data.gruppe[SQ_KG_51_1-SQ_LW_START-1];
-//DEADCODE AMM 03/03/00 		case	SQ_QM111:	return	Node_Data.gruppe[SQ_KG_55_1-SQ_LW_START-1];
 		case	SQ_QM111:	return	Node_Data.gruppe[SQ_KG_4_1-SQ_LW_START-1];
 		case	SQ_QM59:	return	Node_Data.gruppe[SQ_KG_55_1-SQ_LW_START-1];
 		}
@@ -6583,10 +6322,6 @@ Squadron&	NodeData::operator [](SquadNum sq)
 		return	squadron[sq-SQ_BR_START-1];				  //RDH 08/12/99
 
 }
-//DEADCODE DAW 18/02/00 Target&	NodeData::operator [](UniqueID uid)
-//DEADCODE DAW 18/02/00 {
-//DEADCODE DAW 18/02/00 	return GetTarget(uid);
-//DEADCODE DAW 18/02/00 }
 
 
 #define	SUBCALL(routine)	assert(this);	\
@@ -6647,7 +6382,6 @@ PlaneTypeSelect	Gruppen::AcType()
 CString BritSquadron::ShortName()
 {
 	return SubName();
-//DEADCODE RDH 08/12/99 	return ("");
 }
 
 CString Gruppen::ShortName()
@@ -6655,19 +6389,15 @@ CString Gruppen::ShortName()
 	CString string;
 	string.Format("%i", Node_Data.geschwader[wadernum].wadernum);
 
-//DEADCODE RDH 06/01/00 	return	(	RESLIST(JAGD,Node_Data.geschwader[wadernum].wadername)
 	return	(	RESLIST(J,Node_Data.geschwader[wadernum].wadername)
-//DEADCODE RDH 06/01/00 			+	" "
 			+	string
 			);
-//DEADCODE RDH 08/12/99 	return ("");
 	
 }
 
 CString BritSquadron::FullName()
 {
 	return SubName()+" "+RESSTRING(SQUADRON);
-//DEADCODE RDH 08/12/99 	return ("");
 
 }
 
@@ -6682,8 +6412,6 @@ CString Gruppen::FullName()
 			+	string
 		+	" "
 		+	SubName();
-//DEADCODE RDH 08/12/99 	return ("");
-//DEADCODE RDH 08/12/99 //	return RESSTRING(WADERT_JageG,
 }
 
 CString BritSquadron::SubName()
@@ -6695,13 +6423,6 @@ CString Gruppen::SubName()
 {
 	return RESLIST(GI,gruppennum);
 
-//DEADCODE RDH 20/12/99 	switch(gruppennum)
-//DEADCODE RDH 20/12/99 	{
-//DEADCODE RDH 20/12/99 	default:
-//DEADCODE RDH 20/12/99 	case 1:	return RESSTRING(GRUPPEI);
-//DEADCODE RDH 20/12/99 	case 2:	return RESSTRING(GRUPPEII);
-//DEADCODE RDH 20/12/99 	case 3:	return RESSTRING(GRUPPEIII);
-//DEADCODE RDH 20/12/99 	}
 }
 UByte	Squadron::Category()	   //Cat A = 0!
 {
@@ -6807,7 +6528,6 @@ void	NodeData::GenerateProductionRates()
 		spitassembly=	CountProduction(Target::TT_SPITASSEMBLY),
 		hurrparts=		CountProduction(Target::TT_HURRPARTS),	//MS 01Nov00
 		hurrassembly=	CountProduction(Target::TT_HURRASSEMBLY),	//MS 01Nov00
-//DeadCode MS 02Nov00 		ammoprod=		CountProduction(Target::TT_ARMAMENTS) + 20,
 		ammoprod=		CountProduction(Target::TT_ARMAMENTS) + 75,//MS 02Nov00
 		totalassembly;
 	if (spitassembly>spitparts)
@@ -6828,8 +6548,8 @@ void	NodeData::GenerateProductionRates()
 	production[PT_SPIT_A].acperweek=spitassembly;
 	production[PT_HURR_A].acperweek=hurrassembly;
 	const int	minsperweek=60*15*7;
-	spitassembly=minsperweek/spitassembly;
-	hurrassembly=minsperweek/hurrassembly;						//MS 01Nov00
+	spitassembly=spitassembly?minsperweek/spitassembly:0;	//RERUN: no producer -> no rate; acperweek==0 gates delivery anyway
+	hurrassembly=hurrassembly?minsperweek/hurrassembly:0;						//MS 01Nov00
 	production[PT_SPIT_A].minsperac=spitassembly;
 	production[PT_HURR_A].minsperac=hurrassembly;
 }
@@ -7053,8 +6773,6 @@ SquadNum	NodeData::WhereToReassignProduction(PlaneTypeSelect planetype,bool forc
 				if (gw.reconn)
 					reqstr3=6;
 				int	shortfall=reqstr3-gruppe[i].ACTotal();
-//DeadCode JIM 6Nov00 				if (gw.reconn)
-//DeadCode JIM 6Nov00 					shortfall*=5;
 				if (shortfall>0)
 					if (gw.reconn)
 						shortfall=1000-4*shortfall;	//The 4* is to allow a tuning for reconn
@@ -7241,26 +6959,6 @@ void	NodeData::UpgradeAircraftTypes()
 
 
 }
-//DEADCODE DAW 16/02/00 Various factors improve skill and morale during play:
-//DEADCODE DAW 16/02/00 Losing leader:
-//DEADCODE DAW 16/02/00 	Ave morale goes down 1 value
-//DEADCODE DAW 16/02/00 	On losing first leader, second leader is used, with his skill as listed.
-//DEADCODE DAW 16/02/00 	On losing second leader, further leaders are generated with false name and mid-skill between outgoing leader and squad.
-//DEADCODE DAW 16/02/00 Improving skill:
-//DEADCODE DAW 16/02/00 If squad is in G13 or G12N, skill increases at 5% of diff between leader and squad per day, and morale increases by 0.5 levels per day.
-//DEADCODE DAW 16/02/00 If squad is in active location but rested whole day, morale increases by 0.5 levels, skill unchanged.
-//DEADCODE DAW 16/02/00 If squad doesn't fly for a period (3 per day) morale increases by minimum point.
-//DEADCODE DAW 16/02/00 If squad flys and suffers no losses or kills, morale increases by 2*minimum, ave skill increases by 3% of diff between leader and squad.
-//DEADCODE DAW 16/02/00 If leader gets kills, his skill increases by 0.5 levels
-//DEADCODE DAW 16/02/00 If squad gets kills, ave skill improves by 2% of diff between leader and squad per kill.
-//DEADCODE DAW 16/02/00 If squad gets losses> 0.5 of kills ave morale down 0.3 of value
-//DEADCODE DAW 16/02/00 If squad write-off ave morale down 2*minimum
-//DEADCODE DAW 16/02/00 Temporarily decreasing skill:
-//DEADCODE DAW 16/02/00 Each consecutive period of flying (3 per day) decreases skill and morale by 2*minimum
-//DEADCODE DAW 16/02/00 1 period of non-flying clears this effect.
-//DEADCODE DAW 16/02/00 3d effect:
-//DEADCODE DAW 16/02/00 	Skill of leader is directly translated to lead aircraft.
-//DEADCODE DAW 16/02/00 	Remaining aircraft get aveskill+ rnd((leadskill-aveskill)/3)
 
 void	Squadron::ModifyMoraleAcCombat(PeriodStatus periodstatus,int times)
 {
@@ -7273,18 +6971,11 @@ void	Squadron::ModifyMoraleAcCombat(PeriodStatus periodstatus,int times)
 				averagemorale-=MORALE_STAGE;
 			else
 				averagemorale=MORALE_ROCKBOTTOM;
-	//DeadCode JIM 1Nov00 		if (replaceleadername)
-	//DeadCode JIM 1Nov00 		{
 			leadername=replaceleadername;
-	//DeadCode JIM 1Nov00 			replaceleadername=0;
-	//DeadCode JIM 1Nov00 		}
-	//DeadCode JIM 1Nov00 		else
-	//DeadCode JIM 1Nov00 		{
 			if (squadron>=SQ_LW_START)
 				replaceleadername=IDS_JG_3_1_Leader+Math_Lib.rnd(24*3*2);	//150
 			else
 				replaceleadername=IDS_32Leader+Math_Lib.rnd(50*2);
-	//DeadCode JIM 1Nov00 		}
 			leaderskill=(leaderskill*2+averageskill)/3;
 		}
 		break;
@@ -7323,44 +7014,13 @@ void	Squadron::ModifyMoraleNonCombat()
 	switch (periodstatus)
 	{
 	case LEAD_KILLED:	INT3;
-//DeadCode JIM 1Nov00 	{
-//DeadCode JIM 1Nov00 		if (averagemorale>MORALE_STAGE)
-//DeadCode JIM 1Nov00 			averagemorale-=MORALE_STAGE;
-//DeadCode JIM 1Nov00 		else
-//DeadCode JIM 1Nov00 			averagemorale=MORALE_ROCKBOTTOM;
-//DeadCode JIM 1Nov00 		if (replaceleadername)
-//DeadCode JIM 1Nov00 		{
-//DeadCode JIM 1Nov00 			leadername=replaceleadername;
-//DeadCode JIM 1Nov00 			replaceleadername=0;
-//DeadCode JIM 1Nov00 		}
-//DeadCode JIM 1Nov00 		else
-//DeadCode JIM 1Nov00 		{
-//DeadCode JIM 1Nov00 			if (squadron>=SQ_LW_START)
-//DeadCode JIM 1Nov00 				leadername=IDS_JG_3_1_Leader+Math_Lib.rnd(24*3*2);	//150
-//DeadCode JIM 1Nov00 			else
-//DeadCode JIM 1Nov00 				leadername=IDS_32Leader+Math_Lib.rnd(50*2);
-//DeadCode JIM 1Nov00 		}
-//DeadCode JIM 1Nov00 		leaderskill=(leaderskill*2+averageskill)/3;
-//DeadCode JIM 1Nov00 	}
 	break;
 
 	case LEAD_GOTKILL:	INT3;//This should be set in 3d on per-kill basis
-//DeadCode JIM 1Nov00 	{
-//DeadCode JIM 1Nov00 		if (leaderskill<SKILL_HERO1)
-//DeadCode JIM 1Nov00 			leaderskill+=SKILL_SUBSTAGE/2;
-//DeadCode JIM 1Nov00 	}
 	break;
 	case OTHER_GOTKILL:	INT3;//This should be set in 3d on per-kill basis
-//DeadCode JIM 1Nov00 	{
-//DeadCode JIM 1Nov00 		if (averageskill<SKILL_HERO1 && averageskill<leaderskill)
-//DeadCode JIM 1Nov00 			averageskill+=(leaderskill+averageskill*15)/16;
-//DeadCode JIM 1Nov00 	}
 	break;
 	case GOT_LOSSES:	INT3;//This should be set in 3d on per-kill basis
-//DeadCode JIM 1Nov00 	{	//should be 0.1 stake per loss
-//DeadCode JIM 1Nov00 		if (averagemorale>MORALE_STAGE)
-//DeadCode JIM 1Nov00 			averagemorale-=MORALE_STAGE/3;
-//DeadCode JIM 1Nov00 	}
 	break;
 
 	case GOT_ACTION:
@@ -7441,7 +7101,6 @@ void	NodeData::EndOfDay()
 	GoToEndDayRouting();												//RDH 22Aug00
 	//Want to go to fullpane at this point. Then, on way back, do StartOfDay call.
 
-//DEADCODE RDH 14/03/00 	StartOfDay();
 }
 
 
@@ -7529,12 +7188,6 @@ void	NodeData::UndefendedConvoyChecks()
 			UniqueID uid = pk.packagetarget[0].currentid;
 			TargetPtr trg=&operator[](uid);
 
-//DeadCode JIM 24Oct00 			ItemBasePtr p = Persons2::ConvertPtrUID(uid);
-//DeadCode JIM 24Oct00 			int uidband;
-//DeadCode JIM 24Oct00 			if (((itemptr)p)->SGT != UID_Null)
-//DeadCode JIM 24Oct00 				uidband=Persons2::getbandfromUID(((itemptr)p)->SGT);	
-//DeadCode JIM 24Oct00 			else	
-//DeadCode JIM 24Oct00 				uidband=Persons2::getbandfromUID(uid);
 
 			if 	(		trg->IsA(trg->TSS_TargetConvoy)	|| trg->London() 
 					|| trg->truetargtype==trg->TT_DOCKS	||trg->truetargtype==trg->TT_NAVALBASE)
@@ -7625,7 +7278,6 @@ void	NodeData::StartOfDay()
 	
 	if (BadWeatherCheck())
 	{
-//DEADCODE RDH 31/05/00 		SetRAFReadiness(Profile::PS_SPARE);
 		SetRAFPeriodStatus(Squadron::BAD_WEATHER);
 		int period;
 		while ((period=Node_Data.PerformMoveCycle())==0)
@@ -7641,7 +7293,6 @@ void	NodeData::StartOfDay()
 			LWDirectivesResults::LaunchDirectiveMissions();
 		}
 	}
-//DEADCODE RDH 06/04/00 	UpgradeAircraftTypes();
 #endif
 }
 void NodeData::SetRAFPeriodStatus(Squadron::PeriodStatus ps)
@@ -7741,7 +7392,6 @@ void	NodeData::FourHourPeriod(bool	endofday)
 	{	
 		if (BadWeatherCheck())
 		{
-//DEADCODE RDH 31/05/00 			SetRAFReadiness(Profile::PS_SPARE);
 			SetRAFPeriodStatus(Squadron::BAD_WEATHER);
 			int period;
 			while ((period=Node_Data.PerformMoveCycle())==0)
@@ -7757,7 +7407,6 @@ void	NodeData::FourHourPeriod(bool	endofday)
 				LWDirectivesResults::LaunchDirectiveMissions();
 
 
-//DeadCode JIM 19Sep00 				SetRAFReadiness();
 			}
 		}
 	}
@@ -7807,8 +7456,6 @@ FileNum	NodeData::CheckTargetLoaded(UniqueID targ,bool	inconsequentials)
 	FileNum bf=TargetToBf(targ,inconsequentials);
 	if (bf)
 	{
-//DEADCODE DAW 03/02/00 		if (Persons2::loadedBF[0]!=FIL_1_convoy)
-//DEADCODE DAW 03/02/00 			_Error.EmitSysErr("Failed to load subworld file %04x. Fell back to map code!",bf);
 		Persons4	persons;	
 		int slot=0;
 		if 	(!persons.GetSpareBFNumber(slot))
@@ -8141,16 +7788,8 @@ void	TargetGroup::ApplyDamage(int newlevel,UniqueID reportsuccess)
 		}
 		else
 		{	//condition improved
-	//DeadCode JIM 14Sep00 		if (tg->PlayerStatus()<Target::TS_LIGHTDAMAGE)
-	//DeadCode JIM 14Sep00 			rg->missresult=MR_ATTACKNODAMAGE;
-	//DeadCode JIM 14Sep00 		else 
-	//DeadCode JIM 14Sep00 			if (tg->PlayerStatus()<Target::TS_BADDAMAGE)
-	//DeadCode JIM 14Sep00 				rg->missresult=MR_ATTACKSLIGHTDAMAGE;
-	//DeadCode JIM 14Sep00 			else
-	//DeadCode JIM 14Sep00 				rg->missresult=MR_ATTACKSUCCESS;
 			if (PlayerStatus()<Target::TS_BADDAMAGE && oldstatus>Target::TS_BADDAMAGE)
 			{
-	//DeadCode JIM 14Sep00 			if (IsA(Target::TSS_TargetRadar))
 				//the only messages for asset repair are airfields!
 
 			}
@@ -8245,12 +7884,6 @@ void	TargetFighterField::ApplyDamage(int totaldamage,int	sdl_repair,int sdl_fuel
 				{
 					ScriptTables script=SCRIPT_ASSETDESTROYED;
 					if (truestatus>Target::TS_LIGHTDAMAGE)
-//DeadCode JIM 2Nov00 						if (IsA(Target::TSS_TargetRadar))
-//DeadCode JIM 2Nov00 							if (truestatus<Target::TS_NEARLYDESTROYED)
-//DeadCode JIM 2Nov00 								script=SCRIPT_TRGDAMAGED;
-//DeadCode JIM 2Nov00 							else
-//DeadCode JIM 2Nov00 								script=SCRIPT_RDFDESTROYED;
-//DeadCode JIM 2Nov00 						else
 							if (truestatus>Target::TS_NEARLYDESTROYED)
 								if (IsA(Target::TSS_TargetSectorField))
 									script=SCRIPT_LOSTCONTACTSECTOROPS;
@@ -8501,8 +8134,6 @@ int	NodeData::LWFindPercentAvail(int uidbandstart, int uidbandend, int trgpriori
 			)
 		{
 			total++;
-//DeadCode MS 15Nov00 			if	(trg->knownstatus  >= Target::TS_DESTROYED)
-//DeadCode MS 15Nov00 				destroyed++;
 			if	(trg->knownstatus  >= Target::TS_BADDAMAGE && trg->knownstatus < Target::TS_MAXIMUM)
 				destroyed++;
 
