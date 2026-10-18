@@ -699,7 +699,7 @@ void CMIGView::DrawIconExtra(CDC* pDC,int px,int py,IconsUI	f,UniqueID	i, bool h
 
 
 			int packnum,sqline;
-			if (Todays_Packages.GetACSquadEntry(i,packnum,sqline))
+			if (Todays_Packages.GetACSquadEntry(i,packnum,&sqline))
 			{
 				int numsquads=Todays_Packages[packnum].squadlist;
 				int	totalac=0,raidline,firstsquadoriginal=0;
@@ -1039,7 +1039,7 @@ void	CMapDlg::InvalidateIconExtra(int px,int py,ItemBasePtr p,IconsUI i)
 		{
 			int packnum,sqline;
 			if (Todays_Packages.localplayer==NAT_RAF) //raf PLAYER SEES ARROWS AND LOLIPOPS!
-				if (Todays_Packages.GetACSquadEntry(p->uniqueID.count,packnum,sqline))
+				if (Todays_Packages.GetACSquadEntry(p->uniqueID.count,packnum,&sqline))
 				{
 					int	raidline=Todays_Packages[packnum].GetRaidIndFromSquadEntry(sqline);
 
@@ -2493,7 +2493,7 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,bool ref
 
 
 				int packnum,sqline;
-				if (Todays_Packages.GetACSquadEntry(i,packnum,sqline))
+				if (Todays_Packages.GetACSquadEntry(i,packnum,&sqline))
 				{
 					{
 						if (Save_Data.lwplots == PL_REALISTIC)

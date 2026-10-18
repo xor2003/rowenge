@@ -105,17 +105,9 @@ RDialog*	LWDirectives::Make(LWDirectivesResults* dirres)
 			);
 }
 
-//DeadCode RDH 08Feb00 struct	LWDirectives::Targets
-//DeadCode RDH 08Feb00 {
-//DeadCode RDH 08Feb00 	LWDirectivesResultsTargetList target[LWDirectivesResultsTargetList::MAX_TARGETS];
-//DeadCode RDH 08Feb00 	LWDirectivesResultsTargetList& operator[](int i) {return target[i];}
-//DeadCode RDH 08Feb00 };
 
 LWDirectives::LWDirectives(LWDirectivesResults* dirres, CWnd* pParent /*=NULL*/)
 	: RowanDialog(LWDirectives::IDD, pParent)
-//DeadCode RDH 08Feb00 		,
-//DeadCode RDH 08Feb00 	target(*new Targets),
-//DeadCode RDH 08Feb00 	trgarray(new Targets[8])
 {
 	//{{AFX_DATA_INIT(LWDirectives)
 	//}}AFX_DATA_INIT
@@ -125,12 +117,6 @@ LWDirectives::LWDirectives(LWDirectivesResults* dirres, CWnd* pParent /*=NULL*/)
 		dr = new LWDirectivesResults;
 		dr->tempdir = MMC.directives.lw.current; 
 	}
-//DeadCode JIM 10Oct00 	if (MMC.currtime>AFTERNOONPERIODSTART)
-//DeadCode JIM 10Oct00 		MMC.currperiodtime  = AFTERNOONPERIODSTART;
-//DeadCode JIM 10Oct00 	else if (MMC.currtime > MIDDAYPERIODSTART)
-//DeadCode JIM 10Oct00 		MMC.currperiodtime = MIDDAYPERIODSTART;
-//DeadCode JIM 10Oct00 	else
-//DeadCode JIM 10Oct00 		MMC.currperiodtime = MORNINGPERIODSTART;
 	ininitdialog=false;
 
 }
@@ -138,8 +124,6 @@ LWDirectives::~LWDirectives()
 {
 	if (dr)
 		delete dr;
-//DeadCode RDH 08Feb00 	delete	&target;
-//DeadCode RDH 08Feb00 	delete []trgarray;
 }
 
 void LWDirectives::DoDataExchange(CDataExchange* pDX)
@@ -370,30 +354,9 @@ BOOL LWDirectives::OnInitDialog()
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-//DeadCode RDH 20Jun00  	ON_EVENT_RANGE(LWDirectives, IDC_ALLOW2_0, IDC_ALLOW2_7,1 /* Clicked */, OnTextChangedRspinbutAllow2, VTS_I4 VTS_BSTR VTS_I2 )
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_STRAF_0, IDC_STRAF_7,1 /* Clicked */, OnClickedStraf, VTS_I4 )
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_DO17_0, IDC_RSPINBUT_DO17_8,1 /* TextChanged */, OnTextChangedRspinbutDo17, VTS_I4 VTS_BSTR VTS_I2)
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_HE1110,IDC_RSPINBUT_HE1118, 1 /* TextChanged */, OnTextChangedRspinbutHe111, VTS_I4 VTS_BSTR VTS_I2)
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_JU870,IDC_RSPINBUT_JU878, 1 /* TextChanged */, OnTextChangedRspinbutJu87, VTS_I4 VTS_BSTR VTS_I2)
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_JU88_0,IDC_RSPINBUT_JU88_8, 1 /* TextChanged */, OnTextChangedRspinbutJu88, VTS_I4 VTS_BSTR VTS_I2)
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_ME109_0,IDC_RSPINBUT_ME109_8, 1 /* TextChanged */, OnTextChangedRspinbutMe109, VTS_I4 VTS_BSTR VTS_I2)
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_ME1100,IDC_RSPINBUT_ME1108, 1 /* TextChanged */, OnTextChangedRspinbutMe110, VTS_I4 VTS_BSTR VTS_I2)
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_TIED_0,IDC_RSPINBUT_TIED_7, 1 /* TextChanged */, OnTextChangedRspinbutTied, VTS_I4 VTS_BSTR VTS_I2)
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_FREE_0,IDC_RSPINBUT_FREE_7, 1 /* TextChanged */, OnTextChangedRspinbutFree, VTS_I4 VTS_BSTR VTS_I2)
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_TICK_A0, IDC_TICK_A5,1 /* Clicked */, OnClickedAttached, VTS_I4 )
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_TICK_D0, IDC_TICK_D5,1 /* Clicked */, OnClickedDetached, VTS_I4 )
-//DeadCode RDH 20Jun00 	ON_EVENT_RANGE(LWDirectives, IDC_RSPINBUT_SIZE_0, IDC_RSPINBUT_SIZE_7,1 /* TextChanged */, OnTextChangedRspinbutSize, VTS_I4  VTS_BSTR VTS_I2)
 
 void LWDirectives::FillSpins(CRSpinBut* spinbut, int actype, int trgtype, int indexgrp, int maxgrp)
 {
-//DEADCODE  17/02/00 	int acindex = actype-PT_GER_FLYABLE;
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	float	indexgrp = dr->tempdir.targetlines[trgtype][actype];
-//DEADCODE  17/02/00 	float	max = indexgrp + dr->tempdir.targetlines[Directives::LW::Targ::RESTING][actype];
-//DEADCODE  17/02/00 	float maxgrp = max * dr->LWGrAvail[acindex];
-//DEADCODE  17/02/00 	indexgrp = indexgrp * dr->LWGrAvail[acindex];
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 //TEMPCODE RDH 02/02/00 	//resting takes up the slack
 //TEMPCODE RDH 02/02/00 	if(trgtype == Directives::LW::Targ::RESTING)
 //TEMPCODE RDH 02/02/00 	{
 //TEMPCODE RDH 02/02/00 		int intind = 0;
@@ -408,26 +371,6 @@ void LWDirectives::FillSpins(CRSpinBut* spinbut, int actype, int trgtype, int in
 //TEMPCODE RDH 02/02/00 
 //TEMPCODE RDH 02/02/00 	}
 //TEMPCODE RDH 02/02/00 
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	if(trgtype == Directives::LW::Targ::RESTING)
-//DEADCODE  17/02/00 	{
-//DEADCODE  17/02/00 		int rest,total = 0;
-//DEADCODE  17/02/00 		for(int ttype =0; ttype<8;ttype++)
-//DEADCODE  17/02/00 		{
-//DEADCODE  17/02/00 			total += dr->tempdir.targetlines[ttype][actype] * dr->LWGrAvail[acindex];
-//DEADCODE  17/02/00 		}
-//DEADCODE  17/02/00 		//rest
-//DEADCODE  17/02/00 		rest = dr->LWGrAvail[acindex] - total;
-//DEADCODE  17/02/00 		if (rest < 0)
-//DEADCODE  17/02/00 			rest = 0;
-//DEADCODE  17/02/00 		float newrest = rest; 
-//DEADCODE  17/02/00 			newrest = newrest / dr->LWGrAvail[acindex];
-//DEADCODE  17/02/00 		if (newrest >  1)
-//DEADCODE  17/02/00 				newrest = 1;
-//DEADCODE  17/02/00 //		dr->tempdir.targetlines[trgtype][actype] = newrest;
-//DEADCODE  17/02/00 		maxgrp = indexgrp = rest;
-//DEADCODE  17/02/00 	}
-//DEADCODE  17/02/00 
 
 	spinbut->Clear();
 	int i =0;
@@ -439,24 +382,6 @@ void LWDirectives::FillSpins(CRSpinBut* spinbut, int actype, int trgtype, int in
 	spinbut->SetIndex(indexgrp);
 
 }
-//DeadCode RDH 08Feb00 void LWDirectives::FindAcAvail()
-//DeadCode RDH 08Feb00 {
-//DeadCode RDH 08Feb00 	for (int actype = PT_GER_FLYABLE; actype < PT_VEHICLES;actype++)
-//DeadCode RDH 08Feb00 		LWGrAvail[actype - PT_GER_FLYABLE] = 0;
-//DeadCode RDH 08Feb00 
-//DeadCode RDH 08Feb00 	int j = 0;
-//DeadCode RDH 08Feb00 	while (Node_Data.gruppe[j].squadron != SQ_ZERO)
-//DeadCode RDH 08Feb00 	{
-//DeadCode RDH 08Feb00 		Squadron* sq  = Node_Data[Node_Data.gruppe[j].squadron];
-//DeadCode RDH 08Feb00 		if  (!sq->Busy())
-//DeadCode RDH 08Feb00 		{
-//DeadCode RDH 08Feb00 			int type = sq->AcType();
-//DeadCode RDH 08Feb00 			type = type - PT_GER_FLYABLE;
-//DeadCode RDH 08Feb00 			LWGrAvail[type] ++;		//= sq->acavail;
-//DeadCode RDH 08Feb00 		}
-//DeadCode RDH 08Feb00 		j++;
-//DeadCode RDH 08Feb00 	}
-//DeadCode RDH 08Feb00 }
 void LWDirectives::RefreshAcSplit()		 
 {
 	//index is a number between 0 and 10, 10 means allocate all to session
@@ -558,7 +483,7 @@ void LWDirectives::RefreshGruppe(PlaneTypeSelect actype)
 			maxgrp = maxgrp + rest;	//only take whole numbers
 			if (trgtype == 8)
 				indexgrp = rest;
-				int butt;
+			int butt;
 			switch (actype)
 			{
 				case	PT_ME109:
@@ -743,12 +668,9 @@ void LWDirectives::RefreshReconn()
 		dr->tempdir.reconn.missions = maxreconn;
 
 
-//DeadCode JIM 10Sep00 	CRStatic*   s;
-//DeadCode JIM 10Sep00 	s=GETDLGITEM(IDC_RSTATIC_RECONN_MISSIONS);
 	
 	if (maxreconn)
 	{
-//DeadCode JIM 10Sep00 		s->ShowWindow(false);
 		spinbut->EnableWindow(true);
 		spinbut->Clear()->MakeNumList(maxreconn+1,0,1)->SetIndex(dr->tempdir.reconn.missions);
 	}else
@@ -785,10 +707,7 @@ void LWDirectives::RefreshFlags()
 	CRButton* b;
 	for(int trgtype =1; trgtype<8;trgtype++)
 	{
-//DeadCode JIM 20Oct00 		int	tied = dr->tempdir.targetlines[trgtype].attached;
 
-//DEADCODE RDH 20/03/00 		b = GETDLGITEM(IDC_ALLOW2_0+trgtype);
-//DEADCODE RDH 20/03/00 		b->SetPressed(dr->tempdir.targetlines[trgtype].flags  & Directives::LW::Targ::SECONDARIESALLOWED);
 	  	CRSpinBut* spinbut;
 
 		spinbut= GETDLGITEM(IDC_ALLOW2_0+trgtype);
@@ -811,75 +730,6 @@ void LWDirectives::RefreshFlags()
 		
 
 }
-//DEADCODE  08/02/00 void LWDirectives::FillTargetLists()
-//DEADCODE  08/02/00 {
-//DEADCODE  08/02/00 	for (int i=0 ; i < 8; i++)
-//DEADCODE  08/02/00 	{
-//DEADCODE  08/02/00 		int uidbandstart, uidbandend;
-//DEADCODE  08/02/00 		int panel = Target::TT_DUMMY0;
-//DEADCODE  08/02/00 
-//DEADCODE  08/02/00 		switch (i)
-//DEADCODE  08/02/00 		{
-//DEADCODE  08/02/00 		case	Directives::LW::Targ::RECON:
-//DEADCODE  08/02/00 			{
-//DEADCODE  08/02/00 				uidbandstart = 	RAF_FighterAFBAND;
-//DEADCODE  08/02/00 				uidbandend =  CLRadarBAND;
-//DEADCODE  08/02/00 				break;
-//DEADCODE  08/02/00 			}
-//DEADCODE  08/02/00 		case	Directives::LW::Targ::AIRFIELDS:
-//DEADCODE  08/02/00 			{//AIRFIELDS
-//DEADCODE  08/02/00 				uidbandstart = 	RAF_FighterAFBAND;
-//DEADCODE  08/02/00 				uidbandend =  CLRadarBAND;
-//DEADCODE  08/02/00 				break;
-//DEADCODE  08/02/00 			}
-//DEADCODE  08/02/00 		case	Directives::LW::Targ::DOCKS:
-//DEADCODE  08/02/00 			{//DOCKS
-//DEADCODE  08/02/00 				uidbandstart = 	DocksBAND;
-//DEADCODE  08/02/00 				uidbandend =  PortBAND;
-//DEADCODE  08/02/00 				break;
-//DEADCODE  08/02/00 			}
-//DEADCODE  08/02/00 		case	Directives::LW::Targ::RADARS:
-//DEADCODE  08/02/00 			{//RADARS
-//DEADCODE  08/02/00 				uidbandstart = 	CLRadarBAND;
-//DEADCODE  08/02/00 				uidbandend =  LUF_FighterLF2BAND;
-//DEADCODE  08/02/00 				break;
-//DEADCODE  08/02/00 			}
-//DEADCODE  08/02/00 		case	Directives::LW::Targ::CONVOYS:
-//DEADCODE  08/02/00 			{//CONVOYS
-//DEADCODE  08/02/00 				uidbandstart = 	BritBoatBAND;
-//DEADCODE  08/02/00 				uidbandend =  GermBoatBAND;
-//DEADCODE  08/02/00 				break;
-//DEADCODE  08/02/00 			}
-//DEADCODE  08/02/00 		case	Directives::LW::Targ::LONDON:
-//DEADCODE  08/02/00 			{//LONDON
-//DEADCODE  08/02/00 				uidbandstart = 	PowerStationBAND;
-//DEADCODE  08/02/00 				uidbandend =  DocksBAND;
-//DEADCODE  08/02/00 				panel = Target::TT_LONDON;
-//DEADCODE  08/02/00 				break;
-//DEADCODE  08/02/00 			}
-//DEADCODE  08/02/00 		case	Directives::LW::Targ::FACTORIES:
-//DEADCODE  08/02/00 			{//FACTORIES
-//DEADCODE  08/02/00 				uidbandstart = 	PowerStationBAND;
-//DEADCODE  08/02/00 				uidbandend =  DocksBAND;
-//DEADCODE  08/02/00 				break;
-//DEADCODE  08/02/00 			}
-//DEADCODE  08/02/00  		case	Directives::LW::Targ::SWEEPSNDECOYS:
-//DEADCODE  08/02/00 			{//SWEEPSNDECOYS
-//DEADCODE  08/02/00 				uidbandstart = 	PowerStationBAND;
-//DEADCODE  08/02/00 				uidbandend =  DocksBAND;
-//DEADCODE  08/02/00 				break;
-//DEADCODE  08/02/00 			}
-//DEADCODE  08/02/00    
-//DEADCODE  08/02/00 		}
-//DEADCODE  08/02/00 
-//DEADCODE  08/02/00 		LWDirectivesResults::FillTargetList(target.target,uidbandstart, uidbandend, panel);
-//DEADCODE  08/02/00 
-//DEADCODE  08/02/00 		for (int j = 0; j <LWDirectivesResultsTargetList::MAX_TARGETS; j++)
-//DEADCODE  08/02/00 		{
-//DEADCODE  08/02/00 			trgarray[i].target[j] = target[j];
-//DEADCODE  08/02/00 		}
-//DEADCODE  08/02/00 	}
-//DEADCODE  08/02/00 }
 
 bool LWDirectives::ResetProportions(int actype, int line, int index)
 {
@@ -955,7 +805,6 @@ void LWDirectives::OnTextChangedRspinbutAllow2(int id, LPCTSTR caption, short In
 {
 	dr->tempdir.targetlines[id - IDC_ALLOW2_0].secondarytargets = Index;
 	RefreshMissions(id - IDC_ALLOW2_0);
-//DeadCode JIM 7Sep00 	RefreshGruppe();
 }
 void LWDirectives::OnTextChangedRspinbutDo17(int id, LPCTSTR caption, short Index) 
 {
@@ -1009,7 +858,6 @@ void LWDirectives::OnTextChangedRspinbutTied(int id, LPCTSTR caption, short Inde
 		dr->tempdir.targetlines[id].detached = 1 - tied;
 	RefreshInternalMissions();
 	RefreshEscort(id);
-//DeadCode JIM 7Sep00 	Refresh();
 	
 }
 void LWDirectives::OnTextChangedRspinbutFree(int id, LPCTSTR caption, short Index) 
@@ -1022,20 +870,9 @@ void LWDirectives::OnTextChangedRspinbutFree(int id, LPCTSTR caption, short Inde
 		dr->tempdir.targetlines[id].attached = 1 - free;
 	RefreshInternalMissions();
 	RefreshEscort(id);
-//DeadCode JIM 7Sep00 	Refresh();
 	
 }
 
-//DEADCODE RDH 20/03/00 void LWDirectives::OnClickedAllow2(int id) 
-//DEADCODE RDH 20/03/00 {
-//DEADCODE RDH 20/03/00 	id = id - IDC_ALLOW2_0;
-//DEADCODE RDH 20/03/00 	if (dr->tempdir.targetlines[id].flags & Directives::LW::Targ::SECONDARIESALLOWED)
-//DEADCODE RDH 20/03/00 			dr->tempdir.targetlines[id].flags %= Directives::LW::Targ::SECONDARIESALLOWED;
-//DEADCODE RDH 20/03/00 	else
-//DEADCODE RDH 20/03/00 			dr->tempdir.targetlines[id].flags |= Directives::LW::Targ::SECONDARIESALLOWED;
-//DEADCODE RDH 20/03/00 	RefreshFlags();		 
-//DEADCODE RDH 20/03/00 
-//DEADCODE RDH 20/03/00 }
 
 void LWDirectives::OnClickedStraf(int id) 
 {
@@ -1044,7 +881,6 @@ void LWDirectives::OnClickedStraf(int id)
 			dr->tempdir.targetlines[id].flags = dr->tempdir.targetlines[id].flags & (~Directives::LW::Targ::FIGHTERSSTRAFFE);
 	else
 			dr->tempdir.targetlines[id].flags |= Directives::LW::Targ::FIGHTERSSTRAFFE;
-//DeadCode JIM 7Sep00 	RefreshFlags();		 
 	RefreshInternalMissions();
 
 }
@@ -1055,7 +891,6 @@ void LWDirectives::OnTextChangedRcomboTiming(LPCTSTR Caption, short index)
 		dr->tempdir.arrivalminsseperation = 15;							//RDH 9Aug00
 	else
 		dr->tempdir.arrivalminsseperation = 2;
-//DeadCode JIM 7Sep00 	RefreshAcSplit();	
 	RefreshInternalMissions();
 }
 void LWDirectives::OnTextChangedMorn(LPCTSTR Caption, short index) 
@@ -1115,7 +950,6 @@ void LWDirectives::OnClickedAttached(int id)
 	   dr->tempdir.escortmethods %= (Profile::AttackMethod)am;
 	else
 	   dr->tempdir.escortmethods |= (Profile::AttackMethod)am;
-//DeadCode JIM 7Sep00 	RefreshFlags();
 	RefreshInternalMissions();
 
 }
@@ -1139,10 +973,6 @@ void LWDirectives::OnTextChangedRspinbutSize(int id, LPCTSTR caption, short Inde
 				LWTaskSummary::squadinfo[Index].numofsquads * 10;
 
 	RefreshMissions(id); 
-//DEADCODE RDH 06/06/00 	RefreshGruppe();
-//DEADCODE RDH 06/06/00  	RefreshEscort();
-//DEADCODE RDH 06/06/00  	RefreshFlags();
-//DEADCODE RDH 06/06/00 	RefreshMissions();
 #endif
 }
 int	LWDirectivesResults::HowManyReconEscortRequiredThisPeriod(LWDirectivesResults* dr)
@@ -1257,7 +1087,6 @@ void LWDirectivesResults::FindAcAvail(LWDirectivesResults* dr)
 		quota = 1.0;
 	if (quota>1.0)
 		quota=1.0;
-//DeadCode JIM 20Oct00 	int	totalflights=0;
 //			PT_GER_FLYABLE,
 //			PT_ME109=PT_GER_FLYABLE,
 //			PT_ME110,PT_JU87, PT_LW_BOMBERS = PT_JU87,
@@ -1573,19 +1402,6 @@ int	LWDirectivesResults::FillOneDirectivesLine(LWDirectivesResults* dr,int i, in
 
 	}else
 	{
-//DeadCode RDH 30Sep00 		float fightergroupsperraid = fightergroups/missions;
-//DeadCode RDH 30Sep00 		float fightergroupsfirstraid = fightergroups - fightergroupsperraid * (missions -1);
-//DeadCode RDH 30Sep00 	//	attfighters,detfighters,retfighters
-//DeadCode RDH 30Sep00 
-//DeadCode RDH 30Sep00 		float retescort = 1 - dr->tempdir.targetlines[i].detached - dr->tempdir.targetlines[i].attached;
-//DeadCode RDH 30Sep00 		
-//DeadCode RDH 30Sep00 		dr->otherraids.ret = int(retescort * fightergroupsperraid);
-//DeadCode RDH 30Sep00 		dr->otherraids.att = int(dr->tempdir.targetlines[i].attached * fightergroupsperraid);
-//DeadCode RDH 30Sep00 		dr->otherraids.det = fightergroupsperraid - dr->otherraids.ret - dr->otherraids.att;
-//DeadCode RDH 30Sep00 
-//DeadCode RDH 30Sep00 		dr->firstraids.ret = int(retescort * fightergroupsfirstraid);
-//DeadCode RDH 30Sep00 		dr->firstraids.att = int(dr->tempdir.targetlines[i].attached * fightergroupsfirstraid);
-//DeadCode RDH 30Sep00 		dr->firstraids.det = fightergroupsfirstraid - dr->firstraids.ret - dr->firstraids.att;
 
 //previous system gave first raid remainder, we want to spread remainder out	//RDH 30Sep00
 		int minfightergroupsperraid = fightergroups/missions;
@@ -1619,27 +1435,14 @@ int	LWDirectivesResults::FillOneDirectivesLine(LWDirectivesResults* dr,int i, in
 		if (i == Directives::LW::Targ::RECON)
 		{	INT3;	//This should not happen. Recon done differently, now
 			dr->dirresults[k].mission =	MMC.directives.lw.userprofiles[Directives::LW::RECON];
-//DeadCode JIM 18Aug00 			dr->dirresults[k].mission.bomberattackmethod =	MMC.directives.lw.userprofiles[Directives::LW::RECON].bomberattackmethod;
-//DeadCode JIM 18Aug00 			dr->dirresults[k].mission.mainalt =				MMC.directives.lw.userprofiles[Directives::LW::RECON].mainalt;
-//DeadCode JIM 18Aug00 			for (int i  = 0; i <4; i++)									//RDH 9Aug00
-//DeadCode JIM 18Aug00 				dr->dirresults[k].mission.formations[i] =	MMC.directives.lw.userprofiles[Directives::LW::RECON].formations[i];	//RDH 9Aug00
 																		//RDH 9Aug00
 		}else if	(i == Directives::LW::Targ::SWEEPSNDECOYS) 
 		{	INT3;	//This should not happen. Patrols removed.
 			dr->dirresults[k].mission =	MMC.directives.lw.userprofiles[Directives::LW::PATROL];
-//DeadCode JIM 18Aug00 			dr->dirresults[k].mission.bomberattackmethod =	MMC.directives.lw.userprofiles[Directives::LW::PATROL].bomberattackmethod;
-//DeadCode JIM 18Aug00 			dr->dirresults[k].mission.mainalt =				MMC.directives.lw.userprofiles[Directives::LW::PATROL].mainalt;
-//DeadCode JIM 18Aug00 			for (int i  = 0; i <4; i++)									//RDH 9Aug00
-//DeadCode JIM 18Aug00 				dr->dirresults[k].mission.formations[i] =	MMC.directives.lw.userprofiles[Directives::LW::PATROL].formations[i];	//RDH 9Aug00
 																		//RDH 9Aug00
 		}else
 		{
 			dr->dirresults[k].mission =	MMC.directives.lw.userprofiles[Directives::LW::ATTACK];
-//DeadCode JIM 18Aug00 			dr->dirresults[k].mission.bomberattackmethod =	MMC.directives.lw.userprofiles[Directives::LW::ATTACK].bomberattackmethod;
-//DeadCode JIM 18Aug00 			dr->dirresults[k].mission.mainalt =				MMC.directives.lw.userprofiles[Directives::LW::ATTACK].mainalt;
-//DeadCode JIM 18Aug00 			for (int i  = 0; i <4; i++)									//RDH 9Aug00
-//DeadCode JIM 18Aug00 				dr->dirresults[k].mission.formations[i] =	MMC.directives.lw.userprofiles[Directives::LW::ATTACK].formations[i];	//RDH 9Aug00
-//DeadCode JIM 18Aug00 																		//RDH 9Aug00
 		}
 
 		dr->dirresults[k].targets[0] = dr->trgarray[i].target[j].target;
@@ -1693,15 +1496,10 @@ int	LWDirectivesResults::FillOneDirectivesLine(LWDirectivesResults* dr,int i, in
 		}
 		dr->dirresults[k].mission.escortmethods	= dr->tempdir.escortmethods; 
 
-//DEADCODE RDH 10/03/00 		Profile::BetterRule br = Profile::BR_NONE;
 		if (dr->tempdir.targetlines[i].flags & Directives::LW::Targ::FIGHTERSSTRAFFE)
 		{
 			 br = (Profile::BetterRule)(br | Profile::BR_R_ASTRAFE | Profile::BR_R_DSTRAFE);
 		}
-//DeadCode JON 19Jun00 		if (me110bombing)
-//DeadCode JON 19Jun00 			br = (Profile::BetterRule)(br + Profile::BR_R_110BONLY);
-//DeadCode JON 19Jun00 		else
-//DeadCode JON 19Jun00 			br = (Profile::BetterRule)(br + Profile::BR_R_REALBOMB);
 
 
 
@@ -1730,12 +1528,6 @@ void	LWDirectivesResults::FillTargetLists(LWDirectivesResults* dr)
 
 		switch (i)
 		{
-//DEADCODE RDH 11/05/00 		case	Directives::LW::Targ::RECON:
-//DEADCODE RDH 11/05/00 			{
-//DEADCODE RDH 11/05/00 				uidbandstart = 	RAF_FighterAFBAND;
-//DEADCODE RDH 11/05/00 				uidbandend =  RAF_BomberAFBAND;
-//DEADCODE RDH 11/05/00 				break;
-//DEADCODE RDH 11/05/00 			}
 		case	Directives::LW::Targ::AIRFIELDS:
 			{//AIRFIELDS
 				uidbandstart = 	RAF_FighterAFBAND;
@@ -1746,7 +1538,6 @@ void	LWDirectivesResults::FillTargetLists(LWDirectivesResults* dr)
 			{//DOCKS
 				uidbandstart = 	DocksBAND;
 				uidbandend =  CityBAND;							//JIM 16Oct00
-//DeadCode JIM 16Oct00 				uidbandend =  PortBAND;
 				break;
 			}
 		case	Directives::LW::Targ::RADARS:
@@ -1851,10 +1642,6 @@ void	LWDirectivesResults::FillTargetLists(LWDirectivesResults* dr)
 			TargetNoDetail* trg = Node_Data[uid];
 			if (trg)
 			{
-//DeadCode JIM 3Jul00 				int dstatus = trg->knownstatus - trg->truestatus;
-//DeadCode JIM 3Jul00 				if (dstatus < 0)
-//DeadCode JIM 3Jul00 				dstatus = -dstatus;
-//DeadCode JIM 3Jul00 				if (dstatus > 8)
 				if (trg->ReconAdvised())
 					dr->trgarray[0].target[recon++].target = uid;
 				if (recon >= LWDirectivesResults::MAX_TARGETS)
@@ -1888,11 +1675,11 @@ void	LWDirectivesResults::AutoLWPackages()
 
 
 }
-bool	NodeData::GotBadWeatherPeriod(bool& alldayreturn,bool& informreturn)
+bool	NodeData::GotBadWeatherPeriod(bool* alldayreturn,bool* informreturn)
 {
 	bool	alldaylocal;
-	bool &badweatherallday=(&alldayreturn==NULL)?alldaylocal:alldayreturn;
-	bool &infoofbadweather=(&informreturn==NULL)?alldaylocal:informreturn;
+	bool &badweatherallday=(alldayreturn==NULL)?alldaylocal:*alldayreturn;
+	bool &infoofbadweather=(informreturn==NULL)?alldaylocal:*informreturn;
 	badweatherallday = false;
 	infoofbadweather=false;
 	bool badweather = false;
@@ -1944,7 +1731,7 @@ bool	NodeData::BadWeatherCheck()
 {
 	bool badweatherallday;
 	bool infoofbadweather;
-	bool badweather = GotBadWeatherPeriod(badweatherallday,infoofbadweather);
+	bool badweather = GotBadWeatherPeriod(&badweatherallday,&infoofbadweather);
 #ifndef	BOB_DEMO_VER
 	CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
 	main->m_titlebar.Redraw();	//this forces the clock to show the start time for the period.
@@ -1984,7 +1771,6 @@ void	PackageList::IsPlayerUsedInDirectives()
 		if (MMC.fav.geschwader>=0)	  //Don't skip periods if above geschwader level!
 		{
 			//find package that has current wadernum
-//DeadCode JIM 20Oct00 			int	grn=0;
 			if (MMC.fav.gruppe>=0)
 				playerslot[0]=Node_Data.gruppe[MMC.fav.geschwader*3+MMC.fav.gruppe].squadron;
 			else
@@ -2216,9 +2002,6 @@ void	Directives::LW::SetUpReconn()
 	   MMC.directives.lw.current.reconn.escort = false;
 
 //############debug only						 rdh 14/7/00
-//DeadCode rdh 17Jul00 	MMC.directives.lw.current.reconn.ac = 0;
-//DeadCode rdh 17Jul00 	MMC.directives.lw.current.reconn.missions = 0;
-//DeadCode rdh 17Jul00 	MMC.directives.lw.current.reconn.escort = false;
 
 //############debug only
 
@@ -2228,135 +2011,6 @@ void	Directives::LW::AI()
 	 Directives::LW::HistTypes olddir = MMC.lwdir;
 
 
-//DeadCode MS 09Nov00  	switch (olddir)
-//DeadCode MS 09Nov00 	{
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE1A:
-//DeadCode MS 09Nov00 		{
-//DeadCode MS 09Nov00 			if (MMC.currdate >= JUL15th1940)
-//DeadCode MS 09Nov00 			   	 MMC.lwdir =  LWHISTORICALPHASE1B;
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE1B:
-//DeadCode MS 09Nov00 		{
-//DeadCode MS 09Nov00 			if (MMC.currdate >= JUL20th1940)
-//DeadCode MS 09Nov00 		   		MMC.lwdir =  LWHISTORICALPHASE1C;
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE1C:
-//DeadCode MS 09Nov00 		{
-//DeadCode MS 09Nov00 			if (MMC.currdate >= JUL25th1940)
-//DeadCode MS 09Nov00 		   		MMC.lwdir =  LWHISTORICALPHASE1D;
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE1D:
-//DeadCode MS 09Nov00 		{
-//DeadCode MS 09Nov00 			if	(Save_Data.gamedifficulty[GD_LWTACTICS])
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00 				if (MMC.currdate >= JUL31st1940)
-//DeadCode MS 09Nov00 					MMC.lwdir =  LWHISTORICALPHASE2A;
-//DeadCode MS 09Nov00 			}else
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00 				if (MMC.currdate >= AUG12th1940)
-//DeadCode MS 09Nov00 					MMC.lwdir =  LWHISTORICALPHASE2A;
-//DeadCode MS 09Nov00 			}
-//DeadCode MS 09Nov00 			   	 
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE2A:
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE2B:
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE2C:
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE2D:
-//DeadCode MS 09Nov00 		{
-//DeadCode MS 09Nov00 			if	(Save_Data.gamedifficulty[GD_LWTACTICS])
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00 				if (		(Node_Data.LWFindPercentAvail(CLRadarBAND, LUF_FighterLF2BAND, Target::TP_RADAR_HP, Target::TP_RADAR) > 80)
-//DeadCode MS 09Nov00 						||	(MMC.currdate >= AUG23rd1940)
-//DeadCode MS 09Nov00 				   )
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE3A;
-//DeadCode MS 09Nov00 			}else
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00 				if 	(MMC.currdate >= AUG23rd1940)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE3A;
-//DeadCode MS 09Nov00 			}
-//DeadCode MS 09Nov00 	  		if (		(Node_Data.LWFindPercentAvail(RAF_FighterAFBAND, CLRadarBAND, Target::TP_PRIMARYCOASTALAF, Target::TP_SECONDARYCOASTALAF) < 50)
-//DeadCode MS 09Nov00 					||	(MMC.currdate >= AUG16th1940)
-//DeadCode MS 09Nov00 			   )
-//DeadCode MS 09Nov00 			   	 MMC.lwdir =  LWHISTORICALPHASE2B;
-//DeadCode MS 09Nov00 			else
-//DeadCode MS 09Nov00 			   	 MMC.lwdir =  LWHISTORICALPHASE2A;
-//DeadCode MS 09Nov00 	
-//DeadCode MS 09Nov00 	
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE3A:
-//DeadCode MS 09Nov00 		{
-//DeadCode MS 09Nov00 			if	(Save_Data.gamedifficulty[GD_LWTACTICS])
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00 				if (		(Node_Data.LWFindPercentAvail(CLRadarBAND, LUF_FighterLF2BAND, Target::TP_RADAR_HP, Target::TP_RADAR) < 70)
-//DeadCode MS 09Nov00 						&&	(MMC.currdate >= AUG26th1940)
-//DeadCode MS 09Nov00 						&&	(MMC.currdate < AUG30th1940)
-//DeadCode MS 09Nov00 				   )
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE3B;
-//DeadCode MS 09Nov00 				if 	(MMC.currdate >= SEP10th1940)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE4A;
-//DeadCode MS 09Nov00 		  		if	(		(Node_Data.LWFindPercentAvail(RAF_FighterAFBAND, CLRadarBAND, Target::TP_PRIMARYCOASTALAF, Target::TP_SECONDARYINLANDAF) > 90)
-//DeadCode MS 09Nov00 					&&	(MMC.currdate >= AUG28th1940)
-//DeadCode MS 09Nov00 				)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE4A;
-//DeadCode MS 09Nov00 
-//DeadCode MS 09Nov00 			}else
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00 				if 	(MMC.currdate >= SEP7th1940)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE4A;
-//DeadCode MS 09Nov00 			}
-//DeadCode MS 09Nov00 	  		if	(		(Node_Data.LWFindPercentAvail(RAF_FighterAFBAND, CLRadarBAND, Target::TP_PRIMARYCOASTALAF, Target::TP_SECONDARYINLANDAF) > 50)
-//DeadCode MS 09Nov00 					&&	(MMC.currdate >= AUG28th1940)
-//DeadCode MS 09Nov00 				)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE3C;
-//DeadCode MS 09Nov00 
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE3B:
-//DeadCode MS 09Nov00 		{//only for optimum tactics
-//DeadCode MS 09Nov00 			if (Node_Data.LWFindPercentAvail(CLRadarBAND, LUF_FighterLF2BAND, Target::TP_RADAR_HP, Target::TP_RADAR) > 85)
-//DeadCode MS 09Nov00 		   		MMC.lwdir =  LWHISTORICALPHASE3A;
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE3C:
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE3D:
-//DeadCode MS 09Nov00 		{
-//DeadCode MS 09Nov00 			if	(Save_Data.gamedifficulty[GD_LWTACTICS])
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00 				if 	(MMC.currdate >= SEP10th1940)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE4A;
-//DeadCode MS 09Nov00 			}else
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00 				if 	(MMC.currdate >= SEP7th1940)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE4A;
-//DeadCode MS 09Nov00 			}
-//DeadCode MS 09Nov00 	  		if	(		(Node_Data.LWFindPercentAvail(RAF_FighterAFBAND, CLRadarBAND, Target::TP_PRIMARYCOASTALAF, Target::TP_SECONDARYINLANDAF) < 25)
-//DeadCode MS 09Nov00 				)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE3A;
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE4A:
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE4B:
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE4C:
-//DeadCode MS 09Nov00 		case	LWHISTORICALPHASE4D:
-//DeadCode MS 09Nov00 		{
-//DeadCode MS 09Nov00 			if	(Save_Data.gamedifficulty[GD_LWTACTICS])
-//DeadCode MS 09Nov00 			{
-//DeadCode MS 09Nov00  		  		if	(		(Node_Data.LWFindPercentAvail(RAF_FighterAFBAND, CLRadarBAND, Target::TP_PRIMARYCOASTALAF, Target::TP_SECONDARYINLANDAF) < 25)
-//DeadCode MS 09Nov00 					)
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE3A;
-//DeadCode MS 09Nov00 
-//DeadCode MS 09Nov00 			}
-//DeadCode MS 09Nov00 			if 	(MMC.currdate >= SEP15th1940)					//JIM 16Oct00
-//DeadCode MS 09Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE4B;					//RDH 12Oct00
-//DeadCode MS 09Nov00 //this line doesn't make any sense										//RDH 12Oct00
-//DeadCode MS 09Nov00 //DeadCode JIM 16Oct00 		   	 MMC.lwdir =  LWHISTORICALPHASE1B;
-//DeadCode MS 09Nov00 			break;
-//DeadCode MS 09Nov00 		}
  	switch (olddir)
 	{
 		case	LWHISTORICALPHASE1A:
@@ -2431,14 +2085,6 @@ void	Directives::LW::AI()
 						&&	(MMC.currdate < AUG30th1940)
 				   )
 				   	 MMC.lwdir =  LWHISTORICALPHASE3B;
-//DeadCode MS 16Nov00 		  		if	(		(Node_Data.LWFindPercentAvail(RAF_FighterAFBAND, CLRadarBAND, Target::TP_PRIMARYCOASTALAF, Target::TP_SECONDARYINLANDAF) > 90)
-//DeadCode MS 16Nov00 					&&	(MMC.currdate >= SEP10th1940)
-//DeadCode MS 16Nov00 				)
-//DeadCode MS 16Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE4A;
-//DeadCode MS 16Nov00 		  		if	(		(Node_Data.LWFindPercentAvail(RAF_FighterAFBAND, CLRadarBAND, Target::TP_PRIMARYCOASTALAF, Target::TP_SECONDARYINLANDAF) > 50)
-//DeadCode MS 16Nov00 					&&	(MMC.currdate < AUG30th1940)
-//DeadCode MS 16Nov00 				)
-//DeadCode MS 16Nov00 				   	 MMC.lwdir =  LWHISTORICALPHASE3C;
 		  		if	(MMC.currdate < AUG28th1940)
 				  	 MMC.lwdir =  LWHISTORICALPHASE3C;
 
@@ -2495,7 +2141,6 @@ void	Directives::LW::AI()
 			if 	(MMC.currdate >= SEP15th1940)					//JIM 16Oct00
 				   	 MMC.lwdir =  LWHISTORICALPHASE4B;					//RDH 12Oct00
 //this line doesn't make any sense										//RDH 12Oct00
-//DeadCode JIM 16Oct00 		   	 MMC.lwdir =  LWHISTORICALPHASE1B;
 			break;
 		}
 

@@ -68,7 +68,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "NameList.h"
 #include	"memain.h"
 #include	"dosdefs.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"uniqueid.h"
 
 #include	"persons2.h"
@@ -146,7 +145,7 @@ void __fastcall TNameListSel::NameListDrawItem(TWinControl *Control, int Index,
 	AnsiString	s=NameList->Items->Strings[Index];
 	int v=s.Pos("\t");
 	int u=s.SubString(v+1,5).ToInt();
-	if (&Persons2::ConvertPtrUID(UniqueID(u)))
+	if (Persons2::ConvertPtrUID(UniqueID(u)))
 		if (State.Contains(odSelected))
 			NameList->Canvas->Font->Color=NameList->Color;
 		else

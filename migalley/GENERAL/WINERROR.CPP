@@ -249,7 +249,7 @@ Error& Error::SayAndQuit(const char *fmt, ...)
 	}
 
 	exit(0);
-	return	*(Error*)NULL;
+	return	*this;	//unreachable - exit(1) above; *this avoids binding a null ref
 
 }
 
@@ -356,55 +356,3 @@ void Error::KeyTrap()
 
 	#endif
 
-//Old_Code PD 16Jan96 	#if	DEBUGGING
-//Old_Code PD 16Jan96 
-//Old_Code PD 16Jan96 	#include	<stddef.h>
-//Old_Code PD 16Jan96 	#include	<stdlib.h>
-//Old_Code PD 16Jan96 
-//Old_Code PD 16Jan96 
-//Old_Code PD 16Jan96 static SLong malloced=0;
-//Old_Code PD 16Jan96 
-//Old_Code PD 16Jan96 //------------------------------------------------------------------------------
-//Old_Code PD 16Jan96 //Procedure		my_malloc
-//Old_Code PD 16Jan96 //Author		Paul.   
-//Old_Code PD 16Jan96 //Date			Tue 16 Jan 1996
-//Old_Code PD 16Jan96 //
-//Old_Code PD 16Jan96 //Description	Replacement for 'new'
-//Old_Code PD 16Jan96 //
-//Old_Code PD 16Jan96 //Inputs		
-//Old_Code PD 16Jan96 //
-//Old_Code PD 16Jan96 //Returns	
-//Old_Code PD 16Jan96 //
-//Old_Code PD 16Jan96 //------------------------------------------------------------------------------
-//Old_Code PD 16Jan96 void *my_malloc(size_t s)
-//Old_Code PD 16Jan96 {
-//Old_Code PD 16Jan96 	void *retval;
-//Old_Code PD 16Jan96 	if((retval=malloc(s))==NULL)
-//Old_Code PD 16Jan96 	{
-//Old_Code PD 16Jan96 		retval=(void *)0x0A0000;
-//Old_Code PD 16Jan96 		INT3();
-//Old_Code PD 16Jan96 	}
-//Old_Code PD 16Jan96 
-//Old_Code PD 16Jan96 	malloced+=(SLong)s;
-//Old_Code PD 16Jan96 
-//Old_Code PD 16Jan96 	return(retval);
-//Old_Code PD 16Jan96 }
-//Old_Code PD 16Jan96 
-//Old_Code PD 16Jan96 //------------------------------------------------------------------------------
-//Old_Code PD 16Jan96 //Procedure		my_delete
-//Old_Code PD 16Jan96 //Author		Paul.   
-//Old_Code PD 16Jan96 //Date			Tue 16 Jan 1996
-//Old_Code PD 16Jan96 //
-//Old_Code PD 16Jan96 //Description	
-//Old_Code PD 16Jan96 //
-//Old_Code PD 16Jan96 //Inputs		
-//Old_Code PD 16Jan96 //
-//Old_Code PD 16Jan96 //Returns	
-//Old_Code PD 16Jan96 //
-//Old_Code PD 16Jan96 //------------------------------------------------------------------------------
-//Old_Code PD 16Jan96 void my_delete(void *p)
-//Old_Code PD 16Jan96 {
-//Old_Code PD 16Jan96 	malloced-=*((SLongP )p-4);
-//Old_Code PD 16Jan96 	free(p);
-//Old_Code PD 16Jan96 }
-//Old_Code PD 16Jan96 	#endif

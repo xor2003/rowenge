@@ -366,7 +366,7 @@ RDialog*	RDialog::MakeParentDialog(CRect& dialsize,RDialog* parent,DialBox* tree
 RDialog* RDialog::AddPanel(const DialBox* tree, int X2flag,CRect dialsize)
 {
 	const DialBox *  b[2]={tree,NULL};
-	return AddChildren(b,X2flag,dialsize);
+	return AddChildren(b,X2flag,&dialsize);
 }
 
 
@@ -397,7 +397,7 @@ volatile int progressind=0;
 //Description: PANELS WITHIN PANELS
 //
 //////////////////////////////////////////////////////////////////////
-RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& rect)			  
+RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect* rect)			  
 {
 	int	usedy=homesize.Height();
 	RDialog* dial=NULL;								//RERUN: empty diallist returned garbage (scan-build)
@@ -417,7 +417,6 @@ RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& re
 		dial->dchild=dial->fchild=NULL;
 		CRect posn;
 
-//DeadCode JIM 10Jun99 		dial->dragstate=DRAG_NO;
 		dial->artnum=diallist[i]->art;
 		dial->Create(dial->MY_IID,this);
 
@@ -429,9 +428,9 @@ RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& re
 		dial->dragstate=DRAG_NO;
 		int uid=IDJ_PANEL0+i;
 		CWnd* cntrl=GetDlgItem(uid);		//don't know if I should delete this!!!
-		if (&rect!=NULL)
+		if (rect!=NULL)
 		{
-			posn=rect;
+			posn=*rect;
 		}
 		else
 		if (cntrl==NULL)
@@ -493,11 +492,6 @@ RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& re
 		}
 		dial->MoveWindow(dial->viewsize);		//IDC_BUTTON1
 		CRect tempviewsize=dial->viewsize;
-//DeadCode JIM 10Jun99 		dial->m_scalingfactor=(float)fontdpi/96;
-//DeadCode JIM 10Jun99 		if (X2flag)
-//DeadCode JIM 10Jun99 			dial->ScaleDialog(2);
-//DeadCode JIM 10Jun99 		else
-//DeadCode JIM 10Jun99 			dial->ScaleDialog(1);
 //		dial->MoveWindow(tempviewsize);
 		const	DialBox*const* l=diallist[i]->diallist;
 		if (diallist[i]->childtype>=DialMake::TABT)
@@ -587,8 +581,6 @@ void	RDialog::AddChildren(const DialBox*const* diallist,DialMake::ChildType chil
 //		ScreenToClient(&posn);
 		GetClientRect(posn);
 		posn.top+=30; // allow space for tabs
-//DeadCode JIM 10Jun99 		dial->RECT_NORMAL=posn;
-//DeadCode JIM 10Jun99 		dial->dragstate=DRAG_NO;
 		dial->artnum=diallist[i]->art;
 		dial->Create(dial->MY_IID,this);
 
@@ -611,8 +603,6 @@ void	RDialog::AddChildren(const DialBox*const* diallist,DialMake::ChildType chil
 		dial->MoveWindow(dial->viewsize);		//IDC_BUTTON1
 		CRect tempviewsize=dial->viewsize;
 		// scale the dialog if necessary due to font size change
-//DeadCode JIM 10Jun99 		dial->m_scalingfactor=(float)fontdpi/96;
-//DeadCode JIM 10Jun99 		dial->ScaleDialog(1);
 //		dial->MoveWindow(tempviewsize);
 		if (diallist[i]->childtype>=DialMake::TABT)
 		{
@@ -2484,8 +2474,8 @@ int	ScaleTranslate(int input,bool isy)
 	else
 		if (currval==scalinglookup[high][isy][1])
 			return scalinglookup[high][isy][0];		//found exact match
-		if (currval+1==scalinglookup[high][isy][1])
-			return scalinglookup[high][isy][0]-1;		//just under
+	if (currval+1==scalinglookup[high][isy][1])
+		return scalinglookup[high][isy][0]-1;		//just under
 		else
 			if (currval==scalinglookup[low][isy][1]+1)
 				return scalinglookup[low][isy][0]+1;	//just over
@@ -2659,8 +2649,6 @@ LRESULT RDialog::OnCommandHelp(WPARAM w, LPARAM lParam)
 	if (parent)
 		if (
 				parent->MY_IID==IDD_EMPTYDIAL
-//DEADCODE RDH 24/02/99 			||	
-//DEADCODE RDH 24/02/99 			parent->MY_IID==IDD_FULLPANE
 			)
 			return CDialog::OnCommandHelp(w,lParam);
 		else

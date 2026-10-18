@@ -71,12 +71,9 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //------------------------------------------------------------------------------
 
 	#include	"DOSDefs.h"
-//DeadCode DAW 15Apr96 	#include	"Screen.H"
-//DeadCode DAW 19Mar96 	#include	"GetSet.H"
 	#include	"myAngles.h"
 	#include	"WorldInc.h"
 	#include	"World.h"
-//DeadCode DAW 23Feb98 	#include	"Main.H"
 	#include	"myError.h"
 	#include	"TransIte.h"									//PD 11May96
 	#include	"3dcom.h"										//RJS 21Aug96
@@ -87,10 +84,7 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	"persons2.h"
 
 //#define	_TOFILE_
-//DeadCode DAW 23Feb98 	extern		Main	_Main;
-//DeadCode DAW 23Feb98 	extern		Error	_Error;
 
-//DeadCode RDH 27Feb96 	WorldStuff	World_Stuff;
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		WorldStuff
@@ -194,7 +188,6 @@ void WorldStuff::AddToWorld(itemptr item)
 //------------------------------------------------------------------------------
 void WorldStuff::RemoveFromWorld(itemptr item)
 {
-//DeadCode JIM 15Feb96 	UWord	sector_number;
 
 	RemoveFromSector(item,GetSector(item));
 }
@@ -217,7 +210,10 @@ void	WorldStuff::RemoveFromSector(itemptr	item,UWord	sector_number)
 			curr_item;
 
 	if(sectorlist[sector_number ] == (itemptr )NULL)
-		_Error.EmitSysErr(__FILE__":Item not found in sector\n");
+		{
+			_Error.EmitSysErr(__FILE__":Item not found in sector\n");
+		return;
+		}
 
 	//Search this sector for the item we want to remove
 
@@ -232,10 +228,22 @@ void	WorldStuff::RemoveFromSector(itemptr	item,UWord	sector_number)
 		{
 		curr_item = sectorlist[sector_number];
 
+		if (curr_item==(itemptr)NULL)
+			{
+				_Error.EmitSysErr(__FILE__":Item not found in sector\n");
+		return;
+			}
+
 		next_item = curr_item->Next;
 
 		while(next_item!=item)
 		{
+			if (next_item==(itemptr)NULL)
+				{
+					_Error.EmitSysErr(__FILE__":Item not found in sector\n");
+		return;
+				}
+
 			curr_item = next_item;
 
 			if((next_item = curr_item->Next)==(itemptr )NULL)
@@ -262,6 +270,7 @@ void	WorldStuff::RemoveFromSector(itemptr	item,UWord	sector_number)
 				}
 #endif
 				_Error.EmitSysErr(__FILE__":Item not found in sector\n");
+		return;
 			}
 		}
 
@@ -353,35 +362,10 @@ Bool WorldStuff::SameSector(itemptr itemA, itemptr itemB)
 				>(ULong)(REAL_SECTOR_STEP+REAL_SECTOR_STEP))
 		return (FALSE);
 
-//DeadCode JIM 10Aug96 	if (itemA->World.X & REAL_SECTOR_MASK !=
-//DeadCode JIM 10Aug96 		itemB->World.X & REAL_SECTOR_MASK)
-//DeadCode JIM 10Aug96 		return (FALSE);
-//DeadCode JIM 10Aug96 
-//DeadCode JIM 09Aug96 	if (itemA->World.Z & REAL_SECTOR_MASK !=
-//DeadCode JIM 09Aug96 		itemB->World.Z & REAL_SECTOR_MASK)
-//DeadCode JIM 09Aug96 		return (FALSE);
 
 	return (TRUE);
 }
 
-//DeadCode PD 25Jun96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode PD 25Jun96 //Procedure		getsector
-//DeadCode PD 25Jun96 //Author		Martin Alderton
-//DeadCode PD 25Jun96 //Date			Wed 28 Feb 1996
-//DeadCode PD 25Jun96 //
-//DeadCode PD 25Jun96 //Description	
-//DeadCode PD 25Jun96 //
-//DeadCode PD 25Jun96 //Inputs		
-//DeadCode PD 25Jun96 //
-//DeadCode PD 25Jun96 //Returns	
-//DeadCode PD 25Jun96 //
-//DeadCode PD 25Jun96 //------------------------------------------------------------------------------
-//DeadCode PD 25Jun96 UWord WorldStuff::getsector(itemptr item)
-//DeadCode PD 25Jun96 {
-//DeadCode PD 25Jun96 	UWord retval;
-//DeadCode PD 25Jun96 	retval=GetSector(item);
-//DeadCode PD 25Jun96 	return(retval);
-//DeadCode PD 25Jun96 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure	getsector
@@ -424,25 +408,6 @@ Bool WorldStuff::SectorEmpty(COORDS3D& pos)
 }
 
 
-//DEADCODE DAW 07/04/99 void	WorldStuff::ClearWorld()
-//DEADCODE DAW 07/04/99 {
-//DEADCODE DAW 07/04/99 	Trans_Obj.DeleteAll();	//Just resets trans lists			//PD 11May96
-//DEADCODE DAW 07/04/99 
-//DEADCODE DAW 07/04/99 	for (int sn=SECTOR_MAXNUM-1;sn>=0;sn--)
-//DEADCODE DAW 07/04/99 	{
-//DEADCODE DAW 07/04/99 		ItemPtr	next=sectorlist[sn];
-//DEADCODE DAW 07/04/99 		sectorlist[sn]=NULL;
-//DEADCODE DAW 07/04/99 		while (next)
-//DEADCODE DAW 07/04/99 		{
-//DEADCODE DAW 07/04/99 			ItemBasePtr curr=next;
-//DEADCODE DAW 07/04/99 			next=next->Next;
-//DEADCODE DAW 07/04/99 			delete curr;
-//DEADCODE DAW 07/04/99 		}
-//DEADCODE DAW 07/04/99 	}
-//DEADCODE DAW 07/04/99 	for (int pi=0;pi<PITEMTABLESIZE;pi++)
-//DEADCODE DAW 07/04/99 		pItem[pi]=0;
-//DEADCODE DAW 07/04/99 }
-//DEADCODE DAW 07/04/99 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		SetLaunchers
 //Author		Robert Slater
@@ -488,8 +453,6 @@ void	WorldStuff::SetLaunchers()
 ItemBasePtr		WorldStuff::ConvertPtrUID(UniqueID tmpUID)
 {
 	return(pItem[tmpUID]);
-//Old_Code DAW 09Feb96 	INT3();
-//DeadCode DAW 15Feb96  	return(NULL);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -507,7 +470,7 @@ ItemBasePtr		WorldStuff::ConvertPtrUID(UniqueID tmpUID)
 //------------------------------------------------------------------------------
 void	ItemBase::operator delete(void* area)
 {
-	if (!area)	return;
+	if (!area || area==(void*)&Nil())	return;
 	ItemBasePtr	it=(ItemBasePtr)area;
 	if (it->Status.size==ItemBaseSize)
 		::delete(ItemBasePtr)it;
@@ -569,7 +532,6 @@ void	WorldStuff::MakeSunPos(ViewPoint*	View_Point)
 		int	currtime = View_Point->TimeOfDay() / 100;
 
 		sunang=(Angles)(((currtime-MissManDawnTime())<<15)/(MissManDuskTime()-MissManDawnTime()));
-//DeadCode RJS 21Dec99		sunang=ANGLES_45Deg;							
 	}
 	else sunang = ANGLES_45Deg;								
 
@@ -578,7 +540,6 @@ void	WorldStuff::MakeSunPos(ViewPoint*	View_Point)
 	sunpos.Y=MULSHSIN(sinang,SUNELEVDIST,ANGLES_SHIFT);
 	sunpos.X=MULSHSIN(cosang,SUNELEVDIST,ANGLES_SHIFT);
 	Math_Lib.high_sin_cos(ANGLES_50Deg,sinang,cosang);
-//DeadCode MS 7Sep00 	sunpos.Z=-MissManSunSouth();
 	sunpos.Z=-MULSHSIN(sinang,SUNELEVDIST,ANGLES_SHIFT);
 	SLong	range;
 	Math_Lib.Intercept(sunpos.X,sunpos.Y,sunpos.Z,range,sunhdg,sunpitch);

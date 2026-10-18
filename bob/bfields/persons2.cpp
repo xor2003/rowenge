@@ -100,12 +100,8 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 extern	ULong&	GR_TakeOffTime;
 //#undef source
 	//DON'T WRITE INCLUDE FILES HERE, PUT THEM IN BFCOMMON
-//DeadCode JIM 28Mar96 extern	PlaneType&	camel;										//RDH 23Feb96
-//Old_Code PD 27Aug96  	MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);
 //	Persons2	Persons_2;
 //	extern	ULong	GR_FriendlyScoutType00;
-//DeadCode RDH 30Jul97 	extern	ULong	GR_GlobalSkillMin;
-//DeadCode RDH 30Jul97 	extern	ULong	GR_GlobalSkillMax;
 
 int inline operator==(char a,TokenCode b) {return (int)a==(int)b;}
 int inline operator!=(char a,TokenCode b) {return (int)a!=(int)b;}
@@ -113,15 +109,6 @@ int inline operator!=(char a,TokenCode b) {return (int)a!=(int)b;}
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //EventRec*	EventRec::eventbase=NULL;
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 20Mar96 SLong
-//DeadCode JIM 20Mar96 		p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,
-//DeadCode JIM 20Mar96 		p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,
-//DeadCode JIM 20Mar96 		p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,
-//DeadCode JIM 20Mar96 		*globallocations[]={
-//DeadCode JIM 20Mar96 							&p0,&p1,&p2,&p3,&p4,&p5,&p6,&p7,&p8,&p9,
-//DeadCode JIM 20Mar96 							&p10,&p11,&p12,&p13,&p14,&p15,&p16,&p17,&p18,&p19,
-//DeadCode JIM 20Mar96 							&p20,&p21,&p22,&p23,&p24,&p25,&p26,&p27,&p28,&p29,
-//DeadCode JIM 20Mar96 								NULL};
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 
@@ -215,12 +202,10 @@ CON	Persons2::Persons2(WorldStuff* world,ViewPoint* vp)
 {
 	inst3d=NULL;
 	viewpoint=vp;
-//DEADCODE JIM 17/03/99 	eventloglist=NULL;
 	myworld=world;
 	if (world)
 		pItem=world->pItem;
 	rootuidnode = NULL;
-//DEADCODE JIM 25/03/99 	permtextpage=(TextPage)0;
 	justscanning=LOAD;
 
 }
@@ -229,12 +214,11 @@ CON	Persons2::Persons2(WorldStuff* world,ViewPoint* vp)
 ItemBase&		Persons2::ConvertPtrUID(UniqueID tmpUID)
 {
 	if (tmpUID==0)
-		return *(ItemBase*)NULL;	// cppcheck-suppress nullPointer ; deliberate null-ref sentinel (callers test &ref)
+		return ItemBase::Nil();	//defined-behaviour "not found" object; callers' tests fold it back to NULL
+
 //#ifndef	__BCPLUSPLUS__
 	assert (tmpUID>0 && tmpUID<=IllegalSepID);
 //#endif
-//DEADCODE JIM 24/01/00 	if (tmpUID==0x107)		//DEBUG TEST FOR SPECIFIC VALUE
-//DEADCODE JIM 24/01/00 		tmpUID=tmpUID;
 	return(pItem[tmpUID][0]);
 }
 ItemBasePtr		Persons2::SlowConvertPtrUID(UniqueID tmpUID)
@@ -348,12 +332,6 @@ int	Persons2::getbandnumfromUID(UniqueID	tmpUID)
 	return (i);
 }
 
-//DeadCode RJS 13Feb96 enum	UILogType
-//DeadCode RJS 13Feb96 {
-//DeadCode RJS 13Feb96 	ptrcopy			= 1,
-//DeadCode RJS 13Feb96 	worldcopy		= 2,
-//DeadCode RJS 13Feb96 	addworldcopy	= 3
-//DeadCode RJS 13Feb96 };
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		InitSetPiece
@@ -455,7 +433,6 @@ void Persons2::LoadSetPiece(WorldStuff *worldptr)
 {
 	static int go=0;
 	SENT_REQ=FALSE;
-//DEADCODE DAW 08/03/00 	TruckLog=TargLog=PlayerLog=NULL;
 	FileNum	filelist;
 
 	SendInitPacket ();
@@ -468,7 +445,6 @@ void Persons2::LoadSetPiece(WorldStuff *worldptr)
 	{
 		BattlefieldType	debugbfctrlmatchfile=bfctrl;	//This makes debugging easier and gets optimised out
 		filelist = FindCommsNextBf (bfctrl);  //FindNextBf
-//DEADCODE JIM 17/05/99 		_DPlay.SetRandomListPos();								//AMM 10May99
 		if (bfctrl==CONVOYBF)
 		   if (inst3d)
 			   inst3d->timeofday=GR_TakeOffTime*int(SECS100);
@@ -602,8 +578,7 @@ void	Persons2::processbfieldtoplevel(string& bfieldptr)
 {
 currsupergroup=UID_Null;
 int	loopcount=getloopcount(bfieldptr);
-	while (loopcount--)
-		switch (*(bfieldptr++))
+	while (loopcount--) switch (*(bfieldptr++))
 		{
 			case T_comment:		toplevel_string(bfieldptr,T_comment);		break;
 			case T_name:		toplevel_string(bfieldptr,T_name);			break;
@@ -692,7 +667,6 @@ void	Persons2::toplevel_itemS(string	&bfieldptr,bool	enabled)
 	I.SGT=currsupergroup;
 
 int	loopcount=getloopcount(bfieldptr);
-//DeadCode JIM 11Jun97 itemptr	tmpitem = new item;
 	while (loopcount--)
 		switch (*(bfieldptr++))
 		{
@@ -796,7 +770,6 @@ void	Persons2::toplevel_gndgrp(string	&bfieldptr)
 //------------------------------------------------------------------------------
 void	Persons2::toplevel_airgrp(string	&bfieldptr)
 {
-//DeadCode JIM 16Jun97 	UByte		cols[COLS_ALL]={0};
 	info_airgrp	I;
 	I.SGT=currsupergroup;
 	I.usedpaintrules=0;
@@ -1008,10 +981,6 @@ void		Persons2::midlevel_event(string& bfieldptr,info_event*& E)
 
 	midlevel_event(bfieldptr,I);
 ///make_events(I); ///called from make_xxx as required
-//DeadCode JIM 17Jun97 	if (newevent->eventwend)									//JIM 04Nov96
-//DeadCode JIM 17Jun97 		newevent->eventwend+=newevent->eventwstart+Timer_Code.realtime;
-//DeadCode JIM 17Jun97 	if (newevent->eventwstart)
-//DeadCode JIM 17Jun97 		newevent->eventwstart+=Timer_Code.realtime;
 }
 
 
@@ -1139,7 +1108,6 @@ int	loopcount=getloopcount(bfieldptr);
 	es.index=evaluateglobvar(bfieldptr);
 	es=constructvalue(bfieldptr);
 	make_setval(es);
-//DeadCode JIM 20Mar96 	*globallocations[locnum]=value;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1157,7 +1125,6 @@ int	loopcount=getloopcount(bfieldptr);
 SLong	Persons2::evaluateglobvar(string &bfieldptr,FormationIndex fi)
 {
 SLong	retval;
-//DeadCode JIM 08Jan96 	for (;;)
 		switch (*(bfieldptr++))
 		{
 		case T_long:
@@ -1760,14 +1727,12 @@ Bool	Persons2::lowlevel_squadron(string& bfieldptr,info_airgrp& I)
 	if (*bfieldptr!=T_linklist)
 	{	//got a squad number equate...
 		I.squadname=constructvalue(bfieldptr);
-//DeadCode JIM 16Jun97 		return(lowlevel_squadron(snequ));
 		return FALSE;
 	}
 	else
 	{
 int	loopcount=getloopcount(bfieldptr);
-	while (loopcount--)
-		switch (*(bfieldptr++))
+	while (loopcount--) switch (*(bfieldptr++))
 		{
 		case T_paintscheme:
 					I.paintrules[I.usedpaintrules++]=constructvalue(bfieldptr,TRUE);
@@ -1830,18 +1795,20 @@ bool	Persons2::BFLoaded(FileNum f)
 	for (int i=0;i<LOADEDBFS;i++)
 		if(loadedBF[i]==f)
 			return true;
-		return false;
+	return false;
 }
 
 bool	Persons2::GetSpareBFNumber(int& number)
 {
 	for (int i=RELOADABLEBOUNDARY;i<LOADEDBFS;i++)
+	{
 		if(loadedBF[i]==0)
 		{
 			number=i;
 			return true;
 		}
-		return false;
+	}
+	return false;
 }
 
 int		Persons2::DeleteOldestBF()	//need schema to flag accesses...

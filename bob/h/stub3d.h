@@ -146,7 +146,6 @@ inline WinMode::Mode operator & (WinMode::Mask a,WinMode::Mode b)
 class	View3d;
 struct	KeyMap3d;
 class	CEvent;
-//DEADCODE PD 03/12/99 class	Display;
 /* xor BAD code
 #ifdef UNICODE
 #define IID_IDirectInputDevice IID_IDirectInputDeviceW
@@ -207,7 +206,6 @@ public:
 	void	Init(HINSTANCE			hinst,HWND				hwind);
 	~Mast3d();
 	void	MainInit(void);
-//DeadCode AMM 24Aug00 	void	QuitGame(void );
 	void	Stop();
 	void	SmallWin();
 	void	BigWin();
@@ -266,10 +264,8 @@ public:
 	static	void	RestoreDirectX();
 
 void	DoMoveCycle();
-//DeadCode AMM 12May99 void	MoveCycle(int timeofday,WorldStuff* worldref);
 void	MoveCycle(WorldStuff* worldref);						//AMM 11May99
 
-//DeadCode AMM 06Oct98 void	SkipCycles(ULong num);									//AMM 16Sep98
 
 
 	static void	OnKeyDown(int key);
@@ -296,7 +292,6 @@ class	View3d
 	View3d*		nextview;
 	CEvent*		E;
 	KeyMap3d*	keymap;
-//DEADCODE PD 03/12/99 	Display*	Whole_Screen;
 	enum	DrawState {D_NO=0,D_YES,D_SWITCH,D_CLOSE}
 			drawing;
 	static UINT AFX_CDECL drawloop(LPVOID);
@@ -313,9 +308,11 @@ public:
 	int TimeSinceLastMove();
 	int TimeOfDay()		{return inst->timeofday;}
 	void SetTimeOfDay(int time) {inst->timeofday=time;}			//AMM 12May99
-	int	MakeInteractive	(WinMode	v=WinMode::FULL,const CRect& pos=*(CRect*)NULL,bool flag=false,bool flag2=false);
-	int	MakePassive		(WinMode	v=WinMode::FULL,const CRect& pos=*(CRect*)NULL,bool flag=false,bool flag2=false);
-	int	MakeResize		(WinMode	v=WinMode::FULL,const CRect& pos=*(CRect*)NULL);
+	//pos==NULL means "no coords": a null default reference would be a null
+	//dereference, so these take real pointers.
+	int	MakeInteractive	(WinMode	v=WinMode::FULL,const CRect* pos=NULL,bool flag=false,bool flag2=false);
+	int	MakePassive		(WinMode	v=WinMode::FULL,const CRect* pos=NULL,bool flag=false,bool flag2=false);
+	int	MakeResize		(WinMode	v=WinMode::FULL,const CRect* pos=NULL);
 	bool Interactive(bool newmode)
 	{	return (this==inst->Interactive(
 						newmode	?this
@@ -336,7 +333,6 @@ public:
 
 	bool InThe3D()	{return Drawing();}
 
-//DeadCode AMM 06Oct98 	void	SkipCycles(ULong num);								//AMM 16Sep98
 
 	View3d(Inst3d* i,HWND,CWnd*);
 	~View3d();

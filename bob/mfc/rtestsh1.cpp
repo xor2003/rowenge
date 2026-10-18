@@ -153,6 +153,32 @@ Rtestsh1::Rtestsh1(UniqueID uid,CWnd* pParent,bool)	: RowanDialog(IDD,pParent)
 
 }
 
+//RERUN the flybox covers the whole frontend sheet; forward the click to
+//the underlying top-level dialog so its listbox strip (Debrief etc) works.
+extern HWND FindChildWindow(HWND parent,int& x,int& y);
+void Rtestsh1::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	CWnd* wrap=GetParent();
+	CWnd* root=wrap?wrap->GetParent():NULL;
+	CPoint scr=point; ClientToScreen(&scr);
+	{static bool _dbg=getenv("ROWAN_DEBUG_INPUT")!=0;if(_dbg)fprintf(stderr,"[flybox-hit] pt=%d,%d scr=%d,%d wrap=%p root=%p\n",point.x,point.y,scr.x,scr.y,wrap,root);}
+	for (CWnd* sib=root?root->GetTopWindow():NULL;sib;sib=sib->GetNextWindow())
+	{
+		if (sib==wrap||sib==this) continue;
+		CPoint p2=scr; sib->ScreenToClient(&p2);
+		int cx=p2.x,cy=p2.y;
+		HWND h=FindChildWindow(sib->GetSafeHwnd(),cx,cy);
+		CWnd* cw=h?CWnd::FromHandle(h):NULL;
+		{static bool _dbg=getenv("ROWAN_DEBUG_INPUT")!=0;if(_dbg)fprintf(stderr,"[flybox-hit] sib=%p p2=%d,%d h=%p cw=%p\n",sib,p2.x,p2.y,h,cw);}
+		if (cw && cw!=sib && cw!=this)
+		{
+			cw->SendMessage(WM_LBUTTONDOWN,nFlags,MAKELPARAM(cx,cy));
+			cw->SendMessage(WM_LBUTTONUP,nFlags,MAKELPARAM(cx,cy));
+			return;
+		}
+	}
+}
+
 void Rtestsh1::OnCancel()
 {
 	if (!nestedcallsblocker)
@@ -178,20 +204,12 @@ void Rtestsh1::OnCancel()
 	if (RFullPanelDial::gamestate==RFullPanelDial::HOT || RFullPanelDial::gamestate==RFullPanelDial::QUICK)
 		Save_Data.ChangeMode(SaveData::UIR_SCRAMBLE);
 	else
-//DEADCODE JON 04/05/00 		if (trg_uid)
-//DEADCODE JON 04/05/00 			Save_Data.ChangeMode(SaveData::UIR_MAP);
-//DEADCODE JON 04/05/00 		else
 			Save_Data.ChangeMode(SaveData::UIR_FRAG);
 
 }
 static int debugcounter=0;
 void	Rtestsh1::OnOK()
 {
-//DEADCODE JIM 15/04/99 Interesting! Hit AltX then Mouse debrief. 
-//DEADCODE JIM 15/04/99 This comes up after syserr for double delete!
-//DEADCODE JIM 15/04/99  	if (debugcounter++)
-//DEADCODE JIM 15/04/99 		INT3;
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("OnOK["));
 	if (!nestedcallsblocker)
 	{
 		nestedcallsblocker=true;
@@ -219,7 +237,6 @@ void	Rtestsh1::OnOK()
 		}
 		else
 			Save_Data.ChangeMode(SaveData::UIR_FRAG);
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("]OnOK"));
 }
 Rtestsh1::~Rtestsh1()
 {
@@ -327,8 +344,8 @@ void	Rtestsh1::Launch3d(bool flag)
 	if (!tmpview)
 	{
 		tmpview=new View3d(tmpinst,InDialAncestor()->m_hWnd,this);
-		if (trg_uid==UID_Null)	tmpview->MakeInteractive(WinMode::WIN,*(CRect*)NULL,false,flag);
-		else					tmpview->MakeInteractive(WinMode::WIN,*(CRect*)NULL,true);
+		if (trg_uid==UID_Null)	tmpview->MakeInteractive(WinMode::WIN,nullptr,false,flag);
+		else					tmpview->MakeInteractive(WinMode::WIN,nullptr,true);
 	}
 
 //#pragma message("RTestSh1.cpp - paused for profiling")
@@ -353,6 +370,7 @@ BEGIN_MESSAGE_MAP(Rtestsh1, CDialog)
 //	ON_BN_CLICKED(IDC_ReplayRecord, OnReplayRecord)
 //	ON_BN_CLICKED(IDC_Comms, OnComms)
 	ON_WM_PAINT()
+	ON_WM_LBUTTONDOWN()
 	ON_MESSAGE( WM_GETSTRING, OnGetString)
 
 	//}}AFX_MSG_MAP

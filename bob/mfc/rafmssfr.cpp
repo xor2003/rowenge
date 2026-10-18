@@ -123,10 +123,6 @@ void RAFMissionFolder::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_PATROLS, m_IDC_PATROLS);
 	//}}AFX_DATA_MAP
 	GETDLGITEM(IDC_RLISTBOXCTRL1)->AddString("",0);
-//DeadCode JIM 3Nov00 	int	colwidtotal=GETDLGITEM(IDC_RLISTBOXCTRL1)->GetColumnWidth(4)+GETDLGITEM(IDC_RLISTBOXCTRL1)->GetColumnWidth(5);
-//DeadCode JIM 3Nov00 	GETDLGITEM(IDC_RLISTBOXCTRL1)->SetColumnWidth(4,colwidtotal-3);
-//DeadCode JIM 3Nov00 	GETDLGITEM(IDC_RLISTBOXCTRL1)->SetColumnWidth(5,1);
-//DeadCode JIM 3Nov00 
 }
 
 
@@ -173,7 +169,6 @@ void	RAFMissionFolder::FindPackages()
 			{
 
 				int i=0;
-//DeadCode JIM 20Oct00 				int acnum = 0;
 				while (i < pk.squadlist)
 				{
 						FillPackList(pack, pk[i].targetindex, pk.attackmethod, 
@@ -196,8 +191,6 @@ void RAFMissionFolder::FillPackList(UWord	pack, UByte	target, UByte method, UWor
 			packlist[i]=packlist[i+WRAPTHROW];
 		currpacklist-=WRAPTHROW;
 	}
-//DeadCode JIM 2Oct00 	if (currpacklist < MAX_PACKLIST)
-//DeadCode JIM 2Oct00 	{
 		packlist[currpacklist].pack = pack;
 		packlist[currpacklist].target = target;
 		packlist[currpacklist].method = method;
@@ -205,7 +198,6 @@ void RAFMissionFolder::FillPackList(UWord	pack, UByte	target, UByte method, UWor
 		packlist[currpacklist].squadron = squadron;
 		packlist[currpacklist].sqnum = sqnum;
 		packlist[currpacklist++].numofac = numofac;
-//DeadCode JIM 2Oct00 	}
 }
 void	RAFMissionFolder::RefreshButtons()
 {
@@ -310,7 +302,6 @@ void	RAFMissionFolder::RefreshList()
 {
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(40);
 	//rlistbox->AddColumn(70);										  //RDH 02/06/99
@@ -333,8 +324,6 @@ void	RAFMissionFolder::RefreshList()
 
 	int p=0;
 	int t;
-//DeadCode JIM 5Nov00 	sq;
-//DeadCode JIM 5Nov00 	Squadron* lwsq;
 	
 	while (packlist[p].pack != 65535)
 	{
@@ -344,18 +333,13 @@ void	RAFMissionFolder::RefreshList()
  		char* raidletter = Todays_Packages.RaidFormatString(packlistP.pack,0);
 		rlistbox->AddString(CSprintf(raidletter, pk.raidnumentries[0].raidnum),0);
 
-//DEADCODE RDH 12/04/00 		rlistbox->AddString(CSprintf("F%03i", pk.raidnumentries[0].raidnum),0);
 
-//DEADCODE RDH 21/01/00 		int sqnum = packlist[p].squadron;
-//DEADCODE RDH 21/01/00 		SquadNum squid = Node_Data.squadron[sqnum].squadron;
-//DEADCODE RDH 21/01/00 		sq = Node_Data[squid];
 
 		Squadron* sq = Node_Data[(SquadNum)packlistP.squadron];
 		rlistbox->AddString(CSprintf("%4s (%i)",sq->SubName(), packlistP.numofac),1);
 
 
 
-//DEADCODE CSB 08/05/00 		rlistbox->AddString(RESLIST(PS_SPARE,pk.packagestatus),2);
  		rlistbox->AddString(RESLIST(PS_SPARE,pk[packlistP.sqnum].status),2);		//JIM 6Sep00
 
 
@@ -371,19 +355,16 @@ void	RAFMissionFolder::RefreshList()
 
 		if (trguid>IllegalBAND || uidband == SagBAND)
 		{
-			Todays_Packages.GetACSquadEntry(trguid,lwpack,sqnum);
+			Todays_Packages.GetACSquadEntry(trguid,lwpack,&sqnum);
 			
 			Profile& lwpk = Todays_Packages.pack[lwpack];
-//DEADCODE RDH 12/04/00 			rlistbox->AddString(GetTargName(trguid),4);
 
 			int raidline = lwpk.GetRaidIndFromSquadEntry(sqnum);
 
 			char* raidletter = Todays_Packages.RaidFormatString(lwpack,raidline);
 			CString raidmsg=CSprintf(raidletter, lwpk.raidnumentries[raidline].raidnum);
-//DeadCode JIM 3Nov00 			rlistbox->AddString(raidmsg,4);
 
 
-//DEADCODE RDH 12/04/00  			rlistbox->AddString(CSprintf("R%03i", lwpk.raidnumentries[raidline].raidnum),4);
 
 			int firstsq = lwpk.raidnumentries[raidline].squadliststart;
 			int i = firstsq;
@@ -547,25 +528,6 @@ BOOL RAFMissionFolder::OnInitDialog()
 	TotalRefresh();
 
 
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("1",0);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("60 Spitfire(4)",1);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("Engaging",2);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("3/2",3);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("H100",4);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("100+",5);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("Incoming",6);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("Biggin Hill",7);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("Operational",8);
-//DEADCODE RDH 14/01/00 
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("2",0);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("25 Hurricane(3)",1);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("Approaching",2);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("0/0",3);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("H102",4);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("20+",5);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("Outgoing",6);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("Kenley",7);
-//DEADCODE RDH 14/01/00 	rlistbox->AddString("Damaged",8);
 
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -579,7 +541,6 @@ BEGIN_EVENTSINK_MAP(RAFMissionFolder, CDialog)
 	ON_EVENT(RAFMissionFolder, IDC_RBUTTONDELETE, 1 /* Clicked */, OnClickedRbuttondelete, VTS_NONE)
 	ON_EVENT(RAFMissionFolder, IDC_RBUTTONINTELL, 1 /* Clicked */, OnClickedRbuttonintell, VTS_NONE)
 	ON_EVENT(RAFMissionFolder, IDC_RBUTTONSQUADRON, 1 /* Clicked */, OnClickedRbuttonsquadron, VTS_NONE)
-//DeadCode JIM 29Sep00 	ON_EVENT(RAFMissionFolder, IDC_RBUTTONRTB, 1 /* Clicked */, OnClickedRbuttonrtb, VTS_NONE)
 	ON_EVENT(RAFMissionFolder, IDC_RLISTBOXCTRL1, 1 /* Select */, OnSelectRlistboxctrl1, VTS_I4 VTS_I4)
 	ON_EVENT(RAFMissionFolder, IDC_OUTGOING, 1 /* Clicked */, OnClickedOutgoing, VTS_NONE)
 	ON_EVENT(RAFMissionFolder, IDC_LANDED, 1 /* Clicked */, OnClickedLanded, VTS_NONE)
@@ -612,11 +573,7 @@ void RAFMissionFolder::OnClickedRbuttontask()
 			TitleBarPtr().OpenRAFTask();
 	}else
 	{//revector
-//DEADCODE RDH 17/05/00 		Save_Data.mapfilters = 0;
-//DEADCODE RDH 17/05/00 		Save_Data.mapfilters|=FILT_LWSAG;
 
-//DEADCODE RDH 17/05/00 		m_pView->m_mapdlg.Invalidate();
-//DEADCODE RDH 17/05/00 
 		TitleBarPtr().OpenSelTrg(packlist[currpack].sqnum, -1, PackageList::DISPLAY_STAFFEL, STM_LWAC);
 		TotalRefresh();
 
@@ -651,7 +608,7 @@ void RAFMissionFolder::OnClickedRbuttonintell()
 	int lwpack = -1, sqnum=0;
 	if (objective)
 		if (objective>IllegalBAND || Persons2::getbandfromUID(objective)==SagBAND)
-			Todays_Packages.GetACSquadEntry(objective,lwpack,sqnum);
+			Todays_Packages.GetACSquadEntry(objective,lwpack,&sqnum);
 	if (lwpack>=0)
 	{
 		RDialog::m_pView->SetHiLightInfo(lwpack, sqnum,UID_Null);
@@ -687,11 +644,6 @@ void RAFMissionFolder::OnClickedRbuttonsquadron()
 #endif	
 }
 
-//DeadCode JIM 29Sep00 void RAFMissionFolder::OnClickedRbuttonrtb() 
-//DeadCode JIM 29Sep00 {	SUBFUNCTION OF DELETE
-//DeadCode JIM 29Sep00 	// TODO: Add your control notification handler code here
-//DeadCode JIM 29Sep00 	
-//DeadCode JIM 29Sep00 }
 
 void RAFMissionFolder::OnSelectRlistboxctrl1(long row, long column) 
 {

@@ -40,7 +40,7 @@
 #endif
 struct	sagmove_REQUIRED
 {
-	static void	MoveAllSAGs(WorldStuff& world = *(WorldStuff*)NULL);
+	static void	MoveAllSAGs(WorldStuff* world = NULL);
 	void   MoveSAG(PARAMS);
 	void   DecideSAG(PARAMS);
 	void	SAGWPAction(PARAMS);
@@ -77,7 +77,6 @@ struct	sagmove_REQUIRED
 	void	SAGDecisionDeathGlide(PARAMS);								//CSB 15Aug00
 
 //SAGairgrp specific:
-//DEADCODE DAW 21/02/00 	int	GetCruiseAt(Coords3D& pos);
 	void	SAGMovementFollowWP(int p,int s,int sparesecs);
 	void	SAGExecuteWaypoint(int p,int s);
 	int		FakeDamage(UniqueID target,int numbombers,PlaneTypeSelect attackertype,UniqueID reportsuccess);	//returns true if target becomes dead.

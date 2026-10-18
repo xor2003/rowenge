@@ -264,10 +264,6 @@ RDialog*	RDialog::MakeParentDialog(CRect dialsize,RDialog* parent,const DialBox*
 			}
 		}
 	}
-//DEADCODE JIM 05/04/00 	// scale the dialog if necessary due to font size change
-//DEADCODE JIM 05/04/00 	if (dialsize.Width()>=640 && dialsize.Height()>=480)		//RJS 08Sep98
-//DEADCODE JIM 05/04/00 		main->m_scalingfactor=1;								//RJS 08Sep98
-//DEADCODE JIM 05/04/00 	else														//RJS 08Sep98
 		main->m_scalingfactor=(float)fontdpi/96;				//RJS 08Sep98
 	main->ScaleDialog(1);
 	if (parent)
@@ -291,10 +287,6 @@ RDialog*	RDialog::MakeParentDialog(CRect dialsize,RDialog* parent,const DialBox*
 		return NULL;
 	}
 	// scale the dialog if necessary due to font size change
-//DeadCode MS 28Oct100 	if (dialsize.Width()>=640 && dialsize.Height()>=480)	
-//DeadCode MS 28Oct100 		dial->m_scalingfactor=1;							
-//DeadCode MS 28Oct100 	else													
-//DeadCode MS 28Oct100 		dial->m_scalingfactor=(float)fontdpi/96;
 	dial->ScaleDialog(1);
 	dial->m_ReallyDestroyed=TRUE;
 	CRect rect;
@@ -493,7 +485,7 @@ RDialog*	RDialog::MakeParentDialog(CRect dialsize,RDialog* parent,const DialBox*
 RDialog* RDialog::AddPanel(const DialBox* tree, int X2flag,CRect dialsize)
 {
 	const DialBox *  b[2]={tree,NULL};
-	return AddChildren(b,X2flag,dialsize);
+	return AddChildren(b,X2flag,&dialsize);
 }
 
 
@@ -548,7 +540,7 @@ volatile int progressind=0;
 //Description: PANELS WITHIN PANELS
 //
 //////////////////////////////////////////////////////////////////////
-RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& rect)			  
+RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect* rect)			  
 {
 	int	usedy=homesize.Height();
 	RDialog* dial=NULL;
@@ -568,7 +560,6 @@ RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& re
 		dial->dchild=dial->fchild=NULL;
 		CRect posn;
 
-//DeadCode JIM 10Jun99 		dial->dragstate=DRAG_NO;
 		dial->artnum=diallist[i]->art;
 		dial->m_scalingfactor=(float)fontdpi/96;
 		dial->Create(dial->MY_IID,this);
@@ -579,9 +570,9 @@ RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& re
 		dial->dragstate=DRAG_NO;
 		int uid=IDJ_PANEL0+i;
 		CWnd* cntrl=GetDlgItem(uid);		//don't know if I should delete this!!!
-		if (&rect!=NULL)
+		if (rect!=NULL)
 		{
-			posn=rect;
+			posn=*rect;
 		}
 		else
 		if (cntrl==NULL)
@@ -644,11 +635,6 @@ RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& re
 		}
 		dial->MoveWindow(dial->viewsize);		//IDC_BUTTON1
 		CRect tempviewsize=dial->viewsize;
-//DeadCode JIM 10Jun99 		dial->m_scalingfactor=(float)fontdpi/96;
-//DeadCode JIM 10Jun99 		if (X2flag)
-//DeadCode JIM 10Jun99 			dial->ScaleDialog(2);
-//DeadCode JIM 10Jun99 		else
-//DeadCode JIM 10Jun99 			dial->ScaleDialog(1);
 //		dial->MoveWindow(tempviewsize);
 		const	DialBox*const* l=diallist[i]->diallist;
 		if (diallist[i]->childtype>=DialMake::TABT)
@@ -715,7 +701,6 @@ RDialog*	RDialog::AddChildren(const DialBox*const* diallist,int X2flag,CRect& re
 //////////////////////////////////////////////////////////////////////
 void	RDialog::AddChildren(const DialBox*const* diallist,DialMake::ChildType childtype,const IdList* titles)
 {
-//DeadCode JIM 20Oct00 	int	usedy=homesize.Height();
 	{
 		CRTabs* tabControl;
 		tabControl=(CRTabs*)GetDlgItem(IDJ_TABCTRL);
@@ -741,8 +726,6 @@ void	RDialog::AddChildren(const DialBox*const* diallist,DialMake::ChildType chil
 //		ScreenToClient(&posn);
 		GetClientRect(posn);
 		posn.top+=30; // allow space for tabs
-//DeadCode JIM 10Jun99 		dial->RECT_NORMAL=posn;
-//DeadCode JIM 10Jun99 		dial->dragstate=DRAG_NO;
 		dial->artnum=diallist[i]->art;
 		dial->m_scalingfactor=(float)fontdpi/96;
 		dial->Create(dial->MY_IID,this);
@@ -764,8 +747,6 @@ void	RDialog::AddChildren(const DialBox*const* diallist,DialMake::ChildType chil
 		dial->MoveWindow(dial->viewsize);		//IDC_BUTTON1
 		CRect tempviewsize=dial->viewsize;
 		// scale the dialog if necessary due to font size change
-//DeadCode JIM 10Jun99 		dial->m_scalingfactor=(float)fontdpi/96;
-//DeadCode JIM 10Jun99 		dial->ScaleDialog(1);
 //		dial->MoveWindow(tempviewsize);
 		if (diallist[i]->childtype>=DialMake::TABT)
 		{
@@ -1338,7 +1319,6 @@ void RDialog::DoPaint(CDC* pDC)
 				if (newparent->artnum==artnum)
 				{
 //TEMPCODE JIM 17/05/99 					m_bDrawBackground=TRUE;
-//DEADCODE RDH 26/11/99 					EndPaint(&paintstruct);
 					return;
 				}
 			}
@@ -1356,11 +1336,6 @@ void RDialog::DoPaint(CDC* pDC)
 			pDC->SetDIBitsToDevice(short(offsets & 0x0000FFFF),short((offsets & 0xFFFF0000)>>16),pInfo->bmiHeader.biWidth, pInfo->bmiHeader.biHeight,
 				0,0,0,pInfo->bmiHeader.biHeight,pData,pInfo,DIB_RGB_COLORS);
 
-//DEADCODE JIM 19/05/99 //test wipe...
-//DEADCODE JIM 19/05/99 			static int	rgb=0;
-//DEADCODE JIM 19/05/99 			rgb=(rgb+0x004008)&0x00ffffff;
-//DEADCODE JIM 19/05/99 			pDC->FillSolidRect(0,0,2048,2048,COLORREF(rgb));
-//DEADCODE JIM 19/05/99 //test wipe...
 
 
 		}
@@ -2069,15 +2044,6 @@ long RDialog::OnGetXYOffset()
 	RDialog* top=InDialAncestor();
 	if (top->fchild && top->fchild->artnum==artnum)
 	{
-//DEADCODE RDH 03/11/99 		CWnd* title;
-//DEADCODE RDH 03/11/99 		title=top->fchild->GetDlgItem(IDJ_TITLE);
-//DEADCODE RDH 03/11/99 		if (title)
-//DEADCODE RDH 03/11/99 		{
-//DEADCODE RDH 03/11/99 //			TRACE0("Detected Title\n");
-//DEADCODE RDH 03/11/99 			CRect titlerect;
-//DEADCODE RDH 03/11/99 			title->GetClientRect(titlerect);
-//DEADCODE RDH 03/11/99 			offsety+=titlerect.Height();
-//DEADCODE RDH 03/11/99 		}
 		//delete title;
 	}
 	offsetx-=homesize.left;
@@ -2656,8 +2622,8 @@ int	ScaleTranslate(int input,bool isy)
 	else
 		if (currval==scalinglookup[high][isy][1])
 			return scalinglookup[high][isy][0];		//found exact match
-		if (currval+1==scalinglookup[high][isy][1])
-			return scalinglookup[high][isy][0]-1;		//just under
+	if (currval+1==scalinglookup[high][isy][1])
+		return scalinglookup[high][isy][0]-1;		//just under
 		else
 			if (currval==scalinglookup[low][isy][1]+1)
 				return scalinglookup[low][isy][0]+1;	//just over
@@ -2841,12 +2807,6 @@ int RDialog::RMessageBox(CString TitleID, CString MessageID, UINT Button0ID, UIN
 		if (main->toolbars[t])
 			main->toolbars[t]->EnableWindow(FALSE);
 	}}
-//DeadCode DAW 11Jul00 	main->m_titlebar.EnableWindow(FALSE);
-//DeadCode DAW 11Jul00 	main->m_toolbar1.EnableWindow(FALSE);
-//DeadCode DAW 11Jul00 	main->m_toolbar2.EnableWindow(FALSE);
-//DeadCode DAW 11Jul00 	main->m_toolbar3.EnableWindow(FALSE);
-//DeadCode DAW 11Jul00 	main->m_toolbar4.EnableWindow(FALSE);
-//DEADCODE RDH 08/11/99 	main->m_toolbar5.EnableWindow(FALSE);
 	if (main->m_wndSystemBox)
 		main->m_wndSystemBox->InDialAncestor()->EnableWindow(FALSE);
 #endif #ifndef	BOB_DEMO_VER
@@ -2860,12 +2820,6 @@ int RDialog::RMessageBox(CString TitleID, CString MessageID, UINT Button0ID, UIN
 		if (main->toolbars[t])
 			main->toolbars[t]->EnableWindow(TRUE);
 	}}
-//DeadCode DAW 11Jul00 	main->m_titlebar.EnableWindow(TRUE);
-//DeadCode DAW 11Jul00 	main->m_toolbar1.EnableWindow(TRUE);
-//DeadCode DAW 11Jul00 	main->m_toolbar2.EnableWindow(TRUE);
-//DeadCode DAW 11Jul00 	main->m_toolbar3.EnableWindow(TRUE);
-//DeadCode DAW 11Jul00 	main->m_toolbar4.EnableWindow(TRUE);
-//DEADCODE RDH 08/11/99 	main->m_toolbar5.EnableWindow(TRUE);
 	if (main->m_wndSystemBox)
 		main->m_wndSystemBox->InDialAncestor()->EnableWindow(TRUE);
 #endif #ifndef	BOB_DEMO_VER
@@ -2880,14 +2834,10 @@ LRESULT RDialog::OnCommandHelp(WPARAM w, LPARAM lParam)
 	if ((main->disablehelp&1)==0)					//assume every panel has context help
 		return CDialog::OnCommandHelp(w,lParam);
 
-//DEADCODE DAW 23/11/99 	if (MY_IID == IDD_FOOTAGE)
-//DEADCODE DAW 23/11/99 	  return (1);
 
 	if (parent)
 		if (
 				parent->MY_IID==IDDS_EMPTYDIAL
-//DEADCODE RDH 24/02/99 			||	
-//DEADCODE RDH 24/02/99 			parent->MY_IID==IDD_FULLPANE
 			)
 			return CDialog::OnCommandHelp(w,lParam);
 		else
@@ -2901,17 +2851,6 @@ LRESULT RDialog::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 #ifndef NDEBUG
 	// TODO: Add your specialized code here and/or call the base class
-//DeadCode JIM 11Oct00 static int r=0;
-//DeadCode JIM 11Oct00 	if ( message!=0x113)  //message!=0x363 &&
-//DeadCode JIM 11Oct00 	{
-//DeadCode JIM 11Oct00 		Mono_Text.PrintAt(30,r,(UByte*)"   ");
-//DeadCode JIM 11Oct00 		r++;
-//DeadCode JIM 11Oct00 		if (r==25) r=0;
-//DeadCode JIM 11Oct00 		Mono_Text.PrintAt(30,r,(UByte*)"<--");
-//DeadCode JIM 11Oct00 		Mono_Text.PrintHexAt(0,r,message,8);
-//DeadCode JIM 11Oct00 		Mono_Text.PrintHexAt(10,r,wParam,8);
-//DeadCode JIM 11Oct00 		Mono_Text.PrintHexAt(20,r,lParam,8);
-//DeadCode JIM 11Oct00 	}
 	return CDialog::WindowProc(message, wParam, lParam);
 #else
 	return 0;

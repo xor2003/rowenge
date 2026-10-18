@@ -183,20 +183,6 @@ void RAFDirectiveResults::OnCancel()
 	CDialog::OnCancel();
 }
 
-//DEADCODE RDH 03/04/00 int RAFDirectiveResults::SquadsAtField(UniqueID uidaf)
-//DEADCODE RDH 03/04/00 {
-//DEADCODE RDH 03/04/00 
-//DEADCODE RDH 03/04/00 
-//DEADCODE RDH 03/04/00 	int k=0, numsq = 0;
-//DEADCODE RDH 03/04/00 	while (Node_Data.squadron[k].squadron != SQ_ZERO)
-//DEADCODE RDH 03/04/00 	{
-//DEADCODE RDH 03/04/00 			if (Node_Data.squadron[k].homeairfield == uidaf)
-//DEADCODE RDH 03/04/00 			numsq++;
-//DEADCODE RDH 03/04/00 		k++;
-//DEADCODE RDH 03/04/00 	}
-//DEADCODE RDH 03/04/00 	return (numsq);
-//DEADCODE RDH 03/04/00 }
-//DEADCODE RDH 03/04/00 
 void RAFDirectivesResults::MoveSquadron(int sqnum,  int loc0, int loc1, int loc2)
 {
 	//loc0, 1 and 2 are the preferred locations in order of merit, first is best
@@ -224,7 +210,6 @@ void RAFDirectivesResults::MoveSquadron(int sqnum,  int loc0, int loc1, int loc2
 		
 	AirField Airfields[MAX_AF];
 
-//DeadCode JIM 20Oct00 	int index = -1;
 	int i = 0;
 	int j;
 	while (i < MAX_AF)
@@ -308,7 +293,6 @@ void RAFDirectivesResults::MoveSquadron(int sqnum,  int loc0, int loc1, int loc2
 	Airfields[j].uid = UID_NULL;
 
 
-//DeadCode RDH 10Sep00 	Squadron* sq = &Node_Data[Node_Data.squadron[sqnum].squadron];
 	Squadron* sq = Node_Data.squadron[sqnum];
 	int maxaf = j;
 	if (j > 0)
@@ -373,7 +357,6 @@ void RAFDirectivesResults::MoveSquadronswrtFrontLine()
 		UniqueID uid = Node_Data.squadron[i].homeairfield;
 		TargetFighterField* af;
 		af = Node_Data[uid];
-//DeadCode JIM 20Oct00 		int loc = af->location;
 		if 	(af->location == Target::LOC_N_LON)
 		{
 			if (newfrontlinefields	== COASTAL)
@@ -431,27 +414,11 @@ void RAFDirectivesResults::MakeRAFPatrols(RAFDirectivesResults* dr)
 	while (dr->dirresults[i].target != UID_NULL)
 	{
 		int packnum;
-//DEADCODE RDH 15/05/00 		packnum=Todays_Packages.NewPackage(dr->dirresults[i].target,
-//DEADCODE RDH 15/05/00 								NAT_RAF,
-//DEADCODE RDH 15/05/00 								Profile::AM_PATROL,
-//DEADCODE RDH 15/05/00 								(dr->dirresults[i].unitsize+1)*12,	//0 squad, 1 paired, 2 big wing
-//DEADCODE RDH 15/05/00 								dr->dirresults[i].mission.acselectionrules
-//DEADCODE RDH 15/05/00 
-//DEADCODE RDH 15/05/00 											);
 		packnum=Todays_Packages_NewPackage(dr->dirresults[i].target,
 								dr->dirresults[i].mission);					
 		if (packnum!=-1)
 		{
-//DEADCODE RDH 17/04/00 			Todays_Packages[packnum].AddNumerousEscorts(0,0,0,Profile::BR_WIDESTPOSSIBLE);
-//DeadCode JIM 9Oct00 			if (dr->dirresults[i].mission.acselectionrules&Profile::BR_B_ALLOWGRP11)
-//DeadCode JIM 9Oct00 				Todays_Packages[packnum].CalcRoutePositionsAndTime(MMC.currperiodtime+HR01 );
-//DeadCode JIM 9Oct00 			else
 			Todays_Packages[packnum].CalcRoutePositionsAndTime(MMC.currperiodtime+dr->dirresults[i].ETA );
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].RecalcRoutePositions();
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].primarytargetETA = Todays_Packages[packnum].FindEarliestPrimaryTargetETA();//+(int)HR01;
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].SetPredictedPointFromETA(true);
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].RecalcRoutePositions();
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].primarytargetETA = Todays_Packages[packnum].FindEarliestPrimaryTargetETA();//+(int)HR01;
 		}
 		i++;
 	}
@@ -630,10 +597,11 @@ int	RAFDirectivesResults::InterceptSanctioned(int pack, int raid)
 		int totallw = strike + detachedescort+ attachedescort+returnescort;
  		if (!MMC.directives.raf.current.sanctioned[Directives::RAF::ANTISWEEP])							//MS 24Oct00
 		{																						//MS 24Oct00
-			int dummystrike;																	//MS 24Oct00
+			int dummystrike=0;																	//MS 24Oct00
 			RaidAcNumbers(pack, -1, dummystrike, detachedescort, attachedescort, returnescort);	//MS 24Oct00
 			totallw =  detachedescort+ attachedescort+returnescort;						//MS 24Oct00
-			totallw=totallw*strike/dummystrike;
+			if (dummystrike)
+				totallw=totallw*strike/dummystrike;
 			totallw+=strike;
 		}																						//MS 24Oct00
 
@@ -667,7 +635,6 @@ int	RAFDirectivesResults::InterceptSanctioned(int pack, int raid)
 				MMC.directives.raf.userprofiles[misstype],reqalt);
 			if (packnum!=-1)
 			{
-//DeadCode JIM 6Sep00 				Todays_Packages[packnum].CalcRoutePositionsAndTime();
 				if (MMC.directives.raf.current.interceptbeforetarget)
 					Todays_Packages[packnum].CalcRoutePositionsAndTime(0,SGR_WPP_DogLeg);
 				else
@@ -681,7 +648,6 @@ int	RAFDirectivesResults::InterceptSanctioned(int pack, int raid)
 			}
 			else
 			{
-//DeadCode JIM 5Sep00 				INT3;	//WARNING: RAF COULDN'T RESPOND
 				Node_Data.intel.AddMessage(IntelMsg::MED_MANAGEMENT_MAN,AS_NOTSWITCH,SCRIPT_ALLUP ,Todays_Packages[pack][squadnum].instance,Todays_Packages[pack][squadnum].instance,TargetIndexes(Todays_Packages[pack][squadnum].squadnum,Todays_Packages[pack].CountRaid(squadnum)));
 
 			}
@@ -699,7 +665,6 @@ void	RAFDirectivesResults::SetUpRAFDirectives(Directives::RAF::HistTypes dirtype
 	{
 	case	Directives::RAF::HistTypes::HISTORICALSCENARIO_PHASE1:
 		{
-//DeadCode RDH 10Sep00 			Directives::RAF::SessionAI(); done in LaunchDirectiveMissions()
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIUNESC;
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIESC;
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIBIG;
@@ -707,7 +672,6 @@ void	RAFDirectivesResults::SetUpRAFDirectives(Directives::RAF::HistTypes dirtype
 		}
 	case	Directives::RAF::HistTypes::HISTORICALSCENARIO_PHASE2:
 		{
-//DeadCode RDH 10Sep00 			Directives::RAF::SessionAI(); done in LaunchDirectiveMissions()
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIUNESC;
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIESC;
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIBIG;
@@ -715,7 +679,6 @@ void	RAFDirectivesResults::SetUpRAFDirectives(Directives::RAF::HistTypes dirtype
 		}
 	case	Directives::RAF::HistTypes::HISTORICALSCENARIO_PHASE3:
 		{
-//DeadCode RDH 10Sep00 			Directives::RAF::SessionAI(); done in LaunchDirectiveMissions()
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIUNESC;
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIESC;
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIBIG;
@@ -723,7 +686,6 @@ void	RAFDirectivesResults::SetUpRAFDirectives(Directives::RAF::HistTypes dirtype
 		}
 	case	Directives::RAF::HistTypes::HISTORICALSCENARIO_PHASE4:
 		{
-//DeadCode RDH 10Sep00 			Directives::RAF::SessionAI(); done in LaunchDirectiveMissions()
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIUNESC;
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIESC;
 			MMC.directives.raf.current.sanctioned |= Directives::RAF::MissTypes::ANTIBIG;
@@ -803,7 +765,7 @@ Directives::RAF::MissTypes  RAFDirectivesResults::RAFMissType(int packnum)
 
 		if (uidband == SagBAND)
 		{
-			Todays_Packages.GetACSquadEntry(trguid,lwpack,sq);
+			Todays_Packages.GetACSquadEntry(trguid,lwpack,&sq);
 			misstype = RAFInterceptType(lwpack, sq);
 
 		}else

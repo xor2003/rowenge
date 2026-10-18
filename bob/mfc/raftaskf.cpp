@@ -110,7 +110,6 @@ void RAFTaskFighter::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RLISTBOXCTRL1, m_IDC_RLISTBOXCTRL1);
 	DDX_Control(pDX, IDC_RCOMBOPREFERREDTARGET, m_IDC_RCOMBOPREFERREDTARGET);
 	DDX_Control(pDX, IDC_RCOMBOATTACKMETHOD, m_IDC_RCOMBOATTACKMETHOD);
-//DEADCODE RDH 10/04/00 	DDX_Control(pDX, IDC_RCOMBOUNITTYPE, m_IDC_RCOMBOUNITTYPE);
 	DDX_Control(pDX, IDC_RCOMBOFORMATION, m_IDC_RCOMBOFORMATION);
 	DDX_Control(pDX, IDC_RSTATICFIGHTERSALLOCATED, m_IDC_RSTATICFIGHTERSALLOCATED);
 	DDX_Control(pDX, IDC_RSTATICFORMATION, m_IDC_RSTATICFORMATION);
@@ -279,9 +278,6 @@ void RAFTaskFighter::Refresh()
 
 
 
-//DEADCODE RDH 10/04/00 	  	combo=GETDLGITEM(IDC_RCOMBOUNITTYPE);
-//DEADCODE RDH 10/04/00 		combo->ShowWindow(false);
-//DEADCODE RDH 10/04/00 //	combo->Clear()->RESCOMBO(SQUADRON,3)->
 //					SetIndex(unitdisplaylevel);
 
 
@@ -298,46 +294,7 @@ void RAFTaskFighter::Refresh()
 
 
 	
-//DEADCODE RDH 17/01/00 	rlistbox->AddString("56 Squadron",0);
-//DEADCODE RDH 17/01/00 	rlistbox->AddString("H101",1);
 
-//DEADCODE  16/02/00 	Profile& pk = Todays_Packages.pack[Todays_Packages.hipack];
-//DEADCODE  16/02/00 	int i=0;
-//DEADCODE  16/02/00 	maxunits = 0;
-//DEADCODE  16/02/00 	while (i < pk.squadlist)
-//DEADCODE  16/02/00 	{
-//DEADCODE  16/02/00 		Squadron* sq = Node_Data[(SquadNum)pk[i].squadnum];
-//DEADCODE  16/02/00 		int actype = sq->AcType();
-//DEADCODE  16/02/00 
-//DEADCODE  16/02/00 		if (	(		(Profile::AM_DETACHED == attackmethod)
-//DEADCODE  16/02/00 					&&	(	(actype == PT_SPIT_A)	||	(actype == PT_SPIT_B))
-//DEADCODE  16/02/00 				)
-//DEADCODE  16/02/00 				||
-//DEADCODE  16/02/00 				(		  (Profile::AM_ATTACHED == attackmethod)
-//DEADCODE  16/02/00 					&&	(	(actype == PT_HURR_A)	||	(actype == PT_HURR_B))
-//DEADCODE  16/02/00 				)
-//DEADCODE  16/02/00 			)
-//DEADCODE  16/02/00 		{
-//DEADCODE  16/02/00  			CString name = sq->FullName();
-//DEADCODE  16/02/00 			rlistbox->AddString(name,0);
-//DEADCODE  16/02/00 			int lwpack = FindAssociatedLWPack(pk.packagetarget[0]);
-//DEADCODE  16/02/00 
-//DEADCODE  16/02/00 			if (lwpack >= 0)
-//DEADCODE  16/02/00 			{
-//DEADCODE  16/02/00 				Profile& lwpk = Todays_Packages.pack[lwpack];
-//DEADCODE  16/02/00 				rlistbox->AddString(CSprintf("R%i", lwpk.raidnumentries[0].raidnum),1);
-//DEADCODE  16/02/00 				rlistbox->AddString(RESLIST(PS_SPARE,pk.packagestatus),2);
-//DEADCODE  16/02/00 			}else
-//DEADCODE  16/02/00 			{
-//DEADCODE  16/02/00 				rlistbox->AddString("",1);
-//DEADCODE  16/02/00 				rlistbox->AddString("",2);
-//DEADCODE  16/02/00 			}
-//DEADCODE  16/02/00 			maxunits++;
-//DEADCODE  16/02/00 		}
-//DEADCODE  16/02/00 		i++;
-//DEADCODE  16/02/00 	}
-//DEADCODE  16/02/00 
-//DEADCODE  16/02/00 	 rlistbox->AddString(RESSTRING(NEXTAVAILABLE),0);
 
 	FillList();
 
@@ -358,7 +315,7 @@ void RAFTaskFighter::Refresh()
 
 		if (uidband == SagBAND)
 		{
-			Todays_Packages.GetACSquadEntry(trguid,lwpack,sqnum);
+			Todays_Packages.GetACSquadEntry(trguid,lwpack,&sqnum);
 			Profile& lwpk = Todays_Packages.pack[lwpack];
 
 			int raidline = lwpk.GetRaidIndFromSquadEntry(sqnum);
@@ -375,24 +332,6 @@ void RAFTaskFighter::Refresh()
 
 
 
-//DEADCODE RDH 18/05/00 		int sqnum;
-//DEADCODE RDH 18/05/00 		int lwpack;
-//DEADCODE RDH 18/05/00 		if (FindAssociatedLWPack(pk.packagetarget[0], lwpack, sqnum) )
-//DEADCODE RDH 18/05/00 		{
-//DEADCODE RDH 18/05/00 			Profile& lwpk = Todays_Packages.pack[lwpack];
-//DEADCODE RDH 18/05/00  			int raid = lwpk.GetRaidIndFromSquadEntry(sqnum);
-//DEADCODE RDH 18/05/00 
-//DEADCODE RDH 18/05/00 			char* raidletter = Todays_Packages.RaidFormatString(lwpack, raid);
-//DEADCODE RDH 18/05/00 			rlistbox->AddString(CSprintf(raidletter, lwpk.raidnumentries[raid].raidnum),1);
-//DEADCODE RDH 18/05/00 
-//DEADCODE RDH 18/05/00 
-//DEADCODE RDH 18/05/00 //DEADCODE RDH 13/04/00 			rlistbox->AddString(CSprintf("R%03i", lwpk.raidnumentries[0].raidnum),1);
-//DEADCODE RDH 18/05/00 			rlistbox->AddString(RESLIST(PS_SPARE,pk.packagestatus),2);
-//DEADCODE RDH 18/05/00 		}else
-//DEADCODE RDH 18/05/00 		{
-//DEADCODE RDH 18/05/00 			rlistbox->AddString("",1);
-//DEADCODE RDH 18/05/00 			rlistbox->AddString("",2);
-//DEADCODE RDH 18/05/00 		}
 		i++;
 	}
 	if (maxunits < 3)
@@ -408,31 +347,6 @@ int RAFTaskFighter::FindSquad(long index)
 {
 	int i = UnitList[index];
 
-//DEADCODE  16/02/00 	Profile& pk = Todays_Packages.pack[Todays_Packages.hipack];
-//DEADCODE  16/02/00 	int i=0, j =-1;
-//DEADCODE  16/02/00 	while (		(i < pk.squadlist)
-//DEADCODE  16/02/00 			&&	(j != index)
-//DEADCODE  16/02/00 		   )
-//DEADCODE  16/02/00 	{
-//DEADCODE  16/02/00 		Squadron* sq = Node_Data[(SquadNum)pk[i].squadnum];
-//DEADCODE  16/02/00 		int actype = sq->AcType();
-//DEADCODE  16/02/00 
-//DEADCODE  16/02/00 		if (	(		(Profile::AM_DETACHED == attackmethod)
-//DEADCODE  16/02/00 					&&	(	(actype == PT_SPIT_A)	||	(actype == PT_SPIT_B))
-//DEADCODE  16/02/00 				)
-//DEADCODE  16/02/00 				||
-//DEADCODE  16/02/00 				(		  (Profile::AM_ATTACHED == attackmethod)
-//DEADCODE  16/02/00 					&&	(	(actype == PT_HURR_A)	||	(actype == PT_HURR_B))
-//DEADCODE  16/02/00 				)
-//DEADCODE  16/02/00 			)
-//DEADCODE  16/02/00 		{
-//DEADCODE  16/02/00 			j++;
-//DEADCODE  16/02/00 		}
-//DEADCODE  16/02/00 			i++;
-//DEADCODE  16/02/00 	}
-//DEADCODE  16/02/00 	i--;
-//DEADCODE  16/02/00 	if (j != index)
-//DEADCODE  16/02/00 		i = -1;
 	return(i);
  
 }
@@ -461,8 +375,6 @@ void RAFTaskFighter::OnSelectRlistboxctrl1(long row, long column)
 {
 #ifndef	BOB_DEMO_VER
 
-//DeadCode JIM 9Oct00 	if (column == 0)
-//DeadCode JIM 9Oct00 	{
 		Profile& pk = Todays_Packages.pack[Todays_Packages.hipack];
 		bool spitfire;
 		PackageList::AMType*	amtype;
@@ -493,10 +405,6 @@ void RAFTaskFighter::OnSelectRlistboxctrl1(long row, long column)
 		{
 			if (maxunits < 3)
 			{
-//DEADCODE RDH 10/05/00 				if (maxunits == 0)
-//DEADCODE RDH 10/05/00 				{
-//DEADCODE RDH 10/05/00 					pk.AddSquadron(-1,(Profile::AttackMethod) pk.attackmethod,0,br);
-//DEADCODE RDH 10/05/00 				}else 
 				if 	(amtype->acnum >= 1)
 					pk.CompleteSquadron((Profile::AttackMethod) pk.attackmethod);
 				else
@@ -506,20 +414,6 @@ void RAFTaskFighter::OnSelectRlistboxctrl1(long row, long column)
 			TitleBarPtr().OpenAcUnitRAF(FindSquad(row-1), spitfire,tab, attackmethod);	
 
 
-//DeadCode JIM 9Oct00 	}else
-//DeadCode JIM 9Oct00 	{
-//DeadCode JIM 9Oct00 		if ((column == 1) && (row <= maxunits) && (maxunits != 0))
-//DeadCode JIM 9Oct00 		{
-//DeadCode JIM 9Oct00 			Profile& pk = Todays_Packages.pack[Todays_Packages.hipack];
-//DeadCode JIM 9Oct00 			Squadron* sq = Node_Data[(SquadNum)pk[FindSquad(row-1)].squadnum];
-//DeadCode JIM 9Oct00 			UniqueID trguid = pk.packagetarget[pk[FindSquad(row-1)].targetindex];
-//DeadCode JIM 9Oct00 			int uidband=Persons2::getbandfromUID(trguid);	
-//DeadCode JIM 9Oct00 			if (uidband == SagBAND)
-//DeadCode JIM 9Oct00 				TitleBarPtr().OpenSelTrg(FindSquad(row-1), tab, PackageList::DISPLAY_STAFFEL,STM_LWAC);
-//DeadCode JIM 9Oct00 			else
-//DeadCode JIM 9Oct00 				TitleBarPtr().OpenSelTrg(FindSquad(row-1), tab, PackageList::DISPLAY_STAFFEL,STM_GROUND);
-//DeadCode JIM 9Oct00 		}
-//DeadCode JIM 9Oct00 	}
 #endif	
 }
 

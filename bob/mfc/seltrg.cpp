@@ -110,14 +110,7 @@ SelectTarget::SelectTarget(int squad, int tab,int unitdisplaylevel, SelectTarget
 	udl = unitdisplaylevel ;
 
 
-//DeadCode JIM 26Sep00 	Save_Data_tmp = Save_Data;
-//DeadCode JIM 26Sep00 	Save_Data.mapfilters %=	FILT_RAFSAG;		//never want raf on sel trg
 
-//DeadCode JIM 26Sep00 	if (lwonly)
-//DeadCode JIM 26Sep00 	{
-//DeadCode JIM 26Sep00 		Save_Data.mapfilters = 0;
-//DeadCode JIM 26Sep00 		Save_Data.mapfilters|=FILT_LWSAG;
-//DeadCode JIM 26Sep00 	}
 	m_pView->m_mapdlg.Invalidate();
 
 #endif
@@ -201,8 +194,6 @@ void	SelectTarget::RefreshData(int targetid)
  			}else
 				pk.packagetarget[pk[currsquad].targetindex].currentid = (UniqueID)targetid;
 		}
-//DEADCODE RDH 08/05/00 		MainToolBar().DialoguesVisible(true);
-//DEADCODE RDH 08/05/00 		TitleBarPtr().DialoguesVisible(true);
 
 		RDialog*	taskdial = TitleBarPtr().LoggedChild(TitleBar::TASK);
 		if (taskdial)
@@ -213,7 +204,7 @@ void	SelectTarget::RefreshData(int targetid)
 	}else
 	{
 		int packnum,sqline;
-		if (Todays_Packages.GetACSquadEntry((UniqueID)targetid,packnum,sqline))
+		if (Todays_Packages.GetACSquadEntry((UniqueID)targetid,packnum,&sqline))
 		{
 			Todays_Packages.pack[Todays_Packages.hipack].ReassignTo((UniqueID)targetid, true);;
 		}
@@ -258,7 +249,6 @@ void SelectTarget::OnClickedRbuttoncancel()
 	m_pView->m_mapdlg.TargetSelectSink=NULL;
 	MainToolBar().DialoguesVisible(true);
 	TitleBarPtr().DialoguesVisible(true);
-//DeadCode JIM 26Sep00 	Save_Data = Save_Data_tmp;
 	m_pView->m_mapdlg.Invalidate();
 
 #endif
@@ -272,7 +262,6 @@ void SelectTarget::OnOK()
 	m_pView->m_mapdlg.TargetSelectSink=NULL;
 	MainToolBar().DialoguesVisible(true);
 	TitleBarPtr().DialoguesVisible(true);
-//DeadCode JIM 26Sep00 	Save_Data = Save_Data_tmp;
 	m_pView->m_mapdlg.Invalidate();
 #endif
 	OnClickedRbuttonreset() ;

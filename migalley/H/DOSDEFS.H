@@ -253,7 +253,7 @@ IFShare,*IFShareP;
 //RERUN ?? #define repeat			do
 //RERUN ?? #define	until(x)		while(!(x))
 //RERUN ?? #define	proc			void 
-#define	NULLREF(t)		*(t*)NULL
+//#define	NULLREF(t)		*(t*)NULL  // removed: null-ref idiom eliminated
 
 typedef	struct	COORDS3D
 {	SLong	X,Y,Z;

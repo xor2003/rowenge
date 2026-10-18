@@ -93,8 +93,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "radio.g"
 #include "monotxt.h"
 
-//DeadCode JON 10Nov00 HINSTANCE	g_hinst;			//for .AVI playing
-//DeadCode JON 10Nov00 HWND		g_hwndMCIWnd;
 
 #ifdef _DEBUG
 //#define new DEBUG_NEW
@@ -163,11 +161,6 @@ void RFullPanelDial::ResetLoadGameOption()
 {
 	CRListBox* prlistbox;
 	prlistbox=GETDLGITEM(IDC_RLISTBOX);
-//DeadCode AMM 21Feb100	if	(		(_DPlay.GameType == DPlay::COMMSCAMPAIGN)
-//DeadCode AMM 21Feb100			&&	(_DPlay.UIPlayerType == DPlay::PLAYER_HOST)
-//DeadCode AMM 21Feb100		)
-//DeadCode AMM 21Feb100		prlistbox->ReplaceString(RESSTRING(LOADGAME),0,2);
-//DeadCode AMM 21Feb100	else
 	prlistbox->ReplaceString("",0,2);
 }
 void RFullPanelDial::ResetQuitOption()
@@ -201,7 +194,7 @@ Bool RFullPanelDial::QuickMissionBlue()
 				ilun[initind][1]=grp;
 				initind++;
 			}
-	const DialBox&	ND=*(DialBox*)NULL;
+	const DialBox&	ND=DialBox::Null();
 
 	LaunchDial(1,
 		DialList(DialBox(FIL_NULL,new QuickMissionPanel),			
@@ -234,7 +227,7 @@ Bool RFullPanelDial::QuickMissionRed()
 				ilch[initindch][1]=grp;
 				initindch++;
 			}
-	const DialBox&	ND = *(DialBox*)NULL;
+	const DialBox&	ND = DialBox::Null();
 
 	LaunchDial(1,
 		DialList(DialBox(FIL_NULL,new QuickMissionPanel),			
@@ -287,7 +280,6 @@ Bool RFullPanelDial::QuickViewInit()
 	{
 	for (int wave=0;wave<8;wave++)
 		for (int grp=0;grp<3;grp++)
-//DeadCode AMM 10Aug00 			if (CSQuick1::quickdef.line[0][wave][grp].flights)
 			if (CSQuick1::quickdef.line[1][wave][grp].flights)	//AMM 10Aug00
 			{
 				ilun[initind][0]=wave;
@@ -300,7 +292,6 @@ Bool RFullPanelDial::QuickViewInit()
 	int initindch=0;
 	for (int wave=0;wave<8;wave++)
 		for (int grp=0;grp<3;grp++)
-//DeadCode AMM 10Aug00 			if (CSQuick1::*quickdef.line[1][wave][grp].flights)
 			if (CSQuick1::quickdef.line[0][wave][grp].flights)	//AMM 10Aug00
 			{
 				ilch[initindch][0]=wave;
@@ -377,7 +368,6 @@ Bool RFullPanelDial::StartFlying()
 
 bool RFullPanelDial::OnFlyingClosed(RDialog*,int rv)
 {
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("OnFlyingClosed{"));
 
 	FullScreen* s=NULL;
 
@@ -395,14 +385,6 @@ bool RFullPanelDial::OnFlyingClosed(RDialog*,int rv)
 		}														//AMM 18Feb99
 
 		in3d=false;
-//DeadCode AMM 26Feb99		if (_Replay.PlaybackCampDebrief)
-//DeadCode AMM 26Feb99		{
-//DeadCode AMM 26Feb99			MMC.indebrief = true;
-//DeadCode AMM 26Feb99		}
-//DeadCode AMM 26Feb99		else
-//DeadCode AMM 26Feb99		{
-//DeadCode AMM 26Feb99			MMC.indebrief=false;
-//DeadCode AMM 26Feb99		}
 
 #ifndef	BOB_DEMO_VER
 		CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
@@ -414,7 +396,6 @@ bool RFullPanelDial::OnFlyingClosed(RDialog*,int rv)
 		}
 		else if (_Replay.MenuViewPlayback)
 		{
-//DeadCode AMM 17Feb99			_Replay.MenuViewPlayback=false;
 			LaunchScreen(&replayload);
 			_Replay.QMPlayback=false;
 		}
@@ -454,19 +435,16 @@ bool RFullPanelDial::OnFlyingClosed(RDialog*,int rv)
 			_Replay.QMPlayback=false;
 			if (!_Replay.MapPlayback)
 			{
-//DeadCode AMM 7Aug00 				MMC.indebrief = TRUE;
 				CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
 
 				if (_DPlay.PlayerCreated) //AMM 17/05/99
 				{ //AMM 17/05/99
 					if (_DPlay.Host) //AMM 17/05/99
 					{
-//DeadCode AMM 16Nov99						_DPlay.SendInMapMessage(); //AMM 17/05/99
 						_DPlay.SendStatusChange(DPlay::CPS_MAP);
 					}
 					else //AMM 17/05/99
 					{
-//DeadCode AMM 16Nov99						_DPlay.SendInDebriefMessage(); //AMM 17/05/99
 						_DPlay.SendStatusChange(DPlay::CPS_DEBRIEF);
 					}
 				} //AMM 17/05/99
@@ -492,8 +470,6 @@ bool RFullPanelDial::OnFlyingClosed(RDialog*,int rv)
 		}								
 #endif
 	}
-//DeadCode AMM 21Nov100 	_Replay.QMPlayback=false;
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("}OnFlyingClosed"));
 	return true;
 }
 
@@ -506,15 +482,6 @@ Bool	RFullPanelDial::Pseudo3D(FullScreen*&fs)
 //	INT3;	//SET UP YOUR RETURN VALUES NOW!!!!
 
 //##test data begins
-//DEADCODE DAW 26/11/99	MMC.debrief.lastperiod.count[PT_F86E].count[Debrief::MIG] = 3;
-//DEADCODE DAW 26/11/99	MMC.debrief.lastperiod.count[PT_F84].count[Debrief::AAA] = 2;
-//DEADCODE DAW 26/11/99
-//DEADCODE DAW 26/11/99	MMC.debrief.lastperiod.count[PT_F84].count[Debrief::TRAIN] = 4;
-//DEADCODE DAW 26/11/99	MMC.debrief.playerlog[MMC.debrief.currlogday][MMC.debrief.currperiod].target1 = UID_BrRdYalu;
-//DEADCODE DAW 26/11/99
-//DEADCODE DAW 26/11/99	MMC.debrief.playertotals[PT_F84][Debrief::SORTIES]++;
-//DEADCODE DAW 26/11/99	MMC.debrief.playertotals[PT_F84][Debrief::COMBATS]++;
-//DEADCODE DAW 26/11/99	MMC.debrief.playertotals[PT_F84][Debrief::KILLS]++;
 
 //	MMC.DisDayEntry(Debrief::TARGUID, UID_BrRlYalu0, Debrief::T_AttackWest03_H);
 //	MMC.DisDayEntry(Debrief::DISCARDTARGUID, UID_BrRdYalu, Debrief::T_DeceptionFound00_H);
@@ -541,8 +508,6 @@ Bool	RFullPanelDial::FragFly(FullScreen*&fs)
 	{
 		if (_DPlay.Host)
 		{
-//DeadCode AMM 21Feb100			if (_DPlay.GameType==DPlay::COMMSCAMPAIGN)
-//DeadCode AMM 21Feb100				_Replay.SaveTempSaveGame("dcomms.dat",true); //AMM 26/05/99
 // send fly now message to guests
 			if (!_DPlay.UINetworkSelectFly())
 				return FALSE;
@@ -552,17 +517,13 @@ Bool	RFullPanelDial::FragFly(FullScreen*&fs)
 // if game in progress then join, otherwise dont do anything
 			if (!_DPlay.FlyNowFlag)
 			{
-//DEADCODE AMM 10/01/00				if (_DPlay.GameAvailable)
 				if (DPlay::H2H_Player[0].status==DPlay::CPS_3D)
 				{
 					if (!_DPlay.JoinGame())
 					{
-//DeadCode AMM 16Nov99						DPlay::H2H_Player[_DPlay.mySlot].status=CPS_FRAG;
-//DeadCode AMM 16Nov99						_DPlay.SendInFragMessage();
 						_DPlay.SendStatusChange(DPlay::CPS_FRAG);
 						return FALSE;			
 					}
-//DeadCode DAW 27Jun99						return FALSE;
 				}
 				else
 				{
@@ -571,8 +532,6 @@ Bool	RFullPanelDial::FragFly(FullScreen*&fs)
 			}
 		}
 	}
-//DEADCODE DAW 29/01/00		MMC.UpdateAllDis();												//RDH 19/06/99
-//DEADCODE DAW 29/01/00		MMC.ZeroDisDay();
 		MMC.msgwithsmacker = 0;											//RDH 26/06/99
 		MMC.smacker = FIL_NULL;
 
@@ -607,7 +566,6 @@ Bool	RFullPanelDial::FragFly(FullScreen*&fs)
 		}
 		if (!_DPlay.PlayerCreated && _Replay.IsCampState(gamestate))
 		{
-//DeadCode AMM 7Aug00 			_Replay.SaveTempSaveGame("dreplay.dat");//,false);						//AMM 26Feb99
 			_Replay.SaveTempSaveGame(_Replay.replaysavebackup);
 		}
 
@@ -623,7 +581,6 @@ Bool	RFullPanelDial::FragFly2(FullScreen*&fs)
 		return FALSE;													//JIM 12Oct00
 	if (!_DPlay.PlayerCreated && _Replay.IsCampState(gamestate))
 	{
-//DeadCode AMM 7Aug00 		_Replay.SaveTempSaveGame("dreplay.dat");//,false);
 		_Replay.SaveTempSaveGame(_Replay.replaysavebackup);
 	}
 
@@ -638,7 +595,6 @@ Bool	RFullPanelDial::ReturnToMap(FullScreen*&fs)
 {
 	if (gamestate==QUICK)
 		return TRUE;
-//DeadCode AMM 16Nov99	_DPlay.SendInMapMessage();
 	_DPlay.SendStatusChange(DPlay::CPS_MAP);
 #ifndef	BOB_DEMO_VER
 	LaunchMap(fs, false);
@@ -663,7 +619,6 @@ Bool	RFullPanelDial::ReturnToMapAfterReview(FullScreen*&fs)
 	}else{
 		_DPlay.SendStatusChange(DPlay::CPS_MAP);
 		Persons4::StartUpMapWorld();
-//DEADCODE JIM 24/05/00 		Node_Data.StartOfDay();
 
 		LaunchMap(fs, false);
 	}
@@ -676,7 +631,6 @@ bool RFullPanelDial::CommsPlayer(int pos, int& i, int squadnum)
 		return false;													//JIM 19/05/99
 	i = 0;
 	while	(		(i < MAXPLAYERS)							//AMM 04Nov98
-//DeadCode AMM 17Nov98	while	(		(i < _DPlay.CurrPlayers)
 			)
 	{
 		if	(		(DPlay::H2H_Player[i].squadron == squadnum)
@@ -737,8 +691,6 @@ Bool RFullPanelDial::QuickMissionDebriefInit()
 	prlistbox->SetHilightRow(0);
 
 	LaunchDial(new 	RAFCombat(0, false),0);
-//DEADCODE RDH 28/02/00 	LaunchDial(new CSQuick2,0);
-//DEADCODE RDH 28/02/00 	LaunchDial(new CSQuickAirClaims,1);
 
 	return TRUE;
 }
@@ -757,20 +709,11 @@ Bool RFullPanelDial::QuickMissionDebriefGrndInit()
 //	prlistbox=GETDLGITEM(IDC_RLISTBOX);
 	prlistbox->SetHilightCol(2);
 	prlistbox->SetHilightRow(0);
-//DeadCode RJS 4Sep00 	SquadNum sq;
-//DeadCode JIM 23Oct00 	SquadNum* sqnumptr = &sq;
-//DEADCODE RDH 28/02/00 	LaunchDial(new CSQuick2,0);
-//DEADCODE RDH 28/02/00 	LaunchDial(new CSQuickGroundClaims,1);
 
 
-//DeadCode RJS 4Sep00 	int currentry = 0;
-//DeadCode RJS 4Sep00 	int* currentryptr = &currentry;
 	currDiaryEntry = 0;													//RJS 4Sep00
 
 
-//DeadCode RJS 4Sep00 	SquadronBase*	sqdetails[2];
-//DeadCode JIM 23Oct00 	SquadronBase**	sqdetailsptr;
-//DeadCode JIM 23Oct00 	sqdetailsptr = sqdetails; 
 
 	Diary::Player*	pptr = Squad_Diary.GetFirstPlayer();
  	SquadronBase*	squad;
@@ -778,7 +721,6 @@ Bool RFullPanelDial::QuickMissionDebriefGrndInit()
 
 
  	if (RFullPanelDial::gameside != RFullPanelDial::SIDE_LW)
-//DeadCode RDH 9Aug00 	if (Todays_Packages.localplayer==NAT_RED)
 	{
 		sq = (SquadNum)squad->squadnum;
 		sqdetails[0]  = Squad_Diary.FindLast(sq);
@@ -799,12 +741,7 @@ Bool RFullPanelDial::ReplayLoadInit()
 	if (_Replay.IsCampState(gamestate))
 	{
 		_Replay.BackupSaveGame();
-//DeadCode AMM 26Feb99		_Replay.PlaybackCampDebrief=MMC.indebrief;
 	}
-//DeadCode AMM 26Feb99	else
-//DeadCode AMM 26Feb99	{
-//DeadCode AMM 26Feb99		_Replay.PlaybackCampDebrief=false;
-//DeadCode AMM 26Feb99	}
 
 	CString	wildcard="*.cam";
 	selectedfile=Save_Data.lastreplayname;
@@ -839,7 +776,6 @@ Bool RFullPanelDial::ReplaySaveInit()
 		strcpy(_Replay.pfilename,"replay.dat");
 	}
 
-//DeadCode AMM 15Feb99	strcpy(_Replay.pfilename,"replay.dat");
 
 	LaunchDial(new	CLoad(IDDX_SAVEREPLAY,LSD_SAVE,	FIL_VIDEOS_START_DIR,wildcard,selectedfile),0);
 
@@ -856,12 +792,7 @@ Bool RFullPanelDial::CampaignSelectInit()
 	prlistbox->SetHilightCol(1);										//RDH 19/05/99
 
 	LaunchDial(new CSCampaign,0);
-//DEADCODE RDH 12/04/00 	LaunchDial(new PhaseDescription(0),1);
-//DEADCODE RDH 12/04/00 	LaunchSmacker(2,FIL_VID_PHASE1BEGINS);
 	ChangeCamp(0);
-//DEADCODE RDH 12/04/00 	LaunchDial(new PhaseDescription(0),1);
-//DEADCODE RDH 12/04/00 	LaunchSmacker(2,FIL_VID_PHASE1BEGINS);
-//DeadCode CSB 14Jul00 	ChangeCamp(0);
 	return TRUE;
 } 
 Bool RFullPanelDial::CampaignEnterNameInit()
@@ -885,16 +816,12 @@ Bool RFullPanelDial::CampaignEnterNameInit()
 		LaunchSmacker(2,FileNum(FIL_VID_PHASE1BEGINS+whichcamp));
 	}
 
-//DEADCODE RDH 12/04/00 	LaunchDial(new PhaseDescription(0),1);
-//DEADCODE RDH 12/04/00 	LaunchSmacker(2,FIL_VID_PHASE1BEGINS);
 	return TRUE;
 }
 
 Bool RFullPanelDial::EndDayReviewInit()
 {
 	LaunchDial(new EndOfDayReviewList,0);
-//DEADCODE RDH 12/04/00 	LaunchDial(new EndOfDayReviewText(Node_Data.review.latest),1);
-//DEADCODE RDH 13/04/00 	LaunchSmacker(2,FIL_VID_PHASE1BEGINS);
 	ChangeReview(Node_Data.review.latest);
 	return TRUE;
 }
@@ -916,8 +843,6 @@ Bool RFullPanelDial::CampaignOverInit()
 //	Miss_Man.camp = Miss_Man.campaigntable[MissMan::SCRAMBLECAMPAIGN];
 
 //	LaunchDial(new CSCampaign,0);
-//DEADCODE RDH 09/05/00 	LaunchSmacker(1,FileNum(FIL_VID_INTRO+(whichcamp&0x0f)));
-//DEADCODE RDH 09/05/00 	LaunchDial(new CCampBack(IDS_CAMPOBJ0+(whichcamp&0x0f)),2);
 	return TRUE;
 }
 
@@ -935,18 +860,6 @@ Bool RFullPanelDial::LockerRoomInit()
 }
 Bool RFullPanelDial::LoadCampaign(FullScreen*&fs)
 {
-//DeadCode AMM 21Feb100	if	(		(_DPlay.GameType == DPlay::COMMSCAMPAIGN)
-//DeadCode AMM 21Feb100			&&	(_DPlay.UIPlayerType == DPlay::PLAYER_HOST)
-//DeadCode AMM 21Feb100		)
-//DeadCode AMM 21Feb100	{
-//DeadCode AMM 21Feb100		return TRUE;
-//DeadCode AMM 21Feb100 //		if (!LoadCampaignData())
-//DeadCode AMM 21Feb100 //		{
-//DeadCode AMM 21Feb100 //	//		_Error.EmitSysErr("Error: Could not load campaign file");
-//DeadCode AMM 21Feb100 //			return FALSE;
-//DeadCode AMM 21Feb100 //		}else
-//DeadCode AMM 21Feb100 //			return TRUE;
-//DeadCode AMM 21Feb100	}else
 			return FALSE;
 
 }
@@ -1039,7 +952,6 @@ Bool RFullPanelDial::RadioInit()
 
 Bool RFullPanelDial::VariantsInit()
 {
-//DEADCODE DAW 19/11/99	LaunchDial(new CVariants,0);
 	return TRUE;
 }					
 void RFullPanelDial::ResetVariantOption()
@@ -1168,7 +1080,6 @@ Bool RFullPanelDial::ReplayView(FullScreen*&fs)
 
 	if (!_Replay.ValidReplayFile())
 	{
-//DeadCode AMM 14Dec98		MessageBox("Invalid replay file","Error",MB_OK);
 		RMessageBox(IDS_BOB,IDS_INVALIDREPLAYFILE,NULL,IDS_OK);
 		return FALSE;
 	}
@@ -1226,12 +1137,7 @@ Bool RFullPanelDial::StartComms(FullScreen*&fs)
 	CSQuick1::currquickfamily=-1;										//AMM 18Sep00
 	_DPlay.ClearPackages();												//AMM 18Sep00
 
-//DeadCode AMM 29Aug00 	Save_Data.gamedifficulty|=GD_VULNERABLE;
-//DeadCode AMM 29Aug00 	Save_Data.gamedifficulty|=GD_GROUNDCOLLISIONS;			
-//DeadCode AMM 29Aug00 	Save_Data.gamedifficulty|=GD_COLLISIONS;			
-//DeadCode AMM 29Aug00 	Save_Data.flightdifficulty%=FD_ENGINEMANAGMENT;
 
-//DEADCODE CSB 30/11/99	Save_Data.flightdifficulty%=FD_AUTOTHROTTLE;				//AMM 25May99
 
 	if (_DPlay.StartCommsSession())
 		return TRUE;
@@ -1250,9 +1156,7 @@ Bool RFullPanelDial::GetSessions(FullScreen*&fs)
 		{
 // problem initialising connection, exit to main menu
 
-//DeadCode AMM 21Feb100			_DPlay.CommsMessage(IDS_BADSESSIONS2);
 			_DPlay.ExitDirectPlay();
-//DeadCode AMM 12May99			fs=&title;
 
 			if (_DPlay.StartCommsSession())
 			{
@@ -1295,36 +1199,6 @@ Bool RFullPanelDial::JoinCommsGame(FullScreen*&fs)
 
 	return (_DPlay.JoinComms());
 
-//DeadCode AMM 20Jan99	_DPlay.UIPlayerType = PLAYER_GUEST;
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99 // need a temp name to be able to create a player with
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99	strcpy(_DPlay.PlayerName,"temp name");
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99 // need to get game details before going to locker room so that info can be filled
-//DeadCode AMM 20Jan99 // in correctly....
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99	if (_DPlay.UINewPlayer(_DPlay.PlayerName,_DPlay.SessionName))
-//DeadCode AMM 20Jan99	{
-//DeadCode AMM 20Jan99 // null temp player name
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99		strcpy (_DPlay.PlayerName,"");
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99		if (_DPlay.GetGameDetails())
-//DeadCode AMM 20Jan99		{
-//DeadCode AMM 20Jan99			return TRUE;
-//DeadCode AMM 20Jan99		}
-//DeadCode AMM 20Jan99 //DeadCode AMM 14Dec98		MessageBox("Host Busy","",MB_OK);
-//DeadCode AMM 20Jan99		RMessageBox(IDS_MIGALLEY,IDS_HOSTBUSY,NULL,IDS_L_CLEAR);
-//DeadCode AMM 20Jan99	}
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99	strcpy(_DPlay.PlayerName,"");
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99	_DPlay.lpDP4->DestroyPlayer(_DPlay.myDPlayID);
-//DeadCode AMM 20Jan99	_DPlay.lpDP4->Close();
-//DeadCode AMM 20Jan99
-//DeadCode AMM 20Jan99	return FALSE;
-//DeadCode AMM 20Jan99 //DeadCode AMM 13Oct98	return TRUE;
 }
 
 //Bool RFullPanelDial::VisitorsBook(FullScreen*&fs)
@@ -1371,13 +1245,7 @@ Bool RFullPanelDial::SelectReadyRoom(FullScreen*&fs)
 }
 Bool RFullPanelDial::SelectReadyRoomStatic(FullScreen*&fs)
 {
-//DeadCode AMM 2Oct00 	PrepareForFrag(fs);
 
-//DeadCode AMM 08Jan99	if (_DPlay.UpdateMission)
-//DeadCode AMM 08Jan99	{
-//DeadCode AMM 08Jan99		_DPlay.SendCSQuickStrucToPlayers(FALSE);
-//DeadCode AMM 08Jan99		_DPlay.UpdateMission=FALSE;
-//DeadCode AMM 08Jan99	}
 
 	switch (_DPlay.GameType)
 	{
@@ -1417,23 +1285,6 @@ Bool RFullPanelDial::SelectReadyRoomStatic(FullScreen*&fs)
 			}
 			break;
 		}
-//DeadCode AMM 21Feb100		case DPlay::COMMSCAMPAIGN:
-//DeadCode AMM 21Feb100		{
-//DeadCode AMM 21Feb100			if	(_DPlay.Side)
-//DeadCode AMM 21Feb100			{
-//DeadCode AMM 21Feb100				if	(_DPlay.UIPlayerType==DPlay::PLAYER_HOST)
-//DeadCode AMM 21Feb100					fs=&readyroomhostcampaign;
-//DeadCode AMM 21Feb100				else
-//DeadCode AMM 21Feb100					fs=&readyroomguestcampaign;
-//DeadCode AMM 21Feb100			}else
-//DeadCode AMM 21Feb100			{
-//DeadCode AMM 21Feb100				if	(_DPlay.UIPlayerType==DPlay::PLAYER_HOST)
-//DeadCode AMM 21Feb100					fs=&readyroomhostcampaignred;
-//DeadCode AMM 21Feb100				else
-//DeadCode AMM 21Feb100					fs=&readyroomguestcampaignred;
-//DeadCode AMM 21Feb100			}
-//DeadCode AMM 21Feb100			break;
-//DeadCode AMM 21Feb100		}
 	}
 	return TRUE;
 }
@@ -1459,23 +1310,16 @@ Bool RFullPanelDial::CreatePlayer(FullScreen*&fs)
 			gamestate = QUICK;
 			break;
 		}
-//DeadCode AMM 21Feb100		case DPlay::COMMSCAMPAIGN:
-//DeadCode AMM 21Feb100		{
-//DeadCode AMM 21Feb100			gamestate = CAMP;
-//DeadCode AMM 21Feb100			break;
-//DeadCode AMM 21Feb100		}
 	}
 
 	pdial[0]->DestroyPanel();
 	pdial[0]=NULL;
 
-//DeadCode AMM 21Feb100	Bool res;
 	ULong res;
 	if (_DPlay.UIPlayerType==DPlay::PLAYER_HOST)
 	{
 // host now creates session at start of ready room
 
-//DeadCode AMM 21Feb100		res=TRUE;
 		res=DP_OK;
 
 	}
@@ -1503,13 +1347,11 @@ Bool RFullPanelDial::CreatePlayer(FullScreen*&fs)
 
 				if (res!=DP_OK)
 				{
-//DeadCode AMM 14Dec98					MessageBox("Could not contact host","Warning",MB_OK);
 					RMessageBox(IDS_BOB,IDS_NOTCONTACTHOST,NULL,IDS_OK);
 				}
 			}
 			else
 			{
-//DeadCode AMM 14Dec98				MessageBox("Incorrect password","Warning",MB_OK);
 				RMessageBox(IDS_BOB,IDS_INCORRECTPASSWORD,NULL,IDS_OK);
 			}
 		}
@@ -1522,20 +1364,17 @@ Bool RFullPanelDial::CreatePlayer(FullScreen*&fs)
 
 	if (res==DP_OK)
 	{
-//DeadCode AMM 21Feb100		if (_DPlay.GameType!=DPlay::COMMSCAMPAIGN)
 		{
-//DeadCode AMM 2Oct00 			PrepareForFrag(fs);									//AMM 13Oct98
 			Miss_Man.currcampaignnum = MissMan::SCRAMBLECAMPAIGN;		//RDH 16Apr96
 			Miss_Man.camp = Miss_Man.campaigntable[MissMan::SCRAMBLECAMPAIGN];
 			MMC.currtime=28000;
 			Node_Data.BuildTargetTable();
 			Node_Data.LoadCleanNodeTree();
 
-			strcpy(MMC.PlayerName,DPlay::H2H_Player[_DPlay.mySlot].name); //AMM 21/01/00
+			strncpy(MMC.PlayerName,DPlay::H2H_Player[_DPlay.mySlot].name,PLAYERNAMELEN-1); MMC.PlayerName[PLAYERNAMELEN-1]=0; //AMM 21/01/00
 			SetTitleText();
 		}
 
-//DeadCode AMM 24Aug00 		_DPlay.ApplyBackupPilots();
 
 // should be unassigned initially
 
@@ -1561,36 +1400,13 @@ Bool RFullPanelDial::CreatePlayer(FullScreen*&fs)
 			DPlay::H2H_Player[_DPlay.mySlot].position=-1;
 
 			fs=&commsquick;
-//DeadCode AMM 21Feb100		}else if	(	(_DPlay.GameType == DPlay::COMMSCAMPAIGN)
-//DeadCode AMM 21Feb100			&&	(_DPlay.UIPlayerType==DPlay::PLAYER_HOST)
-//DeadCode AMM 21Feb100			)
-//DeadCode AMM 21Feb100		{
-//DeadCode AMM 21Feb100			if (!_DPlay.campaignloaded)
-//DeadCode AMM 21Feb100			{
-//DeadCode AMM 21Feb100				whichcamp=_DPlay.GameIndex; //AMM 10/06/99
-//DeadCode AMM 21Feb100 //DEADCODE RDH 26/10/99				SetCampState(fs);
-//DeadCode AMM 21Feb100				LaunchMapFirstTime(fs);
-//DeadCode AMM 21Feb100
-//DeadCode AMM 21Feb100 // launch map first time sets these up so nobble again
-//DeadCode AMM 21Feb100
-//DeadCode AMM 21Feb100				MMC.playersquadron=-1;
-//DeadCode AMM 21Feb100				MMC.playeracnum=-1;
-//DeadCode AMM 21Feb100				return FALSE;
-//DeadCode AMM 21Feb100			}
 		}else
 		{
 			SelectReadyRoom(fs);
 		}
-//DeadCode AMM 3Oct00 		if	(	(_DPlay.GameType == DPlay::TEAMPLAY)
-//DeadCode AMM 3Oct00 			||		(_DPlay.GameType == DPlay::DEATHMATCH)
-//DeadCode AMM 3Oct00 			)
 
 // dont need this csquick set up when game is launched
 
-//DeadCode AMM 23Oct00 		if (_DPlay.GameType<DPlay::COMMSQUICKMISSION)
-//DeadCode AMM 23Oct00 		{
-//DeadCode AMM 23Oct00 			CSQuick1::quickdef.UpdateAcType();
-//DeadCode AMM 23Oct00 		}
 
 		return TRUE;
 	}
@@ -1605,8 +1421,6 @@ Bool RFullPanelDial::CreatePlayer(FullScreen*&fs)
 
 Bool RFullPanelDial::CommsSelectFly(FullScreen*&fs)
 {
-//DeadCode AMM 18Aug98	if (_DPlay.Host)											//AMM 15Jul98
-//DeadCode AMM 18Aug98		_Agg.StopResetAggregator();								//AMM 15Jul98
 
 	if (!_DPlay.UINetworkSelectFly())
 		return FALSE;
@@ -1641,28 +1455,14 @@ Bool RFullPanelDial::AllowExitFromComms(FullScreen*&fs)
 
 Bool RFullPanelDial::CleanUpComms(FullScreen*&fs)
 {
-//DeadCode AMM 18Sep00 	_DPlay.campaignloaded=false;
 	CSQuick1::currquickmiss=-1;
 
 	CSQuick1::currquickfamily=-1;
 
 
-//DeadCode AMM 18Nov99	_Replay.RestorePrefs();
 
 	_DPlay.ClearPackages();
 
-//DeadCode AMM 14May99 // clear packages
-//DeadCode AMM 14May99
-//DeadCode AMM 14May99	for (int side = 0; side < 2; side++)
-//DeadCode AMM 14May99	{
-//DeadCode AMM 14May99		for (int wave=0;wave<8;wave++)
-//DeadCode AMM 14May99		{
-//DeadCode AMM 14May99			for (int grp=0;grp<3;grp++)
-//DeadCode AMM 14May99			{
-//DeadCode AMM 14May99				Todays_Packages.pack[side].wave[wave].group[grp].uid = UID_NULL;
-//DeadCode AMM 14May99			}
-//DeadCode AMM 14May99		}
-//DeadCode AMM 14May99	}
 
 	_DPlay.UILeavingMainSheet();
 //	_DPlay.DestroyAndClose(_DPlay.myDPlayID);
@@ -1683,9 +1483,6 @@ Bool RFullPanelDial::CleanUpComms(FullScreen*&fs)
 
 
 #ifndef	BOB_DEMO_VER
-//DEADCODE DAW 25/02/00 extern	Smack*	OpenSmack(FileNum filenumber,int win,int X,int Y,int w,int h);
-//DEADCODE DAW 25/02/00 extern	cdecl	UWord	DoSmack(int poo);
-//DEADCODE DAW 25/02/00 extern	cdecl	void	CloseSmack();
 
 void	RFullPanelDial::ChangeCamp(int campnum)
 {
@@ -1706,7 +1503,6 @@ void	RFullPanelDial::ChangeCamp(int campnum)
 	}
 	else
 		CloseVideo();
-//DEADCODE RDH 18/04/00 		OnMciNotify(0,MCI_MODE_STOP);
 	//else
 	//close video because viseo doesn't play in a dialog
 
@@ -1732,10 +1528,8 @@ void	RFullPanelDial::ChangeCamp(int campnum)
 	LaunchSmacker(2,FileNum(FIL_VID_PHASE1BEGINS+whichcamp));
 
 //		OpenSmack(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp),(int)m_hWnd,0,0,640,480);
-//DEADCODE RDH 03/04/00 	}
 
 //test code - how to change a video
-//DeadCode RDH 06Apr100 	ChangeSmacker(1,FileNum(FIL_VID_THOUSANDBOMBER+whichcamp));
 }										
 
 void	RFullPanelDial::ChangeFamilyAnim()
@@ -1778,7 +1572,6 @@ void	RFullPanelDial::ChangeReview(int msgnum)
 	}
 	else
 		CloseVideo();
-//DEADCODE RDH 18/04/00 		OnMciNotify(0,MCI_MODE_STOP);
 
 	int	titletext = Node_Data.review.MessageTitle(msgnum);
 
@@ -1815,70 +1608,21 @@ Bool	RFullPanelDial::StartCampSmacker(FullScreen*&fs)
 	whichcamp=(whichcamp&0x0f);
 	File_Man.DiscardDirList(FileNum(FIL_VID_PHASE1BEGINS+whichcamp));
 	File_Man.ExistNumberedFile(FileNum(FIL_VID_PHASE1BEGINS+whichcamp));
-//DeadCode DAW 25Feb100	OpenSmack(FileNum(FIL_SMACK_CAMP1INTRO+whichcamp),(int)m_hWnd,-1,-1,0,0);
 	return FALSE;
 }
 Bool	RFullPanelDial::StartCampBackground(FullScreen*&fs)
 {
-//DEADCODE RDH 09/05/00 	CloseVideo();
-//DEADCODE RDH 09/05/00 //DEADCODE RDH 18/04/00 	OnMciNotify(0,MCI_MODE_STOP);
-//DEADCODE RDH 09/05/00 //DeadCode DAW 25Feb100	CloseSmack();
-//DEADCODE RDH 09/05/00 	if (pdial[2])
-//DEADCODE RDH 09/05/00 	{
-//DEADCODE RDH 09/05/00 		pdial[2]->PreDestroyPanel();
-//DEADCODE RDH 09/05/00 		pdial[2]->DestroyPanel();
-//DEADCODE RDH 09/05/00 		pdial[2]=NULL;
-//DEADCODE RDH 09/05/00 	}
-//DEADCODE RDH 09/05/00 	whichcamp=(whichcamp&0x0f)+0x10;
-//DEADCODE RDH 09/05/00 	LaunchDial(new CCampBack(IDS_CAMPDESC0+(whichcamp&0x0f)),2);
 	return FALSE;
 }
 Bool	RFullPanelDial::StartCampObjectives(FullScreen*&fs)
 {
-//DEADCODE RDH 09/05/00 
-//DEADCODE RDH 09/05/00 	CloseVideo();
-//DEADCODE RDH 09/05/00 //DEADCODE RDH 18/04/00 	OnMciNotify(0,MCI_MODE_STOP);
-//DEADCODE RDH 09/05/00 //	CloseSmack();
-//DEADCODE RDH 09/05/00 	if (pdial[2])
-//DEADCODE RDH 09/05/00 	{
-//DEADCODE RDH 09/05/00 		pdial[2]->PreDestroyPanel();
-//DEADCODE RDH 09/05/00 		pdial[2]->DestroyPanel();
-//DEADCODE RDH 09/05/00 		pdial[2]=NULL;
-//DEADCODE RDH 09/05/00 	}
-//DEADCODE RDH 09/05/00 	whichcamp=(whichcamp&0x0f)+0x20;
-//DEADCODE RDH 09/05/00 	LaunchDial(new CCampBack(IDS_CAMPOBJ0+(whichcamp&0x0f)),2);
 	return FALSE;
 }
-//DEADCODE DAW 19/11/99 Bool	RFullPanelDial::StartCampBackground2(FullScreen*&fs)
-//DEADCODE DAW 19/11/99 {
-//DEADCODE DAW 19/11/99	if (pdial[2])
-//DEADCODE DAW 19/11/99	{
-//DEADCODE DAW 19/11/99		pdial[2]->PreDestroyPanel();
-//DEADCODE DAW 19/11/99		pdial[2]->DestroyPanel();
-//DEADCODE DAW 19/11/99		pdial[2]=NULL;
-//DEADCODE DAW 19/11/99	}
-//DEADCODE DAW 19/11/99	whichcamp=(whichcamp&0x0f)+0x10;
-//DEADCODE DAW 19/11/99	LaunchDial(new CCampBackEntireWar(IDS_CAMPDESC0+(whichcamp&0x0f)),2);
-//DEADCODE DAW 19/11/99	return FALSE;
-//DEADCODE DAW 19/11/99 }
-//DEADCODE DAW 19/11/99 Bool	RFullPanelDial::StartCampObjectives2(FullScreen*&fs)
-//DEADCODE DAW 19/11/99 {
-//DEADCODE DAW 19/11/99	if (pdial[2])
-//DEADCODE DAW 19/11/99	{
-//DEADCODE DAW 19/11/99		pdial[2]->PreDestroyPanel();
-//DEADCODE DAW 19/11/99		pdial[2]->DestroyPanel();
-//DEADCODE DAW 19/11/99		pdial[2]=NULL;
-//DEADCODE DAW 19/11/99	}
-//DEADCODE DAW 19/11/99	whichcamp=(whichcamp&0x0f)+0x20;
-//DEADCODE DAW 19/11/99	LaunchDial(new CCampBackEntireWar(IDS_CAMPOBJ0+(whichcamp&0x0f)),2);
-//DEADCODE DAW 19/11/99	return FALSE;
-//DEADCODE DAW 19/11/99 }
 
 #endif	//BOB_DEMO_VER
 
 Bool	RFullPanelDial::TitleInit()
 {
-//DeadCode AMM 22Nov99	_Replay.TruncateTempFiles();	//AMM13Jul99
 	_Replay.DeleteTempFiles();
 	_Replay.MenuViewPlayback=false;
 	_Replay.MapPlayback=false;
@@ -1917,7 +1661,6 @@ Bool	RFullPanelDial::SetUpHotShot(FullScreen*&fs)
 
 Bool	RFullPanelDial::SetQuickState(FullScreen*&fs)
 {
-//DeadCode AMM 14Oct98	_DPlay.CurrPlayers = 0;		//##
 
 	Miss_Man.currcampaignnum = MissMan::SCRAMBLECAMPAIGN;		//RDH 16Apr96
 	Miss_Man.camp = Miss_Man.campaigntable[MissMan::SCRAMBLECAMPAIGN];
@@ -1931,13 +1674,6 @@ Bool	RFullPanelDial::SetQuickState(FullScreen*&fs)
 extern	CDC g_OffScreenDC;
 void	Campaign::InitIcons()
 {
-//DEADCODE RDH 06/04/00 		if (RFullPanelDial::gamestate<RFullPanelDial::CAMP)
-//DEADCODE RDH 06/04/00 		{
-//DEADCODE RDH 06/04/00 			Todays_Packages.localplayer=NAT_BLUE;
-//DEADCODE RDH 06/04/00 			Todays_Packages.britishisauto=true;
-//DEADCODE RDH 06/04/00 			Todays_Packages.germanisauto=true;
-//DEADCODE RDH 06/04/00 		}
-//DEADCODE RDH 06/04/00 		else
 		if (RFullPanelDial::gamestate==RFullPanelDial::PILOT)
 		{
 			if (RFullPanelDial::gameside==RFullPanelDial::SIDE_RAF)
@@ -1982,15 +1718,11 @@ Bool	RFullPanelDial::SetUpCommander(FullScreen*&fs)
 Bool	RFullPanelDial::SetUpLW(FullScreen*&fs)
 {
 	gameside = SIDE_LW;
-//DeadCode JIM 14Sep00 	CDC* pdc=GetDC();
-//DEADCODE DAW 08/03/00 	IconDescUI::LoadInstances(*pdc,ICON_SET_1_LW);
 	return SetUpCommander(fs);//TRUE;
 }
 Bool	RFullPanelDial::SetUpRAF(FullScreen*&fs)
 {
 	gameside = SIDE_RAF;
-//DeadCode JIM 14Sep00 	CDC* pdc=GetDC();
-//DEADCODE DAW 08/03/00 	IconDescUI::LoadInstances(*pdc,ICON_SET_1);
 
 	return SetUpCommander(fs);//TRUE;
 }
@@ -2018,45 +1750,12 @@ Bool	RFullPanelDial::MapSpecialsInit()
 {
 	return TRUE;
 }
-//DEADCODE RDH 03/04/00 Bool	RFullPanelDial::EndCampInit()									//RDH 29/06/99
-//DEADCODE RDH 03/04/00 {
-//DEADCODE RDH 03/04/00 	if (Miss_Man.currcampaignnum == MissMan::SO51_CAMPAIGN)
-//DEADCODE RDH 03/04/00 	{
-//DEADCODE RDH 03/04/00 		int index=0;
-//DEADCODE RDH 03/04/00 		{
-//DEADCODE RDH 03/04/00 			if (index > 6)
-//DEADCODE RDH 03/04/00 				index = 6;
-//DEADCODE RDH 03/04/00 			LaunchSmacker(1, MMC.camp_lost_anim);
-//DEADCODE RDH 03/04/00 		}
-//DEADCODE RDH 03/04/00 		LaunchDial(new CCampBack(IDS_CAMP5_END00 + index),2);
-//DEADCODE RDH 03/04/00 
-//DEADCODE RDH 03/04/00 	}else
-//DEADCODE RDH 03/04/00 	{
-//DEADCODE RDH 03/04/00 		if (MMC.wincamp)
-//DEADCODE RDH 03/04/00 		{
-//DEADCODE RDH 03/04/00 			LaunchSmacker(1, MMC.camp_win_anim);
-//DEADCODE RDH 03/04/00 			LaunchDial(new CCampBack(IDS_CAMP1ENDGOOD + Miss_Man.currcampaignnum),2);
-//DEADCODE RDH 03/04/00 		}else
-//DEADCODE RDH 03/04/00 		{
-//DEADCODE RDH 03/04/00 			LaunchSmacker(1,MMC.camp_lost_anim);
-//DEADCODE RDH 03/04/00 			LaunchDial(new CCampBack(IDS_CAMP1ENDBAD + Miss_Man.currcampaignnum),2);
-//DEADCODE RDH 03/04/00 		}
-//DEADCODE RDH 03/04/00 	}
-//DEADCODE RDH 03/04/00 	return TRUE;
-//DEADCODE RDH 03/04/00 }
-//DEADCODE RDH 03/04/00 
 Bool	RFullPanelDial::DeadPilotInit()
 {
 		LaunchSmacker(1, MMC.introsmack);
 		LaunchDial(new CCampBack(IDS_PLAYERDIED),2);
 	return TRUE;
 }
-//DEADCODE RJS 3/21/00 Bool	RFullPanelDial::SpecialsInit()
-//DEADCODE RJS 3/21/00 {
-//DEADCODE RJS 3/21/00 		LaunchSmacker(1, MMC.smacker);
-//DEADCODE RJS 3/21/00 		LaunchDial(new CCampBack(RESTABLESUM(2,DISPARA_0,MMC.msgwithsmacker)),2);
-//DEADCODE RJS 3/21/00 	return TRUE;
-//DEADCODE RJS 3/21/00 }
 Bool	RFullPanelDial::ContinueAlthoughDead(FullScreen*&fs)
 {
 
@@ -2085,22 +1784,6 @@ Bool	RFullPanelDial::ReloadBecauseDead(FullScreen*&fs)
 	return TRUE;
 }
 
-//DeadCode CSB 16Jul00 Bool	RFullPanelDial::StartNextCampaign(FullScreen*&fs)
-//DeadCode CSB 16Jul00 {
-//DeadCode CSB 16Jul00 	CloseVideo();
-//DeadCode CSB 16Jul00 //DEADCODE RDH 18/04/00 	OnMciNotify(0,MCI_MODE_STOP);
-//DeadCode CSB 16Jul00 	Miss_Man.currcampaignnum = MissMan::CampaignName((int)Miss_Man.currcampaignnum + 1);
-//DeadCode CSB 16Jul00 	whichcamp = -1;
-//DeadCode CSB 16Jul00 
-//DeadCode CSB 16Jul00 	char	PlayerName[PLAYERNAMELEN];
-//DeadCode CSB 16Jul00 	memcpy(PlayerName,MMC.PlayerName,PLAYERNAMELEN);
-//DeadCode CSB 16Jul00 	Miss_Man.camp = Miss_Man.campaigntable[Miss_Man.currcampaignnum];	//RDH 15/02/99	
-//DeadCode CSB 16Jul00 	memcpy(MMC.PlayerName,PlayerName,PLAYERNAMELEN);
-//DeadCode CSB 16Jul00 
-//DeadCode CSB 16Jul00 	LaunchMapFirstTime(fs);
-//DeadCode CSB 16Jul00 
-//DeadCode CSB 16Jul00 	return TRUE;
-//DeadCode CSB 16Jul00 }
 
 Bool	RFullPanelDial::LaunchMapIfAlive(FullScreen*&fs)
 {
@@ -2118,7 +1801,6 @@ Bool	RFullPanelDial::LaunchMapFirstTime(FullScreen*&fs)
 {
 	CloseVideo(); 
 
-//DEADCODE RDH 18/04/00 	OnMciNotify(0,MCI_MODE_STOP);
 	FileNum f;
 //	m_pView->GetDocument()->SetTitle(LoadResString(IDS_L_SCAMPAIGNSELECT1+(whichcamp&0x0f)));
 	m_pView->m_zoom = 2.0;//Save_Data.defaultzoom;						//JIM 11Oct00
@@ -2128,13 +1810,11 @@ Bool	RFullPanelDial::LaunchMapFirstTime(FullScreen*&fs)
 	m_pView->m_scrollpoint=CPoint(500,800);
 	
 	CampaignZero::Fav	fav=MMC.fav;
-//DEADCODE RDH 11/05/00 	Todays_Packages.WipeAll();
 	if (whichcamp>=0)
 	{
 		Miss_Man.currcampaignnum = MissMan::CampaignName(whichcamp&0x0f);							//RDH 19/03/99
 		Miss_Man.camp = Miss_Man.campaigntable[Miss_Man.currcampaignnum];	//RDH 15/02/99	
 
-//DEADCODE RDH 06/04/00 		Miss_Man.camp.inentirewar= true;	//(gamestate==WAR);			//RDH 06/04/00
 	}
 	if (gamestate == PILOT)
 	{
@@ -2155,16 +1835,7 @@ Bool	RFullPanelDial::LaunchMapFirstTime(FullScreen*&fs)
 	
 	CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
 	main->m_titlebar.Redraw(true);
-//DEADCODE RDH 29/02/00 	main->m_commsbar.FillTextLines(0,"hello","World");
-//DEADCODE RDH 29/02/00 	main->m_commsbar.FillTextLines(1,"hello","World");
-//DEADCODE RDH 29/02/00 	main->m_commsbar.FillTextLines(2,"hello","World");
-//DEADCODE RDH 29/02/00 	main->m_reportbar.FillTextLines(0,"Hostile Approaching","Dover");
-//DEADCODE RDH 29/02/00 	main->m_reportbar.FillTextLines(1,"Hostile Update","");
-//DEADCODE RDH 29/02/00 	main->m_reportbar.FillTextLines(2,"Enemy Attacking","Kenley");
-//DeadCode JIM 20Oct00 	CMainFrame* pmainwnd=(CMainFrame*)AfxGetMainWnd();
 
-//DEADCODE JIM 29/02/00 	LWDirectivesResults::LaunchDirectiveMissions(); // 18/02/00
-//DEADCODE JIM 24/05/00 	Node_Data.StartOfDay();												//JIM 29/02/00
 
 
 //	pmainwnd->m_toolbar2.OnClickedPlayerlog();	
@@ -2179,7 +1850,6 @@ Bool	RFullPanelDial::DoLoadCommsGame(FullScreen*&fs)
 
 //	strcpy(_DPlay.Password,MMC.CommsPassword);
 //	strcpy(_DPlay.Password,Save_Data.CommsPassword);
-//DeadCode AMM 18Sep00 	_DPlay.campaignloaded=true;
 	if (CreatePlayer(fs))
 	{
 		LaunchMap(fs, true);										//AMM 22Jan99
@@ -2256,7 +1926,6 @@ Bool RFullPanelDial::CheckLobby(FullScreen*&fs)
 //		UpdateSize();													//DAW 15/06/99
 		CloseVideo();																		//DAW 15/06/99
 		Save_Data.ChangeMode(SaveData::UIR_SCRAMBLE);
-//DEADCODE RDH 18/05/00 	if (closedsmack) 
 	{
 		int	failed=0;
 		UpdateSize();
@@ -2364,7 +2033,6 @@ void	DPlay::UpdateCSQuick(UByte* pack,ULong num)
 
 // need to call PrepareForFrag
 
-//DEADCODE DAW 21/03/00 //DEADCODE DAW 21/03/00 	Todays_Packages.PackagePrepareForFrag();
 #endif	//#ifndef	BOB_DEMO_VER
 }
 
@@ -2380,26 +2048,6 @@ void	DPlay::UpdateCSQuick(UByte* pack,ULong num)
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DEADCODE DAW 21/03/00 void	PackageList::PackagePrepareForFrag()
-//DEADCODE DAW 21/03/00 {
-//DEADCODE DAW 21/03/00 #ifndef	BOB_DEMO_VER		//THESE ALL NEED TO USE THE NEW	FragScreenBody STRUCTURE
-//DEADCODE DAW 21/03/00 	int side,wave,grp;
-//DEADCODE DAW 21/03/00 
-//DEADCODE DAW 21/03/00 	switch (_DPlay.GameType)
-//DEADCODE DAW 21/03/00 	{
-//DEADCODE DAW 21/03/00 		case DPlay::TEAMPLAY:
-//DEADCODE DAW 21/03/00 		case DPlay::DEATHMATCH:
-//DEADCODE DAW 21/03/00 			side=0;
-//DEADCODE DAW 21/03/00 			break;
-//DEADCODE DAW 21/03/00 
-//DEADCODE DAW 21/03/00 		case DPlay::COMMSQUICKMISSION:
-//DEADCODE DAW 21/03/00 		{
-//DEADCODE DAW 21/03/00 			break;
-//DEADCODE DAW 21/03/00 		}
-//DEADCODE DAW 21/03/00 
-//DEADCODE DAW 21/03/00 	}
-//DEADCODE DAW 21/03/00 #endif	//#ifndef	BOB_DEMO_VER
-//DEADCODE DAW 21/03/00 }
 
 Bool RFullPanelDial::ReInitCommsInterface(FullScreen*&fs)
 {
@@ -2615,8 +2263,6 @@ bool	DPlay::LoadDummySavegame(char* name)
 
 	retval=CFiling::LoadGame(temp);
 
-//DeadCode AMM 10Jul00 	if (retval)
-//DeadCode AMM 10Jul00 		Todays_Packages.SaveBin();
 
 	return retval;
 
@@ -2634,8 +2280,6 @@ void	Replay::SetState(ULong state)							//AMM 31Mar99
 
 bool	Replay::IsCampState(ULong state)
 {
-//DEADCODE RDH 06/04/00 	if (state==RFullPanelDial::CAMP
-//DEADCODE RDH 06/04/00 	||	state==RFullPanelDial::WAR)
 	if (state==RFullPanelDial::PILOT
 	||	state==RFullPanelDial::COMMANDER)
 		return true;
@@ -2700,7 +2344,6 @@ void	Replay::DeleteTempFiles()
 	File_Man.namenumberedfile(File_Man.fakefile(FIL_VIDEOS_START_DIR,"replay.dat"),buffer);
 	DeleteFile(buffer);
 
-//DeadCode AMM 07Aug00 	File_Man.namenumberedfile(File_Man.fakefile(FIL_SAVEGAMEDIR,"dreplay.dat"),buffer);
 	File_Man.namenumberedfile(File_Man.fakefile(FIL_SAVEGAMEDIR,replaysavebackup),buffer);
 	DeleteFile(buffer);
 

@@ -96,7 +96,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "bfform.h"
 #include "SGroups.h"
 #include	"namelist.h"
-//DEADCODE JIM 09/02/00 #include "text.h"
 
 #include	"shapenum.g"
 
@@ -834,7 +833,7 @@ void __fastcall TMissionEditor::DeleteWorld()
 {
 	for (int uid=0;uid<(int)IllegalBAND;uid++)
 	{
-		delete &Persons2::ConvertPtrUID(UniqueID(uid));
+		delete (ItemBase*)Persons2::ConvertPtrUID(UniqueID(uid));
 		Persons2::delUID(uid);
 	}
 	currwp=
@@ -1069,7 +1068,6 @@ UniqueID __fastcall TMissionEditor::MakeDefaultAirRoute(int X,int Z)
 	info_waypoint*	W=new info_waypoint;
 	W->bfieldindex=bfieldbeingfilled;
 	W->SGT = loadedsupergroup[supergroupbeingfilled].uid;
-//DeadCode RDH 11Feb98 	W->uniqueID.sector=FALSE;
 	MissionEditor->currwp=UID_Null;
 
 //	if ((int)ActiveCampaign.mission[currmission].PlayerNationality == (int)CurrNationality)
@@ -1110,25 +1108,10 @@ UniqueID __fastcall TMissionEditor::MakeDefaultRoute(int X,int Z)
 	info_waypoint*	I=new info_waypoint;
 	I->bfieldindex=bfieldbeingfilled;
 	I->SGT = loadedsupergroup[supergroupbeingfilled].uid;
-//DeadCode RDH 11Feb98 	I->uniqueID.sector=FALSE;
 	MissionEditor->currwp=UID_Null;
 
 	I->position.MakeAbsWorldPos();
 
-//DeadCode RDH 12Feb98 					X = X * ZOOMINITIAL/zoom;
-//DeadCode RDH 12Feb98 					X = X+ maptopx/PIXEL640;
-//DeadCode RDH 12Feb98 					X = X*PIXEL640;
-//DeadCode RDH 12Feb98 					X = X*(int)CONVERTTOSCRN_DIV;
-//DeadCode RDH 12Feb98 					X = X /scrnconvert;
-//DeadCode RDH 12Feb98 					X = X + MapOriginX;
-//DeadCode RDH 12Feb98 					X = X * 100;
-//DeadCode RDH 12Feb98 					Z = Z * ZOOMINITIAL/zoom;
-//DeadCode RDH 12Feb98 					Z = maptopy/PIXEL640 - Z;
-//DeadCode RDH 12Feb98 					Z = Z*PIXEL640;
-//DeadCode RDH 12Feb98 					Z = Z*(int)CONVERTTOSCRN_DIV;
-//DeadCode RDH 12Feb98 					Z = Z/scrnconvert;
-//DeadCode RDH 12Feb98 					Z = Z + MapOriginY;
-//DeadCode RDH 12Feb98 					Z = Z * 100;
 
 					X = MulScaleFactor(X);//*PIXEL640;
 ///					X = X * ZOOMINITIAL/zoom;
@@ -1199,7 +1182,6 @@ UniqueID __fastcall TMissionEditor::InitStatic(int X, int Y, int Z,UniqueIDBand 
 		I->bfieldindex=bfieldbeingfilled;
 		I->SGT = loadedsupergroup[supergroupbeingfilled].uid;
 
-//DeadCode RDH 11Feb98 	I->uniqueID.sector=FALSE;
 		I->position.MakeAbsWorldPos();
 
 		WorldPosition(X,Z);
@@ -1220,7 +1202,6 @@ UniqueID __fastcall TMissionEditor::InitStatic(int X, int Y, int Z,UniqueIDBand 
 		I->bfieldindex=bfieldbeingfilled;
 		I->SGT = loadedsupergroup[supergroupbeingfilled].uid;
 
-//DeadCode RDH 11Feb98 		I->uniqueID.sector=FALSE;
 		Persons2::tabulateUID(I);
 //		return	I->uniqueID.count;
 		return	uid;
@@ -1259,7 +1240,6 @@ UniqueID __fastcall TMissionEditor::InitMobile(int X, int Z,UniqueIDBand u,Shape
 	I->bfieldindex=bfieldbeingfilled;
 	I->SGT = loadedsupergroup[supergroupbeingfilled].uid;
 
-//DeadCode RDH 11Feb98 	I->uniqueID.sector=FALSE;
 	I->position.MakeAbsWorldPos();
 
 	WorldPosition(X,Z);
@@ -1304,7 +1284,6 @@ UniqueID __fastcall TMissionEditor::InitMobile(int X, int Z,UniqueIDBand u,Shape
 	I->bfieldindex=bfieldbeingfilled;
 	I->SGT = loadedsupergroup[supergroupbeingfilled].uid;
 
-//DeadCode RDH 11Feb98 	I->uniqueID.sector=FALSE;
 	I->wpref=route;
 	if ((int)CurrNationality == (int) ALLIES)
 		I->nat=NAT_BLUE;
@@ -1493,7 +1472,6 @@ UniqueID __fastcall TMissionEditor::InitAircraft(int X, int Y,int Z,UniqueIDBand
 	I->bfieldindex=bfieldbeingfilled;
 	I->SGT = loadedsupergroup[supergroupbeingfilled].uid;
 
-//DeadCode RDH 11Feb98 	I->uniqueID.sector=FALSE;
 	I->nat = CurrNationality; 
 
 	I->position.MakeAbsWorldPos();
@@ -1542,7 +1520,6 @@ UniqueID __fastcall TMissionEditor::InitAircraft(int X, int Y,int Z,UniqueIDBand
 	I->bfieldindex=bfieldbeingfilled;
 	I->SGT = loadedsupergroup[supergroupbeingfilled].uid;
 
-//DeadCode RDH 11Feb98 	I->uniqueID.sector=FALSE;
 	I->wpref=route;
 	info_waypoint* W=*Persons2::ConvertPtrUID(route);
 //	W->pos[0][1]=Y;
@@ -4611,7 +4588,6 @@ void __fastcall TMissionEditor::CopyWayPoints(UniqueID destobj,UniqueID srcobj)
 			destwp->bfieldindex=bfieldbeingfilled;
 			destwp->SGT = loadedsupergroup[supergroupbeingfilled].uid;
 
-//DeadCode RDH 11Feb98 			destwp->uniqueID.sector=FALSE;
 			destwp->prevwp=lastwp;
 			lastwp =
 				*destur=

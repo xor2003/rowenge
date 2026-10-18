@@ -290,14 +290,12 @@ struct	Profile
 // 		operator 	SquadList*();
 		int			Max();
 		operator	int()	{return Max();}
-//DEADCODE DAW 26/01/00 		operator	++();
  		void Free();
 		Squad*		Find(int	squadnum);
 		bool		AllInStatus(PackageStatus);
 		bool		AnyInStatus(PackageStatus);
 		bool		AnyMainInStatus(PackageStatus);
 		bool		AllMainInStatus(PackageStatus);
-//DeadCode MS 26Sep00 		void		FixPackageStatus();
 		int			AcBitsFirstSquad();
 		int			AcBitsSquad(int index);
 		bool		SetAcBitsFirstSquad(int pattern);
@@ -344,24 +342,18 @@ struct	Profile
 	SquadListRef		squadlist;	//Pointer to array of Squad
 	Squad&		operator[](int i)	{return squadlist[i];}
 
-//DEADCODE DAW 25/11/99 	enum	WaveSplitting	{WS_SINGLE_PRIMARY};
 
-//DEADCODE AMM 12/01/00 	char		packname[MAX_TARGETS];		//basis of file-name, probably
 	union
 	{
 		int	flags;
 		struct
 		{
-//DeadCode JIM 25Oct00 			bool		redo:1;
-//DeadCode JIM 25Oct00 			bool		edited:1;
 			bool		break109:1;
 			bool		packagehasbeenintercepted:1;
 			UByte		cancelsquad;	//SQ_ZERO==>OK SQ_MAX==>ALL
 			UWord		wpsused;
 		};
 	};
-//DeadCode JIM 25Oct00 	int			wpsused;
-//DEADCODE DAW 24/11/99 	DutyType	duty;
 	UniqueID	packagetakeoff;
 	struct	TargetDesc
 	{
@@ -393,7 +385,6 @@ struct	Profile
  	PackageStatus	packagestatus;
 //////////////////////////////////
 	bool	SetPredictedPointFromETA(SavedGlobrefs faketo=SGR_Pack_BlankZero,bool recalcfromETA=false);
-//DEADCODE AMM 12/01/00 	FileNum		loadedbf;
 	UniqueID	MakePrimaryRoute(int Y);
 	void	RecalcRoutePositions();
 	void	RecalcRoutePositionsAndTime();
@@ -413,14 +404,10 @@ struct	Profile
 	bool	Insert109ReturnWP(int distbackcm);
 	bool	RemoveOverExtendedFlights();
 public:
-//DEADCODE DAW 21/02/00 	int		FindSpareGlobref();
 
 	SquadNum	AddSquadron(int numac,Profile::AttackMethod duty,SquadNum sn)	;
 	SquadNum	AddSquadron(int numac,Profile::AttackMethod duty,int targnum,BetterRule br,SquadNum after=(SquadNum)0);
 	SquadNum	AddSquadron(int numac,Profile::AttackMethod duty,int targnum,SquadNum sn);
-//DEADCODE JIM 31/03/00 	void	ModifyRoute(int wavenum,int	groupnum,int	acnum);
-//DEADCODE JIM 31/03/00 	void	ModifyPatrolRoute(int wavenum,int	groupnum,int	acnum);
-//DEADCODE JIM 31/03/00 	void	SetACTypesFromGeneric();
 	static	UniqueID MakeInterceptWP(SavedGlobrefs a,SavedGlobrefs b,int percent,UniqueID next,SavedGlobrefs as=(SavedGlobrefs)-1,int relalt=0,BFieldWaypointActions action=wpacnoactionno);
 	static	UniqueID MakeInterceptWP(SavedGlobrefs a,SavedGlobrefs b,Ranges distance,UniqueID next,SavedGlobrefs as=(SavedGlobrefs)-1,int deltaalt=0,BFieldWaypointActions action=wpacnoactionno);
 	static int	CalcTime(COORDS3D* last,const COORDS3D* wp,int type, int esctype, SWord StoresDrag);							//CSB 18/06/99
@@ -444,18 +431,16 @@ public:
 	static	Float RelDensity(SLong alt);
 
 	static int CalcHoriAndClimbTime(const struct COORDS3D * last,const struct COORDS3D * wp,SLong& horitime,SLong& climbtime,int type, int esctype, SWord StoresDrag);	//CSB 18/06/99
-	static	bool GetPackageFromWP(UniqueID req_wpuid,int& pack,int& squad=*(int*)nullptr,int& target=*(int*)nullptr);
+	static	bool GetPackageFromWP(UniqueID req_wpuid,int& pack,int* squad=nullptr,int* target=nullptr);
 	static	int WPType(UniqueID u);
 
 	int		DecodePackage(string packstr,bool decodebinary); //returns num flights. -ve if other targets
 	void	SetTargetUIDs(bool	fixconvoys=false);
 	int		CountWaypoints();
-//DeadCode RDH 16Mar100 	bool	GetKeyTargetWPs(UniqueID& targetarea,UniqueID& firststartpatrolbomb,UniqueID& laststartpatrolbomb,UniqueID& firstendpatrol,UniqueID& lastendpatrol,UniqueID& regrouparea);
 #ifdef	RANGES_Included
 	UniqueID	AddAttackWP(int targetnum,Profile::AttackMethod duty,int alt=METRES3000);
 #endif
 	UniqueID	MakeWayPoints(int targetnum,int squadinpack,Profile::AttackMethod duty,SquadNum sq);
-//DEADCODE DAW 14/03/00 	bool	GetKeyTargetWPs(UniqueID& targetarea,UniqueID& firststartpatrolbomb,UniqueID& laststartpatrolbomb,UniqueID& firstendpatrol,UniqueID& lastendpatrol,UniqueID& regrouparea);
 	bool	GetKeyMainWPs(UniqueID& firsttakeoff,UniqueID &takeoffarea,UniqueID& targetarea,UniqueID& regrouparea,UniqueID& landingarea,UniqueID& lastlanding);
 	static UniqueID	FindSquadWpBetween(UniqueID wp1,UniqueID wp2,int group);
 	static UniqueID	FindSquadWpAfter(UniqueID wp1,UniqueID wp2,int group);
@@ -521,7 +506,6 @@ public:
 	void	ReShareSecondaries();					//gets current number of targets
 	AttackMethodField	ScanAttackMethods();
 	void	SaveAirItemBin(Profile::Squad* squad,UniqueID route,BOStream&file);
-//DeadCode MS 28Oct00 		bool	StopFighting(int squadline,info_airgrp* a,bool forcehome=false); //returns true if destroyed
 };
 /* inline int	operator-(const Profile::Squad* entry,Profile::SquadListRef& base)
 {
@@ -546,7 +530,6 @@ struct	PackageList
 	bool squelchfuelwarning;
 	UniqueID	hiwp;
 	Profile&	operator[](int i)	{return pack[i];}
-//DeadCode JIM 24Sep00 	int			GetSpareSquad(Nationality n);
 	void	BuildReorderTable(bool actuallyreorder=true);
 
 	DES	~PackageList()	{WipeAll();}
@@ -606,17 +589,10 @@ static	UniqueID	ReorderZero(UniqueID u);
 //	char	plpack,plwave,plgrp,plac;					//player's slot
 	int		NewPackage(UniqueID targ,Nationality nat, Profile::AttackMethod duty,int initialbombers=-1,Profile::BetterRule br=Profile::BR_WIDESTPOSSIBLE,int mainalt=0,int* actypecounts=NULL);
 	bool	PackageHasBeenEdited();
-//DEADCODE DAW 24/11/99 	void	ProfileFlightsRequired(int pack, int& mb, int& f80,int& f84,int& f51,int& fb,int& f, int& f86a, int& f86b, int& b26, int& b29); //RDH 16/03/99
-//DEADCODE DAW 24/11/99 	void	FlightsAvailable(int pack, int& a_mb, int& a_f80,int& a_f84,int& a_f51,int& a_fb,int& a_f,
-//DEADCODE DAW 24/11/99 			int& a_f86a, int& a_f86b, int& a_b26, int& a_b29); //RDH 16/03/99
 
-//DEADCODE DAW 24/11/99 	void	DeleteNonRedoPackages();
 	int		FindPackage();
 	static SquadNum		FindSquad(Profile::AttackMethod duty,UniqueID doglegloc,UniqueID targloc,int minavailac,Profile::BetterRule br=Profile::BR_WIDESTPOSSIBLE,SquadNum after=(SquadNum)0);
-//DEADCODE AMM 12/01/00 	int		FindSquadExlMedBombers();
-//DEADCODE DAW 24/11/99 	int		PackageList::CAPAircraftcnt();
 
-//DEADCODE DAW 24/11/99 	void	SetWaveTimes(int p, int w,int targettime);	 //RDH 12/02/99
 	void	UpDatePackageTimes();					 //RDH 12/02/99
 	UniqueID	GetTakeOff(SquadNum);
 	char*	RaidFormatString(int pack, int raid);
@@ -630,19 +606,15 @@ static	UniqueID	ReorderZero(UniqueID u);
 	int TargetStatus(int uidbandstart, int uidbandend);
 	void	SplitExistingResponsesTo(int packnum,int newraidind);
 
-	bool	GetSquadEntry(SquadNum s,int&p,int&sq=*(int*)NULL);
-	bool	GetACSquadEntry(UniqueID ac,int&p,int&sq=*(int*)NULL);
+	bool	GetSquadEntry(SquadNum s,int&p,int* sq=NULL);
+	bool	GetACSquadEntry(UniqueID ac,int&p,int* sq=NULL);
 	enum	WPTargSpecials	{WPTS_NONE=-1,WPTS_MAINTAKEOFF=-2,WPTS_DOGLEG=-3,WPTS_LOCALTAKEOFF=-4};
-	bool	GetWPTargEntry(UniqueID wp,int&p,int&trg=*(int*)NULL);	 
-	bool	GetTargEntry(UniqueID t,int&p,int&trg=*(int*)NULL);
+	bool	GetWPTargEntry(UniqueID wp,int&p,int* trg=NULL);	 
+	bool	GetTargEntry(UniqueID t,int&p,int* trg=NULL);
 
-//DEADCODE DAW 24/11/99 	bool	GetSquadEntry(int p, int w, int g, int& squad, int& flight);
 	bool	FlyableAircraftAvailable();
-//DEADCODE DAW 25/11/99 	bool	PackageList::GetPackage(int& i, int& wave, int& group, int squad, int flight);
 	UniqueID FindEgressPoint(UniqueID targ);
 
-//DEADCODE JIM 13/01/00 	int	SquadACUsed(int squadnum);
-//DEADCODE JIM 13/01/00 	int SquadACAvail(int squadnum);	//every squadron initially has 19 aircraftso they
 	//rdh{return 19;}			//can lose 3 aircraft before dropping to 3 flights
 							//If Mark really wants restocking then I suggest
 							//setting a restocking max of 17 so you are fighting

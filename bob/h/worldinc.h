@@ -62,9 +62,7 @@ enum TAKEOFFPOINT{														  //CSB 16/12/99
 //FileItem - part of worldload - discarded
 //
 
-//DeadCode PD 12Oct95 typedef	UWord	shapeindx;
 
-//DeadCode RJS 21Apr99 typedef	void	*animptr;
 //Protected animdata stuff....
 class	GrpMinAnimData;
 class	SunAnimData;
@@ -216,27 +214,20 @@ struct	WEAPCLASS
 };
 typedef	void	*CALLPTR;
 typedef	void	*LIGHTS;
-//DeadCode PD 20Feb96 typedef	void	*VIEWDEF;
 typedef	void	*animrtnref;
 typedef	void	*shpintrpptr;
 typedef	void	*weapptr;
-//DeadCode RJS 10Feb97 typedef	void	*detectrtnref;
-//DeadCode RDH 19Feb96 typedef	ULong	ActionRtnRef;
 
 struct	PlaneType;
 typedef	PlaneType	*ClassPtr;
 
-//DeadCode RDH 28Feb96 enum	DUTYDESC	{dummy_duty = 0,DUTY_ALIGN=255};
 //moved to h\movement.h											//RDH 19Feb96
-//DeadCode RDH 19Feb96 enum	MANOEUVRE	{MANOEUVRE_SELECT=0,MANOEUVRE_IMMELMAN,MANOEUVRE_LOOP,MANOEUVRE_BARREL,MANOEUVRE_STALL};
 //
 //Blues are aggressive friendly forces (do the killing)
 //Reds are aggressive unfriendly forces (get killed)
 //green are non-aggressive neutral forces (bugger 'em)
 //amber are aggressive neutral forces (bugger me)
-//DeadCode RDH 26Oct95 enum	CONTROLMODE	{AUTO = 0,MANUAL};
 //MovedTo3ddefs.h DAW 28Nov95 enum	Obj3DType	{STATIC = 0, MOBILE};
-//DeadCode PD 07Mar96 enum	SHAPETYPE	{DUMMY_TYPE = 0};
 //TempCode DAW 28Nov95 typedef	Obj3DType	OBJ3DTYPE;
 
 
@@ -250,7 +241,6 @@ struct	UNIQUE_ID
 				FIRSTFIELD (UWord,UniqueID,count,13)
 				BITFIELD(Bool,changed,14,14)
 ////				LASTFIELD(Bool,sector,15,15)
-//DeadCode AMM 10Jun98 				LASTFIELD(Bool,deaded,	15,15)		//RJS 27Feb98
 
 				LASTFIELD(Bool,commsmove,	15,15)				//AMM 10Jun98
 
@@ -303,7 +293,6 @@ struct	ITEM_STATUS
 		BITFIELD(UByte,deadtime,8,12)
 		BITFIELD(UByte,deadscale,13,14)
 		LASTFIELD(Bool,deaded,15,15)	 						//AMM 10Jun98
-//DeadCode AMM 10Jun98 		SPAREFIELD(15,15)
 
 //	Bool		BlueLaunch:	1,
 //				ManLaunch:	1,
@@ -338,7 +327,6 @@ void			operator=(ITEM_STATUS&);
 inline ITEM_STATUS SetStatus(UByte dt,UByte ds) {ITEM_STATUS rv(TRUE,TRUE,TRUE,ITEMBASESIZE,dt,ds);return rv;};
 
 
-//DeadCode JIM 06Nov96 typedef	struct	COORDS3D	{	SLong	X,Y,Z;	} Coords3D;
 struct	EventLog
 {
 		enum		Stage											//RDH 01Dec96
@@ -359,7 +347,6 @@ struct	EventLogPtr:EventLog
 	EventLog* operator->()	{return this;}
 	void operator= (const int)	{;}
 };
-//DEADCODE DAW 08/03/00 typedef	EventLog	*EventLogPtr;
 
 typedef Bool	TellLeader;										//DAW 30Jun96
 enum	NextLeadAct		{NL_OnCourse,NL_CircleFlights,NL_CircleSingles,NL_Flights,NL_DoubleFlighs,NL_PrevRipple,NL_PrevDouble,NL_align=255};
@@ -417,6 +404,12 @@ static	bool	OverFrance(Coords3D&);									//RJS 18Sep00
 		return ItemBase::OverFrance(this->World);						//RJS 18Sep00
 	}																	//RJS 18Sep00
 
+	//ConvertPtrUID() "not found" object: a real constructed ItemBase whose
+	//identity marks it nil. The cast/bool ops below fold it back to NULL so
+	//callers' `if (x!=NULL)` tests keep working without binding a null ref.
+	static ItemBase&	Nil()	{ static ItemBase s; return s; }
+	bool	IsNil()	const	{return this==NULL||this==&Nil();}
+
 	void	operator	delete(void*);
 #ifndef	__BCPLUSPLUS__
 	void	operator	delete(void* p,const char*,int)	{operator delete(p);}
@@ -454,134 +447,134 @@ static	bool	OverFrance(Coords3D&);									//RJS 18Sep00
 __forceinline	ItemBase& operator*()
 		{return *this;}
 __forceinline	ItemBase* operator->()
-		{return this;}
+		{return IsNil()?(ItemBase*)NULL:this;}
 __forceinline	operator bool()
-		{return this!=NULL;}
+		{return !IsNil();}
 __forceinline	bool	operator !()
-		{return this==NULL;}
+		{return IsNil();}
 __forceinline 	operator	ItemBase* ()
-		{return(ItemBase*) (this);}
+		{return IsNil()?(ItemBase*)NULL:(ItemBase*) (this);}
 
 #ifndef	worldincassert
 __forceinline 	operator	item* ()	  	{
-	 			return(item*) (this);	}
+	 			return IsNil()?NULL:(item*) (this);	}
 __forceinline 	operator	WayPoint* ()  	{
-	 			return(WayPoint*) (this);	}
+	 			return IsNil()?NULL:(WayPoint*) (this);	}
 
 __forceinline 	operator	hdgitem* ()  	{
-	 			return(hdgitem*) (this);	}
+	 			return IsNil()?NULL:(hdgitem*) (this);	}
 
 __forceinline 	operator	hpitem* ()  	{
-	 			return(hpitem*) (this);	}
+	 			return IsNil()?NULL:(hpitem*) (this);	}
 
 __forceinline 	operator	rotitem* ()  	{
-	 			return(rotitem*) (this);	}
+	 			return IsNil()?NULL:(rotitem*) (this);	}
 
 __forceinline 	operator	mobileitem* ()  	{
-	 			return(mobileitem*) (this);	}
+	 			return IsNil()?NULL:(mobileitem*) (this);	}
 
 __forceinline 	operator	MovingItem* ()  	{
-	 			return(MovingItem*) (this);	}
+	 			return IsNil()?NULL:(MovingItem*) (this);	}
 
 __forceinline 	operator	TransientItem* ()  	{
-	 			return(TransientItem*) (this);	}
+	 			return IsNil()?NULL:(TransientItem*) (this);	}
 
 __forceinline 	operator	FormationItemPtr ()  	{
-	 			return(FormationItemPtr) (this);	}
+	 			return IsNil()?(FormationItemPtr)NULL:(FormationItemPtr) (this);	}
 
 __forceinline 	operator	ShipItemPtr ()  	{
-	 			return(ShipItemPtr) (this);	}
+	 			return IsNil()?(ShipItemPtr)NULL:(ShipItemPtr) (this);	}
 
 __forceinline 	operator	AirStrucPtr ()  	{
-	 			return(AirStrucPtr) (this);	}
+	 			return IsNil()?(AirStrucPtr)NULL:(AirStrucPtr) (this);	}
 
 __forceinline	operator    info_itemS*	()		{
-				return	(info_itemS*)(this);	}
+				return IsNil()?NULL:(info_itemS*) (this);	}
 
 __forceinline	operator    info_base*	()		{
-				return	(info_base*)(this);	}
+				return IsNil()?NULL:(info_base*) (this);	}
 
 __forceinline	operator    info_waypoint*	()		{
-				return	(info_waypoint*)(this);	}
+				return IsNil()?NULL:(info_waypoint*) (this);	}
 
 __forceinline	operator    info_grndgrp*	()		{
-				return	(info_grndgrp*)(this);	}
+				return IsNil()?NULL:(info_grndgrp*) (this);	}
 
 __forceinline	operator    info_airgrp*	()		{
-				return	(info_airgrp*)(this);	}
+				return IsNil()?NULL:(info_airgrp*) (this);	}
 __forceinline	operator    SAGAirstruc*	()		{
-				return	(SAGAirstruc*)(this);	}
+				return IsNil()?NULL:(SAGAirstruc*) (this);	}
 __forceinline	operator    SAGairgrp*	()		{
-				return	(SAGairgrp*)(this);	}
+				return IsNil()?NULL:(SAGairgrp*) (this);	}
 #else
  	operator	item* ()	  	{
 			 if (this)	 assert (Status.size>=ItemSize);
-	 			return(item*) (this);	}
+	 			return IsNil()?NULL:(item*) (this);	}
  	operator	WayPoint* ()  	{
 			 if (this)	 assert ( Status.size==WayPointSize);
-	 			return(WayPoint*) (this);	}
+	 			return IsNil()?NULL:(WayPoint*) (this);	}
 
  	operator	hdgitem* ()  	{
 			 if (this)	 assert ( Status.size>=HdgSize);
-	 			return(hdgitem*) (this);	}
+	 			return IsNil()?NULL:(hdgitem*) (this);	}
 
  	operator	hpitem* ()  	{
 			 if (this)	 assert ( Status.size>=HPSize);
-	 			return(hpitem*) (this);	}
+	 			return IsNil()?NULL:(hpitem*) (this);	}
 
  	operator	rotitem* ()  	{
 			 if (this)	 assert ( Status.size>=RotatedSize);
-	 			return(rotitem*) (this);	}
+	 			return IsNil()?NULL:(rotitem*) (this);	}
 
  	operator	MovingItem* ()  	{
 			 if (this)	 assert ( Status.size>=MovingSize);
-	 			return(MovingItem*) (this);	}
+	 			return IsNil()?NULL:(MovingItem*) (this);	}
 
  	operator	mobileitem* ()  	{
 			 if (this)	 assert ( Status.size>=MobileSize);
-	 			return(mobileitem*) (this);	}
+	 			return IsNil()?NULL:(mobileitem*) (this);	}
 
  	operator	TransientItem* ()  	{
 			 if (this)	 assert ( Status.size>=TransientSize);
-	 			return(TransientItem*) (this);	}
+	 			return IsNil()?NULL:(TransientItem*) (this);	}
 
  	operator	FormationItemPtr ()  	{
 			 if (this)	 assert ( Status.size>=FormationSize);
-	 			return(FormationItemPtr) (this);	}
+	 			return IsNil()?(FormationItemPtr)NULL:(FormationItemPtr) (this);	}
 
  	operator	ShipItemPtr ()  	{
 			 if (this)	 assert ( Status.size>=ShipSize);
-	 			return(ShipItemPtr) (this);	}
+	 			return IsNil()?(ShipItemPtr)NULL:(ShipItemPtr) (this);	}
 
  	operator	AirStrucPtr ()  	{
 			 if (this)	 assert ( Status.size>=AirStrucSize);
-	 			return(AirStrucPtr) (this);	}
+	 			return IsNil()?(AirStrucPtr)NULL:(AirStrucPtr) (this);	}
 
 	operator    info_itemS*	()		{
 			 if (this)	 assert (Status.size>=ItemSize);
-				return	(info_itemS*)(this);	}
+				return IsNil()?NULL:(info_itemS*) (this);	}
 
 	operator    info_base*	()		{
-				return	(info_base*)(this);	}
+				return IsNil()?NULL:(info_base*) (this);	}
 
 	operator    info_waypoint*	()		{
 			 if (this)	 assert ( Status.size==WayPointSize);
-				return	(info_waypoint*)(this);	}
+				return IsNil()?NULL:(info_waypoint*) (this);	}
 
 	operator    info_grndgrp*	()		{
 			 if (this)	 assert ( Status.size>=MobileSize);
-				return	(info_grndgrp*)(this);	}
+				return IsNil()?NULL:(info_grndgrp*) (this);	}
 
 	operator    info_airgrp*	()		{
 			 if (this)	 assert ( Status.size>=AirStrucSize);
-				return	(info_airgrp*)(this);	}
+				return IsNil()?NULL:(info_airgrp*) (this);	}
 
 	operator    SAGAirstruc*	()		{
 	 		 if (this)	assert (Status.size>=AirStrucSize);
-				return	(SAGAirstruc*)(this);	}
+				return IsNil()?NULL:(SAGAirstruc*) (this);	}
 	operator    SAGairgrp*	()		{
 	 		 assert (this && Status.size>=AirStrucSize);
-				return	(SAGairgrp*)(this);	}
+				return IsNil()?NULL:(SAGairgrp*) (this);	}
 #endif
 #ifdef	worldincassert
 	#undef	worldincassert
@@ -642,9 +635,6 @@ public:
 					skipunder=UID_Null;skipover=IllegalSepID;}
 	COORDS3D*	FindDesPos();
 	WayPointPtr		FindWP(WPNames name);										  //RDH 08/03/99
-//DEADCODE DAW 08/06/99 	#ifdef	TEXT_Included
-//DEADCODE DAW 08/06/99 	TextSnip0	GetWpName();
-//DEADCODE DAW 08/06/99 	#endif
 #ifdef TRACKBADASSIGNMENTS
 void	operator=(WayPoint&);
 #endif
@@ -662,7 +652,6 @@ struct	FormationType;
 class	item:public	ItemOverlayWP				//o14	//o1C
 {
 //private:
-//DeadCode PD 26Mar96 	animptr		Anim;		//This is the new shape element linked data area
 public:
 	animptr		Anim;						//o14s04//This is the new shape element linked data area//PD 26Mar96
 	ONLYFIELD(UWord,ShapeNum,shape);		//o18s02
@@ -687,26 +676,14 @@ static 	void InterceptandRange (COORDS3D* subject, COORDS3D* target);
 
 //public:							//and also controls weapon launching
 //	itemptr		Next;
-//DeadCode RDH 04Dec95 	UNIQUE_ID	UniqueID;	//access with myitem->UniqueID.count
 //	BRIEF_ID	BriefID;
-//DeadCode RDH 04Dec95 	ITEM_STATUS	Status;
-//DeadCode RDH 04Dec95 	ITEM_SIZE	ItemSize;
 	item()	{Status.size=ItemSize;Next=NULL;SGT=UID_NULL;shape=ShapeNum(0);}		//RJS 7Nov00
-//DEADCODE JIM 16/11/99 	int	FACReportDamage(bool	waskill);
-//DEADCODE JIM 16/11/99 	static	void	FACReportGround();
-//DeadCode AMM 10Oct00 	void	ScoreSimpleItemKilled(bool itsdead,AirStrucPtr killer);
 #ifdef TRACKBADASSIGNMENTS
 void	operator=(Item&);
 #endif
 	COORDS3D*	Formation_xyz(ANGLES hdg,FormationType* formtype,int formindex);//RDH 17Jun96
 };
 
-//DeadCode RJS 21Apr99 inline	ItemBase::~ItemBase()
-//DeadCode RJS 21Apr99 {	if ((int)Status.size>=(int)ItemSize)
-//DeadCode RJS 21Apr99 		delete [] (char*) ((ItemPtr) this)->Anim;
-//DeadCode RJS 21Apr99 	((ItemPtr) this)->Anim=NULL;
-//DeadCode RJS 21Apr99 //DEADCODE JIM 19/01/99 	Status.size=ItemBaseSize;
-//DeadCode RJS 21Apr99 }
 inline	ItemBase::~ItemBase()									//RJS 21Apr99
 {	if ((int)Status.size>=(int)ItemSize) 						//RJS 21Apr99
 	{															//RJS 21Apr99
@@ -767,11 +744,6 @@ class	MovingItem:public	rotitem		//o22
 public:
 
 void CalcNewPos(SLong deltax,SLong deltay,SLong deltaz);
-//DEADCODE CSB 08/11/99     SWord		velx,					//o22s02						//RDH 13Nov95
-//DEADCODE CSB 08/11/99 				vely,					//o24s02						//RDH 30Oct95
-//DEADCODE CSB 08/11/99 				velz,					//o26s02						//RDH 30Oct95
-//DEADCODE CSB 08/11/99 				velhori,				//o28s02						//RDH 30Oct95
-//DEADCODE CSB 08/11/99 				vel;					//o2As02//units mm/cs - max 3276m/s=mach 10		//RDH 30Oct95
 	//VelX,VelY is not equivalent to VelHori,Hdg when sliding.
 	//no longer want deltas inside moving item - calc. as local longs
 	//they are useful for collision, of course
@@ -786,8 +758,6 @@ void CalcNewPos(SLong deltax,SLong deltay,SLong deltaz);
 	MovingItem()	{Status.size=MovingSize;}
 };
 
-//DeadCode AMM 27Aug98 typedef struct _packet PACKET;
-//DeadCode AMM 27Aug98 typedef struct _packet* LPPACKET;
 //
 // MobileItem allows a movecode and a waypoint
 //
@@ -804,7 +774,6 @@ class	mobileitem:public	MovingItem	//o2C
 	friend class Persons2;	friend class Persons3;
 	friend class TransObj;										//PD 01May96
 	friend	void SendInit2Packet ();							//ARM 17Sep96
-//DeadCode AMM 27Aug98 	friend	void CopyPacket (ItemBasePtr lpItemBase);		//AMM 25Aug98
 	friend Shape;											//RJS 05Aug96
 	friend class State3dOnGoing;											//RJS 05Aug96
 	friend class ArtInt;											//RJS 05Aug96
@@ -857,7 +826,6 @@ BFieldWaypointActions
 		MidLoopWayPoint ();										//RDH 19Feb96
 bool	EscorteePastWP(WayPointPtr);
 void	ForceBreakLoopWayPoint();
-//DeadCode DAW 19Nov96 void	MidLoopWayPoint ();										//RDH 19Feb96
 void	WaitDeadWayPoint ();										//RDH 19Feb96
 void	StartBombing ();										//RDH 19Feb96
 void	StartStraffe ();										//RDH 19Feb96
@@ -892,9 +860,6 @@ public:
 	TransientItem()
 	{
 		Status.size=TransientSize;														//RJS 15Jun99
-//DeadCode RJS 15Jun99 		Status.deadtime = 0;															//RJS 15Jun99
-//DeadCode RJS 15Jun99 		Status.deadscale = 0;															//RJS 15Jun99
-//DeadCode RJS 15Jun99 		Status.deaded = FALSE;															//RJS 15Jun99
 		transcount++;
 		isDeleted=0;
 		isArmed=0;
@@ -937,13 +902,6 @@ static	void MoveAllTrans(WorldStuff& world);						//MGA 20Mar96
 // FormationItem allows mobiles to link together
 //
 //
-//DEADCODE DAW 22/03/00 inline DutyType	BasicDuty(DutyType duty)
-//DEADCODE DAW 22/03/00 {
-//DEADCODE DAW 22/03/00 	if ((int)duty&(int)ACTIONSUBCODE)
-//DEADCODE DAW 22/03/00 		return DutyType((int)duty&(int)DUTYMASK);
-//DEADCODE DAW 22/03/00 	else
-//DEADCODE DAW 22/03/00 		return duty;
-//DEADCODE DAW 22/03/00 }
 
 struct	ContourList;
 
@@ -973,13 +931,6 @@ FormationItemPtr&	Follower()	{return (follower);}
 
 	UWord		manoeuvretime;					//o48s02//max 655sec=11min								//JIM 20/01/99
 
-//DEADCODE DAW 22/03/00 	DutyType	BasicDuty()
-//DEADCODE DAW 22/03/00 	{
-//DEADCODE DAW 22/03/00 		if ((int)duty&(int)ACTIONSUBCODE)
-//DEADCODE DAW 22/03/00 			return DutyType((int)duty&(int)DUTYMASK);
-//DEADCODE DAW 22/03/00 		else
-//DEADCODE DAW 22/03/00 			return duty;
-//DEADCODE DAW 22/03/00 	}
 
 	formationitem()
 	{	Status.size=FormationSize;
@@ -999,8 +950,6 @@ FormationItemPtr&	Follower()	{return (follower);}
 	SLong CalcReqVel ();
 	Bool CalcVel ();
 	Bool CalcVelSub (SLong reqvel);			//RDH 28Feb96
-//DeadCode CSB 12/02/99		SWord CalcAccel (SWord, SWord);
-//DeadCode CSB 12/02/99		void AddAccel2Vel(SWord);
 	Bool CalcHdgRollFlat ();
 	Bool AutoCalcPitch ();
 	void MoveRollToZero(SWord	reqdeltahdg);
@@ -1039,14 +988,11 @@ struct	ai_info						//contains floats	//o??s60
 	SquadronBase*	diaryptr;		//RJS 18Feb00
 
 	itemptr		unfriendly,
-//DeadCode CSB 21Aug00 				secondunfriendly[3],											//o00s04//save
 				spottedunfriendly[4],											//o00s04//save
 				homebase;											//o04s04//unchanged
 	AirStrucPtr	Unfriendly()	{return *unfriendly;}
-//DeadCode CSB 21Aug00 	AirStrucPtr	Unfriendly(int i){return *secondunfriendly[i];}
 	AirStrucPtr	attacker;											//o08s04//save
 	ONLYFIELD(UByte,SkillType,combatskill); // unchanged?
-//DEADCODE JIM 01/12/99 	ONLYFIELD(UByte,SkillType,flyingskill);
 		enum	SubMethod
 		{
 			SM_ANYA2A,
@@ -1075,7 +1021,6 @@ struct	ai_info						//contains floats	//o??s60
 		BITFIELD(		SubMethod,submethod,		8,15)		// unchanged
 		BITFIELD(		MANOEUVRE,manoeuvre,		16,22)		//7	//save
 //LOTS OF SPARE BITS!!!! - Not really Lots any more...
-//DEADCODE CSB 07/03/00 		BITFIELD(		Bool,flatturn,				23,23)		//1	//save
 		BITFIELD(		Bool,moved,					23,23)		//1		//CSB 12Oct00
 		LASTFIELD(		int,pilotnum,				24,31)		//8
 	UByte	morale;												//o10s01	//save
@@ -1092,14 +1037,8 @@ struct	ai_info						//contains floats	//o??s60
 	ONLYFIELD(UByte,AcTactics,		squadrontactics);			//o17s01					//unchanged
 //##not
 //word aligned:
-//DeadCode RDH 10Aug98 	UWord		JinkTime;										//DAW 12Jun96
-//DeadCode AMM 14Aug00 	SLong		lastdelta;		//Dead?								//o18s04	//save, //delta from ideal shooting position
-//DeadCode CSB 29/03/99		SLong		oldufposx, oldoldufposx, oldoldoldufposx,
-//DeadCode CSB 29/03/99					oldufposy, oldoldufposy, oldoldoldufposy,
-//DeadCode CSB 29/03/99					oldufposz, oldoldufposz, oldoldoldufposz;
 	ANGLES		desiredroll,									//o1Cs02	//save
 				desiredpitch,									//o1Es02	//save
-//DEADCODE JIM 28/04/99 				lastdeltaroll,									//o20s02	//save
  				desiredaoa,		//								//o20s02	//save
 				oldpitchI,		//								//o22s02	//save
 				oldoldpitchI,	//								//o24s02	//save
@@ -1126,9 +1065,7 @@ struct	ai_info						//contains floats	//o??s60
 	WayPointPtr&	LastClipped()		{return *(WayPointPtr*)&desiredroll;}
 	BFieldWaypointActions& LastAction()	{return *(BFieldWaypointActions*)&desiredaoa;}
 	ULong&			Lettering()			{return	*(ULong*)&oldoldpitchI;}
-//DeadCode RDH 20Sep98 	SWord		currentbuffet;									//RDH 06Jun96
 	EventLogPtr	eventlog;										//o5Cs04	//ask jim
-//DeadCode JIM 10Jun96 	msgptr		MessageList;	//this is it.. use msg->flags to say done/read
 	 							//Use fixed speed looping to process times.
 	ai_info()	{unfriendly=homebase=NULL;attacker=NULL;eventlog=NULL;diaryptr=NULL;for(int i=0;i<4;i++)spottedunfriendly[i]=NULL;}//RJS 18Feb00	//CSB 1Nov00
 	enum	{PROPER_PILOT_MAX=1};
@@ -1140,13 +1077,6 @@ struct	weap_info					   //o??s20
 	int		reloaddrag;			//o04s04//N
 	int		mass;				//o08s04//0.01 g includes all weapons and weight of fuel tank but not weight of fuel
 	int		drag;				//o0Cs04//N
-//DeadCode RJS 26Nov99	int		int_fuel;			//o10s04//0.01 g
-//DeadCode RJS 26Nov99	int		ext_fuel;			//o14s04//0.01 g
-//DeadCode RJS 26Nov99	SWord	int_fuel_leakage;	//o18s02//g/s
-//DeadCode RJS 26Nov99	SWord	ext_fuel_leakage;	//o1As02//g/s
-//DeadCode RJS 26Nov99	SByte	int_launcher;		//o1Cs01									//RJS 25Mar99
-//DeadCode RJS 26Nov99	SByte	ext_launcher;		//o1Ds01									//RJS 25Mar99
-//DeadCode RJS 26Nov99	UWord	DUMMYWASTAGE;		//o1Es02
 };
 struct	weap_ctl			//o??s6C
 {
@@ -1169,7 +1099,6 @@ struct	weap_ctl			//o??s6C
 	UByte	weapontype;						//o64s01		//LT_ byte	//RJS 08Dec99
 	UByte	shpweapindex;					//o65s01		//Index is basically aircraft type...
 	SWord		weapforce;					//o66s02					//RJS 16Sep98
-//DeadCode RJS 15Nov99 	TransientItem*	currentbullet;			//o68s04					//RJS 29Mar99
 };
 
 struct	flight_ctl						//o??s40
@@ -1185,7 +1114,6 @@ struct	flight_ctl						//o??s40
 				thrustpercent;			//o0As02							//save
 	SWord		propsetting;
 
-//DEADCODE CB 01/11/99 				afterburner;			//o0Cs02							//not used
 //				LastRoll;
 	ANGLES		cpitch;					//o0Es02							//calc
 	WayPointPtr	backupWP;				//o10s04							//save
@@ -1196,16 +1124,12 @@ struct	flight_ctl						//o??s40
 																	//		roll);
 	ONLYFIELD(UWord,FormationIndex,originalformpos);	//o1Cs01
 
-//DEADCODE JIM 09/12/99 	FIRSTFIELD(UByte,	UByte,comefrommap,		6)		//o1Ds01			//ask jim
-//DEADCODE JIM 09/12/99 	LASTFIELD(			Bool,inRadarSight,		7,7)	//RJS 13May99
 	SByte		redeffect;								//o1Es01	//ask Paul
 	UByte		callname;								//o1Fs01		//ask Jim
 	UByte		callnum;								//o20s01		//sak Jim
 //TEMPCODE JIM 28/04/99 	UByte		callvoice;
 	UByte		AeroDeviceCnt;							//o21s01		//RJS 18Sep98
 
-//DEADCODE JIM 10/12/99 	SWord		i_a_s,									//o22s02		//calc from SetInstruments
-//DEADCODE JIM 10/12/99 				vel_cms;								//o24s02		//calc from setFlightParams, questio need
 
 	SWord		aileron,								//o26s02		//save
 				elevator,								//o28s02		//save
@@ -1230,17 +1154,11 @@ struct	flight_ctl						//o??s40
 
 };
 
-//DEADCODE JIM 28/04/99 struct	instrum_ctl
-//DEADCODE JIM 28/04/99 {
-//DEADCODE JIM 28/04/99 //LIGHTS		InstrumLights;	//most flags are in animation data
-//DEADCODE JIM 28/04/99
-//DEADCODE JIM 28/04/99 };
 
 //
 
 struct RequiredBankDataElement									//RDH 18Dec95
 	{															//RDH 18Dec95
-//Old_Code PD 10Nov97 		ANGLES hdg; ANGLES roll;								//RDH 18Dec95
 		ANGLESInst hdg; ANGLESInst roll;								//RDH 18Dec95
 	};															//RDH 18Dec95
 
@@ -1274,12 +1192,8 @@ public:
 	weap_ctl	weap;						//oACs6C	//ask Rob
 	flight_ctl	fly;						//o118s40
 
-//DEADCODE AMM 07/03/00 	bool		sentexpanded;
-//DEADCODE AMM 07/03/00 	bool		sentcontracted;
 
-//DEADCODE JIM 28/04/99   	instrum_ctl	inst;						//o158s	//ask Robert
 
-//DEADCODE AMM 07/03/00 	ONLYFIELD(UWord,UniqueID,CommsOwner);	//o158s02
 
 	FIRSTFIELD(UWord,UniqueID,CommsOwner,13)
 	BITFIELD(Bool,sentcontracted,14,14)
@@ -1292,9 +1206,6 @@ public:
 	SAGAirstruc&   SAG()	{return  *(SAGAirstruc*)*this;}
 	ACMAirStruc&   ACMAS()	{return  *(ACMAirStruc*)*this;}
 	MoveAirStruc&   Move()	{return  *(MoveAirStruc*)*this;}
-//DeadCode AMM 29Aug00 static	bool		playermoving;
-//DeadCode AMM 29Aug00 static	AirStrucPtr	playernotmovingheldac;
-//DeadCode AMM 29Aug00 static	bool		PlayerStartedMoving();
 
 static UWord airdensityratiosquareroot[];
 
@@ -1320,36 +1231,10 @@ void	operator=(AirStruc&);
 #ifndef	__BCPLUSPLUS__
 	void	operator	delete(void* p,const char*,int)	{operator delete(p);}
 #endif
-//DEADCODE CSB 16/12/99 	void AutoCrossOverTurn();										  //CSB 14/12/99
-//DEADCODE CSB 16/12/99 //DeadCode RDH 05Jan99 	void AutoTrainingACM ();
-//DEADCODE CSB 16/12/99 	void AutoCrashSkid();
-//DEADCODE CSB 16/12/99 	void AutoAccelerate();
-//DEADCODE CSB 16/12/99 	void AutoCrashRoll();
-//DEADCODE CSB 16/12/99 //DeadCode RDH 05Jan99 	void AutoTrainingPreMerge ();
-//DEADCODE CSB 16/12/99 //DeadCode RDH 05Jan99 	void SelectNextTrainingManoeuvre();
-//DEADCODE CSB 16/12/99 	void AutoFollowWpWing (AirStrucPtr MyLeader = NULL);		//RDH 27Feb96	//CSB 20/04/99
-//DEADCODE CSB 16/12/99 	void	AutoTakeOff ();										//RDH 17Jun96
-//DEADCODE CSB 16/12/99 	void
-//DEADCODE CSB 16/12/99  	AutoLanding ();
-//DEADCODE CSB 16/12/99 	void	HeldACCheck();
-//DEADCODE DAW 27/01/00 	void AutoCrashSkid();
-//DEADCODE DAW 27/01/00 	void AutoAccelerate();
-//DEADCODE DAW 27/01/00 	void AutoCrashRoll();
-//DeadCode RDH 05Jan99 	void AutoTrainingPreMerge ();
-//DeadCode RDH 05Jan99 	void SelectNextTrainingManoeuvre();
-//DEADCODE DAW 27/01/00 	void AutoFollowWpWing (AirStrucPtr MyLeader = NULL);		//RDH 27Feb96	//CSB 20/04/99
-//DEADCODE DAW 27/01/00 	void	AutoTakeOff ();										//RDH 17Jun96
-//DEADCODE DAW 27/01/00 	void
-//DEADCODE DAW 27/01/00  	AutoLanding ();
-//DEADCODE DAW 27/01/00 	void	HeldACCheck();
 
 
-//DEADCODE DAW 27/01/00 	void	AutoTakeOffWing ();									//RDH 17Jun96
 	void	TrackBogey();
 	void	TrackBandit();
-//DEADCODE CSB 16/12/99 	void	AutoTakeOffWing ();									//RDH 17Jun96
-//DEADCODE CSB 16/12/99 	void	AirStruc::TrackBogey();
-//DEADCODE CSB 16/12/99 	void	AirStruc::TrackBandit();
 
 
 	void	FirstTimeInCombatMsg();						  //RDH 04/03/99
@@ -1363,13 +1248,7 @@ void	operator=(AirStruc&);
 	void	SetLettering(int letteringcode);
 
 	void SetDesiredVel();			//rdh9/12/98
-//DeadCode RDH 10Sep96 static	void AutoDeathSequence(MobileItemPtr);							//RJS 08Aug96
-//DEADCODE JIM 16/11/99 	void	AutoFAC ();
-//DEADCODE JIM 16/11/99 	int		GetFACStage();
 
-//DEADCODE JIM 16/11/99 	void	AutoCAS();
-//DEADCODE JIM 16/11/99 	AirStrucPtr	FindMyFAC();
-//DEADCODE JIM 16/11/99 	void	SetToCAS(bool firsttime=true);
 
 	void	AutoToGrndPitchRoll(ANGLES grndroll,ANGLES grndpitch);
 	void	SimpleMoveToRoll (SWord);
@@ -1377,7 +1256,6 @@ void	operator=(AirStruc&);
 
 	void	FireABullet(SWord delaybetweenbursts,Bool isArmed=TRUE); //RJS 27May99
 	void	FireARocket(SWord delaybetweenbursts,Bool isArmed=TRUE); //RJS 27May99
-//DeadCode DAW 27Jun99 	Bool CheckForWeapon(UByte ltype);							//CSB 26/03/99
 	Bool CheckForAnyWeapon();									//CSB 26/03/99
 	Bool CheckForWeapon(UByte ltype);							//CSB 26/03/99
 	Bool ChooseAWeapon();										//CSB 02/04/99
@@ -1394,10 +1272,7 @@ void	operator=(AirStruc&);
 	void CalcBulletVel(SLong MuzVel, SWord &Hdg, SWord &Pitch, SLong &BullVel);	//CSB 11/06/99
 	void CalcBulletVel(SLong MuzVel, SLong posx, SLong posy, SLong posz, SLong& vx, SLong& vy, SLong& vz);
 
-//DEADCODE JIM 16/11/99 	ItemPtr	CheckFACTarget(ItemBasePtr targ);
-//DEADCODE JIM 16/11/99 	void	LogAutoCASKill();
 
-//DEADCODE JIM 16/11/99 	void SendFACMessage(PhaseFAC phase);
 	Bool	HasSmoked();										//RJS 12Mar99
 	AirStrucPtr	FlyEscortTo();	//returns null if independent
 	AirStrucPtr	FindLeadCandidate();	//CSB 20/04/99
@@ -1412,7 +1287,6 @@ AirStrucPtr&	Follower()	{return *(AirStrucPtr*)(&follower);}
 	UByte	CombatFactor();
 	UByte	FlyingFactor();
 
-//DeadCode JIM 15Oct96 	void RemoveDeadMember();
 	void BreakForm();
 	void SAGBreakForm();
 	bool ShouldDumpAndRun(bool FromSpot, bool FromKill, AirStrucPtr Enemy = NULL);
@@ -1432,16 +1306,12 @@ static	int		ModifyHdgRangeForFormation(int dhori);
 	COORDS3D* PositionWRTLeader (AirStrucPtr lf = NULL);										//RDH 27Feb96	//CSB 25/05/99
 	COORDS3D* PositionTakeOffWRTLeader (AirStrucPtr lf = NULL);						//RDH 17Jun96
 	void SetManualFlightParams ();								//RDH 22Apr96
-//DEADCODE RDH 30/04/99 	void SendEveryOneHome ();									//RDH 24Sep96
 	void LeaderBreakOff ();									//RDH 24Sep96
-//DEADCODE RDH 30/04/99 	void SetWaypointForEveryBody(AirStrucPtr,WayPointPtr);									//RDH 24Sep96
 	SWord RequiredDRoll (SWord);
 	SWord RequiredDRollSub (SWord);								//RDH 11Oct96
 	void RemoveFuelLeakage(weap_info weapinfo, SWord Xpos, UWord NFrames);
 
 	void FuelLeft (FP FuelRate);								//RDH 03Jun96	//CSB 15/09/98
-//DeadCode CSB 12/02/99		Bool CalcVelSub (SLong reqvel);								//RDH 15Nov96
-//DEADCODE CSB 08/11/99 	Bool CalcVel ();											//RDH 22Nov96
 	Bool AutoCalcPitch ();
 	void NewPosition (bool withwind = true);
 	void NewDeadPosition ();									//RJS 23Feb98
@@ -1450,7 +1320,6 @@ static	int		ModifyHdgRangeForFormation(int dhori);
 	void	CheckManualCourse();
 	Bool	FuelShort(int excesstime,int* avail=NULL,int* safety=NULL );
 	Bool	AircraftDamaged();
-//DEADCODE JIM 25/04/99 static	void EndGameScoring();								//RDH 09Sep96
 static	void PrelimActivePilotChk ();					//RDH 11Dec96
 static	SkillType IncSkill (AirStrucPtr,SWord aircraft_no);			//RDH 04Dec96
 static	void PlayerDecision ();						//RDH 09Sep96
@@ -1495,20 +1364,10 @@ static	void ModifyPlayerMerit(DeltaMeritType);				//RDH 09Sep96
 	ShapeNum&	_GetDrawShape();										//RJS 13Oct00
 
 protected:
-//DeadCode JIM 15Oct96 	void BreakForm();
 	void CopyLeader (AirStrucPtr lf);											//RDH 27Feb96
 	Bool CopyLeaderSub (AirStrucPtr lf);											//RDH 27Feb96
 	SWord CalcWobbleDY();												  //CSB 14/12/99
 	SWord CalcWobbleVY();												  //CSB 14/12/99
-//DEADCODE JIM 09/02/00 	void GetFlightLeader_xyz (FormationTypeIndex 	formationtype);//RDH 17Jun96
-//DeadCode JIM 30Apr96 	void GetFollower_xyz ();			//RDH 27Feb96
-//DeadCode JIM 29Apr96 	SLong CalcReqVel ();
-//DeadCode JIM 29Apr96 	Bool CalcVel ();
-//DeadCode JIM 29Apr96 	Bool CalcVelSub (SLong reqvel);								//RDH 28Feb96
-//DeadCode JIM 29Apr96 	Bool CalcHdgRollFlat ();
-//DeadCode JIM 29Apr96 	Bool AutoCalcPitch ();
-//DeadCode JIM 29Apr96 	void CalcXYZVel ();
-//DeadCode JIM 29Apr96 	void SetManoeuvreTime (UWord time=2000);
 	SWord ReachedDesPos ();
 	void SetRpm ();
 	Bool RollLevel (int delta);
@@ -1522,160 +1381,34 @@ protected:
 	SWord FindRequiredRoll (SWord, RequiredBankDataElement*);
 	void	SetControlSurfaces (); //RDH 25Mar96
 //	void	SetInstruments (); //RDH 25Mar96
-//DEADCODE DAW 18/01/00 	void	AirStruc::HeadOnAttack();								  //CB 24/11/99
-//DEADCODE DAW 18/01/00 	void	AirStruc::Lufberry();									  //CB 18/11/99
-//DEADCODE DAW 18/01/00 	void	AirStruc::SteepDive();									  //CB 18/11/99
-//DEADCODE DAW 18/01/00 	void	AirStruc::UpAndUnder();									  //CB 18/11/99
-//DEADCODE DAW 18/01/00 	void	AirStruc::StallTurn();									  //CB 18/11/99
-//DEADCODE DAW 18/01/00 	void	AirStruc::SlashingAttack();								  //CB 18/11/99
-//DEADCODE DAW 18/01/00 	void	AirStruc::ClimbTurn();									  //CB 18/11/99
-//DEADCODE DAW 18/01/00 	void	AirStruc::Roll360();									  //CB 18/11/99
-//DEADCODE DAW 18/01/00 	void	AirStruc::Straffe();									  //CB 18/11/99
-//DEADCODE DAW 18/01/00
 
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::TurnToHdgAndPitch();
-//DeadCode RDH 07Jan99 	void	AirStruc::HotSideLagPursuitFight();
-//DeadCode RDH 07Jan99 	Bool	AirStruc::SandwichManoeuvres();
 //	SWord	AirStruc::RollforTurn(SWord reqdeltapitch,SWord deltahdg, Float& desiredturn);
-//DEADCODE DAW 18/01/00 	SWord	RollforTurn(SWord reqdeltapitch,SWord deltahdg, Float& desiredturn,COORDS3D	target);
-//DEADCODE DAW 18/01/00 	void	CalcDesiredPitchRate(SWord	reqdeltapitch, SWord	reqdeltapitch_sign, UWord	reqdeltapitch_pos);
-//DEADCODE DAW 18/01/00 	FP		CoarseRollAdjust(FP rroll, FP fpitch);
-//DEADCODE DAW 18/01/00 	FP		FineRollAdjust(SWord reqdeltapitch,SWord deltahdg,FP rroll, FP fpitch, FP fhdg);
-//DEADCODE DAW 18/01/00 	Bool	UnfriendlyOnSameRoll();
 
 
-//DeadCode RDH 07Jan99 	void	AirStruc::SustainedTurn();
-//DEADCODE DAW 18/01/00 	void	AirStruc::TurningFight();
 //	void	AirStruc::CalcLead(SWord& velx,SWord& vely,SWord& velz);
 //	void	AirStruc::CalcLead(AirStrucPtr  subject, AirStrucPtr target, SWord& velx,SWord& vely,SWord& velz);
-//DEADCODE DAW 18/01/00 	void	AirStruc::CalcLead(AirStrucPtr  subject, AirStrucPtr target, SLong& velx,SLong& vely,SLong& velz, Bool cutcorner);
 
 //	void	AirStruc::TurnFightSub(ANGLES	HdgIntercept);
 //	void	AirStruc::TurnFightSub(ANGLES	HdgIntercept, Bool sitbehindtarget, ANGLES	deltapitch);
-//DEADCODE DAW 18/01/00 	void	AirStruc::TurnFightSub(ANGLES	HdgIntercept, Bool sitbehindtarget, ANGLES	deltapitch,COORDS3D	target);
-//DEADCODE DAW 18/01/00 	void	AirStruc::TurnFightPhase1(ANGLES	HdgIntercept, Bool sitbehindtarget, ANGLES	deltapitch,COORDS3D	target);
 
 //	void	AirStruc::TurnFightSub(ANGLES	HdgIntercept, Bool sitbehindtarget);
-//DEADCODE DAW 18/01/00 	void	AirStruc::SlowDownCheck(UWord reqdeltahdg_pos);
-//DEADCODE DAW 18/01/00 	void	AirStruc::SlowDown(FP velc);
-//DEADCODE DAW 18/01/00 	void	AirStruc::SpeedUp(FP velc);
 
-//DEADCODE DAW 18/01/00 	SWord	AirStruc::ThrustfromFF();
 
 
 //	void	AirStruc::TurnWithPitchChange(ANGLES	HdgIntercept, Bool sitbehindtarget);
-//DEADCODE DAW 18/01/00 	void	AirStruc::TurnWithPitchChange(ANGLES	HdgIntercept, Bool sitbehindtarget,COORDS3D	target);
-
-//DEADCODE DAW 18/01/00 	void	AirStruc::HighYoYo();
-//DEADCODE DAW 18/01/00 	void	AirStruc::Zoom();
-//DEADCODE DAW 18/01/00 	void	AirStruc::LowYoYo ( );
-//DEADCODE DAW 18/01/00 	void	AirStruc::TurnFightTargetNotOnNose(SWord	reqdeltahdg, SWord	reqdeltapitch, SWord	reqdeltapitch_sign,UWord	reqdeltapitch_pos, ANGLES	deltapitch);
-//DEADCODE DAW 18/01/00 	void	AirStruc::RollAndPull(SWord	reqdeltahdg, SWord dpitch);
-
-//DEADCODE DAW 18/01/00 	void	AirStruc::InterceptHigh();
-//DEADCODE DAW 18/01/00 	void	AirStruc::ClimbAtSustainedTurnSpeed();
-//DEADCODE DAW 18/01/00
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::BanditOnColdSide();
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::BanditHasLead();
-//DEADCODE DAW 18/01/00
-//DEADCODE DAW 18/01/00 	Bool 	AllOnTopCover ();										//RDH 19Aug96
-//DEADCODE DAW 18/01/00 	Bool	AllButLdrNotOnCombat ();								//RDH 11Nov96
-//DEADCODE DAW 18/01/00 	void	BarrelRollAttack ( );
-//DEADCODE DAW 18/01/00 	void	Scissors ( );
-//DEADCODE DAW 18/01/00 	void	MildScissors ( );
-//DEADCODE DAW 18/01/00 	void	StraightandLevel ( );
-//DEADCODE DAW 18/01/00 //DeadCode RDH 30Mar98 	void	AcmSideSlip ( );
-//DEADCODE DAW 18/01/00 	void	SpinOut ( );
-//DEADCODE DAW 18/01/00 	void	DiveforHome ( );
-//DEADCODE DAW 18/01/00 	void	ClimbforHome ( );
-//DEADCODE DAW 18/01/00 	void	StraightDive ( );
-//DEADCODE DAW 18/01/00 	void	GoHome ( );
-//DEADCODE DAW 18/01/00 	void	MakeForFriendly ( );
-//DEADCODE DAW 18/01/00 	void	MoveAway ( );
-//DEADCODE DAW 18/01/00 //DeadCode RDH 06Jan99 	void	AccidentalSpinOut ( );
-//DEADCODE DAW 18/01/00 	void	SpinRecovery ( );								//RDH 21Aug96
-//DEADCODE DAW 18/01/00 //rdh	void	TurningFight ( );
-//DEADCODE DAW 18/01/00 	void	LowGYoYo ( );
-//DEADCODE DAW 18/01/00 	void	RollAway ( );
-//DEADCODE DAW 18/01/00 //DeadCode RDH 07Jan99 	void	VerticalLoop ( );
-//DEADCODE DAW 18/01/00 //DeadCode RDH 07Jan99 	void	ImmelmannTurn ( );
-//DEADCODE DAW 18/01/00 	void	HeadOnOffset ( );
-//DEADCODE DAW 18/01/00 	void	Immelmann ( );
-//DEADCODE DAW 18/01/00 	void	StayWithPrey ( );
-//DEADCODE DAW 18/01/00 //DeadCode RDH 05Jan99 	void	GatherSpeed ();
-//DEADCODE DAW 18/01/00 	void	LeadUnFriendly ();
 
 
-//DeadCode RDH 30Mar98 	void	SelectDefendManoeuvre();
-//DeadCode RDH 30Mar98 	void	SelectAttackManoeuvre();
-//DeadCode RDH 30Mar98 	Bool	SelectDefendManoeuvreSub(DEFENDMANOEUVRE);
-//DeadCode RDH 30Mar98 	Bool	SelectAttackManoeuvreSub(ATTACKMANOEUVRE);
-//DEADCODE DAW 18/01/00 	Bool	TimeToChangeToEvade ();
-//DEADCODE DAW 18/01/00 	Bool	WeHaveNumbersAdvantage ();
-//DeadCode RDH 30Mar98 	Bool	WeHaveNumbersAndACMAdvantage ();
-//DEADCODE DAW 18/01/00 	Bool	DisengageAppropriate ();
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::NoseToTail (ANGLES angle);
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectNextDisengageManoeuvre ();
-//DEADCODE DAW 18/01/00 	void	AirStruc::PanicManoeuvres();
-//DEADCODE DAW 18/01/00 	void	AirStruc::BanditHighManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::BanditLowManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::LowAltManoeuvre();
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::TooLow();
 
-//DEADCODE DAW 18/01/00 	void	AirStruc::MoraleMod();
+
+
 
 //rdh	void	AirStruc::SelectNextEngageManoeuvre ();
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::LooseDeuceSituation();
-//DEADCODE DAW 18/01/00 	void	AirStruc::TakeLooseDeuceOption();
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::TimeToChangeToDisengage ();
-//DEADCODE DAW 18/01/00 	SLong AirStruc::SubjectClosure();
-//DEADCODE DAW 18/01/00 	Bool AirStruc::SubjectClosureGreaterThan(SLong dvel);
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::SubjectLeadingTarget();
-//DEADCODE DAW 18/01/00 	Bool AirStruc::TargetClosureGreaterThan(SLong dvel);
-//DEADCODE DAW 18/01/00 	Bool AirStruc::ClosureLessThan(SLong dvel);
-//DEADCODE DAW 18/01/00 	Bool AirStruc::M_LagRoll();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_FlightSeparation();
-//DEADCODE DAW 18/01/00 	bool AirStruc::AboveGround(SLong height);
-//DEADCODE DAW 18/01/00 	void	AirStruc::ManoeuvreBasedOnClosure();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_BarrelRoll();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_ZoomAndDrop();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_SpinOut();
-//DeadCode RDH 07Jan99 	Bool 	AirStruc::M_SideSlip();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_SelfAsBait();
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::TargetHasCorrectLead(ANGLES lead, ANGLES maxlead);
-//DEADCODE DAW 18/01/00 	ANGLES AirStruc::ActualLead(AirStrucPtr  subjt, AirStrucPtr trgt);
-//DEADCODE DAW 18/01/00 	MANOEUVRE	AirStruc::ManoeuvreBasedOnSkill(SkillType skill, MANOEUVRE goodman, MANOEUVRE badman);
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::SubjectHasEnergyAdvantage();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_GunDefence(ANGLES lead);
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_UnSighted();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_DiveForHome();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_SplitS();
-//DEADCODE DAW 18/01/00 	Bool 	AirStruc::M_Scissors(ANGLES lead);
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::M_ShootTooEarly();
-//DEADCODE DAW 18/01/00 	void	AirStruc::DefenceManoeuvre();
-//DEADCODE DAW 18/01/00 	Bool	AirStruc::M_ShootToFrighten();
-//DEADCODE DAW 18/01/00 	SLong		AirStruc::DeltaAltitude();
-//DEADCODE DAW 18/01/00 	void	AirStruc::AggressivePassManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::DefensivePassManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectNoseToNoseManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectNoseToTailManoeuvre();
-//DEADCODE DAW 18/01/00 	void AirStruc::SelectNoseToBeamManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectBeamToNoseManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectBeamToTailManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectBeamToBeamManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectTailToTailManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectTailToBeamManoeuvre();
-//DEADCODE DAW 18/01/00 	void	AirStruc::SelectTailToNoseManoeuvre();
-//DEADCODE DAW 18/01/00 	SLong AirStruc::CornerSpeed();
-//DEADCODE DAW 18/01/00 	SLong AirStruc::SustainedTurnSpeed();
 
 
 	Float	Model_InstTurnRate(AirStrucPtr subject);
 //rdh	FP	Model_MachNo(){return 0.0;}
 //	FP	Model_Speed(){return 0.0;}
 public:
-//DeadCode DAW 09Mar99 	bool		AcIsFlightLeader()	{return	(fly.position()==0);}
-//DeadCode DAW 09Mar99 	bool		AcIsGroupLeader()	{return	(formpos==0);}
 	bool		AcIsFlightLeader()	{return	((int)position()==0);}
 	bool		AcIsGroupLeader()	{return	((int)formpos==0);}
 	AirStrucPtr		AcIsPlayer();

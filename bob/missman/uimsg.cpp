@@ -88,7 +88,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //
 //////////////////////////////////////////////////////////////////////
 const IntelMsg::PVA
-//DEADCODE DAW 10/03/00 IntelMsg::LOW_ENG_PILOT=		{IntelMsg::LOW,	IntelMsg::PILOT	,IntelMsg::ENGAGEMENT		},
 IntelMsg::HIGH_SPOTTING_WOMAN=		{IntelMsg::HIGH,IntelMsg::WOMAN		,IntelMsg::SPOTTING,	SFX_AlertRaid		},
 IntelMsg::HIGH_FLIGHT_WOMAN=		{IntelMsg::HIGH,IntelMsg::WOMAN		,IntelMsg::FLIGHT,		SFX_PhoneOut		},
 IntelMsg::MED_MANAGEMENT_MAN=		{IntelMsg::MED,	IntelMsg::MAN		,IntelMsg::MANAGEMENT,	SFX_TeleType		},
@@ -122,7 +121,7 @@ static	ULong WhoAndWhat(UniqueID friendly,UniqueID target)
 	if (friendly)
 		if (Persons2::GetBandFromUID(friendly)==SagBAND)
 		{
-			Todays_Packages.GetACSquadEntry(friendly,p,sq);
+			Todays_Packages.GetACSquadEntry(friendly,p,&sq);
 			sq=Todays_Packages[p].GetRaidIndFromSquadEntry(sq);
 			p=p+(sq+1)*512+UID_BIT15;
 			friendly=UniqueID(p);
@@ -130,7 +129,7 @@ static	ULong WhoAndWhat(UniqueID friendly,UniqueID target)
 	if (target)
 		if (Persons2::GetBandFromUID(target)==SagBAND)
 		{
-			Todays_Packages.GetACSquadEntry(target,p,sq);
+			Todays_Packages.GetACSquadEntry(target,p,&sq);
 			sq=Todays_Packages[p].GetRaidIndFromSquadEntry(sq);
 			p=p+(sq+1)*512+UID_BIT15;
 			target=UniqueID(p);
@@ -140,13 +139,17 @@ static	ULong WhoAndWhat(UniqueID friendly,UniqueID target)
 
 }
 
+const TargetIndexes&	NullTargetIndexes()
+{
+	static const TargetIndexes s;
+	return s;
+}
+
 bool	IntelBuffer::AddMessage(
 			IntelMsg::PVA pva,AccelSwitches actiontype,ScriptTables script,
 			UniqueID friendly,UniqueID target,const TargetIndexes&ti
 			)
 {
-	if (&ti==NULL)
-		return AddMessage(pva,actiontype,script,friendly,target,TargetIndexes());
 	if 	(pva.voice != IntelMsg::EXTERNAL)
 	{
 		if (Todays_Packages.localplayer==NAT_RAF)
@@ -165,9 +168,6 @@ bool	IntelBuffer::AddMessage(
 
 
 	ScriptTables	titlescript,bodyscript;
-//DeadCode RDH 07Mar00 	bodyscript=ScriptTables(script+1-0x10000);
-//DeadCode RDH 07Mar00 	ULong	nochoices = bodyscript & 0xFFFF0000;
-//DeadCode RDH 07Mar00 	bodyscript=ScriptTables((bodyscript&0xffff)+0x10000+Math_Lib.rnd(nochoices>>16));
 	ULong	nochoices = ((script>>16)&0xFF)-1;	// should be at least 2
 
 	titlescript= ScriptTables((script&0xffff)+0x10001);
@@ -249,24 +249,20 @@ void	IntelBuffer::ChangeAccelOn(AccelSwitches actiontype,UniqueID friendly,Uniqu
 			mysidemethod=Profile::AM_RAF;
 		int	packf=-1,packt=-1,sqf,sqt;
 		if (friendly && Persons2::ConvertPtrUID(friendly)!=NULL && Persons2::ConvertPtrUID(friendly).Status.size==AIRSTRUCSIZE)
-			Todays_Packages.GetACSquadEntry(friendly,packf,sqf);
+			Todays_Packages.GetACSquadEntry(friendly,packf,&sqf);
 		if (target && Persons2::ConvertPtrUID(target)!=NULL && Persons2::ConvertPtrUID(target).Status.size==AIRSTRUCSIZE)
-			Todays_Packages.GetACSquadEntry(target,packt,sqt);
+			Todays_Packages.GetACSquadEntry(target,packt,&sqt);
 
 		if (MMC.fav.decelon[actiontype])
 		{
 			if (packf!=-1)
 				if ((Todays_Packages[packf].attackmethod&Profile::AM_GROUPMASK)==mysidemethod)
 				{
-//DEADCODE RDH 19/04/00 					MMC.curracceltype=MMC.ACCEL_NORMAL;
-//DEADCODE RDH 19/04/00 					MMC.curraccelrate=1;
 					ClickPlay();
 				}
 			if (packt!=-1)
 				if ((Todays_Packages[packt].attackmethod&Profile::AM_GROUPMASK)==mysidemethod)
 				{
-//DEADCODE RDH 19/04/00 					MMC.curracceltype=MMC.ACCEL_NORMAL;
-//DEADCODE RDH 19/04/00 					MMC.curraccelrate=1;
 					ClickPlay();
 				}
 		}
@@ -366,12 +362,6 @@ void	IntelBuffer::ChangeAccelOn(AccelSwitches actiontype,UniqueID friendly,Uniqu
 								{
 									TargetSectorField* sectfield=
 										TargetFighterFieldPtr(Node_Data[bs->homeairfield])->getsectoraf();
-	//DEADCODE RDH 25/04/00 not doing sector 								if (MMC.favsector)
-	//DEADCODE RDH 25/04/00 								{
-	//DEADCODE RDH 25/04/00 									if (MMC.favsector==sectfield->sectorname)
-	//DEADCODE RDH 25/04/00 										pickedone=sqind;
-	//DEADCODE RDH 25/04/00 								}
-	//DEADCODE RDH 25/04/00 								else
 										if (MMC.fav.group)
 										{
 											if ((IDS_GROUP_10+MMC.fav.group-1)==sectfield->groupname)
@@ -428,9 +418,7 @@ bool	IntelBuffer::SayNextMessage()
 	if (B[Bsaidupto]!=latest)
 	{
 		int guess=latest,bestguess=-1,bestpriority=IntelMsg::LOWEST;
-//DEADCODE RJS 4/6/00 		if (guess==BUFFERSIZE)
 		int secondbestguess=-1;
-//DEADCODE RJS 4/6/00 			guess=0;
 		while (guess!=B[Bsaidupto])
 		{
 			if (messages[guess].pva.priority>bestpriority)
@@ -529,9 +517,6 @@ bool	IntelBuffer::SayMessage(int messagenum)
 
 	_Radio.PlayMessage(messages[messagenum].bodyscript,theVoice);//RJS 28Mar00
 
-//DeadCode RJS 26Oct00 	CString result="";
-//DeadCode RJS 26Oct00 	for (int i=0;messages[messagenum].bodyscript[i];i++)
-//DeadCode RJS 26Oct00 		result+=LoadResString(_Radio.PhraseToResource(messages[messagenum].bodyscript[i]));
 	return true; //return false if didn't speak.
 }
 CString	IntelBuffer::MessageTitleToText(int messagenum)
@@ -568,23 +553,10 @@ void	IntelBuffer::ChangeMessagesUID(UniqueID old,int newid)
 
 
 
-//DeadCode JIM 13Nov00 ScriptTables ReviewBuffer::unrepeatablescripts[32] =
-//DeadCode JIM 13Nov00 {//max 32
-//DeadCode JIM 13Nov00 	SCRIPT_RAFPAC,SCRIPT_LUFPAC//,SCRIPT_FIGHTERCOMMANDEXHAUSTED,
-//DeadCode JIM 13Nov00 	 //SCRIPT_FIGHTERCOMMANDNEARLYEXHAUSTED, SCRIPT_FIGHTERCOMMANDUNFIT,
-//DeadCode JIM 13Nov00 	 SCRIPT_PILOTSHORTAGE, SCRIPT_BIGWINGUSED, SCRIPT_LUFTWAFFEBOMBLONDON,
-//DeadCode JIM 13Nov00 	 SCRIPT_RAFBOMBBERLIN, SCRIPT_THOUSANDBOMBER,SCRIPT_BIGESCORT,
-//DeadCode JIM 13Nov00 	 SCRIPT_CRITICALSHIPPINGLOSS, SCRIPT_CRITICALTARGETS,SCRIPT_RDFHOLES,
-//DeadCode JIM 13Nov00 	 SCRIPT_RAFRADIONET, SCRIPT_RAFRADIONETSUCCESS
-//DeadCode JIM 13Nov00 };
 
 bool	ReviewBuffer::IsScriptRepeated(UnrepeatableScripts::Script script)
 {
 	int i=script;
-//DeadCode JIM 13Nov00 	for (i=0; i<32;i++)
-//DeadCode JIM 13Nov00 	{
-//DeadCode JIM 13Nov00 		breakif (unrepeatablescripts[i] == script);
-//DeadCode JIM 13Nov00 	}
 	ULong mask = 1<<i;
 	ULong rv = 	repeatedscripts &mask;
 	return(rv!=0);
@@ -593,11 +565,6 @@ bool	ReviewBuffer::IsScriptRepeated(UnrepeatableScripts::Script script)
 bool	ReviewBuffer::SetScriptRepeated(UnrepeatableScripts::Script script)
 {
 	int i=script;
-//DeadCode JIM 13Nov00 	int i;
-//DeadCode JIM 13Nov00 	for (i=0; i<32;i++)
-//DeadCode JIM 13Nov00 	{
-//DeadCode JIM 13Nov00 		breakif (unrepeatablescripts[i] == script);
-//DeadCode JIM 13Nov00 	}
 	ULong mask = 1<<i;
 	ULong rv = 	repeatedscripts &mask;
 	repeatedscripts |= mask;

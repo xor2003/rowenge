@@ -185,7 +185,6 @@ BOOL AirfieldDetails::OnInitDialog()
 		damage = 3;
 	s->SetString(RESLIST(UNDAMAGED,damage) SHOWNUMDEBUG(af->subdamagelevels[TargetFighterField::SDL_STAFF]));
 
-//DeadCode JIM 20Oct00 	int ac = 16;
 	s= GETDLGITEM(IDC_RSTATICMAXSQUAD);
 
 	s->SetString(CSprintf("%i", af->maxsquads));
@@ -230,7 +229,7 @@ BOOL AirfieldDetails::OnInitDialog()
 					if (pk->packagetarget[targetnum].currentid <= SagBANDEND)
 					{
 						int tp,ts;
-						if (Todays_Packages.GetACSquadEntry(pk->packagetarget[targetnum].currentid,tp,ts))
+						if (Todays_Packages.GetACSquadEntry(pk->packagetarget[targetnum].currentid,tp,&ts))
 							if (Todays_Packages[tp].SquadTarget(ts)==afuid)
 								packfound=true;
 					}
@@ -274,19 +273,6 @@ void AirfieldDetails::OnClickedAuthorise()
 {
 #ifndef	BOB_DEMO_VER
 
-//DeadCode JIM 9Oct00   	if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DeadCode JIM 9Oct00 	{
-//DeadCode JIM 9Oct00 		
-//DeadCode JIM 9Oct00 		int packnum=Todays_Packages_NewPackage(uid,MMC.directives.lw.userprofiles[Directives::LW::ATTACK]);
-//DeadCode JIM 9Oct00 		if (packnum < 0)
-//DeadCode JIM 9Oct00 			RDialog::RMessageBox(IDS_WARNING, IDS_NOAIRCRAFTAVAIL,NULL,NULL,IDS_CONTINUE);
-//DeadCode JIM 9Oct00 		else
-//DeadCode JIM 9Oct00 		{
-//DeadCode JIM 9Oct00 			Todays_Packages[packnum].CalcRoutePositionsAndTime();
-//DeadCode JIM 9Oct00 			MainToolBar().OnClickedMissionfolder();
-//DeadCode JIM 9Oct00 			Todays_Packages.InvalidateRoute(&Todays_Packages[packnum],true,true);
-//DeadCode JIM 9Oct00 		}
-//DeadCode JIM 9Oct00 	}else
 	{
 			
 		int	packnum=Todays_Packages_NewPackage(afuid,

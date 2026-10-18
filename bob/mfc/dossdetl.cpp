@@ -148,7 +148,7 @@ void DossierDetails::DosNotes()
 						if (pk->packagetarget[targetnum].currentid <= SagBANDEND)
 						{
 							int tp,ts;
-							if (Todays_Packages.GetACSquadEntry(pk->packagetarget[targetnum].currentid,tp,ts))
+							if (Todays_Packages.GetACSquadEntry(pk->packagetarget[targetnum].currentid,tp,&ts))
 								if (Todays_Packages[tp].SquadTarget(ts)==trguid)
 									packfound=true;
 						}
@@ -181,9 +181,6 @@ void DossierDetails::DosNotes()
 		TargetNoDetail* trg = Node_Data[trguid];
 		if (trg)
 		{	
-//DeadCode JIM 3Jul00 			int dstatus = trg->knownstatus - trg->truestatus;
-//DeadCode JIM 3Jul00 			if (dstatus < 0)
-//DeadCode JIM 3Jul00 				dstatus = -dstatus;
 			if (		(RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
 					&&	(!Save_Data.gamedifficulty[GD_LWINTELL])
 					&&	trg->ReconAdvised()
@@ -226,8 +223,6 @@ BOOL DossierDetails::OnInitDialog()
 			trgtype = trg->falsetargtype;
 		else
 			trgtype = trg->truetargtype;
-//DeadCode JIM 3Jul00 		if ( trgtype == Target::TT_AS_KNOWN)
-//DeadCode JIM 3Jul00 			trgtype = trg->truetargtype;
 		s->SetString(RESLIST(TT_AS_KNOWN, trgtype));
 	}else
 		s->SetString("");
@@ -325,8 +320,6 @@ BOOL DossierDetails::OnInitDialog()
 		s->SetString("");
 	}
 	
-//DeadCode  13Sep00 	s= GETDLGITEM(IDC_RSTATICDAMAGE);
-//DeadCode  13Sep00 	s->SetString("");
 
 
 	DosNotes();

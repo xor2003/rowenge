@@ -263,11 +263,6 @@ BOOL IntellMessages::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	//for currmsg to come through from intel we need to turn on all filters
-//DeadCode JIM 9Sep00 	   MMC.intelengagement = false;
-//DeadCode JIM 9Sep00 	   MMC.intelflight = false;
-//DeadCode JIM 9Sep00 	   MMC.intelmanagement = false;
-//DeadCode JIM 9Sep00 	   MMC.intelspotting = false;
-//DeadCode JIM 9Sep00  	   MMC.inteltargetstatus = false;
 
 
 
@@ -366,7 +361,7 @@ void IntellMessages::OnClickedRbuttondetails()
 	if (uidband==SagBAND)
 	{
 		int packnum,sqline;
-		if (Todays_Packages.GetACSquadEntry(item,packnum,sqline))
+		if (Todays_Packages.GetACSquadEntry(item,packnum,&sqline))
 		{
 			RDialog::m_pView->SetHiLightInfo(packnum, sqline,UID_Null);
 			Invalidate();

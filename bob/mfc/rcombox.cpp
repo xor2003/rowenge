@@ -202,7 +202,7 @@ CString		GetTargName(UniqueID u,bool longdesc)
 				else
 					return CSprintf("[F%03i]",u&IllegalSepID);
 		else
-				Todays_Packages.GetACSquadEntry(u,pack,squad);
+				Todays_Packages.GetACSquadEntry(u,pack,&squad);
 	}
 
 	if (pack==-1)
@@ -223,7 +223,7 @@ CString		GetTargName(UniqueID u,bool longdesc)
 			}
 			elseif (p->Status.size==AIRSTRUCSIZE)
 			{
-				if (!Todays_Packages.GetACSquadEntry(u,pack,squad))
+				if (!Todays_Packages.GetACSquadEntry(u,pack,&squad))
 				{
 					squad=-1;
 					pack=0;
@@ -252,15 +252,6 @@ CString		GetTargName(UniqueID u,bool longdesc)
 				raidnum=Todays_Packages[pack].raidnumentries[0].raidnum;
 			char* raidletter = Todays_Packages.RaidFormatString(pack,raid);
 
-//DEADCODE RDH 12/04/00 				char* raidletter="F%03i";
-//DEADCODE RDH 12/04/00 				if (Todays_Packages[pack].attackmethod>=Profile::AM_LWPACKS)
-//DEADCODE RDH 12/04/00 					if (Todays_Packages.localplayer!=NAT_RAF)
-//DEADCODE RDH 12/04/00 						raidletter="R%03i";
-//DEADCODE RDH 12/04/00 					else
-//DEADCODE RDH 12/04/00 						if (Todays_Packages[pack].raidnumentries[raid].detector)
-//DEADCODE RDH 12/04/00 							raidletter="H%03i";
-//DEADCODE RDH 12/04/00 						else
-//DEADCODE RDH 12/04/00 							raidletter="X%03i";
 			name=CSprintf(raidletter,raidnum);
 			if (longdesc)
 			{
@@ -383,13 +374,11 @@ CString		GetDateName(int date,DateFormat form,int time)
 		//I also allow reordering of the parameters.
 	case DATE_SHORT:
 		{
-//DEADCODE RDH 15/06/99 			cdate.Format("%i/%i/%i",day,month+1,year - 1900);
 			cdate.Format("%i/%i/%i",month+1,day,year - 1900);	//use US format //RDH 15/06/99
 			return(cdate);
 		}
 	case DATE_LONG:
 		{
-//DEADCODE RDH 10/01/00 			cdate.Format("%s %i, %i",RESLIST(JANUARY, month),day,year);
 			cdate.Format("%i %s",day, (const char*)RESLIST(JANUARY, month));
 			return(cdate);
 		}

@@ -191,13 +191,6 @@ enum	TargetStrucSize
 //TempCode MS 06Jun00 			TP_IRRELEVENT,TP_LANDMARK,TP_SECONDARYAIRFIELD,TP_PRIMARYAIRFIELD,TP_OTHERFACTORY,
 //TempCode MS 06Jun00 			TP_MAX
 //TempCode MS 06Jun00 		};
-//DeadCode JON 4Sep00 	Target::TS_PERFECT=0,
-//DeadCode JON 4Sep00 	Target::TS_LIGHTDAMAGE=30,
-//DeadCode JON 4Sep00 	Target::TS_BADDAMAGE=70,
-//DeadCode JON 4Sep00 	Target::TS_DESTROYED=100,
-//DeadCode JON 4Sep00 	Target::TS_MAXIMUM=250,
-//DeadCode JON 4Sep00 	Target::TS_NEARLYDESTROYED
-//DeadCode JON 4Sep00	Target::TS_FLAG_UNKNOWN
 
 	enum	TargStatus
 		{	TS_NEARPERFECT=5,TS_LIGHTDAMAGE=20,TS_BADDAMAGE=60,TS_NEARLYDESTROYED=90,TS_DESTROYED=100,TS_MAXIMUM=250,
@@ -281,7 +274,7 @@ BODYSTRUCT	(Target)
 
 	//these should error check!!!
 #ifdef assert
-	#define castassert(n) assert (this==NULL||(n))
+	#define castassert(n) assert (IsNil()||(n))
 #else
 	#define castassert(n)
 #endif
@@ -290,12 +283,12 @@ BODYSTRUCT	(Target)
 	operator type*()						 \
 	{										  \
 		castassert(truedefenses&TSS_##type);   \
-		return (type*)this;						\
+		return IsNil()?NULL:(type*)this;		\
 	}											 \
 	operator type&()							  \
 	{											   \
 		castassert(truedefenses&TSS_##type);		\
-		return *(type*)this;						 \
+		return IsNil()?(type&)Nil():*(type*)this;	\
 	}
 
 	FreeCast(TargetSateliteField)
@@ -309,11 +302,15 @@ BODYSTRUCT	(Target)
 	FreeCast(TargetFighterField)
 ////Cant do this no bits! Use targetNoDetail...	FreeCast(Target)
 
-	operator	bool					(){return this!=NULL;}
-	operator	int					(){return this!=NULL;}
-	bool		operator ==		(const int){return this==NULL;}
-	bool		operator !=		(const int){return this!=NULL;}
-	bool	IsA(TargetStrucSize tss) {if (this) return (truedefenses&tss)!=0; else return false;}
+	//GetTarget() "not found" object: zero-initialised static, folded back
+	//to NULL by IsNil()/the casts below. Replaces the old *(Target*)NULL idiom.
+	static Target&	Nil()	{ static Target s; return s; }
+	bool	IsNil()	const	{return this==NULL||(const void*)this==(const void*)&Target::Nil();}
+	operator	bool					(){return !IsNil();}
+	operator	int					(){return !IsNil();}
+	bool		operator ==		(const int){return IsNil();}
+	bool		operator !=		(const int){return !IsNil();}
+	bool	IsA(TargetStrucSize tss) {if (!IsNil()) return (truedefenses&tss)!=0; else return false;}
 	bool	operator==(TargetStrucSize tss) {return IsA(tss);}
 	bool	operator>=(TargetStrucSize tss) {return IsA(tss);}
 	bool	operator<(TargetStrucSize tss) {return !IsA(tss);}
@@ -619,6 +616,7 @@ inline IntelMsg::PVA PVA(IntelMsg::Priority p,IntelMsg::Voice 	v,IntelMsg::About
 
 enum	ScriptTables;
 struct	TargetIndexes;
+const TargetIndexes&	NullTargetIndexes();	//shared empty TI - defined after the struct is complete
 // x0r a template class	CString;
 class	DeadStream;
 struct	IntelBuffer
@@ -637,7 +635,7 @@ struct	IntelBuffer
 	IntelBuffer()	{latest=B[Bwrap]=B[Bsaidupto]=B[Bviewedupto]=B[Blistedupto]=0;displaypriority=saypriority=IntelMsg::LOWEST;stoppedspeaking=true;}
 	bool AddMessage(	//Add a message to the intell
 		const IntelMsg::PVA pva,AccelSwitches actiontype,
-		ScriptTables script,UniqueID friendly=UID_NULL,UniqueID target=UID_NULL,const TargetIndexes&ti=*(TargetIndexes*)NULL);
+		ScriptTables script,UniqueID friendly=UID_NULL,UniqueID target=UID_NULL,const TargetIndexes&ti=NullTargetIndexes());
 	void	ChangeAccelOn(AccelSwitches actiontype,UniqueID friendly,UniqueID target, int		latestmsg);
 	bool	SayNextMessage();
 	bool	SayMessage(int messagenum);
@@ -661,7 +659,6 @@ struct	ReviewBuffer:IntelBuffer
 	}
 
 
-//DeadCode JIM 13Nov00 	static	 ScriptTables unrepeatablescripts[];
 	struct 	UnrepeatableScripts
 	{
 		enum	Script
@@ -747,7 +744,7 @@ public:
 	void	SetRAFReadiness();
 	void	SetRAFReadiness(Profile::PackageStatus ps);
 	bool	BadWeatherCheck();
-	bool	GotBadWeatherPeriod(bool& alldayreturn=*(bool*)NULL,bool& informreturn=*(bool*)NULL);
+	bool	GotBadWeatherPeriod(bool* alldayreturn=NULL,bool* informreturn=NULL);
 	void	SetRAFPeriodStatus(Squadron::PeriodStatus ps);
 	bool	AssignSecondaryRadars();
 	void	UndefendedConvoyChecks();
@@ -795,7 +792,6 @@ public:
 
 
 
-//DEADCODE JIM 22/02/00 	FileNum TargetToBf(UniqueID targ,bool	inconsequentials=false);
 };
 extern	NodeData	Node_Data;
 

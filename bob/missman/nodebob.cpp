@@ -6095,15 +6095,15 @@ Target&	NodeData::GetTarget(UniqueID index)
 {
 	//assert(index>=0);
 	if (index<0)
-		return	*(Target*)NULL;
+		return	Target::Nil();
 	unsigned int indexhi=index/SUBTABLESIZE;
 	unsigned int	indexlo=index%SUBTABLESIZE;
 	if (indexhi>=SUBTABLESIZE)
-		return	*(Target*)NULL;
+		return	Target::Nil();
 //	assert(indexhi<SUBTABLESIZE);
 	TargetPtr*	subtable=TargetPointers[indexhi];
 	if (subtable==NULL)
-		return	*(Target*)NULL;
+		return	Target::Nil();
 	else
 		return	subtable[indexlo][0];
 }

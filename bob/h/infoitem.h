@@ -107,7 +107,6 @@ struct	info_base
 
 ///	UniqueID	SGT;
 	UWord	 	bfieldindex;			//no							//JIM 8Nov00
-//DeadCode JIM 8Nov00 	UByte 		extra;					//no
 EventVal	uid,						//not saved for aircraft	//negative for key waypoints
 			position;					//not saved for aircraft
 protected:
@@ -297,7 +296,7 @@ EventVal	inform,						//saved
 		bool	GetCruiseToWp(int seconds,bool escortfighter,bool ignorerange,
 /*returned values*/					int& travel,info_waypoint* &wp,	WaypointOffsetSub& wos	);
 		static void MoveConvoySAGs();
-		int	GetCruiseAt(Coords3D& pos,ANGLES& pitchintercept=*(ANGLES*)NULL);  //returns cm per second...
+		int	GetCruiseAt(Coords3D& pos,ANGLES* pitchintercept=NULL);  //returns cm per second...
 		int	GetMinVel(int* getmaxaswell=NULL);  //returns cm per second...
 		int	GetMinCruiseVel(int cruisevelin,int* getmaxaswell=NULL);  //returns cm per second...
 
@@ -349,31 +348,5 @@ int			usedpaintrules;
 }
 #endif
 ;
-//DEADCODE DAW 08/03/00 struct	EventLog;
-//DEADCODE DAW 08/03/00 typedef	EventLog	*EventLogPtr;
-//DEADCODE DAW 08/03/00
-//DEADCODE DAW 08/03/00 struct	EventEntry
-//DEADCODE DAW 08/03/00 {
-//DEADCODE DAW 08/03/00  	ULong		launchtime;
-//DEADCODE DAW 08/03/00 	enum		Stage											//RDH 01Dec96
-//DEADCODE DAW 08/03/00 				{	EMPTY,UNSEEN,SEENBYOTHERS,ATTACKEDBYOTHERS,
-//DEADCODE DAW 08/03/00 					SEENBYPLAYERS,HOSTILE,SPOTTEDDOGFIGHT,
-//DEADCODE DAW 08/03/00 					APPROACHED,ATTACKED,DAMAGED,KILLED,TAKEOFF,     //RDH 01Dec96
-//DEADCODE DAW 08/03/00 					BENTWING,FATALCRASH,CRASHLAND,CRASHLANDTOOFAST,
-//DEADCODE DAW 08/03/00 					LANDOK,LANDOKATHOME,MIDAIRCOLLISION,
-//DEADCODE DAW 08/03/00 					DAMAGEDSTATIC,DAMAGEDTRUCK,KILLEDSTATIC,KILLEDTRUCK,
-//DEADCODE DAW 08/03/00 					PARACHUTED,
-//DEADCODE DAW 08/03/00 				};                                               //RDH 01Dec96
-//DEADCODE DAW 08/03/00 	ONLYFIELD(UByte,Stage,stage);
-//DEADCODE DAW 08/03/00 	UByte		hits;	//kills for air groups... hits for damaged ground
-//DEADCODE DAW 08/03/00 	UByte		losses;
-//DEADCODE DAW 08/03/00 	UByte		encsize;
-//DEADCODE DAW 08/03/00
-//DEADCODE DAW 08/03/00 	UWord		place;
-//DEADCODE DAW 08/03/00 	ONLYFIELD(UWord,UniqueID,homebase);
-//DEADCODE DAW 08/03/00 	ONLYFIELD(UByte,PlaneTypeSelect,encounteredtype);
-//DEADCODE DAW 08/03/00 	ONLYFIELD(UByte,PlaneTypeSelect,escorttype);
-//DEADCODE DAW 08/03/00
-//DEADCODE DAW 08/03/00 };
 #pragma pack(pop)
 #endif

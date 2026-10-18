@@ -80,7 +80,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 #include	"dosdefs.h"
 #include	"files.g"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include "myerror.h"
 #include	"Worldinc.h"
 #include	"node.h"
@@ -106,8 +105,6 @@ BITABLE(Profile::BetterRule);
 ADDORABLE(Profile::BetterRule);
 NOTABLE(Profile::BetterRule,Profile::BR_WIDESTPOSSIBLE);
 //SHIFTABLE(Profile::BetterRule,int,Profile::BetterRule);
-//DEADCODE JIM 25/02/00 	inline	Profile::BetterRule	operator<<	(Profile::BetterRule	b,const int s)
-//DEADCODE JIM 25/02/00 			{return ((Profile::BetterRule) (+b<<+s));}
 
 typedef	Profile::AttackMethod	AttackMethod;
 MAKEFIELD (AttackMethod, Profile::AM_FIELD_MIN,Profile::AM_FIELD_MAX);
@@ -178,11 +175,6 @@ Profile::Squad * Profile::SquadListRef::InsertEnd(UniqueID uid)
 	entry=pointer->numsquadrons++;
 	pointer[0][entry].Clear();
 	pointer[0][entry].instance=uid;
-//DEADCODE JIM 14/02/00 	if (uid)
-//DEADCODE JIM 14/02/00 	{
-//DEADCODE JIM 14/02/00 		info_airgrpPtr a=Persons2::ConvertPtrUID(uid);
-//DEADCODE JIM 14/02/00 		a->package=this;
-//DEADCODE JIM 14/02/00 	}
 	return 	&pointer[0][entry];
 }
 
@@ -364,7 +356,6 @@ void		Profile::DeleteSquadAt(int index)
 			wpref=&wp->nextwp;
 		}
 	}
-//DeadCode JIM 20Oct00 	int	maxsq=squadlist;
 	for (int i2=index,mi2=squadlist.Max()-1;i2<mi2;i2++)
 		SwapNeighborSquadsAt(i2);
 	//Try to save squadlist space? 
@@ -463,54 +454,8 @@ enum UniqueID  info_waypoint::NextWP(int squadline,int targetnum)
 }
 void	PackageList::UpDatePackageTimes()
 {
-//DEADCODE DAW 24/11/99 	int targettime;
-//DEADCODE DAW 24/11/99 	int laststartperiodtime=0;
-//DEADCODE DAW 24/11/99 	int p=0;
-//DEADCODE DAW 24/11/99 	while (p<Profile::MAX_PACKS && Todays_Packages[p][0].firstwp)
-//DEADCODE DAW 24/11/99 	{
-//DEADCODE DAW 24/11/99 		if (MMC.debrief.currperiod == 0)
-//DEADCODE DAW 24/11/99 			laststartperiodtime = AFTERNOONPERIODSTART;
-//DEADCODE DAW 24/11/99 		if (MMC.debrief.currperiod == 1)
-//DEADCODE DAW 24/11/99 			laststartperiodtime = MORNINGPERIODSTART;
-//DEADCODE DAW 24/11/99 		if (MMC.debrief.currperiod == 2)
-//DEADCODE DAW 24/11/99 			laststartperiodtime = MIDDAYPERIODSTART;
-//DEADCODE DAW 24/11/99 		for (int i=0;i<Profile::MAX_WAVES;i++)
-//DEADCODE DAW 24/11/99 		if (Todays_Packages[p][i].firstwp)
-//DEADCODE DAW 24/11/99 		{
-//DEADCODE DAW 24/11/99 			targettime = Todays_Packages[p][i].targettime - laststartperiodtime + MMC.currtime;
-//DEADCODE DAW 24/11/99 			if	(Miss_Man.currcampaignnum == MissMan::SO51_CAMPAIGN)
-//DEADCODE DAW 24/11/99 			{
-//DEADCODE DAW 24/11/99 				if (targettime >	HR16MIN20)							  //RDH 11/06/99
-//DEADCODE DAW 24/11/99 					//don't want it too dark in winter
-//DEADCODE DAW 24/11/99 					targettime =	HR16MIN20;							  //RDH 11/06/99
-//DEADCODE DAW 24/11/99 				if (targettime <	HR08)
-//DEADCODE DAW 24/11/99 					//don't want it too dark in winter
-//DEADCODE DAW 24/11/99 					targettime =	HR08;							  //RDH 11/06/99
-//DEADCODE DAW 24/11/99 			}
-//DEADCODE DAW 24/11/99 			SetWaveTimes(p, i, targettime);
-//DEADCODE DAW 24/11/99 		}
-//DEADCODE DAW 24/11/99 
-//DEADCODE DAW 24/11/99 		p++;
-//DEADCODE DAW 24/11/99 	}
 }
-//DEADCODE DAW 24/11/99 void	PackageList::SetWaveTimes(int p, int w, int targettime)
-//DEADCODE DAW 24/11/99 {
-//DEADCODE DAW 24/11/99 //DEADCODE DAW 24/11/99 	Todays_Packages[p][w].targettime = targettime;
-//DEADCODE DAW 24/11/99 	Todays_Packages[p].CalcWPTimes(w);
-//DEADCODE DAW 24/11/99 
-//DEADCODE DAW 24/11/99 }
 
-//DeadCode JIM 25Oct00 bool	PackageList::PackageHasBeenEdited()
-//DeadCode JIM 25Oct00 {
-//DeadCode JIM 25Oct00 	int p=0;
-//DeadCode JIM 25Oct00 	while (p<Profile::MAX_PACKS && pack[p].route)
-//DeadCode JIM 25Oct00 	{
-//DeadCode JIM 25Oct00 		if (pack[p].edited) 
-//DeadCode JIM 25Oct00 			return (true);
-//DeadCode JIM 25Oct00 		p++;
-//DeadCode JIM 25Oct00 	}
-//DeadCode JIM 25Oct00 	return(false);
-//DeadCode JIM 25Oct00 }
 static	Profile::BetterRule	Type_To_Rule[]=
 {
 		Profile::BR_B_SPITWL	,
@@ -772,7 +717,7 @@ BritSquadron*	NodeData::FindNearestBritSquad(UniqueID closepoint,int minavailac,
 				else
 				{
 					int tp,ts;
-					Todays_Packages.GetACSquadEntry(closepoint,tp,ts);
+					Todays_Packages.GetACSquadEntry(closepoint,tp,&ts);
 					UniqueID doglegloc=Todays_Packages[tp].doglegloc;
 					w=Persons2::ConvertPtrUID(doglegloc)->World;
 				}
@@ -812,7 +757,6 @@ BritSquadron*	NodeData::FindNearestBritSquad(UniqueID closepoint,int minavailac,
 		GroupMatch	groupmatch=GM_NOTFOUND;
 		UniqueID firstaf=Node_Data[after].homeairfield;
 		UniqueID firstsector=TargetFighterFieldPtr(Node_Data[firstaf])->getsectoruid();
-//DeadCode JIM 20Oct00 		int		firstgroup=TargetSectorFieldPtr(Node_Data[firstsector])->groupname;
 		UniqueID testsectaf;
 		int				bestrangefound=0x40000000;
 		BritSquadronPtr	bestsquadfound=NULL;
@@ -868,7 +812,6 @@ BritSquadron*	NodeData::FindNearestBritSquad(UniqueID closepoint,int minavailac,
 			//max 12 bits set. Generate mask for num ac available (up to 20)
 			for (BritSquadron*	brsq=Node_Data.squadron;brsq->squadron;brsq++)
 				if ((Type_To_Rule[brsq->actype]&br) && brsq->totestatus>Profile::PS_ORDER_30 && brsq->homeairfield!=UID_AF_NEWCASTLE)
-//DeadCode RDH 17May100 				if (Type_To_Rule[brsq->actype]&br)
 					if (excludegroup==0 || TargetFighterFieldPtr(Node_Data[brsq->homeairfield])->getsectoraf()->groupname!=excludegroup)
 					{
 						ULong	availbits=Available_Masks[brsq->acavail];
@@ -933,7 +876,6 @@ BritSquadron*	NodeData::FindNearestBritSquad(UniqueID closepoint,int minavailac,
 			}
 		int				bestrangesq=MILES1000*4;
 		BritSquadron*	bestsq=NULL;
-//DeadCode JIM 20Oct00 		GroupMatch	groupmatch=GM_NOTFOUND;
 		for (BritSquadron*	brsq=Node_Data.squadron;brsq->squadron;brsq++)
 			if (!brsq->usedacbits && brsq->acavail>=12 && (Type_To_Rule[brsq->actype]&br) && brsq->totestatus>Profile::PS_ORDER_30&& brsq->homeairfield!=UID_AF_NEWCASTLE)
 				if (excludegroup==0 || TargetFighterFieldPtr(Node_Data[brsq->homeairfield])->getsectoraf()->groupname!=excludegroup)
@@ -1177,9 +1119,6 @@ int	Todays_Packages_NewPackage(UniqueID targ,Directives::RAF::Miss& missiondesc,
 		numac = -maxsq;
 	}
 //	 if (numac < 0)
-//DeadCode JIM 15Sep00 	numac = -numsq;
-//DeadCode JIM 15Sep00 	if (numsq == 0)
-//DeadCode JIM 15Sep00 		 numac = 0;
 	if (targetalt<missiondesc.mainalt)
 		targetalt=missiondesc.mainalt;
 	int rv = -1;
@@ -1226,8 +1165,6 @@ int	Todays_Packages_NewPackage(UniqueID targ,Directives::LW::Miss& missiondesc,U
 		bmbsq = - missiondesc.bombers;
 	else
 		bmbsq = (missiondesc.bombers+9)/10;
-//DeadCode MS 17Nov100 	if (bmbsq == 0)
-//DeadCode MS 17Nov100 		bmbsq = 1;
 
 	int attsq;
 	int detsq;
@@ -1253,8 +1190,6 @@ int	Todays_Packages_NewPackage(UniqueID targ,Directives::LW::Miss& missiondesc,U
 	reqsq =  bmbsq + attsq  + detsq + retsq;
 	if (reqsq > maxsq)
 	{
-//DeadCode JIM 06Nov100 		float strike = maxsq * bmbsq/reqsq;
-//DeadCode JIM 06Nov100 		if (strike >= 1)
 		if (maxsq!=0)
 		{
 			maxsq-=1;
@@ -1300,9 +1235,7 @@ int	Todays_Packages_NewPackage(UniqueID targ,Directives::LW::Miss& missiondesc,U
 		Todays_Packages[rv].AddNumerousEscorts(
 					attfighters, detfighters, retfighters,
 					missiondesc.acselectionrules,*(AttackMethodField*)&missiondesc.escortmethods,missiondesc.mainalt,actypecounts);
-//DEADCODE RDH 03/04/00 no bomber formations			Todays_Packages[rv].SetSubMethod(Profile::AM_LWPACKS,missiondesc.formations[0]);
 
-//DeadCode RDH 9Aug00 #pragma warnmsg("Disabled: formations[] contains garbage")
 			Todays_Packages[rv].SetSubMethod(Profile::AM_DETACHED,missiondesc.formations[2]);	//RDH 02/04/00
 			Todays_Packages[rv].SetSubMethod(Profile::AM_ATTACHED,missiondesc.formations[1]);	//RDH 02/04/00
 			Todays_Packages[rv].SetSubMethod(Profile::AM_RETURNESCORT,missiondesc.formations[3]);
@@ -1402,18 +1335,14 @@ int PackageList::NewPackage(UniqueID targ,Nationality nat, Profile::AttackMethod
 		)
 		dogleg=TargetGroupPtr(targp)->doglegs[0];
 
-//DEADCODE JIM 27/01/00 	int duty=DC_BOMB;
 	sq = FindSquad(duty,dogleg,targ,firstbomberreq, br);				//RDH 30/03/00
 	if (sq <= 0)
 		return -1;
 	p = FindPackage();
 	if (p < 0)
 		return p;
-//DeadCode JIM 20Oct00 	Squadron*	squad=&Node_Data[sq];
 
 	pack[p].attackmethod=duty;
-//DeadCode JIM 25Oct00 	pack[p].redo = false;
-//DeadCode JIM 25Oct00 	pack[p].edited = false;
 	pack[p].flags=0;
 	int	neededraidnums;
 	if (duty==Profile::AM_PATROL||duty==Profile::AM_INTERCEPT || !germanisauto)
@@ -1442,83 +1371,26 @@ int PackageList::NewPackage(UniqueID targ,Nationality nat, Profile::AttackMethod
 		pack[p].raidnumentries[0].raidnum=0;
 	}
 
-//DEADCODE ROD 17/12/99 	pack[p].duty=(DutyType)duty;
 	pack[p].packagestatus=Profile::PS_PLANNED;
-//DEADCODE  23/02/00 	pack[p].primarytargetETA = MMC.currtime + (int)HR01; 
 	pack[p].packagetarget[0]=targ;				//TEMP FIX!!!! No target info available
 	pack[p].doglegloc=dogleg;
-//DeadCode JIM 3Jul00 	pack[p].packagetakeoff=squad->homeairfield;
 	if (!mainalt)
 		mainalt=FT_10000;
 	pack[p].route=pack[p].MakePrimaryRoute(mainalt);
 	pack[p].CountWaypoints();
 
-//DEADCODE JIM 27/01/00 		if (squad->acavail<40 && squad->acavail>=36)
-//DEADCODE JIM 27/01/00 			firstbomberreq=12;
-//DEADCODE JIM 27/01/00 		else
-//DEADCODE JIM 27/01/00 			firstbomberreq=10;
-//DEADCODE JIM 27/01/00 	if (firstbomberreq>=20)
-//DEADCODE JIM 27/01/00 		if (squad->acavail>=24)
-//DEADCODE JIM 27/01/00 			firstbomberreq=12;	//2 staffeln of 12
-//DEADCODE JIM 27/01/00 		else
-//DEADCODE JIM 27/01/00 			firstbomberreq=10;	//2 staffeln of 10
-//DEADCODE JIM 27/01/00 	pack[p][0].numacleft=
-//DEADCODE JIM 27/01/00 		pack[p][0].numacoriginal=firstbomberreq;
-//DEADCODE JIM 27/01/00 	if (nat!=NAT_RED)
-//DEADCODE JIM 27/01/00 	{	//this needs to take account of a leader already flying...
-//DEADCODE JIM 27/01/00 		BritSquadronPtr(*squad)->usedacbits=(2<<firstbomberreq)-1;
-//DEADCODE JIM 27/01/00 	}
-//DEADCODE JIM 27/01/00 	else
-//DEADCODE JIM 27/01/00 		GruppenPtr(*squad)->periodsuntilready=-1;	//busy for 1 period. No message on return.
-//DEADCODE JIM 27/01/00 
-//DEADCODE JIM 27/01/00 	pack[p][0].method=duty;
 
-//DEADCODE JIM 27/01/00 	a->duty=duty;
-//DEADCODE JIM 27/01/00 	a->attmethod=0;
-//DEADCODE JIM 27/01/00 	a->pattern=0;
-//DEADCODE JIM 27/01/00 	a->radiosilence = 0;
-//DEADCODE JIM 27/01/00 	a->form=SQUAD_FLATV;//ListFormExpr(2);								  //JIM 19/05/99//CSB 19May99
-//DEADCODE JIM 27/01/00 //	a->form[0]=SQUAD_FLATV;a->form[1]=SQUAD_FLATV;				//CSB 19May99
-//DEADCODE JIM 27/01/00 	a->bombs=0;
-//DEADCODE JIM 27/01/00 	a->movecode=AUTOSAG_WAITTAKEOFF;
-//DEADCODE JIM 27/01/00 	pack[p][0].takeofftime=MMC.currtime+SECSPERMIN;
 	pack[p].packagetarget[0]=targ;				//TEMP FIX!!!! No target info available
 	pack[p].doglegloc=dogleg;
-//DEADCODE DAW 22/11/99 	pack[p].egressloc= FindEgressPoint(targ);
-//DEADCODE DAW 25/11/99 		pack[p][0][0].takeoffAF;//=
 			//SupplyTree::airfieldinfo[MMC.squad[sq].airfieldindex].airfield;//SquadronInfo							//TEMP
-//DEADCODE DAW 25/11/99 	if (		(a->duty == DUTYMIGCAP)											  //RDH 16/03/99 //RDH 26/04/99
-//DEADCODE DAW 25/11/99 			||	(a->duty == DUTYBARCAP)								  //RDH 26/04/99
-//DEADCODE DAW 25/11/99 		)
-//DEADCODE DAW 25/11/99 		pack[p][0].firstwp=pack[p].MakePrimaryRoute(FT_30000);
-//DEADCODE DAW 25/11/99 	else
-//DEADCODE JON 23/02/00 		pack[p].route=pack[p].MakePrimaryRoute(FT_10000);
 
 
 
 //	UniqueID wt,waf,wal,wpf,wpl,wr;
 //	Todays_Packages[p][0].GetKeyTargetWPs(wt,waf,wal,wpf,wpl,wr);
 //	Todays_Packages[p][0].InsertWpBetween(waf,wal,pack[p].packagetarget,wpbombno,0);
-//DEADCODE DAW 25/11/99 	Todays_Packages[p][0][0][0].globrefind=Todays_Packages[p].FindSpareGlobref();
 
 	pack[p].AddNumerousSquadrons(initialbombers,duty,sq,br,actypecounts);
-//DEADCODE JIM 14/02/00 	if (duty>Profile::AM_LWPACKS)
-//DEADCODE JIM 14/02/00 	{
-//DEADCODE JIM 14/02/00 		pack[p].AddNumerousSquadrons(initialfarfighters,Profile::AM_DETACHED,SQ_ZERO,br);
-//DEADCODE JIM 14/02/00 		pack[p].AddNumerousSquadrons(initialclosefighters,Profile::AM_ATTACHED,SQ_ZERO,br);
-//DEADCODE JIM 14/02/00 		pack[p].AddNumerousSquadrons(initialreturnfighters,Profile::AM_RETURNESCORT,SQ_ZERO,br);
-//DEADCODE JIM 14/02/00 		AttackMethodField am;
-//DEADCODE JIM 14/02/00 		am=0;
-//DEADCODE JIM 14/02/00 		pack[p].FixCloseEscortPositions(Profile::AM_LWPACKS,am);
-//DEADCODE JIM 14/02/00 		pack[p].FixCloseEscortPositions(Profile::AM_DETACHED,am);
-//DEADCODE JIM 14/02/00 		pack[p].FixCloseEscortPositions(Profile::AM_ATTACHED,am);
-//DEADCODE JIM 14/02/00 		pack[p].FixCloseEscortPositions(Profile::AM_RETURNESCORT,am);
-//DEADCODE JIM 14/02/00 	}
-//DEADCODE JIM 14/02/00 	else
-//DEADCODE JIM 14/02/00 	{	if (br==Profile::BR_B_SPITONLY)
-//DEADCODE JIM 14/02/00 			pack[p].AddNumerousSquadrons(initialclosefighters,duty,SQ_ZERO,Profile::BR_B_HURRONLY);
-//DEADCODE JIM 14/02/00 	}
-//DeadCode JIM 29Sep00 	pack[p].wpsused=12;
 	return p;
 }
 void	Profile::AddNumerousEscorts(int initialclosefighters,int initialfarfighters,int initialreturnfighters,Profile::BetterRule br,int* actypecounts)
@@ -1657,19 +1529,16 @@ int	Profile::AddNumerousSquadrons(int initialbombers,Profile::AttackMethod duty,
 			allocatebombers=30;
 		if (sq)
 		{
-//DeadCode JIM 06Nov100 			if (--numspareslots==0)	return totalsquads;
 			sq=AddSquadron(allocatebombers,duty,0,sq);
 			SquadUsedUpInBetterRules(br,actypecounts,sq);
 		}
 		else
 		{
-//DeadCode JIM 06Nov100 			if (--numspareslots==0)	return totalsquads;
 			sq=AddSquadron(allocatebombers,duty,0,br);
 			SquadUsedUpInBetterRules(br,actypecounts,sq);
 			while (allocatebombers>0 && !sq)	//If the above code fails try asking for less!
 			{
 				allocatebombers-=30;
-//DeadCode JIM 06Nov100 			if (--numspareslots==0)	return totalsquads;
 				sq=AddSquadron(allocatebombers,duty,0,br);
 			}
 			if (allocatebombers<=0)
@@ -1690,7 +1559,7 @@ int	Profile::AddNumerousSquadrons(int initialbombers,Profile::AttackMethod duty,
 		{
 			if (allocatebombers>=20)
 			{
-			if (--numspareslots==0)	return totalsquads;
+				if (--numspareslots==0)	return totalsquads;
 				AddSquadron(-1,duty,0,sq);
 				SquadUsedUpInBetterRules(br,actypecounts,sq);
 				totalsquads++;
@@ -1702,11 +1571,11 @@ int	Profile::AddNumerousSquadrons(int initialbombers,Profile::AttackMethod duty,
 				{
 					while (--cb>=0)
 					{
-			if (--numspareslots==0)	return totalsquads;
+						if (--numspareslots==0)	return totalsquads;
 						AddSquadron(-1,duty,sq);
 						SquadUsedUpInBetterRules(br,actypecounts,sq);
 					}
-			if (--numspareslots==0)	return totalsquads;
+					if (--numspareslots==0)	return totalsquads;
 					if (AddSquadron(40,duty,sq))
 						totalsquads+=1;
 					ab+=30;
@@ -1730,7 +1599,7 @@ int	Profile::AddNumerousSquadrons(int initialbombers,Profile::AttackMethod duty,
 					sq=SQ_ZERO;
 					while (!sq && allocatebombers>0)
 					{
-			if (--numspareslots==0)	return totalsquads;
+						if (--numspareslots==0)	return totalsquads;
 						sq=AddSquadron(allocatebombers,duty,0,br,sq);
 						if (!sq)
 							allocatebombers-=30;
@@ -1772,16 +1641,6 @@ SquadNum	Profile::AddSquadron(int numac,Profile::AttackMethod duty,int targnum,B
 
 SquadNum	Profile::AddSquadron(int numac,Profile::AttackMethod duty,int targnum,SquadNum sn)
 {
-//DEADCODE RDH 17/05/00 	if (numac<=0)
-//DEADCODE RDH 17/05/00 	{	//no aircraft supplied... go looking!
-//DEADCODE RDH 17/05/00 		if (duty==AM_PATROL||duty==AM_INTERCEPT)
-//DEADCODE RDH 17/05/00 			numac=12;
-//DEADCODE RDH 17/05/00 		else
-//DEADCODE RDH 17/05/00 			if (numac<-9)
-//DEADCODE RDH 17/05/00 				numac=90;
-//DEADCODE RDH 17/05/00 			else
-//DEADCODE RDH 17/05/00 				numac=30;
-//DEADCODE RDH 17/05/00 	}
 
 	if (duty==AM_PATROL||duty==AM_INTERCEPT)
 	{
@@ -2011,7 +1870,6 @@ AttackMethodField		Profile::FixCloseEscortPositions(AttackMethod escorttype,Atta
 	int	currbombercounter=0;
 	Squad*	bombersquad=&squadlist[0];
 	Squad*	fightersquad=&squadlist[0];
-//DeadCode JIM 20Oct00 	Squad*	lastsquad=NULL;
 	forever	//goes around twice First time up to midway, then to end with 1 less fighter
 	{	
 		while(currbombercounter<atfullcount)
@@ -2019,17 +1877,6 @@ AttackMethodField		Profile::FixCloseEscortPositions(AttackMethod escorttype,Atta
 			//find bomber squad
 			while ((bombersquad->method&AM_GROUPMASK)!=AM_LWPACKS)
 				bombersquad++;
-//DEADCODE JIM 08/02/00 			if (lastsquad==NULL || lastsquad->squadnum!=bombersquad->squadnum)
-//DEADCODE JIM 08/02/00 			{
-//DEADCODE JIM 08/02/00 				lastsquad=bombersquad;
-//DEADCODE JIM 08/02/00 				info_airgrp* a=Persons2::ConvertPtrUID(bombersquad->instance);
-//DEADCODE JIM 08/02/00 				a->leader=0;
-//DEADCODE JIM 08/02/00 			}
-//DEADCODE JIM 08/02/00 			else
-//DEADCODE JIM 08/02/00 			{
-//DEADCODE JIM 08/02/00 				info_airgrp* a=Persons2::ConvertPtrUID(bombersquad->instance);
-//DEADCODE JIM 08/02/00 				a->leader=lastsquad->instance;
-//DEADCODE JIM 08/02/00 			}
 			for (int i=escorttype+6;i!=escorttype;i--)
 				if (amf2[AttackMethod(i)])
 				{
@@ -2040,13 +1887,6 @@ AttackMethodField		Profile::FixCloseEscortPositions(AttackMethod escorttype,Atta
 					a->leader=bombersquad->instance;
 					fightersquad->method=AttackMethod(i);								//JIM 28Aug00
 					FormationTypeIndex interform=FormationTypeIndex((currbombercounter<<FORMTYPE_COURSESEL_SH)&FORMTYPE_COURSEPAIR);
-//DeadCode JIM 19Jul00 					if (currbombercounter<16)
-//DeadCode JIM 19Jul00 						interform+=FTC_FWDLVL;
-//DeadCode JIM 19Jul00 					else
-//DeadCode JIM 19Jul00 						if (currbombercounter<32)
-//DeadCode JIM 19Jul00 							interform+=FTC_FWDHIGH;
-//DeadCode JIM 19Jul00 						else
-//DeadCode JIM 19Jul00 							interform+=FTC_FWDLOW;
 					interform+=FormationTypeIndex(FTIP_GRUPIII+((i&7)<<FORMTYPE_INTERPAIR_SH));
 					fightersquad->FormType()=interform+(fightersquad->formtype%(FORMTYPE_INTERPAIR+FORMTYPE_COURSEPAIR));
 					fightersquad++;
@@ -2088,7 +1928,6 @@ AttackMethodField	Profile::FixIndipendentPositions(AttackMethod flyingmethod,Att
 	int	squadlistMax=squadlist;
 	int previd=-1;
 	flyingmethod=AttackMethod(flyingmethod&AM_GROUPMASK);
-//DeadCode JIM 20Oct00 	Squadron*	prevsquad=NULL;
 	AttackMethodField	optionsset,amfr;
 	optionsset=0;
 	if (flyingmethod==AM_DETACHED)
@@ -2120,12 +1959,11 @@ AttackMethodField	Profile::FixIndipendentPositions(AttackMethod flyingmethod,Att
 		bobassert (flyingmethod==AM_DETACHED,"Only get multiple bits for detached");
 		int i;
 		for (i=AM_CEILING;i<=AM_LATE;i++)
-			if (!amf[AttackMethod(i)])
-			{
+			if (!amf[AttackMethod(i)]) {
 				amf|=AttackMethod(i);
 				break;
 			}
-			bobassert (i<=AM_LATE," More flights than methods!");
+		bobassert (i<=AM_LATE," More flights than methods!");
 		totalbits++;
 		flperbit=totalmain/totalbits;
 	}
@@ -2171,7 +2009,6 @@ AttackMethodField	Profile::FixIndipendentPositions(AttackMethod flyingmethod,Att
 				a->leader=ENABLE_COMPLEX_VAL;
 			else
 				a->leader=UID_NULL;
-//DeadCode JIM 20Oct00 			int	mastersq=sqnum;
 			squadlist[sqnum].FormType()=FormationTypeIndex(newlayout+newescform+wingsquad);
 			squadlist[sqnum].method=AttackMethod(am);
 			for (	sqnum++;
@@ -2217,12 +2054,6 @@ bool	PackageList::FlyableAircraftAvailable()
 UniqueID	Profile::MakeWayPoints(int targetnum,int squadinpack,Profile::AttackMethod duty,SquadNum sq)
 {	//
 
-//DEADCODE DAW 25/11/99  	UniqueID wt,waf,wal,wpf,wpl,wr;
-//DEADCODE DAW 25/11/99 	GetKeyTargetWPs(wt,waf,wal,wpf,wpl,wr);
-//DEADCODE DAW 25/11/99 	UniqueID targ2=UID_NULL;
-//DEADCODE DAW 25/11/99 	UniqueID patrolbeginitem=UID_NULL;
-//DEADCODE DAW 25/11/99 	Coords3D wp0;
-//DEADCODE DAW 25/11/99 	Coords3D wp1;
 
 	UniqueID	tof,tol,ipf,ipl,ldf,ldl;
 	GetKeyMainWPs(tof,tol,ipf,ipl,ldf,ldl);
@@ -2232,11 +2063,6 @@ UniqueID	Profile::MakeWayPoints(int targetnum,int squadinpack,Profile::AttackMet
 	squadlist[squadinpack].takeoffwp=InsertWpBetween(tof,tol,takeoff,wpatakeoffno,squadinpack,ENABLE_COMPLEX_VAL, SGR_WPC_TakeOff, METRES00);	//RDH 28Jun00
 	squadlist[squadinpack].landingwp=InsertWpBetween(ldf,ldl,takeoff,wpalandingno,squadinpack,ENABLE_COMPLEX_VAL,SGR_WPC_Landing, FT_3000);	//RDH 28Jun00
 	info_waypointPtr(Persons2::ConvertPtrUID(squadlist[squadinpack].landingwp))->range=METRES2500;
-//DEADCODE  23/02/00 	if ((ipf=FindTargetWpBetween(ipf,ipl,SavedGlobrefs(SGR_Pack_Target+targetnum)))==UID_NULL)
-//DEADCODE  23/02/00 	{
-//DEADCODE  23/02/00 		UniqueID newwp=AddAttackWP(targetnum,duty);
-//DEADCODE  23/02/00 		packagetarget[targetnum].targetwaypoint=newwp;
-//DEADCODE  23/02/00 	}
 	return tof;
 }
 UniqueID	Profile::AddAttackWP(int targetnum,Profile::AttackMethod duty,int alt)
@@ -2391,15 +2217,10 @@ UniqueID	Profile::MakeInterceptWP(SavedGlobrefs a,SavedGlobrefs b,int percent,	U
 		wp0->position[2][0]=-percent;
 //		wp0->target=new GlobRefExpr(a);
 	}
-//DEADCODE JIM 24/03/99 	wp0->position[2][3]=0;		  //pitch mod!
 	wp0->nextwp=next;
 	wp0->uniqueID.count=
 		rv=Persons2::assignuid(WayPointBAND);
 	info_waypoint *wp;
-//DEADCODE JIM 03/03/99 	if (rv == 355)	//debug
-//DEADCODE JIM 03/03/99 	{
-//DEADCODE JIM 03/03/99   		wp = *Persons2::ConvertPtrUID(rv);
-//DEADCODE JIM 03/03/99 	}
 	if (action!=wpacnoactionno)
 		wp0->wpact=action;
 	Persons2::tabulateUID(wp0);
@@ -2463,45 +2284,6 @@ bool	Profile::GetKeyMainWPs(UniqueID& firsttakeoff,UniqueID &takeoffarea,UniqueI
 
 }
 
-//DEADCODE DAW 14/03/00 bool	Profile::GetKeyTargetWPs(UniqueID& targetarea,UniqueID& firststartpatrolbomb,UniqueID& laststartpatrolbomb,UniqueID& firstendpatrol,UniqueID& lastendpatrol,UniqueID& regrouparea)
-//DEADCODE DAW 14/03/00 {	//if there are no target waypoints then sets TARGET as all 4 and returns false
-//DEADCODE DAW 14/03/00 	firststartpatrolbomb=
-//DEADCODE DAW 14/03/00 		laststartpatrolbomb=
-//DEADCODE DAW 14/03/00 			firstendpatrol=
-//DEADCODE DAW 14/03/00 				lastendpatrol=
-//DEADCODE DAW 14/03/00 					UID_Null;
-//DEADCODE DAW 14/03/00 	UniqueID u=route;
-//DEADCODE DAW 14/03/00 	info_waypoint* w=*Persons2::ConvertPtrUID(u);
-//DEADCODE DAW 14/03/00 	while(w->uid.Evaluate()!=-SGR_WPP_Target &&	w->uid.Evaluate()!=-SGR_WPC_Target)
-//DEADCODE DAW 14/03/00 		w=*Persons2::ConvertPtrUID(u=w->nextwp);
-//DEADCODE DAW 14/03/00 	targetarea=u;
-//DEADCODE DAW 14/03/00 	while(w->uid.Evaluate()!=-SGR_WPP_Egress)
-//DEADCODE DAW 14/03/00 	{
-//DEADCODE DAW 14/03/00 		if (w->wpact.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE DAW 14/03/00 			if(		w->wpact.Evaluate()==wpstoploopchkno 
-//DEADCODE DAW 14/03/00 				||	w->wpact.Evaluate()==wpsecondaryno)
-//DEADCODE DAW 14/03/00 				if (firstendpatrol)
-//DEADCODE DAW 14/03/00 					lastendpatrol=u;
-//DEADCODE DAW 14/03/00 				else
-//DEADCODE DAW 14/03/00 					firstendpatrol=u;
-//DEADCODE DAW 14/03/00 			else
-//DEADCODE DAW 14/03/00 				if (firststartpatrolbomb)
-//DEADCODE DAW 14/03/00 					laststartpatrolbomb=u;
-//DEADCODE DAW 14/03/00 				else
-//DEADCODE DAW 14/03/00 					firststartpatrolbomb=u;
-//DEADCODE DAW 14/03/00 		w=*Persons2::ConvertPtrUID(u=w->nextwp);
-//DEADCODE DAW 14/03/00 	}
-//DEADCODE DAW 14/03/00 	regrouparea=u;
-//DEADCODE DAW 14/03/00 	if (!firststartpatrolbomb)
-//DEADCODE DAW 14/03/00 		firststartpatrolbomb=targetarea;
-//DEADCODE DAW 14/03/00 	if (!laststartpatrolbomb)
-//DEADCODE DAW 14/03/00 		laststartpatrolbomb=firststartpatrolbomb;
-//DEADCODE DAW 14/03/00 	if (!firstendpatrol)
-//DEADCODE DAW 14/03/00 		firstendpatrol=laststartpatrolbomb;
-//DEADCODE DAW 14/03/00 	if (!lastendpatrol)
-//DEADCODE DAW 14/03/00 		lastendpatrol=firstendpatrol;
-//DEADCODE DAW 14/03/00 	return (lastendpatrol!=targetarea);
-//DEADCODE DAW 14/03/00 }
 
 //wpacnoactionno
 UniqueID	Profile::FindSquadWpBetween(UniqueID wp1,UniqueID wp2,int group)
@@ -2512,10 +2294,6 @@ UniqueID	Profile::FindSquadWpBetween(UniqueID wp1,UniqueID wp2,int group)
 	forever
 	{
 		if (group==w->applygroup.Evaluate())
-//DEADCODE DAW 25/11/99 			if (	flight==-1	||	w->applyflight.Evaluate()==GOT_UNDEFINED_VAL
-//DEADCODE DAW 25/11/99 				||	w->applyflight.Evaluate()==flight)
-//DEADCODE DAW 25/11/99 				if (elt==-1 || w->applyelt.Evaluate()==GOT_UNDEFINED_VAL
-//DEADCODE DAW 25/11/99 					||	elt==w->applyelt.Evaluate())
 					return(u);
 		if (u==wp2)	
 			return(UID_Null);
@@ -2532,10 +2310,6 @@ UniqueID	Profile::FindTargetWpBetween(UniqueID wp1,UniqueID wp2,SavedGlobrefs ta
 	forever
 	{
 		if (targnum==w->target)
-//DEADCODE DAW 25/11/99 			if (	flight==-1	||	w->applyflight.Evaluate()==GOT_UNDEFINED_VAL
-//DEADCODE DAW 25/11/99 				||	w->applyflight.Evaluate()==flight)
-//DEADCODE DAW 25/11/99 				if (elt==-1 || w->applyelt.Evaluate()==GOT_UNDEFINED_VAL
-//DEADCODE DAW 25/11/99 					||	elt==w->applyelt.Evaluate())
 					return(u);
 		if (u==wp2)	
 			return(UID_Null);
@@ -2554,10 +2328,6 @@ UniqueID	Profile::FindSquadWpAfter(UniqueID wp1,UniqueID wp2,int group)
 	forever
 	{
 		if (group==w->applygroup.Evaluate())
-//DEADCODE DAW 25/11/99 			if (	flight==-1	||	w->applyflight.Evaluate()==GOT_UNDEFINED_VAL
-//DEADCODE DAW 25/11/99 				||	w->applyflight.Evaluate()==flight)
-//DEADCODE DAW 25/11/99 				if (elt==-1 || w->applyelt.Evaluate()==GOT_UNDEFINED_VAL
-//DEADCODE DAW 25/11/99 					||	elt==w->applyelt.Evaluate())
 					return(u);
 		if (u==wp2)	
 			return(UID_Null);
@@ -2575,10 +2345,6 @@ UniqueID	Profile::FindTargetWpAfter(UniqueID wp1,UniqueID wp2,SavedGlobrefs targ
 	forever
 	{
 		if (targnum==w->target)
-//DEADCODE DAW 25/11/99 			if (	flight==-1	||	w->applyflight.Evaluate()==GOT_UNDEFINED_VAL
-//DEADCODE DAW 25/11/99 				||	w->applyflight.Evaluate()==flight)
-//DEADCODE DAW 25/11/99 				if (elt==-1 || w->applyelt.Evaluate()==GOT_UNDEFINED_VAL
-//DEADCODE DAW 25/11/99 					||	elt==w->applyelt.Evaluate())
 					return(u);
 		if (u==wp2)	
 			return(UID_Null);
@@ -2626,7 +2392,6 @@ UniqueID	Profile::InsertWpBetween(UniqueID&wp1,UniqueID&wp2,SavedGlobrefs target
 		{
 
 			w->position.MakeAngWorldPos(targetref,100000);
-//DEADCODE JIM 28/06/99 			w->target=new GlobRefExpr(targetref);
 		}
 		else
 		{
@@ -2711,7 +2476,6 @@ int	Profile::CalcRoutePositionsAndTime(int preferredtime,SavedGlobrefs faketo,bo
 	int absrvtime;
 	int slowestsq;
 	primarytargetETA = FindEarliestPrimaryTargetETA(absrvtime,slowestsq);
-//DeadCode MS 28Oct100 	if (preferredtime > primarytargetETA)
 	if (UniqueID(packagetarget[0])<SagBANDEND || preferredtime > primarytargetETA)
 	{
 		int delta=primarytargetETA-preferredtime; 
@@ -2762,39 +2526,17 @@ void	Profile::RecalcRoutePositionsAndTime()
 }
 void	Profile::RecalcRoutePositions()
 {
-//DeadCode JIM 3Jul00 	if (Persons2::ConvertPtrUID(route))
-//DeadCode JIM 3Jul00 		packagetakeoff=UniqueID(info_waypointPtr(Persons2::ConvertPtrUID(squadlist[0].takeoffwp))->target.Evaluate());
 	SetTargetGlobrefs();
 	RecalcPrimaryPositions();
-//DeadCode RDH 16Mar100 	int t = 0, t1 = 0, t2 = 0;
-//DeadCode RDH 16Mar100 	CalcWPTimes(t,t1,t2);
 
-//DEADCODE DAW 25/11/99 	for (int i=1;i<MAX_WAVES;i++)
-//DEADCODE DAW 25/11/99 		if (wave[i].firstwp)
-//DEADCODE DAW 25/11/99 		{
-//DEADCODE DAW 25/11/99 			RecalcSecondaryPositions(i);
-//DEADCODE DAW 25/11/99 			CalcWPTimes(i);
-//DEADCODE DAW 25/11/99 		}
 
 }
 
 void	Profile::SetTargetGlobrefs(bool fixconvoys)
 {
-//DEADCODE JON 22/02/00 	if (Persons2::ConvertPtrUID(route))
-//DEADCODE JON 22/02/00 		packagetakeoff=UniqueID(info_waypointPtr(Persons2::ConvertPtrUID(squadlist[0].takeoffwp))->target.Evaluate());
-//DEADCODE DAW 25/11/99 	packagetakeoff=takeoffAF;
-//DEADCODE DAW 22/11/99 	UniqueID targ=packagetarget;
-//DEADCODE JIM 16/11/99 	if (Persons2::getbandfromUID(targ)==RedRoadBAND || Persons2::getbandfromUID(targ)==RedRailBand	)				  //JIM 12/04/99
-//DEADCODE JIM 16/11/99 	{
-//DEADCODE JIM 16/11/99 		SupplyNode* node= SupplyTree::FindSupplyNodeForNodeItem(targ);
-//DEADCODE JIM 16/11/99 		targ=node->associated_item;
-//DEADCODE JIM 16/11/99 	}
 
-//DEADCODE DAW 22/11/99 	Persons2::SetLoc(SGR_Pack_Target,targ);
 	Persons2::SetLoc(SGR_Pack_DogLeg,doglegloc);
 	Persons2::SetLoc(SGR_Pack_Takeoff,packagetakeoff);
-//DEADCODE DAW 22/11/99 	for (int gr=SGR_Pack_Targ_F0_E0;gr<=SGR_Pack_Targ_Fmax_E1;gr++)
-//DEADCODE DAW 22/11/99 		Persons2::SetLoc(gr,0);
 	for (int gr=0;gr<=9;gr++)
 		if (packagetarget[gr])
 			Persons2::SetLoc(SGR_Pack_Target+gr,packagetarget[gr]);
@@ -2807,17 +2549,11 @@ void	Profile::RecalcPrimaryPositions()
 {
 //TEMPCODE DAW 18/01/00 	packagetakeoff=UniqueID(info_waypointPtr(Persons2::ConvertPtrUID(squadlist[0].takeoffwp))->target.Evaluate());
 	{
-//DeadCode JIM 3Jul00 		packagetakeoff=UniqueID(info_waypointPtr(Persons2::ConvertPtrUID(squadlist[0].takeoffwp))->target.Evaluate());
 		Persons2::SetLoc(SGR_Pack_Takeoff,packagetakeoff);
 	}
 	SetGlobRefsForRoute(route);
 	RepositionSubWaypoints(route);
 }
-//DEADCODE DAW 25/11/99 void	Profile::RecalcSecondaryPositions(int w)
-//DEADCODE DAW 25/11/99 {
-//DEADCODE DAW 25/11/99 	SetGlobRefsForRoute(wave[w].firstwp);
-//DEADCODE DAW 25/11/99 	RepositionSubWaypoints(wave[w].firstwp);
-//DEADCODE DAW 25/11/99 }
 
 void	Profile::SetGlobRefsForRoute(UniqueID wpuidstart)
 {
@@ -2909,7 +2645,7 @@ bool	Profile::SetPredictedPointFromETA(SavedGlobrefs faketo,bool recalcfromETA)
 			if (!w && p->Status.size==AIRSTRUCSIZE)
 			{
 				int p,s;
-				if (Todays_Packages.GetACSquadEntry(packagetarget[0],p,s))
+				if (Todays_Packages.GetACSquadEntry(packagetarget[0],p,&s))
 				{
 					w=Persons2::ConvertPtrUID(Todays_Packages[p].route);
 					starttime=Todays_Packages[p][s].takeofftime;
@@ -2949,7 +2685,6 @@ bool	Profile::SetPredictedPointFromETA(SavedGlobrefs faketo,bool recalcfromETA)
 						}
 						else
 						{
-//DeadCode JIM 13Oct00 							w=w2;	//
 							break;
 						}
 
@@ -2978,8 +2713,8 @@ bool	Profile::SetPredictedPointFromETA(SavedGlobrefs faketo,bool recalcfromETA)
 				int	dist=cruisevel*time;
 				if (dist>METRES200KM)
 					dist=METRES200KM;
-/*CSB*/			if((p->Status.size >= AIRSTRUCSIZE) && (dist > d))
-/*CSB*/				dist = d;
+/*CSB*/				if((p->Status.size >= AIRSTRUCSIZE) && (dist > d))
+/*CSB*/					dist = d;
 				Coords3D	estloc=startpos;							//JIM 13Oct00
 				estloc.X+=dist*sh;
 				estloc.Z+=dist*ch;
@@ -3012,7 +2747,7 @@ bool	Profile::SetPredictedPointFromETA(SavedGlobrefs faketo,bool recalcfromETA)
 			UniqueID wu=g->wpref;
 			int	starttime=MMC.currtime;
 			{int p,s;
-			if (Todays_Packages.GetACSquadEntry(packagetarget[0],p,s))
+			if (Todays_Packages.GetACSquadEntry(packagetarget[0],p,&s))
 			{
 				sqnum=s;
 				trgnum=Todays_Packages[p][s].targetindex;
@@ -3100,7 +2835,7 @@ bool	Profile::SetPredictedPointFromETA(SavedGlobrefs faketo,bool recalcfromETA)
 					
 					Math_Lib.HighIntercept(startpos.X-interceptorstartpos.X,startpos.Y-interceptorstartpos.Y,startpos.Z-interceptorstartpos.Z,interceptorrange,directheading,directpitch);
 					directpitch=directpitch+directpitch;	//meeting half-way
-					int	interceptorvel=interceptoritem->GetCruiseAt(interceptorstartpos,directpitch);
+					int	interceptorvel=interceptoritem->GetCruiseAt(interceptorstartpos,&directpitch);
 					ANGLES headingdiff=targetheading-directheading;
 					//ok.. get 'half' length	//it would be half if interceptor's climbvel = target's cruise vel
 					//Mul by cos of angle
@@ -3192,18 +2927,10 @@ int Profile::CalcFuel(struct COORDS3D * last,const struct COORDS3D * wp,int lead
 	int wpY= wp->Y;
 
 	last->Y=newY;														//JIM 24Jul00
-//DEADCODE  21/02/00  	if (leadtype != esctype)
-//DEADCODE  21/02/00  	{
-//DEADCODE  21/02/00  		if (lastY != 0)
-//DEADCODE  21/02/00  			lastY =  MMC.Sky.ContrailBandCentre - MMC.Sky.ContrailBandWidth/2 - FT_1000;
-//DEADCODE  21/02/00  		if (wpY != 0)
-//DEADCODE  21/02/00  			wpY =  MMC.Sky.ContrailBandCentre - MMC.Sky.ContrailBandWidth/2 - FT_1000;
-//DEADCODE  21/02/00  	}
 
 	SLong deltaY = wpY - lastY;
 
 	Float FuelUsageRate;
-//DEADCODE  21/02/00 	Float reldensity;
 	FuelUsageRate = 0.75*1.3;		//1.3*0.75		1.3 fudge factor, 0.75 is throttle setting for cruise
 	
 	int type=(esctype);
@@ -3214,7 +2941,6 @@ int Profile::CalcFuel(struct COORDS3D * last,const struct COORDS3D * wp,int lead
 	if (deltaY > 10000)
 		//climb first for fuel economy
 		alt = wpY;
-//DEADCODE  21/02/00 	reldensity = RelDensity(alt);
 	Float usage = FuelUsageRate * horitime * actype->fuelaboff;// * reldensity	;//s * cg/cs
 	usage = usage * 100;	//cg
 
@@ -3227,7 +2953,6 @@ int Profile::CalcFuel(struct COORDS3D * last,const struct COORDS3D * wp,int lead
 
 	if(actype->version == 2)
 		FuelUsageRate *= 0.65;
-//DEADCODE  21/02/00 	reldensity = RelDensity((wpY+lastY)/2);
  	Float climbusage = FuelUsageRate * climbtime * actype->fuelaboff;// * reldensity;//s * cg/cs
 	climbusage = climbusage* 100;	//cg
 
@@ -3244,13 +2969,6 @@ int Profile::CalcHoriAndClimbTime(const struct COORDS3D * last,const struct COOR
 	int wpY= wp->Y;
 
 
-//DEADCODE  21/02/00  	if (type != esctype)
-//DEADCODE  21/02/00  	{
-//DEADCODE  21/02/00  		if (lastY != 0)
-//DEADCODE  21/02/00  			lastY =  MMC.Sky.ContrailBandCentre - MMC.Sky.ContrailBandWidth/2 - FT_1000;
-//DEADCODE  21/02/00  		if (wpY != 0)
-//DEADCODE  21/02/00  			wpY =  MMC.Sky.ContrailBandCentre - MMC.Sky.ContrailBandWidth/2 - FT_1000;
-//DEADCODE  21/02/00  	}
 
 	SLong x = wp->X - last->X;
 	SLong y = wpY - lastY;
@@ -3291,24 +3009,15 @@ int Profile::CalcHoriAndClimbTime(const struct COORDS3D * last,const struct COOR
 	//assume descent time is same as for climb
 	climbtime = (100 * climbdist) / (actype->bestclimbvel);
 
-//DeadCode CSB 16/06/99		horitime = horidist / (actype->cruisevel * 10);		//  cm and mm/cs
 	
 	int ResCruiseVel = actype->cruisevel;
 
-//DEADCODE CSB 10/01/00 	if((actype->visible == F51) || (actype->visible == YAK9))
 	{
 		FP VelFraction = 1.0 - FP(StoresDrag) * 0.00006;
 		FP fMaxVel	   = FP(ResCruiseVel) * VelFraction;
 		ResCruiseVel = fMaxVel;
 	}
-//DEADCODE CSB 10/01/00 	else
-//DEADCODE CSB 10/01/00 	{
-//DEADCODE CSB 10/01/00 		SLong DeltaVel	 = (175 * StoresDrag) / 1000;
-//DEADCODE CSB 10/01/00 		if(DeltaVel > 0)
-//DEADCODE CSB 10/01/00 			ResCruiseVel -= DeltaVel;
-//DEADCODE CSB 10/01/00 	}
 
-//DeadCode CSB 18/06/99		ResCruiseVel -= (715 * StoresDrag) / 1000;
 
 	SLong MaxAlt = wp->Y;
 	if(last->Y > wp->Y) 
@@ -3343,37 +3052,6 @@ int Profile::ValidateTime(CString* buffer, int packnum, int wavenum)
 {
 	
 	int time = 0;
-//DEADCODE DAW 29/01/00 		if  (	(buffer->GetLength() > 0 )
-//DEADCODE DAW 29/01/00 			&&				(buffer->GetLength() < 6 )			)
-//DEADCODE DAW 29/01/00 		{
-//DEADCODE DAW 29/01/00 			char	buff[5];
-//DEADCODE DAW 29/01/00 			strcpy(buff,*buffer);
-//DEADCODE DAW 29/01/00 			char*	hr = buff;
-//DEADCODE DAW 29/01/00 			char*	cnt = hr;
-//DEADCODE DAW 29/01/00 			char*	min;
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 			while ( (*cnt >= 48) && (*cnt <= 57))
-//DEADCODE DAW 29/01/00 				*cnt++;
-//DEADCODE DAW 29/01/00 			*cnt++ = 0;
-//DEADCODE DAW 29/01/00 			min = cnt;
-//DEADCODE DAW 29/01/00 			while ( (*cnt >= 48) && (*cnt <= 57))
-//DEADCODE DAW 29/01/00 				*cnt++;
-//DEADCODE DAW 29/01/00 			*cnt++ = 0;
-//DEADCODE DAW 29/01/00 			time = atoi(min) + 60 * atoi(hr);
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 			int currtime;
-//DEADCODE DAW 29/01/00 			if (MMC.debrief.currperiod == 0)
-//DEADCODE DAW 29/01/00 				currtime = MORNINGPERIODSTART/60;
-//DEADCODE DAW 29/01/00 			if (MMC.debrief.currperiod == 1)
-//DEADCODE DAW 29/01/00 				currtime = MIDDAYPERIODSTART/60;
-//DEADCODE DAW 29/01/00 			if (MMC.debrief.currperiod == 2)
-//DEADCODE DAW 29/01/00 				currtime = AFTERNOONPERIODSTART/60;
-//DEADCODE DAW 29/01/00 			if (time < currtime)
-//DEADCODE DAW 29/01/00 				time = currtime;
-//DEADCODE DAW 29/01/00 			if (time > (currtime + (HR02 + MIN30+ MIN5)/60))
-//DEADCODE DAW 29/01/00 				 time = (currtime + (HR02 + MIN30+ MIN5)/60);
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 		}
 		return(time);
 
 }
@@ -3442,8 +3120,6 @@ bool PackageList::AcAvailable(AMType* amtype,int actype, int actype2,int& acnum,
 		mingruppeac=Gruppen::MIN_GRUPPEFIGHTERS;
 	if (includecommitted && (amtype->acnum>0 || amtype->squadnum!=0))
 	{
-//DeadCode JIM 15Oct00 		acnum = 0;//amtype->acnum;
-//DeadCode JIM 15Oct00 		squadnum = amtype->squadnum;
 		if (amtype->squadnum<3)
 		{
 			if ((acnum=Node_Data[SquadNum(amtype->squadtype)].acavail)>=mingruppeac)
@@ -3775,23 +3451,9 @@ void	PackageList::SetTaskData()
 
 	Todays_Packages.taskdata.strike.maxac = acnum;
 	Todays_Packages.taskdata.strike.maxsquad = squadnum;
-//DEADCODE DAW 07/04/00 	if (		(AcAvailable(&Todays_Packages.taskdata.strike, PT_ME109, PT_ME109,acnum, squadnum, false))
-//DEADCODE DAW 07/04/00 			&&	(Todays_Packages.taskdata.escortactypes[0] != PT_ME109)
-//DEADCODE DAW 07/04/00 		)
-//DEADCODE DAW 07/04/00 		Todays_Packages.taskdata.escortactypes[i++]	= PT_ME109;
-//DEADCODE DAW 07/04/00 
-//DEADCODE DAW 07/04/00 	if (		(AcAvailable(&Todays_Packages.taskdata.strike, PT_ME110, PT_ME110,acnum, squadnum, false))
-//DEADCODE DAW 07/04/00 			&&	(Todays_Packages.taskdata.escortactypes[0] != PT_ME110)
-//DEADCODE DAW 07/04/00 		)
-//DEADCODE DAW 07/04/00 		Todays_Packages.taskdata.escortactypes[i++]	= PT_ME110;
-//DEADCODE DAW 07/04/00 
 
 
 
-//DEADCODE RDH 07/04/00 //using these attached fields for general purpose 
-//DEADCODE RDH 07/04/00 	int escorttype = Todays_Packages.taskdata.escortactypes[0];
-//DEADCODE RDH 07/04/00 	if (escorttype == -1)
-//DEADCODE RDH 07/04/00 			escorttype = PT_ME109;
 
 	//work out the total fighter figures
 	int fighters = 0;
@@ -3851,13 +3513,8 @@ void	PackageList::SetTaskData()
 
 //using these attached fields for general purpose 
 	int escorttype = Todays_Packages.taskdata.escortactypes[0];
-//DeadCode JIM 15Oct00 	int escorttype2 = Todays_Packages.taskdata.escortactypes[0];
 	if ((escorttype == -1))
 		escorttype=MIXED;
-//DeadCode JIM 15Oct00 	{
-//DeadCode JIM 15Oct00 			escorttype = PT_ME109;
-//DeadCode JIM 15Oct00 			escorttype2 = PT_ME110;
-//DeadCode JIM 15Oct00 	}
 
 	AcAvailable(&Todays_Packages.taskdata.totalfighter, escorttype, 
 		FIGHTER, acnum, squadnum, true);
@@ -3866,7 +3523,6 @@ void	PackageList::SetTaskData()
 
 
 
-//DEADCODE RDH 02/04/00 	 Todays_Packages.taskdata.attackmethod = pk.attackmethod - Profile::AM_DIVEBOMB;
 	 Todays_Packages.taskdata.attackmethod = pk.attackmethod;
 		
 }
@@ -3912,12 +3568,6 @@ bool PackageList::RAFAcAvailable(AMType* amtype,int actype, int actype2,int& acn
 		j++;
 	}
 	bool avail = false;
-//DeadCode JIM 20Oct00 	if (amtype->acnum != -1)
-//DeadCode JIM 20Oct00 	{
-//DeadCode JIM 20Oct00 		if ((acnum > amtype->acnum) ||  (squadnum > 0))
-//DeadCode JIM 20Oct00 			avail = true;
-//DeadCode JIM 20Oct00 	}else if (squadnum >= amtype->squadnum)
-//DeadCode JIM 20Oct00 		avail = true;
 
 	if (acnum == -1)					//RDH 12/05/00
 	{	//sqcommitted are squadrons committed to this mission
@@ -4037,8 +3687,6 @@ void	PackageList::SetRAFTaskData()
 	i = 0;
 	while (i < pk.squadlist)
 	{
-//DEADCODE RDH 10/04/00 		squadron = pk[i].squadnum;
-//DEADCODE RDH 10/04/00 		actype = Node_Data.squadron[squadron].AcType();
 		Squadron* sq = Node_Data[(SquadNum)pk[i].squadnum];
 
 		actype = sq->AcType();
@@ -4130,9 +3778,6 @@ void	PackageList::ClearPack(int p)
 //	pack[p].packagetakeoff=	pack[p].packagetarget	=pack[p].regrouploc=UID_NULL;
 	delete[] pack[p].raidnumentries;
 	pack[p].raidnumentries=NULL;
-//DEADCODE ROD 16/12/99 	pack[p].packname[0] = 0;
-//DeadCode JIM 25Oct00 	pack[p].redo = false;
-//DeadCode JIM 25Oct00 	pack[p].edited = false;
 	pack[p].flags=0;
 	pack[p].packagetakeoff = UID_NULL;							
 	pack[p].packagetarget[0] = UID_NULL;
@@ -4277,22 +3922,10 @@ int	Profile::Squad::FixTakeOffTime(int absrvtime,int rvtime)
 	return rvtime;
 }
 
-//DeadCode CSB 2Aug00 void	Profile::Squad::FixTakeOffTime(int absrvtime,int rvtime)
-//DeadCode CSB 2Aug00 {
-//DeadCode CSB 2Aug00 		WaypointOffsetSub wos;
-//DeadCode CSB 2Aug00 		AirStruc::GenWaypointOffsetSub(formtype,wos,(method&AM_GROUPMASK)==AM_ATTACHED);
-//DeadCode CSB 2Aug00 		int waypointdelta=wos.deltatime/100; //+ve means arrive early	//JIM 25Jul00
-//DeadCode CSB 2Aug00 		takeofftime = absrvtime - rvtime-waypointdelta;	//JIM 24Jul00
-//DeadCode CSB 2Aug00 
-//DeadCode CSB 2Aug00 		UniqueID wpuid = takeoffwp;
-//DeadCode CSB 2Aug00 		info_waypoint* wp=*Persons2::ConvertPtrUID(wpuid);
-//DeadCode CSB 2Aug00 		wp->etas = takeofftime;	//etas;				//CSB 26Jul00
-//DeadCode CSB 2Aug00 }
 
 void Profile::CalcWPRelTimes(int sqnum, int& targettime, int& rvtime)
 {
 //	UniqueID wpuid = route;
-//DeadCode RDH 30Jun00 	UniqueID wpuid = squadlist[sqnum].takeoffwp;
 	int i=0;
 	COORDS3D last,next;
 	int lasttime=0;
@@ -4310,9 +3943,6 @@ void Profile::CalcWPRelTimes(int sqnum, int& targettime, int& rvtime)
 	int deltawpalt=wos.deltavert;
 	int targindex=squadlist[sqnum].targetindex;
 	//takeoff
-//DeadCode RDH 30Jun00 	info_waypoint* wp=*Persons2::ConvertPtrUID(wpuid);
-//DeadCode RDH 30Jun00 	last=&wp->World;
-//DeadCode RDH 30Jun00 	wp->etas = 0;
 
 	UniqueID wpuid = squadlist[sqnum].takeoffwp;
 
@@ -4658,9 +4288,6 @@ bool	Profile::Insert109ReturnWP(int reqdistcm)
 		if (wp->uid.Evaluate()==-SGR_WPC_FighterLimit)
 			ureturn=uIP;
 	}
-//DeadCode RDH 16Aug00 	if (distbackcm<0)
-//DeadCode RDH 16Aug00 		distbackcm=METRES500;
-//DeadCode RDH 16Aug00 	int reqdistcm=distdogip-distbackcm;
 	if (reqdistcm<METRES500)
 		reqdistcm=METRES500;
 	if (distdogip>METRES1000)											//MS 15Nov00
@@ -4826,7 +4453,6 @@ SquadNum Profile::CalcFuel(UniqueID uid, int& strikereqfueltime, int& escortreqf
 			if (squadlist[i].method < AM_ESCORTTYPES)
 				somestrikeok=true;
 
-//DeadCode JIM 20Oct00 		int trg = squadlist[i].targetindex;
 		if (squadlist[i].method < AM_ESCORTTYPES)
 		{
 			if 	(		(reqfueltime != -1)
@@ -4837,8 +4463,6 @@ SquadNum Profile::CalcFuel(UniqueID uid, int& strikereqfueltime, int& escortreqf
 				)
 			{
 				strikereqfueltime = reqfueltime;
-//DeadCode RDH 28Jun00 				if (strikereqfueltime < 0)
-//DeadCode RDH 28Jun00 					strikereqfueltime = 0;
 			}
 		}else	
 		{
@@ -4850,8 +4474,6 @@ SquadNum Profile::CalcFuel(UniqueID uid, int& strikereqfueltime, int& escortreqf
 				)
 			{
 				escortreqfueltime = reqfueltime;
-//DeadCode RDH 28Jun00 				if (escortreqfueltime < 0)
-//DeadCode RDH 28Jun00 					escortreqfueltime = 0;
 			}
 		}
 
@@ -4871,14 +4493,12 @@ SquadNum Profile::CalcFuel(UniqueID uid, int& strikereqfueltime, int& escortreqf
 			if (type == PT_ME109)
 			{
 				int ti = squadlist[i].targetindex;
-//DeadCode JIM 24Oct00 				squadlist[i].targetindex = -10;	//this avoids target area
 				CalcFuel(i, -3, uid, reqfueltime, fueltime);
 				if (lowestreqfueltime > fueltime)
 				{
 					lowestreqfueltime = fueltime;
 					lowestsq = i;
 				}
-//DeadCode JIM 24Oct00 				squadlist[i].targetindex = ti; 
 			}
 			i++;
 		}
@@ -4915,14 +4535,10 @@ bool Profile::CalcFuel(int sqnum, UniqueID uid, int& reqfueltime, int& fueltime)
 bool Profile::CalcFuel(int sqnum, int trgnum, UniqueID uid, int& reqfueltime, int& fueltime)	
 {//returns true if there is sufficient fuel for route
  //reqfueltime returns remaining flying time at specified uid
-//DeadCode RDH 30Jun00 		UniqueID wpuid = route;
-//DeadCode JIM 20Oct00 	int i=0;
 	COORDS3D last;
-//DeadCode JIM 20Oct00 	int lasttime=0;
 		int dtime;
 
 	SWord StoresDrag = 0;
-//DeadCode JIM 20Oct00 	int targettime = 0;
 
 	Squadron* sq = Node_Data[(SquadNum)squadlist[sqnum].squadnum];
 	int type = sq->AcType();
@@ -4936,7 +4552,6 @@ bool Profile::CalcFuel(int sqnum, int trgnum, UniqueID uid, int& reqfueltime, in
 		fuel*=1.75;														//JIM 24Jul00
 
 	//takeoff
-//DeadCode RDH 30Jun00 	info_waypoint* wp=*Persons2::ConvertPtrUID(wpuid);
 //	last=&wp->World;
 	int reqfuel = fuel;
 	int orgfuel = reqfuel;
@@ -4992,14 +4607,10 @@ bool Profile::CalcFuel(int sqnum, int trgnum, UniqueID uid, int& reqfueltime, in
 	fueltime = fueltime/6000;						//so div 360000
 	fueltime = fueltime - 5;	//safety allowance	//so sub 1800000
 
-//DeadCode RDH 28Jun00 	if (fueltime < 0)
-//DeadCode RDH 28Jun00 		fueltime = 0;
-//DeadCode RDH 28Jun00 
 	if (fueltime > 0)
 		return (true);
 	else
 		return(false);
-//DeadCode RDH 28Jun00 	return (fueltime!=0);												//JIM 22/02/00
 
 }
 
@@ -5017,13 +4628,10 @@ bool Profile::CalcFuel(int sqnum, int trgnum, UniqueID uid, int& reqfueltime, in
 Float Profile::Calc109FuelShortCut(int sqnum)	
 {
 
-//DeadCode JIM 20Oct00 	int i=0;
 	COORDS3D last;
-//DeadCode JIM 20Oct00 	int lasttime=0;
 		int dtime;
 
 	SWord StoresDrag = 0;
-//DeadCode JIM 20Oct00 	int targettime = 0;
 
 	Squadron* sq = Node_Data[(SquadNum)squadlist[sqnum].squadnum];
 	int type = sq->AcType();
@@ -5047,13 +4655,8 @@ Float Profile::Calc109FuelShortCut(int sqnum)
 	type = sq->AcType();
 	while (wpuid)
 	{
-//DeadCode RDH 16Aug00 		wp=*Persons2::ConvertPtrUID(wpuid);
 		if (wp->uid==-SGR_WPP_BombRendezvous || wp->uid==-SGR_WPP_BombDisperse)  //always do this for 109's
 		{
-//DeadCode RDH 16Aug00 			if (escortee==type)
-//DeadCode RDH 16Aug00 				escortee=PT_HE111;
-//DeadCode RDH 16Aug00 			else
-//DeadCode RDH 16Aug00 				escortee=type;
 			wpuid = wp->NextWP(sqnum,-9);
 			wp=*Persons2::ConvertPtrUID(wpuid);
 		}
@@ -5064,8 +4667,6 @@ Float Profile::Calc109FuelShortCut(int sqnum)
 
 		last.X=wp->World.X;
 		last.Z=wp->World.Z;
-//DeadCode RDH 16Aug00 		do
-//DeadCode RDH 16Aug00 		{
 
 //TempCode RDH 17Aug00 			if (wp->uid==-SGR_WPP_EscRendezvous)
 //TempCode RDH 17Aug00 				escortee=PT_HE111;
@@ -5080,10 +4681,6 @@ Float Profile::Calc109FuelShortCut(int sqnum)
 				wpuid = wp->NextWP(sqnum,-9);
 			if (wpuid)
 				wp=*Persons2::ConvertPtrUID(wpuid);
-//DeadCode RDH 16Aug00 		}while	(		(wp->uid < -SGR_WPP_DogLeg)
-//DeadCode RDH 16Aug00 					&&	(wp->uid > -SGR_WPP_EscDisperse)
-//DeadCode RDH 16Aug00 				);
-//DeadCode RDH 16Aug00 
 	}
 
 
@@ -5094,9 +4691,8 @@ Float Profile::Calc109FuelShortCut(int sqnum)
 	return(fueltime);
 }
 
-bool Profile::GetPackageFromWP(UniqueID req_wpuid,int& pack,int& squad,int& target)
+bool Profile::GetPackageFromWP(UniqueID req_wpuid,int& pack,int* squad,int* target)
 {
-//DEADCODE DAW 26/11/99 	g = 0;
  	for (pack=0;pack<Profile::MAX_PACKS;pack++)
 	{
 		if (Todays_Packages.pack[pack].packagestatus!=PS_SPARE)
@@ -5108,25 +4704,23 @@ bool Profile::GetPackageFromWP(UniqueID req_wpuid,int& pack,int& squad,int& targ
 				wp=*Persons2::ConvertPtrUID(u);
 				if ( u == req_wpuid)
 				{
-					if (&squad!=NULL)
+					if (squad!=NULL)
 						if (wp->applygroup.Evaluate()!=ENABLE_COMPLEX_VAL)
-							squad=wp->applygroup.Evaluate();
+							*squad=wp->applygroup.Evaluate();
 						else
-							squad=-1;
+							*squad=-1;
 					if (wp->applywave.Evaluate()!=ENABLE_COMPLEX_VAL)
 					{
 						int t=wp->applywave.Evaluate();
-						if (&squad!=NULL && squad==-1)
+						if (squad!=NULL && *squad==-1)
 						{
 							for (int i=Todays_Packages.pack[pack].squadlist.Max()-1;i>=0;i--)
 								if (Todays_Packages.pack[pack][i].targetindex==t)
-									squad=i;
+									*squad=i;
 						}
-						if (&target!=NULL)
-							target=t;
+						if (target!=NULL)
+							*target=t;
 					}
-//DEADCODE DAW 26/11/99 					if (wp->applygroup != GOT_UNDEFINED_VAL)
-//DEADCODE DAW 26/11/99 						g = wp->applygroup;
 					return (true);
 				}
 	   			u=wp->nextwp;
@@ -5212,15 +4806,11 @@ int Profile::WPType(UniqueID u)
 						||	(wp->applywave != GOT_UNDEFINED_VAL)
 					)
 				{
-//DEADCODE  21/02/00 					if (wp->applygroup == 0)
-//DEADCODE  21/02/00 					{
 						int action=wp->wpact.Evaluate();
 						if (action==ENABLE_COMPLEX_VAL)
 							action=wpacnoactionno;
 						if (action != wpacnoactionno)
 							text = 	IDS_L_WPACTION_NONE + action;
-//DEADCODE  21/02/00 					}else
-//DEADCODE  21/02/00 						text = (int)wp->applygroup + IDS_ATTACK;
 				}
 
 			}else
@@ -5351,8 +4941,6 @@ void	PackageList::ChangeMessagesUID(UniqueID old,int newid)
 			UniqueID wpu=pack[p].route;
 			for (info_waypointPtr wp=Persons2::ConvertPtrUID(wpu);wpu;wp=Persons2::ConvertPtrUID(wpu=wp->nextwp))
 			{
-	//DeadCode  20Jul00 			if (wp->applywave==-2)
-	//DeadCode  20Jul00 				INT3;
 
 				if (wp->target.UsesUID(old) || wp->position.UsesUID(old))
 				{
@@ -5367,7 +4955,6 @@ void	PackageList::ChangeMessagesUID(UniqueID old,int newid)
 				info_airgrpPtr ag=Persons2::ConvertPtrUID(pack[p][s].instance);
 				if (ag && ag->target.UsesUID(old,true))
 				{
-//DeadCode MS 15Nov00 					INT3;
 					ag->target=0;
 				}
 
@@ -5449,7 +5036,7 @@ void	Profile::SquadComplete(int sqline)
 		}
 }
 	
-bool	PackageList::GetSquadEntry(SquadNum s,int&pk,int&sq)
+bool	PackageList::GetSquadEntry(SquadNum s,int&pk,int*sq)
 {
 	for (int i=0;i<Profile::MAX_PACKS;i++)
 		if (pack[i].packagestatus!=Profile::PS_COMPLETE)							//JIM 31/03/00
@@ -5459,8 +5046,8 @@ bool	PackageList::GetSquadEntry(SquadNum s,int&pk,int&sq)
 				if (s==p[j].squadnum)
 				{
 					pk=i;
-					if (&sq!=NULL)
-						sq=j;
+					if (sq!=NULL)
+						*sq=j;
 					return true;
 				}
 		}
@@ -5478,7 +5065,7 @@ bool	Profile::GetACSquadEntry(UniqueID ac,int&sq)
 		return false;
 
 }
-bool	PackageList::GetACSquadEntry(UniqueID ac,int&pk,int&sq)
+bool	PackageList::GetACSquadEntry(UniqueID ac,int&pk,int*sq)
 {
 	if (ac&UID_BIT14)
 	{
@@ -5486,8 +5073,8 @@ bool	PackageList::GetACSquadEntry(UniqueID ac,int&pk,int&sq)
 		int raid=ac&0x1f;
 		int p=(ac>>5)&0x1ff;
 		pk=p;
-		if (&sq!=NULL)
-			sq=pack[p].RaidNumEntriesMinSq(raid);
+		if (sq!=NULL)
+			*sq=pack[p].RaidNumEntriesMinSq(raid);
 		return true;
 	}
 	info_airgrpPtr a=Persons2::ConvertPtrUID(ac);
@@ -5501,8 +5088,8 @@ bool	PackageList::GetACSquadEntry(UniqueID ac,int&pk,int&sq)
 			int j;
 			if (p.GetACSquadEntry(ac,j))
 			{
-				if (&sq!=NULL)
-					sq=j;
+				if (sq!=NULL)
+					*sq=j;
 				return true;
 			}
 		}
@@ -5537,7 +5124,7 @@ int		Profile::CountRaid(int squadentry)
 }
 
 
-bool	PackageList::GetWPTargEntry(UniqueID s,int&pk,int&trg)
+bool	PackageList::GetWPTargEntry(UniqueID s,int&pk,int*trg)
 {
 	for (int i=0;i<Profile::MAX_PACKS;i++)
 	{
@@ -5548,22 +5135,22 @@ bool	PackageList::GetWPTargEntry(UniqueID s,int&pk,int&trg)
 			wp=Persons2::ConvertPtrUID(u);
 			if (u==s)
 			{
-				if (&trg!=NULL)
+				if (trg!=NULL)
 				{
 					if (wp->target.Evaluate()!=GOT_UNDEFINED_VAL && wp->target.Evaluate()!=UID_NULL)
 					{
 						u=UniqueID(wp->target.Evaluate());
-						trg=WPTS_LOCALTAKEOFF;
+						*trg=WPTS_LOCALTAKEOFF;
 						if (p.doglegloc==u)
-							trg=WPTS_DOGLEG;
+							*trg=WPTS_DOGLEG;
 						if (p.packagetakeoff==u)
-							trg=WPTS_MAINTAKEOFF;
+							*trg=WPTS_MAINTAKEOFF;
 						for (int j=0;j<Profile::MAX_TARGETS;j++)
 							if (p.packagetarget[j]==u)
-								trg=j;
+								*trg=j;
 					}
 					else
-						trg=WPTS_NONE;
+						*trg=WPTS_NONE;
 				}
 				pk=i;
 				return true;
@@ -5574,7 +5161,7 @@ bool	PackageList::GetWPTargEntry(UniqueID s,int&pk,int&trg)
 	return false;
 }
 
-bool	PackageList::GetTargEntry(UniqueID u,int&pk,int&trg)
+bool	PackageList::GetTargEntry(UniqueID u,int&pk,int*trg)
 {
 	for (int i=0;i<Profile::MAX_PACKS;i++)
 	{
@@ -5583,8 +5170,8 @@ bool	PackageList::GetTargEntry(UniqueID u,int&pk,int&trg)
 			if (p.packagetarget[j]==u)
 			{
 				pk=i;
-				if (&trg!=NULL)
-					trg=j;
+				if (trg!=NULL)
+					*trg=j;
 			}
 	}
 	return false;
@@ -5808,8 +5395,6 @@ AttackMethodField	Profile::ReorderPackage(AttackMethodField am)
 			{
 				if (!(squadlist[order.back[find]].submethod&SM_DOSTRAFFEGROUND))
 				{
-//DeadCode JIM 12Oct00 					squadlist[order.back[find]].targetindex=0;
-//DeadCode JIM 12Oct00 				else
 					squadlist[order.back[find]].targetindex=-1;
 					order.WrapUp(find);
 				}
@@ -5856,7 +5441,6 @@ int	Profile::RecostRaidList()
 	bool	nearescortused=false;
 	AttackMethodField		farescorts={0};
 	typedef UByte	Targets;
-//DEADCODE JIM 21/06/00 	enum	Targets	{};
 
 	MAKEFIELD(Targets,0,15);
 	TargetsField	targetsusedbits={0};	
@@ -5895,7 +5479,6 @@ int	Profile::RecostRaidList()
 	}
 	if (raidnumentries)
 	{
-//DEADCODE RDH 29/03/00 		for (int i=0;raidnumentries[i].squadliststart!=RNEC_LISTVALISLASTREC;i++)
 		rne2[0].raidnum=raidnumentries[0].raidnum;
 		rne2[0].detector=raidnumentries[0].detector;
 		rne2[0].squadliststart=raidnumentries[0].squadliststart;
@@ -5983,8 +5566,6 @@ int	Profile::RemakeRaidList(bool splitbombers,bool splitfighters)
 				{
 					if (lastescortpos==AM_LWPACKS)
 					{
-//DeadCode RJS 26Oct100 						if (gotattached)
-//DeadCode RJS 26Oct100 							currentry++;		//reserve for fighters if fighters not filled in yet.
 						lastentry++;
 						while(lastentry<=currentry)
 						{
@@ -6024,13 +5605,6 @@ int	Profile::RemakeRaidList(bool splitbombers,bool splitfighters)
 			break;
 			}//case
 		}//for
-//DeadCode RDH 18Sep00 		lastentry++;													//JIM 18Sep00
-//DeadCode RDH 18Sep00 		while(lastentry<=currentry)
-//DeadCode RDH 18Sep00 		{
-//DeadCode RDH 18Sep00 			raidnumentries[lastentry].raidnum=0;
-//DeadCode RDH 18Sep00 			raidnumentries[lastentry].squadliststart=s;
-//DeadCode RDH 18Sep00 			lastentry++;
-//DeadCode RDH 18Sep00 		}
 		if (currentry>maxentries)
 			INT3;
 
@@ -6124,23 +5698,6 @@ bool Profile::UnitIsBomber(int j, bool me110isbomber)
 			return(false);
 
 }
-//DeadCode JIM 14Nov00 bool Profile::SqIsAvail(int j, typestolist)
-//DeadCode JIM 14Nov00 {
-//DeadCode JIM 14Nov00 	bool avail = false;
-//DeadCode JIM 14Nov00 	Squadron* sq  = Node_Data[Node_Data.gruppe[j].squadron];
-//DeadCode JIM 14Nov00 	if  (	(	(	(acisfighter) &&	(UnitIsFighter(j, me110isbomber))
-//DeadCode JIM 14Nov00 				)
-//DeadCode JIM 14Nov00 			||
-//DeadCode JIM 14Nov00 				(	(!acisfighter) &&	(UnitIsBomber(j, me110isbomber))
-//DeadCode JIM 14Nov00 				)
-//DeadCode JIM 14Nov00 			)
-//DeadCode JIM 14Nov00 				&&	(!sq->Busy())
-//DeadCode JIM 14Nov00 				&&	(sq->acavail >= Gruppen::MIN_GRUPPEAC)
-//DeadCode JIM 14Nov00 
-//DeadCode JIM 14Nov00 		)
-//DeadCode JIM 14Nov00 		avail = true;
-//DeadCode JIM 14Nov00 	return (avail);
-//DeadCode JIM 14Nov00 }
 bool Profile::StraffRequired(int attackmethod)
 {
 	bool straf = false;
@@ -6317,10 +5874,6 @@ void Profile::RAFResetAcNumbers(Profile::BetterRule brattackmethod, int orgsq, i
 	int deltasq = reqsq - orgsq;
 	BetterRule	br=brattackmethod;
 	SquadNum sqnum;
-//DeadCode JIM 19Oct00 	if (attackmethod == Profile::AM_DETACHED)
-//DeadCode JIM 19Oct00 		br = BR_B_SPITONLY;
-//DeadCode JIM 19Oct00 	else
-//DeadCode JIM 19Oct00 		br = BR_B_HURRONLY;
 
 	sqnum = SQ_ZERO;
 
@@ -6684,18 +6237,6 @@ char*	PackageList::RaidFormatString(int packnum, int raid)
 	}
 	return(raidletter);
 }
-//DEADCODE RDH 24/05/00 int	PackageList::FindNumSquadsInPack(int p)
-//DEADCODE RDH 24/05/00 {
-//DEADCODE RDH 24/05/00 //DEADCODE RDH 12/05/00 	Profile& pk = Todays_Packages.pack[p];
-//DEADCODE RDH 24/05/00 	int sqplanned = 0;
-//DEADCODE RDH 24/05/00 //DEADCODE RDH 12/05/00 	int i=0;
-//DEADCODE RDH 24/05/00 //DEADCODE RDH 12/05/00 	while (i < pk.squadlist)
-//DEADCODE RDH 24/05/00 //DEADCODE RDH 12/05/00 	{
-//DEADCODE RDH 24/05/00 //DEADCODE RDH 12/05/00 	   sqplanned += pk[i++].squadnum;
-//DEADCODE RDH 24/05/00 //DEADCODE RDH 12/05/00 	}
-//DEADCODE RDH 24/05/00 	return (sqplanned);
-//DEADCODE RDH 24/05/00 
-//DEADCODE RDH 24/05/00 }
 int	PackageList::SquadronsPlanned(int nationality)
 {
 	int sqplanned = 0;

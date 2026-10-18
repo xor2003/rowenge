@@ -105,13 +105,22 @@ struct DialBox:DialMake
 	RDialog*	dial;
 	const	DialBox*	diallist[10];
 	Edges	edgesval;
-	DialBox(FileNum artnum,RDialog*	newdial,const Edges& e=*(Edges*)NULL):
+	//Shared "no pane" sentinel: optional slots default to this instance and
+	//AsPtr() folds it back to a nullptr diallist entry.
+	static const DialBox&	Null()	{ static const DialBox s; return s; }
+	static const DialBox*	AsPtr(const DialBox& d)	{ return &d==&Null()?nullptr:&d; }
+	DialBox(FileNum artnum,RDialog*	newdial,const Edges& e):
 	DialMake(&e,artnum)
 	{
 		dial=newdial;diallist[0]=NULL;diallist[1]=(DialBox*)0x12345678;
 		//Caller may pass a temporary Edges which dies at end of the
 		//full expression; keep an owned copy so 'edges' never dangles.
-		if (&e)	{ edgesval=e; edges=&edgesval; }
+		edgesval=e; edges=&edgesval;
+	}
+	DialBox(FileNum artnum,RDialog*	newdial):
+	DialMake(NULL,artnum)
+	{
+		dial=newdial;diallist[0]=NULL;diallist[1]=(DialBox*)0x12345678;
 	}
 protected:
 	DialBox(DialBox& d):DialMake(NULL,d.art)
@@ -126,23 +135,23 @@ struct DialList:DialBox
 {
    
 	DialList(DialBox& d,const DialBox& d0,
-			const DialBox& d1=*(DialBox*)NULL,
-			const DialBox& d2=*(DialBox*)NULL,
-			const DialBox& d3=*(DialBox*)NULL,
-			const DialBox& d4=*(DialBox*)NULL,
-			const DialBox& d5=*(DialBox*)NULL,
-			const DialBox& d6=*(DialBox*)NULL,
-			const DialBox& d7=*(DialBox*)NULL):
+			const DialBox& d1=DialBox::Null(),
+			const DialBox& d2=DialBox::Null(),
+			const DialBox& d3=DialBox::Null(),
+			const DialBox& d4=DialBox::Null(),
+			const DialBox& d5=DialBox::Null(),
+			const DialBox& d6=DialBox::Null(),
+			const DialBox& d7=DialBox::Null()):
 	DialBox(d)
 	{
-		diallist[0]=&d0;
-		diallist[1]=&d1;
-		diallist[2]=&d2;
-		diallist[3]=&d3;
-		diallist[4]=&d4;
-		diallist[5]=&d5;
-		diallist[6]=&d6;
-		diallist[7]=&d7;
+		diallist[0]=AsPtr(d0);
+		diallist[1]=AsPtr(d1);
+		diallist[2]=AsPtr(d2);
+		diallist[3]=AsPtr(d3);
+		diallist[4]=AsPtr(d4);
+		diallist[5]=AsPtr(d5);
+		diallist[6]=AsPtr(d6);
+		diallist[7]=AsPtr(d7);
 		diallist[8]=NULL;
 		diallist[9]=NULL;
 		childtype=CLUMP;
@@ -167,14 +176,14 @@ protected:
 			const DialBox& d6,
 			const DialBox& d7)
 	{
-		diallist[0]=&d0;
-		diallist[1]=&d1;
-		diallist[2]=&d2;
-		diallist[3]=&d3;
-		diallist[4]=&d4;
-		diallist[5]=&d5;
-		diallist[6]=&d6;
-		diallist[7]=&d7;
+		diallist[0]=AsPtr(d0);
+		diallist[1]=AsPtr(d1);
+		diallist[2]=AsPtr(d2);
+		diallist[3]=AsPtr(d3);
+		diallist[4]=AsPtr(d4);
+		diallist[5]=AsPtr(d5);
+		diallist[6]=AsPtr(d6);
+		diallist[7]=AsPtr(d7);
 		diallist[8]=NULL;
 		diallist[9]=NULL;
 		childtype=CLUMP;
@@ -184,6 +193,8 @@ protected:
 
 struct	IdEntry
 {
+	static const IdEntry&	Null()	{ static const IdEntry s(0); return s; }
+	static const IdEntry*	AsPtr(const IdEntry& e)	{ return &e==&Null()?nullptr:&e; }
 	enum	IdType	{T_IDT,T_CHAR,T_GAP}
 	idtype;
 	union
@@ -204,18 +215,18 @@ struct	IdList
 {
 	const IdEntry*	list[10];
 	IdList(	const IdEntry& e0,
-			const IdEntry& e1=*(IdEntry*)NULL,
-			const IdEntry& e2=*(IdEntry*)NULL,
-			const IdEntry& e3=*(IdEntry*)NULL,
-			const IdEntry& e4=*(IdEntry*)NULL,
-			const IdEntry& e5=*(IdEntry*)NULL,
-			const IdEntry& e6=*(IdEntry*)NULL,
-			const IdEntry& e7=*(IdEntry*)NULL,
-			const IdEntry& e8=*(IdEntry*)NULL,
-			const IdEntry& e9=*(IdEntry*)NULL)
+			const IdEntry& e1=IdEntry::Null(),
+			const IdEntry& e2=IdEntry::Null(),
+			const IdEntry& e3=IdEntry::Null(),
+			const IdEntry& e4=IdEntry::Null(),
+			const IdEntry& e5=IdEntry::Null(),
+			const IdEntry& e6=IdEntry::Null(),
+			const IdEntry& e7=IdEntry::Null(),
+			const IdEntry& e8=IdEntry::Null(),
+			const IdEntry& e9=IdEntry::Null())
 	{
-		list[0]=&e0;list[1]=&e1;list[2]=&e2;list[3]=&e3;list[4]=&e4;
-		list[5]=&e5;list[6]=&e6;list[7]=&e7;list[8]=&e8;list[9]=&e9;
+		list[0]=IdEntry::AsPtr(e0);list[1]=IdEntry::AsPtr(e1);list[2]=IdEntry::AsPtr(e2);list[3]=IdEntry::AsPtr(e3);list[4]=IdEntry::AsPtr(e4);
+		list[5]=IdEntry::AsPtr(e5);list[6]=IdEntry::AsPtr(e6);list[7]=IdEntry::AsPtr(e7);list[8]=IdEntry::AsPtr(e8);list[9]=IdEntry::AsPtr(e9);
 	}
 };
 
@@ -225,13 +236,13 @@ struct HTabBox:DialList
 	IdList* titles;
 	HTabBox(FileNum artnum,IdList&idlist,Edges& e,
 			const DialBox& d0,
-			const DialBox& d1=*(DialBox*)NULL,
-			const DialBox& d2=*(DialBox*)NULL,
-			const DialBox& d3=*(DialBox*)NULL,
-			const DialBox& d4=*(DialBox*)NULL,
-			const DialBox& d5=*(DialBox*)NULL,
-			const DialBox& d6=*(DialBox*)NULL,
-			const DialBox& d7=*(DialBox*)NULL):
+			const DialBox& d1=DialBox::Null(),
+			const DialBox& d2=DialBox::Null(),
+			const DialBox& d3=DialBox::Null(),
+			const DialBox& d4=DialBox::Null(),
+			const DialBox& d5=DialBox::Null(),
+			const DialBox& d6=DialBox::Null(),
+			const DialBox& d7=DialBox::Null()):
 	DialList(d0,d1,d2,d3,d4,d5,d6,d7)
 	{
 		titles=&idlist;
@@ -241,13 +252,13 @@ struct HTabBox:DialList
 	}
 	HTabBox(FileNum artnum,Edges &e,
 			const DialBox& d0,
-			const DialBox& d1=*(DialBox*)NULL,
-			const DialBox& d2=*(DialBox*)NULL,
-			const DialBox& d3=*(DialBox*)NULL,
-			const DialBox& d4=*(DialBox*)NULL,
-			const DialBox& d5=*(DialBox*)NULL,
-			const DialBox& d6=*(DialBox*)NULL,
-			const DialBox& d7=*(DialBox*)NULL):
+			const DialBox& d1=DialBox::Null(),
+			const DialBox& d2=DialBox::Null(),
+			const DialBox& d3=DialBox::Null(),
+			const DialBox& d4=DialBox::Null(),
+			const DialBox& d5=DialBox::Null(),
+			const DialBox& d6=DialBox::Null(),
+			const DialBox& d7=DialBox::Null()):
 	DialList(d0,d1,d2,d3,d4,d5,d6,d7)
 	{
 		edges=&e;
@@ -261,24 +272,24 @@ struct VTabBox:HTabBox
 {
 	VTabBox(FileNum artnum,IdList&idlist,Edges &e,
 			const DialBox& d0,
-			const DialBox& d1=*(DialBox*)NULL,
-			const DialBox& d2=*(DialBox*)NULL,
-			const DialBox& d3=*(DialBox*)NULL,
-			const DialBox& d4=*(DialBox*)NULL,
-			const DialBox& d5=*(DialBox*)NULL,
-			const DialBox& d6=*(DialBox*)NULL,
-			const DialBox& d7=*(DialBox*)NULL):
+			const DialBox& d1=DialBox::Null(),
+			const DialBox& d2=DialBox::Null(),
+			const DialBox& d3=DialBox::Null(),
+			const DialBox& d4=DialBox::Null(),
+			const DialBox& d5=DialBox::Null(),
+			const DialBox& d6=DialBox::Null(),
+			const DialBox& d7=DialBox::Null()):
 	HTabBox(artnum,idlist,e,d0,d1,d2,d3,d4,d5,d6,d7)
 	{childtype=TABR;}
 	VTabBox(FileNum artnum,Edges &e,
 			const DialBox& d0,
-			const DialBox& d1=*(DialBox*)NULL,
-			const DialBox& d2=*(DialBox*)NULL,
-			const DialBox& d3=*(DialBox*)NULL,
-			const DialBox& d4=*(DialBox*)NULL,
-			const DialBox& d5=*(DialBox*)NULL,
-			const DialBox& d6=*(DialBox*)NULL,
-			const DialBox& d7=*(DialBox*)NULL):
+			const DialBox& d1=DialBox::Null(),
+			const DialBox& d2=DialBox::Null(),
+			const DialBox& d3=DialBox::Null(),
+			const DialBox& d4=DialBox::Null(),
+			const DialBox& d5=DialBox::Null(),
+			const DialBox& d6=DialBox::Null(),
+			const DialBox& d7=DialBox::Null()):
 	HTabBox(artnum,e,d0,d1,d2,d3,d4,d5,d6,d7)
 	{childtype=TABR;}
 };
@@ -424,7 +435,7 @@ private:
 	
 	int		ModScroll(UINT id,UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	static RDialog*	MakeParentDialog(CRect& e,RDialog* parent,DialBox* tree);
-	RDialog*	AddChildren(const DialBox*const* diallist,int X2flag=0,CRect& rect=*(CRect*)NULL);
+	RDialog*	AddChildren(const DialBox*const* diallist,int X2flag=0,CRect* rect=NULL);
 	void	AddChildren(const DialBox*const* diallist,DialMake::ChildType childtype,const IdList* titles);
 public:
 	static int RMessageBox(UINT TitleID, UINT MessageID, UINT Button0ID=0,UINT Button1ID=0, UINT Button2ID=0, FileNum art=FIL_NULL);

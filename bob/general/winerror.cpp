@@ -78,28 +78,22 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	<conio.h>										//pd 01Nov95
 #include	<dos.h>										//pd 01Nov95
 #include	"DosDefs.h"
-//DeadCode DAW 01Mar96 #include	"Files.g"
 #include	"Palette.h"
-//DeadCode DAW 15Apr96 #include	"screen.h"
 //#include	"wrapper.h"
 #include	"myerror.h"
-//DeadCode DAW 19Mar96 #include	"getset.h"
 #include	"myAngles.H"
 
 #include	"WorldInc.H"
 #include	"World.h"
 
 
-//DeadCode ARM 17Sep96 #include	"main.h"
 
-//DeadCode JIM 02Jul96 #include	<assert.h>											//ARM 26Jun96
 
 //#include	<windows.h>											//ARM 20Jun96
 //#include	"winmain.h"
 
 #include	"stub3d.h"
 //extern Main 	_Main;
-//DeadCode PD 26Oct95 extern Wrapper	_Wrapper;
 
 Error	_Error;
 char Error::exit_string[2048];
@@ -125,12 +119,8 @@ extern		void	TrackMemUse();
 //------------------------------------------------------------------------------
 Error::Error()
 {
-//DeadCode DAW 10Apr96 	#if	DEBUGGING
-//DeadCode DAW 10Apr96 		OpenLog();
-//DeadCode DAW 10Apr96 	#endif
 	//exitmsg="";
 	exit_string[0] = '\0';
-//DeadCode DAW 19Dec96 	exitmsg="Program exitted normally";							//ARM 17Sep96
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -147,9 +137,6 @@ Error::Error()
 //------------------------------------------------------------------------------
 Error::~Error()
 {
-//DeadCode DAW 10Apr96 	#if	DEBUGGING
-//DeadCode DAW 10Apr96 		CloseLog();
-//DeadCode DAW 10Apr96 	#endif
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -217,7 +204,6 @@ Error& Error::SayAndQuit(const char *fmt, ...)
 
 
 
-//DeadCode AMM 24Aug00 	Master_3d.QuitGame();
 	if (exit_string[0]=='\0')
 		strcpy(exit_string,"Error: Press Retry to debug");
 
@@ -252,14 +238,12 @@ Error& Error::SayAndQuit(const char *fmt, ...)
 //		if (Hell_Freezes_Over)
 			return *this;
 	}
-//DeadCode RJS 8Nov00 	else
-//DeadCode RJS 8Nov00 		FatalExit(-1);
 //	exitmsg=exit_string;
 
 //TempCode ARM 20Jun96 	fprintf(stdout, "\n");
 //TempCode ARM 10Jul96 	assert(FALSE);
 	exit(1);
-	return	*(Error*)NULL;
+	return	*this;	//unreachable - exit(1) above; *this avoids binding a null ref
 
 }
 
