@@ -113,7 +113,6 @@ enum	Angles
 	ANGLES_205Deg = 0x091c7,	//+71c
 	ANGLES_210Deg = 0x09555,
 	ANGLES_215Deg = 0x098e4,
-//DeadCode MS 29Jun100 	ANGLES_220Deg = 0x09c73,									//MS 26Jun00
 	ANGLES_220Deg = 0x09C78,
 	ANGLES_225Deg = 0x0A000,
 	ANGLES_235Deg = 0x0A71C,
@@ -199,59 +198,6 @@ class ANGLES;
 /**/
 /**/	operator int() const {return (int)(UWord)a;}
 /**/ };
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >	(const ANGLES a,const ANGLES b);	
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator <	(const ANGLES a,const ANGLES b);	
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >= (const ANGLES a,const ANGLES b);
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator <= (const ANGLES a,const ANGLES b);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >	(const ANGLES a,const Angles b);	
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator <	(const ANGLES a,const Angles b);	
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >= (const ANGLES a,const Angles b);
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator <= (const ANGLES a,const Angles b);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >	(const Angles a,const ANGLES b);	
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator <	(const Angles a,const ANGLES b);	
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >= (const Angles a,const ANGLES b);
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator <= (const Angles a,const ANGLES b);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >> (const ANGLES a,const ANGLES b);
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator << (const ANGLES a,const ANGLES b);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >> (const ANGLES a,const Angles b);
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator << (const ANGLES a,const Angles b);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator >> (const Angles a,const ANGLES b);
-//DEADCODE JIM 13/06/99 /**/	friend	Bool	operator << (const Angles a,const ANGLES b);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator+	(ANGLES,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator+=	(ANGLES&,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator-	(ANGLES,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator-=	(ANGLES&,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator-	(ANGLES);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator++	(ANGLES&);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator--	(ANGLES&);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator++	(ANGLES&,	int);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator--	(ANGLES&,	int);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator+	(ANGLES,	Angles);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator+=	(ANGLES&,	Angles);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator-	(ANGLES,	Angles);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator-=	(ANGLES&,	Angles);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator+	(Angles,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator+=	(Angles&,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator-	(Angles,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator-=	(Angles&,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator*	(ANGLES,	ANGLES);
-//DEADCODE JIM 13/06/99 /**/	friend	ANGLES	operator*=	(ANGLES&,	ANGLES);
-//DEADCODE JIM 13/06/99 
-//DEADCODE JIM 13/06/99 		//friend	ANGLES	operator+	(ANGLES, SLong);
-//DEADCODE JIM 13/06/99 		friend	ANGLES	operator+=	(ANGLES&, SWord);
-//DEADCODE JIM 13/06/99 		//friend	ANGLES	operator-	(ANGLES, SLong);
-//DEADCODE JIM 13/06/99 		friend	ANGLES	operator-=	(ANGLES& ,SWord);
-//DEADCODE JIM 13/06/99 /**/ };
 /**/
 /**/ inline	Bool	operator >	(/*const*/ ANGLES a,/*const*/ ANGLES b)	{return (Bool)(a.a>b.a);}
 /**/ inline	Bool	operator <	(/*const*/ ANGLES a,/*const*/ ANGLES b)	{return (Bool)(a.a<b.a);}

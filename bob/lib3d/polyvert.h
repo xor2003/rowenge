@@ -150,8 +150,6 @@ typedef struct SLine
     SVertex		vertices[2];
 //	R3DVERTEX3	vertices[2];
     Material	material;
-//DeadCode JON 15Nov00 	UWord		orcode;
-//DeadCode JON 15Nov00 	UWord		andcode;
 }
 SLine;
 
@@ -159,7 +157,6 @@ typedef struct SPoint
 {
     struct SPoint *pNext;
     SVertex		vertex;
-//DeadCode JON 8Aug00 	Material	material;
 }
 SPoint;
 

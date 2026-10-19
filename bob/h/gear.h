@@ -65,7 +65,6 @@ public:
 	FP OldLegPos;	//[0,1]
 	FCRD WheelPos;
 
-//DEADCODE CB 03/11/99 	FCRD IntPos;
 	FP IntL;
 
 

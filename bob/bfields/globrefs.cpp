@@ -97,7 +97,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"viewsel.h"
 #include	"transite.h"										//PD 29Apr96
 #include	"Miles.h"
-//DeadCode DAW 29Jun99 #include	"node.h"
 //------------------------------------------------------------------------------
 //declare your internal variables and global #defines here:
 //Intenal variables that are hidden:
@@ -125,7 +124,6 @@ ULong
 		GR_Scram_AC[8]={0},
 		GR_Scram_Skill[8]={0},
 		GR_Scram_Squad[8]={0};
-//DEADCODE RJS 15/02/00 		GR_Pack_TakeTime[8][3]={0};
 
 //GR_PACK_LAST;
 
@@ -221,13 +219,11 @@ static	ULongRef
 			refto8(GR_Scram_G,GR_Scram_Skill,_Skill),
 			refto8(GR_Scram_G,GR_Scram_Squad,_Squad),
 			refto5(GR_Pack_Sq,GR_Pack_Sq_Used,_Used),
-//DEADCODE RJS 15/02/00 			refto8(GR_Pack_Sq,GR_Pack_Home,_Home),
 			pair04(GR_Pack_Targ_F,_E,GR_Pack_Targ),
 			pair59(GR_Pack_Targ_F,_E,GR_Pack_Targ),
 			pair041(GR_Pack_Targ_F1,_E,GR_Pack_Targ),
 			pair591(GR_Pack_Targ_F1,_E,GR_Pack_Targ),
 			pair042(GR_Pack_Targ_F2,_E,GR_Pack_Targ)
-//DEADCODE RJS 15/02/00 			reftoW(GR_Pack_TakeTime_W,G,GR_Pack_TakeTime)
 			;
 
 
@@ -374,11 +370,3 @@ int&	Persons2::GetLoc(int	locnum)
 	return(i);
 }
 
-//DeadCode AMM 02Jun98 int	Persons2::GetLoc(int	locnum)
-//DeadCode AMM 02Jun98 {
-//DeadCode AMM 02Jun98 	ULong i=*(ULong*)BFieldGlobalTable[locnum].reference;
-//DeadCode AMM 02Jun98 	i>>=BFieldGlobalTable[locnum].fieldshift;
-//DeadCode AMM 02Jun98 	ULong imask=(((1L<<BFieldGlobalTable[locnum].fieldsize)>>1)-1);
-//DeadCode AMM 02Jun98 	i&=imask;
-//DeadCode AMM 02Jun98 	return(i);
-//DeadCode AMM 02Jun98 }

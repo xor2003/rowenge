@@ -34,7 +34,6 @@ public:
 	int maxunits;
 	bool me110bomber;
 	int unitdisplaylevel;
-//DEADCODE RDH 24/03/00 	enum {DISPLAY_GESCHWADER,DISPLAY_GRUPPE, DISPLAY_STAFFEL};
 	enum {MAXSQUADS = 100};
 	int UnitList[MAXSQUADS];
 	bool straf;

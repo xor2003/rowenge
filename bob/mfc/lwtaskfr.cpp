@@ -286,7 +286,6 @@ void LWTaskFighter::Refresh()
 	combo=GETDLGITEM(IDC_RCOMBOFORMATION);
 	combo->Clear()->RESCOMBO(AUTO,1)-> SetIndex(0);
 
-//DeadCode JIM 14Nov00 	combo->Clear()->RESCOMBO(ECHELONL,7)-> SetIndex(form);
 
 
 	  	combo=GETDLGITEM(IDC_RCOMBOUNITTYPE);
@@ -341,35 +340,10 @@ void LWTaskFighter::Refresh()
 
 	CRButton* b = GETDLGITEM(IDC_STRAFTARGET);
 
-//DEADCODE RDH 02/04/00 	straf = false;
-//DEADCODE RDH 02/04/00 	for (int num=pk.squadlist.Max()-1;num>=0;num--)
-//DEADCODE RDH 02/04/00 		if  (	((pk.squadlist[num].method&Profile::AM_GROUPMASK)==attackmethod)
-//DEADCODE RDH 02/04/00 			&&	(pk.squadlist[num].submethod == Profile::SM_DOSTRAFFEGROUND)
-//DEADCODE RDH 02/04/00 			)
-//DEADCODE RDH 02/04/00 			straf = true;
-//DEADCODE RDH 02/04/00 	b->SetPressed(straf);
-//DEADCODE RDH 02/04/00 
 	b->SetPressed(pk.StraffRequired(attackmethod));		
 
 	int i=0;
 
-//DEADCODE  15/02/00 	maxunits = 0;
-//DEADCODE  15/02/00 	while (i < pk.squadlist)
-//DEADCODE  15/02/00 	{
-//DEADCODE  15/02/00 		int am = pk[i].method;
-//DEADCODE  15/02/00 
-//DEADCODE  15/02/00 		if (pk[i].method == attackmethod)
-//DEADCODE  15/02/00 		{
-//DEADCODE  15/02/00 			Squadron* sq = Node_Data[(SquadNum)pk[i].squadnum];
-//DEADCODE  15/02/00  			CString name = sq->ShortName() + "/";
-//DEADCODE  15/02/00 			name = name + sq->SubName();
-//DEADCODE  15/02/00 			rlistbox->AddString(name,0);
-//DEADCODE  15/02/00 			rlistbox->AddString(GetTargName(pk.packagetarget[pk[i].targetindex].currentid),1);
-//DEADCODE  15/02/00 			rlistbox->AddString(RESLIST(PS_SPARE,pk.packagestatus),2);
-//DEADCODE  15/02/00 			maxunits++;
-//DEADCODE  15/02/00 		}
-//DEADCODE  15/02/00 		i++;
-//DEADCODE  15/02/00 	}
 
 	FillList();
 	if ((UnitList[0] >= 0)	&&	(maxunits > 0))
@@ -454,21 +428,6 @@ int LWTaskFighter::FindSquad(long index)
 {
 	int i = UnitList[index];
 
-//DEADCODE  15/02/00 	Profile& pk = Todays_Packages.pack[Todays_Packages.hipack];
-//DEADCODE  15/02/00 	int i=0, j =-1;
-//DEADCODE  15/02/00 	while (		(i < pk.squadlist)
-//DEADCODE  15/02/00 			&&	(j != index)
-//DEADCODE  15/02/00 		   )
-//DEADCODE  15/02/00 	{
-//DEADCODE  15/02/00 		if (pk[i].method == attackmethod)
-//DEADCODE  15/02/00 		{
-//DEADCODE  15/02/00 			j++;
-//DEADCODE  15/02/00 		}
-//DEADCODE  15/02/00 			i++;
-//DEADCODE  15/02/00 	}
-//DEADCODE  15/02/00 	i--;
-//DEADCODE  15/02/00 	if (j != index)
-//DEADCODE  15/02/00 		i = -1;
 	return(i);
  
 }
@@ -531,8 +490,6 @@ void LWTaskFighter::OnSelectRlistboxctrl1(long row, long column)
 				TitleBarPtr().OpenAcUnit(FindSquad(row-1), AircraftUnit::TTL_FIGHTER, tab, attackmethod, unitdisplaylevel);
 		}else
 		{
-//DeadCode JIM 26Sep00 			if ((column == 1) && (row <= maxunits) && (maxunits != 0))
-//DeadCode JIM 26Sep00 				TitleBarPtr().OpenSelTrg(FindSquad(row-1), tab, unitdisplaylevel, false);
 		}
 		pk.ReShareSecondaries();												//JIM 28Aug00
 		Profile::AttackMethodField	am=pk.ScanAttackMethods();

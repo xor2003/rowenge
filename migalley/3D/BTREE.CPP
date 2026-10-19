@@ -226,7 +226,6 @@ BaseObj3DPtr btree::Get3DArea(ObjectType objecttype)
 		case STATIC_OBJECT:
 		case MOBILE_OBJECT:
 		case SHADOW_OBJECT:										//RJS 07May97
-//DeadCode DAW 18Aug99 		case SMOKE_OBJECT:										//RJS 08Sep97
 		case COCKPIT_OBJECT:
 
 			new_obj3d = item_list_header[item_list_index++];
@@ -443,7 +442,6 @@ void btree::nz_draw_object(MigWindow *screen,ViewPoint* vp)
 	current_screen = screen;
 	View_Point=vp;
 
-//DeadCode PD 30Nov98 	Bool oldState=current_screen->DoSetZUpdate(FALSE);
 	bool oldState2=current_screen->DoSetMipMap(false);
 
 	//Check to see if the binary tree is empty
@@ -453,7 +451,6 @@ void btree::nz_draw_object(MigWindow *screen,ViewPoint* vp)
 		nz_recurse(start_index);	
 	}
 
-//DeadCode PD 30Nov98 	current_screen->DoSetZUpdate(oldState);
 	current_screen->DoSetMipMap(oldState2);
 }
 
@@ -1065,7 +1062,6 @@ void btree::drw_map(BaseObj3DPtr this_obj3d)
 
 	FPMATRIX_PTR	fpobj_matrix = &objmat;							//PD 09Jan97
 
-//DeadCode RJS 08Sep98 	//Just copy the normal viewer matrix
  	*fpobj_matrix=*Three_Dee.fpviewer_matrix;
 
 	// Identity...												//RJS 20Oct98

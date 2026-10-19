@@ -28,9 +28,6 @@ public:
 				DOSSIER, ACDOSSIER, DIARY,INTERCEPTOFFERED,
 				TAKEOVEROFFERED, ROUTE , WAYPOINT,
 				MAX_ID
-//DEADCODE RDH 06/01/00 				AUTHORISE,RESULTS,OVERVIEW,
-//DEADCODE RDH 06/01/00 				PLAYERLOG,SQUADS,MISSIONS,	 //DIS,
-//DEADCODE RDH 06/01/00 				LOADPROF, ARMY, MAX_ID
 			};
 
 	void ChildDialClosed(int dialnum,RDialog*,int rv);
@@ -60,8 +57,6 @@ public:
 // Implementation
 public:
    void OpenDirectives();
-//DEADCODE RDH 06/01/00    void OpenPlayerlog();
-//DEADCODE RDH 11/11/99    void OpenSquads(int entry);
    void OpenDossier(UniqueID item);
    void OpenACDossier(int item, int gruppe);
    void OpenDiary(int squad);
@@ -70,14 +65,9 @@ public:
 	void OpenRoute();
 	void OpenWP();
 	void	OpenMissionfolder(bool special=false);
-//DEADCODE RDH 05/04/00 	void AuthorisePackage(UniqueID uid);
 
    void OpenDossierNotFrontLine(UniqueID item);
-//DEADCODE JIM 30/11/99    void	OpenDis();
    void DialoguesVisible( bool vis);
-//DEADCODE JIM 30/11/99    void OpenLoadProfile(int uid);
-//DEADCODE JIM 30/11/99    void LaunchPlayerLog(PosnControl x, PosnControl y);
-//DEADCODE RDH 06/01/00    void LaunchOverview(PosnControl x, PosnControl y);
 	void OnClickedMissionlog();
    void OpenHostileslist();
 	void AnythingImportantToReview();

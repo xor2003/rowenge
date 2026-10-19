@@ -41,7 +41,6 @@ public:
 enum	{PITEMTABLESIZE = (int)IllegalBAND+1};
 static	ItemBasePtr		pItem[PITEMTABLESIZE],
 						pMapItemHead;
-//DEADCODE DAW 03/06/99 		ContourList	*contourlists;
 		RouteHdr	*routelist;
 		Coords3D 	sunpos;										//RJS 23Mar98
 		ANGLES	sunhdg,sunpitch,sunrot;							//RJS 23Mar98
@@ -76,7 +75,6 @@ ItemBasePtr		ConvertPtrUID(UniqueID tmpUID);
 
 			itemptr getfirstitem(UWord );
 
-//DeadCode PD 25Jun96 			UWord WorldStuff::getsector(itemptr );
 			UWord GetSector(itemptr );				//PD 25Jun96
 
 			void	ClearWorld();
@@ -95,12 +93,10 @@ ItemBasePtr		ConvertPtrUID(UniqueID tmpUID);
 
 		private:
 
-//DeadCode PD 25Jun96 			UWord WorldStuff::GetSector(itemptr );
 
 		protected:
 
 		};
-//DeadCode RDH 27Feb96 extern	WorldStuff	World_Stuff;
 
 struct	WorldSearch
 {

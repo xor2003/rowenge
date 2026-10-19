@@ -884,10 +884,10 @@ struct IDirectInputDeviceA {
             if (isMouse) {
                 int x, y;
                 Uint32 bs = SDL_GetMouseState(&x, &y);
-                long axes[3] = { x, y, 0 };
+                int axes[3] = { x, y, 0 };
                 for (int i = 0; i < 3; ++i)
                     if (fmtAxis[i] >= 0 && (DWORD)fmtAxis[i] + 4 <= cbData)
-                        *(long*)(buf + fmtAxis[i]) = axes[i];
+                        *(DWORD*)(buf + fmtAxis[i]) = axes[i];	//RERUN: DIDATAFORMAT fields are 4B; long is 8 on LP64
                 static const int sdlbtn[5] = {
                     SDL_BUTTON_LEFT, SDL_BUTTON_MIDDLE, SDL_BUTTON_RIGHT,
                     SDL_BUTTON_X1, SDL_BUTTON_X2 };
@@ -900,8 +900,8 @@ struct IDirectInputDeviceA {
                 if (axes > MAXFMTAXES) axes = MAXFMTAXES;
                 for (int i = 0; i < axes; ++i)
                     if (fmtAxis[i] >= 0 && (DWORD)fmtAxis[i] + 4 <= cbData)
-                        *(long*)(buf + fmtAxis[i]) =
-                            (long)SDL_JoystickGetAxis(sdlJoy, i) + 32768;
+                        *(DWORD*)(buf + fmtAxis[i]) =
+                            (DWORD)SDL_JoystickGetAxis(sdlJoy, i) + 32768;	//RERUN: 4B field
                 int btns = SDL_JoystickNumButtons(sdlJoy);
                 if (btns > MAXFMTBTNS) btns = MAXFMTBTNS;
                 for (int i = 0; i < btns; ++i)

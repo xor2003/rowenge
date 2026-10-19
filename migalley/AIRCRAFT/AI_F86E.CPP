@@ -73,7 +73,6 @@ questions about this file may be asked at http://www.simhq.com/
 #include "WORLDINC.H"
 #include "MODVEC.H"
 #include "MODEL.H"
-//DeadCode RJS 02Dec97 #include "3dcom.h"
 
 void F86E_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 {
@@ -92,7 +91,6 @@ void F86E_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 	ACM.DeltaPitchForMaxElevator = 0.25;//	= 1.0472;
 
 	ACM.pitchmodifier = 0.25;
-//DeadCode CSB 08/03/99		ACM.pitchratemodifier = 0;//100000;
 	ACM.pitchintmodifier = 0;//1.5;
 	ACM.IntPitchForMaxElevator	= 0.1;//1000;
 
@@ -117,34 +115,3 @@ void F86E_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 	ACM.deltayawsum = 0;
 
 }
-//DeadCode CSB 12/03/99		ACMMODEL& ACM = ControlledAC->fly.pModel->ACMModel;
-//DeadCode CSB 12/03/99	
-//DeadCode CSB 12/03/99		
-//DeadCode CSB 12/03/99	//used for simple ground taxi-ing
-//DeadCode CSB 12/03/99		ACM.BrakePower = 14;
-//DeadCode CSB 12/03/99		ACM.SteerRatio = 8e-6;
-//DeadCode CSB 12/03/99	
-//DeadCode CSB 12/03/99		ACM.MaxAileron = 32767;
-//DeadCode CSB 12/03/99	
-//DeadCode CSB 12/03/99		ACM.DeltaPitchForMaxElevator	= 1.0472;
-//DeadCode CSB 12/03/99		ACM.MaxElevatorForTightTurn	= 32767;
-//DeadCode CSB 12/03/99		ACM.lastdeltapitch = 0;
-//DeadCode CSB 12/03/99		ACM.deltapitchsum = 0;
-//DeadCode CSB 12/03/99		ACM.deltayawsum = 0;
-//DeadCode CSB 12/03/99		ACM.yawmodifier = 8;		//10;			//0.2
-//DeadCode CSB 12/03/99		ACM.yawintmodifier = 3;	//1;		//1;
-//DeadCode CSB 12/03/99		ACM.turnmodifier = 1;		//1.1;			//		2;
-//DeadCode CSB 12/03/99		ACM.turnintmodifier = 10;		//1.6;		//1.5;
-//DeadCode CSB 12/03/99		ACM.rollmodifier = 0.7;	//0.6;
-//DeadCode CSB 12/03/99		ACM.pitchratemodifier = 100000;
-//DeadCode CSB 12/03/99		ACM.aoamodifier = 1000;
-//DeadCode CSB 12/03/99		ACM.pitchmodifier = 1;			//2;
-//DeadCode CSB 12/03/99		ACM.pitchintmodifier = 1.5;
-//DeadCode CSB 12/03/99		ACM.liftmodifier = 1000; 
-//DeadCode CSB 12/03/99	
-//DeadCode CSB 12/03/99		ACM.deltarollsum = 0;
-//DeadCode CSB 12/03/99		ACM.rollintmodifier = 2;	//1;
-//DeadCode CSB 12/03/99		ACM.IntRollForMaxAileron = 80;
-//DeadCode CSB 12/03/99		ACM.IntPitchForMaxElevator	= 1000;
-//DeadCode CSB 12/03/99		ACM.maxdeltaforclosework = 0;
-//DeadCode CSB 12/03/99	}

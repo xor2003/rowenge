@@ -176,8 +176,11 @@ void MIG15_Setup (AirStrucPtr const ControlledAC, ULong Version)
 
 	PTHRUSTPOINT pThrust = new THRUSTPOINT (pModel, TT_JET, 0, 0, -1110-CoG, 0,0);
 	
-	pThrust->SetEngine (pEngine);
-	pEngine->SetThrustPoint (pThrust);
+	if (pEngine)									//RERUN: switch may match no engine type
+	{
+		pThrust->SetEngine (pEngine);
+		pEngine->SetThrustPoint (pThrust);
+	}
 
 	Coords3D w,c1,c2;
 	FCRD CG;	//Relative to the centre of the shape

@@ -99,7 +99,6 @@ void AFX_CDECL AfxTrace(LPCTSTR lpszFormat, ...);
 
 #endif
 
-//DeadCode RJS 31Jan00 #define		VOX_RAND	4096		//8192									//RJS 30Jun99
 
 DamageChat	_DamageChat;
 
@@ -293,46 +292,6 @@ void	DamageChat::OtherSideDamageLevel1()
 //------------------------------------------------------------------------------
 void	DamageChat::OtherSideDamageLevel2()
 {
-//DeadCode RJS 31Jan00 	MinAnimData*	mad = (MinAnimData*) acHit->Anim;			//RJS 30Jun99
-//DeadCode RJS 31Jan00 	if (	(Math_Lib.rnd() < VOX_RAND)							//RJS 30Jun99
-//DeadCode RJS 31Jan00 		&&	(mad->itemstate == ALIVE)	)						//RJS 30Jun99
-//DeadCode RJS 31Jan00 	{
-//DeadCode RJS 31Jan00 		AirStrucPtr buddy=acHitter->FindABuddyWithPlayerGivenPriority();
-//DeadCode RJS 31Jan00 		if (buddy)
-//DeadCode RJS 31Jan00 		{
-//DeadCode RJS 31Jan00 	//DeadCode DAW 25Jun99 		_Radio.ClearMessages(MSG_DAMAGELEVEL1,acHit);					//RJS 15Jun99
-//DeadCode RJS 31Jan00 			_Radio.ClearMessages(MSG_DAMAGELEVEL1,acHit);			//RJS 24Jun99
-//DeadCode RJS 31Jan00 			if (!acHitter->AcIsPlayer())
-//DeadCode RJS 31Jan00 			{
-//DeadCode RJS 31Jan00  				if (acHitter->ai.combatskill < SKILL_REGULAR)
-//DeadCode RJS 31Jan00 					_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_OTHERDAMAGE2LOW, MSG_DAMAGELEVEL2, acHitter, acHit, buddy));
-//DeadCode RJS 31Jan00  				else
-//DeadCode RJS 31Jan00  				{
-//DeadCode RJS 31Jan00  					if (acHitter->ai.combatskill < SKILL_HERO)			  //RDH 14/05/99
-//DeadCode RJS 31Jan00 						_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_OTHERDAMAGE2MED, MSG_DAMAGELEVEL2, acHitter, acHit, buddy));
-//DeadCode RJS 31Jan00  					else
-//DeadCode RJS 31Jan00 						_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_DAMAGELEVEL2, acHitter, acHit, buddy));
-//DeadCode RJS 31Jan00  				}
-//DeadCode RJS 31Jan00 			}
-//DeadCode RJS 31Jan00 			else
-//DeadCode RJS 31Jan00 			{
-//DeadCode RJS 31Jan00 				_Radio.ClearMessages(MSG_PLAYERDAMAGELEVEL1,acHit);	//RJS 24Jun99
-//DeadCode RJS 31Jan00 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_PLAYERDAMAGELEVEL2, acHitter, acHit, buddy));//RJS 24Jun99
-//DeadCode RJS 31Jan00 			}
-//DeadCode RJS 31Jan00 	//DeadCode DAW 25Jun99 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_DAMAGELEVEL2, acHitter, acHit, buddy));
-//DeadCode RJS 31Jan00 		}
-//DeadCode RJS 31Jan00 		else
-//DeadCode RJS 31Jan00 		{
-//DeadCode RJS 31Jan00 			if (acHitter->AcIsPlayer())
-//DeadCode RJS 31Jan00 			{
-//DeadCode RJS 31Jan00 				_Radio.ClearMessages(MSG_DAMAGELEVEL1,acHit);		//RJS 24Jun99
-//DeadCode RJS 31Jan00 				_Radio.ClearMessages(MSG_PLAYERDAMAGELEVEL1,acHit);	//RJS 24Jun99
-//DeadCode RJS 31Jan00 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_PLAYERDAMAGELEVEL2, acHitter, acHit, acHitter));//RJS 24Jun99
-//DeadCode RJS 31Jan00 	//DeadCode DAW 25Jun99 			_Radio.ClearMessages(MSG_DAMAGELEVEL1,acHit);				//RJS 15Jun99
-//DeadCode RJS 31Jan00 	//DeadCode DAW 25Jun99 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_DAMAGELEVEL2, acHitter, acHit, acHitter));//RJS 23May99
-//DeadCode RJS 31Jan00 			}
-//DeadCode RJS 31Jan00 		}
-//DeadCode RJS 31Jan00 	}
 /*
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
@@ -383,8 +342,6 @@ void	DamageChat::OtherSideDamageLevel2()
 			}
 		}
 
-//DeadCode RJS 18Oct00 		if (voxrandom < VOX_RAND_1IN32)
-//DeadCode RJS 18Oct00 			Trans_Obj.LaunchCanopyEject(acHit,*mobileitem::currworld);
 	}
 }
 
@@ -402,61 +359,6 @@ void	DamageChat::OtherSideDamageLevel2()
 //------------------------------------------------------------------------------
 void	DamageChat::PlayerSideDamageLevel1()
 {
-//DeadCode RJS 31Jan00 	MinAnimData*	mad = (MinAnimData*) acHit->Anim;			//RJS 30Jun99
-//DeadCode RJS 31Jan00 	if (	(Math_Lib.rnd() < VOX_RAND)							//RJS 30Jun99
-//DeadCode RJS 31Jan00 		&&	(mad->itemstate == ALIVE)	)						//RJS 30Jun99
-//DeadCode RJS 31Jan00 	{
-//DeadCode RJS 31Jan00 		AirStrucPtr buddy=acHit->FindABuddyWithPlayerGivenPriority();						//RDH 28Apr99
-//DeadCode RJS 31Jan00 		if (buddy)
-//DeadCode RJS 31Jan00 		{
-//DeadCode RJS 31Jan00  			if (acHit->ai.combatskill < SKILL_REGULAR)
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00 				if (!acHit->AcIsPlayer())
-//DeadCode RJS 31Jan00 				{
-//DeadCode RJS 31Jan00 		 			ScriptTables	theScript;
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00 	 				if ((acHit->ai.morale < MORALE_MEDIUM) && !acHit->InPlayersElement())
-//DeadCode RJS 31Jan00  						theScript = OLDSCRIPT_CALLEE_PLAYERDAMAGE1COWARD;
-//DeadCode RJS 31Jan00  					else
-//DeadCode RJS 31Jan00  						theScript = OLDSCRIPT_CALLEE_PLAYERDAMAGE1LOW;
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00 	 				_Radio.TriggerMsg(MESSAGE_STRUC(theScript, MSG_DAMAGELEVEL1, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00 				}
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00  			else
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00  				if ((!acHit->AcIsPlayer()) && (Math_Lib.rnd()>48000))
-//DeadCode RJS 31Jan00  				{
-//DeadCode RJS 31Jan00 					buddy = Persons2::PlayerSeenAC->FindBuddy();						//RJS 24Jun99
-//DeadCode RJS 31Jan00 					if (buddy)
-//DeadCode RJS 31Jan00 					{
-//DeadCode RJS 31Jan00  						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE1CONV, MSG_DAMAGELEVEL1, buddy, acHit, acHit));
-//DeadCode RJS 31Jan00  						_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE1CONVREPLY, MSG_DAMAGELEVEL1REPLY, acHit,acHit,buddy));
-//DeadCode RJS 31Jan00 					}
-//DeadCode RJS 31Jan00 	//DeadCode DAW 25Jun99  				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE1CONV, MSG_DAMAGELEVEL1, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00 	//DeadCode DAW 25Jun99  				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE1CONVREPLY, MSG_DAMAGELEVEL1REPLY, buddy,acHit,acHit));
-//DeadCode RJS 31Jan00  				}
-//DeadCode RJS 31Jan00  				else
-//DeadCode RJS 31Jan00  				{
-//DeadCode RJS 31Jan00 					if (!acHit->AcIsPlayer())
-//DeadCode RJS 31Jan00 					{
-//DeadCode RJS 31Jan00  						if (acHit->ai.combatskill < SKILL_ACE)
-//DeadCode RJS 31Jan00 							_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE1MED, MSG_DAMAGELEVEL1, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00  						else
-//DeadCode RJS 31Jan00 						{
-//DeadCode RJS 31Jan00 							ScriptTables script = OLDSCRIPT_CALLEE_PLAYERDAMAGE1HI;
-//DeadCode RJS 31Jan00 							if (acHit->classtype->phrasename != OLDPHRASE_MIGS)		//RJS 06Jul99
-//DeadCode RJS 31Jan00 								script = OLDSCRIPT_CALLEE_PLAYERDAMAGE1HI_MIGS;
-//DeadCode RJS 31Jan00 							_Radio.TriggerMsg(MESSAGE_STRUC(script, MSG_DAMAGELEVEL1, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00 						}
-//DeadCode RJS 31Jan00 					}
-//DeadCode RJS 31Jan00 					else
-//DeadCode RJS 31Jan00 						_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE1HI, MSG_PLAYERDAMAGELEVEL1, acHit, acHit, buddy));//RJS 24Jun99
-//DeadCode RJS 31Jan00 	//DeadCode DAW 25Jun99 					_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE1HI, MSG_DAMAGELEVEL1, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00  				}
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00 		}
-//DeadCode RJS 31Jan00 	}
 
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
@@ -531,66 +433,6 @@ void	DamageChat::PlayerSideDamageLevel1()
 //------------------------------------------------------------------------------
 void	DamageChat::PlayerSideDamageLevel2()
 {
-//DeadCode RJS 31Jan00 	MinAnimData*	mad = (MinAnimData*) acHit->Anim;			//RJS 30Jun99
-//DeadCode RJS 31Jan00 	AirStrucPtr buddy=acHit->FindABuddyWithPlayerGivenPriority();
-//DeadCode RJS 31Jan00 	if (buddy)
-//DeadCode RJS 31Jan00 	{
-//DeadCode RJS 31Jan00 		if (!acHit->AcIsPlayer())
-//DeadCode RJS 31Jan00 		{
-//DeadCode RJS 31Jan00  			ScriptTables	theScript;
-//DeadCode RJS 31Jan00  			Bool			haveTrigger = TRUE;
-//DeadCode RJS 31Jan00  			RndVal	rndpc = (RndVal)Math_Lib.rnd(RndValMAX);		  //RDH 28/05/99
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  			if (	(acHit->ai.morale < MORALE_GOOD)	&& (rndpc <  RND10PC))
-//DeadCode RJS 31Jan00 			{
-//DeadCode RJS 31Jan00   				Art_Int.BreakOff(acHit);							  //RDH 06/06/99
-//DeadCode RJS 31Jan00 				acHit->ai.morale = MORALE_ROCKBOTTOM;				  //RDH 28/05/99
-//DeadCode RJS 31Jan00 				if (	(Math_Lib.rnd() < VOX_RAND)			//RJS 01Jul99
-//DeadCode RJS 31Jan00 					&&	(mad->itemstate == ALIVE)	)		//RJS 01Jul99
-//DeadCode RJS 31Jan00 					_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE2COWARD, MSG_DAMAGELEVEL2, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00 			}
-//DeadCode RJS 31Jan00  			else
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00  				if (acHit->ai.combatskill < SKILL_REGULAR)
-//DeadCode RJS 31Jan00 				{
-//DeadCode RJS 31Jan00 					if (	(Math_Lib.rnd() < VOX_RAND)			//RJS 01Jul99
-//DeadCode RJS 31Jan00 						&&	(mad->itemstate == ALIVE)	)		//RJS 01Jul99
-//DeadCode RJS 31Jan00 						_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE2LOW, MSG_DAMAGELEVEL2, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00 				}
-//DeadCode RJS 31Jan00  				else
-//DeadCode RJS 31Jan00  				{
-//DeadCode RJS 31Jan00  					UWord	voxchoice = Math_Lib.rnd();
-//DeadCode RJS 31Jan00  					if (!acHit->InPlayersElement() && (voxchoice >= 40000))				  //RJS 28Apr99
-//DeadCode RJS 31Jan00  					{
-//DeadCode RJS 31Jan00 						if (	(Math_Lib.rnd() < VOX_RAND)			//RJS 01Jul99
-//DeadCode RJS 31Jan00 							&&	(mad->itemstate == ALIVE)	)		//RJS 01Jul99
-//DeadCode RJS 31Jan00  							_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLER_PLAYERDAMAGE2CONV0RR,MSG_DAMAGELEVEL2,acHit,acHit,buddy));
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00 						//Eject...
-//DeadCode RJS 31Jan00 						Trans_Obj.LaunchCanopyEject(acHit,*mobileitem::currworld);				//RJS 28Apr99
-//DeadCode RJS 31Jan00  					}
-//DeadCode RJS 31Jan00  					else
-//DeadCode RJS 31Jan00  					{
-//DeadCode RJS 31Jan00 						if (	(Math_Lib.rnd() < VOX_RAND)			//RJS 01Jul99
-//DeadCode RJS 31Jan00 							&&	(mad->itemstate == ALIVE)	)		//RJS 01Jul99
-//DeadCode RJS 31Jan00 						{
-//DeadCode RJS 31Jan00  							if (acHit->ai.combatskill < SKILL_ACE)
-//DeadCode RJS 31Jan00 								_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE2MED, MSG_DAMAGELEVEL2, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00  							else
-//DeadCode RJS 31Jan00 								_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE2HI, MSG_DAMAGELEVEL2, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00 						}
-//DeadCode RJS 31Jan00  					}
-//DeadCode RJS 31Jan00  				}
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00 		}
-//DeadCode RJS 31Jan00 		else
-//DeadCode RJS 31Jan00 		{
-//DeadCode RJS 31Jan00 			if (	(Math_Lib.rnd() < VOX_RAND)			//RJS 01Jul99
-//DeadCode RJS 31Jan00 				&&	(mad->itemstate == ALIVE)	)		//RJS 01Jul99
-//DeadCode RJS 31Jan00 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_PLAYERDAMAGE2HI, MSG_PLAYERDAMAGELEVEL2, acHit, acHit, buddy));//RJS 24Jun99
-//DeadCode RJS 31Jan00 		}
-//DeadCode RJS 31Jan00 	}
 
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
@@ -615,8 +457,6 @@ void	DamageChat::PlayerSideDamageLevel2()
 				Art_Int.BreakOff(acHit);
 				acHit->ai.morale = MORALE_ROCKBOTTOM;
 
-//DeadCode RJS 18Oct00 				if (voxrandom < VOX_RAND_1IN32)							//RJS 28Jun00
-//DeadCode RJS 18Oct00 					Trans_Obj.LaunchCanopyEject(acHit,*mobileitem::currworld);
 
 				if (buddy)
 					_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE2COWARD, MSG_DAMAGELEVEL2, acHit, acHit, buddy));
@@ -635,8 +475,6 @@ void	DamageChat::PlayerSideDamageLevel2()
 			{
 				if (!acHit->AcIsPlayer())								//RJS 14Sep00
 				{
-//DeadCode RJS 18Oct00 					if (voxrandom < VOX_RAND_1IN64)
-//DeadCode RJS 18Oct00 						Trans_Obj.LaunchCanopyEject(acHit,*mobileitem::currworld);
 
 					if (buddy)
 						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE2LOW, damagemsg, acHit, acHit, buddy));
@@ -690,34 +528,6 @@ void	DamageChat::PlayerSideDamageLevel2()
 //------------------------------------------------------------------------------
 void	DamageChat::FuelLeak()
 {
-//DeadCode RJS 31Jan00 	if (!acHitter->AcIsPlayer())
-//DeadCode RJS 31Jan00 	{
-//DeadCode RJS 31Jan00  		if (!acHitIsFriend)
-//DeadCode RJS 31Jan00  		{
-//DeadCode RJS 31Jan00 			AirStrucPtr buddy=acHit->FindABuddyWithPlayerGivenPriority();
-//DeadCode RJS 31Jan00 			if (buddy)
-//DeadCode RJS 31Jan00 			{
-//DeadCode RJS 31Jan00 //DEADCODE RDH 06/05/99   				if (acHitter->ai.combatskill < SKILL_REGULAR)
-//DeadCode RJS 31Jan00 	 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_GOTHIMLEAKING, MSG_DAMAGELEVEL2, acHitter, acHit, buddy));
-//DeadCode RJS 31Jan00 //DEADCODE RDH 06/05/99   				else
-//DeadCode RJS 31Jan00 //DEADCODE RDH 06/05/99  	 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_GOTHIMLEAKING, MSG_DAMAGELEVEL2, acHitter, NULL, *acHitter->follower));
-//DeadCode RJS 31Jan00 			}
-//DeadCode RJS 31Jan00  		}
-//DeadCode RJS 31Jan00  		else
-//DeadCode RJS 31Jan00  		{
-//DeadCode RJS 31Jan00  			if (acHit == leader)
-//DeadCode RJS 31Jan00  				LeaderLeaking();
-//DeadCode RJS 31Jan00  			else
-//DeadCode RJS 31Jan00  				FollowerLeaking();
-//DeadCode RJS 31Jan00  		}
-//DeadCode RJS 31Jan00 	}
-//DeadCode RJS 31Jan00 	else
-//DeadCode RJS 31Jan00 	{
-//DeadCode RJS 31Jan00 //DEADCODE RDH 09/05/99 		AirStrucPtr buddy=acHit->FindBuddy();
-//DeadCode RJS 31Jan00 //DEADCODE RDH 09/05/99 		if (buddy)
-//DeadCode RJS 31Jan00 		_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_GOTHIMLEAKING, MSG_PLAYERLEAKING, acHitter, acHit, acHitter));
-//DeadCode RJS 31Jan00 //DeadCode DAW 25Jun99 		_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_GOTHIMLEAKING, (MsgType)(MSG_DAMAGELEVEL2+MSG_DELAY), acHitter, acHit, acHitter));
-//DeadCode RJS 31Jan00 	}
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
 	::AfxTrace("\tEMPTY: FuelLeak\n");
@@ -754,33 +564,6 @@ void	DamageChat::FuelLeak()
 //------------------------------------------------------------------------------
 void	DamageChat::LeaderLeaking()
 {
-//DeadCode RJS 31Jan00  	if (buddy)
-//DeadCode RJS 31Jan00  	{
-//DeadCode RJS 31Jan00  		FuelLeakMsg(buddy);
-//DeadCode RJS 31Jan00  		if (buddy->ai.morale < MORALE_GOOD)
-//DeadCode RJS 31Jan00  		{
-//DeadCode RJS 31Jan00  			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_SEEFUEL, MSG_STATUSRESPONSE_X, buddy, acHit, acHit));//v2
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  			EjectMsg(buddy);
-//DeadCode RJS 31Jan00  		}
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  		if (!acHit->AcIsPlayer())
-//DeadCode RJS 31Jan00  		{
-//DeadCode RJS 31Jan00  			if (buddy->ai.morale < MORALE_GOOD)
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00  				//TakeOverGroup(THISISCALLER,???);
-//DeadCode RJS 31Jan00  				//Eject...;
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00 				Trans_Obj.LaunchCanopyEject(acHit,*mobileitem::currworld);				//RJS 28Apr99
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00  			else
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00  				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_HAVELEAK, MSG_DAMAGELEVEL2, buddy, acHit, acHit));//v2
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  				//TakeOverGroup(THISISCALLER,???);
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00  		}
-//DeadCode RJS 31Jan00  	}
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
 	::AfxTrace("\tEMPTY: LeaderLeaking\n");
@@ -802,22 +585,6 @@ void	DamageChat::LeaderLeaking()
 //------------------------------------------------------------------------------
 void	DamageChat::FollowerLeaking()
 {
-//DeadCode RJS 31Jan00  	if (leader)
-//DeadCode RJS 31Jan00  	{
-//DeadCode RJS 31Jan00  		FuelLeakMsg(leader);
-//DeadCode RJS 31Jan00  		if (!leader->AcIsPlayer())
-//DeadCode RJS 31Jan00  		{
-//DeadCode RJS 31Jan00  			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_SEEFUEL, MSG_STATUSRESPONSE_X, buddy, acHit, acHit));
-//DeadCode RJS 31Jan00  			if (leader->ai.morale < MORALE_GOOD)
-//DeadCode RJS 31Jan00  				EjectMsg(leader);
-//DeadCode RJS 31Jan00  			else
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00  				//SendHome();
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_USEORLOSE, MSG_DAMAGELEVEL2, buddy, acHit, acHit));
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00  		}
-//DeadCode RJS 31Jan00  	}
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
 	::AfxTrace("\tEMPTY: FollowerLeaking\n");
@@ -839,19 +606,6 @@ void	DamageChat::FollowerLeaking()
 //------------------------------------------------------------------------------
 void	DamageChat::FuelLeakMsg(AirStrucPtr	recipient)
 {
-//DeadCode RJS 31Jan00  	ScriptTables	theScript;
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  	if ((acHit->ai.combatskill > SKILL_REGULAR) && (acHit->ai.morale > MORALE_MEDIUM))
-//DeadCode RJS 31Jan00  		theScript = OLDSCRIPT_FUELLEAKMSG_CALLER;
-//DeadCode RJS 31Jan00  	else
-//DeadCode RJS 31Jan00  	{
-//DeadCode RJS 31Jan00  		if (acHit->ai.combatskill == SKILL_REGULAR)
-//DeadCode RJS 31Jan00  			theScript = OLDSCRIPT_FUELLEAKMSG_CALLEE;
-//DeadCode RJS 31Jan00  		else
-//DeadCode RJS 31Jan00  			theScript = OLDSCRIPT_FUELLEAKMSG;
-//DeadCode RJS 31Jan00  	}
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  	_Radio.TriggerMsg(MESSAGE_STRUC(theScript, MSG_STATUSRESPONSE_X, acHit, acHit, recipient));
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
 	::AfxTrace("\tEMPTY: FuelLeakMsg\n");
@@ -873,59 +627,6 @@ void	DamageChat::FuelLeakMsg(AirStrucPtr	recipient)
 //------------------------------------------------------------------------------
 void	DamageChat::BlackSmoke()
 {
-//DeadCode RJS 31Jan00  	if (acHitIsFriend)
-//DeadCode RJS 31Jan00  	{
-//DeadCode RJS 31Jan00  		if (acHit == leader)
-//DeadCode RJS 31Jan00  		{
-//DeadCode RJS 31Jan00  			if (buddy)
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00  				BlackSmokeMsg(buddy);
-//DeadCode RJS 31Jan00  				SmokingBadly(buddy);
-//DeadCode RJS 31Jan00  				if (!buddy->AcIsPlayer())
-//DeadCode RJS 31Jan00  					EjectMsg(buddy);
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  				//if (acHit != Manual_Pilot.ControlledAC2)
-//DeadCode RJS 31Jan00  					//TakeOverGroup(THISISCALLER,???);
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00  		}
-//DeadCode RJS 31Jan00  		else
-//DeadCode RJS 31Jan00  		{
-//DeadCode RJS 31Jan00  			if (leader)
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00 // 				BlackSmokeMsg(leader);
-//DeadCode RJS 31Jan00  				if (!leader->AcIsPlayer())
-//DeadCode RJS 31Jan00  				{
-//DeadCode RJS 31Jan00  					SmokingBadly(leader);
-//DeadCode RJS 31Jan00  					EjectMsg(leader);
-//DeadCode RJS 31Jan00  				}
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00  		}
-//DeadCode RJS 31Jan00  	}
-//DeadCode RJS 31Jan00  	else
-//DeadCode RJS 31Jan00  	{
-//DeadCode RJS 31Jan00  		ScriptTables	theScript;
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00 		//Randomly say this if player is the killer...
-//DeadCode RJS 31Jan00 		UWord			randchance = 0;									//RJS 25Jun99
-//DeadCode RJS 31Jan00 		if (acHitter->AcIsPlayer())
-//DeadCode RJS 31Jan00 			randchance = Math_Lib.rnd();
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00 		if (randchance < 16384)
-//DeadCode RJS 31Jan00 		{
-//DeadCode RJS 31Jan00 			buddy = acHitter->FindABuddyWithPlayerGivenPriority();					//RJS 25May99
-//DeadCode RJS 31Jan00  			if (buddy)
-//DeadCode RJS 31Jan00  			{
-//DeadCode RJS 31Jan00  				if ((acHitter->ai.combatskill < SKILL_REGULAR) || (acHitter->ai.morale < MORALE_MEDIUM))
-//DeadCode RJS 31Jan00  					theScript = OLDSCRIPT_ENEMYSMOKING;
-//DeadCode RJS 31Jan00  				else
-//DeadCode RJS 31Jan00  					theScript = OLDSCRIPT_CALLEE_ENEMYSMOKING;
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  				_Radio.TriggerMsg(MESSAGE_STRUC(theScript, (MsgType)(MSG_DAMAGELEVEL2+MSG_DELAY), acHitter, acHit, buddy));
-//DeadCode RJS 31Jan00  			}
-//DeadCode RJS 31Jan00 			else
-//DeadCode RJS 31Jan00 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_ENEMYSMOKING, (MsgType)(MSG_DAMAGELEVEL2+MSG_DELAY), acHitter, acHit, acHitter));
-//DeadCode RJS 31Jan00 		}
-//DeadCode RJS 31Jan00  	}
 
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
@@ -1022,13 +723,6 @@ void	DamageChat::BlackSmoke()
 //------------------------------------------------------------------------------
 void	DamageChat::SmokingBadly(AirStrucPtr	buddy)
 {
-//DeadCode RJS 31Jan00 	if (!buddy->AcIsPlayer())
-//DeadCode RJS 31Jan00 	{
-//DeadCode RJS 31Jan00 		if (Math_Lib.rnd() > 32768)
-//DeadCode RJS 31Jan00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_SMOKINGBADLY, MSG_DAMAGELEVEL2, buddy, acHit, acHit));
-//DeadCode RJS 31Jan00 		else
-//DeadCode RJS 31Jan00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_FIREINENGINE, MSG_DAMAGELEVEL2, buddy, acHit, acHit));
-//DeadCode RJS 31Jan00 	}
 
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
@@ -1051,19 +745,6 @@ void	DamageChat::SmokingBadly(AirStrucPtr	buddy)
 //------------------------------------------------------------------------------
 void	DamageChat::BlackSmokeMsg(AirStrucPtr	buddy)
 {
-//DeadCode RJS 31Jan00  	ScriptTables theScript = OLDSCRIPT_NULL;
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  	if (acHit->ai.morale < MORALE_GOOD)
-//DeadCode RJS 31Jan00  	{
-//DeadCode RJS 31Jan00  		if ((!acHit->AcIsPlayer()) && (Math_Lib.rnd() > 50000))
-//DeadCode RJS 31Jan00 		{
-//DeadCode RJS 31Jan00  			theScript = OLDSCRIPT_BURNINGUP;
-//DeadCode RJS 31Jan00 		 	_Radio.TriggerMsg(MESSAGE_STRUC(theScript, MSG_DAMAGELEVEL2, acHit, acHit, buddy));
-//DeadCode RJS 31Jan00 		}
-//DeadCode RJS 31Jan00  	}
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00  	if (theScript != OLDSCRIPT_NULL)
-//DeadCode RJS 31Jan00 	 	_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_SMOKE, MSG_DAMAGELEVEL2, acHit, acHit, buddy));
 
 #ifdef	_CHATTRACE_
 	UWord cw=GETFPCW();
@@ -1242,18 +923,6 @@ void	DamageChat::OtherSideKilled()
 						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OTHERKILLED2,mtype, acHitter, acHit, buddy));//RJS 31Jan00
 				}
 			}
-//DeadCode RJS 31Jan00 		else
-//DeadCode RJS 31Jan00 		{
-//DeadCode RJS 31Jan00 			if (acHitter->AcIsPlayer() && (voxrandom < VOX_RAND_1IN32))
-//DeadCode RJS 31Jan00 			{
-//DeadCode RJS 31Jan00 				_Radio.ClearMessages(MSG_DAMAGELEVEL2,acHit);				//RJS 15Jun99
-//DeadCode RJS 31Jan00 				_Radio.ClearMessages(MSG_PLAYERDAMAGELEVEL2,acHit);	//RJS 24Jun99
-//DeadCode RJS 31Jan00 				if (acHitter->nationality == NAT_RED)				//RJS 31Jan00
-//DeadCode RJS 31Jan00 					_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OTHERKILLED,mtype, acHitter, acHit, acHitter));//RJS 31Jan00
-//DeadCode RJS 31Jan00 				else
-//DeadCode RJS 31Jan00 					_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OTHERKILLED2,mtype, acHitter, acHit, acHitter));//RJS 31Jan00
-//DeadCode RJS 31Jan00 			}
-//DeadCode RJS 31Jan00 		}
 		}
 	}
 }
@@ -1359,68 +1028,14 @@ void	DamageChat::OtherSideBlewUp(AirStrucPtr	ac,AirStrucPtr	acDead,bool	migdead)
 							_Radio.ClearMessages(MSG_DAMAGELEVEL2,acDead);			//RJS 15Jun99
 							_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_BOASTKILL,MSG_BLOWUPREPORT, ac, acDead, buddy));//RDH 18May99
 
-//DeadCode RJS 31Jan00 							if ((Math_Lib.rnd() > 32000) && (!buddy->AcIsPlayer()))
-//DeadCode RJS 31Jan00 							{
-//DeadCode RJS 31Jan00 								ScriptTables script = OLDSCRIPT_BOASTKILLREPLY;
-//DeadCode RJS 31Jan00 								if (ac->classtype->phrasename != OLDPHRASE_MIGS)
-//DeadCode RJS 31Jan00 									script = OLDSCRIPT_BOASTKILLREPLY_MIGS;
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00 								_Radio.TriggerMsg(MESSAGE_STRUC(script,MSG_BLOWUPREPORTREPLY, buddy, acDead, ac));//RDH 18May99
-//DeadCode RJS 31Jan00 							}
 						}
 						else
 						{
-//DeadCode RJS 31Jan00 							if (ac->ai.combatskill < SKILL_ACE)
-//DeadCode RJS 31Jan00 							{
 								_Radio.ClearMessages(MSG_DAMAGELEVEL2,acDead);		//RJS 15Jun99
-//DeadCode RJS 31Jan00 								if (migdead)
-//DeadCode RJS 31Jan00 									_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_OTHERSIDEBLEW_MIGS,MSG_BLOWUPREPORT, ac, acDead, buddy));//RDH 18May99
-//DeadCode RJS 31Jan00 								else
 								_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OTHERSIDEBLEW,MSG_BLOWUPREPORT, ac, acDead, buddy));//RDH 18May99
-//DeadCode RJS 31Jan00 							}else
-//DeadCode RJS 31Jan00 							{
-//DeadCode RJS 31Jan00 								buddy = ac->FindABuddyNotPlayer();
-//DeadCode RJS 31Jan00 								if ((!buddy) || (Math_Lib.rnd() > 32000))
-//DeadCode RJS 31Jan00 								{
-//DeadCode RJS 31Jan00 									_Radio.ClearMessages(MSG_DAMAGELEVEL2,acDead);		//RJS 15Jun99
-//DeadCode RJS 31Jan00 									if (migdead)
-//DeadCode RJS 31Jan00 										_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_OTHERSIDEBLEWHIMIG,MSG_BLOWUPREPORT, ac, acDead, buddy));//RDH 18May99
-//DeadCode RJS 31Jan00 									else
-//DeadCode RJS 31Jan00 										_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_OTHERSIDEBLEWHI,MSG_BLOWUPREPORT, ac, acDead, buddy));//RDH 18May99
-//DeadCode RJS 31Jan00
-//DeadCode RJS 31Jan00 									if (!buddy->AcIsPlayer())
-//DeadCode RJS 31Jan00 										_Radio.TriggerMsg(MESSAGE_STRUC(OLDPHRASE_ROGER2,(MsgType)(MSG_BLOWUPREPORTREPLY+MSG_BLOCKCHATTER), buddy, acDead, ac));//RJS 06Jul99
-//DeadCode RJS 31Jan00 								}
-//DeadCode RJS 31Jan00 								else
-//DeadCode RJS 31Jan00 								{
-//DeadCode RJS 31Jan00 									_Radio.ClearMessages(MSG_DAMAGELEVEL2,acDead);		//RJS 15Jun99
-//DeadCode RJS 31Jan00 									if (migdead)
-//DeadCode RJS 31Jan00 										_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_OTHERSIDEBLEWHI2,MSG_BLOWUPREPORT, buddy, acDead, ac));//RDH 18May99
-//DeadCode RJS 31Jan00 									else
-//DeadCode RJS 31Jan00 										_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_OTHERSIDEBLEWHI2_OPT_0,MSG_BLOWUPREPORT, buddy, acDead, ac));//RDH 18May99
-//DeadCode RJS 31Jan00 									_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_ROGER,(MsgType)(MSG_BLOWUPREPORTREPLY+MSG_BLOCKCHATTER), ac, acDead, buddy));//RJS 06Jul99
-//DeadCode RJS 31Jan00 								}
-//DeadCode RJS 31Jan00 							}
 						}
 					}
 				}
-//DeadCode RJS 31Jan00 				else
-//DeadCode RJS 31Jan00 				{
-//DeadCode RJS 31Jan00 					//Don't want to hear 'Splash one' all the time, cos it's annoying
-//DeadCode RJS 31Jan00 //DeadCode RJS 01Jul99 					if (Math_Lib.rnd() > 49152)
-//DeadCode RJS 31Jan00 //DeadCode RJS 01Jul99 					{
-//DeadCode RJS 31Jan00 						_Radio.ClearMessages(MSG_DAMAGELEVEL2,acDead);				//RJS 15Jun99
-//DeadCode RJS 31Jan00 						_Radio.ClearMessages(MSG_PLAYERDAMAGELEVEL2,acDead);//RJS 24Jun99
-//DeadCode RJS 31Jan00 						buddy = ac->FindBuddy();
-//DeadCode RJS 31Jan00 						if (buddy)
-//DeadCode RJS 31Jan00 						{
-//DeadCode RJS 31Jan00 							_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_OTHERSIDEBLEWHI,MSG_PLAYERBLOWUPREPORT, ac, acDead, buddy));
-//DeadCode RJS 31Jan00 							_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_ROGER,(MsgType)(MSG_BLOWUPREPORTREPLY+MSG_BLOCKCHATTER), buddy, acDead, ac));//RJS 06Jul99
-//DeadCode RJS 31Jan00 						}
-//DeadCode RJS 31Jan00 						else
-//DeadCode RJS 31Jan00 							_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_OTHERSIDEBLEWHI,MSG_PLAYERBLOWUPREPORT, ac, acDead, ac));
-//DeadCode RJS 31Jan00 //DeadCode RJS 01Jul99 					}
-//DeadCode RJS 31Jan00 				}
 			}
 		}
 		else
@@ -1507,7 +1122,6 @@ void	DamageChat::PlayerSidePiledIn(AirStrucPtr	ac)
 //------------------------------------------------------------------------------
 void	DamageChat::SayWeapon(SLong	index)
 {
-//DEADCODE RJS 5/3/00 #pragma warnmsg("Naming weapons")
  	SLong	theScript = PHRASE_NONE;
 
  	switch (index & LT_MASK)
@@ -1551,7 +1165,6 @@ void	DamageChat::AlertGoHome(AirStrucPtr	killer)
 			AirStrucPtr	buddy = theLeader->FindABuddyWithPlayerGivenPriority();
 			if (buddy)
 			{
-//DeadCode RJS 3Oct00 #pragma message(__HERE__ "OLDSCRIPT_ALLDISENGAGE, OLDSCRIPT_ALLGOHOME - do we have alternatives? SCRIPT_REGROUP + SCRIPT_ALLGOHOME SCRIPT_SENDEVERYBODY SCRIPT_HOMEWELLDONE")
 
 				int	theScript = SCRIPT_REGROUP;		//RERUN: init (rnd(4) always 0-3; silences uninit analysis)
 				int	choice = Math_Lib.rnd(4);

@@ -570,8 +570,6 @@ Graphic*	chase=master;
 	if (chase!=this)
 		while (chase->windowlink!=this)
 			chase=chase->windowlink;
-//Old_Code DAW 01Feb96 	else
-//Old_Code DAW 01Feb96 		assert((windowlink==NULL)&&("MigDisplay closed, but not all windows"));
 	chase->windowlink=windowlink;
 };
 
@@ -989,9 +987,6 @@ void MigWindow::SetColour(ImageMapDescPtr imapptr)
 //TempCode JIM 12Dec95 //------------------------------------------------------------------------------
 //TempCode JIM 12Dec95 void MigWindow::DestroyWindow(ScreenRecord *screen)
 //TempCode JIM 12Dec95 {
-//TempCode JIM 12Dec95 //DeadCode JIM 09Nov95 	if(screen->LogicalScreenPtr!=NULL)	free(screen->LogicalScreenPtr);	//NOOO!! What if proper pseudo-screening using flat hardware?
-//TempCode JIM 12Dec95 //DeadCode JIM 09Nov95 	if(screen->Palette!=NULL) free(screen->Palette);	//NOOOOOOO!! Windows share pallettes
-//TempCode JIM 12Dec95 //DeadCode JIM 09Nov95 	if(screen->fontptr!=NULL) free(screen->FontPtr);	//NOOOOOOO!! Windows share fonts
 //TempCode JIM 12Dec95 	screen->LogicalScreenPtr = screen->Palette = screen->fontptr = NULL;
 //TempCode JIM 12Dec95 	delete(screen);
 //TempCode JIM 12Dec95 }
@@ -2642,7 +2637,6 @@ Colour	MigDisplay::PlotPixel(SWord	x, SWord	y, Colour	thecol)
 //FIX10-2{
 //FIX10-2
 //FIX10-2	if (BytesPerPixel!=1)
-//FIX10-2//DeadCode JIM 19Jan98 	if (Whole_Screen->BytesPerPixel!=1)
 //FIX10-2		return;
 //FIX10-2	SWord		oldx, oldy, oldw, oldh;
 //FIX10-2	SWord		neww, newh;

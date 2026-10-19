@@ -734,7 +734,10 @@ Bool	Replay::LoadGlobRefList(LPREPGRENTRY& list)
 			if (set&0x1<<m)
 			{
 				if (!ReplayRead((UByte*)&val,sizeof(ULong)))
+				{
+					delete temp;									//RERUN: don't leak on read failure
 					return FALSE;
+				}
 
 				temp->val=val;
 
@@ -883,11 +886,17 @@ Bool	Replay::LoadDeadItems()
 		block->SGT=uid;
 
 		if (!ReplayRead((UByte*)&(block->dataused),sizeof(UWord)))
+		{
+			delete block;										//RERUN: don't leak on read failure
 			return FALSE;
+		}
 
 //		if (!ReplayRead((UByte*)&block->data,1024))
 		if (!ReplayRead((UByte*)&(block->data),block->dataused))
+		{
+			delete block;										//RERUN: don't leak on read failure
 			return FALSE;
+		}
 
 		block->nextblock=NULL;
 
@@ -1714,7 +1723,7 @@ Bool	Replay::LoadHeaderID()
 //------------------------------------------------------------------------------
 Bool	Replay::LoadReplayData(char* name)
 {
-	strcpy(pfilename,name);
+	strncpy(pfilename,name,255); pfilename[255]=0;
 	return TRUE;
 }
 
@@ -1746,13 +1755,13 @@ Bool	Replay::SaveReplayData(char* name)
 		strcpy(buffer,"replay.dat");
 	}
 
-	strcpy(buffer2,name);
+	strncpy(buffer2,name,149); buffer2[149]=0;
 
 	GetReplayFilename(buffer);
 	GetReplayFilename(buffer2);
 
 	if (!RestorePosition)
-		strcpy(pfilename,buffer);
+		strncpy(pfilename,buffer,255); pfilename[255]=0;
 
 	file=CreateFile(
 		buffer,
@@ -1822,7 +1831,7 @@ Bool	Replay::StoreBFieldNum(FileNum bf)
 
 ULong	Replay::LoadBFCtrl()
 {
-	ULong a;
+	ULong a=0;
 
 	ReplayRead((UByte*)&a,sizeof(ULong));
 
@@ -2714,7 +2723,10 @@ Bool	Replay::LoadFileAndGlobRefList()
 		file=temp->file;
 		ctrl=temp->bfctrl;
 		if (!LoadGlobRefList(temp->list))
+		{
+			delete temp;										//RERUN: don't leak on load failure
 			return FALSE;
+		}
 
 		if (bfgrlist)
 		{
@@ -4074,7 +4086,7 @@ Bool	Replay::SaveBlock()
 {
 	HANDLE handy;
 	char* newfile=new char[256];
-	DWORD numtowrite,numwritten;
+	DWORD numtowrite,numwritten=0;
 	DWORD totaltowrite=0,totalwritten=0;
 	Bool	OK=FALSE;
 
@@ -4103,7 +4115,7 @@ Bool	Replay::SaveBlock()
 		superstart=(UByteP)playbackfilestart;
 		superend=headmems[0][0];
 
-		supersize=superend-superstart;
+		supersize=superend?(superend-superstart):0;
 
 		WriteFile(
 			handy,
@@ -4621,7 +4633,7 @@ bool	Replay::ValidReplayFile()
 	bool ok=false;
 	char	temp[256];
 
-	strcpy(temp,pfilename);
+	strncpy(temp,pfilename,255); temp[255]=0;
 	GetReplayFilename(temp);
 
 	f=CreateFile(
@@ -5381,7 +5393,7 @@ bool	Replay::LoadSaveGame()
 	else 
 		retval=FALSE;
 
-	delete savedata;
+	delete[] savedata;
 
 	return retval;
 }

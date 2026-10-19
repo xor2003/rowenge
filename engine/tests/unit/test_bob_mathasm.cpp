@@ -107,7 +107,6 @@ REGISTER_TEST(test_bob_trig) {
     CHECK_EQ((UWord)(+ml.arctan(-4, 3)),
              (UWord)(0x10000 - (UWord)(+ml.arctan(4, 3))));
 
-    // Cos_ArcSin: live arcsin (high_arc_sin/cos are DeadCode in BoB) —
     // table lookup; domain is [0,256] (8-bit fraction *of 256*), not 255.
     CHECK_EQ(ml.Cos_ArcSin(0),    0x7fff);          // cos(0)=1.0
     CHECK_EQ(ml.Cos_ArcSin(256),  0);               // cos(90deg)=0

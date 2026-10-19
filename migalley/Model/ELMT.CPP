@@ -297,16 +297,8 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 //@@						FP CL1 = pClCurve->GetValue(StallAoa);
 //@@						Cl = CL0 + (CL1 - CL0) * (Aoa - UnStallAoa) / (StallAoa - UnStallAoa);
 //@@
-//@@//DeadCode CSB 29/01/99							FP CD0 = pCdCurve->GetValue(UnStallAoa);
-//@@//DeadCode CSB 29/01/99							FP CD1 = pCdCurve->GetValue(StallAoa);
-//@@//DeadCode CSB 29/01/99							Cd = CD0 + (CD1 - CD0) * (Aoa - UnStallAoa) / (StallAoa - UnStallAoa);
-//@@//DeadCode CSB 29/01/99							FP KCl2 = Cd - Cdo;
-//@@//DeadCode CSB 29/01/99							Cd = Cdo * fCd0Mach + KCl2 * fKMach;
 //@@						Cd = pCdCurve->GetValue(StallAoa);
 //@@
-//@@//DeadCode CSB 29/01/99							FP CM0 = pCmCurve->GetValue(UnStallAoa);
-//@@//DeadCode CSB 29/01/99							FP CM1 = pCmCurve->GetValue(StallAoa);
-//@@//DeadCode CSB 29/01/99							Cmx = CM0 + (CM1 - CM0) * (Aoa - UnStallAoa) / (StallAoa - UnStallAoa);
 //@@						Cmx = pCmCurve->GetValue(StallAoa);
 //@@					}
 //@@				}
@@ -319,16 +311,8 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 //@@						FP CL1 = pClCurve->GetValue(-StallAoa);
 //@@						Cl = CL0 + (CL1 - CL0) * (-Aoa - UnStallAoa) / (StallAoa - UnStallAoa);
 //@@
-//@@//DeadCode CSB 29/01/99							FP CD0 = pCdCurve->GetValue(UnStallAoa);
-//@@//DeadCode CSB 29/01/99							FP CD1 = pCdCurve->GetValue(StallAoa);
-//@@//DeadCode CSB 29/01/99							Cd = CD0 + (CD1 - CD0) * (-Aoa - UnStallAoa) / (StallAoa - UnStallAoa);
-//@@//DeadCode CSB 29/01/99							FP KCl2 = Cd - Cdo;
-//@@//DeadCode CSB 29/01/99							Cd = Cdo * fCd0Mach + KCl2 * fKMach;
 //@@						Cd = pCdCurve->GetValue(-StallAoa);
 //@@
-//@@//DeadCode CSB 29/01/99							FP CM0 = pCmCurve->GetValue(UnStallAoa);
-//@@//DeadCode CSB 29/01/99							FP CM1 = pCmCurve->GetValue(StallAoa);
-//@@//DeadCode CSB 29/01/99							Cmx = CM0 + (CM1 - CM0) * (-Aoa - UnStallAoa) / (StallAoa - UnStallAoa);
 //@@						Cmx = pCmCurve->GetValue(-StallAoa);
 //@@					}
 //@@				}
@@ -710,7 +694,7 @@ void Surface::Process (AirStrucPtr const ControlledAC)
 	AircraftAnimData*	adptr;
 	adptr = (AircraftAnimData *)ControlledAC->Anim;
 
-	FP fDamage;
+	FP fDamage=0;												//RERUN: uninit for other Desc values
 	if(Desc == SD_FIN)			fDamage = adptr->FIN;
 	if(Desc == SD_TAILPLANE)	fDamage = adptr->TAIL;
 

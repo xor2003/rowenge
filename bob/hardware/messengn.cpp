@@ -84,11 +84,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 MessageBuffer	_MsgBuffer;
 
-//DeadCode RJS 12Feb99 ULong	MessageBuffer::PhraseToIDS[]=
-//DeadCode RJS 12Feb99 {
-//DeadCode RJS 12Feb99 #include	"radtxt.g"
-//DeadCode RJS 12Feb99 	-1
-//DeadCode RJS 12Feb99 };
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		SetVoice
@@ -164,12 +159,6 @@ const int&	MESSAGE_STRUC::GetScript() const
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode RJS 04Feb99 const MESSAGE_STRUC& MESSAGE_STRUC::SetCaller(Bool saythisis) const
-//DeadCode RJS 04Feb99 {
-//DeadCode RJS 04Feb99 	noCaller = saythisis;
-//DeadCode RJS 04Feb99 
-//DeadCode RJS 04Feb99 	return (*this);
-//DeadCode RJS 04Feb99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		SetPriority
@@ -285,43 +274,13 @@ Bool	MessageBuffer::AddToBuffer(const MESSAGE_STRUC&	msg)
 {
 	Bool 	retval;
 	SLong	index,index2;
-//DeadCode RJS 20Oct00 	Bool	playerRecipient = FALSE;
 	Bool	throwAway;											//RJS 02May00
 
 	if(!ShouldHearMsg(msg,throwAway))							//RJS 02May00
 		return throwAway;										//RJS 02May00
 
 	//Block messages to dead blokes
-//DEADCODE CSB 07/03/00 	if (msg.callee && msg.callee->Status.deadtime)				//RJS 05May99
-//DEADCODE CSB 07/03/00 		return TRUE;											//RJS 05May99
 
-//DEADCODE CSB 07/03/00 	if (msg.caller)
-//DEADCODE CSB 07/03/00 	{
-//DEADCODE CSB 07/03/00 		if (msg.caller->nationality != Manual_Pilot.ControlledAC2->nationality)
-//DEADCODE CSB 07/03/00 			return TRUE;
-//DEADCODE CSB 07/03/00 
-//DEADCODE CSB 07/03/00 		if (msg.caller->ai.radiosilent)
-//DEADCODE CSB 07/03/00 		{
-//DEADCODE CSB 07/03/00 			if (msg.caller->AcIsPlayer())						//RJS 24May99
-//DEADCODE CSB 07/03/00 			{
-//DEADCODE CSB 07/03/00 				MESSAGE_STRUC	tmpmsg(OLDSCRIPT_SILENCE,MSG_SILENCE,NULL,msg.caller,msg.caller);
-//DEADCODE CSB 07/03/00 				_Radio.TriggerMsg(tmpmsg.SetVoice(VOICE_REST));
-//DEADCODE CSB 07/03/00 			}
-//DEADCODE CSB 07/03/00 
-//DEADCODE CSB 07/03/00 			return TRUE;									//RJS 24May99
-//DEADCODE CSB 07/03/00 		}
-//DEADCODE CSB 07/03/00 	}
-//DEADCODE CSB 07/03/00 //DeadCode RJS 06Jul99 	else
-//DEADCODE CSB 07/03/00 //DeadCode RJS 05Jul99 	{
-//DEADCODE CSB 07/03/00 		if (msg.callee)
-//DEADCODE CSB 07/03/00 		{
-//DEADCODE CSB 07/03/00 			if (msg.callee->nationality != Manual_Pilot.ControlledAC2->nationality)
-//DEADCODE CSB 07/03/00 				return TRUE;
-//DEADCODE CSB 07/03/00 		}
-//DEADCODE CSB 07/03/00 //DeadCode RJS 05Jul99 	}
-//DEADCODE CSB 07/03/00 
-//DEADCODE CSB 07/03/00 	if ((msg.callee==thePlayer) || (msg.callee==theOtherOne))	//RDH 17May99
-//DEADCODE CSB 07/03/00 		playerRecipient = TRUE;									//RDH 17May99
 
 	//Does this message already exist?...
 	if(!msg.decisionhandler)											//CSB 07/03/00
@@ -337,9 +296,6 @@ Bool	MessageBuffer::AddToBuffer(const MESSAGE_STRUC&	msg)
 					||	(oldbuffer[index].visibility == VIS_1))
 				{
 	//Removed because it became annoying...							//RJS 02Jun99
-	//DeadCode RJS 02Jun99 				if (!playerRecipient)							//RDH 17May99
-	//DeadCode RJS 02Jun99 					return (FALSE);								//RDH 17May99
-	//DeadCode RJS 02Jun99 				else											//RDH 17May99
 						return (TRUE);								//RDH 17May99
 				}
 			}
@@ -355,9 +311,6 @@ Bool	MessageBuffer::AddToBuffer(const MESSAGE_STRUC&	msg)
 					||	(newbuffer[index].visibility == NOTVIS_1)	)
 				{
 	//Removed because it became annoying...							//RJS 02Jun99
-	//DeadCode RJS 02Jun99 				if (!playerRecipient)							//RDH 17May99
-	//DeadCode RJS 02Jun99 					return (FALSE);								//RDH 17May99
-	//DeadCode RJS 02Jun99 				else											//RDH 17May99
 						return (TRUE);								//RDH 17May99
 				}
 			}
@@ -366,41 +319,6 @@ Bool	MessageBuffer::AddToBuffer(const MESSAGE_STRUC&	msg)
 	else																//CSB 09/03/00
 		msg.priority = PRI_MAX;											//CSB 09/03/00
 
-//DeadCode PD 04Mar99 	//... or not in player group...
-//DeadCode PD 04Mar99 	if (	(msg.caller != thePlayer)
-//DeadCode PD 04Mar99 		||	(msg.callee != thePlayer)	)
-//DeadCode PD 04Mar99 		return (FALSE);
-//DEADCODE CSB 07/03/00 	if (!(msg.caller==thePlayer||msg.callee==thePlayer) &&
-//DEADCODE CSB 07/03/00 		!(msg.caller==theOtherOne||msg.callee==theOtherOne))		//PD 04Mar99
-//DEADCODE CSB 07/03/00 	{
-//DEADCODE CSB 07/03/00 		if (!msg.blockchatter)									//RJS 06Jul99
-//DEADCODE CSB 07/03/00 		{
-//DEADCODE CSB 07/03/00 			AirStrucPtr	checkitem = msg.caller;						//AMM 24Jun99
-//DEADCODE CSB 07/03/00 			if (	(msg.voiceindex != VOICE_REST)
-//DEADCODE CSB 07/03/00 				&&	(msg.voiceindex != VOICE_PLAYER)	)
-//DEADCODE CSB 07/03/00 				checkitem = msg.callee;								//AMM 24Jun99
-//DEADCODE CSB 07/03/00 		
-//DEADCODE CSB 07/03/00 			if (!checkitem)
-//DEADCODE CSB 07/03/00 				return TRUE;
-//DEADCODE CSB 07/03/00 
-//DEADCODE CSB 07/03/00 			if (	checkitem->PlayerInGroup()
-//DEADCODE CSB 07/03/00 				||	checkitem->PlayerInFlight()	)
-//DEADCODE CSB 07/03/00 			{
-//DEADCODE CSB 07/03/00 				//Overhears leader & fac/tac & dentist & tower...
-//DEADCODE CSB 07/03/00 				if (checkitem->AcIsFlightLeader() || checkitem->AcIsGroupLeader())
-//DEADCODE CSB 07/03/00 				{
-//DEADCODE CSB 07/03/00 					if (noBufferedMessages > 8)
-//DEADCODE CSB 07/03/00 						return FALSE;
-//DEADCODE CSB 07/03/00 				}
-//DEADCODE CSB 07/03/00 				else
-//DEADCODE CSB 07/03/00 					return FALSE;
-//DEADCODE CSB 07/03/00 			}
-//DEADCODE CSB 07/03/00 			else
-//DEADCODE CSB 07/03/00 				return FALSE;
-//DEADCODE CSB 07/03/00 		}
-//DEADCODE CSB 07/03/00 		else
-//DEADCODE CSB 07/03/00 			return TRUE;										//RJS 06Jul99
-//DEADCODE CSB 07/03/00 	}															//RJS 28May99
 
 //	thereIsANewMessage=true;
 
@@ -578,23 +496,6 @@ MESSAGE_STRUC*	MessageBuffer::SayNextMessage(SLong&	frametime)
 		}
 	}
 
-//DeadCode DAW 25Jun99 //DeadCode RDH 30Apr99 //	if (retptr->visibility < NOTVIS_2)			//RJS 01Apr99
-//DeadCode DAW 25Jun99 //DeadCode RDH 30Apr99 	{
-//DeadCode DAW 25Jun99 	if (oldbuffer[oldbuffertop].visibility < NOTVIS_2)	   //RJS 01Apr99
-//DeadCode DAW 25Jun99 	{
-//DeadCode DAW 25Jun99 		oldbuffertop++;
-//DeadCode DAW 25Jun99 		if (oldbuffertop >= OLDBUFFERSIZE)
-//DeadCode DAW 25Jun99 			oldbuffertop = 0;
-//DeadCode DAW 25Jun99 	}
-//DeadCode DAW 25Jun99 
-//DeadCode DAW 25Jun99 	oldbuffer[oldbuffertop] = *retptr;
-//DeadCode DAW 25Jun99 	if (oldbufferbot == oldbuffertop)
-//DeadCode DAW 25Jun99 	{
-//DeadCode DAW 25Jun99 		oldbufferbot++;
-//DeadCode DAW 25Jun99 		if (oldbufferbot >= OLDBUFFERSIZE)
-//DeadCode DAW 25Jun99 			oldbufferbot = 0;
-//DeadCode DAW 25Jun99 	}
-//DeadCode DAW 25Jun99 //DeadCode RDH 30Apr99 	}
 
 	//If the last message placed in the old buffer was low priority,
 	//stomp over it with the new one.
@@ -773,7 +674,6 @@ void	MessageBuffer::InitMessageWindow()
 	if (prevdisplayedmsgindex < 0)
 		prevdisplayedmsgindex = OLDBUFFERSIZE-1;
 
-//DeadCode AMM 24Jun99 	if (prevdisplayedmsgindex < oldbufferbot)
 	if (prevdisplayedmsgindex == oldbufferbot)					//RJS 24Jun99
 		prevdisplayedmsgindex = INVALIDMSG;
 
@@ -894,51 +794,6 @@ Bool	MessageBuffer::DecMessageWindow()
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode RJS 29Sep00 Colour	MessageBuffer::MessageColour(SLong	line)
-//DeadCode RJS 29Sep00 {
-//DeadCode RJS 29Sep00 	Colour	thecol = (Colour) 0;		// invalid col...
-//DeadCode RJS 29Sep00 
-//DeadCode RJS 29Sep00 	switch (line)
-//DeadCode RJS 29Sep00 	{
-//DeadCode RJS 29Sep00 	case 0:
-//DeadCode RJS 29Sep00 		line = prevdisplayedmsgindex;
-//DeadCode RJS 29Sep00 		break;
-//DeadCode RJS 29Sep00 	case 1:
-//DeadCode RJS 29Sep00 		line = displayedmsgindex;
-//DeadCode RJS 29Sep00 		break;
-//DeadCode RJS 29Sep00 	case 2:
-//DeadCode RJS 29Sep00 		line = nextdisplayedmsgindex;
-//DeadCode RJS 29Sep00 		break;
-//DeadCode RJS 29Sep00 	}
-//DeadCode RJS 29Sep00 
-//DeadCode RJS 29Sep00 	if (line != INVALIDMSG)
-//DeadCode RJS 29Sep00 	{
-//DeadCode RJS 29Sep00 		SLong			realindex = line;
-//DeadCode RJS 29Sep00 		MESSAGE_STRUC*	thebuffer;
-//DeadCode RJS 29Sep00 
-//DeadCode RJS 29Sep00 		if ((realindex & INNEWBUFFERFLAG) == 0)
-//DeadCode RJS 29Sep00 			thebuffer = oldbuffer;
-//DeadCode RJS 29Sep00 		else
-//DeadCode RJS 29Sep00 		{
-//DeadCode RJS 29Sep00 			realindex -= INNEWBUFFERFLAG;
-//DeadCode RJS 29Sep00 			thebuffer = newbuffer;
-//DeadCode RJS 29Sep00 		}
-//DeadCode RJS 29Sep00 
-//DeadCode RJS 29Sep00 		if (thebuffer[realindex].caller == thePlayer ||
-//DeadCode RJS 29Sep00 			thebuffer[realindex].caller == theOtherOne)
-//DeadCode RJS 29Sep00 		{
-//DeadCode RJS 29Sep00 			if (thebuffer[realindex].callee == thePlayer ||
-//DeadCode RJS 29Sep00 				thebuffer[realindex].callee == theOtherOne)
-//DeadCode RJS 29Sep00 				thecol = (Colour) 1;		//self
-//DeadCode RJS 29Sep00 			else
-//DeadCode RJS 29Sep00 				thecol = (Colour) 2;		//outgoing
-//DeadCode RJS 29Sep00 		}
-//DeadCode RJS 29Sep00 		else
-//DeadCode RJS 29Sep00 			thecol = (Colour) 3;	//incoming
-//DeadCode RJS 29Sep00 	}
-//DeadCode RJS 29Sep00 
-//DeadCode RJS 29Sep00 	return (thecol);
-//DeadCode RJS 29Sep00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		Callsign
@@ -1006,7 +861,6 @@ CString	MessageBuffer::Callsign(SLong	line)
 			}
 		}
 
-//DEADCODE RDH 04/05/99 		PhraseToString(thestring,phrasebuff);
 	}
 
 	return (thestring);
@@ -1147,7 +1001,6 @@ void	MessageBuffer::SetPlayer(AirStrucPtr	ac1,AirStrucPtr	ac2)
 	thePlayer = ac1;
 	theOtherOne = ac2;
 
-//DEADCODE RDH 17/05/00 	_Radio.Enter3D();											//RJS 28Apr99
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1168,7 +1021,6 @@ void	MessageBuffer::PhraseToString(CString &thestring, PhraseBuffer&	thebuff)
 	ULong			count = 0;
 	CString			tmpstring;
 
-//DEADCODE RDH 04/05/99 	thestring = "";
 	while (count < thebuff.phrase_count)
 	{
 		thePhrase = PhraseTables(thebuff.phrase_buffer[count]);
@@ -1224,18 +1076,13 @@ CString	MessageBuffer::GetPlaceName(Coords3D&	wpos)
 {
 	PhraseBuffer	phrasebuff;
 	CString			thestring = "";
-	item*			tmpitem = new item;
+	item			tmpitem;
 
-	if (tmpitem)
-	{
-		tmpitem->World = wpos;
+	tmpitem.World = wpos;
 
-		_Radio.ExpandPlacename(phrasebuff,tmpitem);
+	_Radio.ExpandPlacename(phrasebuff,&tmpitem);
 
-		PhraseToString(thestring,phrasebuff);
-
-		delete tmpitem;
-	}
+	PhraseToString(thestring,phrasebuff);
 
 	return(thestring);
 }
@@ -1320,8 +1167,6 @@ void	MessageBuffer::ClearMessagesMsg(SLong	messagetype)
 			newbuffer[index].priority = GAP;
 			noBufferedMessages--;
 		}
-//DeadCode DAW 25Jun99 		if (newbuffer[index].messagetype == messagetype)
-//DeadCode DAW 25Jun99 			newbuffer[index].priority = GAP;
 	}
 
 	RemoveGaps(newbuffer,newbuffertop,NEWBUFFERSIZE);
@@ -1355,14 +1200,6 @@ void	MessageBuffer::ClearMessagesPri(SLong	priority)
 
 		RemoveGaps(newbuffer,newbuffertop,NEWBUFFERSIZE);
 	}
-//DeadCode DAW 25Jun99 	SLong	index;
-//DeadCode DAW 25Jun99 	for (index = 0; index < NEWBUFFERSIZE; index++)
-//DeadCode DAW 25Jun99 	{
-//DeadCode DAW 25Jun99 		if (newbuffer[index].priority == priority)
-//DeadCode DAW 25Jun99 			newbuffer[index].priority = GAP;
-//DeadCode DAW 25Jun99 	}
-//DeadCode DAW 25Jun99 
-//DeadCode DAW 25Jun99 	RemoveGaps(newbuffer,newbuffertop,NEWBUFFERSIZE);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1415,9 +1252,6 @@ void	MessageBuffer::ClearMessagesMsg(SLong	messagetype, ItemPtr	theTarget)
 			newbuffer[index].priority = GAP;
 			noBufferedMessages--;
 		}
-//DeadCode DAW 25Jun99 		if (	(newbuffer[index].messagetype == messagetype)
-//DeadCode DAW 25Jun99 			&&	(newbuffer[index].target == theTarget)			)
-//DeadCode DAW 25Jun99 			newbuffer[index].priority = GAP;
 	}
 
 	RemoveGaps(newbuffer,newbuffertop,NEWBUFFERSIZE);
@@ -1489,16 +1323,10 @@ MESSAGE_STRUC::MESSAGE_STRUC(int scrpt,MsgType mtype,MobileItemPtr from,ItemBase
 
 	decisionhandler = NULL;
 
-//DeadCode AMM 20Oct100 	if (_Replay.Playback)
-//DeadCode AMM 20Oct100 	{
-//DeadCode AMM 20Oct100 		messagetype = MsgType(MSG_LP | MSG_BLOCKCHATTER);
-//DeadCode AMM 20Oct100 		scrpt = 0;
-//DeadCode AMM 20Oct100 	}
 
 	SetVoiceType();
 	ProcessScript(scrpt);
 	ProcessUserMessage();
-//DeadCode RJS 29Sep00 	SetVoiceType();
 }
 
 MESSAGE_STRUC::MESSAGE_STRUC(int scrpt,MsgType mtype,VoiceType vox,ItemBasePtr about,AirStrucPtr to)//RJS 02Apr99
@@ -1511,11 +1339,6 @@ MESSAGE_STRUC::MESSAGE_STRUC(int scrpt,MsgType mtype,VoiceType vox,ItemBasePtr a
 	voiceindex = vox;
 	decisionhandler = NULL;
 
-//DeadCode AMM 20Oct100 	if (_Replay.Playback)
-//DeadCode AMM 20Oct100 	{
-//DeadCode AMM 20Oct100 		messagetype = MsgType(MSG_LP | MSG_BLOCKCHATTER);
-//DeadCode AMM 20Oct100 		scrpt = 0;
-//DeadCode AMM 20Oct100 	}
 
 	ProcessScript(scrpt);
 	ProcessUserMessage();
@@ -1531,16 +1354,10 @@ MESSAGE_STRUC::MESSAGE_STRUC(int scrpt,MsgType mtype,MobileItemPtr from,ItemBase
 
 	decisionhandler = NULL;
 
-//DeadCode AMM 20Oct100 	if (_Replay.Playback)
-//DeadCode AMM 20Oct100 	{
-//DeadCode AMM 20Oct100 		messagetype = MsgType(MSG_LP | MSG_BLOCKCHATTER);
-//DeadCode AMM 20Oct100 		scrpt = 0;
-//DeadCode AMM 20Oct100 	}
 
 	SetVoiceType();
 	ProcessScript(scrpt);
 	ProcessUserMessage();
-//DeadCode RJS 29Sep00 	SetVoiceType();
 }
 
 void	MessageBuffer::ClearRadio()

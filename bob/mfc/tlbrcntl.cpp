@@ -106,11 +106,9 @@ void ToolBarControl::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(ToolBarControl)
 	DDX_Control(pDX, IDC_TB_TITLE, m_IDC_TB_TITLE);
-//DEADCODE RDH 06/01/00 	DDX_Control(pDX, IDC_TB_COMMS, m_IDC_TB_COMMS);
 	DDX_Control(pDX, IDC_TB_MAIN, m_IDC_TB_MAIN);
 	DDX_Control(pDX, IDC_TB_MAPTOOLS, m_IDC_TB_MAPTOOLS);
 	DDX_Control(pDX, IDC_TB_MESSAGES, m_IDC_TB_MESSAGES);
-//DEADCODE RDH 06/01/00 	DDX_Control(pDX, IDC_TB_OVERVIEW, m_IDC_TB_OVERVIEW);
 	DDX_Control(pDX, IDC_TB_MAPSCALE, m_IDC_TB_MAPSCALE);
 	DDX_Control(pDX, IDC_TB_ALL, m_IDC_TB_ALL);
 	//}}AFX_DATA_MAP
@@ -129,9 +127,6 @@ BOOL ToolBarControl::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	
-//DEADCODE RDH 06/01/00 	CRButton* b = GETDLGITEM(IDC_TB_COMMS);
-//DEADCODE RDH 06/01/00 	b->SetPressed(Save_Data.toolbars[TB_COMMS]);
-//DEADCODE RDH 06/01/00 
 	CRButton* b = GETDLGITEM(IDC_TB_MAIN);
 	b->SetPressed(Save_Data.toolbars[TB_MAIN]);
 
@@ -141,9 +136,6 @@ BOOL ToolBarControl::OnInitDialog()
 	b = GETDLGITEM(IDC_TB_MESSAGES);
 	b->SetPressed(Save_Data.toolbars[TB_REPORT]);
 
-//DEADCODE RDH 06/01/00 	b = GETDLGITEM(IDC_TB_OVERVIEW);
-//DEADCODE RDH 06/01/00 	b->SetPressed(Save_Data.toolbars[TB_STATUS]);
-//DEADCODE RDH 06/01/00 
 	b = GETDLGITEM(IDC_TB_TITLE);
 	b->SetPressed(Save_Data.toolbars[TB_TITLE]);
 
@@ -159,27 +151,15 @@ BOOL ToolBarControl::OnInitDialog()
 
 BEGIN_EVENTSINK_MAP(ToolBarControl, CDialog)
     //{{AFX_EVENTSINK_MAP(ToolBarControl)
-//DEADCODE RDH 06/01/00 	ON_EVENT(ToolBarControl, IDC_TB_COMMS, 1 /* Clicked */, OnClickedTbComms, VTS_NONE)
 	ON_EVENT(ToolBarControl, IDC_TB_MAIN, 1 /* Clicked */, OnClickedTbMain, VTS_NONE)
 	ON_EVENT(ToolBarControl, IDC_TB_MAPTOOLS, 1 /* Clicked */, OnClickedTbMaptools, VTS_NONE)
 	ON_EVENT(ToolBarControl, IDC_TB_MESSAGES, 1 /* Clicked */, OnClickedTbMessages, VTS_NONE)
-//DEADCODE RDH 06/01/00 	ON_EVENT(ToolBarControl, IDC_TB_OVERVIEW, 1 /* Clicked */, OnClickedTbOverview, VTS_NONE)
 	ON_EVENT(ToolBarControl, IDC_TB_TITLE, 1 /* Clicked */, OnClickedTbTitle, VTS_NONE)
 	ON_EVENT(ToolBarControl, IDC_TB_MAPSCALE, 1 /* Clicked */, OnClickedTbMapscale, VTS_NONE)
 	ON_EVENT(ToolBarControl, IDC_TB_ALL, 1 /* Clicked */, OnClickedTbAll, VTS_NONE)
 	//}}AFX_EVENTSINK_MAP
 END_EVENTSINK_MAP()
 
-//DEADCODE RDH 06/01/00 void ToolBarControl::OnClickedTbComms() 
-//DEADCODE RDH 06/01/00 {
-//DEADCODE RDH 06/01/00 	if (Save_Data.toolbars[TB_COMMS])
-//DEADCODE RDH 06/01/00 		Save_Data.toolbars%=TB_COMMS;
-//DEADCODE RDH 06/01/00 	else
-//DEADCODE RDH 06/01/00 		Save_Data.toolbars|=TB_COMMS;
-//DEADCODE RDH 06/01/00 	CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
-//DEADCODE RDH 06/01/00     main->UpdateToolbars(false);
-//DEADCODE RDH 06/01/00 	
-//DEADCODE RDH 06/01/00 }
 void	ToolBarControl::Redraw()
 {
 #ifndef	BOB_DEMO_VER
@@ -226,16 +206,6 @@ void ToolBarControl::OnClickedTbMessages()
 	Redraw();
 }
 
-//DEADCODE RDH 06/01/00 void ToolBarControl::OnClickedTbOverview() 
-//DEADCODE RDH 06/01/00 {
-//DEADCODE RDH 06/01/00 	if (Save_Data.toolbars[TB_STATUS])
-//DEADCODE RDH 06/01/00 		Save_Data.toolbars%=TB_STATUS;
-//DEADCODE RDH 06/01/00 	else
-//DEADCODE RDH 06/01/00 		Save_Data.toolbars|=TB_STATUS;
-//DEADCODE RDH 06/01/00 	CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
-//DEADCODE RDH 06/01/00     main->UpdateToolbars(false);
-//DEADCODE RDH 06/01/00 	
-//DEADCODE RDH 06/01/00 }
 
 void ToolBarControl::OnClickedTbTitle() 
 {

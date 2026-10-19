@@ -131,8 +131,8 @@ static inline void SmackSoundUseMSS(HDIGDRIVER dig) {
 // Shim for SmackVolumePan
 static inline void SmackVolumePan(void* smk, int track, int volume, int pan)
 {
-    (void)smk;   // unused in SDL2 shim
-    (void)track; // we don’t distinguish tracks in SDL2
+    (void)smk;   // unused in the native shim
+    (void)track; // we don’t distinguish tracks
 
     // Clamp values
     if (volume < 0) volume = 0;
@@ -140,21 +140,10 @@ static inline void SmackVolumePan(void* smk, int track, int volume, int pan)
     if (pan < 0) pan = 0;
     if (pan > 65535) pan = 65535;
 
-    // Map volume: 0–65535 → 0–128
-    int sdlVol = (volume * 128) / 65535;
-    Mix_Volume(-1, sdlVol);       // apply to all channels
-    Mix_VolumeMusic(sdlVol);      // apply to music too
-
-    // Map pan: 0–65535 → left/right balance
-    // SDL expects 0–255 for left/right volumes
-    Uint8 left  = (Uint8)((65535 - pan) * 255 / 65535);
-    Uint8 right = (Uint8)(pan * 255 / 65535);
-
-    // Apply panning to all channels (best effort)
-    int numChannels = Mix_AllocateChannels(-1);
-    for (int ch = 0; ch < numChannels; ++ch) {
-        Mix_SetPanning(ch, left, right);
-    }
+    // Map volume: 0–65535 → Miles 0–127 → engine master
+    rowan_audio_set_master_volume((volume * 127) / 65535);
+    // miniaudio has no global channel pan — per-sound pan is set on the
+    // ma_sound at play time; a global SMK pan was best-effort anyway.
 }
 #else // RERUN DISABLED FOR __GNUC__
 RADEXPFUNC Smack PTR4* RADEXPLINK SmackOpen(const char PTR4* name,u32 flags,u32 extrabuf);
@@ -546,8 +535,8 @@ typedef struct SmackBufTag {
 
 } // extern "C"
 
-extern	Smack*	OpenSmack(FileNum filenumber,int win,int X,int Y,int w,int h); //RERUN for Fullpane.cpp
-extern	UWord	DoSmack(int poo);
+extern	Smack*	OpenSmack(FileNum filenumber,intptr_t win,int X,int Y,int w,int h); //RERUN for Fullpane.cpp
+extern	UWord	DoSmack(intptr_t poo);
 extern	void	CloseSmack();
 extern	void	InterruptSmack();
 

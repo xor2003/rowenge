@@ -225,22 +225,6 @@ extern	Bool	BITRESET(void*,ULong);
 // Returns
 //
 //-----------------------------------------------------------------------------
-//DEADCODE RDH 20/05/99 	UByte retval;
-//DEADCODE RDH 20/05/99 	_asm
-//DEADCODE RDH 20/05/99 	{
-//DEADCODE RDH 20/05/99 		push	esi
-//DEADCODE RDH 20/05/99 		push	ecx
-//DEADCODE RDH 20/05/99 		push	eax
-//DEADCODE RDH 20/05/99 		mov		esi,num1
-//DEADCODE RDH 20/05/99 		mov		ecx,num2
-//DEADCODE RDH 20/05/99 		btr		ds:[esi],ecx
-//DEADCODE RDH 20/05/99 		setc	al
-//DEADCODE RDH 20/05/99 		mov		retval,al
-//DEADCODE RDH 20/05/99 		pop		eax
-//DEADCODE RDH 20/05/99 		pop		ecx
-//DEADCODE RDH 20/05/99 		pop		esi
-//DEADCODE RDH 20/05/99 	}
-//DEADCODE RDH 20/05/99 	return (Bool)retval;
 
 /*
 inline bool __fastcall	oldBITRESET(void * num1,ULong num2)

@@ -15,24 +15,13 @@
 #include	"Enumbits.m"
 #include	"BitField.h"
 #include	"HardPAsm.h"
-//DEADCODE JIM 30/04/99 #include	"text.h"
-//DEADCODE JIM 30/04/99 #include	"stub.m"
-//DEADCODE JIM 30/04/99 #include	"files.g"
 #include	"keytest.h"
 
-//DeadCode JIM 30Apr97 #else
-//DeadCode JIM 30Apr97 	#define XP
-//DeadCode JIM 30Apr97 	#define CB
-//DeadCode JIM 30Apr97 #endif
 
-//DeadCode ARM 09Jul96 #include	"windows.h"
-//DeadCode ARM 09Jul96 #include	"windowsx.h"
-//DeadCode ARM 09Jul96 #include	"mmsystem.h"
 
 #define	DEFAULT_ANALOGUE 0
 #ifndef AXIS_USES
 #define	AXIS_USES
-//DeadCode CSB 06/04/99	enum	DeadZones	{DZ_SMALL = 1024, DZ_MEDIUM = 2048, DZ_LARGE = 3096};
 enum	DeadZones	{DZ_SMALL = 512, DZ_MEDIUM = 1536, DZ_LARGE = 3072};	//CSB 06/04/99
 enum	AnalogMode	{ AM_ARCADE, AM_REALISTIC,
 						 AM_LOW, AM_MEDIUM, AM_HIGH, AM_ABSOULTE};
@@ -74,10 +63,6 @@ typedef	void*	PVOID;
 typedef PVOID HANDLE;
 #endif
 
-//DEADCODE DAW 29/01/00 #ifndef IN_SAGMOVE
-//DEADCODE DAW 29/01/00 typedef HANDLE HINSTANCE ;
-//DEADCODE DAW 29/01/00 #endif
-//DEADCODE DAW 29/01/00
 #endif
 
 
@@ -109,9 +94,7 @@ struct	RunTimeDevDesc
 	char	backupaxismaps[MAXMAPS];
 	char	sh_axismaps[MAXMAPS];
 	char	hatmaps[MAXMAPS];
-//DEADCODE RDH 25/05/00 	char	sh_hatmaps[MAXMAPS];
 	char	prevhatbuts[MAXMAPS];
-//DEADCODE RDH 25/05/00 	char	sh_prevhatbuts[MAXMAPS];
 	RunTimeDevDesc()	{dev2=NULL;dev=NULL;}
 
 };
@@ -130,7 +113,6 @@ struct	RunTimeDevDesc
 //------------------------------------------------------------------------------
 struct	FF_Push
 {
-//DeadCode CSB 17Aug00 	UByte	level;
 	bool	triggerX,triggerZ;
 	SWord	MX,MZ;
 	int		durationX,durationZ;
@@ -147,7 +129,6 @@ struct	FF_Push
 };
 struct	FF_Damp
 {
-//DeadCode CSB 17Aug00 	UByte	level;
 	bool	trigger;
 	SWord	MX,MZ;
 	IDirectInputDevice2A* dev;
@@ -164,7 +145,6 @@ struct	FF_Damp
 
 struct	FF_Stiff
 {
-//DeadCode CSB 17Aug00 	UByte	level;
 	bool	trigger;
 	SWord	CX,CZ;
 	SWord	SX,SZ;
@@ -180,7 +160,6 @@ struct	FF_Stiff
 };
 struct	FF_Shake
 {
-//DeadCode CSB 17Aug00 	UByte	level;
 	bool	triggerX,triggerZ,
 			randomX,randomZ,
 			lastrandomX,lastrandomZ;
@@ -225,9 +204,6 @@ class	ViewPoint;
 								AA_TT_REVERSE,	//this is a cludge: 1 bit flag to say axis is reversed...
 								AA_PAIR_MAX,AA_AA_SETUP
 							};
-//DeadCode JIM 9Oct00 	enum	AllowReset		{
-//DeadCode JIM 9Oct00 							AR_NORESET
-//DeadCode JIM 9Oct00 							AR_DEADZONE80000000
 class	Analogue
 {
 public:
@@ -248,8 +224,6 @@ public:
 		AllowAliasingField	aliased;
 		bool	allowmouseresetF5;
 		bool	discardnegative;
-//DeadCode JIM 4Sep00 		bool	reverse:1,
-//DeadCode JIM 4Sep00 				isaliased:1;
 
 	}	tune[AU_MAX];
 
@@ -266,9 +240,6 @@ public:
 
 	static	  AliassingOption	Aliassing_List[],*Aliassing_Table[];
 	AllowAliasing	curraliasingmode,currUIaliasingmode;
-//DEADCODE JIM 19/06/00 	SWord		deadzones[(int)AU_MAX];
-//DEADCODE JIM 19/06/00 	SWord		mode[(int)AU_MAX];
-//DEADCODE JIM 19/06/00 	bool		reverse[(int)AU_MAX];							//AMM 28Mar100
 	UByte FF_gun, FF_buffet, FF_aerodynamic, FF_airframe;				//CSB 17Aug00
 	int		axisbases[+AU_MAX+1];
 	SWord		axisscales[+AU_MAX+1];
@@ -290,7 +261,6 @@ public:
 	bool	noGunner;													//RJS 29Aug00
 
 	void	ResetF5();
-//DeadCode AMM 21Feb100 	Bool	Initialise(int HWNDw,int HINSTANCEi);
 	 Bool	Initialise(intptr_t HWNDw,intptr_t HINSTANCEi,AllowAliasing mousemode,AllowAliasing aliasmode,bool reinit=false);
 	bool	WhatAliasModes(AllowAliasing& mousemode,AllowAliasing& aliasmode,ViewPoint* newwin);
 	Bool	LoadGame();
@@ -300,9 +270,6 @@ public:
 	void	PollForces();
 	SWord	ReadPosition(AxisUses reqaxis);
 	bool	readytopoll;
-//DeadCode  11Aug00 	bool	IsTaskShiftedMouse(int task);
-//DeadCode  11Aug00 	bool	IsTaskShiftedJoystick(int task);
-//DeadCode AMM 27Jul00 	void	SetAxesFromShiftedAxes(int devnum);
 	void	BackupAxes(int devnum);
 	void	SetAxesFromBackup(int devnum);
 	void	BackupAllDeviceAxes();
@@ -326,16 +293,6 @@ public:
 		GUN_ON_MOUSE
 	};
 
-//DeadCode  11Aug00 	bool	CockpitOnShiftedMouse;
-//DeadCode  11Aug00 	bool	CockpitOnShiftedJoystick;
-//DeadCode  11Aug00 	bool	PanOnShiftedMouse;
-//DeadCode  11Aug00 	bool	PanOnShiftedJoystick;
-//DeadCode  11Aug00 	bool	PanOnMouse;
-//DeadCode  11Aug00 	bool	PanOnJoystick;
-//DeadCode  11Aug00 	bool	GunnerOnShiftedMouse;
-//DeadCode  11Aug00 	bool	GunnerOnShiftedJoystick;
-//DeadCode  11Aug00 	bool	GunnerOnJoystick;
-//DeadCode  11Aug00 	bool	GunnerOnMouse;
 
 	Analogue();
 	~Analogue();

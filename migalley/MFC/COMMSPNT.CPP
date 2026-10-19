@@ -168,7 +168,6 @@ void	CCommsPaint::OnClickedButtonID(int id)
 	assert(butnum>=0 && butnum<32);
   
 	DPlay::H2H_Player[_DPlay.mySlot].decal = butnum;
-//DeadCode JIM 12Jan99 	RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
 	FullPanel()->LaunchDial(new CCurrEmblem,1);
 
 }

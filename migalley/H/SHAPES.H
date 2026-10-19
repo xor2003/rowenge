@@ -109,7 +109,6 @@ class	shapestuff
 						list_size,
 						list_index;
 
-//Old_Code PD 27Aug96 		ULong	glob_list[(MaxNumberOfShapes/32)];
 
 		ShapeNumField	gsnf;									//PD 27Aug96
 
@@ -129,13 +128,11 @@ class	shapestuff
 
 		~shapestuff(void );
 
-//Old_Code PD 27Aug96 		UWord 	LoadShapes(ShapeListPtr );
 
 		ShapeDescPtr
 				GetShapePtr(ShapeNumber );
 
 		void	AddShapesToGlobList(ShapeNumField* reqdshps);
-//Old_Code PD 27Aug96 		void	AddShapesToGlobList(UWord *,UWord&);
 
 		void	LoadRequiredShapes(void );
 

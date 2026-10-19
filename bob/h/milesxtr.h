@@ -89,9 +89,6 @@ struct	SubSound
 	struct	MusicRequest
 	{
 		ULong		activated;									//RJS 18Jun99
-//DeadCode RJS 18Jun99 		UByte		activated:1,								//RJS 17Oct97
-//DeadCode RJS 18Jun99 					fader:1,									//RJS 17Oct97
-//DeadCode RJS 18Jun99  					stopsequence:1;							//RJS 17Oct97
 		UByte		todiscard:1,								//RJS 17Oct97
 					killnow:1,									//RJS 17Oct97
 					mainstopped:1,								//RJS 17Oct97
@@ -105,15 +102,6 @@ struct	SubSound
 		SLong		CurrentTrack;
 	};
 
-//DeadCode RJS 16Oct97 	struct SampleRec
-//DeadCode RJS 16Oct97 	{
-//DeadCode RJS 16Oct97 		fileblock	*blockptr;
-//DeadCode RJS 16Oct97 		SLong		size;
-//DeadCode RJS 16Oct97 		int			priority;
-//DeadCode RJS 16Oct97 		UWord		samplerate;									//RJS 16Oct97
-//DeadCode RJS 16Oct97 		UWord		samplevolume;								//RJS 16Oct97
-//DeadCode RJS 16Oct97 		ULong		LastTime;									//RJS 16Oct97
-//DeadCode RJS 16Oct97 	};
 
 
 	struct StatusRec

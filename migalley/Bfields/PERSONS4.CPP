@@ -102,7 +102,6 @@ questions about this file may be asked at http://www.simhq.com/
 //#include "CSTRING.H" // RERUN
 //#include "PACKAGE.H" //RERUN
 	//DON'T WRITE INCLUDE FILES HERE, PUT THEM IN BFCOMMON
-//Old_Code PD 27Aug96  	MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);
 //	extern	ULong	GR_FriendlyScoutType00;
 //	extern	ULong	GR_GlobalSkillMin;
 //	extern	ULong	GR_GlobalSkillMax;
@@ -312,9 +311,6 @@ UniqueID	Persons4::make_waypoint(info_waypoint& I)
 		J->nextwp=UID_Null;
 		return UniqueID(v);
 	}
-//RERUN DEADCODE 	else
-//RERUN DEADCODE 		if (bfdesc && justscanning==SCANNAMES)
-//RERUN DEADCODE ;//ME 			bfdesc->WP++;
 	return UID_Null;
 
 }
@@ -428,9 +424,6 @@ void	Persons4::make_itemS(info_itemS& I,bool enabled)
 		J->Item::shape=ShapeNum(J->shape.Evaluate());
 		logUID(J);
 	}
-//RERUN DEADCODE 	else
-//RERUN DEADCODE 		if (bfdesc && justscanning==SCANNAMES)
-//RERUN DEADCODE ;//ME 			bfdesc->ST++;
 //  }
 //  else
 //  {
@@ -537,24 +530,8 @@ void	Persons4::make_string(string src,int len,TokenCode t)
 	if (justscanning==SCANNAMES)
 	{
  		char*	trg;//ME =bfdesc->title;
-//RERUN DEADCODE		if ((int)t==(int)T_comment)
-//RERUN DEADCODE ;//ME 			if ((UWord&)bfdesc->description[0])
-//RERUN DEADCODE ;//ME 			{
-//RERUN DEADCODE ;//ME 				trg=bfdesc->news;
-//RERUN DEADCODE ;//ME 				if (len>=DESCRIPT_LEN)
-//RERUN DEADCODE ;//ME 					len=DESCRIPT_LEN-1;
-//RERUN DEADCODE ;//ME 
-//RERUN DEADCODE ;//ME 			}
-//RERUN DEADCODE ;//ME 			else
-//RERUN DEADCODE ;//ME 			{
-//RERUN DEADCODE ;//ME 				trg=bfdesc->description;
-//RERUN DEADCODE ;//ME 				if (len>=DESCRIPT_LEN)
-//RERUN DEADCODE ;//ME 					len=DESCRIPT_LEN-1;
-//RERUN DEADCODE ;//ME 			}
-//RERUN DEADCODE ;//ME 		else
 		if ((int)t == (int)T_family)
 		{
-			//RERUN DEADCODE ;//ME 			trg=bfdesc->family;
 			if (len>=TITLE_LEN)
 				len=TITLE_LEN-1;
 		}

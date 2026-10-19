@@ -147,7 +147,6 @@ void CSQuick1::MakeFlightCombo()
   combo2 = GETDLGITEM(IDC_ELTNUM);
   CRStatic*   s=GETDLGITEM(IDC_RSTATICCTRL4);
 
-//DeadCode AMM 14Oct98   if (_DPlay.CurrPlayers != 0)
   if (RFullPanelDial::incomms)									//AMM 14Oct98
   {
 	combo->ShowWindow(SW_HIDE);
@@ -324,13 +323,6 @@ BOOL CSQuick1::OnInitDialog()
 	CRCombo* combo;
 	combo=GETDLGITEM(IDC_MISSLISTS);
 //	combo->RESCOMBO(QUICK_1,20)->SetIndex(currquickmiss);
-//DeadCode AMM 12May99 	char i = 0;
-//DeadCode AMM 12May99 	while (quickmissions[i].missionname !=NULL)
-//DeadCode AMM 12May99 	{
-//DeadCode AMM 12May99 		combo->AddString(LoadResString(quickmissions[i].missionname));
-//DeadCode AMM 12May99 		i++;
-//DeadCode AMM 12May99 	}
-//DeadCode AMM 12May99 	combo->SetIndex(currquickmiss);
 	char i = 0,j=0;
 	while (quickmissions[i].missionname !=0)
 	{
@@ -455,7 +447,6 @@ void CSQuick1::OnTextChangedMisslists(LPCTSTR text)
 {
 	// TODO: Add your control notification handler code here
 	//actually need to shut everything down....
-//DeadCode DAW 18May99 	currquickmiss=GETDLGITEM(IDC_MISSLISTS)->GetIndex();
 	if (!RFullPanelDial::incomms)								//AMM 18May99
 		currquickmiss=GETDLGITEM(IDC_MISSLISTS)->GetIndex();
 	else														//AMM 18May99
@@ -489,7 +480,6 @@ void CSQuick1::OnTextChangedMisslists(LPCTSTR text)
 		currquickmiss=i;
 	}															
 	quickdef=quickmissions[currquickmiss];
-//DeadCode JIM 12Jan99 	RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
 	ReinitCombo();
 	FullPanel()->QuickMissionDesc();							//JIM 12Jan99
 //	DestroyPanel();
@@ -497,7 +487,6 @@ void CSQuick1::OnTextChangedMisslists(LPCTSTR text)
 //		fullscreen->LaunchScreen(&fullscreen->quickmission);
 //	else
 //		fullscreen->LaunchScreen(&fullscreen->commsquick);
-//DeadCode AMM 14Oct98   if (_DPlay.CurrPlayers == 0)
 //  if (!RFullPanelDial::incomms)									//AMM 14Oct98
 //		fullscreen->LaunchScreen(&fullscreen->quickmission);
 //	else
@@ -633,7 +622,6 @@ void CSQuick1::OnDestroy()
 		if (quickdef.line[s][w][g].actype==plsquad)
 			plind+=quickdef.line[s][w][g].flights*4;
 
-//DeadCode AMM 17Nov98  	if ( _DPlay.CurrPlayers == 0)
  	if ( !RFullPanelDial::incomms)								//JIM 12Jan99
 	{
 		MMC.playersquadron=plsquad;

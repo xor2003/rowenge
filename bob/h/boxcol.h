@@ -110,7 +110,6 @@ public:
 	static	ItemPtr SectorCol(MobileItemPtr hitter,ItemPtr trg,Coords3D& hitpos,int& eltnum,Bool,TransientItem*,Bool);//RJS 27May99
 	static	Bool GroupCol(MobileItemPtr hitter,ItemPtr trg,Coords3D& hitpos,int& eltnum,TransientItem*,Bool);//RJS 27May99
 	static	Bool TestCol(MobileItemPtr hitter,ItemPtr,ItemPtr,Coords3D& hitpos,TransientItem*,Bool);//RJS 27May99
-//DeadCode RJS 01Dec97 	static	Bool TestCol2(DOCOLLISION_PTR ptr);					//RJS 26Feb97
 	static	Bool TestCol2(SWord,SWord,SWord,UWord,UWord,UWord);			//RJS 16Jun00
 	static  void AddEffect(UByte, UByte, UWord, UWord,UByteP,SByte,UWord);//RJS 16Nov98
 	static  void ProcessEffectQueue(ItemPtr);					//RJS 27Feb97
@@ -151,7 +150,6 @@ private:
 
 	static	bool	StaticWeapon(const ItemPtr, SLong&, TransientItemPtr&);//RJS 30Jun00
 
-//DeadCode JON 13Oct00 	static	bool	TargetAllowed(ItemPtr,ItemPtr,SLong);			//RJS 11Aug00
 
 	static	void	DoHitWire(MobileItemPtr, ItemPtr,const Coords3D&);//RJS 18Oct00
 	static	void	FindNearestContactPoint(MobileItemPtr, const Coords3D&,SLong&);		//RJS 18Oct00

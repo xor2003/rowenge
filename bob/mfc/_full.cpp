@@ -96,8 +96,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include ".\vwqlist.cpp"
 
 //quick miss
-//DeadCode JIM 28Aug00 #include ".\sairclms.cpp"
-//DeadCode JIM 28Aug00 #include ".\Sgrdclms.cpp"
 #include ".\Squick1.cpp"
 #include ".\Squick2.cpp"
 #include ".\squickp.cpp"

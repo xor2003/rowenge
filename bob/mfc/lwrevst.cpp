@@ -129,7 +129,6 @@ BOOL LWReviewStrength::OnInitDialog()
 	
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(120);
 	//rlistbox->AddColumn(42);										  //RDH 02/06/99
@@ -174,37 +173,8 @@ BOOL LWReviewStrength::OnInitDialog()
  	}
 
 
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("4",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("3",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",1);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("4",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("3",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",2);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("4",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("3",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",3);
 
 
-//DeadCode RDH 22Jun00 	 	CRStatic*   s;
-//DeadCode RDH 22Jun00    	
-//DeadCode RDH 22Jun00 	s=GETDLGITEM(IDC_RSTATIC_COMMENT);
-//DeadCode RDH 22Jun00 	s->SetString("The number of Category A squadrons is very low. Any further dilution will mean that the Luftwaffe is no longer a credible fighting force");
-//DeadCode RDH 22Jun00 
-//DeadCode RDH 22Jun00 
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE

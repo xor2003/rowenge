@@ -76,14 +76,14 @@ questions about this file may be asked at http://www.simhq.com/
 
 long CPicture::GetHandle()
 {
-	long result;
+	long result = 0;
 	GetProperty(0x0, VT_I4, (void*)&result);
 	return result;
 }
 
 long CPicture::GetHPal()
 {
-	long result;
+	long result = 0;
 	GetProperty(0x2, VT_I4, (void*)&result);
 	return result;
 }
@@ -95,21 +95,21 @@ void CPicture::SetHPal(long propVal)
 
 short CPicture::GetType()
 {
-	short result;
+	short result = 0;
 	GetProperty(0x3, VT_I2, (void*)&result);
 	return result;
 }
 
 long CPicture::GetWidth()
 {
-	long result;
+	long result = 0;
 	GetProperty(0x4, VT_I4, (void*)&result);
 	return result;
 }
 
 long CPicture::GetHeight()
 {
-	long result;
+	long result = 0;
 	GetProperty(0x5, VT_I4, (void*)&result);
 	return result;
 }

@@ -60,6 +60,7 @@ protected:
 	afx_msg void OnReplayRecord();
 	afx_msg void OnComms();
 	afx_msg void OnPaint();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	//}}AFX_MSG
 	afx_msg void OnGetString();
 	MSG2_0v(OnGetString);

@@ -155,7 +155,6 @@ InteractiveCockpit::InteractiveCockpit()
 	Add(INST_PROPPITCH1,	FK_PROPPITCH1,		ICT_SLIDE,		IDS_IPROPPITCH,		INSTDIR_UPDOWN);	//RJS 24May00
 	Add(INST_PRIMER1,		FK_PRIMER1,			ICT_HOLDDOWN,	IDS_PRIMER,			FIL_SFX_CPT_PUMP);	//RJS 24May00
 
-//DeadCode CSB 02/12/99		Add(INST_HOODJETTISON,	FK_HOODJETTISON,	ICT_SWITCH,	IDS_HOODJETTISON);
 
 // Shortcuts..
 
@@ -221,27 +220,6 @@ void	InteractiveCockpit::ClearCollide(bool	mousepressed)
 
 	lastMousePressed = mousepressed;
 
-//DEADCODE CSB 25/01/00 	if(mousepressed && lastWasValid)
-//DEADCODE CSB 25/01/00 	{
-//DEADCODE CSB 25/01/00 		if (lastControl == ICT_SLIDE)
-//DEADCODE CSB 25/01/00 			ProcessSlider();
-//DEADCODE CSB 25/01/00 		else if (lastControl == ICT_HOLDDOWN)
-//DEADCODE CSB 25/01/00 			ProcessHoldDown();
-//DEADCODE CSB 25/01/00 		else
-//DEADCODE CSB 25/01/00 		{
-//DEADCODE CSB 25/01/00 			//this is meaningless
-//DEADCODE CSB 25/01/00 			lastControl = ICT_NULL;
-//DEADCODE CSB 25/01/00 			lastString = 0;
-//DEADCODE CSB 25/01/00 		}
-//DEADCODE CSB 25/01/00 	}
-//DEADCODE CSB 25/01/00 	else
-//DEADCODE CSB 25/01/00 	{
-//DEADCODE CSB 25/01/00 		lastWasValid = false;
-//DEADCODE CSB 25/01/00 		lastControl = ICT_NULL;
-//DEADCODE CSB 25/01/00 		lastString = 0;
-//DEADCODE CSB 25/01/00 	}
-//DEADCODE CSB 25/01/00 
-//DEADCODE CSB 25/01/00 	lastMousePressed = mousepressed;
 }	
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -296,55 +274,6 @@ void	InteractiveCockpit::Collide(InstrumentKey	theKey, bool mousepressed)
 
 	lastMousePressed = mousepressed;
 
-//DEADCODE CSB 25/01/00 	if (lastControl == ICT_SLIDE)
-//DEADCODE CSB 25/01/00 	{
-//DEADCODE CSB 25/01/00 		if (mousepressed)
-//DEADCODE CSB 25/01/00 			ProcessSlider();
-//DEADCODE CSB 25/01/00 		else
-//DEADCODE CSB 25/01/00 		{
-//DEADCODE CSB 25/01/00 			lastWasValid = false;
-//DEADCODE CSB 25/01/00 			lastControl = ICT_NULL;
-//DEADCODE CSB 25/01/00 			lastString = 0;
-//DEADCODE CSB 25/01/00 		}
-//DEADCODE CSB 25/01/00 	}
-//DEADCODE CSB 25/01/00 	else if (lastControl == ICT_HOLDDOWN)
-//DEADCODE CSB 25/01/00 	{
-//DEADCODE CSB 25/01/00 		if (mousepressed)
-//DEADCODE CSB 25/01/00 			ProcessHoldDown();
-//DEADCODE CSB 25/01/00 		else
-//DEADCODE CSB 25/01/00 		{
-//DEADCODE CSB 25/01/00 			lastWasValid = false;
-//DEADCODE CSB 25/01/00 			lastControl = ICT_NULL;
-//DEADCODE CSB 25/01/00 			lastString = 0;
-//DEADCODE CSB 25/01/00 		}
-//DEADCODE CSB 25/01/00 	}
-//DEADCODE CSB 25/01/00 	else
-//DEADCODE CSB 25/01/00 	{
-//DEADCODE CSB 25/01/00 		if (!lastWasValid)
-//DEADCODE CSB 25/01/00 		{
-//DEADCODE CSB 25/01/00 			if (mousepressed)
-//DEADCODE CSB 25/01/00 			{
-//DEADCODE CSB 25/01/00 				keytocontrol[lastIndex].Set(false);
-//DEADCODE CSB 25/01/00 				keytocontrol[theKey].Set(false);
-//DEADCODE CSB 25/01/00 
-//DEADCODE CSB 25/01/00 				lastWasValid = true;
-//DEADCODE CSB 25/01/00 				lastControl = keytocontrol[theKey].control;
-//DEADCODE CSB 25/01/00 				lastKeyPress = keytocontrol[theKey].keyenum;
-//DEADCODE CSB 25/01/00 				lastDirection = keytocontrol[theKey].direction;
-//DEADCODE CSB 25/01/00 				lastIndex = theKey;
-//DEADCODE CSB 25/01/00 
-//DEADCODE CSB 25/01/00 				lastString = 0;
-//DEADCODE CSB 25/01/00 				hitMouseX = lastMouseX;
-//DEADCODE CSB 25/01/00 				hitMouseY = lastMouseY;
-//DEADCODE CSB 25/01/00 			}
-//DEADCODE CSB 25/01/00 			else
-//DEADCODE CSB 25/01/00 			{
-//DEADCODE CSB 25/01/00 				lastString = keytocontrol[theKey].resourcestring;
-//DEADCODE CSB 25/01/00 				lastControl = ICT_NULL;
-//DEADCODE CSB 25/01/00 				lastWasValid = false;
-//DEADCODE CSB 25/01/00 			}
-//DEADCODE CSB 25/01/00 		}
-//DEADCODE CSB 25/01/00 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

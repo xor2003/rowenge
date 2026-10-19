@@ -99,14 +99,7 @@ CurveResource::CurveResource ()
 	pCurves = NULL;
 
 	// load all curves for all aircraft
-//DEADCODE  01/11/99 	LoadCurvesCOMM ();
 
-//DEADCODE  01/11/99 	LoadCurvesF51D ();
-//DEADCODE  01/11/99 	LoadCurvesF80C ();
-//DEADCODE  01/11/99 	LoadCurvesF84E ();
-//DEADCODE  01/11/99 	LoadCurvesF86E ();
-//DEADCODE  01/11/99 	LoadCurvesMIG15 ();
-//DEADCODE  01/11/99 	LoadCurvesYAK9 ();
 
 	LoadCurvesSPITFIRE();	//CSB 22/09/99	
 	LoadCurvesHURRICANE();	//CSB 22/09/99	
@@ -115,16 +108,8 @@ CurveResource::CurveResource ()
 	LoadCurvesJU87();	//CSB 22/09/99	
 	LoadCurvesBOB();	//CSB 22/09/99	
 
-//DeadCode CSB 28/04/99		LoadCurvesF82G ();
 //TempCode ARM 03Nov97 	LoadCurvesF94A ();
-//DeadCode CSB 28/04/99		LoadCurvesF9F2 ();
-//DeadCode CSB 28/04/99		LoadCurvesF8 ();
-//DeadCode CSB 28/04/99		LoadCurvesF4U5 ();
-//DeadCode CSB 28/04/99		LoadCurvesSFURY ();
-//DeadCode CSB 28/04/99		LoadCurvesFFLY ();
-//DeadCode CSB 28/04/99		LoadCurvesA1 ();											//D 02Apr98
 
-//DeadCode CSB 27/10/98		LoadCurvesATMOS ();
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -358,60 +343,6 @@ FP Curve::GetValue (FP index)
 	return(v1 + (v2 - v1) * (index - i1) / (i2 - i1) );
 }
 
-//DeadCode CSB 26/02/99		for (;;)
-//DeadCode CSB 26/02/99		{
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99			// special cases
-//DeadCode CSB 26/02/99			// should not occur in a IDT_LIMIT
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99			if (index < CurveData[0].index)
-//DeadCode CSB 26/02/99			{
-//DeadCode CSB 26/02/99				c1 = cPoints - 1;
-//DeadCode CSB 26/02/99				c2 = 0;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99				i1 = CurveData[c1].index - DeltaIndex;
-//DeadCode CSB 26/02/99				i2 = CurveData[c2].index;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99				break;
-//DeadCode CSB 26/02/99			}
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99			if (index > CurveData[cPoints - 1].index)
-//DeadCode CSB 26/02/99			{
-//DeadCode CSB 26/02/99				c1 = cPoints - 1;
-//DeadCode CSB 26/02/99				c2 = 0;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99				i1 = CurveData[c1].index;
-//DeadCode CSB 26/02/99				i2 = CurveData[c2].index + DeltaIndex;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99				break;
-//DeadCode CSB 26/02/99			}
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99			c2 = 1;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99			for (;;)
-//DeadCode CSB 26/02/99			{
-//DeadCode CSB 26/02/99				if (index <= CurveData[c2].index)
-//DeadCode CSB 26/02/99					break;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99				c2++;
-//DeadCode CSB 26/02/99			}
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99			c1 = c2 - 1;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99			i1 = CurveData[c1].index;
-//DeadCode CSB 26/02/99			i2 = CurveData[c2].index;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99			break;
-//DeadCode CSB 26/02/99		}
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99		FP v1,v2;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99		v1 = CurveData[c1].value;
-//DeadCode CSB 26/02/99		v2 = CurveData[c2].value;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99		return (((index - i1) * (v2 - v1)) / (i2 - i1)) + v1;
-//DeadCode CSB 26/02/99	
-//DeadCode CSB 26/02/99	}
 
 
 

@@ -396,8 +396,8 @@ Bool DPlay::UINewPlayer (char* Name, char* SessionName)
 		DPSessionDesc2.guidApplication=*lpAppGuid;				
 		DPSessionDesc2.dwCurrentPlayers=0;
 
-		DPSessionDesc2.lpszSessionNameA=new char[PLAYERNAMELEN];
-		strcpy( DPSessionDesc2.lpszSessionNameA, _DPlay.SessionName);
+		DPSessionDesc2.lpszSessionNameA=new char[SESSIONNAMELEN];
+		strncpy(DPSessionDesc2.lpszSessionNameA, _DPlay.SessionName, SESSIONNAMELEN-1); DPSessionDesc2.lpszSessionNameA[SESSIONNAMELEN-1]=0;
 		
 		
 // create session
@@ -432,8 +432,8 @@ Bool DPlay::UINewPlayer (char* Name, char* SessionName)
 		DPSessionDesc2.dwSize = sizeof (DPSESSIONDESC2);
 
 		DPSessionDesc2.guidApplication = *lpAppGuid;
-		DPSessionDesc2.lpszSessionNameA=new char[PLAYERNAMELEN];
-		strcpy( DPSessionDesc2.lpszSessionNameA, _DPlay.SessionName);
+		DPSessionDesc2.lpszSessionNameA=new char[SESSIONNAMELEN];
+		strncpy(DPSessionDesc2.lpszSessionNameA, _DPlay.SessionName, SESSIONNAMELEN-1); DPSessionDesc2.lpszSessionNameA[SESSIONNAMELEN-1]=0;
 		
 // get session data
 
@@ -464,7 +464,6 @@ Bool DPlay::UINewPlayer (char* Name, char* SessionName)
 
 		Host = FALSE;
 
-//DeadCode DAW 01Jun99 		_Replay.BackupPrefs();
 	}
 	else
 		return FALSE;
@@ -2285,8 +2284,8 @@ Bool	DPlay::ConnectToAggregator(ULong& aggregatorID,char* Name)
 	DPSessionDesc2.dwSize = sizeof (DPSESSIONDESC2);
 
 	DPSessionDesc2.guidApplication = *lpAppGuid;
-	DPSessionDesc2.lpszSessionNameA=new char[PLAYERNAMELEN];
-	strcpy( DPSessionDesc2.lpszSessionNameA, SessionName);
+	DPSessionDesc2.lpszSessionNameA=new char[SESSIONNAMELEN];
+	strncpy(DPSessionDesc2.lpszSessionNameA, SessionName, SESSIONNAMELEN-1); DPSessionDesc2.lpszSessionNameA[SESSIONNAMELEN-1]=0;
 
 // get session data
 
@@ -2299,18 +2298,30 @@ Bool	DPlay::ConnectToAggregator(ULong& aggregatorID,char* Name)
 		);
 
 	if (res!=DP_OK)
+	{
+		delete[] SessionName; delete[] DPSessionDesc2.lpszSessionNameA;	//RERUN: don't leak
 		return FALSE;
+	}
 
 	res=lpDP4->Open ( &DPSessionDesc2,DPOPEN_JOIN );
 
 	if (res!=DP_OK)
+	{
+		delete[] SessionName; delete[] DPSessionDesc2.lpszSessionNameA;
 		return FALSE;
+	}
 
 	if (lpDP4->CreatePlayer ( &myDPlayID, NULL, NULL, NULL,0,0) != DP_OK)
+	{
+		delete[] SessionName; delete[] DPSessionDesc2.lpszSessionNameA;
 		return FALSE;
+	}
 
 	if (!GetMySlot())
+	{
+		delete[] SessionName; delete[] DPSessionDesc2.lpszSessionNameA;
 		return FALSE;
+	}
 
 	if (mySlot==1)
 	{
@@ -2325,13 +2336,14 @@ Bool	DPlay::ConnectToAggregator(ULong& aggregatorID,char* Name)
 
 // fill in name ,initial null dialogue, 0 kills and deaths 
 
-	strcpy ((H2H_Player + mySlot)->name, PlayerName);
+	strncpy((H2H_Player + mySlot)->name, PlayerName, 59); (H2H_Player + mySlot)->name[59]=0;
 	(H2H_Player + mySlot)->status = CPS_READYROOM;
 	strcpy ((H2H_Player + mySlot)->dialogue, "");
 
 	PlayerCreated = TRUE;
 	FlyNowFlag = FALSE;
 
+	delete[] SessionName; delete[] DPSessionDesc2.lpszSessionNameA;		//RERUN: free session strings
 	return TRUE;
 }
 
@@ -2582,7 +2594,8 @@ Bool	DPlay::SetUpPlayerInfo(char* name)
 	if (!strcmp(name,""))
 		strcpy ((H2H_Player + mySlot)->name, "Unnamed Player");
 	else
-		strcpy ((H2H_Player + mySlot)->name, name);
+		strncpy((H2H_Player + mySlot)->name, name, 59);
+	(H2H_Player + mySlot)->name[59]=0;
 
 	(H2H_Player + mySlot)->status = CPS_READYROOM;
 	strcpy ((H2H_Player + mySlot)->dialogue, "");
@@ -2673,8 +2686,7 @@ void	DPlay::AddNameToVisitorsBook(char* name)
 			a=NULL;
 
 			char temptext[256];
-			strcpy(&temptext[0],name);
-			strcat(&temptext[0]," has added name to visitor book");
+			snprintf(temptext,sizeof(temptext),"%s has added name to visitor book",name);
 		}
 		else
 		{
@@ -2687,8 +2699,7 @@ void	DPlay::AddNameToVisitorsBook(char* name)
 			VisitorsBook->next=NULL;
 
 			char temptext[256];
-			strcpy(&temptext[0],name);
-			strcat(&temptext[0]," has added name to visitor book");
+			snprintf(temptext,sizeof(temptext),"%s has added name to visitor book",name);
 		}
 	}
 }
@@ -2797,7 +2808,7 @@ void	DPlay::SendUpdateToVisitorsBook(char* name,Bool status)
 	HRESULT res;
 
 	info.ID=status;
-	strcpy(info.Name,name);
+	strncpy(info.Name,name,20); info.Name[20]=0;
 	info.PacketID=PID_VISITORUPDATE;
 
 	res=lpDP4->Send(from,to,0,&info,sizeof(INITINFO));
@@ -3011,7 +3022,7 @@ Bool DPlay::AttemptToJoin()
 	pack.PacketID=PID_PASSWORD;
 	pack.PlayerID=myDPlayID;
 	strncpy(&pack.pword[0],&Password[0],10);
-	strcpy(&pack.name[0],&PlayerName[0]);
+	strncpy(&pack.name[0],&PlayerName[0],59); pack.name[59]=0;
 
 
 	res=lpDP4->Send(from,to,0,&pack,sizeof(PASSWORDPACK));
@@ -3167,7 +3178,6 @@ Bool	DPlay::UpdatePlayerInfo()
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 13May99 void	DPlay::SendMyPlayerInfo()
 bool	DPlay::SendMyPlayerInfo(bool request)
 {
 	UIPLAYERDATA pack;
@@ -3676,7 +3686,6 @@ void	DPlay::SendCSRequest()
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 23May99 void	DPlay::SendMyMessages()
 bool	DPlay::SendMyMessages(bool request)
 {
 	MESSAGEPACKET p;
@@ -3686,7 +3695,7 @@ bool	DPlay::SendMyMessages(bool request)
 
 	for (n=0;n<NUMRADIOMESSAGES;n++)
 	{
-		strcpy (p.messages[n],Messages[mySlot][n]);
+		strncpy(p.messages[n],Messages[mySlot][n],127); p.messages[n][127]=0;
 	}
 
 	if (request)
@@ -3732,7 +3741,7 @@ void	DPlay::ReceiveMessages(UByteP p,ULong from)
 	{
 		for (n=0;n<NUMRADIOMESSAGES;n++)
 		{
-			strcpy(Messages[slot][n],m->messages[n]);
+			strncpy(Messages[slot][n],m->messages[n],RADIOMESSAGELEN-1); Messages[slot][n][RADIOMESSAGELEN-1]=0;
 		}
 	}
 }
@@ -4901,8 +4910,8 @@ void	DPlay::ProcessRandomList(char* packet)
 //------------------------------------------------------------------------------
 void DPlay::AddChatMessageToBuffer(const char* name, const char* chat)
 {
-	strcpy(ChatBuffer.GetNext()->name,name);
-	strcpy(ChatBuffer.GetNext()->chat,chat);
+	strncpy(ChatBuffer.GetNext()->name,name,31); ChatBuffer.GetNext()->name[31]=0;
+	strncpy(ChatBuffer.GetNext()->chat,chat,127); ChatBuffer.GetNext()->chat[127]=0;
 
 	ChatBuffer.AddEntryAndUpdateNext();
 

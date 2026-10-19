@@ -139,7 +139,6 @@ bool	Sample::Init(WAVEFORMATEX* wavfileheader, int datasize)
 		dsbdesc.dwFlags |= DSBCAPS_CTRLVOLUME;					//RJS 12Jan00
 		dsbdesc.dwFlags |= DSBCAPS_CTRLFREQUENCY;				//RJS 12Jan00
 		dsbdesc.dwFlags |= DSBCAPS_CTRLPAN;						//RJS 12Jan00
-//DeadCode RJS 12Jan00 		dsbdesc.dwFlags |= DSBCAPS_CTRLDEFAULT ;	// allow control of vol, pan, freq
 	}
 
 
@@ -535,9 +534,6 @@ HRESULT	Sample::GetPosition(ULong& sampleposition)
 {
 	if (lpdsb)
 	{
-//DeadCode AMM 22Nov99 		ULong writepos;
-//DeadCode AMM 22Nov99 
-//DeadCode AMM 22Nov99 		return (lpdsb->GetCurrentPosition(&sampleposition, &writepos));
 
 // write pos can be NULL because we only want read pos
 

@@ -148,134 +148,6 @@ CSQuick1::CSQuick1(CWnd* pParent /*=NULL*/)
 
 void CSQuick1::MakeFlightCombo()
 {
-//DEADCODE RDH 18/01/00   CRCombo* combo;
-//DEADCODE RDH 18/01/00   CRCombo* combo2;
-//DEADCODE RDH 18/01/00   combo=GETDLGITEM(IDC_FLIGHTNUM);
-//DEADCODE RDH 18/01/00   combo2 = GETDLGITEM(IDC_ELTNUM);
-//DEADCODE RDH 18/01/00   CRStatic*   s=GETDLGITEM(IDC_RSTATICCTRL4);
-//DEADCODE RDH 18/01/00 
-//DEADCODE RDH 18/01/00 //DeadCode AMM 14Oct98   if (_DPlay.CurrPlayers != 0)
-//DEADCODE RDH 18/01/00   if (RFullPanelDial::incomms)									//AMM 14Oct98
-//DEADCODE RDH 18/01/00   {
-//DEADCODE RDH 18/01/00 	combo->ShowWindow(SW_HIDE);
-//DEADCODE RDH 18/01/00 	combo2->ShowWindow(SW_HIDE);
-//DEADCODE RDH 18/01/00 	s->ShowWindow(SW_HIDE);
-//DEADCODE RDH 18/01/00   }else
-//DEADCODE RDH 18/01/00   {
-//DEADCODE RDH 18/01/00   	combo->ShowWindow(SW_SHOW);
-//DEADCODE RDH 18/01/00   	combo2->ShowWindow(SW_SHOW);
-//DEADCODE RDH 18/01/00   	s->ShowWindow(SW_SHOW);
-//DEADCODE RDH 18/01/00 
-//DEADCODE RDH 18/01/00 
-//DEADCODE RDH 18/01/00 	//cockup recovery. If current player position illegal find a legal one!
-//DEADCODE RDH 18/01/00 	if (	nonplayer[quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].Duty()]
-//DEADCODE RDH 18/01/00 		||	quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].flights==0
-//DEADCODE RDH 18/01/00 		)
-//DEADCODE RDH 18/01/00 	{	//find lowest numbered group on this side first, but then that side
-//DEADCODE RDH 18/01/00 		bool gotone=false;
-//DEADCODE RDH 18/01/00 		for (int pls=1-quickdef.plside,tries=2;tries--;pls=1-pls)
-//DEADCODE RDH 18/01/00 			for (int w=8;w>=0;w--)
-//DEADCODE RDH 18/01/00 				for (int g=2;g>=0;g--)
-//DEADCODE RDH 18/01/00 					if (!gotone)
-//DEADCODE RDH 18/01/00 					if (quickdef.line[pls][w][g].flights && 
-//DEADCODE RDH 18/01/00 						!nonplayer[quickdef.line[pls][w][g].Duty()])
-//DEADCODE RDH 18/01/00 					{	//if zero flights then not flyable, even if it 'exists'
-//DEADCODE RDH 18/01/00 						quickdef.plside=pls;
-//DEADCODE RDH 18/01/00 						quickdef.plwave=w;
-//DEADCODE RDH 18/01/00 						quickdef.plgrp=g;
-//DEADCODE RDH 18/01/00 						gotone=true;
-//DEADCODE RDH 18/01/00 					}
-//DEADCODE RDH 18/01/00 		if (!gotone)
-//DEADCODE RDH 18/01/00 			INT3;
-//DEADCODE RDH 18/01/00 	}
-//DEADCODE RDH 18/01/00 	if (quickdef.plac/4>=quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].flights)
-//DEADCODE RDH 18/01/00 	{
-//DEADCODE RDH 18/01/00 		quickdef.plac%=4;
-//DEADCODE RDH 18/01/00 		quickdef.plac+=4*quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].flights;
-//DEADCODE RDH 18/01/00 		quickdef.plac-=4;
-//DEADCODE RDH 18/01/00 	}
-//DEADCODE RDH 18/01/00 
-//DEADCODE RDH 18/01/00 	//fills IDC_FLIGHTNUM & selects it & selects IDC_ELTNUM;
-//DEADCODE RDH 18/01/00 
-//DEADCODE RDH 18/01/00 	combo->Clear();
-//DEADCODE RDH 18/01/00 	int line=0;
-//DEADCODE RDH 18/01/00 	int pls=quickdef.plside;
-//DEADCODE RDH 18/01/00 	int ens=1-pls;
-//DEADCODE RDH 18/01/00 	//find an enemy flyable squadron...
-//DEADCODE RDH 18/01/00 	bool gotone=false;
-//DEADCODE RDH 18/01/00 	int w,g;
-//DEADCODE RDH 18/01/00 		for (w=7;w>=0;w--)
-//DEADCODE RDH 18/01/00 			for (g=2;g>=0;g--)
-//DEADCODE RDH 18/01/00 				if (!gotone)
-//DEADCODE RDH 18/01/00 				if (quickdef.line[ens][w][g].flights && 
-//DEADCODE RDH 18/01/00 					!nonplayer[quickdef.line[ens][w][g].Duty()])
-//DEADCODE RDH 18/01/00 				{	//if zero flights then not flyable, even if it 'exists'
-//DEADCODE RDH 18/01/00 					flightlines[0][0]=ens;
-//DEADCODE RDH 18/01/00 					flightlines[0][1]=w;
-//DEADCODE RDH 18/01/00 					flightlines[0][2]=g;
-//DEADCODE RDH 18/01/00 					flightlines[0][3]=-1;
-//DEADCODE RDH 18/01/00 					gotone=true;
-//DEADCODE RDH 18/01/00 				}
-//DEADCODE RDH 18/01/00 	if (gotone)
-//DEADCODE RDH 18/01/00 	{
-//DEADCODE RDH 18/01/00 	   if (ens)
-//DEADCODE RDH 18/01/00 			combo->AddString(RESSTRING(RED));
-//DEADCODE RDH 18/01/00 	   else
-//DEADCODE RDH 18/01/00 			combo->AddString(RESSTRING(UN));
-//DEADCODE RDH 18/01/00 	   line++;
-//DEADCODE RDH 18/01/00 	}
-//DEADCODE RDH 18/01/00 		
-//DEADCODE RDH 18/01/00 	CString myside=pls?RESSTRING(RED):RESSTRING(UN);
-//DEADCODE RDH 18/01/00 	for (w=0;w<8;w++)
-//DEADCODE RDH 18/01/00 		for(g=0;g<3;g++)
-//DEADCODE RDH 18/01/00 			if (quickdef.line[pls][w][g].flights && !nonplayer[quickdef.line[pls][w][g].Duty()])
-//DEADCODE RDH 18/01/00 				if (w!=quickdef.plwave || g!=quickdef.plgrp)
-//DEADCODE RDH 18/01/00 				{
-//DEADCODE RDH 18/01/00 					char buffer[30];
-//DEADCODE RDH 18/01/00 					combo->AddString(CSprintf("%s %s",myside,LoadResString(quickdef.line[pls][w][g].descID)));
-//DEADCODE RDH 18/01/00 					flightlines[line][0]=pls;
-//DEADCODE RDH 18/01/00 					flightlines[line][1]=w;
-//DEADCODE RDH 18/01/00 					flightlines[line][2]=g;
-//DEADCODE RDH 18/01/00 					flightlines[line][3]=-1;
-//DEADCODE RDH 18/01/00 					line++;
-//DEADCODE RDH 18/01/00 				}
-//DEADCODE RDH 18/01/00 				else
-//DEADCODE RDH 18/01/00 				{
-//DEADCODE RDH 18/01/00 					int plflst=line;
-//DEADCODE RDH 18/01/00 					int m=quickdef.line[pls][w][g].flights;
-//DEADCODE RDH 18/01/00 					for (int f=0;f<m;f++)
-//DEADCODE RDH 18/01/00 					{
-//DEADCODE RDH 18/01/00 						combo->AddString(CSprintf("%s %s %s %i",myside,LoadResString(quickdef.line[pls][w][g].descID),RESSTRING(FLIGHT),f+1));
-//DEADCODE RDH 18/01/00 						flightlines[line][0]=pls;
-//DEADCODE RDH 18/01/00 						flightlines[line][1]=w;
-//DEADCODE RDH 18/01/00 						flightlines[line][2]=g;
-//DEADCODE RDH 18/01/00 						flightlines[line][3]=f;
-//DEADCODE RDH 18/01/00 						line++;
-//DEADCODE RDH 18/01/00 					}
-//DEADCODE RDH 18/01/00 					combo->SetIndex(plflst+quickdef.plac/4);
-//DEADCODE RDH 18/01/00 				}
-//DEADCODE RDH 18/01/00 	combo=GETDLGITEM(IDC_ELTNUM);
-//DEADCODE RDH 18/01/00 ///    bool wassingle=(combo->GetListboxLength()==1);
-//DEADCODE RDH 18/01/00 	bool nowsingle=(	(quickdef.line[pls][quickdef.plwave][quickdef.plgrp].duty & QuickFields::QFD_MASK)
-//DEADCODE RDH 18/01/00 							==QuickFields::QFD_BRIT_LONE
-//DEADCODE RDH 18/01/00 					||	(quickdef.line[pls][quickdef.plwave][quickdef.plgrp].duty & QuickFields::QFD_MASK)
-//DEADCODE RDH 18/01/00 							==QuickFields::QFD_GERM_LONE
-//DEADCODE RDH 18/01/00 					);
-//DEADCODE RDH 18/01/00 	if (wassingle!=nowsingle)
-//DEADCODE RDH 18/01/00 		if (nowsingle)
-//DEADCODE RDH 18/01/00 		{
-//DEADCODE RDH 18/01/00 			quickdef.plac &=-4;
-//DEADCODE RDH 18/01/00 			combo->Clear()->RESCOMBO(ELTPOS_0,1);
-//DEADCODE RDH 18/01/00 			wassingle=true;
-//DEADCODE RDH 18/01/00 		}
-//DEADCODE RDH 18/01/00 		else
-//DEADCODE RDH 18/01/00 		{
-//DEADCODE RDH 18/01/00 			combo->Clear()->RESCOMBO(ELTPOS_0,4);
-//DEADCODE RDH 18/01/00 			wassingle=false;
-//DEADCODE RDH 18/01/00 		}
-//DEADCODE RDH 18/01/00 	GETDLGITEM(IDC_ELTNUM)->SetIndex(quickdef.plac%4);
-//DEADCODE RDH 18/01/00 
-//DEADCODE RDH 18/01/00   }
 }
 void CSQuick1::DoDataExchange(CDataExchange* pDX)
 {
@@ -363,16 +235,12 @@ BOOL CSQuick1::OnInitDialog()
 
 	RefreshMissionCombo();
 
-//DEADCODE RDH 18/01/00 	combo=GETDLGITEM(IDC_ELTNUM);
-//DEADCODE RDH 18/01/00 	combo->RESCOMBO(ELTPOS_0,4);
 	wassingle=false;
 	ReinitCombo();
 
 //	if (RFullPanelDial::incomms)
 	if (_DPlay.PlayerCreated)
 	{
-//DeadCode AMM 16Nov99 		_DPlay.SendInMissionBriefMessage();
-//DeadCode AMM 16Nov99 		DPlay::H2H_Player[_DPlay.mySlot].status=CPS_MISSIONBRIEF;
 		_DPlay.SendStatusChange(DPlay::CPS_MISSIONBRIEF);
 	}
 
@@ -437,13 +305,6 @@ void	CSQuick1::RefreshMissionCombo()
 	combo->Clear();
 
 //	combo->RESCOMBO(QUICK_1,20)->SetIndex(currquickmiss);
-//DeadCode AMM 12May99 	char i = 0;
-//DeadCode AMM 12May99 	while (quickmissions[i].missionname !=NULL)
-//DeadCode AMM 12May99 	{
-//DeadCode AMM 12May99 		combo->AddString(LoadResString(quickmissions[i].missionname));
-//DeadCode AMM 12May99 		i++;
-//DeadCode AMM 12May99 	}
-//DeadCode AMM 12May99 	combo->SetIndex(currquickmiss);
 
 	int i,j=0;
 	i = missionfamily[currquickfamily];
@@ -481,10 +342,6 @@ void	CSQuick1::RefreshMissionCombo()
 	}
 	if (misslistbackindex[currquickmiss]!=255)
 	{
-//DeadCode JIM 20Oct00  		for (int t=0; t<20;t++)
-//DeadCode JIM 20Oct00 		{
-//DeadCode JIM 20Oct00 			int r = misslistbackindex[t];
-//DeadCode JIM 20Oct00 		}
 		combo->SetIndex(misslistbackindex[currquickmiss]);
 	}
 	else
@@ -501,7 +358,6 @@ void	CSQuick1::RefreshMissionCombo()
 void	CSQuick1::ReinitCombo()
 {
 	quickdef.parent=this;
-//DEADCODE RDH 18/01/00 	MakeFlightCombo();
  	CRRadio*	pradio=GETDLGITEM(IDC_RRADIO);
  	pradio->SetCurrentSelection(0);
 
@@ -518,36 +374,6 @@ void	CSQuick1::ReinitCombo()
 		GETDLGITEM(IDC_DISABLEDEMO)->ShowWindow(SW_HIDE);
 	}
 
-//DEADCODE RDH 18/01/00 	CRCombo* combo;
-//DEADCODE RDH 18/01/00 	targtype=0,targentry=0;
-//DEADCODE RDH 18/01/00 	for (int t=0;t<4;t++)
-//DEADCODE RDH 18/01/00 		for (int e=0;e<4;e++)
-//DEADCODE RDH 18/01/00 			if(quickdef.targets[t][e]==quickdef.target)
-//DEADCODE RDH 18/01/00 				targtype=t,targentry=e;
-//DEADCODE RDH 18/01/00 	combo=GETDLGITEM(IDC_TARGTYPE);
-//DEADCODE RDH 18/01/00 	combo->Clear();
-//DEADCODE RDH 18/01/00 	combo->AddString(LoadResString(quickdef.targtypeIDs[0]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targtypeIDs[1])
-//DEADCODE RDH 18/01/00 		combo->AddString(LoadResString(quickdef.targtypeIDs[1]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targtypeIDs[2])
-//DEADCODE RDH 18/01/00 		combo->AddString(LoadResString(quickdef.targtypeIDs[2]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targtypeIDs[3])
-//DEADCODE RDH 18/01/00 		combo->AddString(LoadResString(quickdef.targtypeIDs[3]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targtypeIDs[0])
-//DEADCODE RDH 18/01/00 		combo->SetIndex(targtype);
-//DEADCODE RDH 18/01/00 	combo=GETDLGITEM(IDC_TARGNAME);
-//DEADCODE RDH 18/01/00 
-//DEADCODE RDH 18/01/00 	//may pull this off as subroutine:
-//DEADCODE RDH 18/01/00 	combo->Clear();
-//DEADCODE RDH 18/01/00 	combo->AddString(GetTargName(quickdef.targets[targtype][0]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targets[targtype][1])
-//DEADCODE RDH 18/01/00 	combo->AddString(GetTargName(quickdef.targets[targtype][1]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targets[targtype][2])
-//DEADCODE RDH 18/01/00 		combo->AddString(GetTargName(quickdef.targets[targtype][2]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targets[targtype][3])
-//DEADCODE RDH 18/01/00 		combo->AddString(GetTargName(quickdef.targets[targtype][3]));
-//DEADCODE RDH 18/01/00 	combo->SetIndex(targentry);
-//DEADCODE RDH 18/01/00 
 //	combo=GETDLGITEM(IDC_WEATHER);
 //	combo->Clear()->RESCOMBO(WEATHER_CLEAR,3)->SetIndex(quickdef.weather);
 //	combo=GetDlgItem(IDC_CLOUD);
@@ -583,45 +409,6 @@ END_EVENTSINK_MAP()
 
 void CSQuick1::OnTextChangedMisslists(LPCTSTR text, short index) 
 {
-//DEADCODE RDH 09/03/00 	// TODO: Add your control notification handler code here
-//DEADCODE RDH 09/03/00 	//actually need to shut everything down....
-//DEADCODE RDH 09/03/00 //DeadCode DAW 18May99 	currquickmiss=GETDLGITEM(IDC_MISSLISTS)->GetIndex();
-//DEADCODE RDH 09/03/00 	if (!RFullPanelDial::incomms)								//AMM 18May99
-//DEADCODE RDH 09/03/00 		currquickmiss=misslistindex[GETDLGITEM(IDC_MISSLISTS)->GetIndex()]; //DAW 03/02/00
-//DEADCODE RDH 09/03/00 	else														//AMM 18May99
-//DEADCODE RDH 09/03/00 	{															//AMM 18May99
-//DEADCODE RDH 09/03/00 		int i=0,j=0,index=GETDLGITEM(IDC_MISSLISTS)->GetIndex();
-//DEADCODE RDH 09/03/00 
-//DEADCODE RDH 09/03/00 		while (quickmissions[i].missionname !=NULL)
-//DEADCODE RDH 09/03/00 		{
-//DEADCODE RDH 09/03/00 			bool	missallowed;
-//DEADCODE RDH 09/03/00 
-//DEADCODE RDH 09/03/00 			missallowed=true;
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 			for (int s=0;s<2;s++)
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 				for (int w=0;w<8;w++)
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 					for (int g=0;g<4;g++)
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 						if (	(quickdef.line[s][w][g].duty & QuickFields::QFD_MASK) //DAW 03/02/00
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 									==QuickFields::QFD_BRIT_LONE
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 							||	(quickdef.line[s][w][g].duty & QuickFields::QFD_MASK) //DAW 03/02/00
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 									==QuickFields::QFD_GERM_LONE
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 							)
-//DEADCODE RDH 09/03/00 //TEMPCODE DAW 03/02/00 							missallowed=false;
-//DEADCODE RDH 09/03/00 
-//DEADCODE RDH 09/03/00 			if (missallowed)
-//DEADCODE RDH 09/03/00 			{
-//DEADCODE RDH 09/03/00 				misslistbackindex[i]=j;
-//DEADCODE RDH 09/03/00 				misslistindex[j]=i;
-//DEADCODE RDH 09/03/00 				j++;
-//DEADCODE RDH 09/03/00 				if (!index)
-//DEADCODE RDH 09/03/00 					break;
-//DEADCODE RDH 09/03/00 				index--;
-//DEADCODE RDH 09/03/00 			}
-//DEADCODE RDH 09/03/00 			else
-//DEADCODE RDH 09/03/00 				misslistbackindex[i]=255;
-//DEADCODE RDH 09/03/00 			i++;
-//DEADCODE RDH 09/03/00 		}
-//DEADCODE RDH 09/03/00 		currquickmiss=i;
-//DEADCODE RDH 09/03/00 	}
 	currquickmiss = misslistindex[index];
 	quickdef=quickmissions[currquickmiss];
 	if (RFullPanelDial::incomms)
@@ -629,7 +416,6 @@ void CSQuick1::OnTextChangedMisslists(LPCTSTR text, short index)
 		if (!_DPlay.Side)
 			quickdef.plside=1;
 	}
-//DeadCode JIM 12Jan99 	RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
 	ReinitCombo();
 	FullPanel()->QuickMissionDesc();							//JIM 12Jan99
 //	DestroyPanel();
@@ -637,7 +423,6 @@ void CSQuick1::OnTextChangedMisslists(LPCTSTR text, short index)
 //		fullscreen->LaunchScreen(&fullscreen->quickmission);
 //	else
 //		fullscreen->LaunchScreen(&fullscreen->commsquick);
-//DeadCode AMM 14Oct98   if (_DPlay.CurrPlayers == 0)
 //  if (!RFullPanelDial::incomms)									//AMM 14Oct98
 //		fullscreen->LaunchScreen(&fullscreen->quickmission);
 //	else
@@ -646,52 +431,14 @@ void CSQuick1::OnTextChangedMisslists(LPCTSTR text, short index)
 
 void CSQuick1::OnTextChangedFlightnum(LPCTSTR text, short Xindex) 
 {
-//DEADCODE RDH 18/01/00 	int index=GETDLGITEM(IDC_FLIGHTNUM)->GetIndex();
-//DEADCODE RDH 18/01/00 	//ok... this is easy, now... index into flightlines!
-//DEADCODE RDH 18/01/00 	if (	flightlines[index][0]!=quickdef.plside
-//DEADCODE RDH 18/01/00 		||	flightlines[index][1]!=quickdef.plwave
-//DEADCODE RDH 18/01/00 		||	flightlines[index][2]!=quickdef.plgrp
-//DEADCODE RDH 18/01/00 		)
-//DEADCODE RDH 18/01/00 	{
-//DEADCODE RDH 18/01/00 		quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].dialog->SetIconPressed(false);
-//DEADCODE RDH 18/01/00 		quickdef.plside=flightlines[index][0];
-//DEADCODE RDH 18/01/00 		quickdef.plwave=flightlines[index][1];
-//DEADCODE RDH 18/01/00 		quickdef.plgrp=flightlines[index][2];
-//DEADCODE RDH 18/01/00 		quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].dialog->SetIconPressed(true);
-//DEADCODE RDH 18/01/00 		if (quickdef.plac>=quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].flights*4)
-//DEADCODE RDH 18/01/00 			quickdef.plac=quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].flights*4
-//DEADCODE RDH 18/01/00 							-4+(quickdef.plac%4);
-//DEADCODE RDH 18/01/00 		MakeFlightCombo();
-//DEADCODE RDH 18/01/00 	}
-//DEADCODE RDH 18/01/00 	else
-//DEADCODE RDH 18/01/00 	{
-//DEADCODE RDH 18/01/00 		quickdef.plac=(quickdef.plac%4)+4*(flightlines[index][3]);
-//DEADCODE RDH 18/01/00 	}
 }
 
 void CSQuick1::OnTextChangedTargtype(LPCTSTR text, short index) 
 {
-//DEADCODE RDH 18/01/00 	// TODO: Add your control notification handler code here
-//DEADCODE RDH 18/01/00 	targtype=GETDLGITEM(IDC_TARGTYPE)->GetIndex();
-//DEADCODE RDH 18/01/00 	targentry=0;
-//DEADCODE RDH 18/01/00 	quickdef.target=quickdef.targets[targtype][targentry];
-//DEADCODE RDH 18/01/00 	CRCombo* combo;
-//DEADCODE RDH 18/01/00 	(combo=GETDLGITEM(IDC_TARGNAME))->Clear();
-//DEADCODE RDH 18/01/00 	//may pull this off as subroutine:
-//DEADCODE RDH 18/01/00 	combo->AddString(GetTargName(quickdef.targets[targtype][0]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targets[targtype][1])
-//DEADCODE RDH 18/01/00 	combo->AddString(GetTargName(quickdef.targets[targtype][1]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targets[targtype][2])
-//DEADCODE RDH 18/01/00 		combo->AddString(GetTargName(quickdef.targets[targtype][2]));
-//DEADCODE RDH 18/01/00 	if (quickdef.targets[targtype][3])
-//DEADCODE RDH 18/01/00 		combo->AddString(GetTargName(quickdef.targets[targtype][3]));
-//DEADCODE RDH 18/01/00 	combo->SetIndex(targentry);
 }
 
 void CSQuick1::OnTextChangedTargname(LPCTSTR text, short index) 
 {
-//DEADCODE RDH 18/01/00 	targentry=GETDLGITEM(IDC_TARGNAME)->GetIndex();
-//DEADCODE RDH 18/01/00 	quickdef.target=quickdef.targets[targtype][targentry];
 	
 }
 
@@ -720,10 +467,6 @@ int		QuickDef::SpareFlights(int squad)
 					rv-=line[s][w][g].flights;
 	if (rv>3)					//but only 1 squad right now
 		rv=CSQuick1::MaxFlights(PlaneTypeSelect(squad));					//MS 02/05/00
-//DEADCODE MS 02/05/00 	if (squad>=PT_GER_FLYABLE && rv>3)
-//DEADCODE MS 02/05/00 		rv=3;
-//DEADCODE MS 02/05/00 	elseif (rv>4)
-//DEADCODE MS 02/05/00 		rv=4;
 		
 	return rv;
 }
@@ -767,23 +510,6 @@ void CSQuick1::OnDestroy()
 	//Calc ac type and player slot number
 	//from quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp] &	 quickdef.plac
 	//to MMC.	playersquadron,playeracnum;
-//DeadCode JIM 20Oct00 	int plsquad=quickdef.line[quickdef.plside][quickdef.plwave][quickdef.plgrp].actype;
-//DeadCode JIM 20Oct00 	int plind=quickdef.plac;
-//DeadCode JIM 20Oct00 	int s = quickdef.plside;
-//DEADCODE MS 16/03/00 	for (int w=0;w<quickdef.plwave;w++)
-//DEADCODE MS 16/03/00 		for(int g=0;g<3;g++)
-//DEADCODE MS 16/03/00 				if (quickdef.line[s][w][g].actype==plsquad)
-//DEADCODE MS 16/03/00 					plind+=quickdef.line[s][w][g].flights*4;
-//DEADCODE MS 16/03/00 	for(int g=0;g<quickdef.plgrp;g++)
-//DEADCODE MS 16/03/00 		if (quickdef.line[s][w][g].actype==plsquad)
-//DEADCODE MS 16/03/00 			plind+=quickdef.line[s][w][g].flights*4;
-//DEADCODE MS 16/03/00 
-//DEADCODE MS 16/03/00 //DeadCode AMM 17Nov98  	if ( _DPlay.CurrPlayers == 0)
-//DEADCODE MS 16/03/00  	if ( !RFullPanelDial::incomms)								//JIM 12Jan99
-//DEADCODE MS 16/03/00 	{
-//DEADCODE MS 16/03/00 		MMC.playersquadron=plsquad;
-//DEADCODE MS 16/03/00 		MMC.playeracnum=plind;
-//DEADCODE MS 16/03/00 	}
 
 	_DPlay.UpdateMission=TRUE;
 

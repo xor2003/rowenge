@@ -65,7 +65,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 // RSpinButCtl.cpp : Implementation of the CRSpinButCtrl ActiveX Control class.
 
 #define F_COMMON
-//DeadCode RDH 28Feb99 #define F_SOUNDS
 #define F_BATTLE
 #include "stdafx.h"
 #include "RSpinBut.h"
@@ -283,7 +282,6 @@ char*	CRSpinButCtrl::GetCurrentText(char* currtext)
 {
 	if (m_SpinState == STATE_NORMAL)							//MS 01Apr99
 	{
-//DEADCODE RDH 29/10/99 //		ASSERT(m_list.GetCount()); // have at least one entry!
 		char	tempst[255] ;
 		if (m_list.GetCount())										  //RDH 29/10/99
 			strcpy(tempst, m_list.GetAt(m_list.FindIndex(m_index))) ;
@@ -573,18 +571,6 @@ void CRSpinButCtrl::OnTimer(UINT nIDEvent)
 			CWnd* parent;
 			parent=GetParent();
 
-//DeadCode RDH 28Feb99 		if (m_bGoingDown)
-//DeadCode RDH 28Feb99 		{
-//DeadCode RDH 28Feb99 			m_index--;
-//DeadCode RDH 28Feb99 			if (m_index<0)
-//DeadCode RDH 28Feb99 				m_index=0;
-//DeadCode RDH 28Feb99 		}
-//DeadCode RDH 28Feb99 		else
-//DeadCode RDH 28Feb99 		{
-//DeadCode RDH 28Feb99 			m_index++;
-//DeadCode RDH 28Feb99 			if (m_index>=m_list.GetCount())
-//DeadCode RDH 28Feb99 				m_index=m_list.GetCount()-1;
-//DeadCode RDH 28Feb99 		}
 			if (m_bGoingDown)
 			{
 				if (m_index >= 1)
@@ -611,10 +597,6 @@ void CRSpinButCtrl::OnTimer(UINT nIDEvent)
 				||
 				 	m_SpinState == STATE_PLAYERNEG)
 		{
-//Old_Code MS 01Apr99 			if(		m_SpinState == STATE_PRICE 
-//Old_Code MS 01Apr99 				||
-//Old_Code MS 01Apr99 					m_SpinState == STATE_PLAYERNEG)
-//Old_Code MS 01Apr99 				ResetStepSize() ;
 			if (m_bGoingDown)
 			{
 				m_CurrentValue -= m_Delta ;

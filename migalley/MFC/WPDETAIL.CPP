@@ -122,7 +122,6 @@ void WPDetail::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX,IDC_SDETAIL6,m_IDC_SDETAIL6);
 	DDX_Control(pDX,IDC_FUEL,m_IDC_FUEL);
 	DDX_Control(pDX,IDC_ALT,m_IDC_ALT);
-//DEADCODE RDH 16/02/99 	DDX_Control(pDX,IDC_ETA_ABS,m_IDC_ETA_ABS);
 	DDX_Control(pDX,IDC_NAME,m_IDC_NAME);
 	DDX_Control(pDX,IDC_PREV,m_IDC_PREV);
 	DDX_Control(pDX,IDC_NEXT,m_IDC_NEXT);
@@ -154,10 +153,6 @@ void WPDetail::ValidateEta()
 //		CREdit* edit;
 //		CString	buffer;
 
-//DEADCODE RDH 17/02/99 		edit=GETDLGITEM(IDC_ETA_ABS);
-//DEADCODE RDH 17/02/99 		buffer = edit->GetCaption();
-//DEADCODE RDH 17/02/99 
-//DEADCODE RDH 17/02/99 		Profile::ValidateTime(&buffer, packnum, wavenum);
 	}
 }
 void WPDetail::UpdateEtasAndFuel()
@@ -241,7 +236,6 @@ void WPDetail::RefreshEtasAndFuel()
 			sprintf(bufferrel,"-%02i:%02i",-t/60,-t%60);
 
 		CRStatic*   seta=GETDLGITEM(IDC_ETANONEDIT);
-//DEADCODE RDH 16/02/99 		CREdit* edit=GETDLGITEM(IDC_ETA_ABS);
 		CRSpinBut* spinbut;
 		spinbut=GETDLGITEM(IDC_RSPINETA);
 
@@ -250,13 +244,10 @@ void WPDetail::RefreshEtasAndFuel()
 
 		if (Todays_Packages[packnum][wavenum].targettime == w->etas)
 		{
-//DEADCODE RDH 16/02/99 			edit->ShowWindow(SW_SHOW);
 			spinbut->ShowWindow(SW_SHOW);
 			seta->ShowWindow(SW_HIDE);
-//DEADCODE RDH 16/02/99 			edit->SetWindowText(buffer);
 		}else
 		{
-//DEADCODE RDH 16/02/99 			edit->ShowWindow(SW_HIDE);
 			spinbut->ShowWindow(SW_HIDE);
 			seta->ShowWindow(SW_SHOW);
 			seta->SetString(buffer);
@@ -358,17 +349,6 @@ void WPDetail::RefreshData(int sender)
 						Save_Data.alt.mediumstepsize
 					)->SetIndex(altind);
 
-//DEADCODE RDH 25/04/99 			combo->AddString(RESSTRING(GROUND));
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 			if (LoadResString(IDS_SHORT_ALT_ABBR)[0]==LoadResString(IDS_M_SH)[0])
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 			{
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 				combo->MakeNumList(80,200,200);						  //RDH 19/03/99
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 				combo->SetIndex(w->World.Y/METRES200);
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 			}else
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 			{
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 				combo->MakeNumList(100,500,500);					  //RDH 19/03/99
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 				if (w->World.Y/FT_500 < 100)
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 					combo->SetIndex(w->World.Y/FT_500);
-//DEADCODE RDH 25/04/99 //DEADCODE DAW 25/04/99 			}
 			alt->SetString(CSprintf("%s, %s", RESSTRING(ALTITUDE), LoadResString(Save_Data.alt.mediumabbr)));
 
 			
@@ -408,16 +388,11 @@ void WPDetail::OnTextChangedAlt(LPCTSTR text)
 	w->World.Y=(combo->GetIndex()+Save_Data.alt.minstepcount)*Save_Data.alt.mediumstepsize
 	*Save_Data.alt.mediummm/10+1;
 
-//DEADCODE rdh 25/04/99 	if (LoadResString(IDS_SHORT_ALT_ABBR)[0]==LoadResString(IDS_M_SH)[0])
-//DEADCODE rdh 25/04/99 		w->World.Y=combo->GetIndex()*METRES200;
-//DEADCODE rdh 25/04/99 	else
-//DEADCODE rdh 25/04/99 		w->World.Y=combo->GetIndex()*FT_500;
 
 	Coords3D c=w->World;
 	if (w->target.Evaluate()!=ENABLE_COMPLEX_VAL)
 		c-=Persons2::ConvertPtrUID(UniqueID(w->target.Evaluate()));
 	w->position.RecalcDeltasToMatch(c);
-//DEADCODE DAW 17/06/99 	wplist->RefreshData(DATA);
 	Todays_Packages[packnum].CalcWPTimes(wavenum);
 	wplist->RefreshData(DATA);										  //DAW 17/06/99
 

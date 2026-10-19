@@ -74,7 +74,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //#include "mainevt.h"
 #include "currshp.h"
 
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"shapenum.g"
 #include 	"bfenum.h"
 #include 	"memain.h"
@@ -221,22 +220,6 @@ void __fastcall TGroundGroupForm::GG_StatusComboBoxChange(TObject *Sender)
 	}
 
 }
-//DeadCode RDH 19Feb98 //---------------------------------------------------------------------------
-//DeadCode RDH 19Feb98 int __fastcall TGroundGroupForm::GeneralFindShapes(int currshape)
-//DeadCode RDH 19Feb98 {
-//DeadCode RDH 19Feb98 	int i = 0;
-//DeadCode RDH 19Feb98 	int	shapeindex;
-//DeadCode RDH 19Feb98
-//DeadCode RDH 19Feb98 	while (AvailableShapes[i] != currshape)
-//DeadCode RDH 19Feb98
-//DeadCode RDH 19Feb98 	{
-//DeadCode RDH 19Feb98 		if ( (AvailableShapes[i] ==NULL) &&  (AvailableShapes[i+1] ==NULL))
-//DeadCode RDH 19Feb98 			break;
-//DeadCode RDH 19Feb98
-//DeadCode RDH 19Feb98 		i++;
-//DeadCode RDH 19Feb98 	}
-//DeadCode RDH 19Feb98 	return(TEXT_FLAKBRIT+i-1);
-//DeadCode RDH 19Feb98 }
 //---------------------------------------------------------------------------
 int __fastcall TGroundGroupForm::FindShapes(int currshape,int& groupindex,int shapepage)
 {

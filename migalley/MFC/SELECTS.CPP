@@ -183,18 +183,13 @@ void CSelectionResults::Redraw()
 			)
 		{
 			rlistbox->AddColumn(180);
-//DEADCODE RDH 26/04/99 			rlistbox->AddColumn(180);
 			rlistbox->AddColumn(100);
 			rlistbox->AddString(RESSTRING(DIRECTIVETARGET),0);
-//DEADCODE RDH 26/04/99 			rlistbox->AddString(RESSTRING(FROM),0);
-//DEADCODE RDH 26/04/99 			rlistbox->AddString(RESSTRING(TO),1);
 			rlistbox->AddString(RESSTRING(NOTES),1);
  			for (char i = 0; i < CComit_e::This->dir_ctrl.directives[directive].targets ;i++)	
 			{
 				if (CComit_e::This->dir_ctrl.directives[directive].missions[i].target != UID_NULL)
 		  			rlistbox->AddString(GetTargName(CComit_e::This->dir_ctrl.directives[directive].missions[i].target), 0);
-//DEADCODE RDH 26/04/99 				if (CComit_e::This->dir_ctrl.directives[directive].missions[i].suppliee != UID_NULL)
-//DEADCODE RDH 26/04/99 		  			rlistbox->AddString(GetTargName(CComit_e::This->dir_ctrl.directives[directive].missions[i].suppliee), 1);
 				if (CComit_e::This->dir_ctrl.directives[directive].missions[i].missionset)
 					rlistbox->AddString(LoadResString(IDS_L_ALPHASTRIKE + CComit_e::This->dir_ctrl.directives[directive].missions[i].profile),1);
 				else

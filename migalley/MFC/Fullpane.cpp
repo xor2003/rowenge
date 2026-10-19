@@ -172,25 +172,21 @@ FullScreen RFullPanelDial::introsmack=
 	{
 		{
 			FIL_NULL,
-//DEADCODE DAW 21/03/99 			{{320,74}},
 			{{0,70}},
 			0,0
 		},
 		{
 			FIL_NULL,
-//DEADCODE DAW 21/03/99 			{{80,234}},
 			{{0,70}},
 			0,0
 		},
 		{
 			FIL_NULL,
-//DEADCODE DAW 21/03/99 			{{192,218}},
 			{{0,70}},
 			0,0
 		},
 		{
 			FIL_NULL,
-//DEADCODE DAW 21/03/99 			{{320,346}},
 			{{0,70}},
 			0,0
 		},
@@ -207,25 +203,21 @@ FullScreen RFullPanelDial::credits=
 	{
 		{
 			FIL_NULL,
-//DEADCODE DAW 30/03/99 			{{0,0},{0,350}},
  			{{0,0},{100,50}},
 			0,200
 		},
 		{
 			FIL_NULL,
-//DEADCODE DAW 30/03/99 			{{0,0},{0,450}},
 			{{80,250},{80,10}},									  //JIM 15/06/99
 			0,200
 		},
 		{
 			FIL_NULL,
-//DEADCODE DAW 30/03/99 			{{0,0},{0,550}},
 			{{192,350},{200,100}},									  //JIM 15/06/99
 			0,200
 		},
 		{
 			FIL_NULL,
-//DEADCODE DAW 30/03/99 			{{0,0},{0,750}},
 			{{320,350},{300,100}},									  //JIM 15/06/99
 			0,300
 		},
@@ -264,12 +256,7 @@ FullScreen RFullPanelDial::demotitle=
 	{
 		{IDS_TITLE1,&options3d},
 		{ IDS_SINGLEPLAYER1, &quickmissionflight, &RFullPanelDial::SetUpHotShot },
-//DEADCODE JIM 11/07/99 		{IDS_TITLE2,&singleplayer},
-//DeadCode AMM 12Jul98 		{IDS_TITLE3,&selectservice},
-//DEADCODE JIM 11/07/99 		{IDS_TITLE3,&selectservice,StartComms},
-//DEADCODE JIM 11/07/99 		{IDS_LOADGAME,&loadgame},
 		{ IDS_TITLE5, &replayload, &RFullPanelDial::InitReplay },
-//DeadCode AMM 04Jan99 		{IDS_TITLE5,&replaysave,InitReplay},
 		{IDS_TITLE6,&credits},
 		{ IDS_TITLE7, NULL, &RFullPanelDial::ConfirmExit }
 	},
@@ -305,11 +292,9 @@ FullScreen RFullPanelDial::title=
 #ifndef	 MIG_DEMO_VER
 		{IDS_TITLE1,&options3d},
 		{IDS_TITLE2,&singleplayer},
-//DeadCode AMM 12Jul98 		{IDS_TITLE3,&selectservice},
 		{ IDS_TITLE3, &selectservice, &RFullPanelDial::StartComms },
 		{IDS_LOADGAME,&loadgame},
 		{ IDS_TITLE5, &replayload, &RFullPanelDial::InitReplay },
-//DeadCode AMM 04Jan99 		{IDS_TITLE5,&replaysave,InitReplay},
 		{IDS_TITLE6,&credits},
 #endif
 		{ IDS_TITLE7, NULL, &RFullPanelDial::ConfirmExit }
@@ -414,11 +399,9 @@ FullScreen RFullPanelDial::replayload=
 	FullScreen::Align::HORIZ,
 	{
 		{ IDS_QUICKMISSION1, &title, &RFullPanelDial::ReplayLoadBack },
-//DeadCode AMM 17Feb99 		{IDS_LOAD,NULL,ReplayLoad},
 		{ IDS_LOAD, &quickmissionflight, &RFullPanelDial::ReplayLoad },			//AMM 17Feb99
 //		{IDS_SAVE,NULL,ReplaySave},
 //		{IDS_VIEW,NULL,ReplayView},
-//DeadCode AMM 17Feb99 		{IDS_VIEW,&quickmissionflight,ReplayView},
 	},
 	&RFullPanelDial::ReplayLoadInit
 };
@@ -530,8 +513,6 @@ FullScreen RFullPanelDial::selectservice=
 	FullScreen::Align::HORIZ,
 	{
 		{ IDS_QUICKMISSION1, &title, &RFullPanelDial::CleanUpComms },
-//DeadCode AMM 12Jul98 		{IDS_SELECT,&selectsession},
-//DeadCode AMM 20Jan99 		{IDS_SELECT,&selectsession,GetSessions},
 		{ IDS_CREATEGAME, &multiplayer, &RFullPanelDial::CreateCommsGame },
 		{ IDS_JOINGAME, &selectsession, &RFullPanelDial::GetSessions },
 
@@ -574,9 +555,6 @@ FullScreen RFullPanelDial::selectsession=
 	FullScreen::Align::HORIZ,
 	{
 		{ IDS_QUICKMISSION1, &selectservice, &RFullPanelDial::ReInitCommsInterface },
-//DeadCode AMM 20Jan99 		{IDS_CREATEGAME,&multiplayer,CreateCommsGame},
-//DeadCode AMM 20Jan99 		{IDS_JOINGAME,&multiplayer,JoinCommsGame},
-//DeadCode AMM 20Jan99 //		{IDS_PREFERENCES9,&selectsession,RefreshSessions},
 		{ IDS_SELECT, &multiplayer, &RFullPanelDial::JoinCommsGame },
 	},
 	&RFullPanelDial::SelectSessionInit
@@ -762,10 +740,6 @@ FullScreen RFullPanelDial::radio=
 	{
 		{ IDS_CONTINUE, &readyroomhostmatch, &RFullPanelDial::SelectReadyRoomFromRadio },
 		{ IDS_RESETMSG, &radio, &RFullPanelDial::ResetMessages },
-//DeadCode AMM 17Nov98 		{IDS_QUICKMISSION1,&selectsession},
-//DeadCode AMM 17Nov98 		{IDS_LOADGAME,&quickmission},
-//DeadCode AMM 17Nov98 		{IDS_SCAMPAIGNSELECT7,&campaignselect},
-//DeadCode AMM 17Nov98 		{IDS_VISITORS,&visitorsbook},
 	},
 	&RFullPanelDial::RadioInit
 };
@@ -809,7 +783,6 @@ FullScreen RFullPanelDial::paintshop=
 	{
 		{ IDS_CONTINUE, &readyroomhostmatch, &RFullPanelDial::SelectReadyRoom },
 		{ IDS_VARIANTS, &variants, &RFullPanelDial::SelectRRVariants },
-//DeadCode DAW 27Jun99 		{IDS_VARIANTS,&variants},
 	},
 	&RFullPanelDial::PaintShopInit
 };
@@ -840,7 +813,6 @@ FullScreen RFullPanelDial::paintshop=
 //	},
 //	FullScreen::Align::HORIZ,
 //	{
-////DeadCode AMM 05Aug98 		{IDS_BACK,&multiplayer},
 //		{IDS_QUICKMISSION1,&title,CleanUpComms},
 //		{IDS_FRAG,&singlefrag, PrepareForFrag},
 //		{IDS_FLY,&quickmission,CommsSelectFly},
@@ -1006,7 +978,6 @@ FullScreen RFullPanelDial::readyroomhostcampaign=
 //		{IDS_FLY,&quickmission,CommsSelectFly},
 		{IDS_VISITORS,&visitorsbook},
 		{IDS_RADIO,&radio},
-//DeadCode AMM 04Jan99 		{IDS_MAP,&paintshop},
 		{ IDS_MAP, &paintshop, &RFullPanelDial::ReturnToMap },
 		{IDS_CPS_PREFS,&options3d},
 
@@ -1021,8 +992,6 @@ FullScreen RFullPanelDial::readyroomguestcampaign=
 		{ IDS_TITLE7, &title, &RFullPanelDial::CleanUpComms },
 		{IDS_FRAG,&commsfrag},
 		{IDS_RADIO,&radio},
-//DeadCode AMM 04Jan99 		{IDS_MAP,&paintshop},
-//DeadCode AMM 18Feb99 		{IDS_MAP,&paintshop,ReturnToMap},
 		{IDS_CPS_PREFS,&options3d},
 	},
 	&RFullPanelDial::ReadyRoomInit
@@ -1244,7 +1213,6 @@ FullScreen RFullPanelDial::endcamp=
 	MAPSPECIALLAYOUT,
 	FullScreen::Align::HORIZ,
 	{
-//DEADCODE AMM 16/05/99 		{IDS_TITLE7,&singleplayer},
 		{ IDS_TITLE7, &singleplayer, &RFullPanelDial::CleanUpComms }, //AMM 16/05/99
 	},
 	&RFullPanelDial::EndCampInit
@@ -1254,7 +1222,6 @@ FullScreen RFullPanelDial::deadpilot=
 	MAPSPECIALLAYOUT,
 	FullScreen::Align::HORIZ,
 	{
-//DEADCODE AMM 16/05/99 		{IDS_TITLE7,&singleplayer},
 		{ IDS_TITLE7, &singleplayer, &RFullPanelDial::CleanUpComms },  //AMM 16/05/99
 		{ IDS_CONTINUE, NULL, &RFullPanelDial::ContinueAlthoughDead },
 		{ IDS_LOADGAME, NULL, &RFullPanelDial::ReloadBecauseDead },
@@ -1382,7 +1349,6 @@ FullScreen RFullPanelDial::quickmission=
 	{
 		{ IDS_QUICKMISSION1, &singleplayer, &RFullPanelDial::CheckForDemo },
 		{IDS_VARIANTS,&variants},
-//DeadCode DAW 09Jul99 		{IDS_QUICKMISSION2,&quickmissiondebrief},
 		{IDS_QUICKMISSION3,&quickmissionflight}
 	},
 	&RFullPanelDial::QuickMissionInit
@@ -2683,7 +2649,7 @@ bool RFullPanelDial::OnFlyingClosed(RDialog*,int rv)
 	{
 		if (!_Replay.RestorePosition)							//AMM 18Feb99
 		{														//AMM 18Feb99
-			strcpy(_Replay.pfilename,Save_Data.lastreplayname);	//AMM 18Feb99
+			strncpy(_Replay.pfilename,Save_Data.lastreplayname,255); _Replay.pfilename[255]=0;	//AMM 18Feb99
 		}														//AMM 18Feb99
 
 		in3d=false;
@@ -3038,7 +3004,7 @@ Bool RFullPanelDial::ReplayLoadInit()
 
 	CString	wildcard="*.cam";
 	selectedfile=Save_Data.lastreplayname;
-	strcpy(_Replay.pfilename,selectedfile);
+	strncpy(_Replay.pfilename,selectedfile,255); _Replay.pfilename[255]=0;
 
 	LaunchDial(new	CLoad(IDD_SREPLAY,LSD_LOAD,	FIL_VIDEOS_START_DIR,wildcard,selectedfile),0);
 
@@ -4537,20 +4503,20 @@ void	DPlay::SaveRadioMessages()
 void	Replay::GetReplayFilename(char* buff)
 {
 	char buffer[50];
-	strcpy(buffer,buff);
+	strncpy(buffer,buff,sizeof(buffer)-1); buffer[sizeof(buffer)-1]=0;
 	File_Man.namenumberedfile(File_Man.fakefile(FIL_VIDEOS_START_DIR,buffer),buff);
 }
 
 void	DPlay::GetCommsSavename(char* buff)
 {
 	char buffer[50];
-	strcpy(buffer,buff);
+	strncpy(buffer,buff,sizeof(buffer)-1); buffer[sizeof(buffer)-1]=0;
 	File_Man.namenumberedfile(File_Man.fakefile(FIL_SAVEGAMEDIR,buffer),buff);
 }
 
 void	DPlay::GetLastSaveName(char* buff)
 {
-	strcpy(buff,Save_Data.lastsavegame);
+	strncpy(buff,Save_Data.lastsavegame,149); buff[149]=0;
 }
 
 #ifndef	MIG_DEMO_VER

@@ -80,7 +80,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //#include <vcl\vcl.h>
 //---------------------------------------------------------------------------
 #include	"dosdefs.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"myerror.h"
 #include	"worldinc.h"
 #include	"missman2.h"

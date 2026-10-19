@@ -240,57 +240,57 @@ void CRadio::OnOK()
 
 	if (m_IDCX_PLAYERMESSAGE1.m_hWnd)
 	{
-	   m_IDCX_PLAYERMESSAGE1.GetWindowText(buffer);	strcpy(_DPlay.Messages[_DPlay.mySlot][0],buffer);
-	   m_IDCX_PLAYERMESSAGE2.GetWindowText(buffer);	strcpy(_DPlay.Messages[_DPlay.mySlot][1],buffer);
-	   m_IDCX_PLAYERMESSAGE3.GetWindowText(buffer);	strcpy(_DPlay.Messages[_DPlay.mySlot][2],buffer);
-	   m_IDCX_PLAYERMESSAGE4.GetWindowText(buffer);	strcpy(_DPlay.Messages[_DPlay.mySlot][3],buffer);
-	   m_IDCX_PLAYERMESSAGE5.GetWindowText(buffer);	strcpy(_DPlay.Messages[_DPlay.mySlot][4],buffer);
-	   m_IDCX_PLAYERMESSAGE6.GetWindowText(buffer);	strcpy(_DPlay.Messages[_DPlay.mySlot][5],buffer);
-	   m_IDCX_PLAYERMESSAGE7.GetWindowText(buffer);	strcpy(_DPlay.Messages[_DPlay.mySlot][6],buffer);
-	   m_IDCX_PLAYERMESSAGE8.GetWindowText(buffer);	strcpy(_DPlay.Messages[_DPlay.mySlot][7],buffer);
+	   m_IDCX_PLAYERMESSAGE1.GetWindowText(buffer);	strncpy(_DPlay.Messages[_DPlay.mySlot][0],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][0][RADIOMESSAGELEN-1]=0;
+	   m_IDCX_PLAYERMESSAGE2.GetWindowText(buffer);	strncpy(_DPlay.Messages[_DPlay.mySlot][1],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][1][RADIOMESSAGELEN-1]=0;
+	   m_IDCX_PLAYERMESSAGE3.GetWindowText(buffer);	strncpy(_DPlay.Messages[_DPlay.mySlot][2],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][2][RADIOMESSAGELEN-1]=0;
+	   m_IDCX_PLAYERMESSAGE4.GetWindowText(buffer);	strncpy(_DPlay.Messages[_DPlay.mySlot][3],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][3][RADIOMESSAGELEN-1]=0;
+	   m_IDCX_PLAYERMESSAGE5.GetWindowText(buffer);	strncpy(_DPlay.Messages[_DPlay.mySlot][4],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][4][RADIOMESSAGELEN-1]=0;
+	   m_IDCX_PLAYERMESSAGE6.GetWindowText(buffer);	strncpy(_DPlay.Messages[_DPlay.mySlot][5],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][5][RADIOMESSAGELEN-1]=0;
+	   m_IDCX_PLAYERMESSAGE7.GetWindowText(buffer);	strncpy(_DPlay.Messages[_DPlay.mySlot][6],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][6][RADIOMESSAGELEN-1]=0;
+	   m_IDCX_PLAYERMESSAGE8.GetWindowText(buffer);	strncpy(_DPlay.Messages[_DPlay.mySlot][7],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][7][RADIOMESSAGELEN-1]=0;
 
 	}
 	else
 	{
 		editbox=GetDlgItem(IDC_PLAYERMESSAGE1);
 		buffer = editbox->GetCaption();
-		strcpy(_DPlay.Messages[_DPlay.mySlot][0],buffer);
+		strncpy(_DPlay.Messages[_DPlay.mySlot][0],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][0][RADIOMESSAGELEN-1]=0;
 
 		editbox=GetDlgItem(IDC_PLAYERMESSAGE2);
 		buffer = editbox->GetCaption();
-		strcpy(_DPlay.Messages[_DPlay.mySlot][1],buffer);
+		strncpy(_DPlay.Messages[_DPlay.mySlot][1],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][1][RADIOMESSAGELEN-1]=0;
 
 		editbox=GetDlgItem(IDC_PLAYERMESSAGE3);
 		buffer = editbox->GetCaption();
-		strcpy(_DPlay.Messages[_DPlay.mySlot][2],buffer);
+		strncpy(_DPlay.Messages[_DPlay.mySlot][2],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][2][RADIOMESSAGELEN-1]=0;
 
 		editbox=GetDlgItem(IDC_PLAYERMESSAGE4);
 		buffer = editbox->GetCaption();
-		strcpy(_DPlay.Messages[_DPlay.mySlot][3],buffer);
+		strncpy(_DPlay.Messages[_DPlay.mySlot][3],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][3][RADIOMESSAGELEN-1]=0;
 
 		editbox=GetDlgItem(IDC_PLAYERMESSAGE5);
 		buffer = editbox->GetCaption();
-		strcpy(_DPlay.Messages[_DPlay.mySlot][4],buffer);
+		strncpy(_DPlay.Messages[_DPlay.mySlot][4],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][4][RADIOMESSAGELEN-1]=0;
 
 		editbox=GetDlgItem(IDC_PLAYERMESSAGE6);
 		buffer = editbox->GetCaption();
-		strcpy(_DPlay.Messages[_DPlay.mySlot][5],buffer);
+		strncpy(_DPlay.Messages[_DPlay.mySlot][5],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][5][RADIOMESSAGELEN-1]=0;
 
 		editbox=GetDlgItem(IDC_PLAYERMESSAGE7);
 		buffer = editbox->GetCaption();
-		strcpy(_DPlay.Messages[_DPlay.mySlot][6],buffer);
+		strncpy(_DPlay.Messages[_DPlay.mySlot][6],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][6][RADIOMESSAGELEN-1]=0;
 
 		editbox=GetDlgItem(IDC_PLAYERMESSAGE8);
 		buffer = editbox->GetCaption();
-		strcpy(_DPlay.Messages[_DPlay.mySlot][7],buffer);
+		strncpy(_DPlay.Messages[_DPlay.mySlot][7],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][7][RADIOMESSAGELEN-1]=0;
 	}
 //	editbox=GetDlgItem(IDC_PLAYERMESSAGE9);
 //	buffer = editbox->GetCaption();
-//	strcpy(_DPlay.Messages[_DPlay.mySlot][8],buffer);
+//	strncpy(_DPlay.Messages[_DPlay.mySlot][8],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][8][RADIOMESSAGELEN-1]=0;
 
 //	editbox=GetDlgItem(IDC_PLAYERMESSAGE10);
 //	buffer = editbox->GetCaption();
-//	strcpy(_DPlay.Messages[_DPlay.mySlot][9],buffer);
+//	strncpy(_DPlay.Messages[_DPlay.mySlot][9],buffer,RADIOMESSAGELEN-1); _DPlay.Messages[_DPlay.mySlot][9][RADIOMESSAGELEN-1]=0;
 	_DPlay.SaveRadioMessages();
 }
 void CRadio::OnDestroy() 
@@ -321,8 +321,11 @@ void CRadio::OnTextChangedPlayermessage10(LPTSTR text)
 
 void	DPlay::InitMessages()
 {
-	for (int n=0;n<NUMRADIOMESSAGES;n++)
-		strcpy(Messages[mySlot][n],RESSTRING(L_RADIOMSG0+n));
+		for (int n=0;n<NUMRADIOMESSAGES;n++)
+		{
+			strncpy(Messages[mySlot][n],RESSTRING(L_RADIOMSG0+n),RADIOMESSAGELEN-1);
+			Messages[mySlot][n][RADIOMESSAGELEN-1]=0;
+		}
 }
 
 void CRadio::OnTextChangedPlayermessage1(LPTSTR text) 

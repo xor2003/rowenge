@@ -91,7 +91,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "monotxt.h"
 #include "cstring.h"
 
-//DEADCODE MS 02/02/00 #include	<initguid.h>
 
 #include	"sw_force.h"	//standard header, but all the functions are inline
 
@@ -151,19 +150,9 @@ CON		Analogue::Analogue()
 						axisbases[i]=
 							0;
 		tune[i].aliased=0;
-//DeadCode CSB 22Aug00 		tune[i].hreverse=false;
 	}
 
-//DeadCode CSB 17Aug00 	FFpush.level=
-//DeadCode CSB 17Aug00 		FFstiff.level=
-//DeadCode CSB 17Aug00 		FFshake.level=
-//DeadCode CSB 17Aug00 		FFdamp.level=3;
 
-//DEADCODE JIM 19/06/00 	FF_gun=
-//DEADCODE JIM 19/06/00 		FF_buffet=
-//DEADCODE JIM 19/06/00 			FF_aerodynamic=
-//DEADCODE JIM 19/06/00 				FF_airframe=
-//DEADCODE JIM 19/06/00 					0;		  //RDH 29/11/99
 
 	FF_gun         = 0;
 	FF_buffet      = 0;
@@ -194,7 +183,6 @@ CON		Analogue::Analogue()
 //------------------------------------------------------------------------------
 DES		Analogue::~Analogue()
 {
-//DeadCode DAW 04Apr96 	INT3();
 	CloseDown();
 }
 
@@ -302,8 +290,6 @@ static	BOOL CALLBACK DIEnumDeviceObjectsProc(LPCDIDEVICEOBJECTINSTANCE ddoi,LPVO
 			dataobjects[objectcount].dwFlags=0;
 			if (DIDFT_GETTYPE(ddoi->dwType)==DIDFT_RELAXIS)	   //MOUSE AXES
 			{
-//DeadCode AMM 07Dec99 				_Analogue.axisbases[dev->axismaps[axiscount]]=0x80000000;
-//DeadCode AMM 07Dec99 				_Analogue.axisscales[dev->axismaps[axiscount]]=256*100;
 				if (_Analogue.mouseusesabsolute)
 					dataobjects[objectcount].dwOfs=AX_FLAG_AXIS+(transaxis<<2);
 				else
@@ -406,17 +392,14 @@ void	Analogue::ResetF5()
 //////////////////////////////////////////////////////////////////////
 Bool	Analogue::Initialise(intptr_t HWNDw,intptr_t HINSTANCEi,AllowAliasing mousemode,AllowAliasing aliasingmode, bool reinit)
 {
-//DeadCode JIM 2Nov00 	(*(UByte*)0xB0000)++;
 	CloseDown();												//JIM 15Sep100
 	forcedevicerestart=false;
-//DeadCode JIM 15Sep00 	usingMouseToPan=false;
 	curraliasingmode=aliasingmode;
 	currUIaliasingmode=mousemode;
 	{for (int i=0;i<MAXFORCEAXES;i++)	   ForceAxes[i]=NULL;}
 	{for (int i=0;i<AU_MAX;i++)	   {axisdeltas[i]=0;tune[i].allowmouseresetF5=tune[i].discardnegative=false;}}
 
 	HWND w=(HWND)HWNDw;
-//DeadCode JIM 20Oct00 	HINSTANCE i=(HINSTANCE)HINSTANCEi;
 	DIdev=Master_3d.g_lpDI;
 //	DirectInputCreate(i,DIRECTINPUT_VERSION,&DIdev,NULL);
 	if (runtimedevices[0].devid.Data1==0)
@@ -426,22 +409,6 @@ Bool	Analogue::Initialise(intptr_t HWNDw,intptr_t HINSTANCEi,AllowAliasing mouse
 		SController::SetAxisConfig(false,false);
 //##		runtimedevices[0].useff=true;
 	}
-//DeadCode JIM 7Sep00 	if (!reinit)														//AMM 19/05/00
-//DeadCode JIM 7Sep00 	{
-//DeadCode JIM 7Sep00 		bool backup;
-//DeadCode JIM 7Sep00 		SController::BuildEnumerationTables();
-//DeadCode JIM 7Sep00 		backup=SController::GetAxisConfig(true);			//fn used on config screen to set defaults
-//DeadCode JIM 7Sep00 //DeadCode AMM 21Feb100 		SController::SetAxisConfig();
-//DeadCode JIM 7Sep00 		SController::SetAxisConfig(false,false);	//mshift,false);//jshift);
-//DeadCode JIM 7Sep00 
-//DeadCode JIM 7Sep00 //DeadCode JIM 4Sep00 		if (backup)
-//DeadCode JIM 7Sep00 //DeadCode JIM 4Sep00 			BackupAllDeviceAxes();
-//DeadCode JIM 7Sep00 //##		runtimedevices[0].useff=true;
-//DeadCode JIM 7Sep00 	}
-//DeadCode JIM 7Sep00 	else
-//DeadCode JIM 7Sep00 	{
-//DeadCode JIM 7Sep00 		SController::SetAxisConfig(false,false);	//mshift,false);//jshift);
-//DeadCode JIM 7Sep00 	}
 	FFdevice=NULL;
 	int gotprimdevs=0;
 	int secdevscount=2;
@@ -570,7 +537,6 @@ Bool	Analogue::Initialise(intptr_t HWNDw,intptr_t HINSTANCEi,AllowAliasing mouse
 				runtimedevices[devnum].dev2->GetDeviceState(AX_TABLE_SIZE,buffer);
 
 
-//DeadCode JIM 20Oct00 				int i=4;
 			}
 		}
 	}
@@ -589,7 +555,6 @@ Bool	Analogue::Initialise(intptr_t HWNDw,intptr_t HINSTANCEi,AllowAliasing mouse
 	}
 	readytopoll=true;
 
-//DeadCode  AMM 10Aug00 	usingMouseToPan = false;
 
 	SetDeviceAxisFlags();
 
@@ -788,7 +753,6 @@ void	Analogue::PollPosition()
 		breakif (!numelts);
 			for (DIDEVICEOBJECTDATA* datum=readings;numelts;datum++,numelts--)
 			{
-//DeadCode JIM 2Nov00 				Mono_Text.Print(datum->dwOfs,(UByte*)"Read");
 				if (datum->dwOfs>=AX_FLAG_RELAXIS)
 				{
 					int theaxis=(datum->dwOfs-AX_FLAG_RELAXIS)>>2;
@@ -807,15 +771,8 @@ void	Analogue::PollPosition()
 									mouseusesabsolute=true;
 									forcedevicerestart=true;
 								}
-//DeadCode JIM 18Oct00 								if (axisbases[theaxis]>>16!=axisbases[theaxis]>>24)
-//DeadCode JIM 18Oct00 									INT3;
 								axisbases[theaxis]+=(SWord)datum->dwData;
-//DeadCode JIM 18Oct00 								if (axisbases[theaxis]>>16!=axisbases[theaxis]>>24)
-//DeadCode JIM 18Oct00 									INT3;
-//DeadCode CSB 11Sep00 								Mono_Text.PrintHexAt(0,theaxis,datum->dwData,8);
-//DeadCode CSB 11Sep00 								Mono_Text.PrintHexAt(10,theaxis,axisbases[theaxis],8);
 								int newval=MULSHSIN(axisbases[theaxis],axisscales[theaxis],8);
-//DeadCode CSB 11Sep00 								Mono_Text.PrintHexAt(20,theaxis,newval,8);
 								if (tune[theaxis].discardnegative && newval<0)
 								{
 									newval=0;
@@ -864,7 +821,6 @@ void	Analogue::PollPosition()
 								newval=0-0x7fff;
 							if (newval>0x7fff)
 								newval=0X7FFF;
-	//DEADCODE RDH 20/05/99 						Mono_Text.PrintHexAt(theaxis,theaxis,newval,4);
 							if (tune[theaxis].deadzones && tune[theaxis].mode>=AM_LOW && tune[theaxis].mode<=AM_HIGH)					//CSB 21Aug00
 							{											//CSB 21Aug00
 								//quick bit of deadzone code:
@@ -918,12 +874,6 @@ void	Analogue::PollPosition()
 					}
 					int axis=(datum->dwOfs-AX_FLAG_HATASAXIS)>>2;	  //JIM 09/02/00
 					dx*=axisscales[axis];dy*=axisscales[axis+1];
-//DeadCode JIM 10Nov00 					if (datum->dwOfs-AX_FLAG_HATASAXIS!=AU_UI_X)
-//DeadCode JIM 10Nov00 						if (dx==0 && dy==0)
-//DeadCode JIM 10Nov00 						{
-//DeadCode JIM 10Nov00 							dx=UWord(-0.2*axisdeltas[axis])+0x0A0000;	  
-//DeadCode JIM 10Nov00 							dy=UWord(-0.2*axisdeltas[axis+1])+0x0A0000;
-//DeadCode JIM 10Nov00 						}
 					axisdeltas[axis]=dx;
 					axisdeltas[axis+1]=dy;
 				}
@@ -966,13 +916,6 @@ void	Analogue::PollPosition()
 				axisvalues[i]=-32767;
 			else
 			{
-//DeadCode JIM 10Nov00 				if ((axisdeltas[i]&0x0f0000)==0x0A0000)	//unique flag (I hope)
-//DeadCode JIM 10Nov00 				{
-//DeadCode JIM 10Nov00 					if (((SWord)axisvalues[i]<0)==(j>=0))
-//DeadCode JIM 10Nov00 					{
-//DeadCode JIM 10Nov00 						axisdeltas[i]=j=0;
-//DeadCode JIM 10Nov00 					}
-//DeadCode JIM 10Nov00 				};
 				axisvalues[i]=j;
 			}
 
@@ -1013,23 +956,16 @@ void	FF_Push::Init(IDirectInputDevice2A* d)
 {
 	triggerX=triggerZ=false;MX=MZ=0x8000;durationX=durationZ=0;
 	dev=d;
-	if (pForceX)  pForceX->Release();	pForceX=NULL;
-	if (pForceY)  pForceY->Release();	pForceY=NULL;
+	if (pForceX)  pForceX->Release();
+	pForceX=NULL;
+	if (pForceY)  pForceY->Release();
+	pForceY=NULL;
 	if (dev)
 	{
 		SWFF_CreateRawAxisForceEffect(dev,&pForceX,0,X_AXIS);
 		SWFF_CreateRawAxisForceEffect(dev,&pForceY,0,Y_AXIS);
 		pForceX->Start(1,0);
 		pForceY->Start(1,0);
-//DEADCODE DAW 06/05/99 	Set(30000,30000,10);
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Set(-30000,-30000,10);
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Set(0,0,1);
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Poll();
 	}
 
 }
@@ -1074,10 +1010,6 @@ bool	FF_Push::Poll()
 		MZ=0;
 	if (triggerX)
 	{
-//DeadCode CSB 17Aug00 		int tM=MX*0.25*0.33*level;
-//DeadCode CSB 17Aug00 		if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 		if (tM<-10000)	tM=-10000 ;
-//DeadCode CSB 17Aug00 		SWFF_ChangeRawAxisForceEffect(pForceX,tM);
 		if (pForceX)		SWFF_ChangeRawAxisForceEffect(pForceX, MX);						//CSB 17Aug00
 		if (pForceX)		pForceX->Start(1,0);
 
@@ -1086,10 +1018,6 @@ bool	FF_Push::Poll()
 	}
 //	if (triggerZ)	//must be!
 //	{
-//DeadCode CSB 17Aug00 		int tM=MZ*0.25*0.33*level;
-//DeadCode CSB 17Aug00 		if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 		if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 		SWFF_ChangeRawAxisForceEffect(pForceY,tM);
 		if (pForceY)		SWFF_ChangeRawAxisForceEffect(pForceY, MZ);						//CSB 17Aug00
 		if (pForceY)		pForceY->Start(1,0);
 		triggerZ=false;
@@ -1161,25 +1089,13 @@ void	FF_Stiff::Init(IDirectInputDevice2A* d)
 			pStiffX->Start(1,0);
 			pStiffY->Start(1,0);
 		}
-//DEADCODE DAW 06/05/99 		SetX(25000,30000);
-//DEADCODE DAW 06/05/99 		SetZ(25000,30000);
-//DEADCODE DAW 06/05/99 		Poll();
-//DEADCODE DAW 06/05/99 		Poll();
 	}
 }
 bool	FF_Stiff::Poll()
 {
 	if (!trigger)	return false;
-//DeadCode CSB 17Aug00 	int tM=SX*0.33*0.33*level;
-//DeadCode CSB 17Aug00 	if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 	if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 	SWFF_ChangeAxisCenter(pStiffX,tM,CX/3);
 	if (pStiffX)		SWFF_ChangeAxisCenter(pStiffX, SX, CX/3);
 	if (pStiffX)		pStiffX->Start(1,0);
-//DeadCode CSB 17Aug00 		tM=SZ*0.33*0.33*level;
-//DeadCode CSB 17Aug00 	if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 	if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 	SWFF_ChangeAxisCenter(pStiffY,tM,CZ/3);
 	if (pStiffY)		SWFF_ChangeAxisCenter(pStiffY, SZ, CZ/3);
 	if (pStiffY)		pStiffY->Start(1,0);
 	trigger=false;
@@ -1245,26 +1161,13 @@ void	FF_Damp::Init(IDirectInputDevice2A* d)
 			pDampX->Start(1,0);
 			pDampY->Start(1,0);
 		}
-//DEADCODE DAW 06/05/99 		SetX(25000,30000);
-//DEADCODE DAW 06/05/99 		SetZ(25000,30000);
-//DEADCODE DAW 06/05/99 		Poll();
-//DEADCODE DAW 06/05/99 		Poll();
 	}
 }
 bool	FF_Damp::Poll()
 {
 	if (!trigger)	return false;
-//DeadCode CSB 17Aug00 	int tM=MX*0.33*0.33*level;
-//DeadCode CSB 17Aug00 	if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 	if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 	SWFF_ChangeAxisDamping(pDampX,MX);
 	if (pDampX)		SWFF_ChangeAxisDamping(pDampX, MX);
 	if (pDampX)		pDampX->Start(1,0);
-//DeadCode CSB 17Aug00 		tM=MZ*0.33*0.33*level;
-//DeadCode CSB 17Aug00 	if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 	if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 
-//DeadCode CSB 17Aug00 	SWFF_ChangeAxisDamping(pDampY,tM);
 	if (pDampY)		SWFF_ChangeAxisDamping(pDampY, MZ);
 	if (pDampY)		pDampY->Start(1,0);
 	trigger=false;
@@ -1294,10 +1197,6 @@ bool	FF_Shake::Set(SWord mx,SWord mz,SWord fx,SWord fz,bool rnd)
 
 bool	FF_Shake::SetX(SWord mx,SWord fx,bool rnd)
 {
-//DEADCODE RDH 23/05/99 	long qMX = mx;
-//DEADCODE RDH 23/05/99 	long qFX = fx;
-//DEADCODE RDH 23/05/99 	Mono_Text.PrintAt(5, 5, qMX, UByteP("M X "));
-//DEADCODE RDH 23/05/99 	Mono_Text.PrintAt(5, 6, qFX, UByteP("F X "));
 	if (MX==mx && FX==fx && randomX==rnd)
 		return false;
 	if (rnd && pRandX==NULL)
@@ -1311,10 +1210,6 @@ bool	FF_Shake::SetX(SWord mx,SWord fx,bool rnd)
 
 bool	FF_Shake::SetZ(SWord mz,SWord fz,bool rnd)
 {
-//DEADCODE RDH 23/05/99 	long qMZ = mz;
-//DEADCODE RDH 23/05/99 	long qFZ = fz;
-//DEADCODE RDH 23/05/99 	Mono_Text.PrintAt(5, 8, qMZ, UByteP("M Z "));
-//DEADCODE RDH 23/05/99 	Mono_Text.PrintAt(5, 9, qFZ, UByteP("F Z "));
 	if (MZ==mz && FZ==fz && randomZ==rnd)
 		return false;
 	if (rnd && pRandY==NULL)
@@ -1329,10 +1224,14 @@ bool	FF_Shake::SetZ(SWord mz,SWord fz,bool rnd)
 void	FF_Shake::Init(IDirectInputDevice2A* d)	
 {
 	triggerX=triggerZ=randomX=randomZ=false;MX=MZ=FX=FZ=0x8000;dev=d;
-	if (pShakeX)	pShakeX->Release();	pShakeX=NULL;
-	if (pShakeY)	pShakeY->Release();	pShakeY=NULL;				  //JIM 03/03/99
-	if (pRandX)		pRandX->Release();	pRandX=NULL;
-	if (pRandY)		pRandY->Release();	pRandY=NULL;				  //JIM 03/03/99
+	if (pShakeX)	pShakeX->Release();
+	pShakeX=NULL;
+	if (pShakeY)	pShakeY->Release();
+	pShakeY=NULL;									  //JIM 03/03/99
+	if (pRandX)	pRandX->Release();
+	pRandX=NULL;
+	if (pRandY)		pRandY->Release();
+	pRandY=NULL;				  //JIM 03/03/99
 	if (d)
 	{
 		SWFF_CreateROMEffect(dev,&pRandX,GUID_RandomNoise,INFINITE,0,0,-1);
@@ -1347,15 +1246,6 @@ void	FF_Shake::Init(IDirectInputDevice2A* d)
 		pShakeX->Start(1,0);
 		pShakeY->Start(1,0);
 	}
-//DEADCODE DAW 06/05/99 	Set(30000,30000,20,20,false);
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Set(30000,30000,20,20,true);
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Set(0,0,0,0,false);
-//DEADCODE DAW 06/05/99 	Poll();
-//DEADCODE DAW 06/05/99 	Poll();
 
 }
 bool	FF_Shake::Poll()
@@ -1377,19 +1267,11 @@ bool	FF_Shake::Poll()
 			}
 		if (randomX)
 		{
-//DeadCode CSB 17Aug00 			int	tM=MX*0.33*0.33*level;
-//DeadCode CSB 17Aug00 			if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 			if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 			SWFF_SetGain(pRandX,tM);
 			if (pRandX)		SWFF_SetGain(pRandX, MX);
 			if (pRandX)		pRandX->Start(1,0);
 		}
 		else
 		{
-//DeadCode CSB 17Aug00 			int	tM=MX*0.25*0.33*level;
-//DeadCode CSB 17Aug00 			if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 			if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 			SWFF_SetPeriodic(pShakeX,tM,0,0,HZ_TO_uS(FX));
 			if (pShakeX)		SWFF_SetPeriodic(pShakeX, MX, 0, 0, HZ_TO_uS(FX));			//CSB 17Aug00
 		 	if (pShakeX)		pShakeX->Start(1,0);
 		}
@@ -1412,23 +1294,11 @@ bool	FF_Shake::Poll()
 			}
 		if (randomZ)
 		{
-//DeadCode CSB 17Aug00 			int	tM=MZ*0.33*0.33*level;
-//DeadCode CSB 17Aug00 			if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 			if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 			SWFF_SetGain(pRandY,tM);
 			if (pRandY)		SWFF_SetGain(pRandY, MZ);
 			if (pRandY)		pRandY->Start(1,0);
 		}
 		else
 		{
-//DEADCODE RDH 23/05/99 	long qMZ = MZ;
-//DEADCODE RDH 23/05/99 	long qFZ = FZ;
-//DEADCODE RDH 23/05/99 	Mono_Text.PrintAt(25, 8, qMZ, UByteP("M Z "));
-//DEADCODE RDH 23/05/99 	Mono_Text.PrintAt(25, 9, qFZ, UByteP("F Z "));
-//DeadCode CSB 17Aug00 			int	tM=MZ*0.25*0.33*level;
-//DeadCode CSB 17Aug00 			if (tM>10000)	tM=10000;
-//DeadCode CSB 17Aug00 			if (tM<-10000)	tM=-10000;
-//DeadCode CSB 17Aug00 			SWFF_SetPeriodic(pShakeY,tM,0,0,HZ_TO_uS(FZ));
 			if (pShakeY)		SWFF_SetPeriodic(pShakeY, MZ, 0, 0, HZ_TO_uS(FZ));			//CSB 17Aug00
 		 	if (pShakeY)		pShakeY->Start(1,0);
 		}
@@ -2066,59 +1936,6 @@ HRESULT SWFF_CreatePeriodicEffect(	IN LPDIRECTINPUTDEVICE2 pDIDevice,
 //				or set both lFx and lFy to zero
 //  
 // ----------------------------------------------------------------------------
-//DEADCODE RDH 23/05/99 HRESULT SWFF_CreateSpringEffect(	IN LPDIRECTINPUTDEVICE2 pDIDevice,
-//DEADCODE RDH 23/05/99 							IN OUT LPDIRECTINPUTEFFECT* ppDIEffect,
-//DEADCODE RDH 23/05/99 							IN DWORD dwDuration,
-//DEADCODE RDH 23/05/99 							IN LONG lKx,
-//DEADCODE RDH 23/05/99 							IN LONG lCenterx,
-//DEADCODE RDH 23/05/99 							IN LONG lKy,
-//DEADCODE RDH 23/05/99 							IN LONG lCentery,
-//DEADCODE RDH 23/05/99 							IN LONG lButton)
-//DEADCODE RDH 23/05/99 {
-//DEADCODE RDH 23/05/99 	if(pDIDevice == NULL || ppDIEffect == NULL)
-//DEADCODE RDH 23/05/99 		return SFERR_INVALID_PARAM;
-//DEADCODE RDH 23/05/99 	
-//DEADCODE RDH 23/05/99 	// Always clear return IPtr
-//DEADCODE RDH 23/05/99 	*ppDIEffect = NULL;
-//DEADCODE RDH 23/05/99 
-//DEADCODE RDH 23/05/99 	HRESULT hResult = SWFF_CreateConditionEffect(pDIDevice,
-//DEADCODE RDH 23/05/99 											ppDIEffect,
-//DEADCODE RDH 23/05/99 											SPRING,
-//DEADCODE RDH 23/05/99 											dwDuration,
-//DEADCODE RDH 23/05/99 											lKx, lCenterx,
-//DEADCODE RDH 23/05/99 											lKy, lCentery,
-//DEADCODE RDH 23/05/99 											lButton);
-//DEADCODE RDH 23/05/99 
-//DEADCODE RDH 23/05/99 	return hResult;
-//DEADCODE RDH 23/05/99 }
-//DEADCODE RDH 23/05/99 
-//DEADCODE RDH 23/05/99 HRESULT SWFF_CreateDamperEffect(	IN LPDIRECTINPUTDEVICE2 pDIDevice,
-//DEADCODE RDH 23/05/99 							IN OUT LPDIRECTINPUTEFFECT* ppDIEffect,
-//DEADCODE RDH 23/05/99 							IN DWORD dwDuration,
-//DEADCODE RDH 23/05/99 							IN LONG lKx,
-//DEADCODE RDH 23/05/99 							IN LONG lCenterx,
-//DEADCODE RDH 23/05/99 							IN LONG lKy,
-//DEADCODE RDH 23/05/99 							IN LONG lCentery,
-//DEADCODE RDH 23/05/99 							IN LONG lButton)
-//DEADCODE RDH 23/05/99 {
-//DEADCODE RDH 23/05/99 	if(pDIDevice == NULL || ppDIEffect == NULL)
-//DEADCODE RDH 23/05/99 		return SFERR_INVALID_PARAM;
-//DEADCODE RDH 23/05/99 	
-//DEADCODE RDH 23/05/99 	// Always clear return IPtr
-//DEADCODE RDH 23/05/99 	*ppDIEffect = NULL;
-//DEADCODE RDH 23/05/99 
-//DEADCODE RDH 23/05/99 	HRESULT hResult = SWFF_CreateConditionEffect(pDIDevice,
-//DEADCODE RDH 23/05/99 											ppDIEffect,
-//DEADCODE RDH 23/05/99 											DAMPER,
-//DEADCODE RDH 23/05/99 											dwDuration,
-//DEADCODE RDH 23/05/99 											lKx, lCenterx,
-//DEADCODE RDH 23/05/99 											lKy, lCentery,
-//DEADCODE RDH 23/05/99 											lButton);
-//DEADCODE RDH 23/05/99 
-//DEADCODE RDH 23/05/99 	return hResult;
-//DEADCODE RDH 23/05/99 }
-//DEADCODE RDH 23/05/99 
-//DEADCODE RDH 23/05/99 
 // Set Periodic function by DBM
 HRESULT SWFF_SetPeriodic(
 	IN LPDIRECTINPUTEFFECT pDIEffect,
@@ -2358,25 +2175,21 @@ void Analogue::SetDeviceAxisFlags()
 			if (runtimedevices[devnum].sh_axismaps[axisnum]==AU_VIEWP && runtimedevices[devnum].ismouse)
 			{
 				AxisDeviceFlags|=PAN_ON_SH_MOUSE;
-//DeadCode RJS 11Sep00 				usingMouseToPan=true;
 			}
 
 			if (runtimedevices[devnum].sh_axismaps[axisnum]==AU_VIEWP && !runtimedevices[devnum].ismouse)
 			{
 				AxisDeviceFlags|=PAN_ON_SH_JOYSTICK;
-//DeadCode RJS 11Sep00 				usingMouseToPan=true;
 			}
 
 			if (runtimedevices[devnum].sh_axismaps[axisnum]==AU_GUNP && runtimedevices[devnum].ismouse)
 			{
 				AxisDeviceFlags|=GUN_ON_SH_MOUSE;
-//DeadCode JIM 15Sep00 				usingMouseToPan=setMouse;							//RJS 29Aug00
 			}
 
 			if (runtimedevices[devnum].sh_axismaps[axisnum]==AU_GUNP && !runtimedevices[devnum].ismouse)
 			{
 				AxisDeviceFlags|=GUN_ON_SH_JOYSTICK;
-//DeadCode JIM 15Sep00 				usingMouseToPan=setMouse;							//RJS 29Aug00
 			}
 
 			if (runtimedevices[devnum].axismaps[axisnum]==AU_VIEWP && runtimedevices[devnum].ismouse)
@@ -2387,19 +2200,16 @@ void Analogue::SetDeviceAxisFlags()
 			if (runtimedevices[devnum].axismaps[axisnum]==AU_VIEWP && !runtimedevices[devnum].ismouse)
 			{
 				AxisDeviceFlags|=PAN_ON_JOYSTICK;
-//DeadCode RJS 11Sep00 				usingMouseToPan=true;
 			}
 
 			if (runtimedevices[devnum].axismaps[axisnum]==AU_GUNP && runtimedevices[devnum].ismouse)
 			{
 				AxisDeviceFlags|=GUN_ON_MOUSE;
-//DeadCode JIM 15Sep00 				usingMouseToPan=setMouse;							//RJS 29Aug00
 			}
 
 			if (runtimedevices[devnum].axismaps[axisnum]==AU_GUNP && !runtimedevices[devnum].ismouse)
 			{
 				AxisDeviceFlags|=GUN_ON_JOYSTICK;
-//DeadCode JIM 15Sep00 				usingMouseToPan=setMouse;							//RJS 29Aug00
 			}
 
 // etc etc

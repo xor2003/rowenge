@@ -78,7 +78,6 @@ protected:
 	FileNum GetIconFileNum(UniqueID uid);
 	void RefreshButtons();
 	void FindHiLight();
-//DEADCODE RDH 06/06/00 	bool Response(int pack, int firstsq);
 	bool CorrectSquad(int pack);
 	void FindKillsandAcNumbers(int pack, int raid, int& acleft, int& kills, int& acincoming, int& acengaged, int& acoutgoing);
 	int FindNearestPack(int pack,int psmin,int psmax);	//inclusive package statuses

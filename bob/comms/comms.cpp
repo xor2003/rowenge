@@ -356,7 +356,7 @@ Bool DPlay::UINewPlayer (char* Name, char* SessionName)
 		DPSessionDesc2.dwCurrentPlayers=0;
 
 		DPSessionDesc2.lpszSessionNameA=new char[PLAYERNAMELEN];
-		strcpy( DPSessionDesc2.lpszSessionNameA, _DPlay.SessionName);
+		strncpy(DPSessionDesc2.lpszSessionNameA, _DPlay.SessionName, SESSIONNAMELEN-1); DPSessionDesc2.lpszSessionNameA[SESSIONNAMELEN-1]=0;
 
 
 // create session
@@ -391,7 +391,7 @@ Bool DPlay::UINewPlayer (char* Name, char* SessionName)
 
 		DPSessionDesc2.guidApplication = *lpAppGuid;
 		DPSessionDesc2.lpszSessionNameA=new char[PLAYERNAMELEN];
-		strcpy( DPSessionDesc2.lpszSessionNameA, _DPlay.SessionName);
+		strncpy(DPSessionDesc2.lpszSessionNameA, _DPlay.SessionName, SESSIONNAMELEN-1); DPSessionDesc2.lpszSessionNameA[SESSIONNAMELEN-1]=0;
 
 // get session data
 
@@ -1642,7 +1642,8 @@ Bool	DPlay::SetUpPlayerInfo(char* name)
 	if (!strcmp(name,""))
 		strcpy ((H2H_Player + mySlot)->name, "Unnamed Player");
 	else
-		strcpy ((H2H_Player + mySlot)->name, name);
+		strncpy((H2H_Player + mySlot)->name, name, 59);
+	(H2H_Player + mySlot)->name[59]=0;
 
 	(H2H_Player + mySlot)->status = CPS_READYROOM;
 	strcpy ((H2H_Player + mySlot)->dialogue, "");
@@ -1733,8 +1734,7 @@ void	DPlay::AddNameToVisitorsBook(char* name)
 			a=NULL;
 
 			char temptext[256];
-			strcpy(&temptext[0],name);
-			strcat(&temptext[0]," has added name to visitor book");
+			snprintf(temptext,sizeof(temptext),"%s has added name to visitor book",name);
 
 			DisplayChatDialogue("VISITOR",&temptext[0]);
 		}
@@ -1749,8 +1749,7 @@ void	DPlay::AddNameToVisitorsBook(char* name)
 			VisitorsBook->next=NULL;
 
 			char temptext[256];
-			strcpy(&temptext[0],name);
-			strcat(&temptext[0]," has added name to visitor book");
+			snprintf(temptext,sizeof(temptext),"%s has added name to visitor book",name);
 
 			DisplayChatDialogue("VISITOR",&temptext[0]);
 		}
@@ -1837,7 +1836,7 @@ void	DPlay::SendUpdateToVisitorsBook(char* name,Bool status)
 	HRESULT res;
 
 	info.ID=status;
-	strcpy(info.Name,name);
+	strncpy(info.Name,name,20); info.Name[20]=0;
 	info.PacketID=PID_VISITORUPDATE;
 
 	res=lpDP4->Send(from,to,0,&info,sizeof(INITINFO));
@@ -2460,7 +2459,8 @@ bool	DPlay::SendMyMessages(bool request)
 
 	for (n=0;n<NUMRADIOMESSAGES;n++)
 	{
-		strcpy (p.messages[n],Messages[mySlot][n]);
+		strncpy(p.messages[n],Messages[mySlot][n],COMMSRADIOMESSAGELEN-1);
+		p.messages[n][COMMSRADIOMESSAGELEN-1]=0;
 	}
 
 	return (SendMessageToGroup((char*)&p,sizeof(MESSAGEPACKET)));
@@ -2479,7 +2479,8 @@ void	DPlay::ReceiveMessages(char* p,ULong from)
 	{
 		for (n=0;n<NUMRADIOMESSAGES;n++)
 		{
-			strcpy(Messages[slot][n],m->messages[n]);
+			strncpy(Messages[slot][n],m->messages[n],RADIOMESSAGELEN-1);
+			Messages[slot][n][RADIOMESSAGELEN-1]=0;
 		}
 	}
 }
@@ -3566,8 +3567,8 @@ void DPlay::Process_PM_Resync(char* message,ULong from)
 //------------------------------------------------------------------------------
 void DPlay::AddChatMessageToBuffer(char* name, char* chat)
 {
-	strcpy(ChatBuffer.GetNext()->name,name);
-	strcpy(ChatBuffer.GetNext()->chat,chat);
+	strncpy(ChatBuffer.GetNext()->name,name,31); ChatBuffer.GetNext()->name[31]=0;
+	strncpy(ChatBuffer.GetNext()->chat,chat,127); ChatBuffer.GetNext()->chat[127]=0;
 
 	ChatBuffer.AddEntryAndUpdateNext();
 

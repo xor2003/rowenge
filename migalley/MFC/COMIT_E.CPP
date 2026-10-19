@@ -400,7 +400,6 @@ void DirControl::UpdatePackageAircraft(int packnum, int d, int i)
 		{
    			Todays_Packages[packnum].ClearWave(1);
 		}
-//DEADCODE RDH 26/04/99 		Todays_Packages[packnum].ClearWave(2);
 
 	}else
 	{
@@ -751,7 +750,6 @@ void DirControl::ProcessFrontLine(int d, SupplyLine* sl)
 void DirControl::ListFrontLines(int d)
 {
 	ProcessFrontLine(d, &SupplyTree::WestRoute);
-//DEADCODE RDH 12/07/99 	ProcessFrontLine(d, &SupplyTree::EastRoute);
 	ProcessFrontLine(d, &SupplyTree::CentralRoute);
 
 }
@@ -1075,7 +1073,6 @@ bool	DirControl::AllocateTargets(int d, char inputstriketype, bool escortreq)
 						}
 						if  (acavailable)
 						{
-//DEADCODE RDH 12/06/99 							acalloc = true;
 					 		for (int j = 0; j < MAX_DIRGROUPS ; j++)
 							{
 								if (tmpgroup[j].squadron < 2)	//f86
@@ -1203,27 +1200,6 @@ int 	DirControl::EscortRequired(SupplyNode*  node)
 		escort = 8;
 	return (escort);
 
-//DEADCODE RDH 18/03/99 	for (int i = 0; i < 3; i++)
-//DEADCODE RDH 18/03/99 	{
-//DEADCODE RDH 18/03/99 		for (int j = 0; j < SupplyTree::AIRFIELDSINWORLD; j++)
-//DEADCODE RDH 18/03/99 			if (node->airfield[i] == SupplyTree::airfieldinfo[j].airfield)
-//DEADCODE RDH 18/03/99 				break;
-//DEADCODE RDH 18/03/99 
-//DEADCODE RDH 18/03/99 
-//DEADCODE RDH 18/03/99 		if 	(		(j < SupplyTree::AIRFIELDSINWORLD)
-//DEADCODE RDH 18/03/99 				&&	(SupplyTree::airfieldinfo[j].nationality != NAT_BLUE)
-//DEADCODE RDH 18/03/99 				&&	(SupplyTree::RedAcAtAirfield(SupplyTree::airfieldinfo[j].airfield))
-//DEADCODE RDH 18/03/99 
-//DEADCODE RDH 18/03/99 			)
-//DEADCODE RDH 18/03/99 		{//active red ac close by
-//DEADCODE RDH 18/03/99 				escort++;
-//DEADCODE RDH 18/03/99 		}
-//DEADCODE RDH 18/03/99 
-//DEADCODE RDH 18/03/99 	}
-//DEADCODE RDH 18/03/99 	if (escort == 3)
-//DEADCODE RDH 18/03/99 		escort = 8;
-//DEADCODE RDH 18/03/99 	else if (escort > 0)
-//DEADCODE RDH 18/03/99 		escort = 4;
 
 }
 int 	DirControl::FlakRequired(UniqueID target, SupplyNode*  node)
@@ -1403,17 +1379,6 @@ bool	DirControl::AllocAc(int grptype, int ac, int type, int d)
 void	DirControl::AllocateAlphaStrike(int d, int i)	
 {
 	char note;
-//DEADCODE RDH 19/03/99 	int fightersrequired;
-//DEADCODE RDH 19/03/99 			int  p = FIL_ALPHASTRIKE;
-//DEADCODE RDH 19/03/99 			fightersrequired = 16;
-//DEADCODE RDH 19/03/99 			if (fightersrequired < (acresource[SQ_F86A] + acresource[SQ_F86B]))
-//DEADCODE RDH 19/03/99 			{
-//DEADCODE RDH 19/03/99 			 	AllocateFighters(fightersrequired, d, i);
-//DEADCODE RDH 19/03/99 			}else
-//DEADCODE RDH 19/03/99 			{
-//DEADCODE RDH 19/03/99 				directives[d].missions[i].escort = false;
-//DEADCODE RDH 19/03/99 				note = SupplyTree::M_NOTOPCOVER;
-//DEADCODE RDH 19/03/99 			}
 			AllocateStrike(d, i, note, FIL_ALPHASTRIKE);
 			directives[d].missions[i].note = note;
 
@@ -1820,8 +1785,6 @@ void	DirControl::AllocateAc()
 			)
 		{
 
-//DEADCODE RDH 12/06/99 			if (!AllocateTargets(i, UNDECIDEDSTRIKE, true))
-//DEADCODE RDH 12/06/99 				//nomissions were set and so try unescorted			  //RDH 10/06/99
 				AllocateTargets(i, UNDECIDEDSTRIKE, true);
 
 		}else

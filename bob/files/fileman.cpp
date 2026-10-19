@@ -80,7 +80,6 @@
 //  Then, the fixup routine will only be called for the initial load.
 //
 //
-//DeadCode JIM 02Jul96 #include	<assert.h>
 //#define	NO_EXTRA_BUFFERING	//define this to stop Fileman from cacheing
 
 #define		F_GRAFIX											//JIM 01Aug96
@@ -207,7 +206,6 @@ CON	fileman::fileman()
 	dirrootblock = NULL;
 	//	direntries[MAXDIRENTRIES];
 	//	makerootdirlist();
-	//DeadCode JIM 24Oct96 	makerootdirlist();
 #ifdef	__MSVC__
 	MemFailPFU = _set_new_handler(MyMemFailPFU);
 #endif
@@ -267,7 +265,6 @@ void	fileman::fakedir(FileNum thisdir, char* dirname)
 
 FileNum	fileman::fakefile(FileNum thisdir, const char* filename)
 {	//returns file number to use for fake (always dir+2 at present)
-	//DeadCode DAW 20Nov98 #pragma message ("fileman::fakefile - string copy causes memory overwrite")
 	strncpy(namedirdir + fakefileoffset, filename, 80);
 	assumefakedir = dirnum(thisdir);
 	fileblocklink::deletedirchain(thisdir);
@@ -291,10 +288,6 @@ void	fileman::makerootdirlist()
 	assumefakedir = 255;
 
 
-	//DeadCode JIM 21Sep95 char	here[]=".",
-	//DeadCode JIM 21Sep95 		exedir[80],
-	//DeadCode JIM 21Sep95 		cddir[80],
-	//DeadCode JIM 21Sep95 		paramdir[80];
 
 	static char	worker[1250];
 	dirfakeblock = worker;
@@ -396,7 +389,6 @@ void	fileman::GetParamDir(string		paramdir)
 
 void	fileman::translatedirlist(void*	&dataarea, ULong&	datalengthin)
 {
-	//DeadCode JIM 07Sep95 ULong	outputpos=0;
 	string	datascan = (string)dataarea,
 		outptr = (string)dataarea;
 	int		outind = 0;
@@ -491,7 +483,6 @@ void	fileman::translatedirlist(void*	&dataarea, ULong&	datalengthin)
 		//Now add fix for alias directories - modify pointer to NULL &!!DONT delete text DONT!!
 		if ((outptr[pathstart] == '.') && (outptr[pathstart + 1] == 0))
 		{
-			//DeadCode JIM 21Sep95 			outind=pathstart;
 			pathstart = fileman::ALIASDIRIND;
 		}
 
@@ -529,13 +520,11 @@ void	fileman::translatedirlist(void*	&dataarea, ULong&	datalengthin)
 
 void	retranslatedirlist(void*	&dataarea, ULong&	datalengthin)
 {
-	//DeadCode JIM 07Sep95 ULong	outputpos=0;
 	string	datascan = (char*)dataarea,
 		outptr = (char*)dataarea;
 	int		outind = 0,
 		datalength = datalengthin;
 
-	//DeadCode JIM 06Nov95 dirindex	dirnum;
 	//Skip leading garbage...
 	while ((datalength > 0) && ((*datascan<'0') || (*datascan>'9')))
 	{
@@ -604,9 +593,6 @@ void	retranslatedirlist(void*	&dataarea, ULong&	datalengthin)
 		//Ok.. now process the info collected.
 		//First perform sanity checks - not needed on reload
 		//Now add fix for alias directories - modify pointer to NULL & delete text
-		//DeadCode JIM 21Sep95 	This is difficult so I have stopped doing it ever!
-		//DeadCode JIM 21Sep95 		if 	(*((uword*) &outptr[outind-2])==*((uword*) "."))
-		//DeadCode JIM 21Sep95 			outind-=2;
 
 		//Thats it for this reading loop
 	}
@@ -780,7 +766,6 @@ void	fixmanualdirnum(void*	&srcdata, ULong& srcsize)
 	bobassert(srcsize, "=0=wildcard - not implemented");
 	//If first byte is zero then it is a concatenated directory
 	//else
-	//Old_Code DAW 24Feb97 	assert	((srcchar[0])&&("=0=concatenated - not implemented"));
 	if (srcchar[0] == 0)			//Concatinated Dir.dir files
 	{							//Don't do anything yet
 		////		INT3;
@@ -811,7 +796,6 @@ void	fixmanualdirnum(void*	&srcdata, ULong& srcsize)
 		//Allocate: Temporary cheat.. not changing data areas, so wasting a little space. File must be oversize enough to accomodate 16 bytes per filename
 		bobassert(indexer <= srcsize, "Storing back at present!");
 		string	outchar = srcchar;
-		//DeadCode JIM 20Oct00 void*		outstart=srcdata;
 
 		//Copy the entries
 		indexer = 0;
@@ -827,13 +811,7 @@ void	fixmanualdirnum(void*	&srcdata, ULong& srcsize)
 			while (count--)
 				*(outchar++) = 0;
 		}
-		//DeadCode JIM 21Sep95 //Return the result
-		//DeadCode JIM 21Sep95 		return(outstart);
 	}
-	//DeadCode JIM 21Sep95 	//else
-	//DeadCode JIM 21Sep95 	{
-	//DeadCode JIM 21Sep95 		return(srcdata);
-	//DeadCode JIM 21Sep95 	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -843,8 +821,6 @@ void	fixmanualdirnum(void*	&srcdata, ULong& srcsize)
 fileblockptr	fileman::readfilelist(dirindex	reqdir)
 {
 	fileblockptr	dfblock;
-	//DeadCode JIM 21Sep95 dirindex
-	//DeadCode JIM 21Sep95 	reqdir= dirnum(MyFile);
 	makedirectoryname(reqdir, filenameindex);
 	//At this point I want to load 'dir.dir'
 	//This would be:
@@ -900,7 +876,6 @@ string	fileman::namenumberedfilelessfail(FileNum	MyFile)
 	currfilenum = MyFile;
 	string		dirlister = (string)fb.getdata();
 
-	//DeadCode DAW 25Feb97 	INT3();
 	assert(dirlister);
 	if (dirlister == NULL)										//DAW 25Feb97
 		return("//");
@@ -979,7 +954,6 @@ string	fileman::namenumberedfile(FileNum	MyFile)
 	currfilenum = MyFile;
 	string		dirlister = (string)fb.getdata();
 
-	//DeadCode DAW 25Feb97 	INT3();
 	//    assert(dirlister);
 	if (!dirlister || dirlister[0] == 0)										//DAW 25Feb97
 		return("//");
@@ -1056,13 +1030,10 @@ FILE*	fileman::opennumberedfile(FileNum	MyFile)
 		char* n = pathnameptr;
 		char buffer[1000];
 		strcpy(buffer, pathnameptr);
-		//DeadCode AMM 09Jul99 		int level=LockExchange(&interlocker,0);
 		char* fname = buffer;									  //JIM 21/12/98
 		if (dirnum(MyFile) == assumefakedir && (MyFile & 255) == fakefileindex)		  //JIM 21/12/98
 			fname = namedirdir + fakefileoffset - filenameindex + (pathnameptr - pathname); //JIM 21/12/98
 
-		//DEADCODE RDH 20/05/99 		if(MessageBox(Master_3d.winst,"Please insert correct media for above file",fname,MB_RETRYCANCEL)
-		//DEADCODE RDH 20/05/99 			==IDCANCEL)
 		BLOCKCHILD = true;
 		tstring.LoadString(IDS_INSERTCD);
 		//			HWND upperwnd=HWND_BOTTOM;
@@ -1085,8 +1056,6 @@ FILE*	fileman::opennumberedfile(FileNum	MyFile)
 				MyFile,pathnameptr);
 				}
 				*/
-		//DeadCode AMM 09Jul99 		while (LockExchange(&interlocker,1))
-		//DeadCode AMM 09Jul99 		{Sleep(0);}
 		pathnameptr = n;
 		strcpy(pathnameptr, buffer);
 #else
@@ -1461,7 +1430,6 @@ DES	fileblock::~fileblock()
 	fileblocklink::deletelink(-2); //release nearly 4GB
 
 #endif
-	//DeadCode JIM 01Apr96 	if ((fileblockdata)&&(datasize))
 	{
 		//TempCode JIM 29Mar96 		dirindex reqdir=dirnum(filenum);
 		//TempCode JIM 29Mar96 		//find in old list
@@ -1484,7 +1452,6 @@ DES	fileblock::~fileblock()
 		//TempCode JIM 29Mar96 		newfb->nextindir=search;
 		//TempCode JIM 29Mar96 		search = newfb;
 
-		//DeadCode JIM 01Apr96 		delete []	(voidbigblock*)	fileblockdata;
 	}
 }
 
@@ -1503,7 +1470,6 @@ DES	fileblock::~fileblock()
 //------------------------------------------------------------------------------
 Bool	fileman::loadednumberedfile(FileNum filenum, int offset)
 {
-	//DeadCode JIM 20Oct00 int	filehandle=-1;
 	dirindex reqdir = dirnum(filenum);
 	fileblocklink	**search = &direntries[reqdir].freedfiles;
 	fileblocklink	*s2;
@@ -1543,7 +1509,6 @@ void*	fileblocklink::makelink(FileNum filenum, ULong fileoffset, ULong size, fil
 				, "Indexed part of file with different size!");
 			link = s2 = *search;
 			//remove from free list,
-			//DeadCode JIM 20Oct00 				fileblocklink **tmp = &FILEMAN.allfreedfiles;
 			s2->dir.remove(s2);
 			s2->heap.remove(s2);
 			//insert in active lists
@@ -1621,7 +1586,6 @@ Bool	fileblocklink::breaklink()
 			dir.insert(this, *search);
 
 			//Next, the full list
-			//DeadCode JIM 20Oct00 			fileblocklink **tmp = &FILEMAN.allfreedfiles;
 			search = &FILEMAN.allfreedfiles;
 			while (*search && search[0]->datasize <= datasize + 500)
 				search = &search[0]->heap.next;
@@ -1703,7 +1667,6 @@ Bool	fileblocklink::deletelink(ULong size)
 		while (s2)
 		{
 			s2->dir.remove(s2);									//JIM 10Apr96
-			//DeadCode JIM 10Apr96 			s2->heap.remove(s2);			//JIM 10Apr96
 			FILEMAN.allfreedfiles = s2->heap.next;
 			//do something with file handles
 			delete[](voidbigblock*) s2->fileblockdata;
@@ -1741,12 +1704,6 @@ void	fileman::MakeRoomFor(int delta)
 	}
 }
 ////////////////////////////////////////////////////////
-//DeadCode JIM 21Sep95 ULong	fileblock::getsize()
-//DeadCode JIM 21Sep95 	{return(datasize);}
-//DeadCode JIM 21Sep95
-//DeadCode JIM 21Sep95 ////////////////////////////////////////////////////////
-//DeadCode JIM 21Sep95 void*	fileblock::getdata()
-//DeadCode JIM 21Sep95 	{return(fileblockdata);}
 
 ////////////////////////////////////////////////////////
 fileman::dirfileentry::dirfileentry()
@@ -2006,7 +1963,6 @@ void fileman::InitFileSystem()
 
 	//Work out what resources are available for the file system
 #ifdef	_MSC_VER
-	//DeadCode CSB 11Sep00 	Mono_Text.Print((UByte*)"Before mem test ");
 #endif
 	MEMORYSTATUS	memstats = { sizeof(MEMORYSTATUS) };
 	GlobalMemoryStatus(&memstats);
@@ -2036,7 +1992,6 @@ void fileman::InitFileSystem()
 	delete []lump;
 #else
 #ifdef	_MSC_VER
-	//DeadCode CSB 11Sep00 	Mono_Text.Print((UByte*)"Mem test disabled");
 #endif
 #endif
 
@@ -2051,7 +2006,6 @@ void fileman::InitFileSystem()
 		_Error.ReallyEmitSysErr("Not Enough memory.\nWanted 64M, Got %iM phys and %iM virtual",
 		memstats.dwAvailPhys / (1024 * 1024), memstats.dwAvailPageFile / (1024 * 1024));
 #ifdef	_MSC_VER
-	//DeadCode CSB 11Sep00 	Mono_Text.Print((UByte*)"After mem test");
 #endif
 
 	totalmem = memstats.dwTotalPhys;
@@ -2069,7 +2023,6 @@ void fileman::InitFileSystem()
 	delete loaddirlist(FIL_640resDIR);
 	delete loaddirlist(FIL_soundsDIR);
 	delete loaddirlist(FIL_battleDIR);
-	//DeadCode DAW 08Jan97 	delete FILEMAN.loaddirlist(FIL_localsDIR);
 
 	//set up CD file access
 
@@ -2101,7 +2054,6 @@ dirindex fileman::getbasedir(dirindex	d)						//DAW 24Sep96
 		n = direntries[n].parentdir;
 	if (direntries[n].driverfile == INVALIDFILENUM)
 		return(RAMCACHEHANDLEDIR);
-	//DeadCode DAW 25Sep96 	printf("directory src:%i\tdest:%i\n",d,n);
 	return(n);
 }
 

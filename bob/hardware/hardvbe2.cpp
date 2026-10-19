@@ -112,7 +112,6 @@ void	Display::XX_SetGraphicsMode()
 	regs.l.eax=regs.l.ebx=regs.l.ecx=regs.l.edx=0;
 	regs.l.edi=regs.l.ebp=regs.l.esi=regs.l.esp=0;
 	regs.s.ds=regs.s.es=regs.s.cs=regs.s.ss=regs.s.fs=regs.s.gs=0;
-//DeadCode JIM 13Dec96 	regs.flags=;
 	regs.l.eax=0x4f02;
 	regs.l.ecx=VFLAT.mode;
 	regs.l.ebx=VFLAT.mode;
@@ -352,10 +351,6 @@ void	Display::XX_PalChange()
 		ASM_OutSB(0x3c9,Palette,768);
 }
 
-//DeadCode RJS 14Mar96 void	Display::XX_PhysMouseMove(MouseSave* oldpos,void* MouseShape,MouseSave* newpos)
-//DeadCode RJS 14Mar96 {
-//DeadCode RJS 14Mar96 	INT3();
-//DeadCode RJS 14Mar96 }
 
 extern	void	copydata(void* src,void* trg,int longs);
 #ifdef __WATCOMC__
@@ -375,27 +370,6 @@ inline void	copydata(void* src,void* trg,int longs);
 
 #endif
 #endif
-//DeadCode JIM 19Nov96 	void	copyloop(void* out,void* in,ULong count);
-//DeadCode JIM 19Nov96 	#pragma aux copyloop=				\
-//DeadCode JIM 19Nov96 			"push	ebp"				\
-//DeadCode JIM 19Nov96 			"add	ecx,15"				\
-//DeadCode JIM 19Nov96 			"shr	ecx,4"				\
-//DeadCode JIM 19Nov96 			"l:"						\
-//DeadCode JIM 19Nov96 			"mov	edx,[esi]"			\
-//DeadCode JIM 19Nov96 			"mov	ebp,[esi+4]"			\
-//DeadCode JIM 19Nov96 			"mov	eax,[esi+8]"		\
-//DeadCode JIM 19Nov96 			"mov	ebx,[esi+12]"		\
-//DeadCode JIM 19Nov96 			"add	edi,16"				\
-//DeadCode JIM 19Nov96 			"add	esi,16"				\
-//DeadCode JIM 19Nov96 			"dec	ecx"				\
-//DeadCode JIM 19Nov96 			"mov	[edi-16],edx"		\
-//DeadCode JIM 19Nov96 			"mov	[edi+4-16],ebp"		\
-//DeadCode JIM 19Nov96 			"mov	[edi+8-16],eax"		\
-//DeadCode JIM 19Nov96 			"mov	[edi+12-16],ebx"		\
-//DeadCode JIM 19Nov96 			"jnz	l"					\
-//DeadCode JIM 19Nov96 			"pop	ebp"				\
-//DeadCode JIM 19Nov96 			parm	[edi] [esi] [ecx]	\
-//DeadCode JIM 19Nov96 			modify	[ebx eax edx]
 
 Bool	Display::XX_CopyP2L(LogicalPtr	T,int W,int H)
 {
@@ -406,25 +380,11 @@ Bool	Display::XX_CopyP2L(LogicalPtr	T,int W,int H)
 	else
 		S=logicalscreenptr+VFLAT.scrsize*(NumberOfScreens-1);
 	S+=(T-logicalscreenptr);
-//DeadCode JIM 04Sep96 	ULong	wd=(W+3)/(4*2);
 	ULong	bps=BytesPerScanLine;
 	W>>=2;
 	do
 	{
 		copydata(S,T,W);
-//DeadCode JIM 04Sep96 		ULong*	S1=(ULong*) S;
-//DeadCode JIM 04Sep96 		ULong*	T1=((ULong*) T) -2;
-//DeadCode JIM 04Sep96 		ULong	W1=wd;
-//DeadCode JIM 04Sep96 		do
-//DeadCode JIM 04Sep96 		{
-//DeadCode JIM 04Sep96 			ULong	tmp0=S1[0];
-//DeadCode JIM 04Sep96 			ULong	tmp1=S1[1];
-//DeadCode JIM 04Sep96 			T1+=2;
-//DeadCode JIM 04Sep96 			S1+=2;
-//DeadCode JIM 04Sep96 			T1[0]=tmp0;
-//DeadCode JIM 04Sep96 			T1[1]=tmp1;
-//DeadCode JIM 04Sep96 		}
-//DeadCode JIM 04Sep96 		while(--W1);
 		S+=bps;
 		T+=bps;
 	}

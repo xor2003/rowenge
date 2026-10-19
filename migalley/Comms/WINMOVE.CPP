@@ -6501,6 +6501,7 @@ void	DPlay::Process1stAIACPositionPacket(LPBASICPACKET p,UByte slot)
 			temp->Unfriendly=unf;
 
 			temp->ID=ID;
+			temp->extrainfo=0;			//RERUN: POD struct - |=2 read garbage
 			temp->extrainfo|=2;
 
 			p->next=temp;
@@ -6723,15 +6724,21 @@ void	DPlay::AddAIACToPositionList(AirStrucPtr ac)
 		while (temp->next)
 		{
 			if (acpos->ID==temp->ID)
+			{
+				delete acpos;										//RERUN: duplicate - don't leak
 				return;
+			}
 
 			temp=temp->next;
 		}
 
 		if (acpos->ID!=temp->ID)
+		{
 			temp->next=acpos;
-
-		acpos=NULL;
+			acpos=NULL;
+		}
+		else
+			delete acpos;											//RERUN: duplicate tail ID - don't leak
 	}
 	else
 	{
@@ -9463,7 +9470,7 @@ void	DPlay::DisplayPlayerMessage(ItemPtr victim, ItemPtr hitterItem, UByte scrip
 	if (H2H_Player[mySlot].status!=CPS_3D) // no messages unless in 3d
 		return;
 
-	if (hitterItem && hitterItem->MigStatus.LaunchFlags.size!=AIRSTRUCSIZE)
+	if (!hitterItem || hitterItem->MigStatus.LaunchFlags.size!=AIRSTRUCSIZE)	//RERUN: NULL hitterItem fell through to *hitterItem
 		return;
 
 	MsgType msg=(MsgType)MSG_PLAYERKILLED;
@@ -10080,7 +10087,8 @@ bool	DPlay::GetDeadStream()
 	switch (SyncData.deadstage)
 	{
 	case 0:
-		int dtime;
+		{
+		int dtime=0;				//RERUN: GetNumDeadBlocks may leave it unwritten
 		if (GetNumDeadBlocks(need,dtime))
 		{
 			Dead_Stream.ClrWorldDead();
@@ -10089,6 +10097,7 @@ bool	DPlay::GetDeadStream()
 			got=0;
 		}
 		break;
+		}
 	case 1:
 		if (need!=0)
 		{

@@ -88,8 +88,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"miles.h"													//RJS 18Oct00
 
 #include "_mfc.h"
-//DeadCode JON 10Nov00 extern HINSTANCE	g_hinst;
-//DeadCode JON 10Nov00 extern HWND		g_hwndMCIWnd;
 
 #define INITGUID
 #include <streams.h>
@@ -153,7 +151,6 @@ BEGIN_MESSAGE_MAP(RFullPanelDial, CDialog)
 	ON_MESSAGE_CLASS( WM_GETGLOBALFONT,RFullPanelDial,OnGetGlobalFont)
 	ON_MESSAGE_CLASS( WM_GETARTWORK,RFullPanelDial, OnGetArt)
 	ON_MESSAGE_CLASS( WM_SELECTTAB,RFullPanelDial, OnMciDidQuit)
-//DeadCode JON 10Nov00 	ON_MESSAGE_CLASS( 0x04c8, RFullPanelDial, OnMciNotify)
 	ON_MESSAGE_CLASS( WM_GRAPHNOTIFY, RFullPanelDial, OnMciNotify)				//JON 10Nov00
 END_MESSAGE_MAP()
 
@@ -166,9 +163,6 @@ END_MESSAGE_MAP()
 void RFullPanelDial::LaunchMain(FullScreen* startscreen)
 { // launches the main dialog window
 	CRect rect;
-//DeadCode DAW 18Jun99 	if (GetCurrentRes()==0)
-//DeadCode DAW 18Jun99 		MessageBox("Resolution is too small to run Mig Alley - this message to be removed","Warning",MB_OK);
-//DeadCode DAW 18Jun99 	else
 	{
 
 	m_pView->GetClientRect(rect);
@@ -263,28 +257,7 @@ void RFullPanelDial::LaunchSmacker(int dialID,FileNum smackerID)
 //#endif
 			{
 
-//DeadCode JIM 19Oct00 MCIWNDF_NOAUTOSIZEWINDOW	Will not change the dimensions of an MCIWnd window when the image size changes. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOAUTOSIZEMOVIE	Will not change the dimensions of the destination rectangle when an MCIWnd window size changes.  
-//DeadCode JIM 19Oct00 MCIWNDF_NOERRORDLG		Inhibits display of MCI errors to users. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOMENU			Hides the Menu button from view on the toolbar and prohibits users from accessing its pop-up menu. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOOPEN			Hides the open and close commands from the MCIWnd menu and prohibits users from accessing these choices in the pop-up menu. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOPLAYBAR		Hides the toolbar from view and prohibits users from accessing it. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOTIFYANSI		Causes MCIWnd to use an ANSI string instead of a Unicode string when notifying the parent window of device mode changes. This flag is used in combination with MCIWNDF_NOTIFYMODE and is exclusive to Windows NT/Windows 2000. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOTIFYMODE		Causes MCIWnd to notify the parent window with an MCIWNDM_NOTIFYMODE message whenever the device changes operating modes. The lParam parameter of this message identifies the new mode, such as MCI_MODE_STOP. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOTIFYPOS		Causes MCIWnd to notify the parent window with an MCIWNDM_NOTIFYPOS message whenever a change in the playback or record position within the content occurs. The lParam parameter of this message contains the new position in the content. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOTIFYMEDIA		Causes MCIWnd to notify the parent window with an MCIWNDM_NOTIFYMEDIA message whenever a new device is used or a data file is opened or closed. The lParam parameter of this message contains a pointer to the new filename. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOTIFYSIZE		Causes MCIWnd to notify the parent window when the MCIWnd window size changes. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOTIFYERROR		Causes MCIWnd to notify the parent window when an MCI error occurs. 
-//DeadCode JIM 19Oct00 MCIWNDF_NOTIFYALL		Causes all MCIWNDF window notification styles to be used. 
-//DeadCode JIM 19Oct00 MCIWNDF_RECORD			Adds a Record button to the toolbar and adds a new file command to the menu if the MCI device has recording capability.  
-//DeadCode JIM 19Oct00 MCIWNDF_SHOWALL			Causes all MCIWNDF_SHOW styles to be used. 
-//DeadCode JIM 19Oct00 MCIWNDF_SHOWMODE			Displays the current mode of the MCI device in the window title bar. For a list of device modes, see the MCIWndGetMode macro. 
-//DeadCode JIM 19Oct00 MCIWNDF_SHOWNAME			Displays the name of the open MCI device or data file in the MCIWnd window title bar. 
-//DeadCode JIM 19Oct00 MCIWNDF_SHOWPOS			Displays the current position within the content of the MCI device in the window title bar. 
 
-//DeadCode JON 10Nov00 #pragma warnmsg ( "remove the g_hwndMCIWnd" )
-//DeadCode JON 10Nov00 				g_hwndMCIWnd=MCIWndCreate(m_hWnd,g_hinst,WS_CHILD|WS_VISIBLE|MCIWNDF_NOTIFYMODE|MCIWNDF_NOPLAYBAR|MCIWNDF_NOMENU,FILEMAN.namenumberedfile(smackerID));
-//DeadCode JON 10Nov00 				::SetWindowPos(g_hwndMCIWnd,NULL,X,Y,0,0,SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
 //			MCIWndPlay(g_hwndMCIWnd);				//MCI did not run on all our machines. Switched to DirectMedia
 
 			WCHAR wFile[MAX_PATH];
@@ -322,15 +295,8 @@ void RFullPanelDial::LaunchSmacker(int dialID,FileNum smackerID)
 				}
 				else
 				{	
-//DeadCode JON 12Nov00 					RECT grc;
-//DeadCode JON 12Nov00 					grc.left = X;
-//DeadCode JON 12Nov00 					grc.top = Y;
-//DeadCode JON 12Nov00 					grc.right = X+videoWidth;
-//DeadCode JON 12Nov00 					grc.bottom = Y+videoHeight;
 					pivw->SetWindowPosition(X, Y, videoWidth, videoHeight);	
 				}
-//DeadCode JON 10Nov00 				GetClientRect(ghApp, &grc);
-//DeadCode JON 10Nov00 				pivw->SetWindowPosition(grc.left, grc.top, grc.right, grc.bottom);
 
 				// Run the graph if RenderFile succeeded
 				if (!SUCCEEDED(hr))
@@ -347,19 +313,14 @@ void RFullPanelDial::LaunchSmacker(int dialID,FileNum smackerID)
 		}
 		else
 		{			//stop video
-//DeadCode JON 10Nov00 			if (g_hwndMCIWnd)
-//DeadCode JON 10Nov00 			{
-//DeadCode JON 10Nov00 				MCIWndClose(g_hwndMCIWnd);
 				CloseVideo();
 				lastsmacker=(FileNum)-1;
-//DeadCode JON 10Nov00 			}
 		}
 //	}else{
 //	}
 }
 void RFullPanelDial::ChangeSmacker(int dialID,FileNum aviID)
 {
-//DeadCode JON 10Nov00 	MCIWndClose(g_hwndMCIWnd);
 	CloseVideo();
 	LaunchSmacker(dialID,aviID);
 }
@@ -370,15 +331,6 @@ void RFullPanelDial::OnTimer(UINT nIDEvent)
 	// Nick the Enum loop thing
 	if (nIDEvent==m_timerID)
 	{
-//DeadCode DAW 25Feb100 		if (!DoSmack((int)m_hWnd))
-//DeadCode DAW 25Feb100 		{
-//DeadCode DAW 25Feb100 //			Master_3d.BigWin();
-//DeadCode DAW 25Feb100 //			Invalidate();
-//DeadCode DAW 25Feb100 			CloseSmack();
-//DeadCode DAW 25Feb100 			OnLButtonUp(0, CPoint (0,0)) ;
-//DeadCode DAW 25Feb100 			//KillTimer(m_timerID);
-//DeadCode DAW 25Feb100 			//m_timerID=0;
-//DeadCode DAW 25Feb100 		}
 	}
 }
 
@@ -387,9 +339,6 @@ void RFullPanelDial::OnLButtonUp(UINT nFlags, CPoint point)
 	if (m_currentscreen && m_currentscreen->textlists[0].text==NULL) 
 	{
 		OnSelectRlistbox(0,0);
-//DEADCODE DAW 15/06/99 		UpdateSize();
-//DEADCODE DAW 15/06/99 
-//DEADCODE DAW 15/06/99 		_Miles.InitSoundFonts();		//RJS 24Nov98
 	}
 //	{
 //		LaunchScreen();
@@ -469,21 +418,10 @@ void RFullPanelDial::LaunchScreen(FullScreen * pfullscreen)
 {
 	pleasestartthissmacker=FIL_NULL;
 	bool	closedsmack=false;
-//DeadCode DAW 25Feb100 	if (m_timerID) 
-//DeadCode DAW 25Feb100 	{
-//DeadCode DAW 25Feb100 		CloseSmack();
-//DeadCode DAW 25Feb100 		Master_3d.BigWin();
-//DeadCode DAW 25Feb100 		KillTimer(m_timerID);
-//DeadCode DAW 25Feb100 		m_txosedsmack=true;
-//DeadCode DAW 25Feb100 	}
-//DeadCode JON 10Nov00 	if (g_hwndMCIWnd)
 	if ( pivw )
 	{
 		CloseVideo();
-//DEADCODE RDH 18/04/00 		OnMciNotify(0,MCI_MODE_STOP);
-//DEADCODE RDH 18/05/00 		Save_Data.ChangeMode(SaveData::UIR_SCRAMBLE);
 		closedsmack=true;
-//DEADCODE RDH 18/05/00 		ReleaseCapture();
 	}
 	else
 		ReleaseCapture();	//x0r LaunchSmacker takes capture unconditionally;
@@ -565,11 +503,6 @@ void RFullPanelDial::UpdateSize()
 	AfxGetMainWnd()->GetClientRect(rect);
 	if (m_currentscreen->textlists[0].text==NULL && height!=600)
 		NOP;
-//DEADCODE RDH 18/05/00 	{
-//DEADCODE RDH 18/05/00 		parent->MoveWindow(rect);
-//DEADCODE RDH 18/05/00 		MoveWindow(0,0,rect.Width(),rect.Height());
-//DEADCODE RDH 18/05/00 	}
-//DEADCODE RDH 18/05/00 	else
 	{
 		parent->MoveWindow((rect.Width()-width)/2,(rect.Height()-height)/2,
 				width,height);
@@ -680,9 +613,7 @@ void RFullPanelDial::PositionRListBox()
 
 Bool RFullPanelDial::LaunchMap(FullScreen*&fs, bool firsttime)
 {
-//DeadCode DAW 25Feb100 	CloseSmack();
 	CloseVideo();
-//DEADCODE RDH 18/04/00 	OnMciNotify(0,MCI_MODE_STOP);
 	Save_Data.ChangeMode(SaveData::UIR_MAP);
 //	Persons4::StartUpMapWorld();
 	Node_Data.SetPlayerInfoLevel();
@@ -695,9 +626,7 @@ Bool RFullPanelDial::LaunchMap(FullScreen*&fs, bool firsttime)
 Bool RFullPanelDial::Launch3d(FullScreen*&fs)
 {
 	CloseVideo();
-//DEADCODE RDH 18/04/00 	OnMciNotify(0,MCI_MODE_STOP);
 //	closedsmack=true;
-//DeadCode DAW 25Feb100 	CloseSmack();
 	return TRUE;
 }
 
@@ -706,15 +635,10 @@ CFont* RFullPanelDial::OnGetGlobalFont(int fontnum)
 	if (m_currentres==-1) m_currentres=GetCurrentRes();
 	if (g_AllFonts[fontnum][1])
 	{
-//DeadCode JIM 20Oct00 		int currentres=resolutions[m_currentres];
 		if (m_currentres>=3)
 			return g_AllFonts[fontnum][3];
 		else
 			return g_AllFonts[fontnum][m_currentres];
-//DEADCODE MS 01/02/00 		if (currentres>=1280) return g_AllFonts[fontnum][3];
-//DEADCODE MS 01/02/00 		else if (currentres>=1024) return g_AllFonts[fontnum][2];
-//DEADCODE MS 01/02/00 		else if (currentres>=800) return g_AllFonts[fontnum][1];
-//DEADCODE MS 01/02/00 		else return g_AllFonts[fontnum][0];	
 	}
 	else if (m_scalingfactor==2) return g_AllFonts[fontnum][3];
 	else return g_AllFonts[fontnum][0];
@@ -806,13 +730,10 @@ void RFullPanelDial::OnPaint()
 		EndPaint(&paintstruct);
 		
 	}
-//DeadCode JON 10Nov00 	if (pleasestartthissmacker && g_hwndMCIWnd)
 	if (pleasestartthissmacker && pimc)
 	{
 		pimc->Run();
 		videoAudio->put_Volume( _Miles.SmackerOn(0) );
-//DeadCode JON 10Nov00 _Miles.SmackerOn(int(g_hwndMCIWnd));									//RJS 18Oct00
-//DeadCode JON 10Nov00 		MCIWndPlay(g_hwndMCIWnd);
 	}
 
 	pleasestartthissmacker=FIL_NULL;
@@ -855,15 +776,6 @@ void RFullPanelDial::CloseVideo()
     HELPER_RELEASE(pimex);
 	HELPER_RELEASE(videoAudio);
 
-//DeadCode JON 10Nov00 	if (g_hwndMCIWnd)
-//DeadCode JON 10Nov00 	{
-//DeadCode JON 10Nov00 
-//DeadCode JON 10Nov00 		MCIWndClose(g_hwndMCIWnd);
-//DeadCode JON 10Nov00 		MCIWndDestroy(g_hwndMCIWnd);
-//DeadCode JON 10Nov00 		g_hwndMCIWnd=NULL;
-//DeadCode JON 10Nov00 		ReleaseCapture();
-//DeadCode JON 10Nov00 		_Miles.SmackerOff();											//RJS 18Oct00
-//DeadCode JON 10Nov00 	}																	//JIM 23Oct00
 }
 
 void RFullPanelDial::OnMciDidQuit(int wParam,int lParam)
@@ -873,12 +785,12 @@ void RFullPanelDial::OnMciDidQuit(int wParam,int lParam)
 
 }
 
-// this function is called when a message is recieved from the smacker...	
+// this function is called when a message is recieved from the smacker...
 void RFullPanelDial::OnMciNotify(int wParam,int lParam)
-{return;/*
-	LONG		evCode;
-	LONG		evParam1;
-	LONG		evParam2;
+{
+	long		evCode;
+	long		evParam1;
+	long		evParam2;
 	HRESULT		hr;
 
 	if ( pimex ) // check we've not cloded it down already
@@ -894,24 +806,6 @@ void RFullPanelDial::OnMciNotify(int wParam,int lParam)
 				break;
 			} // Finished
 		} // Spin through the events
-*/
-//DeadCode JON 10Nov00 	switch (lParam)
-//DeadCode JON 10Nov00 	{
-//DeadCode JON 10Nov00 	case	MCI_MODE_STOP:
-//DeadCode JON 10Nov00 		CloseVideo();
-//DeadCode JON 10Nov00 		PostMessage(WM_SELECTTAB,0,0);
-//DeadCode JON 10Nov00 //DeadCode DAW 2Aug00 		TRACE0("MCI STOP");
-//DeadCode JON 10Nov00 //DeadCode JIM 2Aug00 		ReleaseCapture();
-//DeadCode JON 10Nov00 //DEADCODE RDH 18/04/00 				MCIWndClose(g_hwndMCIWnd);
-//DeadCode JON 10Nov00 //DEADCODE RDH 18/04/00 				MCIWndDestroy(g_hwndMCIWnd);
-//DeadCode JON 10Nov00 //DEADCODE RDH 18/04/00 				g_hwndMCIWnd=NULL;
-//DeadCode JON 10Nov00 //DeadCode DAW 2Aug00 				OnLButtonUp(0, CPoint (0,0)); //terminate the sheet also
-//DeadCode JON 10Nov00 	break;
-//DeadCode JON 10Nov00 	default:
-//DeadCode JON 10Nov00 //		wParam=lParam;
-//DeadCode JON 10Nov00 	break;
-//DeadCode JON 10Nov00 	}
-
 }
 
 BOOL RFullPanelDial::OnCommand(WPARAM wParam, LPARAM lParam) 
@@ -920,29 +814,6 @@ BOOL RFullPanelDial::OnCommand(WPARAM wParam, LPARAM lParam)
 	return CDialog::OnCommand(wParam, lParam);
 }
 
-//DEADCODE RDH 18/05/00 LRESULT RFullPanelDial::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
-//DEADCODE RDH 18/05/00 {
-//DEADCODE RDH 18/05/00 	// TODO: Add your specialized code here and/or call the base class
-//DEADCODE RDH 18/05/00 	int rv= CDialog::DefWindowProc(message, wParam, lParam);
-//DEADCODE RDH 18/05/00 	switch (message)
-//DEADCODE RDH 18/05/00 	{
-//DEADCODE RDH 18/05/00 	case	WM_NCCREATE:			case	WM_PARENTNOTIFY:
-//DEADCODE RDH 18/05/00 	case	WM_NCCALCSIZE:			case	0x04c8:	//MCIWNDM_NOTIFY:
-//DEADCODE RDH 18/05/00 	case	WM_CREATE:				case	WM_NCPAINT:
-//DEADCODE RDH 18/05/00 	case	WM_SIZE:				case	WM_SETCURSOR:
-//DEADCODE RDH 18/05/00 	case	WM_MOVE:				case	WM_SETFONT:
-//DEADCODE RDH 18/05/00 	case	WM_INITDIALOG:			case	WM_DISPLAYCHANGE:
-//DEADCODE RDH 18/05/00 	case	WM_CTLCOLORSTATIC:		case	WM_IDLEUPDATECMDUI: //363
-//DEADCODE RDH 18/05/00 	case	WM_GETFONT:				//
-//DEADCODE RDH 18/05/00 	case	WM_WINDOWPOSCHANGING:	//
-//DEADCODE RDH 18/05/00 	case	WM_SHOWWINDOW:			//
-//DEADCODE RDH 18/05/00 	case	WM_PAINT:				//
-//DEADCODE RDH 18/05/00 	case	WM_WINDOWPOSCHANGED:	//
-//DEADCODE RDH 18/05/00 	case	 WM_NCHITTEST:			//
-//DEADCODE RDH 18/05/00 		return rv;
-//DEADCODE RDH 18/05/00 	}
-//DEADCODE RDH 18/05/00 	return rv;
-//DEADCODE RDH 18/05/00 }
 
 BOOL RFullPanelDial::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo) 
 {

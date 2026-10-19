@@ -262,7 +262,6 @@ void CCareer::OnOK()
 	else
 	{
 		editbox=&m_IDC_NAME;
-//DeadCode DAW 23Nov98 	editbox=GETDLGITEM(IDC_NAME);
 		buffer = editbox->GetCaption();
 
 		if (buffer.GetLength() <= (PLAYERNAMELEN - 1))

@@ -382,9 +382,6 @@ void TGA::PutTGABody(FILE* fp,UWord* srcptr, ULong length)
 
 		UWord	inval = *srcptr++;
 
-//Old_Code PD 24Oct97 			int	b = inval & 0x1F; inval >>= 5;
-//Old_Code PD 24Oct97 			int	g = inval & 0x3F; inval >>= 6;
-//Old_Code PD 24Oct97 			int	r = inval & 0x1F;
 
 		int	r = (inval >> redScale) & redMask;				//PD 24Oct97
 		int	g = (inval >> greenScale) & greenMask;			//PD 24Oct97

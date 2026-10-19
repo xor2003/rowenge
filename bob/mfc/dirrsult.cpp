@@ -172,7 +172,6 @@ BOOL DirectiveResults::OnInitDialog()
 	CDialog::OnInitDialog();
 		CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 
 		//rlistbox->AddColumn(40);
@@ -206,20 +205,6 @@ void DirectiveResults::OnCancel()
 void DirectiveResults::OnOK() 
 {
 	LWDirectivesResults::MakeLWPackages(dr, true);
-//DeadCode RDH 08Feb00 		int i = 0;
-//DeadCode RDH 08Feb00 	while (dr->dirresults[i].targets[0] != UID_NULL)
-//DeadCode RDH 08Feb00 	{
-//DeadCode RDH 08Feb00 		int packnum;
-//DeadCode RDH 08Feb00 		packnum=Todays_Packages.NewPackage(dr->dirresults[i].targets[0],NAT_RED,Profile::AM_LEVELBOMB,
-//DeadCode RDH 08Feb00 								dr->dirresults[i].mission.bombers,
-//DeadCode RDH 08Feb00 								dr->dirresults[i].mission.attfighters, 
-//DeadCode RDH 08Feb00 								dr->dirresults[i].mission.detfighters,
-//DeadCode RDH 08Feb00 								dr->dirresults[i].mission.retfighters						
-//DeadCode RDH 08Feb00 											);
-//DeadCode RDH 08Feb00 		if (packnum!=-1)
-//DeadCode RDH 08Feb00 			Todays_Packages[packnum].RecalcRoutePositions();
-//DeadCode RDH 08Feb00 		i++;
-//DeadCode RDH 08Feb00 	}
 	m_pView->m_mapdlg.Invalidate();
 	MMC.directives.lw.current =	dr->tempdir;
 
@@ -233,33 +218,6 @@ void DirectiveResults::OnOK()
  typedef	Profile::AttackMethod	AttackMethod;
  MAKEFIELD(AttackMethod,Profile::AM_FIELD_MIN,Profile::AM_FIELD_MAX);
 
-//DEADCODE RDH 05/04/00 void LWDirectivesResults::SetSecondaryTargets(LWDirectivesResults* dr, int i, int packnum)
-//DEADCODE RDH 05/04/00 {
-//DEADCODE RDH 03/04/00 	int trg = 0;
-//DEADCODE RDH 03/04/00 	int targets = 1;
-//DEADCODE RDH 03/04/00 	while (		(trg < TargetGroup::MAXSECONDARIES)
-//DEADCODE RDH 03/04/00 			&&	(dr->dirresults[i].targets[trg+1])
-//DEADCODE RDH 03/04/00 			)
-//DEADCODE RDH 03/04/00 	{
-//DEADCODE RDH 03/04/00 		Todays_Packages[packnum].packagetarget[trg+1] = dr->dirresults[i].targets[trg+1];
-//DEADCODE RDH 03/04/00 		targets++;
-//DEADCODE RDH 03/04/00 	}
-//DEADCODE RDH 03/04/00 
-//DEADCODE RDH 03/04/00 	int j=0;
-//DEADCODE RDH 03/04/00 	int squads = 0;
-//DEADCODE RDH 03/04/00 	Profile& pk = Todays_Packages.pack[packnum];
-//DEADCODE RDH 03/04/00 
-//DEADCODE RDH 03/04/00 
-//DEADCODE RDH 03/04/00 	while (j < pk.squadlist)
-//DEADCODE RDH 03/04/00 	{
-//DEADCODE RDH 03/04/00 	   if (pk[j].method <= Profile::AM_RETURNESCORT)
-//DEADCODE RDH 03/04/00 		   squads++;
-//DEADCODE RDH 03/04/00 	   j++;
-//DEADCODE RDH 03/04/00 	}
-//DEADCODE RDH 03/04/00 	int squadspertarget = squads/targets;
-//DEADCODE RDH 03/04/00 
-//DEADCODE RDH 05/04/00 
-//DEADCODE RDH 05/04/00 }
 
 void LWDirectivesResults::MakeLWPackages(LWDirectivesResults* dr, bool manual)
 {
@@ -291,7 +249,6 @@ void LWDirectivesResults::MakeLWPackages(LWDirectivesResults* dr, bool manual)
 	while (dr->dirresults[i].targets[0] != UID_NULL)
 	{
 		int packnum;
-//DeadCode RDH 28Jun00 		dr->dirresults[i].mission.mainalt=METRES3000;
 		//the following are filled in:
 		//dr->dirresults[k].mission.escortmethods
 		bool gruppe = true;
@@ -326,10 +283,6 @@ void LWDirectivesResults::MakeLWPackages(LWDirectivesResults* dr, bool manual)
 
 
 			}
-//DeadCode JIM 3Nov00 			if (Todays_Packages[packnum].RemoveOverExtendedFlights())
-//DeadCode JIM 3Nov00 			{
-//DeadCode JIM 3Nov00 				Todays_Packages[packnum].ReorderPackage(dr->dirresults[i].mission.escortmethods);
-//DeadCode JIM 3Nov00 			}
 			Todays_Packages[packnum].CalcRoutePositionsAndTime(missiontime);
 			if (Todays_Packages[packnum].cancelsquad)
 				anyofpacksbad=true;
@@ -346,29 +299,6 @@ void LWDirectivesResults::MakeLWPackages(LWDirectivesResults* dr, bool manual)
 	if (anyofpacksbad &&  Todays_Packages.localplayer!=NAT_RAF)
 		MainToolBar().OpenMissionfolder(true);
 	//temp to set up raf
-//DEADCODE RDH 17/03/00 	int pack=0;
-//DEADCODE RDH 17/03/00 
-//DEADCODE RDH 17/03/00 	while (pack < Profile::MAX_PACKS)
-//DEADCODE RDH 17/03/00 	{
-//DEADCODE RDH 17/03/00 		if 	(		(Todays_Packages.pack[pack].packagestatus!=Profile::PS_SPARE)
-//DEADCODE RDH 17/03/00 				&&	(Todays_Packages.pack[pack].packagestatus!=Profile::PS_COMPLETE)
-//DEADCODE RDH 17/03/00 				&&	(Todays_Packages.pack[pack].attackmethod >= Profile::AM_LWPACKS)
-//DEADCODE RDH 17/03/00 			)
-//DEADCODE RDH 17/03/00 
-//DEADCODE RDH 17/03/00 		{
-//DEADCODE RDH 17/03/00 				RAFDirectivesResults::SetRAFIntercept(pack,0);
-//DEADCODE RDH 17/03/00 //DEADCODE RDH 14/03/00 				if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DEADCODE RDH 17/03/00 //DEADCODE RDH 14/03/00 					RAFDirectivesResults::SetRAFIntercept(pack,0);
-//DEADCODE RDH 17/03/00 //DEADCODE RDH 14/03/00 				else
-//DEADCODE RDH 17/03/00 //DEADCODE RDH 14/03/00 				{
-//DEADCODE RDH 17/03/00 //DEADCODE RDH 14/03/00 //DEADCODE RDH 14/03/00 					if (pack == 0)
-//DEADCODE RDH 17/03/00 //DEADCODE RDH 14/03/00 						MainToolBar().OpenInterceptOffered(pack,0); 
-//DEADCODE RDH 17/03/00 //DEADCODE RDH 14/03/00 				}
-//DEADCODE RDH 17/03/00 		}
-//DEADCODE RDH 17/03/00 		pack++;
-//DEADCODE RDH 17/03/00 
-//DEADCODE RDH 17/03/00 	}
-//DEADCODE RDH 17/03/00 
 }
 Directives::LW::MissTypes  LWDirectivesResults::LWMissType()
 {

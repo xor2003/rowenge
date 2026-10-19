@@ -26,21 +26,15 @@ public:
 	Aggregator();
 	~Aggregator();
 
-//DeadCode AMM 16Nov99 	void 	AggregatorGetPackets(Bool reset,Bool timercall);
 	void 	AggregatorGetPackets(); 
 	Bool	Running;
 	void	StopResetAggregator();
-//DEADCODE AMM 24/01/00 	void	ResizeBuffers(ULong);
  	UByte	GetAggFrameCount();
-//DeadCode AMM 16Nov99 	UByte	GetAggFrameCount();
-//DeadCode AMM 21Aug98  	void	InitRecBits();
 
-//DeadCode AMM 16Nov99 	static int	inaggregator;
 
 private:
 	bool	ResetFlag;
 	UByte	AggFrameCount;	// aggregators frame count
-//DeadCode AMM 16Nov99 	void	SetAcks(LPAGGSENDPACKET packet);
 	void	SetAcks();
 
 	CBuffer<AGGBUFF,BUFFERLENGTH> AggBuffer;
@@ -51,19 +45,15 @@ private:
 
 	CBuffer<ACPACKET, BUFFERLENGTH> ReservePackets[MAXPLAYERS];
 
-//DeadCode AMM 16Nov99 	void	InitAggArrayBuffer(LPAGGSENDPACKET pack);
 	void	InitAggArrayBuffer();
 	void	InitAggregator();
  	ULong	RecBits;
 	void	ResetAcks();
-//DeadCode AMM 16Nov99 	void	CheckAck(UByte val, UByte count, UByte pos);
 	void	CheckAck(UByte val, UByte pos);
 	void	InitReservePackets();
 	void	UpdateAckBuffer();
 
 	// 0=not resent, 1=resent 1/4 , 2=resent 1/2
-//DeadCode AMM 16Nov99 	UByte	ResendStatus;
-//DeadCode AMM 16Nov99 	UByte	ResendPacket;
 
 	char*	AggPacketPtr;
 	ULong	AggPacketLength;

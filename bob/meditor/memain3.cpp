@@ -96,7 +96,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	<vcl\clipbrd.hpp>
 //#include	"loadsave.h"
 #pragma hdrstop
-//DEADCODE JIM 09/02/00 #include "text.h"
 //#include "bstream.h"
 #include	"shapenum.g"
 #define F_SOUNDS

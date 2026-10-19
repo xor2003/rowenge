@@ -19,6 +19,8 @@
 #include <sys/uio.h>
 #include <sys/mman.h>
 #include <unordered_map>
+#include <unordered_set>
+#include <mutex>
 #include "io_compat.h"
 #include "SDL.h"
 #include "MigCstring.h"
@@ -964,6 +966,35 @@ struct HandleBase {
     virtual ~HandleBase() = default;
 };
 
+// Registry of heap-allocated handles so CloseHandle/Wait* never dereference
+// a small integer or a stale pointer (analysis found delete on constant
+// 0x10000 reachable via bogus handle values).
+inline std::unordered_set<HANDLE>& RowanLiveHandles()
+{
+    static std::unordered_set<HANDLE>* s = new std::unordered_set<HANDLE>;
+    return *s;
+}
+inline std::mutex& RowanLiveHandlesMutex()
+{
+    static std::mutex* m = new std::mutex;
+    return *m;
+}
+inline void RegisterLiveHandle(HANDLE h)
+{
+    std::lock_guard<std::mutex> lk(RowanLiveHandlesMutex());
+    RowanLiveHandles().insert(h);
+}
+inline bool IsLiveHandle(HANDLE h)
+{
+    std::lock_guard<std::mutex> lk(RowanLiveHandlesMutex());
+    return RowanLiveHandles().count(h) != 0;
+}
+inline void UnregisterLiveHandle(HANDLE h)
+{
+    std::lock_guard<std::mutex> lk(RowanLiveHandlesMutex());
+    RowanLiveHandles().erase(h);
+}
+
 // Internal wrapper types
 struct LinuxSemaphore : public HandleBase {
     sem_t sem;
@@ -986,11 +1017,13 @@ inline HANDLE CreateEvent(void* lpEventAttributes, bool bManualReset, bool bInit
     pthread_cond_init(&ev->cond, nullptr);
     ev->signaled = bInitialState;
     ev->manualReset = bManualReset;
+    RegisterLiveHandle((HANDLE)ev);
     return (HANDLE)ev;
 }
 
 // Drop-in replacement for SetEvent
 inline bool SetEvent(HANDLE hEvent) {
+    if (!IsLiveHandle(hEvent)) return false;
     PosixEventObject* ev = (PosixEventObject*)hEvent;
     pthread_mutex_lock(&ev->mutex);
     ev->signaled = true;
@@ -1004,6 +1037,7 @@ inline bool SetEvent(HANDLE hEvent) {
 
 // Drop-in replacement for ResetEvent
 inline bool ResetEvent(HANDLE hEvent) {
+    if (!IsLiveHandle(hEvent)) return false;
     PosixEventObject* ev = (PosixEventObject*)hEvent;
     pthread_mutex_lock(&ev->mutex);
     ev->signaled = false;
@@ -1018,6 +1052,12 @@ static inline bool CloseHandle(HANDLE hObject) {
     if (h < 0x10000) {
         return (close((int)h) == 0);
     }
+
+    // Values in [0x10000, 0x1000000) are neither fds nor plausible heap
+    // handles (our wrappers are new'd objects) — reject without dereferencing.
+    if (h < 0x1000000) return false;
+    if (!IsLiveHandle(hObject)) return false;   // not ours — don't deref
+    UnregisterLiveHandle(hObject);
 
     HandleBase* hb = (HandleBase*)hObject;
     if (hb->type == HandleType::Semaphore) {
@@ -1045,6 +1085,7 @@ inline int WaitForSingleObject(HANDLE hEvent, int timeout) {
     uintptr_t h = (uintptr_t)hEvent;
     if (h == 0 || h == (uintptr_t)INVALID_HANDLE_VALUE) return WAIT_FAILED;
     if (h < 0x10000) return WAIT_FAILED;
+    if (!IsLiveHandle(hEvent)) return WAIT_FAILED;
 
     HandleBase* hb = (HandleBase*)hEvent;
     if (hb->type == HandleType::Semaphore) {
@@ -1149,6 +1190,7 @@ inline HANDLE CreateSemaphore(void* /*lpSemaphoreAttributes*/,
     }
     // Note: POSIX semaphores don’t enforce max count, you’ll need to track it manually if required
     s->maxCount = lMaximumCount;
+    RegisterLiveHandle((HANDLE)s);
     return s;
 }
 
@@ -1162,13 +1204,14 @@ inline HANDLE CreateMutex(void* /*lpMutexAttributes*/,
         delete m;
         return nullptr;
     }
+    RegisterLiveHandle((HANDLE)m);
     return m;
 }
 
 // ReleaseSemaphore: increments the semaphore count
 inline bool ReleaseSemaphore(HANDLE hSemaphore, LONG lReleaseCount, LONG* lpPreviousCount) {
+    if (!IsLiveHandle(hSemaphore)) return false;
     LinuxSemaphore* s = (LinuxSemaphore*)hSemaphore;
-    if (!s) return false;
 
     int val;
     if (sem_getvalue(&s->sem, &val) != 0) return false;
@@ -1192,8 +1235,8 @@ inline bool ReleaseSemaphore(HANDLE hSemaphore, LONG lReleaseCount, LONG* lpPrev
 
 // ReleaseMutex: unlocks the mutex
 inline bool ReleaseMutex(HANDLE hMutex) {
+    if (!IsLiveHandle(hMutex)) return false;
     PosixEventObject* m = (PosixEventObject*)hMutex;
-    if (!m) return false;
     return pthread_mutex_unlock(&m->mutex) == 0;
 }
 
@@ -1231,6 +1274,7 @@ inline HANDLE CreateThread(void* /*lpThreadAttributes*/,
         delete t;
         return nullptr;
     }
+    RegisterLiveHandle((HANDLE)t);
     return t;
 }
 

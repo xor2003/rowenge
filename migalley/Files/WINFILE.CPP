@@ -458,10 +458,10 @@ void fileman::pingCD()
 				//2048-aligned scratch like every other caller.
 				void*	retval = readblockbuffer;
 
-				LARGE_INTEGER	t1;
+				LARGE_INTEGER	t1={0,0};								//RERUN: QPC may fail leaving garbage
 				QueryPerformanceCounter(&t1);
 				CDseekreadfilepos(cdfile->winhandle,cdfile->actualindex,retval,4);
-				LARGE_INTEGER	t2;
+				LARGE_INTEGER	t2={0,0};
 				QueryPerformanceCounter(&t2);
 				int t=t2.LowPart-t1.LowPart;
 				t>>=4;

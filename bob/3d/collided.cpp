@@ -88,8 +88,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"3dcode.h"
 const	ANGLES ACROLLANGLE = ANGLES_10Deg;						//RJS 02JUN99
 const	ANGLES ACPITCHANGLE= ANGLES_15Deg;						//PD 11Sep96
-//DEADCODE CSB 29/02/00 const	UWord ACUPSIDEDOWNMIN= UWord(ANGLES_180Deg) - UWord(ANGLES_15Deg);	//RJS 14Apr99
-//DEADCODE CSB 29/02/00 const	UWord ACUPSIDEDOWNMAX= UWord(ANGLES_180Deg) + UWord(ANGLES_15Deg);	//RJS 14Apr99
 const	UWord ACUPSIDEDOWNMIN= UWord(ANGLES_180Deg) - UWord(ANGLES_80Deg);	//CSB 29/02/00
 const	UWord ACUPSIDEDOWNMAX= UWord(ANGLES_180Deg) + UWord(ANGLES_80Deg);	//CSB 29/02/00
 
@@ -436,35 +434,6 @@ Bool Collide::TouchedGround(	AirStrucPtr ac,
 {
 	ac->fly.pModel->GroundHeight = groundlevel;			//RJS 15Apr99
 
-//DEADCODE CSB 14/03/00 	if(ac->fly.numinsag)
-//DEADCODE CSB 14/03/00 	{
-//DEADCODE CSB 14/03/00 		if(ac->World.Y < groundlevel + ac->classtype->deckshunt)
-//DEADCODE CSB 14/03/00 		{
-//DEADCODE CSB 14/03/00 			SWord maxang = ac->pitch;
-//DEADCODE CSB 14/03/00 			pos = Collide::NOSE_TOUCH;
-//DEADCODE CSB 14/03/00 			if(-SWord(ac->pitch) > maxang)
-//DEADCODE CSB 14/03/00 			{
-//DEADCODE CSB 14/03/00 				maxang = -SWord(ac->pitch);
-//DEADCODE CSB 14/03/00 				pos = Collide::TAIL_TOUCH;
-//DEADCODE CSB 14/03/00 			}
-//DEADCODE CSB 14/03/00 			if(SWord(ac->roll) > maxang)
-//DEADCODE CSB 14/03/00 			{
-//DEADCODE CSB 14/03/00 				maxang = SWord(ac->roll);
-//DEADCODE CSB 14/03/00 				pos = Collide::RIGHT_WING_TOUCH;
-//DEADCODE CSB 14/03/00 			}
-//DEADCODE CSB 14/03/00 			if(-SWord(ac->roll) > maxang)
-//DEADCODE CSB 14/03/00 			{
-//DEADCODE CSB 14/03/00 				maxang = -SWord(ac->roll);
-//DEADCODE CSB 14/03/00 				pos = Collide::LEFT_WING_TOUCH;
-//DEADCODE CSB 14/03/00 			}
-//DEADCODE CSB 14/03/00 			return(TRUE);
-//DEADCODE CSB 14/03/00 		}
-//DEADCODE CSB 14/03/00 		else
-//DEADCODE CSB 14/03/00 		{
-//DEADCODE CSB 14/03/00 			pos = Collide::NOTTOUCHED;
-//DEADCODE CSB 14/03/00 			return(FALSE);
-//DEADCODE CSB 14/03/00 		}
-//DEADCODE CSB 14/03/00 	}
 
 	Bool		retval = FALSE;
 	SWord 		pitchdelta,
@@ -570,8 +539,6 @@ switch(CTtocheck)
 }
 switch(pos)
 {
-//DEADCODE CSB 01/03/00 	case Collide::NOTTOUCHED:			PrintString(40, 3, "NOTTOUCHED  ");	break;
-//DEADCODE CSB 01/03/00 	case Collide::LANDED_OK:			PrintString(40, 3, "LANDED_OK   ");	break;
 	case Collide::WHEEL_AND_WING_TOUCH:	PrintString(40, 3, "WHEEL_&_WING");	break;
 	case Collide::LANDED_BELLY:			PrintString(40, 3, "LANDED_BELLY");	break;
 	case Collide::PROP_TOUCH:			PrintString(40, 3, "PROP_TOUCH  ");	break;
@@ -581,84 +548,6 @@ switch(pos)
 	case Collide::TAIL_TOUCH:			PrintString(40, 3, "TAIL_TOUCH  ");	break;
 }
 #endif
-//DEADCODE CSB 29/02/00 		if( (pitchdelta<0?-pitchdelta:pitchdelta) < (rolldelta<0?-rolldelta:rolldelta) )
-//DEADCODE CSB 29/02/00 		{
-//DEADCODE CSB 29/02/00 			//Dpitch gt Droll
-//DEADCODE CSB 29/02/00 
-//DEADCODE CSB 29/02/00 			if ((ANGLES)(Angles)rolldelta>ACROLLANGLE)
-//DEADCODE CSB 29/02/00 			{
-//DEADCODE CSB 29/02/00 				SHAPE.GetContactPoint((itemptr )ac,CT_LEFT,coords,offset,PushedOffset);//RJS 12Aug97
-//DEADCODE CSB 29/02/00 				if((adptr->aclegsuspl > 0) || (adptr->aclegsuspr > 0))
-//DEADCODE CSB 29/02/00 					pos = Collide::WHEEL_AND_WING_TOUCH;
-//DEADCODE CSB 29/02/00 				else
-//DEADCODE CSB 29/02/00 					pos = Collide::LEFT_WING_TOUCH;
-//DEADCODE CSB 29/02/00 			}
-//DEADCODE CSB 29/02/00 			else
-//DEADCODE CSB 29/02/00 			{
-//DEADCODE CSB 29/02/00 				if ((ANGLES)(Angles)rolldelta<-ACROLLANGLE)
-//DEADCODE CSB 29/02/00 				{
-//DEADCODE CSB 29/02/00 					SHAPE.GetContactPoint((itemptr )ac,CT_RIGHT,coords,offset,PushedOffset);//RJS 12Aug97
-//DEADCODE CSB 29/02/00 					if((adptr->aclegsuspl > 0) || (adptr->aclegsuspr > 0))
-//DEADCODE CSB 29/02/00 						pos = Collide::WHEEL_AND_WING_TOUCH;
-//DEADCODE CSB 29/02/00 					else
-//DEADCODE CSB 29/02/00 		 				pos = Collide::RIGHT_WING_TOUCH;
-//DEADCODE CSB 29/02/00 				}
-//DEADCODE CSB 29/02/00 				else
-//DEADCODE CSB 29/02/00 				{
-//DEADCODE CSB 29/02/00 					if (	(!adptr->acleglowerl && !adptr->LEFTWHEEL)				//RJS 19May99
-//DEADCODE CSB 29/02/00 						&&	(!adptr->acleglowerr && !adptr->RIGHTWHEEL)	)			//RJS 19MaY99
-//DEADCODE CSB 29/02/00 					{
-//DEADCODE CSB 29/02/00 						pos = Collide::LANDED_OK;
-//DEADCODE CSB 29/02/00 						return FALSE;
-//DEADCODE CSB 29/02/00 					}	
-//DEADCODE CSB 29/02/00 					else
-//DEADCODE CSB 29/02/00 					{
-//DEADCODE CSB 29/02/00 						SHAPE.GetContactPoint((itemptr )ac,CT_BELLY,coords,offset,PushedOffset);//RJS 12Aug97
-//DEADCODE CSB 29/02/00 						pos = Collide::LANDED_BELLY;
-//DEADCODE CSB 29/02/00 					}
-//DEADCODE CSB 29/02/00 				}
-//DEADCODE CSB 29/02/00 			}
-//DEADCODE CSB 29/02/00 		}
-//DEADCODE CSB 29/02/00 		else
-//DEADCODE CSB 29/02/00 		{
-//DEADCODE CSB 29/02/00 			//Droll gt DPitch
-//DEADCODE CSB 29/02/00 
-//DEADCODE CSB 29/02/00 			if ((ANGLES)(Angles)pitchdelta>ACPITCHANGLE)
-//DEADCODE CSB 29/02/00 			{
-//DEADCODE CSB 29/02/00 				SHAPE.GetContactPoint((itemptr )ac,CT_FRONT,coords,offset,PushedOffset);//RJS 12Aug97
-//DEADCODE CSB 29/02/00 		 		pos = Collide::NOSE_TOUCH;
-//DEADCODE CSB 29/02/00 			}
-//DEADCODE CSB 29/02/00 			else
-//DEADCODE CSB 29/02/00 			{
-//DEADCODE CSB 29/02/00 				if ((ANGLES)(Angles)pitchdelta<-ACPITCHANGLE)
-//DEADCODE CSB 29/02/00 				{
-//DEADCODE CSB 29/02/00 					SHAPE.GetContactPoint((itemptr )ac,CT_BACK,coords,offset,PushedOffset);//RJS 12Aug97
-//DEADCODE CSB 29/02/00 					pos = Collide::TAIL_TOUCH;						//RJS 13Jan99
-//DEADCODE CSB 29/02/00 				}
-//DEADCODE CSB 29/02/00 				else
-//DEADCODE CSB 29/02/00 				{
-//DEADCODE CSB 29/02/00 					if (	(!adptr->acleglowerl && !adptr->LEFTWHEEL)				//RJS 19May99
-//DEADCODE CSB 29/02/00 						&&	(!adptr->acleglowerr && !adptr->RIGHTWHEEL)	)			//RJS 19MaY99
-//DEADCODE CSB 29/02/00 					{
-//DEADCODE CSB 29/02/00 						pos = Collide::LANDED_OK;
-//DEADCODE CSB 29/02/00 						return FALSE;
-//DEADCODE CSB 29/02/00 					}	
-//DEADCODE CSB 29/02/00 					else
-//DEADCODE CSB 29/02/00 					{
-//DEADCODE CSB 29/02/00 						if((adptr->ENGINELEFT != BS_DEAD) || (adptr->ENGINERIGHT != BS_DEAD))
-//DEADCODE CSB 29/02/00 						{
-//DEADCODE CSB 29/02/00 							SHAPE.GetContactPoint((itemptr )ac,CT_BELLY,coords,offset,PushedOffset);//RJS 12Aug97
-//DEADCODE CSB 29/02/00 							pos = Collide::PROP_TOUCH;
-//DEADCODE CSB 29/02/00 						}
-//DEADCODE CSB 29/02/00 						else
-//DEADCODE CSB 29/02/00 						{
-//DEADCODE CSB 29/02/00 							SHAPE.GetContactPoint((itemptr )ac,CT_BELLY,coords,offset,PushedOffset);//RJS 12Aug97
-//DEADCODE CSB 29/02/00 							pos = Collide::LANDED_BELLY;
-//DEADCODE CSB 29/02/00 						}
-//DEADCODE CSB 29/02/00 					}
-//DEADCODE CSB 29/02/00 				}
-//DEADCODE CSB 29/02/00 			}
-//DEADCODE CSB 29/02/00 		}
 
 	SLong	glevel;
 
@@ -779,7 +668,6 @@ void Collide::FindRelPitchAndRoll(	AirStrucPtr ac,
 	Coords3D	thecoord = ac->World;						//RJS 20Apr99
 
  	Three_Dee.pMigLand->GetShadowAngles(thecoord,ac->hdg,newpitch,newroll);//RJS 20Apr99	//CSB 01Jul99
-//DeadCode DAW 01Jul99 	Three_Dee.pMigLand->GetShadowAngles(thecoord,ac->hdg,newpitch,newroll);//RJS 01Jul99
 	heading=ac->hdg;
 	pitch=(ANGLES)newpitch;
 	roll=(ANGLES)newroll;

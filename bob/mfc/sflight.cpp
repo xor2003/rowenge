@@ -151,8 +151,6 @@ BOOL CSFlight::OnInitDialog()
 
 	if (_DPlay.PlayerCreated)
 	{
-//DeadCode AMM 16Nov99 		_DPlay.UISendInPrefsMessage();
-//DeadCode AMM 16Nov99 		DPlay::H2H_Player[_DPlay.mySlot].status=CPS_PREFS;
 		_DPlay.SendStatusChange(DPlay::CPS_PREFS);
 	}
 
@@ -161,15 +159,6 @@ BOOL CSFlight::OnInitDialog()
 #define	SG2C_DISPLAY setlevel
 #include "sg2combo.h"
 	OPTIONS	
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_ALL.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_POWERBOOST.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_WINDGUSTS.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_SPINS.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_AIRFRAME.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_TORQUE.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_109FUEL.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_WIND0.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 
 
 	CRCombo* combo;
  	if(Save_Data.flightdifficulty[FD_SPINS] && !_DPlay.PlayerCreated)
@@ -269,10 +258,8 @@ BEGIN_EVENTSINK_MAP(CSFlight, CDialog)
 	ON_EVENT(CSFlight, IDC_CBO_AIRFRAME, 1 /* TextChanged */, OnTextChangedCboAirframe, VTS_BSTR VTS_I2)
 	ON_EVENT(CSFlight, IDC_CBO_109FUEL, 1 /* TextChanged */, OnTextChangedCbo109Fuel, VTS_BSTR VTS_I2)
 	ON_EVENT(CSFlight, IDC_CBO_POWERBOOST, 1 /* TextChanged */, OnTextChangedCboPowerboost, VTS_BSTR VTS_I2)
-//DEADCODE JIM 30/11/99 	ON_EVENT(CSFlight, IDC_CBO_RUDDER, 1 /* TextChanged */, OnTextChangedCboRudder, VTS_BSTR VTS_I2)
 	ON_EVENT(CSFlight, IDC_CBO_SPINS, 1 /* TextChanged */, OnTextChangedCboSpins, VTS_BSTR VTS_I2)
 	ON_EVENT(CSFlight, IDC_CBO_TORQUE, 1 /* TextChanged */, OnTextChangedCboTorque, VTS_BSTR VTS_I2)
-//DEADCODE JIM 30/11/99 	ON_EVENT(CSFlight, IDC_CBO_WIND, 1 /* TextChanged */, OnTextChangedCboWind, VTS_BSTR VTS_I2)
 	ON_EVENT(CSFlight, IDC_CBO_WIND0, 1 /* TextChanged */, OnTextChangedCboWind0, VTS_BSTR VTS_I2)
 	ON_EVENT(CSFlight, IDC_CBO_PROPPITCH, 1 /* TextChanged */, OnTextChangedCboProppitch, VTS_BSTR VTS_I2)
 	ON_EVENT(CSFlight, IDC_CBO_ENGINEMANAGEMENT, 1 /* TextChanged */, OnTextChangedCboEnginemanagement, VTS_BSTR VTS_I2)
@@ -322,8 +309,6 @@ void CSFlight::OnTextChangedCboAll(LPCTSTR text, short index)
 void CSFlight::OnTextChangedCboAirframe(LPCTSTR text, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DEADCODE RDH 24/11/99 #define	SG2C_CHANGEFIELD
-//DEADCODE RDH 24/11/99 #include "sg2combo.h"
 	OPTIONS
 	
 }
@@ -371,8 +356,6 @@ void CSFlight::OnTextChangedCboSpins(LPCTSTR text, short index)
 			combo->SetEnabled(false);
 			Save_Data.flightdifficulty |= FD_PROPPITCH;
 		}
-//DEADCODE CSB 13/01/00 		combo=GETDLGITEM(IDC_CBO_PROPPITCH);
-//DEADCODE CSB 13/01/00 		combo->SetEnabled(true);
 	}else
 	{
 		combo=GETDLGITEM(IDC_CBO_ENGINEMANAGEMENT);

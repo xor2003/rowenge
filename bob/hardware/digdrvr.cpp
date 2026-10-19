@@ -78,7 +78,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"cguid.h"
 #define NULL 0
 
-//DeadCode RJS 08Nov99 DigitalDriver Dig_Driver;
 
 BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, LPVOID lpContext);
 
@@ -172,7 +171,6 @@ bool	DigitalDriver::Init(WAVEFORMATEX* wavformat,bool have3dsound, int& maxchann
 		Release();
 
  		samplerate=wavformat->nSamplesPerSec;
-//DeadCode RJS 28Sep00 		nochannels=maxchannels;
 		nochannelsused=0;
 		using3d=have3dsound;
 
@@ -184,14 +182,6 @@ bool	DigitalDriver::Init(WAVEFORMATEX* wavformat,bool have3dsound, int& maxchann
 
 // create 3dListener AFTER Primary buffer has been set up
 
-//DEADCODE AMM 24/11/99 		if (using3d)
-//DEADCODE AMM 24/11/99 		{
-//DEADCODE AMM 24/11/99 			if (!Create3DListener())
-//DEADCODE AMM 24/11/99 			{
-//DEADCODE AMM 24/11/99 				Release();
-//DEADCODE AMM 24/11/99 				return false;
-//DEADCODE AMM 24/11/99 			}
-//DEADCODE AMM 24/11/99 		}
 
 		if (!InitPrimaryBuffer(wavformat,oldVol))
 		{
@@ -220,7 +210,6 @@ bool	DigitalDriver::Init(WAVEFORMATEX* wavformat,bool have3dsound, int& maxchann
 // that are requested then fail. Caller will have to decide whether he wants to
 // recall function with less required samples.
 
-//DeadCode RJS 10Oct00 		if (maxchannels < CHANNELS_MIN)
 		if (maxchannels <= 2)
 			maxchannels = CHANNELS_MIN;
 
@@ -322,7 +311,6 @@ void	DigitalDriver::Release()
 
 		ULong n;
 
-//DeadCode RJS 28Sep00 		for (n=0;n<nochannelsused;n++)
 		for (n=0;n<nochannels;n++)
 		{
 			if (channeltable[n])
@@ -687,17 +675,6 @@ int	DigitalDriver::GetDecibels(int	theVol)
 	return Vol_Table[theVol & 0x1FF];									//RJS 14Sep00
 }
 
-//DeadCode AMM 12Oct00 void	DPlay::CommitDodge()
-//DeadCode AMM 12Oct00 {
-//DeadCode AMM 12Oct00 	ListenerStruc	l;
-//DeadCode AMM 12Oct00
-//DeadCode AMM 12Oct00 	ZeroMemory(&l,sizeof(ListenerStruc));
-//DeadCode AMM 12Oct00
-//DeadCode AMM 12Oct00 	_Miles.dig->Set3DListener(l);
-//DeadCode AMM 12Oct00 	_Miles.dig->Test3DSound();
-//DeadCode AMM 12Oct00 //	_Miles.dig->DirectSound_Commit();
-//DeadCode AMM 12Oct00
-//DeadCode AMM 12Oct00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		AddDefaultDeviceToList
@@ -714,7 +691,6 @@ int	DigitalDriver::GetDecibels(int	theVol)
 void DigitalDriver::AddDefaultDeviceToList()
 {
 	LPDSPORTINFO portinfo=new DSPORTINFO;
-//DeadCode RJS 22Oct00 	LPDSPORTINFO temp=PortInfo;
 
 	strcpy(portinfo->device,"Default");
 	portinfo->port=GUID_NULL;

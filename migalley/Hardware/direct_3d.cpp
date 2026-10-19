@@ -914,7 +914,6 @@ void DDErrorCodes(const char* file,int lineno,HRESULT dderr)
 		break;
 	}
 	OutputDebugString(ErrorString);
-//DEADCODE JIM 20/07/99 	Mono_Text.Print((UByte*)ErrorString);
 	_Error.ReallyEmitSysErr(ErrorString);
 #endif
 }

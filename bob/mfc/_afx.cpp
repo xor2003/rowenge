@@ -68,17 +68,14 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //#include ".\Afxauto.h"
 
 #include ".\font.cpp"
-//DEADCODE DAW 24/11/99 #include ".\picture.cpp"
 #include ".\rbutton.cpp"
 #include ".\rcombo.cpp"
 #include ".\RComboX.cpp"
 #include ".\redit.cpp"
 #include ".\redtbt.cpp"
-//DEADCODE DAW 24/11/99 #include ".\rjoycfg.cpp"
 #include ".\rlistbox.cpp"
 #include ".\rspltbar.cpp"
 #include ".\rtabs.cpp"
-//DEADCODE DAW 24/11/99 #include ".\rtitle.cpp"
 #include ".\rscrlbar.cpp"
 #include "rspinbut.cpp"
 

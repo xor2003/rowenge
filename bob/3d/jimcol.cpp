@@ -89,6 +89,7 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #define F_BATTLE
 
 #include	"dosdefs.h"
+#include	"animlink.h"											//ptr side-channel for animdata fields
 #include "myerror.h"
 #include	"Collided.h"
 #include	"worldinc.h"
@@ -120,7 +121,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #ifndef	NDEBUG
 //#define	_FXDEBUG_
 //#define	_BOMBTRACE_
-//DeadCode RJS 26Oct00 #define	_REPLAYCOL_
 //#define	_EASYKILLS_
 #endif
 
@@ -268,7 +268,6 @@ const	int		MIN_RUNWAYDAMAGE = 8;									//RJS 11Aug00
 	bool		BoxCol::notAirborne=false;						//RJS 8Sep00
 
 
-//DeadCode AMM 4Jul00 static	bool	withinColTest = false;
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		NineSectorCol
@@ -311,7 +310,6 @@ ItemPtr BoxCol::NineSectorCol(MobileItemPtr hitter,Coords3D& hitpos,int& eltnum)
 	UWord	sector_x,
 			sector_y;
 	TransientItem*	lastbullet = NULL;							//RJS 29Mar99
-//DeadCode RJS 30Jun00 	ShapeDescPtr	sdptr = SHAPESTUFF.GetShapePtr(hitter->shape);
 
 	aggressoriswire = false;									//RJS 04Feb00
 
@@ -339,8 +337,6 @@ ItemPtr BoxCol::NineSectorCol(MobileItemPtr hitter,Coords3D& hitpos,int& eltnum)
 		sector_x--;
 		sector_y--;
 
-	//DeadCode DAW 01Dec98 	HitterStrength = SHAPESTUFF.GetShapeDamageStrength(hitter->shape);//RJS 22Jan98
-//DeadCode RJS 13Aug00 		HitterDamageType = SHAPESTUFF.GetShapeDamageType(hitter->shape);//RJS 22Jan98
 		Col_Hitter = hitter;										//RJS 07Mar97
 		Col_GroupElement = -1;										//RJS 27Feb98
 		if (HitterDamageType == DMT_EXPLOSION)
@@ -358,14 +354,6 @@ ItemPtr BoxCol::NineSectorCol(MobileItemPtr hitter,Coords3D& hitpos,int& eltnum)
 			trg=SectorCol(hitter,trg,hitpos,eltnum,hittersector,lastbullet,isPlayer);//RJS 27May99
 			if (trg)
 			{
-//DeadCode DAW 15Jun99 #ifndef NDEBUG
-//DeadCode DAW 15Jun99 	if (isPlayer)
-//DeadCode DAW 15Jun99 	{
-//DeadCode DAW 15Jun99 		UWord	cw=GETFPCW();
-//DeadCode DAW 15Jun99 		::AfxTrace("GOOD HIT!!: 0x%x\n",trg);
-//DeadCode DAW 15Jun99 		SETFPCW(cw);
-//DeadCode DAW 15Jun99 	}
-//DeadCode DAW 15Jun99 #endif
 
 	//			*(char*)(0xb0000+160*24+100)='C';
 				ProcessEffectQueue(trg);
@@ -407,9 +395,6 @@ bool	BoxCol::TargetAllowed(ItemPtr hitter,ItemPtr trg,SLong strength)
 	{
 		return true;
 // does this mean all big, hard explosions can do damage?
-//DeadCode RJS 26Oct00 		if (Col_ExplodeIt)			return true;
-//DeadCode RJS 26Oct00 
-//DeadCode RJS 26Oct00 		return false;
 	}
 }
 
@@ -443,13 +428,11 @@ ItemPtr BoxCol::SectorCol(	MobileItemPtr hitter,
 			|| Save_Data.gamedifficulty[GD_VULNERABLE])			//RJS 11Dec96
 		{
 // cheap throw-out...
-//DeadCode RJS 8Nov00 			if ((trg->Status.size == AirStrucSize) || (hitter->World.Y < HIGHESTGROUND))//RJS 21May99
 			if ((trg->World.Y >= HIGHESTGROUND) || (hitter->World.Y < HIGHESTGROUND))	//RJS 8Nov00
 			{
 				StaticTrgSdptr=SHAPESTUFF.GetShapePtr(trg->shape);	//RJS 03Mar98
  				if (hittersector || SHAPESTUFF.GetShapeScale(StaticTrgSdptr)==SHP_GRP)//RJS 03Mar98
 					if (trg->Status.size != AirStrucSize || ((AirStrucPtr)trg)->movecode != AUTO_RESURRECT )
-//DeadCode RJS 20Dec99						if (trg!=hitter && trg != launcher && ((trg->Status.size!=TRANSIENTSIZE) || (StaticTrgSdptr->AnimDataSize==AIRCRAFTANIM)))//RJS 25Nov99
 						if (trg!=hitter && trg != launcher && trg->Status.size!=TRANSIENTSIZE)
 							if (TargetAllowed(hitter,trg,HitterStrength))		  //DAW 07/04/99//RJS 10Jun99
 								if (GroupCol(hitter,trg,hitpos,eltnum,lastbullet,isPlayer)) 
@@ -477,7 +460,6 @@ ItemPtr BoxCol::SectorCol(	MobileItemPtr hitter,
 Bool BoxCol::GroupCol(MobileItemPtr hitter,ItemPtr trg,Coords3D& hitpos,int& eltnum, TransientItem* lastbullet, Bool isPlayer)
 {
 
-//DeadCode RJS 03Mar98 	ShapeDescPtr sdptr=SHAPESTUFF.GetShapePtr(trg->shape);
 	Col_GroupPtr = NULL;										//RJS 23Feb00
 	Col_GroupElement = -1;										//RJS 24Jun99
 	if (trg->World.Y==0)
@@ -532,7 +514,6 @@ Bool BoxCol::GroupCol(MobileItemPtr hitter,ItemPtr trg,Coords3D& hitpos,int& elt
 			MinAnimData*	mad = (MinAnimData*) trg->Anim;
 			Coords3D		centrepoint=trg->World;
 			ShapeNum		newshape;
-//DeadCode RJS 20Oct00 							groupshp=trg->shape;
 			SLong			ex,ey,ez;
 			UByteP			PrevIptr;
 			MobileItemPtr	TmpItmPtr = new mobileitem;						//CSB 16Jun00
@@ -712,7 +693,6 @@ Bool	BoxCol::TestCol(MobileItemPtr 	hitter,
 	Bool	isRotated;											//RJS 29Mar99
 	Coords3D hit2;
 	int i;
-//DeadCode RJS 20Oct00 	int sh=0;
 	int	sizemul = 16;											//RJS 27May99
 	if (hitter->Status.size!=TRANSIENTSIZE)
 	{	//vel -> dist assuming 1 frame of 2cs
@@ -809,12 +789,10 @@ Bool	BoxCol::TestCol(MobileItemPtr 	hitter,
 					case TS_LARGE:
 #pragma warnmsg("********** LARGEW   TARGETS - 32 **********")
 						sizemul = 32;									//CSB 21Sep00
-//DeadCode CSB 21Sep00 						sizemul=48;			//rdh9/12/98
 						break;
 					case TS_MEDIUM:
 #pragma warnmsg("********** MEDIUM   TARGETS - 24 **********")
 						sizemul = 24;									//CSB 21Sep00
-//DeadCode CSB 21Sep00 						sizemul=32;			//rdh9/12/98
 						break;
 				}
 			}
@@ -826,29 +804,7 @@ Bool	BoxCol::TestCol(MobileItemPtr 	hitter,
 
 
 	Coords3D tsize;
-//DeadCode RJS 03Mar98 	ShapeDescPtr	sdptr;
-//DeadCode RJS 27May99 
-//DeadCode RJS 27May99 	int	sizemul;												//DAW 18May99
 {
-//DeadCode DAW 18May99 	int	sizemul;
-//DeadCode RJS 27May99 	if ((hitter->Status.size!=TRANSIENTSIZE) || (trgReal->Status.size != AIRSTRUCSIZE))	//RJS 25May99
-//DeadCode RJS 27May99 		sizemul=16;
-//DeadCode RJS 27May99 	else
-//DeadCode RJS 27May99 		switch (Save_Data.targetsize)								//PD 02Sep96
-//DeadCode RJS 27May99 		{
-//DeadCode RJS 27May99 			case TS_LARGE:
-//DeadCode RJS 27May99 				sizemul=48;			//rdh9/12/98
-//DeadCode RJS 27May99 				break;
-//DeadCode RJS 27May99 			case TS_MEDIUM:
-//DeadCode RJS 27May99 				sizemul=32;			//rdh9/12/98
-//DeadCode RJS 27May99 				break;
-//DeadCode RJS 27May99 			default:
-//DeadCode RJS 27May99 				sizemul=16;			//rdh9/12/98
-//DeadCode RJS 27May99 				break;
-//DeadCode RJS 27May99 		}															//PD 02Sep96
-//DeadCode RJS 27May99 
-//DeadCode RJS 27May99 	// fiddle!!!!
-//DeadCode RJS 27May99 //	sizemul = 16;
 
 	SLong	side=(StaticHitterSize+StaticTrgSdptr->Size)*sizemul;//RJS 03Mar98
 
@@ -870,14 +826,6 @@ Bool	BoxCol::TestCol(MobileItemPtr 	hitter,
 		return(FALSE);
 }
 
-//DeadCode DAW 15Jun99 #ifndef NDEBUG
-//DeadCode DAW 15Jun99 	if (isPlayer)
-//DeadCode DAW 15Jun99 	{
-//DeadCode DAW 15Jun99 		UWord	cw=GETFPCW();
-//DeadCode DAW 15Jun99 		::AfxTrace("HIT OUTER!: 0x%x  %d  %d\n",trgReal,StaticHitterSize,sizemul);
-//DeadCode DAW 15Jun99 		SETFPCW(cw);
-//DeadCode DAW 15Jun99 	}
-//DeadCode DAW 15Jun99 #endif
 
 #ifdef	_REPLAYCOL_
 	if (trgReal->Status.size == AIRSTRUCSIZE)
@@ -887,7 +835,6 @@ Bool	BoxCol::TestCol(MobileItemPtr 	hitter,
 #endif
 
 	MATRIX	viewer_matrix;										//RJS 29Mar99
-//DeadCode DAW 17Jun99 	FPMATRIX	fpviewer_matrix;										//RJS 29Mar99
 
 	isRotated = FALSE;
 	if (trgTest->Status.size>=ROTATEDSIZE)						//RJS 16Nov98
@@ -914,14 +861,6 @@ Bool	BoxCol::TestCol(MobileItemPtr 	hitter,
 			hit2.Y>>=scalefactor;
 			hit2.Z>>=scalefactor;
 			isRotated = TRUE;
-//DeadCode DAW 15Jun99 #ifndef NDEBUG
-//DeadCode DAW 15Jun99 	if (isPlayer)
-//DeadCode DAW 15Jun99 	{
-//DeadCode DAW 15Jun99 		UWord	cw=GETFPCW();
-//DeadCode DAW 15Jun99 		::AfxTrace("ROTATED!\n");
-//DeadCode DAW 15Jun99 		SETFPCW(cw);
-//DeadCode DAW 15Jun99 	}
-//DeadCode DAW 15Jun99 #endif
 		}
 	}
 
@@ -1008,10 +947,6 @@ Bool	BoxCol::TestCol(MobileItemPtr 	hitter,
 			hit2.Z>>=scalefactor;
 		}
 
-//DeadCode CSB 21Sep00 		TTrgSize -= (METRES05>>4);
-//DeadCode CSB 21Sep00 		TTrgSize >>= 1;
-//DeadCode RJS 15Jun99 //		StaticHitterSize -= (METRES05>>4);
-//DeadCode RJS 15Jun99 //		StaticHitterSize>>=1;
 
 		bdeltx = (hitlastpos.X - hitpos.X)/noGuns;
 		bdelty = (hitlastpos.Y - hitpos.Y)/noGuns;
@@ -1070,110 +1005,6 @@ Bool	BoxCol::TestCol(MobileItemPtr 	hitter,
 
 	return (retval);
 
-//DeadCode RJS 16Nov98	if (Col_GroupElement > -1)
-//DeadCode RDH 30Mar99 	SHAPE.SetGroupDamage(Col_GroupElement,Col_GroupPrev,Col_GroupNext,Col_AnimPrevPtr,Col_AnimNextPtr,Col_TokenDepAnim);//RJS 12Feb99
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 	Bool retval;
-//DeadCode RDH 30Mar99 //	*(char*)(0xb0000+160*24+100)='A';	
-//DeadCode RDH 30Mar99 	if (StaticTrgSdptr->CollisionOffset)						//RJS 03Mar98
-//DeadCode RDH 30Mar99 	{
-//DeadCode RDH 30Mar99 		TPos1 = &hitpos;
-//DeadCode RDH 30Mar99 		TPos2 = &hit2;
-//DeadCode RDH 30Mar99 		LastTSize = &tsize;										//DAW 01Dec98
-//DeadCode RDH 30Mar99 		EffectCnt = 0;
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 		retval=SHAPE.TestHitBoxes(trgReal,trgTest->shape,Col_AnimPtr,(UByteP)StaticTrgSdptr);//RJS 16Nov98
-//DeadCode RDH 30Mar99 	}
-//DeadCode RDH 30Mar99 	else
-//DeadCode RDH 30Mar99 		retval=TestCol(&hitpos,&hit2,&tsize);
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 	if (retval)
-//DeadCode RDH 30Mar99 	{
-//DeadCode RDH 30Mar99 		// Had a hit.....
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 		SHAPE.FixUpColLog();
-//DeadCode RDH 30Mar99 		if (trgTest->Status.size>=ROTATEDSIZE)					//RJS 16Nov98
-//DeadCode RDH 30Mar99 		{
-//DeadCode RDH 30Mar99 			RotItemPtr trg2=*trgTest;							//RJS 16Nov98
-//DeadCode RDH 30Mar99 			MATRIX inverse_matrix;
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 			_matrix.inverse(hdgflip,							//RJS 25Feb97
-//DeadCode RDH 30Mar99 							pitchflip,							//RJS 25Feb97
-//DeadCode RDH 30Mar99 							rollflip,							//RJS 25Feb97
-//DeadCode RDH 30Mar99 							&inverse_matrix);								//PD 20Dec95
-//DeadCode RDH 30Mar99 			int scalefactor;
-//DeadCode RDH 30Mar99 			scalefactor =16+ _matrix.transform(&inverse_matrix,hitpos.X,hitpos.Y,hitpos.Z);//PD 31Oct95
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 			hitpos.X>>=scalefactor;
-//DeadCode RDH 30Mar99 			hitpos.Y>>=scalefactor;
-//DeadCode RDH 30Mar99 			hitpos.Z>>=scalefactor;
-//DeadCode RDH 30Mar99 		}
-//DeadCode RDH 30Mar99 		hitpos.X+=trgTest->World.X;								//RJS 16Nov98
-//DeadCode RDH 30Mar99 		hitpos.Y+=trgTest->World.Y;								//RJS 16Nov98
-//DeadCode RDH 30Mar99 		hitpos.Z+=trgTest->World.Z;								//RJS 16Nov98
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 		colpos_impact = hitpos;
-//DeadCode RDH 30Mar99 		colpos_hitgrp = trgTest->World;							//RJS 16Nov98
-//DeadCode RDH 30Mar99 	}
-//DeadCode RDH 30Mar99 	else
-//DeadCode RDH 30Mar99 	{
-//DeadCode RDH 30Mar99 		//near miss...
-//DeadCode RDH 30Mar99 		// Had a near miss...
-//DeadCode RDH 30Mar99 		if (	(trgTest->Status.size == AirStrucSize)			//RJS 16Nov98
-//DeadCode RDH 30Mar99 			&&	(hitter->Status.size == TransientSize)	)				//RJS 22Jun98
-//DeadCode RDH 30Mar99 		{
-//DeadCode RDH 30Mar99 			if (_Replay.Record || _DPlay.Implemented)
-//DeadCode RDH 30Mar99 			{
-//DeadCode RDH 30Mar99 // only do near misses of players bullets against AI AC
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 				if (trgTest!=Persons2::PlayerSeenAC				//RJS 16Nov98
-//DeadCode RDH 30Mar99 				&&	!trgTest->uniqueID.commsmove)				//RJS 16Nov98
-//DeadCode RDH 30Mar99 				{
-//DeadCode RDH 30Mar99 // only store if this players bullet caused nearmiss
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 					if ((AirStrucPtr)(((TransientItemPtr)hitter)->Launcher)==Persons2::PlayerSeenAC)
-//DeadCode RDH 30Mar99 					{
-//DeadCode RDH 30Mar99 // dont store if targets ai.unfriendly is player
-//DeadCode RDH 30Mar99 						if (((AirStrucPtr)trgTest)->ai.unfriendly!=Persons2::PlayerSeenAC)//AMM12Jan99
-//DeadCode RDH 30Mar99 						{
-//DeadCode RDH 30Mar99 							_DPlay.NewNearMiss((AirStrucPtr)trgTest,(AirStrucPtr)((TransientItemPtr)hitter)->Launcher);//RJS 16Nov98
-//DeadCode RDH 30Mar99 						}
-//DeadCode RDH 30Mar99 					}
-//DeadCode RDH 30Mar99 					else
-//DeadCode RDH 30Mar99 					{
-//DeadCode RDH 30Mar99 // dont process if bullet is a comms bullet
-//DeadCode RDH 30Mar99 						
-//DeadCode RDH 30Mar99 						if (((TransientItemPtr)hitter)->CollTestEnabled)
-//DeadCode RDH 30Mar99 						{
-//DeadCode RDH 30Mar99 							Art_Int.PersonalThreat((AirStrucPtr)trgTest,(AirStrucPtr)((TransientItemPtr)hitter)->Launcher);//RJS 16Nov98
-//DeadCode RDH 30Mar99 						}
-//DeadCode RDH 30Mar99 					}
-//DeadCode RDH 30Mar99 				}
-//DeadCode RDH 30Mar99 			}
-//DeadCode RDH 30Mar99 			else
-//DeadCode RDH 30Mar99 			{
-//DeadCode RDH 30Mar99 				if (!_Replay.Playback)
-//DeadCode RDH 30Mar99 				{
-//DeadCode RDH 30Mar99 // standard game - do all near misses
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 					Art_Int.PersonalThreat((AirStrucPtr)trgTest,(AirStrucPtr)((TransientItemPtr)hitter)->Launcher);//RJS 16Nov98
-//DeadCode RDH 30Mar99 				}
-//DeadCode RDH 30Mar99 				else if ((AirStrucPtr)(((TransientItemPtr)hitter)->Launcher)==Persons2::PlayerSeenAC)
-//DeadCode RDH 30Mar99 				{
-//DeadCode RDH 30Mar99 // in playback do all near misses not caused by player
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 					Art_Int.PersonalThreat((AirStrucPtr)trgTest,(AirStrucPtr)((TransientItemPtr)hitter)->Launcher);//RJS 16Nov98
-//DeadCode RDH 30Mar99 				}
-//DeadCode RDH 30Mar99 			}
-//DeadCode RDH 30Mar99 		}
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 	}
-//DeadCode RDH 30Mar99 //DeadCode RDH 01Dec96 	((UByte*)0xB0000)[n]=retval;
-//DeadCode RDH 30Mar99 //DeadCode PD 02Dec96 	n+=2;
-//DeadCode RDH 30Mar99 //DeadCode PD 02Dec96 	n&=4095;
-//DeadCode RDH 30Mar99 
-//DeadCode RDH 30Mar99 //	*(char*)(0xb0000+160*24+100)='B';	
-//DeadCode RDH 30Mar99 	return(retval);						//RJS 10Nov98
 }
 
 
@@ -1360,9 +1191,7 @@ Bool	BoxCol::SmallSideTest(SLong	side, SLong	offset, SLong	sizeaxis)
 //------------------------------------------------------------------------------
 Bool	BoxCol::TestCol2(SWord	xoff, SWord	yoff, SWord	zoff,
 						 UWord	sx, UWord sy, UWord sz	)
-//DeadCode RJS 16Jun00 						 UWord	succeed)
 {
-//DeadCode RJS 9Nov00 	yoff = -yoff;
 
 	Coords3D	tmppos1, tmppos2;
 
@@ -1384,8 +1213,7 @@ Bool	BoxCol::TestCol2(SWord	xoff, SWord	yoff, SWord	zoff,
 	if (SmallSideTest(tmppos1.X,xoff,sx))						//RJS 01Dec97
 		return(FALSE);
 
-//DeadCode RJS 16Jun00 	if (succeed == 0)											//RJS 01Dec97
-		*TPos1 = tmppos1;
+	*TPos1 = tmppos1;
 
 	return(TRUE);
 }
@@ -1587,12 +1415,9 @@ void	BoxCol::BashHitter(	MobileItemPtr 	trg,
 		COORDS3D	PushedOffset;			
 		SLong		dx, dy, dz;
 		SLong		range;
-//DeadCode RJS 20Oct00 		SLong		minrange = 1000000;
-//DeadCode RJS 20Oct00 		SLong		thisLauncher = LT_CONTACT;
 		SLong		useLauncher;
 		SLong		hitterSize;
 		SLong		mainDist;
-//DeadCode RJS 20Oct00 		WorldStuff	*worldP = mobileitem::currworld;
 
 		if (!hitwire)
 		{
@@ -1681,10 +1506,6 @@ void	BoxCol::BashHitter(	MobileItemPtr 	trg,
 					trgac->fly.pModel->Vel.y = 0.0001 * trgac->vel_y;
 					trgac->fly.pModel->Vel.z = 0.0001 * trgac->vel_z;
 
-//DeadCode RJS 19Oct00 					FP vel = FSqrt(FP(trgac->vel_x)*FP(trgac->vel_x) + FP(trgac->vel_y)*FP(trgac->vel_y) + FP(trgac->vel_z)*FP(trgac->vel_z));
-//DeadCode RJS 19Oct00 					trgac->fly.pModel->Ori.z.x = FP(trgac->vel_x) / vel;
-//DeadCode RJS 19Oct00 					trgac->fly.pModel->Ori.z.y = FP(trgac->vel_y) / vel;
-//DeadCode RJS 19Oct00 					trgac->fly.pModel->Ori.z.z = FP(trgac->vel_z) / vel;
 
 					float hvel = fastMath.FastInvSqrt(float(trgac->vel_x)*float(trgac->vel_x) + float(trgac->vel_y)*float(trgac->vel_y) + float(trgac->vel_z)*float(trgac->vel_z));
 					trgac->fly.pModel->Ori.z.x = float(trgac->vel_x) * hvel;
@@ -1734,93 +1555,6 @@ void	BoxCol::BashHitter(	MobileItemPtr 	trg,
 		else
 			DoHitWire(trg,hitter,hitpos);
 
-//DeadCode RJS 18Oct00 			hitterSize = sdptr->Size << 4;
-//DeadCode RJS 18Oct00 			dx = hitter->World.X - grppos.X; 
-//DeadCode RJS 18Oct00 			dy = hitter->World.Y - grppos.Y; 
-//DeadCode RJS 18Oct00 			dz = hitter->World.Z - grppos.Z; 
-//DeadCode RJS 18Oct00 
-//DeadCode RJS 18Oct00 			mainDist = Math_Lib.distance3d(dx,dy,dz);
-//DeadCode RJS 18Oct00 			if ((mainDist < hitterSize) && !hitwire)				//RJS 15Dec99
-//DeadCode RJS 18Oct00 				BounceOrExplode(trg,hitter,eltnum,grppos,(UByteP)sdptr);//RJS 20May99
-//DeadCode RJS 18Oct00 			else
-//DeadCode RJS 18Oct00 			{
-//DeadCode RJS 18Oct00 				// Clipped....
-//DeadCode RJS 18Oct00 				Squad_Diary.UpdatePlayerLog(EFS_ACLOST);					//RJS 18Feb00
-//DeadCode RJS 18Oct00 				while (thisLauncher < CT_DUMMY)
-//DeadCode RJS 18Oct00 				{
-//DeadCode RJS 18Oct00 					SHAPE.GetContactPoint(trg,(LnchrType)thisLauncher,coords,offset,PushedOffset);
-//DeadCode RJS 18Oct00 
-//DeadCode RJS 18Oct00 					dx = coords.X - hitpos.X;
-//DeadCode RJS 18Oct00 					dy = coords.Y - hitpos.Y;
-//DeadCode RJS 18Oct00 					dz = coords.Z - hitpos.Z;
-//DeadCode RJS 18Oct00 
-//DeadCode RJS 18Oct00 					range = Math_Lib.distance3d(dx,dy,dz);
-//DeadCode RJS 18Oct00 					if (range < minrange)
-//DeadCode RJS 18Oct00 					{
-//DeadCode RJS 18Oct00 						minrange = range;
-//DeadCode RJS 18Oct00 						useLauncher = thisLauncher;
-//DeadCode RJS 18Oct00 					}
-//DeadCode RJS 18Oct00 
-//DeadCode RJS 18Oct00 					thisLauncher++;
-//DeadCode RJS 18Oct00 				}
-//DeadCode RJS 18Oct00 
-//DeadCode RJS 18Oct00 				AircraftAnimData*	adptr = (AircraftAnimData*) trg->Anim;
-//DeadCode RJS 18Oct00 
-//DeadCode RJS 18Oct00 				if (hitwire)
-//DeadCode RJS 18Oct00 				{
-//DeadCode RJS 18Oct00 					switch (useLauncher)
-//DeadCode RJS 18Oct00 					{
-//DeadCode RJS 18Oct00 					case CT_BACK:
-//DeadCode RJS 18Oct00 					case CT_WHLFRONT:
-//DeadCode RJS 18Oct00 					case CT_WHLLEFT:
-//DeadCode RJS 18Oct00 					case CT_LEFT:
-//DeadCode RJS 18Oct00 						SHAPE.ForceDamage(trg,hitter,&adptr->LEFTWINGOUT,BS_DEAD);
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					case CT_BELLY:
-//DeadCode RJS 18Oct00 					case CT_FRONT:
-//DeadCode RJS 18Oct00 					case CT_WHLRIGHT:
-//DeadCode RJS 18Oct00 					case CT_RIGHT:
-//DeadCode RJS 18Oct00 						SHAPE.ForceDamage(trg,hitter,&adptr->RIGHTWINGOUT,BS_DEAD);
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					default:
-//DeadCode RJS 18Oct00 						SHAPE.ForceDamage(trg,hitter,&adptr->LEFTWINGOUT,BS_DEAD);
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					}
-//DeadCode RJS 18Oct00 				}
-//DeadCode RJS 18Oct00 				else
-//DeadCode RJS 18Oct00 				{
-//DeadCode RJS 18Oct00 					switch (useLauncher)
-//DeadCode RJS 18Oct00 					{
-//DeadCode RJS 18Oct00 					case CT_LEFT:
-//DeadCode RJS 18Oct00 						SHAPE.ForceDamage(trg,hitter,&adptr->LEFTWINGOUT,BS_DEAD);//JIM 11Mar99
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					case CT_RIGHT:
-//DeadCode RJS 18Oct00 						SHAPE.ForceDamage(trg,hitter,&adptr->RIGHTWINGOUT,BS_DEAD);//JIM 11Mar99
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					case CT_WHLLEFT:
-//DeadCode RJS 18Oct00 						if (!adptr->acleglowerl)
-//DeadCode RJS 18Oct00 							SHAPE.ForceDamage(trg,hitter,&adptr->LEFTWINGIN,BS_DEAD);//JIM 11Mar99
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					case CT_WHLRIGHT:
-//DeadCode RJS 18Oct00 						if (!adptr->acleglowerr)
-//DeadCode RJS 18Oct00 							SHAPE.ForceDamage(trg,hitter,&adptr->RIGHTWINGIN,BS_DEAD);//JIM 11Mar99
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					case CT_WHLFRONT:
-//DeadCode RJS 18Oct00 					case CT_FRONT:
-//DeadCode RJS 18Oct00 		//				SHAPE.ForceDamage(trg,hitter,&adptr->PROPLEFTIN,BS_DEAD);//RJS 20May99
-//DeadCode RJS 18Oct00 						BounceOrExplode(trg,hitter,eltnum,grppos,(UByteP)sdptr);//RJS 20May99
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					case CT_WHLBACK:
-//DeadCode RJS 18Oct00 					case CT_BACK:
-//DeadCode RJS 18Oct00 						SHAPE.ForceDamage(trg,hitter,&adptr->TAIL,BS_DEAD);	//JIM 11Mar99
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					case CT_BELLY:
-//DeadCode RJS 18Oct00 						Trans_Obj.KillLauncher(trg,hitter,*worldP,-1,&hitpos,TRUE);//JIM 11Mar99
-//DeadCode RJS 18Oct00 						break;
-//DeadCode RJS 18Oct00 					}
-//DeadCode RJS 18Oct00 				}
-//DeadCode RJS 18Oct00 			}
-//DeadCode RJS 18Oct00 		}
 	}
 }
 
@@ -1862,19 +1596,6 @@ ItemPtr BoxCol::SpecificCollision(MobileItemPtr hitter,ItemPtr trg)
 		ShapeDescPtr	sdptr = SHAPESTUFF.GetShapePtr(hitter->shape);
 		if (sdptr->AnimDataSize == MISSILEANIM)
 		{
-	//DeadCode DAW 23Jun99 		MissileAnimData*	adptr = (MissileAnimData*) hitter->Anim;
-	//DeadCode DAW 23Jun99 		StaticHitterSize = sdptr->Size;
-	//DeadCode DAW 23Jun99 		HitterStrength = (adptr->hitstrength / 2);
-	//DeadCode DAW 23Jun99 		SLong			newhitsize = (StaticHitterSize* 3);
-	//DeadCode DAW 23Jun99 		SLong			maxsize = newhitsize + StaticHitterSize;
-	//DeadCode DAW 23Jun99 																
-	//DeadCode DAW 23Jun99 		if (adptr->frameno)										
-	//DeadCode DAW 23Jun99 		{														
-	//DeadCode DAW 23Jun99 			newhitsize = (newhitsize * (adptr->frameno + 1));	
-	//DeadCode DAW 23Jun99 			StaticHitterSize += (newhitsize >>= 8);
-	//DeadCode DAW 23Jun99 											
-	//DeadCode DAW 23Jun99 			HitterStrength = ((maxsize - StaticHitterSize) * HitterStrength)/newhitsize;
-	//DeadCode DAW 23Jun99 		}														
 			MissileAnimData*	adptr = (MissileAnimData*) hitter->Anim;
 			if (adptr->hitstrength)			//something to prove...
 			{
@@ -1978,14 +1699,6 @@ ItemPtr BoxCol::SpecificCollision(MobileItemPtr hitter,ItemPtr trg)
 //------------------------------------------------------------------------------
 Bool	BoxCol::DetailedTest()
 {
-//DeadCode DAW 15Jun99 #ifndef NDEBUG
-//DeadCode DAW 15Jun99 	if (Col_Shooter == Persons2::PlayerSeenAC)
-//DeadCode DAW 15Jun99 	{
-//DeadCode DAW 15Jun99 		UWord cw=GETFPCW();
-//DeadCode DAW 15Jun99 		::AfxTrace("DETAILED TEST!\n");
-//DeadCode DAW 15Jun99 		SETFPCW(cw);
-//DeadCode DAW 15Jun99 	}
-//DeadCode DAW 15Jun99 #endif
 
 	return(TestCol(TPos1,TPos2,LastTSize));
 }
@@ -2015,7 +1728,6 @@ Bool BoxCol::GroupColSpecific(MobileItemPtr hitter,ItemPtr trg,Coords3D& hitpos,
 		MinAnimData*	mad = (MinAnimData*) trg->Anim;
 		Coords3D		centrepoint=trg->World;
 		ShapeNum		newshape;
-//DeadCode RJS 20Oct00 						groupshp=trg->shape;
 		SLong			ex,ey,ez;
 		UByteP			PrevIptr;
 		RotItemPtr		TmpItmPtr = new rotitem;
@@ -2047,10 +1759,8 @@ Bool BoxCol::GroupColSpecific(MobileItemPtr hitter,ItemPtr trg,Coords3D& hitpos,
 		while(SHAPE.GetGroupElement(iptr,newshape,ex,ey,ez,0,&PrevIptr,(SWordP)&TmpItmPtr->hdg,&Col_GroupNext))//RJS 30Jun99
 		{
 			groupindex++;											
-//DeadCode 30 Jun99			Col_GroupNext = iptr + 1;
 			mad = (MinAnimData*) Tmp_AnimNextPtr;				//AMM 02Jul99
 			Col_AnimPtr = &Tmp_AnimNextPtr;						//AMM 02Jul99
-//DeadCode RJS 02Jul99 			tmpanim = Col_AnimPtr;				
 			Tmp_AnimNextPtr += SHAPE.GetElementAnimOffset(newshape);
 			Col_AnimNextPtr = &Tmp_AnimNextPtr;					//AMM 02Jul99
 			if ((mad->itemstate != DEAD) && (mad->IsInvisible == 0))	//CSB 16Jun00
@@ -2207,7 +1917,6 @@ Bool	BoxCol::DoCollision(Coords3D& hitpos, Coords3D& hit2, Coords3D& tsize, Item
 		hitpos.Y+=trgTest->World.Y;
 		hitpos.Z+=trgTest->World.Z;
 
-//DeadCode AMM 05Jul99 		colpos_list[pointindex] = colpos_impact = hitpos;		//RJS 29Jun99
 		colpos_impact = hitpos;		//RJS 05Jul99
 		if (pointindex > -1)									//RJS 05Jul99
 			colpos_list[pointindex] = colpos_impact;			//RJS 05Jul99
@@ -2240,7 +1949,6 @@ Bool	BoxCol::DoCollision(Coords3D& hitpos, Coords3D& hit2, Coords3D& tsize, Item
 					if ((AirStrucPtr)(((TransientItemPtr)hitter)->Launcher)==Persons2::PlayerSeenAC)
 					{
 // dont store if targets ai.unfriendly is player
-//DeadCode AMM 9Nov00 						if (AirStrucPtr(trgReal)->ai.unfriendly!=Persons2::PlayerSeenAC)//AMM12Jan99
 
 // ai unfriendlies should never be seen, always ghost...
 
@@ -2307,8 +2015,6 @@ void	WorldStuff::ClearWorld()
 		while (next)
 		{
 			ItemBasePtr curr=next;
-//DeadCode CSB 1Aug00 			if (next->World.X==-572662307)
-//DeadCode CSB 1Aug00 				curr=next;
 			next=next->Next;
 			delete curr;
 		}
@@ -2357,8 +2063,6 @@ ItemPtr BoxCol::NineSectorColPiloted(MobileItemPtr hitter)
 		if (Col_Shooter != Persons2::PlayerSeenAC)					//RJS 30Mar00
 		{
 			n++;
-//DEADCODE RJS 3/30/00 		UWord	sector_x,
-//DEADCODE RJS 3/30/00 				sector_y;
 
 			ShapeDescPtr	sdptr = SHAPESTUFF.GetShapePtr(hitter->shape);
 
@@ -2374,11 +2078,7 @@ ItemPtr BoxCol::NineSectorColPiloted(MobileItemPtr hitter)
 			//Only do collision with things that have damage potential...
 			if (HitterStrength)
 			{
-//DEADCODE RJS 3/30/00 			hitter->currworld->getsectornos(hitter,sector_x,sector_y);
-//DEADCODE RJS 3/30/00 			int	currentsector = hitter->currworld->GetSector(hitter);
 				ItemPtr trg;
-//DEADCODE RJS 3/30/00 			sector_x--;
-//DEADCODE RJS 3/30/00 			sector_y--;
 
 				HitterDamageType = SHAPESTUFF.GetShapeDamageType(hitter->shape);
 				Col_Hitter = hitter;			
@@ -2388,20 +2088,6 @@ ItemPtr BoxCol::NineSectorColPiloted(MobileItemPtr hitter)
 				else
 					Col_ExplodeIt = FALSE;
 
-//DEADCODE RJS 3/30/00 			for (int i=11;i>0;i--,sector_x++,sector_y-=3)
-//DEADCODE RJS 3/30/00 				for (;i&3;i--,sector_y++)
-//DEADCODE RJS 3/30/00 			{
-//DEADCODE RJS 3/30/00 				Bool hittersector;
-//DEADCODE RJS 3/30/00 				int	thissector=hitter->currworld->makeindex(sector_x,sector_y);
-//DEADCODE RJS 3/30/00 				hittersector=(thissector==currentsector)?TRUE:FALSE;
-//DEADCODE RJS 3/30/00 				trg=hitter->currworld->getfirstitem(thissector);
-//DEADCODE RJS 3/30/00 				trg=SectorColPiloted(hitter,trg,hittersector);
-//DEADCODE RJS 3/30/00 				if (trg)
-//DEADCODE RJS 3/30/00 				{
-//DEADCODE RJS 3/30/00 					ProcessEffectQueue(trg);
-//DEADCODE RJS 3/30/00 					return(trg);
-//DEADCODE RJS 3/30/00 				}
-//DEADCODE RJS 3/30/00 			}
 
 				trg=SectorColPiloted(hitter,Persons2::PlayerSeenAC,TRUE);
 				if (trg)
@@ -2435,16 +2121,7 @@ ItemPtr BoxCol::SectorColPiloted(	MobileItemPtr hitter,
 									ItemPtr trg,
 									Bool hittersector	)
 {
-//DEADCODE RJS 3/30/00 	if (hitter->Status.size==TRANSIENTSIZE)
-//DEADCODE RJS 3/30/00 	{
-//DEADCODE RJS 3/30/00 		if (((TransientItemPtr)*hitter)->Launcher == Manual_Pilot.ControlledAC2)
-//DEADCODE RJS 3/30/00 			return NULL;
-//DEADCODE RJS 3/30/00 	}
 
-//DEADCODE RJS 3/30/00 	while (trg)
-//DEADCODE RJS 3/30/00 	{
-//DEADCODE RJS 3/30/00 		if ((trg == Manual_Pilot.ControlledAC2)	&& Save_Data.gamedifficulty[GD_VULNERABLE])
-//DEADCODE RJS 3/30/00 		{
 			int			eltnum = -1;
 			Coords3D	hitpos;
 			StaticTrgSdptr=SHAPESTUFF.GetShapePtr(trg->shape);
@@ -2455,9 +2132,6 @@ ItemPtr BoxCol::SectorColPiloted(	MobileItemPtr hitter,
 						BashHitter((mobileitem*)trg,hitter,hitpos,eltnum,colpos_hitgrp,Col_HitShape);
 					return(trg);
 				}
-//DEADCODE RJS 3/30/00 		}
-//DEADCODE RJS 3/30/00 		trg=trg->Next;
-//DEADCODE RJS 3/30/00 	}
 	return(NULL);
 }
 
@@ -2561,14 +2235,12 @@ void	BoxCol::BounceOrExplode(	MobileItemPtr 	trg,
 	Bool			noExplode = TRUE;
 	AirStrucPtr		you_ac = (AirStrucPtr) trg;
 
-//DEADCODE AMM 26/01/00 	if ((you_ac == Persons2::PlayerSeenAC) && _Replay.Playback)	//RJS 21May99
 	if ((you_ac == Persons2::PlayerSeenAC) && !_Replay.Playback) //AMM 26/01/00
 	{
 		_DPlay.CheckSeen();
 		_DPlay.AddDeltas(Persons2::PlayerSeenAC,FALSE,0);			//RJS 21May99
 	}
 
-//DeadCode AMM 21Feb100 	_DPlay.CheckSeen();
 
 	if (trg->vel_ > MPH15)
 	{
@@ -2590,9 +2262,7 @@ void	BoxCol::BounceOrExplode(	MobileItemPtr 	trg,
 			you_ac->vel_y= 0;
 			you_ac->vel_x= 0;
 			you_ac->vel_z= 0;
-//DEADCODE CSB 09/11/99 			you_ac->velhori = 0;
 			you_ac->movecode = AUTO_NOPPILOT;
-//DeadCode CSB 14Aug00 			you_ac->RecycleAC();									//CSB 10Aug00
 		}
 		else
 		{
@@ -2607,7 +2277,6 @@ void	BoxCol::BounceOrExplode(	MobileItemPtr 	trg,
 			you_ac->vel_x /= -2;
 			you_ac->vel_y /= -2;
 			you_ac->vel_z /= -2;
-//DEADCODE CSB 09/11/99 			you_ac->velhori /= -2;
 		}
 	}
 	else
@@ -2621,7 +2290,6 @@ void	BoxCol::BounceOrExplode(	MobileItemPtr 	trg,
 		you_ac->vel_x /= 2;
 		you_ac->vel_y /= 2;
 		you_ac->vel_z /= 2;
-//DEADCODE CSB 09/11/99 		you_ac->velhori /= 2;
 
 		if (noExplode)
 		{
@@ -2637,14 +2305,12 @@ void	BoxCol::BounceOrExplode(	MobileItemPtr 	trg,
 		}
 	}
 
-//DEADCODE AMM 26/01/00 	if ((you_ac == Persons2::PlayerSeenAC) && _Replay.Playback)	//RJS 21May99
 	if ((you_ac == Persons2::PlayerSeenAC) && !_Replay.Playback)	 //AMM 26/01/00
 	{
 		_DPlay.AddDeltas(Persons2::PlayerSeenAC,TRUE,0);			//RJS 21May99
 		_DPlay.BackupSeen();
 	}
 
-//DeadCode AMM 21Feb100 	_DPlay.BackupSeen();
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2682,7 +2348,6 @@ Bool	BoxCol::TestWireGroup(MobileItemPtr hitter,ItemPtr trg,Coords3D& hitpos,int
 	MinAnimData*	mad = (MinAnimData*) trg->Anim;
 	Coords3D		centrepoint=trg->World;
 	ShapeNum		newshape;
-//DeadCode RJS 20Oct00 					groupshp=trg->shape;
 	SLong			ex,ey,ez;
 	UByteP			PrevIptr;
 	RotItemPtr		TmpItmPtr = new rotitem;
@@ -2690,7 +2355,6 @@ Bool	BoxCol::TestWireGroup(MobileItemPtr hitter,ItemPtr trg,Coords3D& hitpos,int
 	animptr			tmpanim;
 	Coords3D		testpos;
 	ULong			tokenoffset;
-//DeadCode RJS 20Oct00 	UByteP			anmstart = (UByteP)mad;
 	animptr			Tmp_AnimNextPtr = trg->Anim;
 
 	Col_AnimPtr = trg->Anim;
@@ -2794,7 +2458,6 @@ Bool	BoxCol::TestWire(MobileItemPtr 	hitter,
 {
 	Coords3D hit2;
 	int i;
-//DeadCode RJS 20Oct00 	int sh=0;
 	int	sizemul = 16;											
 
 	//vel -> dist assuming 1 frame of 2cs
@@ -2944,7 +2607,6 @@ ItemPtr BoxCol::NineSectorColAircraft(MobileItemPtr hitter)
 		sector_x--;
 		sector_y--;
 
-//DeadCode RJS 13Aug00 		HitterDamageType = SHAPESTUFF.GetShapeDamageType(hitter->shape);
 		Col_Hitter = hitter;					
 		Col_GroupElement = -1;					
 		if (HitterDamageType == DMT_EXPLOSION)
@@ -3043,7 +2705,6 @@ bool	BoxCol::StaticWeapon(const ItemPtr	hitter, SLong& hitTime, TransientItemPtr
 			//... max radius is 220m for 2000 lb bomb (64 strength)
 
 			SLong	impactStrength = adptr->hitstrength;
-//DeadCode RJS 20Oct00 			SLong	scaleStrength = impactStrength << 8;
 
 //Impact zone is 55m for 2000 lb bomb
 			SLong	impactZone = (impactStrength * IMPACT_CM_RADIUS_2000LB)/64;			//RJS 14Sep00
@@ -3070,9 +2731,6 @@ bool	BoxCol::StaticWeapon(const ItemPtr	hitter, SLong& hitTime, TransientItemPtr
 				
 				Float	intensity = Float(impactStrength*impactZone*impactZone)/(Float(theRadius)*Float(theRadius));
 
-//DeadCode RJS 13Aug00 				newstrength = impactStrength - ((theRadius*impactStrength)/blastSize);
-//DeadCode RJS 13Aug00 
-//DeadCode RJS 13Aug00 				HitterStrength = newstrength;
 
 				HitterStrength = fastMath.DoubleToULong(intensity);		//RJS 13Aug00
 				if (HitterStrength <= (impactStrength>>1))				//RJS 8Sep00
@@ -3100,7 +2758,7 @@ bool	BoxCol::StaticWeapon(const ItemPtr	hitter, SLong& hitTime, TransientItemPtr
 		{
 			StaticHitterSizeSingle = (sdptr->sx+sdptr->sy)>>1;
 			//multiple gun???
-			lastBullet = TransientItemPtr(adptr->lastmissile);
+			lastBullet = TransientItemPtr(AnimLink::Load(adptr->lastmissile));
 															 
 			noGuns = adptr->novirtualguns;					 
 			if (noGuns > 1)

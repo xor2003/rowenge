@@ -63,7 +63,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 */
 
 // REdtBtCtl.cpp : Implementation of the CREdtBtCtrl ActiveX Control class.
-//DEADCODE RDH 28/02/99 #define F_SOUNDS
 #define F_BATTLE
 #define F_COMMON
 

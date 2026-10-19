@@ -474,32 +474,6 @@ void CRComboCtrl::OnDraw(
 		ExtTextOut(pOffScreenDC,(m_FontNum<0),tm.tmHeight,fontcol,m_ShadowColor,
 			  S->margin,2,offset,&CRect(rc.left,rc.top,rc.right-S->cliptextr,rc.bottom),InternalGetText());
 
-//DEADCODE JIM 15/12/99 		if (m_FontNum<0)
-//DEADCODE JIM 15/12/99 		{
-//DEADCODE JIM 15/12/99 			//pOffScreenDC->SetTextColor(RGB(0,0,0));
-//DEADCODE JIM 15/12/99 
-//DEADCODE JIM 15/12/99 
-//DEADCODE JIM 15/12/99 			pOffScreenDC->SetTextColor(m_ShadowColor);
-//DEADCODE JIM 15/12/99 			int shadowx=GetShadow1XOffset(tm.tmHeight);
-//DEADCODE JIM 15/12/99 			int shadowy=GetShadow1YOffset(tm.tmHeight);
-//DEADCODE JIM 15/12/99 			pOffScreenDC->ExtTextOut(3+shadowx, 2+shadowy,
-//DEADCODE JIM 15/12/99 				ETO_CLIPPED, CRect(rc.left,rc.top,rc.right-S->cliptextr,rc.bottom), InternalGetText(), InternalGetText().GetLength(), NULL);
-//DEADCODE JIM 15/12/99 			shadowx=GetShadow2XOffset(tm.tmHeight);
-//DEADCODE JIM 15/12/99 			shadowy=GetShadow2YOffset(tm.tmHeight);
-//DEADCODE JIM 15/12/99 			pOffScreenDC->ExtTextOut(3+shadowx, 2+shadowy,
-//DEADCODE JIM 15/12/99 				ETO_CLIPPED, CRect(rc.left,rc.top,rc.right-S->cliptextr,rc.bottom), InternalGetText(), InternalGetText().GetLength(), NULL);
-//DEADCODE JIM 15/12/99 		}
-//DEADCODE JIM 15/12/99 		if(GetEnabled())
-//DEADCODE JIM 15/12/99 		{
-//DEADCODE JIM 15/12/99 			 pOffScreenDC->SetTextColor(TranslateColor(GetForeColor()));
-//DEADCODE JIM 15/12/99 		}
-//DEADCODE JIM 15/12/99 		else
-//DEADCODE JIM 15/12/99 		{
-//DEADCODE JIM 15/12/99 			pOffScreenDC->SetTextColor(RGB(128,128,128));
-//DEADCODE JIM 15/12/99 		}
-//DEADCODE JIM 15/12/99 
-//DEADCODE JIM 15/12/99 		pOffScreenDC->ExtTextOut(3, 2,
-//DEADCODE JIM 15/12/99 			ETO_CLIPPED, CRect(rc.left,rc.top,rc.right-S->cliptextr,rc.bottom), InternalGetText(), InternalGetText().GetLength(), NULL);
 	}
 	// draw the border and icon at the end
 	else

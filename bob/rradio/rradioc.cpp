@@ -241,8 +241,6 @@ BOOL CRRadioCtrl::CRRadioCtrlFactory::GetLicenseKey(DWORD dwReserved,
 CRRadioCtrl::CRRadioCtrl()
 {
 	InitializeIIDs(&IID_DRRadio, &IID_DRRadioEvents);
-//DEADCODE RDH 17/11/99 	m_hButtonDown=(HICON)LoadImage(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_BUTTONDOWN),IMAGE_ICON,32,32,LR_DEFAULTCOLOR);
-//DEADCODE RDH 17/11/99 	m_hButtonUp=(HICON)LoadImage(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_BUTTONUP),IMAGE_ICON,32,32,LR_DEFAULTCOLOR);
 	m_CurSel=0;
 	m_bitmapheight = 0 ; //woody 10/12/98 
 	m_FirstSweep = TRUE;

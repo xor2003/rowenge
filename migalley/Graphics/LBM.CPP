@@ -82,6 +82,7 @@ questions about this file may be asked at http://www.simhq.com/
 //RERUN #include	<fstream.h>
 #include	"FILEMAN.H"
 #include	"LBM.H"
+#include	"LBMCPP.H"
 #include	"MOUSE.H"
 
 UWord	screenshotnum=0;
@@ -141,7 +142,6 @@ void LBM::MakeHead(short w, short h)
 	hdr->y		= 0;
 	hdr->nPlanes= 8;
 	hdr->masking= 0;
-//Old_Code DAW 22Feb96 	hdr->compression=cmpNone;
 	hdr->compression=cmpByteRun1;
 	hdr->pad1	= 0;
 	hdr->transparentColour= 0xff;
@@ -273,8 +273,6 @@ void	LBM::Save(UWord ScreenShot,ULong packedlength)
 		fprintf(fp,"BODY");
 		Put68KLong(fp,packedlength);
 		fwrite(body,1,packedlength,fp);
-//Old_Code DAW 22Feb96 		Put68KLong(fp,hdr->width*hdr->height);
-//Old_Code DAW 22Feb96 		fwrite(body,1,hdr->width*hdr->height,fp);
 
 		fclose(fp);
 
@@ -328,12 +326,9 @@ void	Graphic::FillExpandBuff()
 UByte *Graphic::UnpackRow(UByte *c, SLong width, SLong x, SLong y, SLong minx, SLong maxx)
 //------------------------------------------------------------------------------
 {
-
-	#define	TRANSFERVALUESIZE	UByte
-	#define	LOADVALUE(x)	TRANSFERVALUE=x
-	#define	COPYVALUE(t,s)	*t++=s
-
-	#include	"LBMCPP.H"
+	return	LBMUnpackNRow(c,(const UByte*)~0UL,logicalscreenptr,
+						BytesPerScanLine,width,x,y,minx,maxx);
+}
 //------------------------------------------------------------------------------
 //Procedure	Graphic::SkipRow
 //------------------------------------------------------------------------------

@@ -65,24 +65,13 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //
 // This module writes the key and joystick mapping to a binary file...
 //
-//DEADCODE JIM 10/02/00 RECURSION TREE FOR C:\bob\Src\Input\Keylist.cpp
-//DEADCODE JIM 10/02/00 "C:\bob\Src\Input\Keylist.cpp"		"C:\bob\Src\Input\Keylist.cpp"
-//DEADCODE JIM 10/02/00  "<stdio.h>"		"(SYSTEM)"
-//DEADCODE JIM 10/02/00  "DosDefs.h"		"C:\bob\Src\H\Dosdefs.h"
-//DEADCODE JIM 10/02/00  "keytest.h"		"C:\bob\Src\H\Keytest.h"
-//DEADCODE JIM 10/02/00   "dosdefs.h"		"(REPEATED)"
-//DEADCODE JIM 10/02/00   "keymaps.h"		"C:\bob\Src\H\Keymaps.h"
-//DEADCODE JIM 10/02/00    "<dinput.h>"		"(SYSTEM)"
 
 //
-//DEADCODE JIM 10/02/00 #include	<dos.h>
 #include <stdio.h>
 //#include	"stdafx.h"
-//DEADCODE JIM 10/02/00 #include	"DosDefs.h"
 typedef	unsigned short	UWord;
 //#include	"Files.g"
 //x0r enum	FileNum;
-//DEADCODE JIM 10/02/00 #include	"fileman.h"
 
 //#include	"hardpasm.h"										//ARM 04Jun96
 //const int	TOTALKEYBITFLAGS=768;

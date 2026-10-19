@@ -578,7 +578,7 @@ void	shape::ParticleCylinderPlain(UWord	vertex0,
 
 				Dist = MaxDist - Dist;
 
-				Radius = 2 + ((Dist*MaxRadius)/MaxDist);
+				Radius = 2 + (MaxDist>0 ? (Dist*MaxRadius)/MaxDist : 0);	//RERUN: INT_MIN deltas can leave MaxDist==0
 
 				_matrix.SetClipFlags(dopoint0);
 				_matrix.body2screen(dopoint0);
@@ -745,7 +745,7 @@ void	shape::ParticleCylinderImapd(UWord	vertex0,
 
 					Dist = MaxDist - Dist;
 
-					Radius = 2 + ((Dist*MaxRadius)/MaxDist);
+					Radius = 2 + (MaxDist>0 ? (Dist*MaxRadius)/MaxDist : 0);	//RERUN: INT_MIN deltas can leave MaxDist==0
 		
 					if (ClipSphere(dopoint0,dopoint1,dopoint2,dopoint3,Radius)==FALSE)
 					{

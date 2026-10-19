@@ -83,8 +83,6 @@ static char THIS_FILE[] = __FILE__;
 
 RDialog*	LuftFlotte::Make()
 {
-//DeadCode JIM 20Oct00 	int numopts = 1;
-//DeadCode JIM 20Oct00 	DialBox* ND = NULL;
 	CString	tabtitle[4];
 
 		tabtitle[0] = RESSTRING(JAGD_A); 

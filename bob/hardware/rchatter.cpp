@@ -289,7 +289,6 @@ RadioChatter::~RadioChatter()
 {
 	int	count,count2;
 	RadioSampleRec	*RPtr;
-//DeadCode RJS 20Oct00 	RadioMessageP	MessPtr = RootMessPtr;
 	RadioMessageP	TmpMessPtr;
 
 	for (count2 = 0; count2 < VOICE_MAX; count2++)
@@ -327,33 +326,6 @@ RadioChatter::~RadioChatter()
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode RJS 27Jan99 void	RadioChatter::PlayMessage(	int		Scriptno,
-//DeadCode RJS 27Jan99 									TargetIndexes&	tstruc,
-//DeadCode RJS 27Jan99 									ItemPtr	Caller,
-//DeadCode RJS 27Jan99 									ItemPtr	Trg,
-//DeadCode RJS 27Jan99 									ItemPtr	Callee,
-//DeadCode RJS 27Jan99 									Bool	noCaller	)
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	if (Save_Data.vol.rchat)
-//DeadCode RJS 27Jan99 	{
-//DeadCode RJS 27Jan99 		RadioMessageP	MessPtr = CreateMessage((mobileitem*)Caller,
-//DeadCode RJS 27Jan99 												(mobileitem*)Trg,
-//DeadCode RJS 27Jan99 												(mobileitem*)Callee,
-//DeadCode RJS 27Jan99 												tstruc	);
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 		if (MessPtr)
-//DeadCode RJS 27Jan99 		{
-//DeadCode RJS 27Jan99 			if (!noCaller)
-//DeadCode RJS 27Jan99 			{
-//DeadCode RJS 27Jan99 				ComposeSample(MessPtr,PHRASE_THISCALLER);
-//DeadCode RJS 27Jan99 				ComposeSample(MessPtr,PHRASE_COMMA);
-//DeadCode RJS 27Jan99 			}
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 			DecomposeScript(MessPtr,Scriptno);
-//DeadCode RJS 27Jan99 		}
-//DeadCode RJS 27Jan99 	}
-//DeadCode RJS 27Jan99 }
-//DeadCode RJS 27Jan99
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		DecomposeScript
 //Author		Robert Slater
@@ -524,1015 +496,6 @@ RadioOnz*	RadioChatter::PhraseFactors(int	thePhrase)
 //------------------------------------------------------------------------------
 void	RadioChatter::ComposeSample(RadioMessageP	MessPtr,int phrase)
 {
-//Old_Code RJS 18Jan00 	if (phrase != PHRASE_NULL)									//RJS 12Feb99
-//Old_Code RJS 18Jan00 	{
-//Old_Code RJS 18Jan00 		int			ptype = phrase & 0xFF00;
-//Old_Code RJS 18Jan00 		int			pelement = phrase & 0xFF;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 		if (pelement)
-//Old_Code RJS 18Jan00 		{
-//Old_Code RJS 18Jan00 			if (MessPtr->isAudio)
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				RadioSampleRec*	RSamplePtr;
-//Old_Code RJS 18Jan00 				int				StartOffset;
-//Old_Code RJS 18Jan00 				int				SampleSize;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				if (ptype == PHRASE_VOICE2_ONLY)								//RJS 08Jun99
-//Old_Code RJS 18Jan00 					MessPtr->IsExcited = voicechoiceV2;							//RJS 08Jun99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				RSamplePtr = LoadSample(MessPtr,phrase,StartOffset,SampleSize);
-//Old_Code RJS 18Jan00 				if (RSamplePtr)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					if ((ptype == PHRASE_PUNCTUATION) || ((lastPhrase & 0xFF00) == PHRASE_PUNCTUATION))
-//Old_Code RJS 18Jan00 						MessPtr->phraselist[MessPtr->nophrases].noCrossFade = 1;
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 						MessPtr->phraselist[MessPtr->nophrases].noCrossFade = 0;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					MessPtr->AddSample(RSamplePtr->dataptr,StartOffset,SampleSize);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			else
-//Old_Code RJS 18Jan00 				MessPtr->AddPhrase(phrase);
-//Old_Code RJS 18Jan00 		}
-//Old_Code RJS 18Jan00 		else
-//Old_Code RJS 18Jan00 		{
-//Old_Code RJS 18Jan00 			RadioOnz*		phraseControl = &PhraseToFile[ptype>>8];
-//Old_Code RJS 18Jan00 			PhraseTables	compositePhrase;
-//Old_Code RJS 18Jan00 			int				pilotno;
-//Old_Code RJS 18Jan00 			int				squadron;
-//Old_Code RJS 18Jan00 			int				punctuate = PHRASE_COMMA;
-//Old_Code RJS 18Jan00 			UniqueID		commsname = (UniqueID) 0;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 			switch (ptype)
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 			case PHRASE_CALLERGROUP:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				AirStrucPtr	ac = (AirStrucPtr) MessPtr->caller;
-//Old_Code RJS 18Jan00 				if (ac)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					squadron = ac->fly.callname;
-//Old_Code RJS 18Jan00 					if (squadron)
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_CALLGROUPS+squadron);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_CALLEEGROUP:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				AirStrucPtr	ac = (AirStrucPtr) MessPtr->callee;
-//Old_Code RJS 18Jan00 				if (ac)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					squadron = ac->fly.callname;
-//Old_Code RJS 18Jan00 					if (squadron)
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_CALLGROUPS+squadron);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_CALLERSTOP:
-//Old_Code RJS 18Jan00 				punctuate = PHRASE_STOP;
-//Old_Code RJS 18Jan00 			case PHRASE_THISCALLER:
-//Old_Code RJS 18Jan00 			case PHRASE_CALLER:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 //DeadCode RDH 12Apr99 				if (MessPtr->isAudio)			//RJS 01Apr99
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					AirStrucPtr	ac = (AirStrucPtr) MessPtr->caller;//RJS 13Jan99
-//Old_Code RJS 18Jan00 					if (ac)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						pilotno = ac->fly.callnum;
-//Old_Code RJS 18Jan00 						squadron = ac->fly.callname;
-//Old_Code RJS 18Jan00 						Bool	fixlater = FALSE;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						if (squadron)
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							if (ptype == PHRASE_THISCALLER)				//RJS 15Jan99
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00 								punctuate = PHRASE_STOP;
-//Old_Code RJS 18Jan00 								if (!MessPtr->Random(2))		//RDH 04May99
-//Old_Code RJS 18Jan00 									ComposeSample(MessPtr,PHRASE_THISIS);	//RJS 15Jan99
-//Old_Code RJS 18Jan00 								else
-//Old_Code RJS 18Jan00 									fixlater = TRUE;				//RJS 10Feb99
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_CALLSIGNS_N+squadron);
-//Old_Code RJS 18Jan00 							if (pilotno && (ac->fly.callname < Call_FAC0))	//RJS 20May99
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00 								if ((pilotno == 1) && (fixlater==FALSE))
-//Old_Code RJS 18Jan00 								{
-//Old_Code RJS 18Jan00 									if (MessPtr->Random(1))		//RDH 04May99
-//Old_Code RJS 18Jan00 										ComposeSample(MessPtr,PHRASE_LEAD);
-//Old_Code RJS 18Jan00 									else
-//Old_Code RJS 18Jan00 										ComposeSample(MessPtr,PHRASE_LEAD2);
-//Old_Code RJS 18Jan00 								}
-//Old_Code RJS 18Jan00 								else
-//Old_Code RJS 18Jan00 									ComposeSample(MessPtr,PHRASE_NUMTABLE1_N+pilotno+1);
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 							if (fixlater)
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_HERE);	//RJS 10Feb99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,punctuate);			//RJS 08Mar99
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_SUBJECT:
-//Old_Code RJS 18Jan00 			case PHRASE_CALLEE:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				AirStrucPtr	ac;												//RJS 04May99
-//Old_Code RJS 18Jan00 				if (ptype == PHRASE_SUBJECT)								//RJS 04May99
-//Old_Code RJS 18Jan00 					ac = (AirStrucPtr) MessPtr->target;						//RJS 04May99
-//Old_Code RJS 18Jan00 				else														//RJS 04May99
-//Old_Code RJS 18Jan00 					ac = (AirStrucPtr) MessPtr->callee;						//RJS 04May99
-//Old_Code RJS 18Jan00 				if (ac)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					pilotno = ac->fly.callnum;
-//Old_Code RJS 18Jan00 					squadron = ac->fly.callname;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (squadron)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 //DeadCode RDH 04May99 						UWord	randy = Math_Lib.rnd();
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_CALLSIGNS_N+squadron);
-//Old_Code RJS 18Jan00 						if (pilotno && (ac->fly.callname < Call_FAC0))		//RJS 20May99
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							if (pilotno == 1)
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00  								if (!MessPtr->Random(2))		//RDH 04May99
-//Old_Code RJS 18Jan00  									ComposeSample(MessPtr,PHRASE_LEAD);
-//Old_Code RJS 18Jan00  								else
-//Old_Code RJS 18Jan00 									ComposeSample(MessPtr,PHRASE_LEAD2);
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00 							else
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_NUMTABLE1_N+pilotno+1);
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_SMLRANGESKM:
-//Old_Code RJS 18Jan00 			case PHRASE_SMLRANGESIMP:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				SLong	dist = MessPtr->distance;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				dist += phraseControl->subFactor;
-//Old_Code RJS 18Jan00 				dist /= phraseControl->divFactor;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_SMALLRANGES+dist);
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_BIGRANGESKM:
-//Old_Code RJS 18Jan00 			case PHRASE_BIGRANGESIMP:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				SLong	dist = MessPtr->distance;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				dist += phraseControl->subFactor;				//RJS 12Feb99
-//Old_Code RJS 18Jan00 				dist /= phraseControl->divFactor;				//RJS 12Feb99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				dist += PHRASE_NUMTABLE25_N;
-//Old_Code RJS 18Jan00 				if (dist > PHRASE_NUMBER800)
-//Old_Code RJS 18Jan00 					dist = PHRASE_NUMBER800;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,dist);
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_RANGESKM:
-//Old_Code RJS 18Jan00 			case PHRASE_RANGESIMP:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				SLong	dist = MessPtr->distance;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				dist += phraseControl->subFactor;			//RJS 12Feb99
-//Old_Code RJS 18Jan00 				dist /= phraseControl->divFactor;			//RJS 12Feb99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				if (dist > 100)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					// Are we a pilot?
-//Old_Code RJS 18Jan00 					if (MessPtr->theVoice < VOICE_FACTAC)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						// only the leader can say big ranges...
-//Old_Code RJS 18Jan00 						if (MessPtr->caller != ((AirStrucPtr)MessPtr->caller)->GroupLeader())
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99 							ComposeSample(MessPtr,PHRASE_OVER100);
-//Old_Code RJS 18Jan00 							break;
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (ptype == PHRASE_RANGESKM)
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_BIGRANGESKM);
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_BIGRANGESIMP);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 				else
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					SLong	 newphrase = dist + PHRASE_NUMTABLEF;
-//Old_Code RJS 18Jan00 					if (newphrase < PHRASE_FNUMBER2)
-//Old_Code RJS 18Jan00 						newphrase = PHRASE_FNUMBER2;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (newphrase > PHRASE_FNUMBER16)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						newphrase -= PHRASE_NUMTABLEF;
-//Old_Code RJS 18Jan00 						newphrase += PHRASE_NUMTABLE1_N;
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,newphrase);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_NUMBERCLOCK:
-//Old_Code RJS 18Jan00 			case PHRASE_BEARINGS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->InitROL())
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					UWord	relbearing = UWord(MessPtr->bearing);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					relbearing -= UWord(MessPtr->callee->hdg);	//RJS 05May99
-//Old_Code RJS 18Jan00 					relbearing += phraseControl->subFactor;		//RJS 12Feb99
-//Old_Code RJS 18Jan00 					relbearing /= phraseControl->divFactor;		//RJS 12Feb99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (ptype == PHRASE_BEARINGS)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						if (!relbearing)
-//Old_Code RJS 18Jan00 							relbearing = 1;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,ptype+relbearing);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_THEOCLOCK);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						relbearing += PHRASE_NUMTABLE1_N;
-//Old_Code RJS 18Jan00 						if (relbearing < PHRASE_NUMBER1)
-//Old_Code RJS 18Jan00 							relbearing = PHRASE_NUMBER12;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_YOUR);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,relbearing);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_TARGDIR:
-//Old_Code RJS 18Jan00 			if (MessPtr->InitROL())
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				UWord	relbearing = MessPtr->bearing;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				relbearing += phraseControl->subFactor;		//RJS 12Feb99
-//Old_Code RJS 18Jan00 				relbearing /= phraseControl->divFactor;		//RJS 12Feb99
-//Old_Code RJS 18Jan00 				if (!relbearing)
-//Old_Code RJS 18Jan00 					relbearing = 1;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,ptype+relbearing);
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_RELHEIGHTS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				// Must cater for relative heights from
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				// different perspectives!!
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				//
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				// ie. caller and target, or callee and target
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				SLong	rheights = MessPtr->pitch;
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				if (rheights > 5000)
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 					ComposeSample(MessPtr,PHRASE_HIGH);
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				else
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				{
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 					if (rheights < -5000)
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 						ComposeSample(MessPtr,PHRASE_LOW);
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 					else
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 						ComposeSample(MessPtr,PHRASE_OURLEVEL);//RJS 10Feb99
-//Old_Code RJS 18Jan00 //DeadCode AMM 05Jul99 				}
-//Old_Code RJS 18Jan00 				if (MessPtr->target && MessPtr->callee)			//RJS 05Jul99
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					SLong	rheights = MessPtr->target->World.Y - MessPtr->callee->World.Y;
-//Old_Code RJS 18Jan00 					//100m
-//Old_Code RJS 18Jan00 					if (rheights > 10000)
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_HIGH);
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						if (rheights < -10000)
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_LOW);
-//Old_Code RJS 18Jan00 						else
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_OURLEVEL);//RJS 10Feb99
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_HEIGHTSANGELS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->target)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					MessPtr->realheight = MessPtr->target->World.Y;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					DigRange = TRUE;
-//Old_Code RJS 18Jan00 					if (Save_Data.gamedifficulty [GD_UNITS])
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_HEIGHTSM);
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_HEIGHTSFT);
-//Old_Code RJS 18Jan00 					DigRange = FALSE;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_ANGELS);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_PLACENAMESNP:
-//Old_Code RJS 18Jan00 				lastPhrase = PHRASE_LOST;
-//Old_Code RJS 18Jan00 			case PHRASE_PLACENAMES:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				SectorNameP	NamePtr;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 //DeadCode RJS 23May99 				if (lastPhrase == PHRASE_LOST)
-//Old_Code RJS 18Jan00 //DeadCode RJS 23May99 				{
-//Old_Code RJS 18Jan00 //DeadCode RJS 23May99 					RelativeToPilot = TRUE;
-//Old_Code RJS 18Jan00 //DeadCode RJS 23May99 					NamePtr = GetPlaceName(MessPtr->caller);
-//Old_Code RJS 18Jan00 //DeadCode RJS 23May99 				}
-//Old_Code RJS 18Jan00 //DeadCode RJS 23May99 				else
-//Old_Code RJS 18Jan00 				if (MessPtr->target)
-//Old_Code RJS 18Jan00 					NamePtr = GetPlaceName(MessPtr->target);
-//Old_Code RJS 18Jan00 				else
-//Old_Code RJS 18Jan00 					NamePtr = GetPlaceName(MessPtr->TargetStuff.targetname);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				if (NamePtr)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					if (lastPhrase == PHRASE_NULL)					//RJS 11Feb99
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,NamePtr->prefix);
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						if (lastPhrase != PHRASE_LOST)		//RJS 11Feb99
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							if (	((NamePtr->prefix >= PHRASE_CENTRAL) && (NamePtr->prefix < PHRASE_OVER))
-//Old_Code RJS 18Jan00 								||	(NamePtr->prefix == PHRASE_NULL)	)
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_OVER);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,NamePtr->prefix);
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,NamePtr->name);
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,NamePtr->postfix);	//RJS 15Jun99
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_ANAMED_AC:
-//Old_Code RJS 18Jan00 			case PHRASE_NAMED_AC:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->target && (MessPtr->target->Status.size==AIRSTRUCSIZE))
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					ClassPtr	clstyp = ((AirStrucPtr)MessPtr->target)->classtype;
-//Old_Code RJS 18Jan00 					SLong		pno = 0;						//RJS 01Jul99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (clstyp->phrasename == PHRASE_MIGS)
-//Old_Code RJS 18Jan00 						pno = PHRASE_QMIG - PHRASE_NAMED_AC;
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						if (clstyp->phrasename == PHRASE_F86S)	//RJS 01Jul99
-//Old_Code RJS 18Jan00 							pno = PHRASE_QSABRE - PHRASE_NAMED_AC;
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (pno)									//RJS 01Jul99
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,ptype+pno);		//RJS 01Jul99
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_NAMED_ACS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->target && (MessPtr->target->Status.size==AIRSTRUCSIZE))
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					ClassPtr	clstyp = ((AirStrucPtr)MessPtr->target)->classtype;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,clstyp->phrasename);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_DIRECTIONS_TRAVEL:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->TargetStuff.targetdirection)	//RJS 12Jan99
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_HEADING);
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,ptype+MessPtr->TargetStuff.targetdirection);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 				else
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					ULong	direction;
-//Old_Code RJS 18Jan00 					Bool	dirset = FALSE;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (RelativeToPilot == TRUE)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						if (MessPtr->caller)
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							direction = MessPtr->caller->hdg;
-//Old_Code RJS 18Jan00 							dirset = TRUE;
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						if (MessPtr->target)
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							direction = MessPtr->target->hdg;
-//Old_Code RJS 18Jan00 							dirset = TRUE;
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (dirset)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						direction += phraseControl->subFactor;	//RJS 12Feb99
-//Old_Code RJS 18Jan00 						direction /= phraseControl->divFactor;	//RJS 12Feb99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 //						if (direction == 0)
-//Old_Code RJS 18Jan00 //							direction = 1;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_HEADING);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,ptype+direction);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 			case PHRASE_BANDIT_ALERT:
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 			{
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 				ULong	randy = Math_Lib.rnd();
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 				randy += phraseControl->subFactor;				//RJS 12Feb99
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 				randy /= phraseControl->divFactor;				//RJS 12Feb99
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 				ComposeSample(MessPtr,ptype+randy);
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 			}
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_TARGTYPE:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				compositePhrase = (PhraseTables)MessPtr->TargetStuff.targettype;
-//Old_Code RJS 18Jan00 				if ((compositePhrase & 0xFF00)==ptype)
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,compositePhrase);			//RJS 28Apr99
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_TARGNAM:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				compositePhrase = (PhraseTables)MessPtr->TargetStuff.targetname;
-//Old_Code RJS 18Jan00 				if ((compositePhrase & 0xFF00)==ptype)
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,compositePhrase);			//RJS 28Apr99
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_TARGMOV:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				compositePhrase = (PhraseTables)MessPtr->TargetStuff.targetmovement;
-//Old_Code RJS 18Jan00 				if ((compositePhrase & 0xFF00)==ptype)
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,compositePhrase);		//RJS 28Apr99
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_WEAPONS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				compositePhrase = (PhraseTables)MessPtr->TargetStuff.weaponset;
-//Old_Code RJS 18Jan00 				if ((compositePhrase & 0xFF00)==ptype)
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,compositePhrase);			//RJS 28Apr99
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_HEIGHTSM:
-//Old_Code RJS 18Jan00 			case PHRASE_HEIGHTSFT:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				SLong	height = MessPtr->realheight;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				height += phraseControl->subFactor;
-//Old_Code RJS 18Jan00 				height /= phraseControl->divFactor;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				if (DigRange)
-//Old_Code RJS 18Jan00 					ComposeDigitNumber(MessPtr,height,2);
-//Old_Code RJS 18Jan00 				else
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					height += PHRASE_NUMTABLEF;
-//Old_Code RJS 18Jan00 					if (height < PHRASE_FNUMBER1)
-//Old_Code RJS 18Jan00 						height = PHRASE_FNUMBER1;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (height > PHRASE_FNUMBER16)				//RJS 12Apr99
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						height -= PHRASE_NUMTABLEF;
-//Old_Code RJS 18Jan00 						height += PHRASE_NUMTABLE1_N;
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,height);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_HEIGHTS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->target || MessPtr->TargetStuff.targetheight)//RJS 01Jun99
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					bool	saidheight = false;
-//Old_Code RJS 18Jan00 //DeadCode RDH 04May99 					UWord	randy = Math_Lib.rnd();
-//Old_Code RJS 18Jan00 					if (MessPtr->Random(3))						//RDH 04May99
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_HEIGHT);
-//Old_Code RJS 18Jan00 						saidheight = true;
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						if ((MessPtr->IsExcited == 0) && MessPtr->Random(3))//RDH 04May99
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_ESTHEIGHT);
-//Old_Code RJS 18Jan00 							saidheight = true;
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (!saidheight)
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_SPACE);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (MessPtr->TargetStuff.targetheight)		//RJS 01Jun99
-//Old_Code RJS 18Jan00 						MessPtr->realheight = MessPtr->TargetStuff.targetheight;
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 						MessPtr->realheight = MessPtr->target->World.Y;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (Save_Data.gamedifficulty [GD_UNITS])
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_HEIGHTSM);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_THOUSANDM);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_HEIGHTSFT);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_THOUSANDFT);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_SPEEDS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->InitROL())
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					ULong	vel;
-//Old_Code RJS 18Jan00 					SLong	newphrase;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 					if (Save_Data.gamedifficulty [GD_UNITS])
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 					{
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 						// metric (m/cm)... but have as knots
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 						vel = Float(MessPtr->speed) * 0.19438;
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 						newphrase = PHRASE_SPEEDSKNOT;
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 					}
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 					else
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 					{
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 						// mph
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 						vel = Float(MessPtr->speed) * 0.225;
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 						newphrase = PHRASE_SPEEDSMPH;
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 					}
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 					MessPtr->speed = vel;
-//Old_Code RJS 18Jan00 //DeadCode RJS 18Mar99 					ComposeSample(MessPtr,newphrase);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					vel = MessPtr->speed;
-//Old_Code RJS 18Jan00 					vel += phraseControl->subFactor;
-//Old_Code RJS 18Jan00 					vel /= phraseControl->divFactor;
-//Old_Code RJS 18Jan00 					if (!vel)	vel = 1;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_SPACE);				//RJS 09May99
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_NUMTABLE25_N+vel);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (Save_Data.gamedifficulty [GD_UNITS])
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_CLICKS);
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_KNOTS);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_RANGES:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->InitROL())
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					bool	saidrange = false;
-//Old_Code RJS 18Jan00 					if ((MessPtr->distance > 300000) || (MessPtr->IsExcited==0))
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 //DeadCode RDH 04May99 						UWord	randpoo = Math_Lib.rnd();
-//Old_Code RJS 18Jan00 						if (MessPtr->Random(1))					//RDH 04May99
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 // At Range can only be said, if no comma precedes it...
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 							if (randpoo > 55000)
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 								ComposeSample(MessPtr,PHRASE_ATRANGE);
-//Old_Code RJS 18Jan00 //DeadCode RJS 17Mar99 							else
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_RANGE);
-//Old_Code RJS 18Jan00 							saidrange = true;
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (!saidrange)
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_SPACE);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (MessPtr->distance > 250000)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						if (Save_Data.gamedifficulty [GD_UNITS])
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_RANGESKM);
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_KILOMETRES);
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 						else
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_RANGESIMP);
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_MILES);
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						// Small ranges...
-//Old_Code RJS 18Jan00 						if (Save_Data.gamedifficulty [GD_UNITS])
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							if (	(MessPtr->theVoice != VOICE_DENTIST)
-//Old_Code RJS 18Jan00 								&&	(MessPtr->theVoice != VOICE_TOWER)	)
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_SMLRANGESKM);
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_METRES);
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00 							else
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_UNDER2);
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_KILOMETRES);
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 						else
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							if (	(MessPtr->theVoice != VOICE_DENTIST)
-//Old_Code RJS 18Jan00 								&&	(MessPtr->theVoice != VOICE_TOWER)	)
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_SMLRANGESIMP);
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_YARDS);
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00 							else
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_UNDER2);
-//Old_Code RJS 18Jan00 								ComposeSample(MessPtr,PHRASE_MILES);
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_BEARINGNO:								//RJS 18Mar99
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->InitROL())
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					UWord	relbearing = UWord(MessPtr->bearing);//RDH 13Apr99
-//Old_Code RJS 18Jan00 					SLong	therel = (relbearing * 360)>>16;	//RDH 13Apr99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeDigitNumber(MessPtr,therel,3);		//RDH 30Apr99
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_ALTWINDBEARINGNO:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				windHeightSet = 1061666;	//35,000ft in cm
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_ALTWIND);
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_COMMA);
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_WINDBEARINGNO);
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_SURFACEWINDBEARINGNO:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				windHeightSet = 0;
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_SURFACEWIND);
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_COMMA);
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_WINDBEARINGNO);
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_WINDBEARINGNO:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				SLong	vx,vy,vz;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				// height is set up by prevous wind phrase...
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 				if (MMC.Sky.GetWind(windHeightSet,vx,vy,vz))
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 				{
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					ANGLES	bearing,pitch;
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					Math_Lib.Intercept(vx,vy,vz,windSpeedSet,bearing,pitch);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ULong	theBearing;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					//These values should already be in degrees...
-//Old_Code RJS 18Jan00 					if (windHeightSet)
-//Old_Code RJS 18Jan00 						theBearing = UWord(MMC.Sky.diralt);
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 						theBearing = UWord(MMC.Sky.dir0);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					theBearing *= 360;
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					theBearing >>= 16;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_THEBEARING);
-//Old_Code RJS 18Jan00 					ComposeDigitNumber(MessPtr,SLong(theBearing),3);
-//Old_Code RJS 18Jan00 //DEADCODE DAW 04/05/99 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_WINDSPEED:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (windSpeedSet == -1)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					SLong	vx,vy,vz;
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					if (MMC.Sky.GetWind(windHeightSet,vx,vy,vz))
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 						windSpeedSet = Math_Lib.distance3d(vx,vy,vz);
-//Old_Code RJS 18Jan00 					//Knots...
-//Old_Code RJS 18Jan00 					if (windHeightSet)
-//Old_Code RJS 18Jan00 						windSpeedSet = UWord(MMC.Sky.windalt);
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 						windSpeedSet = UWord(MMC.Sky.wind0);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				if (windSpeedSet > -1)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					Float	fspeed;
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					//Scale & divide by 10!
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					fspeed = Float(windSpeedSet);
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					if (Save_Data.gamedifficulty [GD_UNITS])
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 						fspeed *= 0.194261;						//RJS 30Apr99
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					else
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 						fspeed *= 0.22369;						//RJS 30Apr99
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99
-//Old_Code RJS 18Jan00 //DeadCode DAW 04May99 					windSpeedSet = SLong(fspeed);
-//Old_Code RJS 18Jan00 					windSpeedSet += PHRASE_FNUMBER0;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (windSpeedSet < PHRASE_FNUMBER2)
-//Old_Code RJS 18Jan00 						windSpeedSet = PHRASE_FNUMBER2;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					if (windSpeedSet > PHRASE_FNUMBER16)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						windSpeedSet -= PHRASE_NUMTABLEF;
-//Old_Code RJS 18Jan00 						windSpeedSet += PHRASE_NUMTABLE1_N;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						if (windSpeedSet > PHRASE_NUMBER100)
-//Old_Code RJS 18Jan00 							windSpeedSet = PHRASE_NUMBER100;
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_SPACE);
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,windSpeedSet);
-//Old_Code RJS 18Jan00 //DEADCODE DAW 05/05/99 					if (Save_Data.gamedifficulty [GD_UNITS])
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_KNOTS);
-//Old_Code RJS 18Jan00 //DEADCODE DAW 05/05/99 					else
-//Old_Code RJS 18Jan00 //DEADCODE DAW 05/05/99 						ComposeSample(MessPtr,PHRASE_PERHOUR);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				windSpeedSet = -1;
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_FUELLEVEL:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->caller)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					AirStrucPtr	ac = (AirStrucPtr) MessPtr->caller;
-//Old_Code RJS 18Jan00 //DEADCODE CSB 05/11/99 					ULong	fueltot = ac->weap.left.int_fuel;
-//Old_Code RJS 18Jan00 //DEADCODE CSB 05/11/99
-//Old_Code RJS 18Jan00 //DEADCODE CSB 05/11/99 					fueltot += ac->weap.left.ext_fuel;
-//Old_Code RJS 18Jan00 //DEADCODE CSB 05/11/99 					fueltot += ac->weap.right.int_fuel;
-//Old_Code RJS 18Jan00 //DEADCODE CSB 05/11/99 					fueltot += ac->weap.right.ext_fuel;
-//Old_Code RJS 18Jan00 //DEADCODE CSB 05/11/99 					fueltot += ac->weap.centre.int_fuel;
-//Old_Code RJS 18Jan00 //DEADCODE CSB 05/11/99 					fueltot += ac->weap.centre.ext_fuel;
-//Old_Code RJS 18Jan00 					ULong fueltot = 0;											//CSB 05/11/99
-//Old_Code RJS 18Jan00 					for(SWord i = 0; i < 4; i++)								//CSB 05/11/99
-//Old_Code RJS 18Jan00 						fueltot += ac->fly.fuel_content[i];						//CSB 05/11/99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					fueltot /= 100000;	//kgs
-//Old_Code RJS 18Jan00 //DeadCode CSB 30/06/99						fueltot = Float(fueltot) * 0.453597;		//RJS 13May99
-//Old_Code RJS 18Jan00 					fueltot = Float(fueltot) * 2.2046;		//CSB 30/06/99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_SPACE);		//RJS 13May99
-//Old_Code RJS 18Jan00 					ComposeDigitNumber(MessPtr,SLong(fueltot));
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_GALLONS);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_RELPOSITION:							//RJS 25Feb99
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				// split into 4 directions, with 45 degree spread -&+...
-//Old_Code RJS 18Jan00 				if (MessPtr->InitROL())
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					UWord	relbearing = MessPtr->bearing;
-//Old_Code RJS 18Jan00 					relbearing += phraseControl->subFactor;		//RJS 12Feb99
-//Old_Code RJS 18Jan00 					relbearing /= phraseControl->divFactor;		//RJS 12Feb99
-//Old_Code RJS 18Jan00 					if (!relbearing)
-//Old_Code RJS 18Jan00 						relbearing++;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,ptype+relbearing);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_RANDOMTHINKTIME:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->isAudio)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					RadioSampleRec*	RSamplePtr;
-//Old_Code RJS 18Jan00 					int				StartOffset;
-//Old_Code RJS 18Jan00 					int				SampleSize;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					RSamplePtr = LoadSample(MessPtr,PHRASE_THINKING,StartOffset,SampleSize);
-//Old_Code RJS 18Jan00 					if (RSamplePtr)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						// Fiddle the sample size to vary pause length...
-//Old_Code RJS 18Jan00 						SampleSize >>= 1;
-//Old_Code RJS 18Jan00 						SampleSize += Math_Lib.rnd(SampleSize);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						MessPtr->AddSample(RSamplePtr->dataptr,StartOffset,SampleSize);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 				else
-//Old_Code RJS 18Jan00 					MessPtr->AddPhrase(PHRASE_THINKING);
-//Old_Code RJS 18Jan00 //				{
-//Old_Code RJS 18Jan00 //					//1.5 secs...
-//Old_Code RJS 18Jan00 //					for (int i=0; i < 3; i++)
-//Old_Code RJS 18Jan00 //						MessPtr->AddPhrase(PHRASE_THINKING);
-//Old_Code RJS 18Jan00 //				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_GUSTTYPE:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				SLong magnitude = MMC.Sky.MaxMagnitude;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				//assume magnitude is 0...6
-//Old_Code RJS 18Jan00 				magnitude = (2 * magnitude)/6;		//scale down to 3 possible types...
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_GUSTLIGHT+magnitude);
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_THISDENTIST:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 //DeadCode RDH 12Apr99 				if (MessPtr->isAudio)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					if (!MessPtr->Random(2))					//RDH 04May99
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_THISIS);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_DENTIST);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 					else
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_DENTISTHERE);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_THISDENTISTTO:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 //DeadCode RDH 12Apr99 				if (MessPtr->isAudio)
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_DENTISTTO);
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_DENTISTSTOP:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 //DeadCode RDH 12Apr99 				if (MessPtr->isAudio)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_DENTIST);
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_STOP);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_AIRFIELDS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->target)									//RJS 05May99
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					SLong	uid = MessPtr->target->uniqueID.count;		//RJS 05May99
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					// Find offset...
-//Old_Code RJS 18Jan00 					uid -= UID_AF_Abbeville; //RJS 16/11/99
-//Old_Code RJS 18Jan00 					uid++;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 					uid += PHRASE_AIRFIELDS;
-//Old_Code RJS 18Jan00 					if ((uid > PHRASE_AIRFIELDS) && (uid <= PHRASE_AFJAPAN))
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,uid);
-//Old_Code RJS 18Jan00 //Dead(moved to script)						ComposeSample(MessPtr,PHRASE_AIRFIELD);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_THISCOMMS:
-//Old_Code RJS 18Jan00 			case PHRASE_COMMSCALLER:
-//Old_Code RJS 18Jan00 				commsname = MessPtr->caller->uniqueID.count;
-//Old_Code RJS 18Jan00 			case PHRASE_COMMSTARGET:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (!commsname)
-//Old_Code RJS 18Jan00 					commsname = MessPtr->target->uniqueID.count;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,PHRASE_PLAYERNAME1+_DPlay.GetPlayerNumber(commsname));
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				if (ptype == PHRASE_THISCOMMS)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_COLON);
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_SPACE);
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_USER_DEFINED:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				ULong	messno = 8 * _DPlay.GetPlayerNumber(MessPtr->caller->uniqueID.count);
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				messno += MessPtr->TargetStuff.usermessage;
-//Old_Code RJS 18Jan00 				messno++;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 				ComposeSample(MessPtr,ptype+messno);
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_GERMANCALLERSTOP:
-//Old_Code RJS 18Jan00 				punctuate = PHRASE_STOP;
-//Old_Code RJS 18Jan00 			case PHRASE_GERMANTHISCALLER:
-//Old_Code RJS 18Jan00 			case PHRASE_GERMANCALLER:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->isAudio)
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					switch (ptype)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 					case PHRASE_GERMANCALLERSTOP:
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_CALLERSTOP);
-//Old_Code RJS 18Jan00 						break;
-//Old_Code RJS 18Jan00 					case PHRASE_GERMANTHISCALLER:
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_THISCALLER);
-//Old_Code RJS 18Jan00 						break;
-//Old_Code RJS 18Jan00 					case PHRASE_GERMANCALLER:
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_CALLER);
-//Old_Code RJS 18Jan00 						break;
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 				else
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					AirStrucPtr	ac = (AirStrucPtr) MessPtr->caller;
-//Old_Code RJS 18Jan00 					if (ac)
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						pilotno = ac->fly.callnum;
-//Old_Code RJS 18Jan00 						squadron = ac->fly.callname;
-//Old_Code RJS 18Jan00 						Bool	fixlater = FALSE;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						if (squadron)
-//Old_Code RJS 18Jan00 						{
-//Old_Code RJS 18Jan00 							if (ptype == PHRASE_GERMANTHISCALLER)
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00 								punctuate = PHRASE_STOP;
-//Old_Code RJS 18Jan00 								if (!MessPtr->Random(2))
-//Old_Code RJS 18Jan00 									ComposeSample(MessPtr,PHRASE_THISIS);
-//Old_Code RJS 18Jan00 								else
-//Old_Code RJS 18Jan00 								{
-//Old_Code RJS 18Jan00 									ComposeSample(MessPtr,PHRASE_HERE);
-//Old_Code RJS 18Jan00 									ComposeSample(MessPtr,PHRASE_SPACE);
-//Old_Code RJS 18Jan00 									fixlater = TRUE;
-//Old_Code RJS 18Jan00 								}
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,PHRASE_CALLSIGNS_N+squadron);
-//Old_Code RJS 18Jan00 							if (pilotno && (ac->fly.callname < Call_FAC0))
-//Old_Code RJS 18Jan00 							{
-//Old_Code RJS 18Jan00 //DeadCode RJS 15Jun99 								if ((pilotno == 1) && (fixlater==FALSE))
-//Old_Code RJS 18Jan00 //DeadCode RJS 15Jun99 								{
-//Old_Code RJS 18Jan00 //DeadCode RJS 15Jun99 									if (MessPtr->Random(1))
-//Old_Code RJS 18Jan00 //DeadCode RJS 15Jun99 										ComposeSample(MessPtr,PHRASE_LEAD);
-//Old_Code RJS 18Jan00 //DeadCode RJS 15Jun99 									else
-//Old_Code RJS 18Jan00 //DeadCode RJS 15Jun99 										ComposeSample(MessPtr,PHRASE_LEAD2);
-//Old_Code RJS 18Jan00 //DeadCode RJS 15Jun99 								}
-//Old_Code RJS 18Jan00 //DeadCode RJS 15Jun99 								else
-//Old_Code RJS 18Jan00 									ComposeSample(MessPtr,PHRASE_NUMTABLE1_N+pilotno+1);
-//Old_Code RJS 18Jan00 							}
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 							ComposeSample(MessPtr,punctuate);
-//Old_Code RJS 18Jan00 						}
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_GERMANNUMBERCLOCK:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->isAudio)
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_NUMBERCLOCK);
-//Old_Code RJS 18Jan00 				else
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					if (MessPtr->InitROL())
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						UWord	relbearing = MessPtr->bearing;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						relbearing -= UWord(MessPtr->callee->hdg);
-//Old_Code RJS 18Jan00 						relbearing += phraseControl->subFactor;
-//Old_Code RJS 18Jan00 						relbearing /= phraseControl->divFactor;
-//Old_Code RJS 18Jan00 						relbearing += PHRASE_NUMTABLE1_N;
-//Old_Code RJS 18Jan00 						if (relbearing < PHRASE_NUMBER1)
-//Old_Code RJS 18Jan00 							relbearing = PHRASE_NUMBER12;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_SPACE);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,relbearing);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_YOUR);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99 			case PHRASE_COMMSACCEL:
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99 			{
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99 //DeadCode AMM 16Nov99 				int	accelno = _DPlay.GetAccelNumber();
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99 				int accelno=0;
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99 				ComposeSample(MessPtr,PHRASE_NUMBER0+accelno);
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99 			}
-//Old_Code RJS 18Jan00 //DEADCODE RDH 07/12/99 			break;
-//Old_Code RJS 18Jan00 			case PHRASE_ITALIANBEARINGS:
-//Old_Code RJS 18Jan00 			{
-//Old_Code RJS 18Jan00 				if (MessPtr->isAudio)
-//Old_Code RJS 18Jan00 					ComposeSample(MessPtr,PHRASE_BEARINGS);
-//Old_Code RJS 18Jan00 				else
-//Old_Code RJS 18Jan00 				{
-//Old_Code RJS 18Jan00 					if (MessPtr->InitROL())
-//Old_Code RJS 18Jan00 					{
-//Old_Code RJS 18Jan00 						UWord	relbearing = MessPtr->bearing;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						relbearing -= UWord(MessPtr->callee->hdg);
-//Old_Code RJS 18Jan00 						relbearing += phraseControl->subFactor;
-//Old_Code RJS 18Jan00 						relbearing /= phraseControl->divFactor;
-//Old_Code RJS 18Jan00 						if (!relbearing)
-//Old_Code RJS 18Jan00 							relbearing = 1;
-//Old_Code RJS 18Jan00
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,PHRASE_THEOCLOCK);
-//Old_Code RJS 18Jan00 						ComposeSample(MessPtr,ptype+relbearing);
-//Old_Code RJS 18Jan00 					}
-//Old_Code RJS 18Jan00 				}
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 			break;
-//Old_Code RJS 18Jan00 			}
-//Old_Code RJS 18Jan00 		}
-//Old_Code RJS 18Jan00 	}
 
 	if (phrase != PHRASE_NULL)
 	{
@@ -1548,8 +511,6 @@ void	RadioChatter::ComposeSample(RadioMessageP	MessPtr,int phrase)
 			PhraseTables	compositePhrase;
 			int				pilotno;
 			int				squadron;
-//DeadCode RJS 20Oct00 			int				punctuate = PHRASE_COMMA;
-//DeadCode RJS 20Oct00 			UniqueID		commsname = (UniqueID) 0;
 
 			switch (ptype)
 			{
@@ -1645,11 +606,6 @@ void	RadioChatter::ComposeSample(RadioMessageP	MessPtr,int phrase)
 				CALLER_GSECTIONRAF(MessPtr);
 			}
 			break;
-//DEADCODE MS 28/04/00 			case PHRASE_CALLER_GSN:
-//DEADCODE MS 28/04/00 			{
-//DEADCODE MS 28/04/00 				CALLER_GSN(MessPtr);
-//DEADCODE MS 28/04/00 			}
-//DEADCODE MS 28/04/00 			break;
 			case PHRASE_CALLER_GSQUADRAF:
 			{
 				CALLER_GSQUADRAF(MessPtr);
@@ -1670,11 +626,6 @@ void	RadioChatter::ComposeSample(RadioMessageP	MessPtr,int phrase)
 				CALLER_SN(MessPtr);
 			}
 			break;
-//DEADCODE RJS 5/3/00 			case PHRASE_COMMS:			//?
-//DEADCODE RJS 5/3/00 			{
-//DEADCODE RJS 5/3/00 				COMMS(MessPtr);
-//DEADCODE RJS 5/3/00 			}
-//DEADCODE RJS 5/3/00 			break;
 			case PHRASE_COMMSCALLER_SN:	//?
 			{
 				COMMSCALLER_SN(MessPtr);
@@ -1766,11 +717,6 @@ void	RadioChatter::ComposeSample(RadioMessageP	MessPtr,int phrase)
 				SURFACEWINDBEARINGNO(MessPtr);
 			}
 			break;
-//DEADCODE MS 28/04/00 			case PHRASE_TRG_1AC:
-//DEADCODE MS 28/04/00 			{
-//DEADCODE MS 28/04/00 				TRG_1AC(MessPtr);
-//DEADCODE MS 28/04/00 			}
-//DEADCODE MS 28/04/00 			break;
 			case PHRASE_TRG_AC:
 			{
 				TRG_AC(MessPtr);
@@ -1781,11 +727,6 @@ void	RadioChatter::ComposeSample(RadioMessageP	MessPtr,int phrase)
 				TRG_BOMBER2ACS(MessPtr);
 			}
 			break;
-//DEADCODE MS 28/04/00 			case PHRASE_TRG_BOMBERAC:
-//DEADCODE MS 28/04/00 			{
-//DEADCODE MS 28/04/00 				TRG_BOMBERAC(MessPtr);
-//DEADCODE MS 28/04/00 			}
-//DEADCODE MS 28/04/00 			break;
 			case PHRASE_TRG_BOMBERACS:
 			{
 				TRG_BOMBERACS(MessPtr);
@@ -1872,7 +813,6 @@ void	RadioChatter::ComposeSample(RadioMessageP	MessPtr,int phrase)
 			}
 			break;
 			case PHRASE_CALLEE_GLW:
-//DEADCODE MS 28/04/00 			case PHRASE_CALLEE_GGRUPPELW:
 			{
 				ComposeSample(MessPtr,ptype+SquadronName(*MessPtr->callee));
 			}
@@ -1925,12 +865,6 @@ void	RadioChatter::ComposeSample(RadioMessageP	MessPtr,int phrase)
 				ComposeDigitNumber(MessPtr,number);
 			}
 			break;
-//DEADCODE RJS 4/18/00 			case PHRASE_NUMBEROFLOSSES:
-//DEADCODE RJS 4/18/00 			{
-//DEADCODE RJS 4/18/00 #pragma	message(__HERE__ "Jim:  I need number of losses for the day")
-//DEADCODE RJS 4/18/00
-//DEADCODE RJS 4/18/00 			}
-//DEADCODE RJS 4/18/00 			break;
 			case PHRASE_ONLYRAID_ID:
 			{
 				ComposeSample(MessPtr,PHRASE_W_RAID);
@@ -2239,6 +1173,9 @@ RadioSampleRec*	RadioChatter::LoadSample(	RadioMessageP	MessPtr,
 
 		StartOff = SampleSize = 0;
 
+		if (fileindex < 1 || fileindex > MaxSamples
+			|| voiceoffset < 0 || voiceoffset >= VOICE_MAX)
+			return NULL;											//no sample for this phrase
 		SamplePtr = &radiosamples[fileindex-1][voiceoffset];		//RJS 17Mar99
 		if (!SamplePtr->blockptr)
 		{
@@ -2334,10 +1271,6 @@ RadioSampleRec*	RadioChatter::LoadSample(	RadioMessageP	MessPtr,
 				_Error.EmitSysErr("Chatter file size wrong... phrase %x, %d elements!",thephrase,SamplePtr->noFiles);
 			}
 
-	//DeadCode RJS 27Jul98 		if (pelement)											//RJS 23Jul98
-	//DeadCode RJS 27Jul98 			StartOff = SamplePtr->offsetptr[pelement-1];		//RJS 23Jul98
-	//DeadCode RJS 27Jul98
-	//DeadCode RJS 27Jul98 		SampleSize = SamplePtr->offsetptr[pelement] - StartOff;	//RJS 23Jul98
 		}
 	}
 
@@ -2388,9 +1321,6 @@ void	RadioChatter::ProcessMessages(SLong frametime)
 					}
 					else
 					{
-//DeadCode RJS 06Jul99 						SLong	frequency = 11025;
-//DeadCode RJS 06Jul99 						if (MessPtr->theVoice == VOICE_REST)
-//DeadCode RJS 06Jul99 							frequency += Math_Lib.rnd(1000) - 750;
 
 						timesincelast = 0;
 						timesincestart = 0;
@@ -2432,7 +1362,6 @@ void	RadioChatter::ProcessMessages(SLong frametime)
 					timesincelast += frametime;				//RJS 01Apr99
 					if (timesincelast > 450)		//display nowt after 4.5secs//DAW 07Apr99
 					{
-	//DEADCODE DAW 05/05/99 					timesincelast = 450;
 						_MsgBuffer.nothingatall = true;
 					}
 				}
@@ -2464,7 +1393,6 @@ UWord		RadioChatter::GetPlaceNum(Coords3D* WPtr,int noelements)
 			UWord	location;
 			SLong	xof, zof, val;
 			UWord	bigx, bigz, x, z;
-//DEADCODE JIM 18/03/99 			Coords3D	*WPtr = &itm->World;
 
 			// Sector shift = 21...
 			val=WPtr->X>>21;
@@ -2497,69 +1425,6 @@ UWord		RadioChatter::GetPlaceNum(Coords3D* WPtr,int noelements)
 				return 0;
 }
 
-//DEADCODE RJS 5/5/00 SectorNameP	RadioChatter::GetPlaceName(UWord location)
-//DEADCODE RJS 5/5/00 {
-//DEADCODE RJS 5/5/00 	if (LoadSectorNames(FIL_RCHAT_NAMEGRID))
-//DEADCODE RJS 5/5/00 		if (location < theSectors.noelements)
-//DEADCODE RJS 5/5/00 			return	&theSectors.PlaceNames[location];
-//DEADCODE RJS 5/5/00 	return NULL;
-//DEADCODE RJS 5/5/00 }
-//DEADCODE RJS 5/5/00
-//DEADCODE RJS 5/5/00 SectorNameP	RadioChatter::GetPlaceName(ItemPtr	itm)
-//DEADCODE RJS 5/5/00 {
-//DEADCODE RJS 5/5/00 	SectorNameP	NamePtr = NULL;
-//DEADCODE RJS 5/5/00 	if (LoadSectorNames(FIL_RCHAT_NAMEGRID) && itm)						//RJS 15Jun99
-//DEADCODE RJS 5/5/00 	{
-//DEADCODE RJS 5/5/00 		UWord location=GetPlaceNum(&itm->World,theSectors.noelements);
-//DEADCODE RJS 5/5/00 		return (GetPlaceName(location));
-//DEADCODE RJS 5/5/00 	}
-//DEADCODE RJS 5/5/00
-//DEADCODE RJS 5/5/00 	return(NamePtr);
-//DEADCODE RJS 5/5/00 }
-//DeadCode DAW 26Mar99 SectorNameP	RadioChatter::GetPlaceName(ItemPtr	itm)
-//DeadCode DAW 26Mar99 {
-//DeadCode DAW 26Mar99 	SectorNameP	NamePtr = NULL;
-//DeadCode DAW 26Mar99 	if (itm)
-//DeadCode DAW 26Mar99 	{
-//DeadCode DAW 26Mar99 		if (LoadSectorNames(FIL_RCHAT_NAMEGRID))
-//DeadCode DAW 26Mar99 		{
-//DeadCode DAW 26Mar99 			UWord	location;
-//DeadCode DAW 26Mar99 			SLong	xof, zof, val;
-//DeadCode DAW 26Mar99 			UWord	bigx, bigz, x, z;
-//DeadCode DAW 26Mar99 			Coords3D	*WPtr = &itm->World;
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			// Sector shift = 21...
-//DeadCode DAW 26Mar99 			val=WPtr->X>>21;
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			x = (val&0x7);
-//DeadCode DAW 26Mar99 			bigx = (val>>3);
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			// Sector shift = 21...
-//DeadCode DAW 26Mar99 			val=WPtr->Z>>21;
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			z = (val&0x7);
-//DeadCode DAW 26Mar99 			bigz = (val>>3);
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			// x vals range from 2 to 6
-//DeadCode DAW 26Mar99 			// z vals range from 2 to 8
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			if (bigx > 6)
-//DeadCode DAW 26Mar99 				bigx = 6;
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			bigx -= 1;
-//DeadCode DAW 26Mar99 			bigz -= 1;
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			xof = (bigx * 8) + x;
-//DeadCode DAW 26Mar99 			zof = (bigz * 8) + z;
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 			location = (zof * 40) + xof;
-//DeadCode DAW 26Mar99 			if (location < theSectors.noelements)
-//DeadCode DAW 26Mar99 				NamePtr = &theSectors.PlaceNames[location];
-//DeadCode DAW 26Mar99 		}
-//DeadCode DAW 26Mar99 	}
-//DeadCode DAW 26Mar99
-//DeadCode DAW 26Mar99 	return(NamePtr);
-//DeadCode DAW 26Mar99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		LoadSectorNames
@@ -2605,7 +1470,6 @@ UWordP	RadioChatter::GetScript(SLong	scriptno,RadioMessageP MessPtr,PhraseTables
 {
 	UWordP	ptr = NULL;
 
-//DEADCODE CSB 15/12/99 #ifndef NO_CHATTER_
 
 	singlephrase = PHRASE_NULL;
 #ifndef	_NO_CHATTER_
@@ -2653,19 +1517,6 @@ UWordP	RadioChatter::GetScript(SLong	scriptno,RadioMessageP MessPtr,PhraseTables
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode RJS 27Jan99 void	RadioChatter::PlayMessage(	int		Scriptno,
-//DeadCode RJS 27Jan99 									ItemPtr	Caller,
-//DeadCode RJS 27Jan99 									ItemPtr	Trg,
-//DeadCode RJS 27Jan99 									ItemPtr	Callee,
-//DeadCode RJS 27Jan99 									Bool	noCaller	)
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	if (Save_Data.vol.rchat)
-//DeadCode RJS 27Jan99 	{
-//DeadCode RJS 27Jan99 		TargetIndexes	tripeval;
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 		PlayMessage(Scriptno,tripeval,Caller,Trg,Callee,noCaller);
-//DeadCode RJS 27Jan99 	}
-//DeadCode RJS 27Jan99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ExpandMessage
@@ -2731,10 +1582,6 @@ void	RadioChatter::ExpandCallsign(PhraseBuffer&	phbuf, ItemPtr	Caller,const Voic
 				thephrase = PHRASE_COMMSTARGET;							//RJS 12Jul00
 			else
 				thephrase = PHRASE_CALLEE_GSN_RAF;
-//DEADCODE RJS 5/12/00 			if (((AirStrucPtr)Caller)->nationality == NAT_RED)
-//DEADCODE RJS 5/12/00 				thephrase = PHRASE_CALLEE_GSN_RAF;
-//DEADCODE RJS 5/12/00 			else
-//DEADCODE RJS 5/12/00 				thephrase = PHRASE_CALLEE_GSN_RAF;
 		}
 	}
 	else
@@ -2804,12 +1651,10 @@ void	RadioChatter::Message_DecomposeScript(RadioMessageP	MessPtr,int Scriptno)
 {
 	UWordP			ScriptPtr;
 	PhraseTables	ThePhrase;
-//DeadCode RJS 20Oct00 	int		count=0;
 	ULong	nochoices = Scriptno & 0xFFFF0000;
 
 	if (nochoices)
 	{
-//DeadCode RJS 12Apr99 		nochoices >>= 16;
 
 		Scriptno &= 0xFFFF;
 		ScriptPtr = GetScript(Scriptno,MessPtr,ThePhrase);		//RJS 12Apr99
@@ -2884,8 +1729,6 @@ void	RadioChatter::PlayMessage(const	MESSAGE_STRUC&	radiomessage, SLong vol, boo
 	{
  		if (radiomessage.isComms)	MessPtr->isAudio = FALSE;//RJS 22Mar99
 
-//DeadCode RJS 10May99 		if (radiomessage.addThinkTime)
-//DeadCode RJS 10May99  			ComposeSample(MessPtr,PHRASE_RANDOMTHINKTIME);
 		DecomposeScript(MessPtr,radiomessage.GetScript());				//RJS 15Sep00
 	}
 
@@ -3038,17 +1881,6 @@ RADIOMESSAGE::RADIOMESSAGE(	RADIOMESSAGE*& 	MessPtr,
 
 	MessPtr = this;					//RJS 17May00
 
-//DEADCODE RDH 17/05/00 	if ((fbuffp==NULL) && (Save_Data.vol.rchat > 0))			//RJS 22Mar99
-//DEADCODE RDH 17/05/00 	{
-//DEADCODE RDH 17/05/00 		isAudio = TRUE;
-//DEADCODE RDH 17/05/00
-//DEADCODE RDH 17/05/00 		MessPtr = this;
-//DEADCODE RDH 17/05/00 	}
-//DEADCODE RDH 17/05/00 	else
-//DEADCODE RDH 17/05/00 	{
-//DEADCODE RDH 17/05/00 		isAudio = FALSE;
-//DEADCODE RDH 17/05/00 		MessPtr = this;
-//DEADCODE RDH 17/05/00 	}
 
 	IsExcited = 0;												//RJS 18Mar99
 	TextNum = FALSE;											//RJS 18Mar99
@@ -3144,11 +1976,6 @@ const MESSAGE_STRUC&	RadioChatter::TriggerMsg(const MESSAGE_STRUC&	msg)
 								PlayMessage(msg,theVol,true);			//RJS 2Oct00
 							}
 						}
-//DeadCode RJS 7Nov00 						else
-//DeadCode RJS 7Nov00 						{
-//DeadCode RJS 7Nov00 							if (msg.caller)								//RJS 7Nov00
-//DeadCode RJS 7Nov00 								PlayMessage(msg,105,true);				//RJS 7Nov00
-//DeadCode RJS 7Nov00 						}
 					}
 				}
 			}
@@ -3249,9 +2076,6 @@ void	MESSAGE_STRUC::ProcessUserMessage()
    	}
 	else
 	{
-//DEADCODE RDH 02/04/99 		if ((caller == Manual_Pilot.ControlledAC2) || (callee == Manual_Pilot.ControlledAC2))
-//DEADCODE RDH 02/04/99 			priority = PRI_MAX;
-//DEADCODE RDH 02/04/99 		else
 		priority = PRI_MED;
 		if (messagetype & MSG_REPEAT)
 			visibility = VIS_2;
@@ -3352,21 +2176,6 @@ void	RadioChatter::ComposeFakeDigitNumber(RadioMessageP	MessPtr, SLong number, S
 {
 }
 
-//DeadCode RJS 6Sep00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode RJS 6Sep00 //Procedure		ComposeFakeSample
-//DeadCode RJS 6Sep00 //Author		Robert Slater
-//DeadCode RJS 6Sep00 //Date			Mon 22 Feb 1999
-//DeadCode RJS 6Sep00 //
-//DeadCode RJS 6Sep00 //Description
-//DeadCode RJS 6Sep00 //
-//DeadCode RJS 6Sep00 //Inputs
-//DeadCode RJS 6Sep00 //
-//DeadCode RJS 6Sep00 //Returns
-//DeadCode RJS 6Sep00 //
-//DeadCode RJS 6Sep00 //------------------------------------------------------------------------------
-//DeadCode RJS 6Sep00 void	RadioChatter::ComposeFakeSample(RadioMessageP	MessPtr,int phrase)
-//DeadCode RJS 6Sep00 {
-//DeadCode RJS 6Sep00 }
 
 static int poolocation;
 
@@ -3494,12 +2303,6 @@ void	MESSAGE_STRUC::ChooseScript(int	sno) const
 
 	scriptno = sno;
 
-//DeadCode RJS 15Sep00 #ifndef	NDEBUG
-//DeadCode RJS 15Sep00 	_Radio.totmess++;
-//DeadCode RJS 15Sep00 	messagecnt = _Radio.totmess;										//JIM 29Apr99
-//DeadCode RJS 15Sep00 #endif
-//DeadCode RJS 15Sep00
-//DeadCode RJS 15Sep00 	randomno = Math_Lib.rnd();
 
 	if (scriptno)
 		_Radio.ScanScript(*this);											//RJS 6Sep00
@@ -3523,15 +2326,12 @@ void	RADIOMESSAGE::StripIsPlayer(UWordP &ScriptPtr)
 	thePhrase = (PhraseTables) *ScriptPtr;						//RJS 11May99
 	while (thePhrase != PHRASE_NULL)
 	{
-//DeadCode RJS 29Sep100 #pragma	message(__HERE__ " Rob:  Fix caller phrase bandwidth")
 		//Assume there is a bandwidth for this...
  		if (	((thePhrase >= PHRASE_CALLER_GL_RAF) && (thePhrase < PHRASE_CALLEE_SQUADNUMBERSHORT))
-//DeadCode RJS 29Sep100 			||	((thePhrase & 0xFF00) == PHRASE_CALLEE_GLW)
 			||	((thePhrase & 0xFF00) == PHRASE_CALLEE_GL_RAF)
 			||	(thePhrase == PHRASE_CALLING)
 			||	(thePhrase == PHRASE_THISIS)	)
  		{
-//DeadCode RJS 29Sep100  			DodgyRandomFix();									//RJS 11May99
  			ScriptPtr++;
  		}
  		else
@@ -3564,12 +2364,10 @@ void	RADIOMESSAGE::StripCaller(UWordP &ScriptPtr)
 	while (thePhrase != PHRASE_NULL)
 	{
 		//Assume there is a bandwidth for this...
-//DeadCode RJS 29Sep100 #pragma	message(__HERE__ " Rob:  Fix caller phrase bandwidth")
  		if (	((thePhrase >= PHRASE_CALLER_GL_RAF) && (thePhrase < PHRASE_CALLEE_SN))
 			||	(thePhrase == PHRASE_CALLING)
 			||	(thePhrase == PHRASE_THISIS)	)
  		{
-//DeadCode RJS 29Sep100  			DodgyRandomFix();									//RJS 11May99
  			ScriptPtr++;
  		}
  		else
@@ -4283,10 +3081,6 @@ void	RadioChatter::THOUSANDUNITS(RadioMessageP	MessPtr)
 //------------------------------------------------------------------------------
 void	RadioChatter::VOLUMEUNITS(RadioMessageP	MessPtr)
 {
-//DEADCODE RJS 5/5/00 	if (Save_Data.gamedifficulty [GD_UNITS])
-//DEADCODE RJS 5/5/00 		ComposeSample(MessPtr,PHRASE_LITRES);
-//DEADCODE RJS 5/5/00 	else
-//DEADCODE RJS 5/5/00 		ComposeSample(MessPtr,PHRASE_GALLONS);
 #pragma warnmsg("Litres and gallons!!!")
 }
 
@@ -4741,8 +3535,6 @@ void	RadioChatter::BAREBEARINGS(RadioMessageP	MessPtr)
 {
 	if (MessPtr->InitROL())
 	{
-//DeadCode RJS 20Jan00 		UWord	relbearing = UWord(MessPtr->bearing);
-//DeadCode RJS 19Jun00 		UWord	relbearing = UWord(MessPtr->heading);
 		UWord	relbearing = UWord(MessPtr->bearing);
 		SLong	therel = (relbearing * 360)>>16;
 
@@ -4807,9 +3599,6 @@ void	RadioChatter::TRG_HEIGHT(RadioMessageP	MessPtr)
 {
 	if (MessPtr->target)// || MessPtr->TargetStuff.targetheight)		//RJS 29Sep00
 	{
-//DeadCode RJS 29Sep00 		if (MessPtr->TargetStuff.targetheight)
-//DeadCode RJS 29Sep00 			MessPtr->realheight = MessPtr->TargetStuff.targetheight;
-//DeadCode RJS 29Sep00 		else
 			MessPtr->realheight = MessPtr->target->World.Y;
 
 		if (Save_Data.gamedifficulty [GD_UNITS])
@@ -5078,12 +3867,6 @@ void	RadioChatter::Airfields(RadioMessageP	MessPtr, ItemPtr airfielditem)
 void	RadioChatter::TRG_HDGCARDINAL(RadioMessageP	MessPtr)
 {
 	RadioOnz*	phraseControl = PhraseFactors(PHRASE_HDGCARDINAL);
-//DeadCode RJS 9Jun00 	if ((MessPtr->TargetStuff.targetdirection & 0xFF00) == PHRASE_HDGCARDINAL)
-//DeadCode RJS 9Jun00 	{
-//DeadCode RJS 9Jun00 //		ComposeSample(MessPtr,PHRASE_HEADING);
-//DeadCode RJS 9Jun00 		ComposeSample(MessPtr,MessPtr->TargetStuff.targetdirection);
-//DeadCode RJS 9Jun00 	}
-//DeadCode RJS 9Jun00 	else
 	{
 		if (MessPtr->InitROL())
 		{
@@ -5138,7 +3921,6 @@ void	RadioChatter::TRG_NUM_ESTIMATE(RadioMessageP	MessPtr)
 {
 	SLong	forcesize = GetForceSize(MessPtr);
 
-//DeadCode RJS 05Sep00 	ComposeSample(MessPtr,PHRASE_PAUSE_SPACE);						//RJS 24Aug00
 	ComposeSample(MessPtr,PHRASE_SPACE);						//RJS 05Sep00
 	ForceSize(MessPtr,forcesize);
 }
@@ -5531,7 +4313,6 @@ void	RadioChatter::SQUADNUMBERLONG(RadioMessageP	MessPtr)
 //------------------------------------------------------------------------------
 void	RadioChatter::PATROL_PLACE(RadioMessageP	MessPtr)
 {
-//DEADCODE RJS 5/5/00 	ComposeSample(MessPtr,PHRASE_PATROL);
 	AREANAMES(MessPtr,MessPtr->target);
 }
 
@@ -6121,7 +4902,6 @@ void	RadioChatter::TRG_BOMBER2AC(RadioMessageP	MessPtr)
 //------------------------------------------------------------------------------
 void	RadioChatter::FIGHTERESCORT(RadioMessageP	MessPtr)
 {
-//DeadCode RJS 20Oct00 	UWord	rand = MessPtr->Random(1);
 
 /*	if (rand)*/
 		ComposeSample(MessPtr,PHRASE_LWFIGHTERSABOVE);
@@ -6470,10 +5250,9 @@ void	RadioChatter::SayRaidID(RadioMessageP	MessPtr, ItemPtr	theItem,ItemPtr	theO
 	if (theItem==NULL || theItem->uniqueID.count<SagBAND || theItem->uniqueID.count>=RealAcBAND)
 		theItem=theOtherItem;
 
-	Todays_Packages.GetACSquadEntry(theItem->uniqueID.count,p,s);
+	Todays_Packages.GetACSquadEntry(theItem->uniqueID.count,p,&s);
  	raidid = Todays_Packages[p].GetRaidIndFromSquadEntry(s);
 
-//DEADCODE RDH 07/04/00 #pragma warnmsg("Target and callee are valid, need to handle both 16;3;00")
 	ComposeDigitNumber(MessPtr,Todays_Packages[p].raidnumentries[raidid].raidnum,3);
 }
 
@@ -6660,8 +5439,6 @@ void	RadioChatter::SpeakPhrase(RadioMessageP	MessPtr,int	phrase)
 		int				StartOffset;
 		int				SampleSize;
 
-//DeadCode RJS 21Aug00 		if (ptype == PHRASE_VOICE2)									//RJS 10May00
-//DeadCode RJS 21Aug00 			MessPtr->theVoice = VOICE_VOICE2;						//RJS 10May00
 
 		RSamplePtr = LoadSample(MessPtr,phrase,StartOffset,SampleSize);
 		if (RSamplePtr)
@@ -6794,7 +5571,6 @@ void	RadioChatter::Init()
 //------------------------------------------------------------------------------
 void	RadioChatter::ScanScript(const MESSAGE_STRUC&	radiomessage)
 {
-//DeadCode RJS 3Oct00 	PhraseBuffer	fbuff;
 	int				Scriptno = radiomessage.GetScript();				//RJS 15Sep00
 
 	lockout = true;
@@ -6941,7 +5717,6 @@ void	RadioChatter::ComposeFakeSample(RadioMessageP	MessPtr, PhraseTables& phrase
 			case PHRASE_SQUADNUMBERLONG:
 			case PHRASE_SUBJECT_SN:
 			case PHRASE_TRG_AC:
-//DeadCode RJS 16Oct00 			case PHRASE_TRG_BOMBER2ACS:
 			case PHRASE_TRG_BOMBERACS:
 			case PHRASE_TRG_DESC_ESTIMATE:
 			case PHRASE_TRG_HDGCARDINAL:

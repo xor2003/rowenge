@@ -91,9 +91,6 @@ SLong	item::Range;
 
 //------------------------------------------------------------------------------
 #include	"display.h"
-//DEADCODE PD 01/12/99 Bool	Graphic::locked=FALSE;									//AMM 02May97
-//DEADCODE PD 01/12/99 UByte	Graphic::locklevel=0;								//AMM 02May97
-//DEADCODE PD 01/12/99 DirectDDP  _DirectDraw::lpDirectDD=NULL;
 //Direct3DP  _DirectDraw::lpDirect3D=NULL;
 //------------------------------------------------------------------------------
 //Next??
@@ -101,7 +98,6 @@ SLong	item::Range;
 //#define F_SOUNDS												//DAW 05Aug96
 //#define F_COMMON												//DAW 05Aug96
 //#include	"files.g"		//NON-GRAPHICS FILES				//JIM 14May96
-//DeadCode JIM 30Apr96 #include	"miss_man.h"										//DAW 17Jan96
 //#include	"ui.h"												//JIM 30Apr96
 //#include	"briefing.h"												//JIM 30Apr96
 
@@ -117,12 +113,8 @@ SLong	item::Range;
 #ifndef	BOB_DEMO_VER	//MIGALLEY_GUID	
 DEFINE_GUID(BOB_GUID,
 0xc3a51900, 0xef77, 0x11d3, 0x81, 0x63, 0x00, 0xa0, 0xd2, 0x1b, 0x17, 0x13);
-//DeadCode AMM 19Sep00 DEFINE_GUID(MIGALLEY_GUID, 
-//DeadCode AMM 19Sep00 0x38305683, 0x1eb, 0x11d2, 0xb1, 0xa4, 0x0, 0x40, 0x5, 0x24, 0x7c, 0x3d);
 #else
 DEFINE_GUID(BOB_GUID,
 0xc3a51900, 0xef77, 0x11d3, 0x81, 0x63, 0x00, 0xa0, 0xd2, 0x1b, 0x17, 0x13);
-//DeadCode AMM 19Sep00 DEFINE_GUID(MIGALLEY_GUID, 
-//DeadCode AMM 19Sep00 0x38305683, 0x1eb, 0x11d2, 0xb1, 0xa4, 0x0, 0x40, 0x5, 0x24, 0x7c, 0x4d);
 #endif 
 #include "sw_guid.hpp"	//GUID_RandomNoise

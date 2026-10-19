@@ -92,10 +92,16 @@ int main() {
     CHECK(guest->InitializeConnection((LPVOID)"RDPNTCP", 0) == 0,
           "guest InitializeConnection");
 
+    /* EnumSessions is nonblocking (UI-timer safe): the query goes out on
+       the call and the host's UDP reply lands on a *later* call's drain —
+       so poll like the real frontend does. */
     found.clear();
-    CHECK(guest->EnumSessions(&desc, 0, (LPVOID)&sessCb, nullptr,
-                              0x10 /*ASYNC*/) == 0,
-          "guest EnumSessions DP_OK");
+    for (int i = 0; i < 40 && found.empty(); ++i) {
+        CHECK(guest->EnumSessions(&desc, 0, (LPVOID)&sessCb, nullptr,
+                                  0x10 /*ASYNC*/) == 0,
+              "guest EnumSessions DP_OK");
+        usleep(50000);
+    }
     CHECK(!found.empty() && found[0].name == "Loopback Skirmish",
           "guest discovered host session over loopback");
 

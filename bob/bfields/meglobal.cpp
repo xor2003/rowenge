@@ -99,7 +99,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //------------------------------------------------------------------------------
 #include	"DosDefs.h"
 #include	"iostream.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"files.g"
 #include	"Makebf.h"
 //#include	"textref.h"

@@ -66,8 +66,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 #include ".\MIGView.cpp"
 
-//DEADCODE DAW 24/11/99 #include ".\CntrItem.cpp"
-//DEADCODE MS 14/12/99 #include ".\Fullpane.cpp"
 #include "..\Input\Keystub.cpp"
 #include ".\MainFrm.cpp"
 #include ".\MapDlg.cpp"
@@ -80,7 +78,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 #include "RDEmpty.cpp"
 #include ".\RDialog.cpp"
-//DEADCODE MS 02/02/00 #include ".\Stub3d.cpp"
 #include "hintbox.cpp"
 #include "listbx.cpp"	
 

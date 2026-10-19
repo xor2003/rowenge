@@ -158,7 +158,6 @@ BOOL AcUnitRAF::OnInitDialog()
 	
 
 
-//DeadCode JIM 20Oct00 		int acavail = 0;
 	int j = 0;
 	sqlist=0;
 	while (Node_Data.squadron[j].squadron != SQ_ZERO)
@@ -224,20 +223,6 @@ void AcUnitRAF::OnOK()
 		{
 			Squadron* sq  = Node_Data[Node_Data.squadron[j].squadron];
 		int actype = sq->AcType();
-//deadcode JIM 04/07/01			if  (	(	(	(acisspitfire) &&	(	(actype == PT_SPIT_A)
-//deadcode JIM 04/07/01													||
-//deadcode JIM 04/07/01													(actype == PT_SPIT_B)	
-//deadcode JIM 04/07/01												 )
-//deadcode JIM 04/07/01						)
-//deadcode JIM 04/07/01						||
-//deadcode JIM 04/07/01						(	(!acisspitfire) &&	  (	(actype == PT_HURR_A)
-//deadcode JIM 04/07/01													||
-//deadcode JIM 04/07/01													(actype == PT_HURR_B)	
-//deadcode JIM 04/07/01												 )
-//deadcode JIM 04/07/01						)
-//deadcode JIM 04/07/01					)
-//deadcode JIM 04/07/01		 			&&	(!sq->Busy())	//NO CHECK FOR GRP 13!!
-//deadcode JIM 04/07/01				)
 			if (sqlist[sq->squadron])										//JIM 04/07/01
 			{
 				k++;
@@ -272,7 +257,6 @@ void AcUnitRAF::OnOK()
 				else
 					pk.IncreaseSubSquadronToSquadron(Profile::AM_ATTACHED);
 
-	//DeadCode RDH 9Aug00 			pk.AddSquadron(-1, (Profile::AttackMethod)attackmethod,pk.packagetarget[0].currentid,(SquadNum)j);
 	//make method same as 1st																		//RDH 9Aug00
 				pk.AddSquadron(-1, pk[0].method, pk.packagetarget[0].currentid,(SquadNum)j);
 

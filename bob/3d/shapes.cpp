@@ -93,11 +93,7 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	"shapenum.g"
 	#include	"hardpasm.h"
 	#include	"bitfield.h"
-//DeadCode PD 27Aug96  	MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);
 
-//DeadCode PD 27Aug96 #pragma dump_object_model ShapeType
-//DeadCode PD 27Aug96 #pragma	dump_object_model Shape_Desc
-//DeadCode PD 27Aug96 #pragma dump_object_model DOLAUNCHER
 
 	shapestuff	SHAPESTUFF;										//PD 27Aug96
 
@@ -260,22 +256,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 				};
 #endif
 
-//Old_Code PD 27Aug96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//Old_Code PD 27Aug96 //Author		Paul.
-//Old_Code PD 27Aug96 //Date		Mon 18 Sep 1995
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //Description
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //Inputs
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //Returns
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //------------------------------------------------------------------------------
-//Old_Code PD 27Aug96 shapestuff::shapestuff()
-//Old_Code PD 27Aug96 {
-//Old_Code PD 27Aug96 	settable();
-//Old_Code PD 27Aug96 	glob_list = &gsnf;											//PD 27Aug96
-//Old_Code PD 27Aug96 }
 
 #ifdef	_SHAPEBUG_
 static	FILE*	fpdeb = NULL;
@@ -339,30 +319,6 @@ shapestuff::~shapestuff()
 #endif
 }
 
-//Old_Code PD 27Aug96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//Old_Code PD 27Aug96 //Procedure		AddShapesToGlobList
-//Old_Code PD 27Aug96 //LastModified:	PD 27Aug96
-//Old_Code PD 27Aug96 //Author		Paul.
-//Old_Code PD 27Aug96 //Date			Tue 10 Oct 1995
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //Description	Takes an array of shape numbers as an input and sets the
-//Old_Code PD 27Aug96 //				appropriate bits in a bit table for loading later.
-//Old_Code PD 27Aug96 //Inputs
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //Returns
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //------------------------------------------------------------------------------
-//Old_Code PD 27Aug96 void shapestuff::AddShapesToGlobList(UWord *reqdshps, UWord& count)
-//Old_Code PD 27Aug96 {
-//Old_Code PD 27Aug96 	UWord	new_shps;
-//Old_Code PD 27Aug96
-//Old_Code PD 27Aug96 	for(new_shps=0;new_shps<count;new_shps++)
-//Old_Code PD 27Aug96 	{
-//Old_Code PD 27Aug96 		*glob_list|=(ShapeNum)reqdshps[new_shps];
-//Old_Code PD 27Aug96 		reqdshps[new_shps]=NULL;
-//Old_Code PD 27Aug96 	}
-//Old_Code PD 27Aug96 	count=0;
-//Old_Code PD 27Aug96 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		AddShapesToGlobList
@@ -421,28 +377,6 @@ void shapestuff::LoadRequiredShapes()
 	while(loadedthistime);
 }
 
-//Old_Code PD 27Aug96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//Old_Code PD 27Aug96 //Author		Paul.
-//Old_Code PD 27Aug96 //Date			Mon 18 Sep 1995
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //Description
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //Inputs		shapelist = ptr to a NULL terminated list of shapes
-//Old_Code PD 27Aug96 //				to be loaded.
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //Returns		number of new shapes loaded.
-//Old_Code PD 27Aug96 //
-//Old_Code PD 27Aug96 //------------------------------------------------------------------------------
-//Old_Code PD 27Aug96 UWord shapestuff::LoadShapes(ShapeListPtr shapelist)
-//Old_Code PD 27Aug96 {
-//Old_Code PD 27Aug96 	UWord	currentshapeno,
-//Old_Code PD 27Aug96 			shapesloaded = 0;
-//Old_Code PD 27Aug96
-//Old_Code PD 27Aug96 	while((currentshapeno = *shapelist)!=NULL)
-//Old_Code PD 27Aug96 		if(LoadShape(currentshapeno))	shapesloaded++;
-//Old_Code PD 27Aug96
-//Old_Code PD 27Aug96 	return(shapesloaded);
-//Old_Code PD 27Aug96 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Author		Paul.
@@ -466,10 +400,7 @@ Bool shapestuff::LoadShape(ShapeNumber shape_number)
 		INT3;															//RJS 7Nov00
 	}
 
-//DeadCode RJS 7Nov00 	if (!shape_number)											//PD 27Mar96
-//DeadCode RJS 7Nov00 		_Error.EmitSysErr(__FILE__":Invalid shape number (0)");	//PD 27Mar96
 
-//DeadCode RJS 7Nov00 	FileNum	shapefile = (FileNum )(shape_number + DIR_SHAPES);
 	if(shapetable[shape_number]==NULL)
 	{
 		FileNum	shapefile = FileNum(shape_number + DIR_SHAPES);		//RJS 7Nov00
@@ -686,10 +617,6 @@ void	shapestuff::FixupShapeFile(void*	&dataarea,ULong&	datalengthin)
 //------------------------------------------------------------------------------
 void shapestuff::FixHeaderData(ShapeDescPtr shapeptr)
 {
-//DeadCode PD 10Jul96 	if (shapeptr->LauncherDataSize!=0)
-//DeadCode PD 10Jul96 		haslaunchers = TRUE;
-//DeadCode PD 10Jul96 	else
-//DeadCode PD 10Jul96 		haslaunchers = FALSE;
 }
 
 static	int	lastinstr=0;
@@ -722,7 +649,6 @@ void shapestuff::FixInstrData(UByte *& ptr, ULong& datalen)
 
 	while(datalen)
 	{
-//DeadCode RJS 03Mar97 		lastinstr++;
 
 		if(((instr = (UWord )*ptr)>dosetglassrangeno)||(instr==0))//RJS 19Dec97
 		{
@@ -740,7 +666,6 @@ void shapestuff::FixInstrData(UByte *& ptr, ULong& datalen)
 		{sfmfp fixrtn=fixuptable[instr].fixrtn;
 		(this->*fixrtn) (ptr,datalen);}
 
-//DeadCode RJS 23Apr97 		lastinstr = instr;
 
 		ptr += (size = fixuptable[instr].skipsize);
 
@@ -876,9 +801,7 @@ void shapestuff::FixupCreateBPoly(UByte *&dataptr,ULong &)
 //------------------------------------------------------------------------------
 void shapestuff::FixupDrawCloud(UByteP& dataptr,ULong& )
 {
-//DeadCode RJS 20Oct00 	SWord	temp;
 
-//DeadCode RJS 20Oct00 	DODRAWCLOUD_PTR	ptr = (DODRAWCLOUD_PTR )dataptr;
 
 /*	temp = ((temp=ptr->image_no)>=0)?temp:-temp;
 
@@ -1337,15 +1260,6 @@ void shapestuff::FixupDoCollision(UByte *&dataptr, ULong &datalen)
 
 	DOCOLLISION_PTR ptr = (DOCOLLISION_PTR)dataptr;
 
-//DeadCode RJS 16Jun00 	oldoff = ptr->succeed;
-//DeadCode RJS 16Jun00
-//DeadCode RJS 16Jun00 	if (oldoff)
-//DeadCode RJS 16Jun00 	{
-//DeadCode RJS 16Jun00 		temp = shp_base_ptr + oldoff;
-//DeadCode RJS 16Jun00 		newoff = temp - dataptr;
-//DeadCode RJS 16Jun00
-//DeadCode RJS 16Jun00 		ptr->succeed = newoff;
-//DeadCode RJS 16Jun00 	}
 
 	oldoff = ptr->fail;
 
@@ -2373,7 +2287,6 @@ void shapestuff::settable()
 		fixuptable[docreatebumppolyno].skipsize = sizeof(DOCREATEBUMPPOLY);//PD 15Jan96
 		fixuptable[docopybvertno].skipsize = sizeof(DOCOPYBVERT);	//PD 15Jan96
 		fixuptable[dodrawbpolyno].skipsize = NULL;
-	//DeadCode PD 28Mar96 	fixuptable[dodrawcloudno].skipsize = sizeof(DODRAWCLOUD);	//PD 22Jan96
 		fixuptable[dodrawrpolyno].skipsize = sizeof(DODRAWRPOLY);	//PD 28Mar96
 		fixuptable[dodrawopolyno].skipsize = NULL;					//PD 16Apr96
 		fixuptable[dorealisphereno].skipsize = sizeof(DOREALISPHERE);//RJS 16Dec97
@@ -2552,7 +2465,6 @@ void shapestuff::settable()
 		fixuptable[dodrawbpolyno].fixrtn = &shapestuff::FixupStubb;				//PD 15Jan96
 		fixuptable[dodrawrpolyno].fixrtn = &shapestuff::FixupStubb;				//PD 28Mar96
 		fixuptable[dodrawopolyno].fixrtn = &shapestuff::FixupStubb;				//PD 16Apr96
-	//DeadCode PD 28Mar96 	fixuptable[dodrawcloudno].fixrtn = &shapestuff::FixupDrawCloud;			//PD 22Jan96
 		fixuptable[dorealisphereno].fixrtn = &shapestuff::FixupStubb;		//RJS 16Dec97
 		fixuptable[dolauncherno].fixrtn = &shapestuff::FixupStubb;				//PD 10Jul96
 		fixuptable[dodialno].fixrtn = &shapestuff::FixupStubb;					//PD 10Jul96
@@ -2635,7 +2547,6 @@ void shapestuff::settable()
 	else
 		_Error.EmitSysErr(__FILE__":Could not generate FixUpTable!");//RJS 01Dec97
 
-//DeadCode PD 13Mar96 	UWord	tablesize = dosetglassrangeno;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

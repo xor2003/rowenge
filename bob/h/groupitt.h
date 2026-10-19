@@ -38,13 +38,13 @@ struct ITEM_STATUS;
 struct GroupItterator
 {
 	CON	GroupItterator(ShapeNum	s)								//RJS 21Apr99
-	{	group=shape=s;deadstream=NULL;
+	{	group=shape=s;deadstream=NULL;deadittfirstbyteptr=NULL;
 		//need to fill in data for first element!
 
 		InitGroupFields();
 	}
 	CON	GroupItterator(ShapeNum	s,animptr& anim)
-	{	group=shape=s;animdata=anim;deadstream=NULL;
+	{	group=shape=s;animdata=anim;deadstream=NULL;deadittfirstbyteptr=NULL;
 		//need to fill in data for first element!
 
 		InitGroupFields();
@@ -52,6 +52,7 @@ struct GroupItterator
 	CON	GroupItterator(ShapeNum	s,DeadStream::DeadBlockItterator* d)
 	{
 		group=shape=s;											//RJS 21Apr99
+		deadittfirstbyteptr=NULL;
 		if (d)
 		{
 			deadstream=DeadIttCopy(d);
@@ -60,7 +61,6 @@ struct GroupItterator
 		}
 		else
 			deadstream=d;
-//DeadCode JIM 20Oct00 		int deadstreamblocksize=-1;
 		//need to fill in data for first element!
 
 		InitGroupFields();
@@ -78,7 +78,6 @@ struct GroupItterator
 	bool		hitlimit;										//RJS 15Feb99
 
 //THE FOLLOWING FUNCTIONS ALLOW THE ITTERATOR TO ITTERATE
-//DeadCode RJS 15Feb99 	bool	operator++(int);//		{status++;return (status<10);}
 	bool	operator++(int)
 	{
 		bool rv;

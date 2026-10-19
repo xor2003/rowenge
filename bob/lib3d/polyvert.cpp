@@ -15,11 +15,9 @@ inline ULong FPNormToLong(const D3DVALUE p)
         SVertex* pp = pVertexList;
         for (int q=vertexcount; q>0; q--)
         {
-//DeadCode JON 30Aug00 			ztot+=pp->sz;
             ztot+=pp->hw;
             pp=pp->pNext;
         }
-//DeadCode JON 3Oct00 		ztot/=(D3DVALUE(vertexcount)*zFarPlane);
         ztot/=D3DVALUE(vertexcount);
         ztot+=tZBias;
         ztot*=zFarPlaneInv;
@@ -563,35 +561,6 @@ inline ULong FPNormToLong(const D3DVALUE p)
             // copy the rest of the vertex info ( 1 val for color, 1 for specular, 2 for each imapcoord pair );
             memcpy( &bufferPos->color, &curVert->color, (2+(2*2))*sizeof( D3DVALUE ) );
         )
-//DeadCode JON 30Oct00 		SVertex* curVert = pVertexList;
-//DeadCode JON 30Oct00 		for (int i=vertexcount;i>0;i--)
-//DeadCode JON 30Oct00 		{
-//DeadCode JON 30Oct00 			if ( curVert->identical == NULL ||
-//DeadCode JON 30Oct00 				 curVert->identical->uploadPass != bufferPass )
-//DeadCode JON 30Oct00 			{ // upload this vertex...
-//DeadCode JON 30Oct00 				D3DVALUE rhw = 1.f/curVert->hw;
-//DeadCode JON 30Oct00 				bufferPos->x=			curVert->x*rhw*sx+cx;
-//DeadCode JON 30Oct00 				bufferPos->y=			curVert->y*rhw*sy+cy;
-//DeadCode JON 30Oct00 				bufferPos->z=			curVert->z*zFactor;
-//DeadCode JON 30Oct00 				bufferPos->rhw=			rhw;
-//DeadCode JON 30Oct00 				// copy the rest of the vertex info ( 1 val for color, 1 for specular, 2 for each imapcoord pair );
-//DeadCode JON 30Oct00 				memcpy( &bufferPos->color, &curVert->color, (2+(2*2))*sizeof( D3DVALUE ) );
-//DeadCode JON 30Oct00 				// more indexing stuff
-//DeadCode JON 30Oct00 				curVert->uploadPass = bufferPass;
-//DeadCode JON 30Oct00 				*curPrimIndex++=
-//DeadCode JON 30Oct00 					curVert->vertIndex =
-//DeadCode JON 30Oct00 						WORD( bufferPos-bufferStart );
-//DeadCode JON 30Oct00 				bufferPos++;
-//DeadCode JON 30Oct00 			} else
-//DeadCode JON 30Oct00 			{ // this vertex is already uploaded...
-//DeadCode JON 30Oct00 				*curPrimIndex++=
-//DeadCode JON 30Oct00 					curVert->vertIndex=
-//DeadCode JON 30Oct00 						curVert->identical->vertIndex;
-//DeadCode JON 30Oct00 				curVert->uploadPass = bufferPass;
-//DeadCode JON 30Oct00 			}
-//DeadCode JON 30Oct00 			curVert=curVert->pNext;
-//DeadCode JON 30Oct00 		}
-//DeadCode JON 30Oct00 		return bufferPos;
     }
 
     _R3DVERTEX3* SPolygon::StandardProjectCopyBGI( _R3DVERTEX3* bufferPos, WORD* &curPrimIndex, const _R3DVERTEX3* bufferStart, const D3DVALUE cx, const D3DVALUE cy, const D3DVALUE sx, const D3DVALUE sy ) const

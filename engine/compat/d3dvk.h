@@ -185,8 +185,10 @@ struct Dev {
     std::map<uint32_t,VkSampler> samps;
     struct SetKey { VkImageView v0,v1,v2; uint32_t sc;
         bool operator<(const SetKey&o)const{
-            if(v0!=o.v0)return v0<o.v0; if(v1!=o.v1)return v1<o.v1;
-            if(v2!=o.v2)return v2<o.v2; return sc<o.sc; } };
+            if(v0!=o.v0)return v0<o.v0;
+            if(v1!=o.v1)return v1<o.v1;
+            if(v2!=o.v2)return v2<o.v2;
+            return sc<o.sc; } };
     std::map<SetKey,VkDescriptorSet> sets;
 };
 // Leaked on purpose: the render thread can still be inside TexFor()/Draw() when
@@ -385,7 +387,8 @@ static VkImage MkImage(VkFormat f, DWORD w, DWORD h, VkImageUsageFlags use,
                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     if(!m) m=AllocMem(mr.size,mr.memoryTypeBits,0);
     if(!m||V(BindImageMemory)(D.dev,img,m,0)!=VK_SUCCESS){
-        if(m)V(FreeMemory)(D.dev,m,0); V(DestroyImage)(D.dev,img,0); return 0;
+        if(m)V(FreeMemory)(D.dev,m,0);
+        V(DestroyImage)(D.dev,img,0); return 0;
     }
     *out=m; return img;
 }
@@ -441,7 +444,8 @@ static VkBuffer MkBuf(VkDeviceSize sz, VkBufferUsageFlags use,
     VkMemoryRequirements mr; V(GetBufferMemoryRequirements)(D.dev,b,&mr);
     VkDeviceMemory m=AllocMem(mr.size,mr.memoryTypeBits,props);
     if(!m||V(BindBufferMemory)(D.dev,b,m,0)!=VK_SUCCESS){
-        if(m)V(FreeMemory)(D.dev,m,0); V(DestroyBuffer)(D.dev,b,0); return 0;
+        if(m)V(FreeMemory)(D.dev,m,0);
+        V(DestroyBuffer)(D.dev,b,0); return 0;
     }
     if(map){
         void* p=0;
@@ -507,9 +511,10 @@ static bool Init() {
     D.tried=true;
     const char* env=getenv("ROWAN_VK");
     if(env&&env[0]=='0'&&env[1]==0) return false;
-#define VK_FAIL(x) do{ if(getenv("ROWAN_VK_DEBUG")) \
-        fprintf(stderr,"[vk] init fail: %s\n",x); return false; }while(0)
-    if(!LoadFns()) VK_FAIL("LoadFns");
+#define VK_FAIL(x) do{ if(getenv("ROWAN_VK_DEBUG")) {\
+        fprintf(stderr,"[vk] init fail: %s\n",x);} \
+        return false; }while(0)
+    if(!LoadFns()){VK_FAIL("LoadFns");}
     VkApplicationInfo app={VK_STRUCTURE_TYPE_APPLICATION_INFO};
     app.pApplicationName="rowan-compat"; app.apiVersion=VK_API_VERSION_1_0;
     VkInstanceCreateInfo ici={VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};

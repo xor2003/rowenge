@@ -177,7 +177,6 @@ enum	VoiceType
 	VOICE_LWTOWER,												//RJS 29Feb00
 	VOICE_VOICE2,												//RJS 29Feb00
 	VOICE_LWVOICE2,												//RJS 21Aug00
-//DeadCode RJS 11Sep00 	VOICE_DENTIST = VOICE_GROUND,								//RJS 10May00
 	VOICE_ANY,													//RJS 21Aug00
 	VOICE_MAX,													//RJS 08Jun99
 	VOICE_SILENT = 31,													//RJS 11Oct00
@@ -210,8 +209,6 @@ enum		MsgType
 	MSG_STATUSRESPONSE_X,
 	MSG_STATUSRESPONSEREPLY_X,
 	MSG_WELCOMECLOSERANGEREPLY_X,
-//DeadCode RDH 20May99 	MSG_CLEAR_X,
-//DeadCode RJS 13May99 	MSG_HIPRIORITY_X,
 
 	MSG_CLEAR,
 	MSG_ADVISEATTACK,
@@ -225,7 +222,6 @@ enum		MsgType
 	MSG_BOGEYCALLDENTIST,											  //RDH 24/05/99
 	MSG_CHOSENMANOEUVRE,
 	MSG_CLEARINGAREA,
-//DEADCODE RDH 02/04/99 //	MSG_CLEAR_RPT,
 	MSG_CONTRAILSREPORTED,
 	MSG_COVERME,
 	MSG_CROSSRIVER,
@@ -338,7 +334,6 @@ enum		MsgType
 	MSG_FORMATIONFLYING_RPT = MSG_FORMATIONFLYING + MSG_REPEAT,			//CSB 12/04/00
 	MSG_INITIALCOMBATINFO_DELAY = MSG_INITIALCOMBATINFO + MSG_DELAY,  //DAW 28/04/99
 	MSG_PLAYERKILLED = MSG_COMMS + MSG_PLAYERKILLED_X + MSG_REPEAT,			//RJS 02Apr99
-//DeadCode DAW 25Jun99 	MSG_CLEAR_RPT = MSG_CLEAR + MSG_REPEAT						//RJS 02Apr99
 	MSG_CLEAR_RPT = MSG_CLEAR + MSG_REPEAT,						//RJS 02Apr99
 
 	MSG_PLAYERDAMAGELEVEL1 = MSG_DAMAGELEVEL1 + MSG_MEDHIPRIORITY_X,
@@ -376,7 +371,6 @@ public:
 	mutable AirStrucPtr			caller;
 	mutable ItemBasePtr			target;
 	mutable AirStrucPtr			callee;
-//DeadCode RJS 10May99  	Bool			addThinkTime;								//RJS 11Feb99
 	mutable VoiceType		voiceindex;
 	MsgType					messagetype;						//RJS 27Jan99
 	mutable DecisionAI*		decisionhandler;
@@ -408,7 +402,6 @@ public:
 
 	const MESSAGE_STRUC& SetVoice(const VoiceType&) const;
 	const MESSAGE_STRUC& SetDecision(DecisionAI*) const;
-//DeadCode RJS 04Feb99 	const MESSAGE_STRUC& SetCaller(Bool) const;
 	const MESSAGE_STRUC& SetPriority(MsgPriority) const;			//RJS 26Jan99
 	const MESSAGE_STRUC& CheckCalleePlayer() const;
 	const MESSAGE_STRUC& CheckCallerPlayer() const;
@@ -597,8 +590,6 @@ public:
 	ULong	PhraseToResource(SLong);								//RJS 12Feb99
 
 	void	PlayMessage(const MESSAGE_STRUC&,SLong vol=128,bool isChatter=false);//RJS 14Jun99
-//DeadCode RJS 27Jan99 	void	PlayMessage(int,const TargetIndexes&,ItemPtr,ItemPtr trg=NULL,ItemPtr callee=NULL,Bool nocaller=FALSE);//RJS 12Jan99
-//DeadCode RJS 27Jan99 	void	PlayMessage(int,ItemPtr,ItemPtr trg=NULL,ItemPtr callee=NULL,Bool nocaller=FALSE);
 	void	ProcessMessages(SLong);										//RJS 01Apr99
 	Bool	TimeOut();											//RJS 27Jan99
 	const MESSAGE_STRUC&	TriggerMsg(const MESSAGE_STRUC&);	//RJS 28Jan99

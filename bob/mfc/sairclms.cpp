@@ -66,7 +66,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 // MiG Alley specific
 
 // PORT NOTE (T118): Dead code -- this claims screen was removed from the
-// _full.cpp unity build on 28Aug00 ("//DeadCode JIM") and references
 // IDC_SCLAIMS_UN_YAK/MIG15/F86/F51/B26 ids that do not exist in
 // mfc/resource.h (Korean-war lineage leftovers). It cannot have compiled
 // in the shipped BoB build. Body removed; file kept as an empty TU.

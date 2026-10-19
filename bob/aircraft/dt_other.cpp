@@ -84,15 +84,6 @@ void DUMMY_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	Model& Model = *ControlledAC->fly.pModel;
 	AircraftAnimData* adptr = (AircraftAnimData* )ControlledAC->Anim;
 	Model.Type = AT_VOID;
-//DEADCODE CSB 20/03/00 	switch(data->visible)
-//DEADCODE CSB 20/03/00 	{
-//DEADCODE CSB 20/03/00 		case DEF:		Model.Type = AT_DEFIANT;	break;
-//DEADCODE CSB 20/03/00 		case BRISTO:	Model.Type = AT_BLENHIEM;	break;
-//DEADCODE CSB 20/03/00 		case JU88:		Model.Type = AT_JU88;		break;
-//DEADCODE CSB 20/03/00 		case HE11:		Model.Type = AT_HE111;		break;
-//DEADCODE CSB 20/03/00 		case DO17:		Model.Type = AT_DO17;		break;
-//DEADCODE CSB 20/03/00 		case JU52:		Model.Type = AT_HE59;		break;
-//DEADCODE CSB 20/03/00 	}
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.aileron, &adptr->acaileronr);//RJS 14May98
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.aileron, &adptr->acaileronl, 32767, -32768);//RJS 14May98
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.elevator, &adptr->acelevator, 32767, -32768);//RJS 14May98

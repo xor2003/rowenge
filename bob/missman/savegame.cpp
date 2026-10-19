@@ -82,7 +82,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"uniqueid.h"
 #include	"worldinc.h"
 #include	"bitfield.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 
 #include	"missman2.h"
 
@@ -112,7 +111,6 @@ static CString	LoadResString(int resnum)
 };
 
 extern void GetDriverAndMode(int&,int&,int&,int&);
-//DEADCODE PD 03/12/99 extern void Configure(bool,HWND);
 #include	"..\mfc\resource.h"
 
 #ifdef NDEBUG
@@ -143,7 +141,6 @@ static	BOStream& operator  <<  (BOStream& bos,RunTimeDevDesc& devdesc)
 		 bos.write(devdesc.axismaps,devdesc.MAXMAPS);
 		 bos.write(devdesc.sh_axismaps,devdesc.MAXMAPS);
 		 bos.write(devdesc.hatmaps,devdesc.MAXMAPS);
-//DEADCODE RDH 25/05/00 		 bos.write(devdesc.sh_hatmaps,devdesc.MAXMAPS);
 	 }
 	 return	bos;
 }
@@ -160,7 +157,6 @@ static	BIStream& operator  >>  (BIStream& bis,RunTimeDevDesc& devdesc)
 		 bis.read(devdesc.axismaps,devdesc.MAXMAPS);
 		 bis.read(devdesc.sh_axismaps,devdesc.MAXMAPS);
 		 bis.read(devdesc.hatmaps,devdesc.MAXMAPS);
-//DEADCODE RDH 25/05/00 		 bis.read(devdesc.sh_hatmaps,devdesc.MAXMAPS);
 	 }
 	 return bis;
 }
@@ -184,10 +180,6 @@ BIStream& operator	>>	(BIStream& bis,Analogue::Tuning& tuning)
 	{
 		bos<<analogue.tune[au];
 	}
-//DeadCode CSB 17Aug00 	bos<<analogue.FFpush.level;
-//DeadCode CSB 17Aug00 	bos<<analogue.FFstiff.level;
-//DeadCode CSB 17Aug00 	bos<<analogue.FFshake.level;
-//DeadCode CSB 17Aug00 	bos<<analogue.FFdamp.level;
 	bos<<analogue.FF_gun;												//CSB 17Aug00
 	bos<<analogue.FF_buffet;											//CSB 17Aug00
 	bos<<analogue.FF_aerodynamic;										//CSB 17Aug00
@@ -204,10 +196,6 @@ BIStream& operator	>>	(BIStream& bis,Analogue::Tuning& tuning)
 	{
 		bis>>analogue.tune[au];
 	}
-//DeadCode CSB 17Aug00 	bis>>analogue.FFpush.level;
-//DeadCode CSB 17Aug00 	bis>>analogue.FFstiff.level;
-//DeadCode CSB 17Aug00 	bis>>analogue.FFshake.level;
-//DeadCode CSB 17Aug00 	bis>>analogue.FFdamp.level;
 	bis>>analogue.FF_gun;
 	bis>>analogue.FF_buffet;
 	bis>>analogue.FF_aerodynamic;
@@ -372,7 +360,7 @@ static	BIStream& operator	>>	(BIStream& bis,Campaign& campaign)
 	bis>>campaign.garbage;
 	bis.read((char*)&campaign+sizeof(CampaignPtrs),sizeof(Campaign)-sizeof(CampaignPtrs));
  	bis>>Dead_Stream;
-	strcpy(Save_Data.CommsPlayerName,campaign.PlayerName);
+	strncpy(Save_Data.CommsPlayerName,campaign.PlayerName,PLAYERNAMELEN-1); Save_Data.CommsPlayerName[PLAYERNAMELEN-1]=0;
 	//Need to fix currmission and dfltmission pointers
 	//
 	//
@@ -417,12 +405,11 @@ static	BIStream& operator	>>	(BIStream& bis,Campaign& campaign)
 BOStream& operator	<<	(BOStream& bos,MissMan& miss_man)
 {
 
-	strcpy(miss_man.camp.CommsPassword,_DPlay.Password);
+	strncpy(miss_man.camp.CommsPassword,_DPlay.Password,PASSWORDNAMELEN-1); miss_man.camp.CommsPassword[PASSWORDNAMELEN-1]=0;
 	bos<<(SByte&) miss_man.currcampaignnum;
 	bos<<miss_man.camp;
 	Node_Data.Save(bos);
 	bos<<(SaveDataSoftware&)Save_Data;
-//DeadCode JIM 2Nov00 	bos<<Dead_Stream;
 	Squad_Diary.Save(bos);										//RJS 02Feb00
 	Todays_Packages.SaveGame(bos);	//must be last thing in savegame!!!
 	return(bos);
@@ -441,11 +428,10 @@ BIStream& operator	>>	(BIStream& bis,MissMan& miss_man)
 	Persons4::ShutDownMapWorld();
 	bis>>(SByte&) miss_man.currcampaignnum;
 	bis>>miss_man.camp;
-	strcpy(_DPlay.Password,miss_man.camp.CommsPassword);
+	strncpy(_DPlay.Password,miss_man.camp.CommsPassword,PASSWORDNAMELEN-1); _DPlay.Password[PASSWORDNAMELEN-1]=0;
 	Node_Data.BuildTargetTable();
 	Node_Data.Load(bis);
 	bis>>(SaveDataSoftware&)Save_Data;
-//DeadCode JIM 2Nov00 	bis>>Dead_Stream;
 	Squad_Diary.Load(bis);										//RJS 02Feb00
 	Persons4::StartUpMapWorld();
 	Todays_Packages.LoadGame(bis);	//must be last thing in savegame!!!
@@ -690,7 +676,6 @@ UniqueID	DeadStream::DeadBlockItterator::SkipItem()
 	else
 		if (off)
 			return (UniqueID)lastuniqueID;
-//DeadCode JIM 20Oct00 	UWord get=
 	lastuniqueID=GetWord();
 	if (lastuniqueID)
 	{
@@ -854,7 +839,6 @@ void	DeadStream::SetWorldDead(WorldStuff* world)
 			int band=0,uidnum=0;
 			ClearForSGT(UniqueID(sgt));
 			DeadBlockItterator b(firstblock,UniqueID(sgt));
-//DEADCODE RJS 16/11/99 			if (Persons2::getbandfromUID(UniqueID(sgt))!=AmberBattleNodeBAND)
 			for (int i=0;i<WorldStuff::PITEMTABLESIZE;i++)
 				if (world->pItem[i])
 				{
@@ -1034,7 +1018,6 @@ void	DeadStream::GetWorldDead(WorldStuff* world)
 					lastuid=targbandMAX-1;
 				}
 				bandcount=targuid+1;
-//DEADCODE JIM 10/06/99 				lastuid=p->uniqueID.count+1;
 				targuid=b.GetWord();
 			}
 		}
@@ -1062,7 +1045,6 @@ static bool	RevivableBand(int targuid)
 void	DeadStream::ReviveWorld(const int repairpointsinperiod,int repairbridgepointsinperiod)
 {	//have to make second copy of each block as go along
 	//second copy has alive items removed, so damage is forgotten.
-//DeadCode JIM 16Oct00 	return;
 	//"Simplified" Mig Alley repair scheme:
 	//	Each super group has a limited number of points of repair per period
 	//	Each point is 1 element in a group.
@@ -1333,9 +1315,7 @@ void	DeadStream::ReviveWorld(const int repairpointsinperiod,int repairbridgepoin
 							trg.PutWord(targuid);
 							trg.PutWord(status);
 							trg.PutWord(shape);
-						if (numelts==-1)
-							numelts=numelts;
-							trg.PutByte(numelts);
+						trg.PutByte(numelts);
 
 							while (numelts--)
 							{
@@ -1463,7 +1443,6 @@ void	DeadStream::FakeDamage(UniqueID targuid,ULong newpercent,bool clearifreduce
 		UniqueIDBand db=tbv;
 		if (tb==0)
 			db=NULL_BAND;
-//DeadCode JIM 20Oct00 		int	basebandindex=0;
 		for (int u=tbv;Persons2::GetBandFromUID(UniqueID(u))==tbv;u++)
 		{
 			info_itemSPtr it=Persons2::ConvertPtrUID(UniqueID(u));
@@ -1524,7 +1503,7 @@ void	DeadStream::FakeDamage(UniqueID targuid,ULong newpercent,bool clearifreduce
 			}
 			for (;w<64;w++)
 				damagableitems[tb][te].damagelevels[w].weight=0;
-		 		if (totalweight<256)
+			if (totalweight<256)
   					AfxTrace("Shape under strength (Only %i) Shape %i(%s) UID=%04x(%s)",
    					totalweight,
  					b.lastshape,LoadResString(IDS_SHAPESSTART+b.lastshape),
@@ -1831,39 +1810,6 @@ void	NodeData::CheckDamage(DeadStream& ds)
 				}
 
 			}
-//DeadCode JIM 13Sep00 			while ((SGT=src.NextSGT())!=UID_NULL)
-//DeadCode JIM 13Sep00 			{
-//DeadCode JIM 13Sep00 				for (int entry=0;entry<usedentries;entry++)
-//DeadCode JIM 13Sep00 					breakif (damagelist[entry].uniqueid==SGT);
-//DeadCode JIM 13Sep00 				if (entry==usedentries)
-//DeadCode JIM 13Sep00 				{
-//DeadCode JIM 13Sep00 					usedentries++;
-//DeadCode JIM 13Sep00 					damagelist[entry].uniqueid=SGT;
-//DeadCode JIM 13Sep00 					damagelist[entry].eltsleft=0;
-//DeadCode JIM 13Sep00 				}
-//DeadCode JIM 13Sep00 				while ((targuid=src.GetWord())!=UID_NULL)
-//DeadCode JIM 13Sep00 				{
-//DeadCode JIM 13Sep00 					//skip rest of info
-//DeadCode JIM 13Sep00 					UWord status=src.GetWord();
-//DeadCode JIM 13Sep00 					UWord shape=src.GetWord();
-//DeadCode JIM 13Sep00 					int	numelts=src.GetByte();
-//DeadCode JIM 13Sep00 					while (numelts--)
-//DeadCode JIM 13Sep00 					{	char v=src.GetByte();
-//DeadCode JIM 13Sep00 						MinAnimData firstbyte=(MinAnimData&)v;
-//DeadCode JIM 13Sep00 						if (firstbyte.itemstate)
-//DeadCode JIM 13Sep00 							damagelist[entry].eltsleft=damagelist[entry].eltsleft+1;
-//DeadCode JIM 13Sep00 						if (firstbyte.IsInvisible)
-//DeadCode JIM 13Sep00 							src.SkipCountedInfo();
-//DeadCode JIM 13Sep00 					}
-//DeadCode JIM 13Sep00 				}
-//DeadCode JIM 13Sep00 			}
-//DeadCode JIM 13Sep00 			for (int entry=0;entry<usedentries;entry++)
-//DeadCode JIM 13Sep00 			{													//DAW 27Jun99
-//DeadCode JIM 13Sep00 				if (Persons2::getbandfromUID(damagelist[entry].uniqueid)==BritBridgeBAND)
-//DeadCode JIM 13Sep00 					damagelist[entry].pointsleft=repairbridgepointsinperiod;
-//DeadCode JIM 13Sep00 				else
-//DeadCode JIM 13Sep00 					damagelist[entry].pointsleft=repairpointsinperiod;
-//DeadCode JIM 13Sep00 			}
 		}
 	//Ok.. I have a list of all the damaged SGTs now... Now what????
 		bool	oldspeak = Node_Data.intel.stoppedspeaking;
@@ -1886,8 +1832,6 @@ int	NodeData::GetCheckDamage(DeadStream& ds,UniqueID SGT)
 		DeadStream::DeadBlockItterator	src(ds.firstblock,UID_NULL);
 		if (src.SkipToItem(SGT))
 		{
-//DeadCode JIM 13Sep00 			UWord status=src.GetWord();
-//DeadCode JIM 13Sep00 			UWord shape=src.GetWord();
 			GroupItterator g=(ShapeNum(src.lastshape));
 			int	numelts=src.lastnumelts;//.GetByte();
 			if (numelts==-1)
@@ -1912,12 +1856,10 @@ int	NodeData::GetCheckDamage(DeadStream& ds,UniqueID SGT)
 		TargetFactory* tf=Node_Data[SGT];
 		if (tf->maxdispersedperweek>0)
 		{
-//DeadCode JIM 22Sep00 			INT3;	//JIM This is here because the dispersed production is untested
 			tf->maxdispersedperweek=-tf->maxdispersedperweek;
 			int	datefromstart=(MMC.currdate-MMC.startdate)/SECSPERDAY;
 			if (datefromstart>30)
 				tf->perweekwhenout+=(datefromstart-30)/5;
-//DeadCode JIM 20Sep00 Don't have a message for dispersed production.			Node_Data.intel.AddMessage(IntelMsg::MED_MANAGEMENT_MAN,AS_NOTSWITCH,SCRIPT_LWOPERATIONAL ,gruppe[i].homeairfield,UID_NULL,TargetIndexes(gruppe[i].squadron,gruppe[i].ACTotal()));
 		}
 		else
 		{
@@ -1939,7 +1881,6 @@ int	NodeData::GetCheckDamage(DeadStream& ds,UniqueID SGT,int&a,int&b,int&c,int&d
 		if (trg)
 			if (trg->IsA(Target::TSS_TargetAirfield))
 			{
-//DeadCode JIM 20Oct00 				TargetFighterField* ta=*trg;
 				int damagebits[5]={0,0,0,maindamage*7.5,0};
 				const UniqueIDBand damagebands[3]={AfStoresBAND,AfFieldBAND,AfStaffBAND};
 				DeadStream::DeadBlockItterator	src(ds.firstblock,UID_NULL);
@@ -2150,30 +2091,10 @@ void	GroupItterator::NextDeadIttElt(DeadStream::DeadBlockItterator* I,UByte&di1b
 //
 //		 ... code in mfc\damage.cpp
 //
-//DeadCode RJS 15Feb99 bool	GroupItterator::operator++(int)		{status++;return (status<10);}
 //move on to next element?
 //if not NULL Push animptr,grpindexer, and deadstream forward
-//DeadCode RJS 15Feb99 GroupItterator::operator bool()		{return (status<10);}	//reached end of group?
 
 
-//DeadCode RJS 15Feb99 int GroupItterator::NumElts(void)
-//DeadCode RJS 15Feb99 {return 5;}
-//DeadCode RJS 15Feb99
-//DeadCode RJS 15Feb99 char& GroupItterator::AnimDataByte()
-//DeadCode RJS 15Feb99 {
-//DeadCode RJS 15Feb99 	static char dummy=5;
-//DeadCode RJS 15Feb99 	return dummy;
-//DeadCode RJS 15Feb99 }
-//DeadCode RJS 15Feb99
-//DeadCode RJS 15Feb99 int GroupItterator::PostLauncherDataSize()
-//DeadCode RJS 15Feb99 {
-//DeadCode RJS 15Feb99 	return 0;
-//DeadCode RJS 15Feb99 }
-//DeadCode RJS 15Feb99
-//DeadCode RJS 15Feb99 char * GroupItterator::PostLauncherDataLoc()
-//DeadCode RJS 15Feb99 {
-//DeadCode RJS 15Feb99 	return NULL;
-//DeadCode RJS 15Feb99 }
 
 static	DistanceFactors
 Distance[]=
@@ -2274,9 +2195,6 @@ void SaveData::InitPreferences(intptr_t wh)
 
 	gamedifficulty |= GD_VULNERABLE;
 	gamedifficulty |= GD_AUTOPADLOCKTOG;
-//DeadCode AMM 9Oct00 	gamedifficulty |= GD_GEFFECTS;									  //rdh 14/04/99
-//DeadCode AMM 9Oct00 	gamedifficulty |= GD_INJURYEFFECTS;								  //rdh 14/04/99
-//DeadCode AMM 9Oct00 	gamedifficulty |= GD_WHITEOUT;									  //rdh 14/04/99
 	gamedifficulty |= GD_PERFECTRADARASSISTEDGUNSIGHT;				  //rdh 14/04/99
 	gamedifficulty |= GD_PERIPHERALVISION;							  //rdh 14/04/99
 	gamedifficulty |= GD_HUDINSTACTIVE;								  //rdh 14/04/99
@@ -2286,7 +2204,6 @@ void SaveData::InitPreferences(intptr_t wh)
 	toolbars=-1;
 	toolbars%=TB_FILTERS;
 	toolbars%=TB_COMMS;
-//DEADCODE RDH 28/02/00 	toolbars%=TB_TITLE;
 	toolbars%=TB_STATUS;
 
 	keysensitivity=3;													//JON 17Oct00
@@ -2337,11 +2254,6 @@ void SaveData::InitPreferences(intptr_t wh)
 
 	lwplots = 	PL_REALISTIC;												//RDH 10/03/00
 
-//DEADCODE RDH 06/01/00 	mapfilters|= FILT_RED_SUPPLY;
-//DEADCODE RDH 06/01/00 	mapfilters|= FILT_RED_BRIDGE;
-//DEADCODE RDH 06/01/00 	mapfilters|= FILT_MAINWP;
-//DEADCODE RDH 06/01/00 	mapfilters|= FILT_BLUE_AIRFIELDS;
-//DEADCODE RDH 06/01/00 	mapfilters|= FILT_FRONTLINE;
 
 	_Analogue.tune	[AU_AILERON]	.deadzones = DZ_SMALL;						  //RDH 24/05/99
 	_Analogue.tune	[AU_ELEVATOR]	.deadzones = DZ_SMALL;					  //RDH 24/05/99
@@ -2383,10 +2295,7 @@ void SaveData::InitPreferences(intptr_t wh)
 	_Analogue.tune[AU_GUNH]		.aliased	%=AA_TT_REVERSE;	//=false;
 
 
-//DEADCODE RDH 30/06/99 	Save_Data.targetsize = TS_LARGE;
 	targetsize = TS_MEDIUM;
-//DeadCode CSB 27Jul00 	autopilotskillUN  = 2;								  //RDH 09/07/99
-//DeadCode CSB 27Jul00 	autopilotskillRED = 2;								  //RDH 09/07/99
 	autopilotskillLW  = 2;								  //RDH 09/07/99
 	autopilotskillRAF = 2;								  //RDH 09/07/99
 	// SFX stuff...
@@ -2434,7 +2343,6 @@ void SaveData::InitPreferences(intptr_t wh)
 		ui_horizontalres[UIR_MAP]=		UIRC_DESK;			//0 means use desktop
 		ui_horizontalres[UIR_FRAG]=		UIRC_DESK;			//1 can mean use map
 	}
-//DeadCode JIM 18Oct00 	ui_horizontalres[UIR_FIRST]=	0;			//First call fills this with desktop
 	ui_colourdepth=0;							//Zero means default depth
 	ui_winx=0,
 	ui_winy=0,
@@ -2447,8 +2355,6 @@ void SaveData::InitPreferences(intptr_t wh)
 	Save_Data.detail_3d%=DETAIL3D_AUTODETAIL;
 	Save_Data.desiredfps=8;
 	Save_Data.detail_3d|=DETAIL3D_GROUNDSHADING;
-//DeadCode JON 22Sep00 	Save_Data.detail_3d%=DETAIL3D_ITEMSHADING;// this will actually be done as specular is set.
-//DeadCode JON 22Sep00 	Save_Data.detail_3d|=DETAIL3D_SPECITEM;
 	Save_Data.itemShading = 2; // specular.
 	Save_Data.detail_3d|=DETAIL3D_TRANSSMOKE;
 	Save_Data.detail_3d|=DETAIL3D_INCONSEQUENTIALS;
@@ -2479,12 +2385,9 @@ void SaveData::InitPreferences(intptr_t wh)
 		if (!successfulLoad)
 		{
 			MessageBox(hWnd,LoadResString(IDS_CONFIGIGNORED),LoadResString(IDS_CHOOSEPREFS),MB_OK);
-//DEADCODE MS 03/05/00 			HardwareConfigure(true,hWnd);
 		}
 //		ThreeDeeSound=false;
 	}
-//DEADCODE MS 03/05/00 	else
-//DEADCODE MS 03/05/00 		HardwareConfigure(true,hWnd);
 
 // check to ensure that any music device guid contained in the savegame is still valid
 	if (backupminsbetweensavegame)
@@ -2515,7 +2418,6 @@ void SaveData::InitPreferences(intptr_t wh)
 		ui_horizontalres[i]=backupres[i];
 	}
 
-//DeadCode JIM 18Oct00 	ui_horizontalres[UIR_FIRST]=		0;		  //first call needs to fill this in.
 	if (gameSettings.m_bBorder)
 	{
 		ui_horizontalres[UIR_SMACKER]=	UIRC_DESK;
@@ -2615,14 +2517,6 @@ void	NodeData::LoadCleanNodeTree()
 		bos.write("\n\032\0\0",4);
 		Save(bos);
 	}
-//DeadCode JIM 3Jul00 	if (Todays_Packages.localplayer==NAT_RAF)
-//DeadCode JIM 3Jul00 		for (int i=0;i<IllegalBAND;i++)
-//DeadCode JIM 3Jul00 		{
-//DeadCode JIM 3Jul00 			TargetGroup* g=operator[](UniqueID(i));
-//DeadCode JIM 3Jul00 			if (g)
-//DeadCode JIM 3Jul00 				g->FixInitialStatusRAF();
-//DeadCode JIM 3Jul00 		}
-//DeadCode JIM 3Jul00 	else
 		for (int i=0;i<IllegalBAND;i++)
 		{
 			TargetGroup* g=operator[](UniqueID(i));
@@ -2630,32 +2524,3 @@ void	NodeData::LoadCleanNodeTree()
 				g->FixInitialStatusLW();
 		}
 }
-//DEADCODE JIM 16/11/99 void	SupplyTree::LoadCleanNodeTree()
-//DEADCODE JIM 16/11/99 {
-//DEADCODE JIM 16/11/99 	char buffer[150];
-//DEADCODE JIM 16/11/99 	bool	filegood;
-//DEADCODE JIM 16/11/99 	{
-//DEADCODE JIM 16/11/99 		BIStream bis(File_Man.namenumberedfile(File_Man.fakefile(FIL_SAVEGAMEDIR,"blank_nt.dat"),buffer));
-//DEADCODE JIM 16/11/99 		filegood=(bis.is_open()==TRUE);
-//DEADCODE JIM 16/11/99 		if (filegood)
-//DEADCODE JIM 16/11/99 		{
-//DEADCODE JIM 16/11/99 			char buffer[50];
-//DEADCODE JIM 16/11/99 			int len=strlen(compiledate);
-//DEADCODE JIM 16/11/99 			bis.read(buffer,len+4);
-//DEADCODE JIM 16/11/99 			buffer[len]=0;
-//DEADCODE JIM 16/11/99 			if (strcmp(buffer,compiledate))
-//DEADCODE JIM 16/11/99 				filegood=false;
-//DEADCODE JIM 16/11/99 		}
-//DEADCODE JIM 16/11/99 		if (filegood)
-//DEADCODE JIM 16/11/99 		{
-//DEADCODE JIM 16/11/99 			SupplyTree::Load(bis);
-//DEADCODE JIM 16/11/99 		}
-//DEADCODE JIM 16/11/99 	}
-//DEADCODE JIM 16/11/99 	if (!filegood)
-//DEADCODE JIM 16/11/99 	{
-//DEADCODE JIM 16/11/99 		BOStream bos(buffer);
-//DEADCODE JIM 16/11/99 		bos.write(compiledate,strlen(compiledate));
-//DEADCODE JIM 16/11/99 		bos.write("\n\032\0\0",4);
-//DEADCODE JIM 16/11/99 		SupplyTree::Save(bos);
-//DEADCODE JIM 16/11/99 	}
-//DEADCODE JIM 16/11/99 }

@@ -27,7 +27,6 @@ class	 Error
 		Error(void);
 		~Error(void );
 
-//DeadCode JIM 02Jul96 		void Error::EmitSysErr(char *, ...);
 		Error& ExitMode();
 Error& Say(const char *, ...);
 Error& SayAndQuit(const char *, ...);
@@ -41,7 +40,6 @@ Error& SayAndQuit(const char *, ...);
 //#pragma	aux SayAndQuit		aborts;
 #endif
 		#if	DEBUGGING
-//DeadCode ARM 05Aug96 			void screenswap(Display *);
 			void OpenLog(void );
 			void WriteToLog(char *,...);
 			void CloseLog(void );
@@ -86,7 +84,6 @@ extern	class Error	_Error;
 #undef nassert
 #endif*/
 
-//DEADCODE DAW 26/04/99 #ifndef	assert
 
 	#ifdef NDEBUG
 		#define myassert(expr) {}

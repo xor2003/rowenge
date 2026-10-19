@@ -156,11 +156,8 @@ new	AERODEVICE(ControlledAC, pModel, AeroDevice::DT_CANOPY, AeroDevice::CT_KEYS,
 new	AERODEVICE(ControlledAC, pModel, AeroDevice::DT_SLATS, AeroDevice::CT_AUTO, AeroDevice::PT_VOID,
 				0.35, 0.035, 0, 0, 2, 328, NULLKEY, NULLKEY, ANGLES_12Deg, &adptr->acslats);
 																								
-//DeadCode CSB 22Sep00 new	AERODEVICE(ControlledAC, pModel, AeroDevice::DT_SLATS, AeroDevice::CT_AUTO, AeroDevice::PT_MANUAL,
-//DeadCode CSB 22Sep00 				0.2265, 0.01, 0, -0.05, 2, 328, NULLKEY, NULLKEY, 55, &adptr->acslats);
 																										
 																										
-//DEADCODE CSB 28/01/00 	pModel	->	SetMassInertias		(	ControlledAC	,	6604	,	11943	,	8120	)	;												
 	pModel	->	SetMassInertias		(	ControlledAC	,	13537	,	19675	,	7716	)	;												
 																										
 																										
@@ -207,21 +204,18 @@ PENGINE	pEngine	=	new	ENGINE	(	pModel	,	ET_PISTON	)	;
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLLEFT, w, c1, c2);
 	PGEAR pMainPort = new GEAR (pModel, PORT);
 	pMainPort->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DEADCODE CSB 08/05/00 	pMainPort->SetDimensions (-100, -195, -205-CoG, -100, -165, -205-CoG);
 	pMainPort->SetSuspension (31500, 315000);
 	pMainPort->SetTyres (0.05, 0.4, 7500);
 	
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLRIGHT, w, c1, c2);
 	PGEAR pMainStbd = new GEAR (pModel, STBD);
 	pMainStbd->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DEADCODE CSB 08/05/00 	pMainStbd->SetDimensions (100, -195, -205-CoG, 100, -165, -205-CoG);
 	pMainStbd->SetSuspension (31500, 315000);
 	pMainStbd->SetTyres (0.05, 0.4, 7500);
 
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLBACK, w, c1, c2);
 	PGEAR pTail = new GEAR (pModel, TAIL);
 	pTail->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DEADCODE CSB 08/05/00 	pTail->SetDimensions (0, -30, -765-CoG, 0, -15, -765-CoG);
 	pTail->SetSuspension (11500, 115000);
 	pTail->SetTyres (0.05, 0.4, 0);
 
@@ -238,13 +232,11 @@ PENGINE	pEngine	=	new	ENGINE	(	pModel	,	ET_PISTON	)	;
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.elevator, &adptr->acelevator,32767,-32768);//RJS 14May98
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.rudder, &adptr->acrudder);
 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &ControlledAC->fly.rpm, &adptr->acrpm, 0, (255 * 5) / 3);
-//DeadCode RJS 05May99 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &pModel->Inst.Rpm1, &adptr->acrpm, 0, 65536);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pTail, &adptr->aclegsuspb, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainPort, &adptr->aclegsuspl, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainStbd, &adptr->aclegsuspr, 0, 255);
 
 	Model.PowerBoost = 1.5;
-//DeadCode CSB 6Nov00 	Model.MaxG = 5;
 
 	Model.ContrailDuration = 1.0;
 
@@ -272,29 +264,6 @@ void BF109_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 
 	ACM.yawmodifier				= 1e10;
 	
-//DEADCODE CSB 19/01/00 	ACM.BrakePower = 14;
-//DEADCODE CSB 19/01/00 	ACM.SteerRatio = 8e-6;
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 	ACM.MaxAileron = 32767;
-//DEADCODE CSB 19/01/00 	ACM.MaxElevatorForTightTurn	= 16384;
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 	ACM.aoamodifier = 1500;//1200;
-//DEADCODE CSB 19/01/00 	ACM.DeltaPitchForMaxElevator = 0.5;//	= 1.0472;
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 	ACM.pitchmodifier = 2.5;
-//DEADCODE CSB 19/01/00 	ACM.pitchintmodifier = 0;
-//DEADCODE CSB 19/01/00 	ACM.IntPitchForMaxElevator	= 0.1;//1000;
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 	ACM.rollmodifier = 2.0;	
-//DEADCODE CSB 19/01/00 	ACM.rollintmodifier = 0;
-//DEADCODE CSB 19/01/00 	ACM.IntRollForMaxAileron = 100;
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 	ACM.yawmodifier = 5;//6;
-//DEADCODE CSB 19/01/00 	ACM.yawintmodifier = 0;//3;	
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 	ACM.turnmodifier = 1.5;//1.2;
-//DEADCODE CSB 19/01/00 	ACM.turnintmodifier = 0.02;//12;
-//DEADCODE CSB 19/01/00 	ACM.liftmodifier = 1000;//1200;
 
 	ACM.maxdeltaforclosework = 0.1;
 	ACM.lastdeltapitch = 0;

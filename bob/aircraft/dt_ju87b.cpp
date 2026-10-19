@@ -152,7 +152,6 @@ new	AERODEVICE		(	ControlledAC	,	pModel	,	AeroDevice	::	DT_DIVEBRAKES	,	AeroDevi
 				-0.1	,	0.015	,	0.075	,	0.00	,	2	,	164	,	SPEEDBRAKE	,	SPEEDBRAKE	,	250	,	&adptr->acbreak	)	;
 																						
 																						
-//DEADCODE CSB 28/01/00 	pModel	->	SetMassInertias		(	ControlledAC	,	13961	,	27747	,	20568	)	;								
 	pModel	->	SetMassInertias		(	ControlledAC	,	30953	,	51023	,	21874	)	;								
 																						
 																						
@@ -199,21 +198,18 @@ PENGINE	pEngine	=	new	ENGINE	(	pModel	,	ET_PISTON	)	;
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLLEFT, w, c1, c2);
 	PGEAR pMainPort = new GEAR (pModel, PORT);
 	pMainPort->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DeadCode CSB 27Jun00 	pMainPort->SetDimensions (-150, -250, -275-CoG, -150, -230, -275-CoG);
 	pMainPort->SetSuspension (45000, 450000);
 	pMainPort->SetTyres (0.05, 0.4, 5000);
 	
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLRIGHT, w, c1, c2);
 	PGEAR pMainStbd = new GEAR (pModel, STBD);
 	pMainStbd->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DeadCode CSB 27Jun00 	pMainStbd->SetDimensions (150, -250, -275-CoG, 150, -230, -275-CoG);
 	pMainStbd->SetSuspension (45000, 450000);
 	pMainStbd->SetTyres (0.05, 0.4, 5000);
 
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLBACK, w, c1, c2);
 	PGEAR pTail = new GEAR (pModel, TAIL);
 	pTail->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DeadCode CSB 27Jun00 	pTail->SetDimensions (0, -90, -1025-CoG, 0, -75, -1025-CoG);
 	pTail->SetSuspension (12500, 125000);
 	pTail->SetTyres (0.05, 0.4, 0);
 
@@ -230,7 +226,6 @@ PENGINE	pEngine	=	new	ENGINE	(	pModel	,	ET_PISTON	)	;
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.elevator, &adptr->acelevator,32767,-32768);//RJS 14May98
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.rudder, &adptr->acrudder);
 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &ControlledAC->fly.rpm, &adptr->acrpm, 0, (255 * 5) / 3);
-//DeadCode RJS 05May99 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &pModel->Inst.Rpm1, &adptr->acrpm, 0, 65536);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pTail, &adptr->aclegsuspb, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainPort, &adptr->aclegsuspl, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainStbd, &adptr->aclegsuspr, 0, 255);
@@ -239,7 +234,6 @@ PENGINE	pEngine	=	new	ENGINE	(	pModel	,	ET_PISTON	)	;
 
 	Model.ContrailDuration = 1.0;
 
-//DeadCode CSB 27/10/99		F51D_SetupAI (ControlledAC, Version);
 }
 
 

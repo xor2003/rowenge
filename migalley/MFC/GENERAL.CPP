@@ -176,7 +176,7 @@ void	CGeneral::PrintMiGActivity(SupplyNode*	node)
 	migact/=SupplyTree::STANDARDREDAFCOMPLEMENT;
 	if (migact > 4)
 		migact = 4;
-		CRStatic* stat=GETDLGITEM(IDC_THREAT_MIG15);
+	CRStatic* stat=GETDLGITEM(IDC_THREAT_MIG15);
 	stat->SetString(RESLIST(ENEMYACTIVITY0,migact));
 }
 
@@ -282,7 +282,6 @@ BOOL CGeneral::OnInitDialog()
 	}
 	else
 	{
-//DEADCODE RDH 19/06/99 		PrintMiGActivity(node);
 		stat=GETDLGITEM(IDC_MSR);
 		if (node->supplyline==&SupplyTree::WestRoute)
 			stat->SetString(RESSTRING(WEST));
@@ -301,9 +300,6 @@ BOOL CGeneral::OnInitDialog()
  		}else
 		{
 
-//DEADCODE RDH 12/06/99 			stat=GETDLGITEM(IDC_THREAT_AAA);
-//DEADCODE RDH 12/06/99 			stat->SetString(RESLIST(ENEMYACTIVITY0,node->attackstats.aaalevel/60));
-//DEADCODE RDH 12/06/99 			stat=GETDLGITEM(IDC_STATUS);
 
 			if  (		(relation == SupplyTree::S2U_AF0)
 					||	(relation == SupplyTree::S2U_AF1)

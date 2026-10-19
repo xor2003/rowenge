@@ -81,7 +81,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	<stdio.h>
 	//DON'T WRITE INCLUDE FILES HERE, PUT THEM IN BFCOMMON
 	#define	TEXTREF_Included
-//DEADCODE JIM 09/02/00 	#include	"text.h"
 //	#include	"error.h"
 	#include	"mymath.h"
 	#include	"worldinc.h"

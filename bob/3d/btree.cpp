@@ -114,32 +114,13 @@ btree::btree(SLong land_tree_size,SLong item_tree_size)
 		rollBuffet=ANGLES_0Deg;
 
 	item_list_size = 0;													//RJS 28Aug00
-//DeadCode RJS 28Aug00 	item_list_size = item_tree_size;
-//DEADCODE PD 06/12/99 	land_list_size = land_tree_size;
 
-//DeadCode RJS 28Aug00 	item_list_header = new Obj3DPtr[item_tree_size];			//PD 12Mar96
-//DEADCODE PD 06/12/99 	land_list_header = new LandObj3DPtr[land_tree_size];		//PD 12Mar96
 
-//DeadCode RJS 28Aug00 	int	temp;
-//DeadCode RJS 28Aug00 
-//DeadCode RJS 28Aug00 	for(temp=item_tree_size;temp--;)
-//DeadCode RJS 28Aug00 	{
-//DeadCode RJS 28Aug00 		item_list_header[temp] = new Obj3D;
-//DeadCode RJS 07Feb00		item_list_header[temp]->lptr = NULL;
-//DeadCode RJS 07Feb00		item_list_header[temp]->rptr = NULL;
-//DeadCode RJS 28Aug00 	}
 
-//DEADCODE PD 06/12/99 	for(temp=land_tree_size;temp--;)
-//DEADCODE PD 06/12/99 	{
-//DEADCODE PD 06/12/99 		land_list_header[temp] = new LandObj3D;
-//DEADCODE PD 06/12/99 		land_list_header[temp]->lptr = NULL;
-//DEADCODE PD 06/12/99 		land_list_header[temp]->rptr = NULL;
-//DEADCODE PD 06/12/99 	}
 
 	start_index = NULL;
 
 	item_list_index =0; //PD 06/12/99
-//DEADCODE PD 06/12/99 	land_list_index = 0;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -163,18 +144,8 @@ btree::~btree()
 {
 	int	temp;
 
-//DeadCode RJS 28Aug00 	for(temp=item_list_size;temp--;)
-//DeadCode RJS 28Aug00 	{
-//DeadCode RJS 28Aug00 		delete item_list_header[temp];
-//DeadCode RJS 28Aug00 	}
 
-//DEADCODE PD 06/12/99 	for(temp=land_list_size;temp--;)
-//DEADCODE PD 06/12/99 	{
-//DEADCODE PD 06/12/99 		delete land_list_header[temp];
-//DEADCODE PD 06/12/99 	}
 
-//DeadCode RJS 28Aug00 	delete[]item_list_header;
-//DEADCODE PD 06/12/99 	delete[]land_list_header;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -195,55 +166,6 @@ btree::~btree()
 //------------------------------------------------------------------------------
 BaseObj3DPtr btree::Get3DArea(ObjectType objecttype)
 {
-//DeadCode RJS 28Aug00 	BaseObj3DPtr	new_obj3d;									//PD 12Mar96
-//DeadCode RJS 28Aug00 
-//DeadCode RJS 28Aug00 	switch(objecttype)
-//DeadCode RJS 28Aug00 	{
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 		case GROUND_TILE_OBJECT:
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			new_obj3d = land_list_header[land_list_index++];
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			if(land_list_index>land_list_size)					//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			{													//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 				land_list_index--;								//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 				new_obj3d = RecycleObj3D();						//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			}													//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			new_obj3d->objtype=GROUND_TILE_OBJECT;
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			break;
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 		case SPECIAL_TILE_OBJECT:
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			new_obj3d = land_list_header[land_list_index++];
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			if(land_list_index>land_list_size)					//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			{													//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 				land_list_index--;								//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 				new_obj3d = RecycleObj3D();						//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			}													//PD 17Dec96
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			new_obj3d->objtype=SPECIAL_TILE_OBJECT;
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 			break;
-//DeadCode RJS 28Aug00 //DEADCODE PD 06/12/99 
-//DeadCode RJS 28Aug00 		case STATIC_OBJECT:
-//DeadCode RJS 28Aug00 		case MOBILE_OBJECT:
-//DeadCode RJS 28Aug00 		case SHADOW_OBJECT:										//RJS 07May97
-//DeadCode RJS 28Aug00 //DeadCode RJS 05Nov99 		case SMOKE_OBJECT:										//RJS 08Sep97
-//DeadCode RJS 28Aug00 		case COCKPIT_OBJECT:
-//DeadCode RJS 28Aug00 
-//DeadCode RJS 28Aug00 			new_obj3d = item_list_header[item_list_index++];
-//DeadCode RJS 28Aug00 
-//DeadCode RJS 28Aug00 			if(item_list_index>item_list_size)
-//DeadCode RJS 28Aug00 			{													//PD 26Jul96
-//DeadCode RJS 28Aug00 				item_list_index--;								//PD 26Jul96
-//DeadCode RJS 28Aug00 				new_obj3d = RecycleObj3D();						//PD 26Jul96
-//DeadCode RJS 28Aug00 			}													//PD 26Jul96
-//DeadCode RJS 28Aug00 			break;
-//DeadCode RJS 28Aug00 		case SMOKE_OBJECT:										//RJS 08Sep97
-//DeadCode RJS 28Aug00 			new_obj3d = item_list_header[item_list_index++];
-//DeadCode RJS 28Aug00 
-//DeadCode RJS 28Aug00 			if(item_list_index>item_list_size)
-//DeadCode RJS 28Aug00 			{													//PD 26Jul96
-//DeadCode RJS 28Aug00 				item_list_index--;								//PD 26Jul96
-//DeadCode RJS 28Aug00 				new_obj3d = NULL;						//PD 26Jul96
-//DeadCode RJS 28Aug00 			}	
-//DeadCode RJS 28Aug00 			break;
-//DeadCode RJS 28Aug00 	}
-//DeadCode RJS 28Aug00 	return(new_obj3d);
 
 	return NULL;
 }
@@ -268,53 +190,6 @@ BaseObj3DPtr btree::Get3DArea(ObjectType objecttype)
 //------------------------------------------------------------------------------
 void btree::insert_object(BaseObj3DPtr new_object)				//PD 12Mar96
 {
-//DeadCode RJS 07Feb00 	BaseObj3DPtr	scan_index,									//PD 12Mar96
-//DeadCode RJS 07Feb00 					next_index;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	Float		scan_bodyz,
-//DeadCode RJS 07Feb00 				new_bodyz;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	Bool		inserted = FALSE;								//PD 12Mar96
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	if(start_index == NULL)
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		start_index = new_object;
-//DeadCode RJS 07Feb00 	}
-//DeadCode RJS 07Feb00 	else
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		next_index = start_index;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 		while(!inserted)
-//DeadCode RJS 07Feb00 		{
-//DeadCode RJS 07Feb00 			scan_index = next_index;
-//DeadCode RJS 07Feb00 			
-//DeadCode RJS 07Feb00 			scan_bodyz = scan_index->realbz.f;
-//DeadCode RJS 07Feb00 			new_bodyz = new_object->realbz.f;
-//DeadCode RJS 07Feb00 			
-//DeadCode RJS 07Feb00 			if(scan_bodyz > new_bodyz)
-//DeadCode RJS 07Feb00 			{
-//DeadCode RJS 07Feb00 				if((next_index = scan_index->lptr)==NULL)
-//DeadCode RJS 07Feb00 				{
-//DeadCode RJS 07Feb00 					scan_index->lptr = new_object;
-//DeadCode RJS 07Feb00 					inserted = TRUE;
-//DeadCode RJS 07Feb00 					objcount++;									//PD 15Oct96
-//DeadCode RJS 07Feb00 					if (new_bodyz>farobj)
-//DeadCode RJS 07Feb00 						farobj = new_bodyz;
-//DeadCode RJS 07Feb00 				}
-//DeadCode RJS 07Feb00 			}
-//DeadCode RJS 07Feb00 			else
-//DeadCode RJS 07Feb00 			{
-//DeadCode RJS 07Feb00 				if((next_index = scan_index->rptr)==NULL)
-//DeadCode RJS 07Feb00 				{
-//DeadCode RJS 07Feb00 					scan_index->rptr = new_object;
-//DeadCode RJS 07Feb00 					inserted = TRUE;
-//DeadCode RJS 07Feb00 					objcount++;									//PD 15Oct96
-//DeadCode RJS 07Feb00 					if (new_bodyz>farobj)
-//DeadCode RJS 07Feb00 						farobj = new_bodyz;
-//DeadCode RJS 07Feb00 				}	
-//DeadCode RJS 07Feb00 			}
-//DeadCode RJS 07Feb00 		}
-//DeadCode RJS 07Feb00 	}		
 }
 #else
 void btree::insert_object(BaseObj3DPtr new_object)
@@ -344,58 +219,6 @@ void btree::insert_object(BaseObj3DPtr new_object)
 //------------------------------------------------------------------------------
 void btree::insert_object2(BaseObj3DPtr new_object)				//PD 12Mar96
 {
-//DeadCode RJS 07Feb00 	BaseObj3DPtr	scan_index,									//PD 12Mar96
-//DeadCode RJS 07Feb00 					next_index;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	Obj3DPtr		o3dp = (Obj3DPtr )new_object;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	itemptr			ip = o3dp->ItemPtr;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	Float		scan_bodyz,
-//DeadCode RJS 07Feb00 				new_bodyz;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	Bool		inserted = FALSE;								//PD 12Mar96
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	new_bodyz = new_object->realbz.f;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	if(start_index == NULL)
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		start_index = new_object;
-//DeadCode RJS 07Feb00 	}
-//DeadCode RJS 07Feb00 	else
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		next_index = start_index;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 		while(!inserted)
-//DeadCode RJS 07Feb00 		{
-//DeadCode RJS 07Feb00 			scan_index = next_index;
-//DeadCode RJS 07Feb00 			
-//DeadCode RJS 07Feb00 			scan_bodyz = scan_index->realbz.f;					//PD 12Mar96
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 			if(scan_bodyz > new_bodyz)
-//DeadCode RJS 07Feb00 			{
-//DeadCode RJS 07Feb00 				if((next_index = scan_index->lptr)==NULL)
-//DeadCode RJS 07Feb00 				{
-//DeadCode RJS 07Feb00 					scan_index->lptr = new_object;
-//DeadCode RJS 07Feb00 					inserted = TRUE;
-//DeadCode RJS 07Feb00 					objcount++;									//PD 15Oct96
-//DeadCode RJS 07Feb00 					if (new_bodyz>farobj)
-//DeadCode RJS 07Feb00 						farobj = new_bodyz;
-//DeadCode RJS 07Feb00 				}
-//DeadCode RJS 07Feb00 			}
-//DeadCode RJS 07Feb00 			else
-//DeadCode RJS 07Feb00 			{
-//DeadCode RJS 07Feb00 				if((next_index = scan_index->rptr)==NULL)
-//DeadCode RJS 07Feb00 				{
-//DeadCode RJS 07Feb00 					scan_index->rptr = new_object;
-//DeadCode RJS 07Feb00 					inserted = TRUE;
-//DeadCode RJS 07Feb00 					objcount++;									//PD 15Oct96
-//DeadCode RJS 07Feb00 					if (new_bodyz>farobj)
-//DeadCode RJS 07Feb00 						farobj = new_bodyz;
-//DeadCode RJS 07Feb00 				}	
-//DeadCode RJS 07Feb00 			}
-//DeadCode RJS 07Feb00 		}
-//DeadCode RJS 07Feb00 	}		
 }
 #else
 void btree::insert_object2(BaseObj3DPtr new_object)
@@ -475,20 +298,6 @@ void btree::nz_draw_object(CLib3D *lib3d,ViewPoint* vp)
 //------------------------------------------------------------------------------
 void btree::recurse(BaseObj3DPtr next_index)					//PD 12Mar96
 {
-//DeadCode RJS 07Feb00 	BaseObj3DPtr scan_index;									//PD 12Mar96
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	do
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		scan_index = next_index;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 		if((next_index = scan_index->rptr)!=NULL)
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 			recurse(next_index);
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 		drw_obj(scan_index);
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	}
-//DeadCode RJS 07Feb00 	while((next_index = scan_index->lptr)!=NULL);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -498,19 +307,6 @@ void btree::recurse(BaseObj3DPtr next_index)					//PD 12Mar96
 //------------------------------------------------------------------------------
 void btree::nz_recurse(BaseObj3DPtr next_index)					//PD 12Mar96
 {
-//DeadCode RJS 07Feb00 	BaseObj3DPtr scan_index;									//PD 12Mar96
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	do
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		scan_index = next_index;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 		if((next_index = scan_index->rptr)!=NULL)
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 			recurse(next_index);
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 		drw_obj(scan_index);
-//DeadCode RJS 07Feb00 	}
-//DeadCode RJS 07Feb00 	while((next_index = scan_index->lptr)!=NULL);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -527,31 +323,6 @@ void btree::nz_recurse(BaseObj3DPtr next_index)					//PD 12Mar96
 //------------------------------------------------------------------------------
 BaseObj3DPtr btree::RecycleObj3D()
 {
-//DeadCode RJS 07Feb00 	BaseObj3DPtr scan_index,
-//DeadCode RJS 07Feb00 				 prev_index;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	scan_index = start_index;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	if (scan_index->rptr==NULL)
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		start_index=scan_index->lptr;
-//DeadCode RJS 07Feb00 		scan_index->lptr =
-//DeadCode RJS 07Feb00 			scan_index->rptr = NULL;
-//DeadCode RJS 07Feb00 		return (scan_index);
-//DeadCode RJS 07Feb00 	}
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	while (scan_index->rptr!=NULL)
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		prev_index=scan_index;
-//DeadCode RJS 07Feb00 		scan_index=scan_index->rptr;
-//DeadCode RJS 07Feb00 	}
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	prev_index->rptr = scan_index->lptr;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	scan_index->lptr =
-//DeadCode RJS 07Feb00 		scan_index->rptr = NULL;
-//DeadCode RJS 07Feb00 
-//DeadCode RJS 07Feb00 	return(scan_index);
 
 	return NULL;
 }
@@ -576,31 +347,6 @@ BaseObj3DPtr btree::RecycleObj3D()
 void btree::drw_obj(BaseObj3DPtr this_obj3d)					//PD 12Mar96
 {
 //	*(char*)(0xb0000+160*24+112)='A'+this_obj3d->objtype;
-//DeadCode RJS 28Aug00 	switch(this_obj3d->objtype)									//PD 12Mar96
-//DeadCode RJS 28Aug00 	{
-//DeadCode RJS 28Aug00 		case COCKPIT_OBJECT:
-//DeadCode RJS 28Aug00 			drw_cockpit(this_obj3d);
-//DeadCode RJS 28Aug00 			break;
-//DeadCode RJS 28Aug00 
-//DeadCode RJS 28Aug00 		case SHADOW_OBJECT:										//RJS 07May97
-//DeadCode RJS 28Aug00 			drw_shadow(this_obj3d);								//RJS 07May97
-//DeadCode RJS 28Aug00 			break;												//RJS 07May97
-//DeadCode RJS 28Aug00 
-//DeadCode RJS 28Aug00 		case SMOKE_OBJECT:										//RJS 08Sep97
-//DeadCode RJS 28Aug00 		case STATIC_OBJECT:										//RJS 08Sep97
-//DeadCode RJS 28Aug00 			drw_static(this_obj3d);
-//DeadCode RJS 28Aug00 			break;
-//DeadCode RJS 28Aug00 		case SHADEOVERRIDE_OBJECT:
-//DeadCode RJS 28Aug00 			drw_shadeoverride(this_obj3d);
-//DeadCode RJS 28Aug00 			break;
-//DeadCode RJS 28Aug00 
-//DeadCode RJS 28Aug00 		case MOBILE_OBJECT:
-//DeadCode RJS 28Aug00 			drw_mobile(this_obj3d);
-//DeadCode RJS 28Aug00 			break;
-//DeadCode RJS 28Aug00 		case MAP_OBJECT:										//RJS 08Sep98
-//DeadCode RJS 28Aug00 			drw_map(this_obj3d);								//RJS 08Sep98
-//DeadCode RJS 28Aug00 			break;												//RJS 08Sep98
-//DeadCode RJS 28Aug00 	}
 
 //	*(char*)(0xb0000+160*24+112)='Z';
 }
@@ -800,7 +546,6 @@ void btree::drw_mobile(BaseObj3DPtr this_obj3d)
 	Obj3DPtr robj3d=(Obj3DPtr )this_obj3d;
 
 	bool	fOldState;
-//DeadCode RJS 20Oct00 			fIsAc=robj3d->ItemPtr && robj3d->ItemPtr->Status.size==AirStrucSize?true:false;
 
 //	if (fIsAc) fOldState=current_screen->DoSetMipMap(false);
 
@@ -995,22 +740,11 @@ void btree::Clear3DArea()
 {
 	int	temp;
 
-//DeadCode RJS 28Aug00 	for(temp=item_list_index;temp--;)
-//DeadCode RJS 28Aug00 	{
-//DeadCode RJS 28Aug00 //DeadCode RJS 07Feb00 		item_list_header[temp]->lptr = NULL;
-//DeadCode RJS 28Aug00 //DeadCode RJS 07Feb00 		item_list_header[temp]->rptr = NULL;
-//DeadCode RJS 28Aug00 	}
 
-//DEADCODE PD 06/12/99 	for(temp=land_list_index;temp--;)
-//DEADCODE PD 06/12/99 	{
-//DEADCODE PD 06/12/99 		land_list_header[temp]->lptr = NULL;
-//DEADCODE PD 06/12/99 		land_list_header[temp]->rptr = NULL;
-//DEADCODE PD 06/12/99 	}
 
 	start_index = NULL;
 
 	item_list_index =
-//DEADCODE PD 06/12/99 		land_list_index =
 		farobj =
 		objcount = 0;											//PD 15Oct96
 }
@@ -1053,7 +787,6 @@ void btree::drw_map(BaseObj3DPtr this_obj3d)
 
 	FPMATRIX_PTR	fpobj_matrix = &objmat;							//PD 09Jan97
 
-//DeadCode RJS 08Sep98 	//Just copy the normal viewer matrix
  	*fpobj_matrix=*Three_Dee.fpviewer_matrix;
 
 	// Identity...												//RJS 20Oct98

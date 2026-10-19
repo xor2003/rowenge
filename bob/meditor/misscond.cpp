@@ -134,7 +134,6 @@ void __fastcall TMissionConditionsForm::OpenForm()
 {
 	SWord	month = 1;
 	SWord	day = 1,year = 1;
-//DeadCode RDH 04Mar96 	window->SetColour (WHITE);
 	char buff[50];
 
 

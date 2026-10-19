@@ -78,14 +78,13 @@ questions about this file may be asked at http://www.simhq.com/
 
 #include "_3D.H" //RERUN
 	#include	"DOSDEFS.H"
+#include	"animlink.h"											//ptr side-channel for animdata fields
 	//#include	"MAClib.h"f
 #define F_GRAFIX												//DAW 05Aug96
-//DeadCode RJS 17Oct96 #define F_SOUNDS
 #include "_3D.H" //RERUN
 	#include	"DOSDEFS.H"
 	//#include	"MAClib.h"f
 #define F_GRAFIX                                                //DAW 05Aug96
-//DeadCode RJS 17Oct96 #define F_SOUNDS
 #define F_BATTLE
 	// RERUN #include	"Files.g"
 	#include 	"MYERROR.H"
@@ -107,7 +106,6 @@ questions about this file may be asked at http://www.simhq.com/
 	#include	"3DCODE.H"
 	#include	"SHPBLD.H"                                        //PD 22Jan96
 	#include	"LANDSCAP.H"                                    //MGA 09May96
-//DeadCode DAW 23Feb98 	#include	"Wrapper.h"                                        //PD 26Oct95
 
 	#include	"MYTIME.H"                                        //PD 15Mar96
 
@@ -210,14 +208,12 @@ inline SLong ASM_GetFadeColour(SLong a, SLong b)
 
 	class shape	SHAPE;
 
-//DeadCode RJS 01Dec97 	shape::InterpProc*	shape::InterpTable[dosetglassrangeno+1];
 	shape::InterpProc*	*shape::InterpTable;
 	UByteP				shape::animflags;
 	SLong				shape::fade_start,
 						shape::fade_end,
 						shape::object_dist;
 
-//DeadCode PD 10Jan97 	MATRIX_PTR 			shape::object_matrix;
 	FPMATRIX_PTR 		shape::fpobject_matrix;
 	Obj3DPtr	  		shape::object_obj3d;
 	FPMATRIX_PTR 		shape::fprealobject_matrix;				//RJS 15Jan99
@@ -550,9 +546,6 @@ shape::shape()
 		traillist[i].LaunchCountdown = -1;						//RJS 25Nov97
 		traillist[i].SampleTime = 0;							//RJS 08Jan98
 		traillist[i].FakePointPtr = NULL;						//RJS 25Feb98
-//DeadCode RJS 06May99 		traillist[i].InitVelH = 0;								//RJS 09Apr98
-//DeadCode RJS 06May99 		traillist[i].InitVelY = 0;								//RJS 09Apr98
-//DeadCode RJS 06May99 		traillist[i].Acceleration = 0;							//RJS 09Apr98
 		traillist[i].SmkDescPtr = NULL;							//RJS 09Apr98
 		traillist[i].cloudlaunched = FALSE;						//RJS 03Jul98
 		traillist[i].transient = 0;								//RJS 22Jan99
@@ -766,7 +759,6 @@ void shape::UpdateGlobalFlags(int ft)
 //	PolyPitAnimData* adptr = (PolyPitAnimData* )Manual_Pilot.ControlledAC2->Anim;
 }
 
-//DeadCode PD 10Jun97 Bool	bZBufferLock;
 Bool	bOldZState;
 
 Bool	bPlayerTextures;
@@ -934,21 +926,6 @@ void shape::animate_shape(Obj3DPtr thisobj3d)
 			return;								//shape file missing
 
 		// We need this for smoke launchers......				//MS 30Nov98
-//DEADCODE DAW 23/04/99  		switch (SHAPESTUFF.GetShapeScale(sdptr))				//MS 30Nov98
-//DEADCODE DAW 23/04/99  		{														//MS 30Nov98
-//DEADCODE DAW 23/04/99  			case SHP_GRP:										//MS 30Nov98
-//DEADCODE DAW 23/04/99  				_Error.EmitSysErr(__FILE__":Bad shape type field (SHAPE NUMBER %d)",thisobj3d->Shape);//MS 30Nov98
-//DEADCODE DAW 23/04/99  				break;											//MS 30Nov98
-//DEADCODE DAW 23/04/99  			case SHP_1CM:										//MS 30Nov98
-//DEADCODE DAW 23/04/99  				shapescale = 0;									//MS 30Nov98
-//DEADCODE DAW 23/04/99  				break;											//MS 30Nov98
-//DEADCODE DAW 23/04/99  			case SHP_4CM:										//MS 30Nov98
-//DEADCODE DAW 23/04/99  				shapescale = 2;									//MS 30Nov98
-//DEADCODE DAW 23/04/99  				break;											//MS 30Nov98
-//DEADCODE DAW 23/04/99  			case SHP_16CM:										//MS 30Nov98
-//DEADCODE DAW 23/04/99  				shapescale = 4;									//MS 30Nov98
-//DEADCODE DAW 23/04/99  				break;											//MS 30Nov98
-//DEADCODE DAW 23/04/99  		}														//MS 30Nov98
 		// ....We need this for smoke launchers					//MS 30Nov98
 
 		UByte	vaptype = sdptr->Type.VapourType;				//RJS 21Jan99
@@ -979,13 +956,7 @@ void shape::animate_shape(Obj3DPtr thisobj3d)
 					SunItemAnim((SunAnimData* )adptr);					//PD 24Jun96
 					break;												//PD 24Jun96
 
-//DeadCode RJS 21Jan99 				case FLAMEANIM:
-//DeadCode RJS 21Jan99 					FlameItemAnim((FireAnimData *)adptr);
-//DeadCode RJS 21Jan99 					break;
 
-//DeadCode RJS 21Jan99 				case BALLOONANIM:										//RJS 05Aug96
-//DeadCode RJS 21Jan99 					BalloonItemAnim((BalloonAnimData *)adptr,thisobj3d);
-//DeadCode RJS 21Jan99 					break;
 				case WINDSOCANIM:									//RJS 05Jun97
 					WindsockItemAnim((WindsocAnimData*) adptr);		//RJS 05Jun97
 					break;
@@ -994,9 +965,6 @@ void shape::animate_shape(Obj3DPtr thisobj3d)
 					BarageItemAnim((BarageAnimData*) adptr);
 					break;
 
-//DeadCode RJS 21Apr99 				case FIREBALLANIM:										//RJS 07Oct96
-//DeadCode RJS 21Apr99 					FireballItemAnim((ExplodeAnimData*) adptr);		//RJS 09Jan97
-//DeadCode RJS 21Apr99 					break;
 				case MOVEGUNANIM:
 					if (!sdptr->Type.VapourType)						//RJS 10Mar98
 						MoveGunItemAnim((MoveGunAnimData*) adptr);	//RJS 04Jun97
@@ -1013,9 +981,6 @@ void shape::animate_shape(Obj3DPtr thisobj3d)
 				case TROOPANIM:
 					TroopItemAnim((TroopAnimData*) adptr,(TroopAnimData*)thisobj3d->ItemPtr->Anim);//RJS 06Dec96
 					break;
-//DeadCode RJS 21Apr99 				case BRIDGEANIM:
-//DeadCode RJS 21Apr99 					BridgeItemAnim((ExplodeAnimData*) adptr);			//RJS 20Nov96
-//DeadCode RJS 21Apr99 					break;
 				case SMOKETRAILANIM:
 					vaptype = TRAIL_OFF;
 					ProbeStaticTrail((UByteP)sdptr,thisobj3d->ItemPtr,adptr);
@@ -1031,7 +996,6 @@ void shape::animate_shape(Obj3DPtr thisobj3d)
 							TransientItem*	theChute = (TransientItem*)targ->Target; 
 							oldcoords = theChute->World;
 							theChute->World = thisobj3d->ItemPtr->World;
-//DeadCode RJS 27Apr99							theChute->uniqueID.changed = TRUE;
 
 							Three_Dee.StuffInBinaryTree(theChute);//DAW 23Apr99
 							theChute->World = oldcoords;
@@ -1350,18 +1314,15 @@ void shape::dopolygon(UByte *& instr_ptr)
 {
 	ImageMapNumber	imapno;
 	SLong	flag;												//RJS 12Feb97
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;				//RJS 18Feb97
 
 	DOSETCOLOUR_PTR	dscptr = (DOSETCOLOUR_PTR )instr_ptr;
 
 	imapno = (ImageMapNumber )(dscptr->imageno);
 
-//DeadCode RJS 01Apr98 	imapno = (ImageMapNumber )((imapno<0)?-imapno:imapno);
 
 	ImageMapDescPtr imptr = Image_Map.GetImageMapPtr(imapno);
 
 	flag = GlobalAdptr[dscptr->flagname];						//RJS 16Apr99
-//DeadCode RJS 12Feb97 	flag = *(animflags+flag);
 
 	flag <<= 6;		// * 64
 
@@ -1530,7 +1491,6 @@ void shape::dopolygon(UByte *& instr_ptr)
 	v3 = (SWord )ptr->vertex3;									//RJS 10Mar97
 
 	if(!_matrix.crossproduct(newco[v1],newco[v2],newco[v3]))
-//Old_Code PD 06Dec96 	if(!_matrix.accuratecrossproduct(newco[v1],newco[v2],newco[v3]))
 	{
 		instr_ptr += ptr->offset;
 	}
@@ -1717,7 +1677,6 @@ void shape::dopolygon(UByte *& instr_ptr)
 {
 	DOWINDOWDIAL_PTR ptr = (DOWINDOWDIAL_PTR )instr_ptr;
 	SWord			minx, miny, maxx, maxy;
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr;
 	SLong			val;
 	SWord			rwidth, rheight;
 	SLong			maxshift;
@@ -1860,13 +1819,8 @@ void shape::dopolygon(UByte *& instr_ptr)
 	cx = ptr->xpos;
 	cy = -ptr->ypos;
 	cz = ptr->zpos;
-//DeadCode PD 05Oct98 	cx = ptr->xpos << shapescale;
-//DeadCode PD 05Oct98 	cy = -ptr->ypos << shapescale;
-//DeadCode PD 05Oct98 	cz = ptr->zpos << shapescale;
 
 	//radius <<= shapescale;
-//DeadCode PD 05Oct98 	radius <<= shapescale;
-//Old_Code PD 12Oct98 	_matrix.generate2(ANGLES_0Deg,ANGLES_0Deg,(ANGLES)-object_obj3d->AngR,tmatp);//RJS 19Jun98
 	_matrix.Generate2(ANGLES_0Deg,ANGLES_0Deg,(ANGLES)extraRoll-object_obj3d->AngR,1,tmatp);//RJS 19Jun98
 
 	wx.i = -radius;
@@ -2068,8 +2022,6 @@ void shape::dopolygon(UByte *& instr_ptr)
 		//}
 	}
 
-//DeadCode DAW 01Sep98 	else
-//DeadCode DAW 01Sep98 	{
 	// Do glint....
 	if (	(Three_Dee.lightson == FALSE)						//RJS 10May99
 		&& 	ddptr->imagemap										//RJS 10May99
@@ -2183,7 +2135,6 @@ void shape::dopolygon(UByte *& instr_ptr)
 void shape::doscalesize(UByte *& instr_ptr)
 {
 	DOSCALESIZE_PTR	ptr = (DOSCALESIZE_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;
 	SLong	frameno = GlobalAdptr[ptr->animoffsrc];				//RJS 16Apr99
 	UByte	animscale = ptr->animscale;
 
@@ -2211,7 +2162,6 @@ void shape::doscalesize(UByte *& instr_ptr)
 void shape::dogunsight(UByte *& instr_ptr)
 {
 	DOGUNSIGHT_PTR	ptr = (DOGUNSIGHT_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;
 	int		count;
 	int		vertno;
 	int		count2;
@@ -2607,21 +2557,7 @@ void shape::dogunsight(UByte *& instr_ptr)
 					}
 				}
 			}
-//DeadCode DAW 25Jun99 		}
-//DeadCode DAW 25Jun99 		else
-//DeadCode DAW 25Jun99 		{
-//DeadCode DAW 25Jun99 			instr_ptr += sizeof(DOGUNSIGHT);					//RDH 29Nov98
-//DeadCode DAW 25Jun99 			instr_ptr += ptr->nopoints * sizeof(UByte);			//RDH 29Nov98
-//DeadCode DAW 25Jun99 		}														//RDH 29Nov98
 																//RDH 29Nov98
-//DeadCode DAW 25Jun99 		tmpplane->Anim = NULL;									//RJS 29Mov98
-//DeadCode DAW 25Jun99 		delete tmpplane;										//RDH 29Nov98
-//DeadCode DAW 25Jun99 	}
-//DeadCode DAW 25Jun99 	else														//RDH 29Nov98
-//DeadCode DAW 25Jun99 	{															//RDH 29Nov98
-//DeadCode DAW 25Jun99 		instr_ptr += sizeof(DOGUNSIGHT);						//RDH 29Nov98
-//DeadCode DAW 25Jun99 		instr_ptr += ptr->nopoints * sizeof(UByte);				//RDH 29Nov98
-//DeadCode DAW 25Jun99 	}															//RDH 29Nov98
 }
 
 
@@ -2640,7 +2576,6 @@ void shape::dogunsight(UByte *& instr_ptr)
  void shape::dowheelspray(UByte *& instr_ptr)
 {
 	DOWHEELSPRAY_PTR ptr = (DOWHEELSPRAY_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP		adptr = (UByteP) object_obj3d->AnimPtr;
 	UByte		suspension = GlobalAdptr[ptr->animflag];
 
 	if (suspension)
@@ -2662,17 +2597,10 @@ void shape::dogunsight(UByte *& instr_ptr)
 		SLong		outback;
 		DoPointStruc	dp1,dp2,dp3,dp4;
 		totdist = vel >> 3;
-//DeadCode DAW 25Jan99 
-//DeadCode DAW 25Jan99 		char	shite[32];
-//DeadCode DAW 25Jan99 		sprintf(shite,"Dist: %d  ",totdist);
-//DeadCode DAW 25Jan99 		Mono_Text.PrintAt(50,10,(UByteP)shite);
 
 		wxx = ptr->xcoord;
 		wyy = ptr->ycoord;
 		wzz = ptr->zcoord;
-//DeadCode PD 05Oct98 		wxx = ptr->xcoord << shapescale;
-//DeadCode PD 05Oct98 		wyy = ptr->ycoord << shapescale;
-//DeadCode PD 05Oct98 		wzz = ptr->zcoord << shapescale;
 
 		dotinst.vertex = 0;
 		dotinst.colour = 31;
@@ -2838,7 +2766,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
  void shape::dofadeenvelope(UByte *& instr_ptr)
 {
 	DOFADEENVELOPE_PTR	ptr = (DOFADEENVELOPE_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;
 	SLong	btime = *((SLongP)&GlobalAdptr[ptr->birthtimeoffset]);
 	SLong	lastval, thisval;
 	SLong	totval = ptr->attackval;
@@ -3070,35 +2997,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 //		}
 //	}
 
-//Old_Code PD 07Oct98 	UWord	vertex,
-//Old_Code PD 07Oct98 			counter;
-//Old_Code PD 07Oct98 
-//Old_Code PD 07Oct98 	DONPOINTS_PTR npnt_ptr = (DONPOINTS_PTR )instr_ptr;
-//Old_Code PD 07Oct98 
-//Old_Code PD 07Oct98 	COORDS_PTR	ptr = (COORDS_PTR)(instr_ptr+sizeof(DONPOINTS));
-//Old_Code PD 07Oct98 
-//Old_Code PD 07Oct98 	vertex = (UWord )npnt_ptr->start_vertex;					//RJS 10Mar97
-//Old_Code PD 07Oct98 
-//Old_Code PD 07Oct98 	for(counter=0;counter<npnt_ptr->vertex_count;counter++)
-//Old_Code PD 07Oct98 	{
-//Old_Code PD 07Oct98 		DoPointStruc& dp=newco[vertex];
-//Old_Code PD 07Oct98 		dp.bodyx.i = ptr->xcoord;
-//Old_Code PD 07Oct98 		dp.bodyy.i = ptr->ycoord;
-//Old_Code PD 07Oct98 		dp.bodyz.i = ptr->zcoord;
-//Old_Code PD 07Oct98 		_matrix.transformNC(fpobject_matrix,dp);
-//Old_Code PD 07Oct98 		dp.bodyx.f += object_obj3d->Body.X.f;
-//Old_Code PD 07Oct98 		dp.bodyy.f += object_obj3d->Body.Y.f;
-//Old_Code PD 07Oct98 		dp.bodyz.f += object_obj3d->Body.Z.f;
-//Old_Code PD 07Oct98 		_matrix.SetClipFlags(dp);
-//Old_Code PD 07Oct98 		if (!doingHW3D) _matrix.body2screen(dp);				//PD 19Jun98
-//Old_Code PD 07Oct98 		dp.intensity = -1;//0;//-1;										//RJS 20Mar98
-//Old_Code PD 07Oct98 		dp.specFlip=
-//Old_Code PD 07Oct98 		dp.specular=-1;											//PD 24Aug98
-//Old_Code PD 07Oct98 		ptr++;
-//Old_Code PD 07Oct98 		vertex++;
-//Old_Code PD 07Oct98 	}
-//Old_Code PD 07Oct98 
-//Old_Code PD 07Oct98 	instr_ptr += npnt_ptr->vertex_count * sizeof(NNEXT) + sizeof(DONPOINTS);
 }
 
 //------------------------------------------------------------------------------
@@ -3361,9 +3259,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 		dpPtr->bodyx.i = npoint->xcoord;
 		dpPtr->bodyy.i = npoint->ycoord;
 		dpPtr->bodyz.i = npoint->zcoord;
-//DeadCode PD 05Oct98 		dpPtr->bodyx.i = npoint->xcoord << shapescale;
-//DeadCode PD 05Oct98 		dpPtr->bodyy.i = npoint->ycoord << shapescale;
-//DeadCode PD 05Oct98 		dpPtr->bodyz.i = npoint->zcoord << shapescale;
 		npoint++;
 		dpPtr++;
 	}
@@ -3379,7 +3274,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 			for (count=0; count < vno; count++)
 			{
 				dpPtr->bodyx.i += (npointdelta->delta*scaleup)>>8;//RJS 24May99
-//DeadCode PD 05Oct98 				dpPtr->bodyx.i += (npointdelta->delta << shapescale);
 				npointdelta++;
 				dpPtr++;
 			}
@@ -3391,7 +3285,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 			for (count=0; count < vno; count++)
 			{
 				dpPtr->bodyy.i -= (npointdelta->delta*scaleup)>>8;
-//DeadCode PD 05Oct98 				dpPtr->bodyy.i -= (npointdelta->delta << shapescale);
 				npointdelta++;
 				dpPtr++;
 			}
@@ -3403,7 +3296,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 			for (count=0; count < vno; count++)
 			{
 				dpPtr->bodyz.i += (npointdelta->delta*scaleup)>>8;
-//DeadCode PD 05Oct98 				dpPtr->bodyz.i += (npointdelta->delta << shapescale);
 				npointdelta++;
 				dpPtr++;
 			}
@@ -3416,8 +3308,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 			{
 				dpPtr->bodyx.i += (npointdelta->delta[0]*scaleup)>>8;
 				dpPtr->bodyy.i -= (npointdelta->delta[1]*scaleup)>>8;
-//DeadCode PD 05Oct98 				dpPtr->bodyx.i += (npointdelta->delta[0] << shapescale);
-//DeadCode PD 05Oct98 				dpPtr->bodyy.i -= (npointdelta->delta[1] << shapescale);
 				npointdelta++;
 				dpPtr++;
 			}
@@ -3430,8 +3320,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 			{
 				dpPtr->bodyx.i += (npointdelta->delta[0]*scaleup)>>8;
 				dpPtr->bodyz.i += (npointdelta->delta[1]*scaleup)>>8;
-//DeadCode PD 05Oct98 				dpPtr->bodyx.i += (npointdelta->delta[0] << shapescale);
-//DeadCode PD 05Oct98 				dpPtr->bodyz.i += (npointdelta->delta[1] << shapescale);
 				npointdelta++;
 				dpPtr++;
 			}
@@ -3444,8 +3332,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 			{
 				dpPtr->bodyy.i -= (npointdelta->delta[0]*scaleup)>>8;
 				dpPtr->bodyz.i += (npointdelta->delta[1]*scaleup)>>8;
-//DeadCode PD 05Oct98 				dpPtr->bodyy.i -= (npointdelta->delta[0] << shapescale);
-//DeadCode PD 05Oct98 				dpPtr->bodyz.i += (npointdelta->delta[1] << shapescale);
 				npointdelta++;
 				dpPtr++;
 			}
@@ -3459,9 +3345,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
 				dpPtr->bodyx.i += (npointdelta->delta[0]*scaleup)>>8;
 				dpPtr->bodyy.i -= (npointdelta->delta[1]*scaleup)>>8;
 				dpPtr->bodyz.i += (npointdelta->delta[2]*scaleup)>>8;
-//DeadCode PD 05Oct98 				dpPtr->bodyx.i += (npointdelta->delta[0] << shapescale);
-//DeadCode PD 05Oct98 				dpPtr->bodyy.i -= (npointdelta->delta[1] << shapescale);
-//DeadCode PD 05Oct98 				dpPtr->bodyz.i += (npointdelta->delta[2] << shapescale);
 				npointdelta++;
 				dpPtr++;
 			}
@@ -3507,7 +3390,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
  void shape::dodrawsun(UByte *&instr_ptr)		
 {
 	DODRAWSUN_PTR	ptr = (DODRAWSUN_PTR) instr_ptr;
-//DeadCode RJS 21Apr99  	UByteP			adptr = (UByteP) object_obj3d->AnimPtr; 			
 	SWord			minx, maxx;
 	SWord			miny, maxy;
 	SWord			width, height;
@@ -3646,7 +3528,6 @@ void shape::doquikpoly(UByte *& instr_ptr)
  void shape::doswitch(UByte *& instr_ptr)
 {
 	DOSWITCH_PTR	ptr = (DOSWITCH_PTR) instr_ptr;				//RJS 13Mar98
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr;		//RJS 13Mar98
 	ULong			flag = GlobalAdptr[ptr->animoff];					//RJS 13Mar98
 																//RJS 13Mar98
 
@@ -3731,9 +3612,6 @@ void shape::dopoint2x(UByte *& instr_ptr)
 		dp.bodyx.i = dp2x_ptr->xcoord;
 		dp.bodyy.i = dp2x_ptr->ycoord;
 		dp.bodyz.i = dp2x_ptr->zcoord;
-//DeadCode PD 05Oct98 		dp.bodyx.i = dp2x_ptr->xcoord<<shapescale;
-//DeadCode PD 05Oct98 		dp.bodyy.i = dp2x_ptr->ycoord<<shapescale;
-//DeadCode PD 05Oct98 		dp.bodyz.i = dp2x_ptr->zcoord<<shapescale;
 		_matrix.transformNC(fpobject_matrix,&dp);
 		dp.bodyx.f += object_obj3d->Body.X.f;
 		dp.bodyy.f += object_obj3d->Body.Y.f;
@@ -3749,9 +3627,6 @@ void shape::dopoint2x(UByte *& instr_ptr)
 		dp.bodyx.i = 0-dp2x_ptr->xcoord;
 		dp.bodyy.i = dp2x_ptr->ycoord;
 		dp.bodyz.i = dp2x_ptr->zcoord;
-//DeadCode PD 05Oct98 		dp.bodyx.i = 0-dp2x_ptr->xcoord<<shapescale;
-//DeadCode PD 05Oct98 		dp.bodyy.i = dp2x_ptr->ycoord<<shapescale;
-//DeadCode PD 05Oct98 		dp.bodyz.i = dp2x_ptr->zcoord<<shapescale;
 		_matrix.transformNC(fpobject_matrix,&dp);
 		dp.bodyx.f += object_obj3d->Body.X.f;
 		dp.bodyy.f += object_obj3d->Body.Y.f;
@@ -3806,7 +3681,6 @@ void shape::dopoint2x(UByte *& instr_ptr)
  void shape::doifcase(UByte *& instr_ptr)
 {
 	DOIFCASE_PTR dic_ptr = (DOIFCASE_PTR )instr_ptr;			//RJS 04Nov98
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;				//RJS 18Feb97
 	SLong	offset;												//RJS 15May98
 	UWord	realcnt = dic_ptr->count - 1;						//RJS 04Nov98
 																//RJS 15May98
@@ -3964,7 +3838,6 @@ void shape::domorphsphere(UByte *& instr_ptr)
 {
 	DOMORPHSPHERE_PTR sphere_ptr = (DOMORPHSPHERE_PTR )instr_ptr;
 	SLong		 radius;
-//DeadCode RJS 21Apr99 	UByteP		adptr = (UByteP) object_obj3d->AnimPtr;
 	UWord		timeframe;
 	SLong		timefrac;
 	int			lumtype;
@@ -4010,16 +3883,6 @@ void shape::domorphsphere(UByte *& instr_ptr)
 		GlobalAdptr[sphere_ptr->animflag] = animflag;
 	}
 
-//DeadCode RJS 03Feb98 	SHAPE.drawsphere(	sphere_ptr->vertex,
-//DeadCode RJS 03Feb98 						radius,
-//DeadCode RJS 03Feb98 						sphere_ptr->colour,
-//DeadCode RJS 03Feb98 						sphere_ptr->animflag,
-//DeadCode RJS 03Feb98 						sphere_ptr->animscale,
-//DeadCode RJS 03Feb98 						transp,
-//DeadCode RJS 03Feb98 						(Bool)sphere_ptr->smooth,
-//DeadCode RJS 03Feb98 						sphere_ptr->halowidth,
-//DeadCode RJS 03Feb98 						lumtype,
-//DeadCode RJS 03Feb98 						0			);
 
 	SHAPE.drawsphere(	sphere_ptr->vertex,
 						radius,
@@ -4051,7 +3914,6 @@ void shape::domorphsphereimapd(UByte *& instr_ptr)
 {
 	DOMORPHCYLINDERIMAPD_PTR ptr = (DOMORPHCYLINDERIMAPD_PTR )instr_ptr;
 	SWord		 radius;
-//DeadCode RJS 21Apr99 	UByteP		adptr = (UByteP) object_obj3d->AnimPtr;
 	UWord		timeframe;
 	int			lumtype;
 	int			transp;
@@ -4200,24 +4062,6 @@ void shape::domorphsphereimapd(UByte *& instr_ptr)
  	
  	poly_data = (DOSMOOTHPOLY_PTR )instr_ptr;
  
-//DeadCode RJS 23Mar98  	SWord intensity = 0;//temp code
-//DeadCode RJS 23Mar98 	int i;
-//DeadCode RJS 23Mar98  	UByte j;
-//DeadCode RJS 23Mar98  	UWord vertex;
-//DeadCode RJS 23Mar98  
-//DeadCode RJS 23Mar98  	POLYGON.createpoly(shape::colour,shape::range);				//PD 25Jan96
-//DeadCode RJS 23Mar98  	j= poly_data->edges;
-//DeadCode RJS 23Mar98  
-//DeadCode RJS 23Mar98  
-//DeadCode RJS 23Mar98  	for (i=0;i<j;i++)
-//DeadCode RJS 23Mar98  	{
-//DeadCode RJS 23Mar98   		vertex = poly_data->vertices[i];
-//DeadCode RJS 23Mar98  		vertex = (UWord )vertex;								//RJS 10Mar97
-//DeadCode RJS 23Mar98  		POLYGON.createvert(newco[vertex],intensity);
-//DeadCode RJS 23Mar98  		if (i==1)
-//DeadCode RJS 23Mar98 		intensity =255;
-//DeadCode RJS 23Mar98  	}
-//DeadCode RJS 23Mar98 	POLYGON.drawpoly();
  	instr_ptr +=  sizeof(DOSMOOTHPOLY) + poly_data->edges*sizeof(UWord);
 }
 
@@ -4537,7 +4381,6 @@ void shape::donspheresimapd(UByte *& instr_ptr)				//RJS 13Jul98
 void shape::doweaponoff(UByte *& instr_ptr)								//RJS 13Jul98
 {
 	DOWEAPONOFF_PTR ptr = (DOWEAPONOFF_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP)object_obj3d->AnimPtr;
 
 	instr_ptr += sizeof(DOWEAPONOFF);
 	if (GlobalAdptr[ptr->launchoffset] == ptr->launchertype)
@@ -4618,7 +4461,6 @@ void shape::doweaponoff(UByte *& instr_ptr)								//RJS 13Jul98
  void shape::doresetanim(UByte *& instr_ptr)			
 {
 	DORESETANIM_PTR	ptr = (DORESETANIM_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr;
 	UWord			controlframe = *((UWordP)&GlobalAdptr[ptr->animofftimer]);
 
 	if (controlframe == 0)
@@ -4646,7 +4488,6 @@ void shape::doweaponoff(UByte *& instr_ptr)								//RJS 13Jul98
  void shape::dospin(UByte *& instr_ptr)
 {
 	DOSPIN_PTR	ptr = (DOSPIN_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP		adptr = (UByteP) object_obj3d->AnimPtr;
 	UWordP		anglep = (UWordP)&GlobalAdptr[ptr->animoff];
 	UWord		currentangle = *anglep;
 	UWord		spinspeed = *((UWordP)&GlobalAdptr[ptr->speedoff]);
@@ -4711,29 +4552,6 @@ void shape::doweaponoff(UByte *& instr_ptr)								//RJS 13Jul98
 //------------------------------------------------------------------------------
  void shape::doquiksmoothpoly(UByte *& instr_ptr)
 {
-//DeadCode RJS 23Mar98 	DOQUIKSMOOTHPOLY_PTR poly_data;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	poly_data = (DOQUIKSMOOTHPOLY_PTR )instr_ptr;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	
-//DeadCode RJS 23Mar98 	SWord intensity = 0;//temp code
-//DeadCode RJS 23Mar98 	int i,j;
-//DeadCode RJS 23Mar98 	UWord vertex;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	POLYGON.createpoly(shape::colour,shape::range);				//PD 25Jan96
-//DeadCode RJS 23Mar98 	j= poly_data->edges;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	for (i=0;i<j;i++)
-//DeadCode RJS 23Mar98 	{
-//DeadCode RJS 23Mar98 		vertex = (UWord )poly_data->vertices[i];				//RJS 10Mar97
-//DeadCode RJS 23Mar98 		POLYGON.createvert(newco[vertex],intensity);
-//DeadCode RJS 23Mar98 		if (i==1)
-//DeadCode RJS 23Mar98 		intensity =255;
-//DeadCode RJS 23Mar98 	}
-//DeadCode RJS 23Mar98 	POLYGON.drawpoly();
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	instr_ptr += sizeof(DOQUIKSMOOTHPOLY) + j*sizeof(UWord);
 }
 
 //------------------------------------------------------------------------------
@@ -5018,7 +4836,6 @@ void shape::dodrawipoly(UByte *& instr_ptr)				//RJS 19Mar97
  void shape::dodrawrpoly(UByte *& instr_ptr)								//PD 29Nov95
 {
 	DODRAWRPOLY_PTR	ptr = (DODRAWRPOLY_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;				//RJS 18Feb97
 	SLong	flag;												//RJS 12Feb97
 	int		novertices;									
 	int		i;											
@@ -5072,19 +4889,10 @@ void shape::dodrawipoly(UByte *& instr_ptr)				//RJS 19Mar97
 	ix = ptr->image_x;
 	iy = ptr->image_y;
 
-//DeadCode RJS 28Feb97  	if (	((ULong) newco[vertex].bodyx.f == -1.0)
-//DeadCode RJS 28Feb97  		&&	((ULong) newco[vertex].bodyy.f == -1.0)
-//DeadCode RJS 28Feb97  		&&	((ULong) newco[vertex].bodyz.f == -1.0)
-//DeadCode RJS 28Feb97  		&&	((ULong) newco[vertex].screenx.f == -1.0)
-//DeadCode RJS 28Feb97  		&&	((ULong) newco[vertex].screeny.f ==-1.0)	)
-//DeadCode RJS 28Feb97  	{
-//DeadCode RJS 28Feb97  		_Error.EmitSysErr(__FILE__":Bollocks do_point %d, shape %d\n",vertex,object_obj3d->Shape);
-//DeadCode RJS 28Feb97  	}
 		
 	newco[vertex].ix = ix;
 	newco[vertex].iy = iy;
 
-//DeadCode RJS 19Mar97 	POLYGON.createvert(newco[vertex],ix,iy);
 
 	instr_ptr += sizeof(DOCOPYIVERT);
 }
@@ -5107,39 +4915,6 @@ void shape::dodrawipoly(UByte *& instr_ptr)				//RJS 19Mar97
 //------------------------------------------------------------------------------
  void shape::dosmthrelpoly(UByte *& instr_ptr)
 {
-//DeadCode RJS 23Mar98 	DOSMTHRELPOLY_PTR drp_ptr;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	UWord	counter;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	drp_ptr = (DOSMTHRELPOLY_PTR )instr_ptr;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	counter = (UWord )(((UWord )drp_ptr->edges)-1);				//PD 15Jan96
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	SWord intensity = 3;//temp code
-//DeadCode RJS 23Mar98 	int i;
-//DeadCode RJS 23Mar98 	UWord vertex,old_vertex,new_vertex;
-//DeadCode RJS 23Mar98 	SByte offset;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	POLYGON.createpoly(shape::colour,shape::range);				//PD 25Jan96
-//DeadCode RJS 23Mar98 	
-//DeadCode RJS 23Mar98 	vertex = (UWord )drp_ptr->start_vertex;						//RJS 10Mar97
-//DeadCode RJS 23Mar98 	POLYGON.createvert(newco[vertex]);
-//DeadCode RJS 23Mar98 	old_vertex=drp_ptr->start_vertex;
-//DeadCode RJS 23Mar98 	
-//DeadCode RJS 23Mar98 	for (i=0;i<counter;i++)
-//DeadCode RJS 23Mar98 	{
-//DeadCode RJS 23Mar98 		offset=*(instr_ptr +(sizeof(DOSMTHRELPOLY))+(i*sizeof(SByte)));
-//DeadCode RJS 23Mar98 		new_vertex = (UWord )(old_vertex + offset);				//PD 15Jan96
-//DeadCode RJS 23Mar98 		vertex = (UWord )new_vertex;							//RJS 10Mar97
-//DeadCode RJS 23Mar98 		POLYGON.createvert(newco[vertex],intensity);
-//DeadCode RJS 23Mar98 		old_vertex=new_vertex;
-//DeadCode RJS 23Mar98 		if (i==1)
-//DeadCode RJS 23Mar98 			intensity =255;
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	}
-//DeadCode RJS 23Mar98 	POLYGON.drawpoly();
-//DeadCode RJS 23Mar98 
-//DeadCode RJS 23Mar98 	instr_ptr += sizeof(DOSMTHRELPOLY) + counter * sizeof(SByte);
 }
 
 //------------------------------------------------------------------------------
@@ -5243,7 +5018,6 @@ void shape::dodrawipoly(UByte *& instr_ptr)				//RJS 19Mar97
  void shape::dobitsofffx(UByte *& instr_ptr)
 {
 	DOBITSOFFFX_PTR	ptr = (DOBITSOFFFX_PTR)  instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr;
 	UByte			damval = GlobalAdptr[ptr->animoff];
 
 	if (damval > ptr->threshold)
@@ -5309,7 +5083,6 @@ void shape::dodrawipoly(UByte *& instr_ptr)				//RJS 19Mar97
  void shape::doondamaged(UByte *& instr_ptr)
 {
 	DOONDAMAGED_PTR	ptr = (DOONDAMAGED_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr;
 	SLong			damval = GlobalAdptr[ptr->animoff];			//RJS 28Apr99
 	SLong			topthresh;									//RJS 28Apr99
 
@@ -5500,9 +5273,6 @@ void shape::donpoint2x(UByte *& instr_ptr)
 			dp.bodyx.i = ptr->xcoord;
 			dp.bodyy.i = ptr->ycoord;
 			dp.bodyz.i = ptr->zcoord;
-//DeadCode PD 05Oct98 			dp.bodyx.i = ptr->xcoord<<shapescale;
-//DeadCode PD 05Oct98 			dp.bodyy.i = ptr->ycoord<<shapescale;
-//DeadCode PD 05Oct98 			dp.bodyz.i = ptr->zcoord<<shapescale;
 			_matrix.transformNC(fpobject_matrix,&dp);
 			dp.bodyx.f += object_obj3d->Body.X.f;
 			dp.bodyy.f += object_obj3d->Body.Y.f;
@@ -5518,9 +5288,6 @@ void shape::donpoint2x(UByte *& instr_ptr)
 			dp.bodyx.i = 0-ptr->xcoord;
 			dp.bodyy.i = ptr->ycoord;
 			dp.bodyz.i = ptr->zcoord;
-//DeadCode PD 05Oct98 			dp.bodyx.i = 0-ptr->xcoord<<shapescale;
-//DeadCode PD 05Oct98 			dp.bodyy.i = ptr->ycoord<<shapescale;
-//DeadCode PD 05Oct98 			dp.bodyz.i = ptr->zcoord<<shapescale;
 			_matrix.transformNC(fpobject_matrix,&dp);
 			dp.bodyx.f += object_obj3d->Body.X.f;
 			dp.bodyy.f += object_obj3d->Body.Y.f;
@@ -5581,102 +5348,6 @@ void shape::donpoint2x(UByte *& instr_ptr)
 //------------------------------------------------------------------------------
  void shape::dosmokepnt(UByte *& instr_ptr)
 {
-//DeadCode RJS 17Sep97 	DOSMOKEPNT_PTR	ptr = (DOSMOKEPNT_PTR) instr_ptr;
-//DeadCode RJS 17Sep97 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr;		//RJS 22May97
-//DeadCode RJS 17Sep97 	SWord		*countptr = (SWord*) &adptr[ptr->countoffset];	//RJS 05Jun97
-//DeadCode RJS 17Sep97 	SWord		Stores = *countptr;								//RJS 05Jun97
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 	if (	adptr
-//DeadCode RJS 17Sep97 		&&	adptr[ptr->flagoffset]
-//DeadCode RJS 17Sep97 		&&	!Timer_Code.paused
-//DeadCode RJS 17Sep97 		&&	Stores
-//DeadCode RJS 17Sep97 		&&	!IsSubShape)										//RJS 03Jun97
-//DeadCode RJS 17Sep97 	{
-//DeadCode RJS 17Sep97 		int			index = adptr[ptr->flagoffset];				//RJS 22May97
-//DeadCode RJS 17Sep97 		SLong		wx, wy, wz;									//RJS 21May97
-//DeadCode RJS 17Sep97 		MATRIX  	omat;										//RJS 21May97
-//DeadCode RJS 17Sep97 		MATRIX_PTR	obj_matrix = &omat;							//RJS 21May97
-//DeadCode RJS 17Sep97 		UWord		scaleback;									//RJS 21May97
-//DeadCode RJS 17Sep97 		TrailRecord*	trailptr = &traillist[index];			//RJS 21May97
-//DeadCode RJS 17Sep97 		int			lifetime;
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 		trailptr->addtime = ptr->LifeTime;
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 		// -1 is infinite....
-//DeadCode RJS 17Sep97 		if (Stores != -1)
-//DeadCode RJS 17Sep97 		{
-//DeadCode RJS 17Sep97 			Stores-=16;											//RJS 04Jun97
-//DeadCode RJS 17Sep97 		
-//DeadCode RJS 17Sep97 			if (Stores < 0)
-//DeadCode RJS 17Sep97 				Stores = 0;
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 			*countptr = Stores;
-//DeadCode RJS 17Sep97 		}
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 		if (Stores)
-//DeadCode RJS 17Sep97 		{
-//DeadCode RJS 17Sep97 			lifetime = ptr->LifeTime;
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 			if (trailptr->lifetime && (lifetime > 500))
-//DeadCode RJS 17Sep97 				lifetime = trailptr->lifetime;
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97  			if (trailptr->nextlist)
-//DeadCode RJS 17Sep97  			{
-//DeadCode RJS 17Sep97  				Coords3DListPtr	nextptr = traillist[trailptr->nextlist].thelist;
-//DeadCode RJS 17Sep97  				if (nextptr)
-//DeadCode RJS 17Sep97  				{
-//DeadCode RJS 17Sep97  					wx = nextptr->trailpoint.gx;
-//DeadCode RJS 17Sep97  					wy = nextptr->trailpoint.gy;
-//DeadCode RJS 17Sep97  					wz = nextptr->trailpoint.gz;
-//DeadCode RJS 17Sep97  
-//DeadCode RJS 17Sep97  					SHAPE.AddNewVapourPoint(trailptr,wx,wy,wz,lifetime);
-//DeadCode RJS 17Sep97  					lifetime = trailptr->lifetime;
-//DeadCode RJS 17Sep97  				}
-//DeadCode RJS 17Sep97  
-//DeadCode RJS 17Sep97  				trailptr->nextlist = 0;
-//DeadCode RJS 17Sep97  			}
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 			// Every frame....
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 			wx = ptr->xcoord << shapescale;
-//DeadCode RJS 17Sep97 			wy = ptr->ycoord << shapescale;
-//DeadCode RJS 17Sep97 			wz = ptr->zcoord << shapescale;
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 			_matrix.generate2(	object_obj3d->AngH,
-//DeadCode RJS 17Sep97 								object_obj3d->AngC,
-//DeadCode RJS 17Sep97 								object_obj3d->AngR,
-//DeadCode RJS 17Sep97 								obj_matrix);
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 			scaleback = _matrix.transform(obj_matrix,wx,wy,wz);
-//DeadCode RJS 17Sep97  			wx >>= (16-scaleback);
-//DeadCode RJS 17Sep97  			wy >>= (16-scaleback);
-//DeadCode RJS 17Sep97  			wz >>= (16-scaleback);
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 			wx += trailptr->lastwx;
-//DeadCode RJS 17Sep97 			wy += trailptr->lastwy;
-//DeadCode RJS 17Sep97 			wz += trailptr->lastwz;
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 			// Reset after approx 128 points.
-//DeadCode RJS 17Sep97 			if (trailptr->bitshift == 8)
-//DeadCode RJS 17Sep97 			{
-//DeadCode RJS 17Sep97 				trailptr->bitshift = 0;
-//DeadCode RJS 17Sep97 				trailptr->lifetime = 0;
-//DeadCode RJS 17Sep97 				trailptr->addtime = 0;
-//DeadCode RJS 17Sep97 				trailptr->nopoints = 0;
-//DeadCode RJS 17Sep97 
-//DeadCode RJS 17Sep97 				adptr[ptr->flagoffset] = -index;
-//DeadCode RJS 17Sep97 				SHAPE.AddNewVapourPoint(trailptr,wx,wy,wz,ptr->LifeTime);
-//DeadCode RJS 17Sep97 				SHAPE.DetatchVapourStream(index,LIFETIME_VAPOUR);
-//DeadCode RJS 17Sep97 			}
-//DeadCode RJS 17Sep97 			else
-//DeadCode RJS 17Sep97 				SHAPE.AddNewVapourPoint(trailptr,wx,wy,wz,lifetime);//RJS 29May97
-//DeadCode RJS 17Sep97 		}
-//DeadCode RJS 17Sep97 		else
-//DeadCode RJS 17Sep97 		{
-//DeadCode RJS 17Sep97 			adptr[ptr->flagoffset] = 0;
-//DeadCode RJS 17Sep97 			SHAPE.DetatchVapourStream(index,LIFETIME_VAPOUR);
-//DeadCode RJS 17Sep97 		}
-//DeadCode RJS 17Sep97 	}
 
 	instr_ptr += sizeof(DOSMOKEPNT);
 }
@@ -5700,17 +5371,9 @@ void shape::donpoint2x(UByte *& instr_ptr)
  void shape::dobitsoff(UByte *& instr_ptr)
 {
 	DOBITSOFF_PTR	dbo_ptr = (DOBITSOFF_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;				//RJS 18Feb97
 	UByte	damageflag = GlobalAdptr[dbo_ptr->animoff];					//RJS 18Feb97
 	SWord	deadoff = dbo_ptr->deadoffset;//RJS 29AUG98
 
-//DeadCode RJS 13Feb97 	UWordP	dammageflags = (UWordP )(animflags+ACBITSFLAGS);
-//DeadCode RJS 13Feb97 
-//DeadCode RJS 13Feb97 	UWord	localdamflag = *dammageflags;
-//DeadCode RJS 13Feb97 
-//DeadCode RJS 13Feb97 	localdamflag >>= dbo_ptr->flag;
-//DeadCode RJS 13Feb97 
-//DeadCode RJS 13Feb97 	localdamflag &= BS_DEAD;
 
 	instr_ptr += sizeof(DOBITSOFF);
 
@@ -5845,18 +5508,6 @@ static	ULong	biggestcyl = 0;
   	//								xoff1, yoff1);				//RJS 17Nov97
  	//		}													//RJS 17Nov97
  //
-//DeadCode RJS 06Feb98  			if (drawsphere)
-//DeadCode RJS 06Feb98  			{
-//DeadCode RJS 06Feb98  				SWord	mapstart = ptr->height*ptr->sphereframe;
-//DeadCode RJS 06Feb98  				SWord	mapend = mapstart+ptr->height;
-//DeadCode RJS 06Feb98  
-//DeadCode RJS 06Feb98  				SHAPE.imapsphere(1,
-//DeadCode RJS 06Feb98  							 	radius,
-//DeadCode RJS 06Feb98  							 	(ImageMapNumber )ptr->imagemap,
-//DeadCode RJS 06Feb98  							 	minx,mapstart,
-//DeadCode RJS 06Feb98  							 	ptr->width,ptr->height,
-//DeadCode RJS 06Feb98  							 	0);							//RJS 05Feb98
-//DeadCode RJS 06Feb98  			}
 
 // 			dotransparentoff(tmpinstptr);
 //			current_screen->SetTransparency(SMOKED_OFF);		//RJS 25Nov97
@@ -5897,7 +5548,6 @@ static	ULong	biggestcyl = 0;
  void shape::doisphere(UByte *& instr_ptr)
 {
 	DOISPHERE_PTR 	isphere_ptr = (DOISPHERE_PTR )instr_ptr;			//RJS 05Feb98
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr; 			//RJS 05Feb98
 	UWord			frameno = 0;										//RJS 05Feb98
 	SWord			stepx,stepy;
 	SWord			nofx;
@@ -5994,37 +5644,6 @@ static	ULong	biggestcyl = 0;
 	instr_ptr += sizeof(DOISPHERE);						//RJS 05Feb98
 }
 
-//DeadCode RJS 16Dec97 //------------------------------------------------------------------------------
-//DeadCode RJS 16Dec97 //Procedure	dorealisphere
-//DeadCode RJS 16Dec97 //------------------------------------------------------------------------------
-//DeadCode RJS 16Dec97 //Author		Paul.   
-//DeadCode RJS 16Dec97 //Date		Wed 16 Aug 1995
-//DeadCode RJS 16Dec97 //Modified	Martin 16 Apr 1996	
-//DeadCode RJS 16Dec97 //
-//DeadCode RJS 16Dec97 //Description	
-//DeadCode RJS 16Dec97 //
-//DeadCode RJS 16Dec97 //Inputs	
-//DeadCode RJS 16Dec97 //
-//DeadCode RJS 16Dec97 //Returns	
-//DeadCode RJS 16Dec97 //
-//DeadCode RJS 16Dec97 //Externals
-//DeadCode RJS 16Dec97 //------------------------------------------------------------------------------
-//DeadCode RJS 16Dec97 //------------------------------------------------------------------------------
-//DeadCode RJS 16Dec97  void shape::doosphere(UByte *& instr_ptr)
-//DeadCode RJS 16Dec97 {
-//DeadCode RJS 16Dec97 	DOOSPHERE_PTR osphere_ptr;
-//DeadCode RJS 16Dec97 
-//DeadCode RJS 16Dec97 	osphere_ptr = (DOOSPHERE_PTR )instr_ptr;
-//DeadCode RJS 16Dec97 
-//DeadCode RJS 16Dec97 	GREY3DTYPE	gtdt = (GREY3DTYPE )0;							//PD 21Jun96
-//DeadCode RJS 16Dec97 
-//DeadCode RJS 16Dec97 	SHAPE.omapsphere(osphere_ptr->vertex,osphere_ptr->radius,(ImageMapNumber )osphere_ptr->image,//PD 17Oct96
-//DeadCode RJS 16Dec97 					osphere_ptr->minx,osphere_ptr->miny,osphere_ptr->maxx,osphere_ptr->maxy,osphere_ptr->width,osphere_ptr->height,
-//DeadCode RJS 16Dec97 					osphere_ptr->factor,
-//DeadCode RJS 16Dec97 					osphere_ptr->flagoffset);					//RJS 19Feb97
-//DeadCode RJS 16Dec97 	
-//DeadCode RJS 16Dec97 	instr_ptr += sizeof(DOOSPHERE);
-//DeadCode RJS 16Dec97 }
 
 //------------------------------------------------------------------------------
 //Procedure		dorealisphere
@@ -6273,12 +5892,8 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 	else														//RJS 02Sep97
 		rpm = ntp_ptr->fixedrpm;								//RJS 03Sep97
 
-//DeadCode DAW 13Nov97 	r = (Angles)roll_angle;									//PD 08Mar96
 	if (rpm)
 	{
-//DeadCode RJS 03Sep97 		roll_angle = (ANGLES_359Deg * rpm)/60;						//PD 08Mar96
-//DeadCode RJS 03Sep97 		roll_angle *= globalanimtime.centisec;						//PD 02Apr96
-//DeadCode RJS 03Sep97 		roll_angle /= -10;											//PD 02Apr96
 
 		if (!ntp_ptr->notrpm)									//RJS 03Sep97
 		{														//RJS 03Sep97
@@ -6312,9 +5927,6 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 	basex = ntp_ptr->base_x;						//PD 08Mar96
 	basey = ntp_ptr->base_y;						//PD 08Mar96
 	basez = ntp_ptr->base_z;						//PD 08Mar96
-//DeadCode PD 05Oct98 	basex = ntp_ptr->base_x<<shapescale;						//PD 08Mar96
-//DeadCode PD 05Oct98 	basey = ntp_ptr->base_y<<shapescale;						//PD 08Mar96
-//DeadCode PD 05Oct98 	basez = ntp_ptr->base_z<<shapescale;						//PD 08Mar96
 
 	int	j = (int )ntp_ptr->count;
 
@@ -6325,9 +5937,6 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 		wx.i = (next_ptr->xcoord)-basex;
 		wy.i = (next_ptr->ycoord)-basey;
 		wz.i = (next_ptr->zcoord)-basez;
-//DeadCode PD 05Oct98 		wx.i = (next_ptr->xcoord<<shapescale)-basex;
-//DeadCode PD 05Oct98 		wy.i = (next_ptr->ycoord<<shapescale)-basey;
-//DeadCode PD 05Oct98 		wz.i = (next_ptr->zcoord<<shapescale)-basez;
 		
 		//Transform the point around the selected origin
 
@@ -6485,10 +6094,6 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 			UWord	noframes = ptr->noframes - 1;
 			Bool	nocyl = FALSE;
 
-	//DeadCode DAW 21Jun99 #ifndef NDEBUG
-	//DeadCode DAW 21Jun99 		if (!radius || !fadetime)
-	//DeadCode DAW 21Jun99 			INT3;
-	//DeadCode DAW 21Jun99 #endif
 			if (radius && fadetime>0)									//RJS 09Jul99
 			{
 				if (lifegone > adptr->FadeTime)
@@ -6628,14 +6233,6 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 					if (!avdist)
 						avdist = 1;
 
-		//DeadCode RJS 24Nov98 			fadetype = SMOKED_SOLID - fadetype;
-		//DeadCode RJS 24Nov98 			ThisDepth -= fadetype;
-		//DeadCode RJS 24Nov98 			if (ThisDepth < SMOKED_LIGHT)
-		//DeadCode RJS 24Nov98 			{
-		//DeadCode RJS 24Nov98 				Degrade = ((SMOKED_LIGHT - ThisDepth) / 63)+1;	//RJS 27Mar98
-		//DeadCode RJS 24Nov98 				ThisDepth = SMOKED_LIGHT;
-		//DeadCode RJS 24Nov98 				avdist /= Degrade;
-		//DeadCode RJS 24Nov98 			}
 
 					theImap = (ImageMapNumber) ptr->Imagemap;
 					theImap2 = (ImageMapNumber) ptr->Imagemap2;
@@ -6706,7 +6303,6 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 							pixpercyl = (pixpercyl * ThisDepth)/100;
 							pixpercyl = (pixpercyl*ptr->Density)>>7;
 
-		//DeadCode RJS 29Jun99 					if (doingHW3D)								//PD 19Jun98
 	 							SHAPE.ParticleCylinderImapd(0,1,
  															xoff0,yoff0,
  															xoff1,yoff1,
@@ -6716,26 +6312,10 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 															minx,miny,
  															ptr->Width, ptr->Height,
 		 													ThisDepth);
-		//DeadCode DAW 30Jun99 					else
-		//DeadCode DAW 30Jun99 						SHAPE.ParticleCylinderPlain(0,1,
-		//DeadCode DAW 30Jun99  													xoff0,yoff0,
-		//DeadCode DAW 30Jun99  													xoff1,yoff1,
-		//DeadCode DAW 30Jun99  													pixpercyl,MaxRadius,
-		//DeadCode DAW 30Jun99  													WCylStartP, WCylEndP,
-		//DeadCode DAW 30Jun99 													ptr->Colour,
-		//DeadCode DAW 30Jun99 		 											ThisDepth);
 						}
 						break;
 						case SMK_STREAM:
 						{
-		//DeadCode MS 10Dec98 					SLong	realdist2 = ptr->FadeDist - realdist;
-		//DeadCode MS 10Dec98 					pixpercyl = (avdist<<2)/avrad;
-		//DeadCode MS 10Dec98 					pixpercyl = 4 + ((realdist2*pixpercyl)/ptr->FadeDist);
-		//DeadCode MS 10Dec98 
-		//DeadCode MS 10Dec98 					if (pixpercyl > 48)
-		//DeadCode MS 10Dec98 						pixpercyl = 48;
-		//DeadCode MS 10Dec98 
-		//DeadCode MS 10Dec98 					pixpercyl = (pixpercyl*ptr->Density)>>7;
 
 							SLong	realdist2 = (realdist << 7) / 7500;	//MS 10Dec98
 							if (realdist2 <= 0)
@@ -6743,9 +6323,7 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 
 							if (realdist2 > 65535)
 								realdist2 = 65535;
-		//DeadCode RJS 29Jun99 #pragma message (__HERE__ "ROB - Unitialised Variable pixpercyl - still there...")
-		//DeadCode RJS 29Jun99 //					if (doingHW3D)								//PD 19Jun98
-								SHAPE.ParticleStreamImapd(	0,1,
+							SHAPE.ParticleStreamImapd(	0,1,
 															xoff0,yoff0,
 															xoff1,yoff1,
 															UWord(realdist2),	//RJS 10Dec98
@@ -6756,16 +6334,6 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 															minx,miny,
 															ptr->Width, ptr->Height,
 															ThisDepth);
-		//DeadCode DAW 30Jun99 //					else
-		//DeadCode DAW 30Jun99 //						SHAPE.ParticleStreamPlain(	0,1,
-		//DeadCode DAW 30Jun99 //													xoff0,yoff0,
-		//DeadCode DAW 30Jun99 //													xoff1,yoff1,
-		//DeadCode DAW 30Jun99 //													pixpercyl,
-		//DeadCode DAW 30Jun99 //													oldrad,
-		//DeadCode DAW 30Jun99 //													radius,
-		//DeadCode DAW 30Jun99 //													WCylStartP, WCylEndP,
-		//DeadCode DAW 30Jun99 //													ptr->Colour,
-		//DeadCode DAW 30Jun99 //													ThisDepth);
 						}
 						break;
 						case SMK_CLUSTER:
@@ -6787,7 +6355,6 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 
 								pixpercyl = ThisDepth * ptr->Density;
 
-		//DeadCode RJS 29Jun99 						if (doingHW3D)								//PD 19Jun98
 	 								SHAPE.ParticleCylinderImapd(0,1,
  																xoff0,yoff0,
  																xoff1,yoff1,
@@ -6797,14 +6364,6 @@ void	shape::dorealisphere(UByteP	&instr_ptr)
 																minx2,miny2,
  																maxx2 - minx2,maxy2-miny2,
 		 														ThisDepth);
-		//DeadCode DAW 30Jun99 						else
-		//DeadCode DAW 30Jun99 							SHAPE.ParticleCylinderPlain(0,1,
-		//DeadCode DAW 30Jun99  														xoff0,yoff0,
-		//DeadCode DAW 30Jun99  														xoff1,yoff1,
-		//DeadCode DAW 30Jun99  														pixpercyl,MaxRadius,
-		//DeadCode DAW 30Jun99  														WCylStartP, WCylEndP,
-		//DeadCode DAW 30Jun99 														ptr->Colour,
-		//DeadCode DAW 30Jun99 		 												ThisDepth);
 							}
 							else
 							{
@@ -6960,7 +6519,6 @@ void shape::SunItemAnim(SunAnimData* adptr)
 
 			if (View_Point && !View_Point->PolyPitEnabled())
 			{
-	//DeadCode PD 12Feb99 			Bool oldState=current_screen->DoSetZUpdate(FALSE);	//PD 25Nov98
 
 				int	i;
 				Float	dx, dy, dz;
@@ -7132,7 +6690,6 @@ void shape::SunItemAnim(SunAnimData* adptr)
 						}
 					}
 				}
-	//DeadCode PD 12Feb99 			current_screen->DoSetZUpdate(oldState);				//PD 25Nov98
 			}
 
  			//Generate the dimensions of a box of screen area
@@ -7188,7 +6745,6 @@ void shape::SunItemAnim(SunAnimData* adptr)
  void shape::doicylinder(UByte *& instr_ptr)
 {
 	DOICYLINDER_PTR ptr= (DOICYLINDER_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;
 	UWord	frameno = 0;
 	ImageMapNumber	imap;
 	UByte			fadedepth = GlobalAdptr[ptr->fadeoff];		//RJS 16Apr99
@@ -7251,14 +6807,6 @@ void shape::SunItemAnim(SunAnimData* adptr)
 
  	dist = (SLong)object_obj3d->Body.Z.f;
 
-//DeadCode CSB 21/01/99	#ifndef NDEBUG													//RJS 02Nov98
-//DeadCode CSB 21/01/99		if (object_obj3d->ItemPtr == Manual_Pilot.ControlledAC2)
-//DeadCode CSB 21/01/99		{
-//DeadCode CSB 21/01/99			char	shite[32];
-//DeadCode CSB 21/01/99			sprintf(shite,"Dist : %d  ",dist);
-//DeadCode CSB 21/01/99			Mono_Text.PrintAt(55,6,(UByteP)shite);
-//DeadCode CSB 21/01/99		}
-//DeadCode CSB 21/01/99	#endif
 
 //	dist *= DistScale;
 //	dist >>= 8;
@@ -7308,111 +6856,6 @@ void shape::SunItemAnim(SunAnimData* adptr)
 //------------------------------------------------------------------------------
  void shape::dodial(UByte *& instr_ptr)
 {
-//DeadCode RJS 29Jan98 	IFShare	xpos,ypos,zpos;
-//DeadCode RJS 29Jan98 	SLong	radius;						
-//DeadCode RJS 29Jan98 	IFShare	xpos2,ypos2,zpos2;
-//DeadCode RJS 29Jan98 	SLong	xpos3,ypos3,zpos3;
-//DeadCode RJS 29Jan98 	SWord	sin_ang,cos_ang,radius2;
-//DeadCode RJS 29Jan98 	SWord	totalangle;
-//DeadCode RJS 29Jan98 	SWord	valuestep;
-//DeadCode RJS 29Jan98 	UWord	vertex;
-//DeadCode RJS 29Jan98 	UWord	object_scale,point_scale,scalefactor;
-//DeadCode RJS 29Jan98 	SWord	angval;
-//DeadCode RJS 29Jan98 	SWord	pulledval;											//RJS 04Oct96
-//DeadCode RJS 29Jan98 	SWord	viewangle;											//RJS 20Nov96
-//DeadCode RJS 29Jan98 	PolyPitAnimData* adptr = (PolyPitAnimData*) object_obj3d->AnimPtr;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 	DODIAL_PTR ptr = (DODIAL_PTR )instr_ptr;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 	viewangle = View_Point.hdg;									//RJS 10Dec96
-//DeadCode RJS 29Jan98 	viewangle += (SWord)Manual_Pilot.ControlledAC2->hdg;				//RJS 10Dec96
-//DeadCode RJS 29Jan98 	if (	(viewangle > (SWord) ANGLES_280Deg)					//RJS 20Nov96
-//DeadCode RJS 29Jan98 		&&	(viewangle < (SWord) ANGLES_80Deg))					//RJS 20Nov96
-//DeadCode RJS 29Jan98 	{
-//DeadCode RJS 29Jan98 		xpos.i = ptr->posx<<shapescale;
-//DeadCode RJS 29Jan98 		ypos.i =  0 - ptr->posy<<shapescale;
-//DeadCode RJS 29Jan98 		zpos.i = ptr->posz<<shapescale;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		radius = ptr->radius;
-//DeadCode RJS 29Jan98 		radius2 = ptr->radius2;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		switch (ptr->dtype)
-//DeadCode RJS 29Jan98 		{
-//DeadCode RJS 29Jan98 			case DT_RPM:
-//DeadCode RJS 29Jan98 				pulledval = adptr->rpmdial;							//RJS 04Oct96
-//DeadCode RJS 29Jan98 				angval = pulledval * ptr->anglestep;				//RJS 04Oct96
-//DeadCode RJS 29Jan98 				break;
-//DeadCode RJS 29Jan98 			case DT_ALT:
-//DeadCode RJS 29Jan98 				pulledval = (object_obj3d->ItemPtr->World.Y * 10) / 305;//RJS 04Oct96
-//DeadCode RJS 29Jan98 				angval = (pulledval * ptr->anglestep) / 100;			//RJS 04Oct96
-//DeadCode RJS 29Jan98 				break;
-//DeadCode RJS 29Jan98 			case DT_MPH:
-//DeadCode RJS 29Jan98 				pulledval = (adptr->veldial * 100) / 447;			//RJS 04Oct96
-//DeadCode RJS 29Jan98 				angval = pulledval * ptr->anglestep;				//RJS 04Oct96
-//DeadCode RJS 29Jan98 				break;
-//DeadCode RJS 29Jan98 			case DT_FUEL:
-//DeadCode RJS 29Jan98 				pulledval = adptr->fuel;							//RJS 04Oct96
-//DeadCode RJS 29Jan98 				angval = pulledval * ptr->anglestep;				//RJS 04Oct96
-//DeadCode RJS 29Jan98 				break;
-//DeadCode RJS 29Jan98 		}
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		if (pulledval > ptr->maxvalue)
-//DeadCode RJS 29Jan98 			angval = ptr->maxvalue * ptr->anglestep;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		totalangle = (SWord)ptr->startangle + angval - (SWord)ANGLES_180Deg;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		Math_Lib.high_sin_cos((Angles) totalangle,sin_ang,cos_ang);
-//DeadCode RJS 29Jan98 		xpos2.i = (sin_ang * radius) / ANGLES_FRACT;
-//DeadCode RJS 29Jan98 		ypos2.i = (cos_ang * radius) / ANGLES_FRACT;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		xpos2.i = xpos.i - xpos2.i;
-//DeadCode RJS 29Jan98 		ypos2.i = ypos.i - ypos2.i;
-//DeadCode RJS 29Jan98 		zpos2.i = zpos.i;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		if (radius != radius2)
-//DeadCode RJS 29Jan98 		{
-//DeadCode RJS 29Jan98 			radius += radius2;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98   			xpos3 = xpos.i;
-//DeadCode RJS 29Jan98   			ypos3 = ypos.i;
-//DeadCode RJS 29Jan98   			zpos3 = zpos.i;
-//DeadCode RJS 29Jan98  
-//DeadCode RJS 29Jan98  			xpos.i = (sin_ang * radius) / ANGLES_FRACT;
-//DeadCode RJS 29Jan98  			ypos.i = (cos_ang * radius) / ANGLES_FRACT;
-//DeadCode RJS 29Jan98  
-//DeadCode RJS 29Jan98  			xpos.i = xpos3- xpos.i;
-//DeadCode RJS 29Jan98  			ypos.i = ypos3- ypos.i;
-//DeadCode RJS 29Jan98 		}
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		_matrix.transform(fpobject_matrix,xpos,ypos,zpos);
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		newco[0].bodyx.f = xpos.f + object_obj3d->Body.X.f;
-//DeadCode RJS 29Jan98 		newco[0].bodyy.f = ypos.f + object_obj3d->Body.Y.f;
-//DeadCode RJS 29Jan98 		newco[0].bodyz.f = zpos.f + object_obj3d->Body.Z.f;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		_matrix.transform(fpobject_matrix,xpos2,ypos2,zpos2);
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		newco[1].bodyx.f = xpos2.f + object_obj3d->Body.X.f;
-//DeadCode RJS 29Jan98 		newco[1].bodyy.f = ypos2.f + object_obj3d->Body.Y.f;
-//DeadCode RJS 29Jan98 		newco[1].bodyz.f = zpos2.f + object_obj3d->Body.Z.f;
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		_matrix.body2screen(newco[0]);				
-//DeadCode RJS 29Jan98 		_matrix.body2screen(newco[1]);
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		SLong	z0,z1;												//PD 20Nov96
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		z0 = (SLong)newco[0].bodyz.f;									//PD 20Nov96
-//DeadCode RJS 29Jan98 		z1 = (SLong)newco[1].bodyz.f;									//PD 20Nov96
-//DeadCode RJS 29Jan98 
-//DeadCode RJS 29Jan98 		if (z0>0&&z1>0)												//PD 20Nov96
-//DeadCode RJS 29Jan98 		{
-//DeadCode RJS 29Jan98  			current_screen->ClipLine3D(	newco[0].screenx.f,		//RJS 26Feb97
-//DeadCode RJS 29Jan98 	 								   	newco[0].screeny.f,		//RJS 26Feb97
-//DeadCode RJS 29Jan98  									   	newco[1].screenx.f,		//RJS 26Feb97
-//DeadCode RJS 29Jan98  									   	newco[1].screeny.f);	//RJS 26Feb97
-//DeadCode RJS 29Jan98 		}
-//DeadCode RJS 29Jan98 	}
-//DeadCode RJS 29Jan98 
 
 	DODIAL_PTR	ptr = (DODIAL_PTR )instr_ptr;
 	IFShare		cx,cy,cz;
@@ -7422,7 +6865,6 @@ void shape::SunItemAnim(SunAnimData* adptr)
 	IFShare		xpos2,ypos2,zpos2;
 	IFShare		xpos3,ypos3,zpos3;
 	SWord		sin_ang,cos_ang,radius2;
-//DeadCode RJS 21Apr99 	UByteP		adptr = (UByteP) object_obj3d->AnimPtr;
 	SLong		flag;
 	SLong		arc;
 	SWord		totalangle = ptr->startangle;
@@ -7462,10 +6904,6 @@ void shape::SunItemAnim(SunAnimData* adptr)
 	cx.i = ptr->xpos;
 	cy.i = -ptr->ypos;
 	cz.i = ptr->zpos;
-//DeadCode PD 05Oct98 	cx.i = ptr->xpos << shapescale;
-//DeadCode PD 05Oct98 	cy.i = -ptr->ypos << shapescale;
-//DeadCode PD 05Oct98 	cz.i = ptr->zpos << shapescale;
-//DeadCode DAW 03Feb98 ==========
 
 	tipx.i += cx.i;
 	tipy.i += cy.i;
@@ -7663,9 +7101,6 @@ void shape::docompass(UByte *& instr_ptr)
 	cx.i = ptr->xpos;
 	cy.i = -ptr->ypos;
 	cz.i = ptr->zpos;
-//DeadCode PD 05Oct98 	cx.i = ptr->xpos << shapescale;
-//DeadCode PD 05Oct98 	cy.i = -ptr->ypos << shapescale;
-//DeadCode PD 05Oct98 	cz.i = ptr->zpos << shapescale;
 
 	Math_Lib.high_sin_cos(object_obj3d->AngR,sin_ang,cos_ang);
 	l1 = (ptr->radius) ? (ptr->radius * POLYGON.Cos_ArcSin((radius2<<8)/ptr->radius)) >> 15 : SHP_DIV0("doincln.radius",0);//RERUN div-by-zero on bad file data
@@ -7769,9 +7204,6 @@ void shape::docompass(UByte *& instr_ptr)
 	tipx.i = (ptr->xpos) - ptr->radius;
 	tipy.i = (-ptr->ypos);
 	tipz.i = (ptr->zpos);
-//DeadCode PD 05Oct98 	tipx.i = (ptr->xpos << shapescale) - ptr->radius;
-//DeadCode PD 05Oct98 	tipy.i = (-ptr->ypos << shapescale);
-//DeadCode PD 05Oct98 	tipz.i = (ptr->zpos << shapescale);
 
 	tipx2.i = tipx.i + (ptr->radius<<1);
 	tipy2.i = tipy.i;
@@ -7900,7 +7332,6 @@ void shape::docompass(UByte *& instr_ptr)
  void shape::doanimation(UByte *&instr_ptr)
 {
 	DOANIMATION_PTR	ptr = (DOANIMATION_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr;			
 	SByte			toggleflag;
 	UByte			loopflag = GlobalAdptr[ptr->loopoffset];
 	SLong			framecounter;
@@ -8094,22 +7525,18 @@ void shape::docompass(UByte *& instr_ptr)
 	if (CollisionOn)		
 	{
 		DODAMAGE_PTR	ptr = (DODAMAGE_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 		UByteP			adptr = damage_AnimPtr;			//RJS 25Aug98
 		UWord			damageflag;									//RJS 27Feb98
-//DeadCode RJS 21Apr99 		UWord			velrand = adptr[ptr->veloffset];
 		ItemPtr			itemhit = damage_ItemPtr;//RJS 25Aug98
 		ULong			thisdead = BS_DEAD;
 		WeapAnimData*	weapon = NULL;								//RJS 23May97
 		MinAnimData*	mad = (MinAnimData*) damage_AnimPtr;				//RJS 27Feb98
 		UWord	randno = Math_Lib.rnd();					//RJS 30Jun98
-//DeadCode RJS 12Feb99 		SLong	realHitStrength = BoxCol::HitterStrength * (BoxCol::HitterDamageType + 1);//RJS 08Jan99
 		SLong	realHitStrength = BoxCol::HitterStrength;		//RJS 12Feb99
 
 		if (!HitThisOffset)
 		{
 			if (ptr->stationno)
 			{
-//DeadCode RJS 21Apr99 				weapon = (WeapAnimData*)(adptr + (sizeof(WeapAnimData)*(ptr->stationno-1)) + sizeof(MinAnimData));
 				MoveGunAnimData* adptr = (MoveGunAnimData*)damage_AnimPtr;
 				weapon = (WeapAnimData*) &adptr->weaponlaunchers[ptr->stationno-1];
 				laststationdamage[0] = weapon->SubDamage;		//RJS 25Nov98
@@ -8158,8 +7585,6 @@ void shape::docompass(UByte *& instr_ptr)
 				vulnerability &= 0xFF;							//RJS 30Jun98
 				if (vulnerability)
 				{
-//DeadCode RJS 12Feb99 					realinc = vulnerability * realHitStrength;	//RJS 06Dec98
-//DeadCode RJS 12Feb99 					damageflag += realinc;							//RJS 22Jan98
 					if (BoxCol::HitterStrength)
 					{
 						ULong	nohitstokill = vulnerability / BoxCol::HitterStrength;
@@ -8220,18 +7645,6 @@ void shape::docompass(UByte *& instr_ptr)
 					else
 						damageflag = thisdead;
 
-//DeadCode RJS 08Feb99 					vulnerability++;	//up to 256
-//DeadCode RJS 08Feb99 					hitstrength = realHitStrength + 1;//up to 32
-//DeadCode RJS 08Feb99 
-//DeadCode RJS 08Feb99 					//random hit strength increment, of maximum 30% power (out of hitterstrength),
-//DeadCode RJS 08Feb99 					//so something of 70% hit strength could do total damage with one hit
-//DeadCode RJS 08Feb99 					randno = (randno * 3 * hitstrength)/7;
-//DeadCode RJS 08Feb99 					hitstrength += (randno>>16);
-//DeadCode RJS 08Feb99 
-//DeadCode RJS 08Feb99 					destruction = thisdead * vulnerability * hitstrength;//RJS 17Nov98
-//DeadCode RJS 08Feb99 					destruction >>= 13;							//RJS 17Nov98
-//DeadCode RJS 08Feb99 
-//DeadCode RJS 08Feb99 					damageflag += destruction;
 				}
 			}
 		}
@@ -8256,7 +7669,6 @@ void shape::docompass(UByte *& instr_ptr)
 			{
 				lastdamptr = &damage_AnimPtr[ptr->flagoffset];				//RJS 27Feb98
 				if (ptr->flagoffset)								//RJS 27Feb98
-//DEADCODE DAW 26/04/99 					damageflag = damage_AnimPtr[ptr->flagoffset];//RJS 21Apr99
 					damageflag = damage_ItemState;					//RJS 26Apr99
 				else
 				{
@@ -8302,7 +7714,6 @@ void shape::docompass(UByte *& instr_ptr)
 // and so ac wont get shoved in same way as in record, resulting in complete
 // breakdown of playback and me getting very annoyed 			//AMM 08Jul99
 					
-//DeadCode AMM 08Jul99 					if (!_Replay.Playback || (itemhit != Persons2::PlayerSeenAC))		//RJS 29Jun99
 					if (!_Replay.Playback && !_Replay.Record)	//AMM 08Jul99
 					{									
 						if (BoxCol::ShoveX || BoxCol::ShoveY || BoxCol::ShoveZ)
@@ -8465,7 +7876,6 @@ void shape::docompass(UByte *& instr_ptr)
 
 							if (itemhit->MigStatus.LaunchFlags.size == FORMATIONSIZE)
 							{
-//DEADCODE JIM 09/09/99 								if (((FormationItem*)itemhit)->AutoMoveInfo.movecode != AUTO_NOPPILOT)//RJS 01Jul99
 									((FormationItem*)itemhit)->BreakForm();
 							}
 							else
@@ -8492,8 +7902,6 @@ void shape::docompass(UByte *& instr_ptr)
 								if (_DPlay.GameType>TEAMPLAY)
 								{
 	// coop games only
-	//DeadCode AMM 08Apr99 								if (hitterscorer)
-	//DeadCode AMM 08Apr99 									_DPlay.NewScoreClaim(hitterscorer,(UniqueID)uniqueid);
 									if (BoxCol::Col_Shooter)		//AMM 08Apr99
 										_DPlay.NewScoreClaim(BoxCol::Col_Shooter,itemhit->uniqueID.bitfieldUid.count);//AMM 08Apr99
 
@@ -8546,7 +7954,6 @@ void shape::docompass(UByte *& instr_ptr)
 	if (CollisionOn)					
 	{
 		DOEFFECT_PTR	ptr = (DOEFFECT_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 		UByteP			adptr = damage_AnimPtr;			//RJS 25Aug98
 		UWord			damageflag;
 		ULong			knockval;
 		UWord			randomval;
@@ -8647,7 +8054,6 @@ void shape::docompass(UByte *& instr_ptr)
 			{
 				switch (thetype)
 				{
-//DeadCode RJS 04Feb99 					case FX_SFX_ALL:									//RJS 15Sep98
 					case FX_SFX:										//RJS 15Sep98
 						BoxCol::AddEffect(thetype,ptr->levelactive,ptr->enumvalue,ptr->randomdelta,NULL,damage_GrpElmt,damage_Shape);
 						break;
@@ -8655,13 +8061,6 @@ void shape::docompass(UByte *& instr_ptr)
 					case FX_RADIO:
 					{
 						// Only trigger if another ac has inflicted this damage...
-//DeadCode RDH 18May99 						TransientItemPtr transhitter = (TransientItemPtr) BoxCol::Col_Hitter;
-//DeadCode RDH 18May99 						if (	transhitter
-//DeadCode RDH 18May99 							&& (transhitter->MigStatus.LaunchFlags.size == TRANSIENTSIZE)
-//DeadCode RDH 18May99 							&& (transhitter->Launcher->MigStatus.LaunchFlags.size >= AIRSTRUCSIZE)	)
-//DeadCode RDH 18May99 						{
-//DeadCode RDH 18May99 							BoxCol::AddEffect(thetype,ptr->levelactive,EffectVal,ptr->randomdelta,(UByteP)weapon,damage_GrpElmt,damage_Shape);
-//DeadCode RDH 18May99 						}
 						if ((BoxCol::Col_Shooter)&&
 							BoxCol::Col_Shooter->MigStatus.LaunchFlags.size >= AIRSTRUCSIZE)		//RDH 18May99
 							BoxCol::AddEffect(thetype,ptr->levelactive,EffectVal,ptr->randomdelta,(UByteP)weapon,damage_GrpElmt,damage_Shape);//RDH 18May99
@@ -8672,7 +8071,6 @@ void shape::docompass(UByte *& instr_ptr)
 						break;
 					case FX_EJECT:
 					{
-//DeadCode RJS 23Mar99 						if (BoxCol::Col_ExplodeIt == FALSE)		//RJS 30Mar98
 						{
 							WorldStuff*	worldptr = mobileitem::currworld;
 							UByte		lastdam = damage_AnimPtr[ptr->enumvalue];//RJS 21Apr99
@@ -8681,7 +8079,6 @@ void shape::docompass(UByte *& instr_ptr)
 							if (lastdam != BS_DEAD)
 							{
 								BoxCol::AddEffect(FX_VISUAL,ptr->levelactive,ANIM_SMALLFLASH,ptr->randomdelta,(UByteP)weapon,damage_GrpElmt,damage_Shape);//RJS 05May99
-//DeadCode RJS 23Mar99 								adptr[ptr->enumvalue] = BS_DEAD;
 
 								Trans_Obj.LaunchBitsOffPart(damage_ItemPtr,
 															lastptr,
@@ -8748,7 +8145,6 @@ void shape::docompass(UByte *& instr_ptr)
 	else
 	{
 		DOCOLLISION_PTR	ptr = (DOCOLLISION_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 		UByteP			adptr = damage_AnimPtr;						//RJS 25Aug98
 		UByte			flag = damage_AnimPtr[ptr->flagoffset];
 		Bool			hitit = FALSE;
 
@@ -8775,7 +8171,6 @@ void shape::docompass(UByte *& instr_ptr)
 				{
 					// Log a successful collision...
 //						DamageNow = TRUE;
-//DeadCode AMM 12Jul99 					CollisionOn = FALSE;
 					_Replay.FakeCollisionOn=true;				//AMM 12Jul99
 
 					SHAPE.LogCollision(	damage_ItemPtr,
@@ -8832,17 +8227,14 @@ void shape::docompass(UByte *& instr_ptr)
 					{
 						// Log a successful collision...
 //						DamageNow = TRUE;
-//DeadCode AMM 12Jul99 						CollisionOn = FALSE;
 						_Replay.FakeCollisionOn=true;			//AMM 12Jul99
 
 						// send calc moved to posstransmitcoll...//AMM 08Jan99
 
-//DeadCode AMM 13Apr99 						if (send == 1)							//AMM 08Jan99
 						if (send==-1)							//AMM 13Apr99
 						{
 // we are going to do this collision so kill the transient that caused it on all machines
 
-//DeadCode AMM 13Apr99 							_DPlay.SendKillTransientsMessage(((TransientItemPtr)(BoxCol::Col_Hitter))->uniqueID.bitfieldUid.count);
 							_DPlay.SendKillTransientsMessage();
 						}
 
@@ -8928,7 +8320,6 @@ void shape::docompass(UByte *& instr_ptr)
  void shape::docaserange(UByte *& instr_ptr)
 {
 	DOCASERANGE_PTR ptr = (DOCASERANGE_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP			adptr = (UByteP) object_obj3d->AnimPtr;	
 	SWord			flag;										//RJS 04Sep97
 	SWord			thisjump;									//RJS 03Sep97
 	UByteP			offset;
@@ -8963,10 +8354,6 @@ void shape::docompass(UByte *& instr_ptr)
 			break;
 	}
 
-//DeadCode RJS 03Sep97 	if (flag < ptr->range)
-//DeadCode RJS 03Sep97 		offset += (ptr->nofields-1) * sizeof(UWord);
-//DeadCode RJS 03Sep97 
-//DeadCode RJS 03Sep97 	instr_ptr += *(UWord *)offset;
 
 	instr_ptr += possiblejump;
 }
@@ -9141,7 +8528,6 @@ void shape::docompass(UByte *& instr_ptr)
 
 	instr_ptr += sizeof(UByte);
 
-//DeadCode RJS 23Apr97	_Error.EmitSysErr(__FILE__":Not a real instruction yet.....(DOTRIFAN)\n");
 }
 
 //------------------------------------------------------------------------------
@@ -9275,7 +8661,6 @@ void shape::docompass(UByte *& instr_ptr)
 
 	instr_ptr += sizeof(UByte);
 
-//DeadCode RJS 23Apr97 	_Error.EmitSysErr(__FILE__":Not a real instruction yet.....(DOTRIZAG)\n");
 }
 
 //------------------------------------------------------------------------------
@@ -9522,7 +8907,6 @@ void shape::docompass(UByte *& instr_ptr)
 
 	instr_ptr += sizeof(UByte);
 
-//DeadCode RJS 23Apr97 	_Error.EmitSysErr(__FILE__":Not a real instruction yet.....(DOTRIZAGFLAT)\n");
 }
 
 //------------------------------------------------------------------------------
@@ -9540,7 +8924,6 @@ void shape::docompass(UByte *& instr_ptr)
  void shape::dostretchpoint(UByte *& instr_ptr)
 {
 	DOSTRETCHPOINT_PTR  ptr = (DOSTRETCHPOINT_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	int					nokills = GlobalAdptr[ptr->killflag];
 	Float				xdiff, ydiff, zdiff;
 	int					killfrac,killdiff;
@@ -9591,7 +8974,6 @@ void shape::docompass(UByte *& instr_ptr)
  void shape::dostretchmap(UByte *& instr_ptr)
 {
 	DOSTRETCHMAP_PTR ptr = (DOSTRETCHMAP_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP			 adptr = (UByteP) object_obj3d->AnimPtr;
 	int				 nokills = GlobalAdptr[ptr->killflag];
 	Float			 xdiff, ydiff, zdiff;
 	int				 killfrac,killdiff;
@@ -9639,7 +9021,6 @@ void shape::doflipvector(UByte *& instr_ptr)		//PD 13Nov97
 	DOFLIPVECTOR_PTR ptr=(DOFLIPVECTOR_PTR )instr_ptr;
 	DoPointStruc& dp=newco[ptr->vertex];
 	dp.intensity=256-dp.intensity;//RJS 13Jul98
-//DeadCode PD 25Aug98 	dp.specular=256-dp.specular;
 	if (dp.intensity<0) dp.intensity=0;
 
 	SLong temp=dp.specular;
@@ -9671,7 +9052,6 @@ void shape::doflipnvec(UByte *& instr_ptr)			//PD 13Nov97
 		dp.intensity=256-dp.intensity;//RJS 13Jul98
 		if (dp.intensity<0) dp.intensity=0;
 
-//DeadCode PD 25Aug98 		dp.specular=256-dp.specular;
 
 		SLong temp=dp.specular;
 		dp.specular=dp.specFlip;
@@ -9696,7 +9076,6 @@ void shape::doflipnvec(UByte *& instr_ptr)			//PD 13Nov97
  void shape::domorphpoint(UByte *& instr_ptr)
 {
 	DOMORPHPOINT_PTR  ptr = (DOMORPHPOINT_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	DOPOINT			ptr2;
 	UByteP			instptr2 = (UByteP) &ptr2;
 	SLong			TotDist;
@@ -9749,7 +9128,6 @@ void shape::domorphnpoints(UByte *& instr_ptr)
 {
 	DOMORPHNPOINTS_PTR  ptr = (DOMORPHNPOINTS_PTR )instr_ptr;
 	MORPHNNEXT_PTR		ptr2;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	DOPOINT			ptr3;
 	UByteP			instptr2 = (UByteP) &ptr3;
 	SLong			TotDist;
@@ -9824,7 +9202,6 @@ void shape::domorphnpoints(UByte *& instr_ptr)
 void shape::douserealtime(UByte *& instr_ptr)
 {
 	DOUSEREALTIME_PTR  ptr = (DOUSEREALTIME_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	ULongP			btimep = (ULongP) &GlobalAdptr[ptr->birthtimeoffset];//RJS 21Apr99
 	ULong			btime = *btimep;
 
@@ -9849,7 +9226,6 @@ void shape::douserealtime(UByte *& instr_ptr)
 void shape::dotimerphase(UByte *& instr_ptr)
 {
 	DOTIMERPHASE_PTR  ptr = (DOTIMERPHASE_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	ULongP			btimep = (ULongP) &GlobalAdptr[ptr->birthtimeoffset];//RJS 21Apr99
 	UWordP			dtimep = (UWordP) &GlobalAdptr[ptr->deltatimeoffset];//RJS 21Apr99
 	ULong			btime = *btimep;
@@ -9905,7 +9281,6 @@ void shape::dotimerphase(UByte *& instr_ptr)
 void shape::dowheeldamage(UByte *& instr_ptr)
 {
 	DOWHEELDAMAGE_PTR  ptr = (DOWHEELDAMAGE_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	UByteP				oldinstr_ptr = instr_ptr;
 	MinAnimData*		mad = (MinAnimData*) GlobalAdptr;
 
@@ -10024,71 +9399,11 @@ void shape::doblobline(UByte *& instr_ptr)
 void shape::dolight(UByte *& instr_ptr)
 {
 	DOLIGHT_PTR	ptr = (DOLIGHT_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP		adptr = (UByteP) object_obj3d->AnimPtr;
 	UWord		frametime;
 	LIGHTDATA_PTR	ldataptr = (LIGHTDATA_PTR) SHAPE.GetLightDataPtr((ShapeNum)object_obj3d->Shape,ptr->lightoffset);
 
 	if (ldataptr)
 	{
-//DeadCode RJS 15Feb99 		DOPOINT dopointno;
-//DeadCode RJS 15Feb99 		UByteP	instr_ptr2 = (UByteP) &dopointno;
-//DeadCode RJS 15Feb99 		Colour	colon = (Colour) ldataptr->colouron;
-//DeadCode RJS 15Feb99 		Colour	coloff = (Colour) ldataptr->colouroff;
-//DeadCode RJS 15Feb99 		DOSETCOLOUR256	tmpinst3;								//RJS 06Jan98
-//DeadCode RJS 15Feb99 		UByteP			tmpinstptr;
-//DeadCode RJS 15Feb99 		Bool			issmooth = FALSE;
-//DeadCode RJS 15Feb99 		UWord			radius = ptr->radius;
-//DeadCode RJS 15Feb99 
-//DeadCode RJS 15Feb99 		tmpinst3.spread = 0;									//RJS 06Jan98
-//DeadCode RJS 15Feb99 		tmpinst3.imap = 0xFF;									//RJS 06Jan98
-//DeadCode RJS 15Feb99 		tmpinst3.basecolour = coloff<<1;						//RJS 06Jan98
-//DeadCode RJS 15Feb99 
-//DeadCode RJS 15Feb99 		if (ptr->animoff)
-//DeadCode RJS 15Feb99 		{
-//DeadCode RJS 15Feb99 			if (ptr->isword)
-//DeadCode RJS 15Feb99 				frametime = *((UWordP)&adptr[ptr->animoff]);
-//DeadCode RJS 15Feb99 			else
-//DeadCode RJS 15Feb99 				frametime = adptr[ptr->animoff];
-//DeadCode RJS 15Feb99 
-//DeadCode RJS 15Feb99 			if (frametime >= ptr->timeoff)
-//DeadCode RJS 15Feb99 			{
-//DeadCode RJS 15Feb99 				if (frametime < ptr->timeup)
-//DeadCode RJS 15Feb99 					tmpinst3.basecolour = coloff<<1;			//RJS 06Jan98
-//DeadCode RJS 15Feb99 				else
-//DeadCode RJS 15Feb99 				{
-//DeadCode RJS 15Feb99 					if (frametime < ptr->timeon)
-//DeadCode RJS 15Feb99 					{
-//DeadCode RJS 15Feb99 						tmpinst3.basecolour = colon<<1;			//RJS 06Jan98
-//DeadCode RJS 15Feb99 						radius += 6;
-//DeadCode RJS 15Feb99 						issmooth = TRUE;
-//DeadCode RJS 15Feb99 					}
-//DeadCode RJS 15Feb99 				}
-//DeadCode RJS 15Feb99 			}
-//DeadCode RJS 15Feb99 		}
-//DeadCode RJS 15Feb99 
-//DeadCode RJS 15Feb99 		tmpinstptr = (UByteP) &tmpinst3;						//RJS 06Jan98
-//DeadCode RJS 15Feb99 		dosetcolour256(tmpinstptr);								//RJS 06Jan98
-//DeadCode RJS 15Feb99 
-//DeadCode RJS 15Feb99 		if (ptr->radius)
-//DeadCode RJS 15Feb99 		{
-//DeadCode RJS 15Feb99 			dopointno.xcoord = ldataptr->xpos;
-//DeadCode RJS 15Feb99 			dopointno.ycoord = ldataptr->ypos;
-//DeadCode RJS 15Feb99 			dopointno.zcoord = ldataptr->zpos;
-//DeadCode RJS 15Feb99 			dopointno.vertex = 0;
-//DeadCode RJS 15Feb99 
-//DeadCode RJS 15Feb99 			dopoint(instr_ptr2);
-//DeadCode RJS 15Feb99 
-//DeadCode RJS 15Feb99 			SHAPE.drawsphere(	0,
-//DeadCode RJS 15Feb99 	 							radius,
-//DeadCode RJS 15Feb99  								shape::colour,
-//DeadCode RJS 15Feb99  								0,
-//DeadCode RJS 15Feb99  								1,
-//DeadCode RJS 15Feb99  								4,
-//DeadCode RJS 15Feb99  								issmooth,
-//DeadCode RJS 15Feb99 								0,
-//DeadCode RJS 15Feb99 								LUM_MAX,
-//DeadCode RJS 15Feb99 								0);								//RJS 21Jan98
-//DeadCode RJS 15Feb99 		}
 		DOPOINT dopointno;
 		UByteP	instr_ptr2 = (UByteP) &dopointno;
 		SWord	minx,miny,maxx,maxy;
@@ -10173,7 +9488,6 @@ void shape::dolight(UByte *& instr_ptr)
 void shape::dolighttimer(UByte *& instr_ptr)
 {
 	DOLIGHTTIMER_PTR	ptr = (DOLIGHTTIMER_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	UWordP				wordptr = (UWordP)&GlobalAdptr[ptr->animoff];
 	UWord				frametime;
 	LightTimerTypes		timertype = (LightTimerTypes)ptr->timertype;
@@ -10223,7 +9537,6 @@ void shape::dolighttimer(UByte *& instr_ptr)
 void shape::dodigitdial(UByte *& instr_ptr)
 {
 	DODIGITDIAL_PTR	ptr = (DODIGITDIAL_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	UWordP				wordptr = (UWordP)&GlobalAdptr[ptr->animoff];
 	Float				dx, dy, dz;
 	Float				dx2, dy2, dz2;
@@ -10340,7 +9653,6 @@ void shape::dodigitdial(UByte *& instr_ptr)
 void shape::donianimverts(UByte *& instr_ptr)
 {
 	DONIANIMVERTS_PTR	ptr = (DONIANIMVERTS_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	NEXTMAP_PTR			mapit;
 	int					counter;
 	int					vertex;
@@ -10411,7 +9723,6 @@ void shape::donianimverts(UByte *& instr_ptr)
 void shape::dosetluminosity(UByte *& instr_ptr)
 {
 	DOSETLUMINOSITY_PTR	ptr = (DOSETLUMINOSITY_PTR) instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP				adptr = (UByteP) object_obj3d->AnimPtr;
 	UByte				depth;
 
 	if (ptr->animoff)
@@ -10448,7 +9759,6 @@ void shape::dosetluminosity(UByte *& instr_ptr)
 void shape::dobitsoffcock(UByte *& instr_ptr)
 {
 	DOBITSOFFCOCK_PTR	ptr = (DOBITSOFFCOCK_PTR )instr_ptr;
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr;
 	ULong	flag = *((ULongP)&GlobalAdptr[ptr->animflag]);
 
 	flag >>= ptr->bitflag;
@@ -10485,7 +9795,6 @@ void shape::doheathaze(UByte *& instr_ptr)
 	}
 	else
 	{
-//DeadCode RJS 21Apr99 		UByteP			adptr = (UByteP) object_obj3d->AnimPtr;
 		SWord			minx, maxx;
 		SWord			miny, maxy;
 		SWord			width, height;
@@ -10546,7 +9855,6 @@ void shape::domorphnsphrs(UByte *& instr_ptr)
 {
 	DOMORPHNSPHRS_PTR ptr = (DOMORPHNSPHRS_PTR )instr_ptr;
 	SLong		 radius;
-//DeadCode RJS 21Apr99 	UByteP		adptr = (UByteP) object_obj3d->AnimPtr;
 	UWord		timeframe;
 	SLong		timefrac;
 	int			lumtype;
@@ -10636,7 +9944,6 @@ void shape::domorphnsphrsimapd(UByte *& instr_ptr)
 {
 	DOMORPHNSPHRSIMAPD_PTR ptr = (DOMORPHNSPHRSIMAPD_PTR )instr_ptr;
 	SLong		 radius;
-//DeadCode RJS 21Apr99 	UByteP		adptr = (UByteP) object_obj3d->AnimPtr;
 	UWord		timeframe;
 	SLong		timefrac;
 	int			lumtype;
@@ -10858,7 +10165,6 @@ void shape::domorphnsphrsimapd(UByte *& instr_ptr)
 	DoPointStruc	*const	subco=new DoPointStruc[64];//RJS 02Dec97
 	Obj3D			backobj3d;
 	int				index;
-//DeadCode DAW 07May99 	Bool			oldsubstat = IsSubShape;
 	DoPointStruc	*oldco;
 	FPMATRIX bupMatrix=light_matrix;			//PD 8May98
 	Bool			oldsubstate = IsSubShape;
@@ -10892,7 +10198,6 @@ void shape::domorphnsphrsimapd(UByte *& instr_ptr)
 
 		*object_obj3d = backobj3d;
 
-//DeadCode DAW 07May99 		IsSubShape = oldsubstat;
  
 		delete [] subco;												//RJS 02Dec97
 	}
@@ -11073,9 +10378,6 @@ void	shape::ForceDamage(	ItemPtr		itm,
 		oldoffset = HitThisOffset;
 
 		adptr = itm->Anim;										//RJS 21Apr99
-//DeadCode AMM 26Apr99 		animptr		damageanim = adptr;
-//DeadCode AMM 26Apr99 		damageanim = damageptr;
-//DeadCode AMM 26Apr99 		offset = damageanim - adptr;
 		offset = adptr.Offset(damageptr);						//AMM 26Apr99
 		sdptr = SHAPESTUFF.GetShapePtr(itm->shape);
 
@@ -11093,7 +10395,6 @@ void	shape::ForceDamage(	ItemPtr		itm,
 			lastdamage[0] = *damageptr;
 			lastdamptr = damageptr;
 
-//DeadCode AMM 26Apr99 			*damageptr = whatstate;
 			damage_ItemState = whatstate;						//AMM 26Apr99
 			CommsDamage = commsdamage;
 			CollisionOn = FALSE;
@@ -11266,7 +10567,6 @@ int shape::GetLiveElementPos(int num, ItemPtr itm, SLong& x, SLong& y, SLong& z)
 	ShapeNum	newshp;
 	if (SHAPESTUFF.GetShapeScale(sdptr)==SHP_GRP)				//JIM 06Sep96
 	{
-//DeadCode RJS 21Apr99 		UByteP	animdataptr = (UByteP )itm->Anim;
 		MinAnimData*	aptr = (MinAnimData*) itm->Anim;			  //MS 06/05/99
 		UByteP	li,instr_ptr = (UByteP )sdptr + sdptr->liveshpref;
 		while ((priority = GetGroupElement(instr_ptr,newshp,x,y,z))!=0 )//RJS 22Nov96
@@ -11293,11 +10593,6 @@ int shape::GetLiveElementPos(int num, ItemPtr itm, SLong& x, SLong& y, SLong& z)
 
 			{
 				FormationItemPtr i3=i2;
-//Old_Code PD 09Dec96 				while (i3 && !i3->uniqueID.deaded && num--)
-//Old_Code PD 09Dec96 				{
-//Old_Code PD 09Dec96 					i2=i3;
-//Old_Code PD 09Dec96 					i3=i3->follower;
-//Old_Code PD 09Dec96 				}
 
 				while (i3)
 				{
@@ -11392,10 +10687,8 @@ SLong shape::SetAnimData(itemptr itm,SWord pack)
 UByte shape::GetNumberOfLaunchers(ShapeNum shpno)
 {
 	ShapeDescPtr	sdptr;
-//DeadCode AMM 30Jul99 	UByteP			launcher_ptr = NULL;
 	UByte 			*instr_ptr;
 	UWord		 	instruction, last_inst;
-//DeadCode AMM 30Jul99 	Bool			go=TRUE;
 	UByte			nolaunchers;
 	DOLAUNCHER_PTR	lptr;
 
@@ -11403,7 +10696,6 @@ UByte shape::GetNumberOfLaunchers(ShapeNum shpno)
 
 	sdptr = SHAPESTUFF.GetShapePtr(shpno);
 
-//DeadCode AMM 30Jul99 	launcher_ptr = (UByteP )sdptr + sdptr->LauncherDataSize;
 
 	if (sdptr->LauncherDataSize)
 	{
@@ -11419,7 +10711,6 @@ UByte shape::GetNumberOfLaunchers(ShapeNum shpno)
 			instruction = (UWord )*instr_ptr;
 
 			instr_ptr ++;
-//DeadCode RJS 19Dec97 			instruction>>=1;
 
 			if(instruction>dosetglassrangeno || instruction==0)
 				_Error.EmitSysErr(__FILE__":Bad instruction in launcher size (%d)",instruction);
@@ -11479,18 +10770,14 @@ SLong shape::GetAnimDataSizeAndCheck(ShapeNum shpno, AnimSizes  theanim, Bool &i
 		switch (animdatasize)				
 		{											
 			case MINANIM:			RETURN(sizeof(MinAnimData));
-//DeadCode RJS 21Apr99 			case EXPLODEANIM:		RETURN(sizeof(ExplodeAnimData));
 			case POLYPITANIM:		RETURN(sizeof(PolyPitAnimData));
 			case BLOKESANIM: 		RETURN(sizeof(BlokesAnimData));
 			case WEAPANIM:			RETURN(sizeof(WeapAnimData));
 			case AIRCRAFTANIM:		RETURN(sizeof(AircraftAnimData));
 			case SUNANIM:			RETURN(sizeof(SunAnimData ));
-//DeadCode RJS 21Apr99 			case FLAMEANIM:			RETURN(sizeof(FireAnimData ));
-//DeadCode RJS 21Apr99 			case BALLOONANIM:		RETURN(sizeof(BalloonAnimData ));
 			case WINDSOCANIM:		RETURN(sizeof(WindsocAnimData ));
 			case BARAGEANIM:		RETURN(sizeof(BarageAnimData ));
 			case MOVEGUNANIM:		RETURN(sizeof(MoveGunAnimData ));
-//DeadCode RJS 21Apr99 			case FIREBALLANIM:		RETURN(sizeof(ExplodeAnimData ));
 			case TANKANIM:			RETURN(sizeof(TwoGunAnimData ));
 			case TRUCKANIM:			RETURN(sizeof(MoveGunAnimData ));
 			case TRAINANIM:			RETURN(sizeof(TrainAnimData ));
@@ -11569,18 +10856,14 @@ SLong shape::GetAnimDataSize(ShapeNum shpno)
 			switch (animdatasize)								//RJS 30Jun97
 			{														//JIM 06Sep96
 				case MINANIM:			RETURN(sizeof(MinAnimData));//JIM 06Sep96
-//DeadCode RJS 21Apr99 				case EXPLODEANIM:		RETURN(sizeof(ExplodeAnimData));
 				case POLYPITANIM:		RETURN(sizeof(PolyPitAnimData));
 				case BLOKESANIM: 		RETURN(sizeof(BlokesAnimData));
 				case WEAPANIM:			RETURN(sizeof(WeapAnimData));
 				case AIRCRAFTANIM:		RETURN(sizeof(AircraftAnimData));
 				case SUNANIM:			RETURN(sizeof(SunAnimData ));						//PD 24Jun96
-//DeadCode RJS 21Apr99 				case FLAMEANIM:			RETURN(sizeof(FireAnimData ));
-//DeadCode RJS 21Apr99 				case BALLOONANIM:		RETURN(sizeof(BalloonAnimData ));
 				case WINDSOCANIM:		RETURN(sizeof(WindsocAnimData ));//RJS 05Jun97
 				case BARAGEANIM:		RETURN(sizeof(BarageAnimData ));
 				case MOVEGUNANIM:		RETURN(sizeof(MoveGunAnimData ));
-//DeadCode RJS 21Apr99 				case FIREBALLANIM:		RETURN(sizeof(ExplodeAnimData ));//RJS 07Feb97
 				case TANKANIM:			RETURN(sizeof(TwoGunAnimData ));//RJS 17Oct96
 				case TRUCKANIM:			RETURN(sizeof(MoveGunAnimData ));//JIM 14Dec96
 				case TRAINANIM:			RETURN(sizeof(TrainAnimData ));//RJS 03Mar98
@@ -11628,7 +10911,6 @@ SByte	shape::GetElementYDelta(ShapeNum	shpno, animptr	&adptr, Coords3D&	pos, SLo
 		{
 			if (mad->itemstate == DEAD)								//RJS 09Jun99
 			{
-	//DeadCode RJS 21Apr99 			delta = *((SByteP)adptr);
 				delta = (SByte) adptr[0];
 				if (delta == -128)
 				{
@@ -11712,76 +10994,6 @@ void shape::InitAnimData(itemptr itm)
 {
 	DefaultAnimData(itm,itm->Anim);								//RJS 21Apr99
 
-//DeadCode RJS 06Jul98 	ShapeDescPtr	sdptr;
-//DeadCode RJS 06Jul98 	UByteP			instr_ptr;
-//DeadCode RJS 06Jul98 	Bool			haslaunchers = FALSE;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 	sdptr = SHAPESTUFF.GetShapePtr(itm->shape);
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 	UByteP	animdataptr = (UByteP )itm->Anim;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 	globinitairitem = NULL;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 	switch (SHAPESTUFF.GetShapeScale(sdptr))					//PD 23Apr96
-//DeadCode RJS 06Jul98 	{
-//DeadCode RJS 06Jul98 		case SHP_GRP:
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 			SLong	tmp;
-//DeadCode RJS 06Jul98 			ShapeNum	newshp;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 			instr_ptr = (UByteP )sdptr + sdptr->liveshpref;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 			while (GetGroupElement(instr_ptr,newshp,tmp,tmp,tmp))
-//DeadCode RJS 06Jul98 			{
-//DeadCode RJS 06Jul98 				if (GetNumberOfLaunchers(newshp) > 0)
-//DeadCode RJS 06Jul98 					haslaunchers = TRUE;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 				InitItemAnim(animdataptr,newshp);
-//DeadCode RJS 06Jul98 				*animdataptr++ = 0x80;							//RJS 20Nov97
-//DeadCode RJS 06Jul98 			}
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 			if (haslaunchers)
-//DeadCode RJS 06Jul98 				sdptr->Type.haslaunchers = TRUE;
-//DeadCode RJS 06Jul98 			else
-//DeadCode RJS 06Jul98 				sdptr->Type.haslaunchers = FALSE;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 			break;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 		case SHP_1CM:
-//DeadCode RJS 06Jul98 		case SHP_4CM:
-//DeadCode RJS 06Jul98 		case SHP_16CM:
-//DeadCode RJS 06Jul98 			if (itm->MigStatus.LaunchFlags.size == AirStrucSize)					//RJS 13May98
-//DeadCode RJS 06Jul98 			{
-//DeadCode RJS 06Jul98 				AirStrucPtr	asptr = (AirStrucPtr) itm;
-//DeadCode RJS 06Jul98 				asptr->weap.left.mass = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.left.drag = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.left.int_fuel = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.left.int_fuel_leakage = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.left.ext_fuel = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.left.ext_fuel_leakage = 0;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 				asptr->weap.centre.mass = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.centre.drag = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.centre.int_fuel = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.centre.int_fuel_leakage = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.centre.ext_fuel = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.centre.ext_fuel_leakage = 0;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 				asptr->weap.right.mass = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.right.drag = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.right.int_fuel = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.right.int_fuel_leakage = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.right.ext_fuel = 0;
-//DeadCode RJS 06Jul98 				asptr->weap.right.ext_fuel_leakage = 0;
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 				asptr->weap.AircraftStatus.UseIntFuel = TRUE;		//Default fuel switch	RJS 23Jun98
-//DeadCode RJS 06Jul98 				asptr->weap.AircraftStatus.FuelDumped = TRUE;		//Default fuel dump		RJS 23Jun98
-//DeadCode RJS 06Jul98 
-//DeadCode RJS 06Jul98 				globinitairitem = asptr;
-//DeadCode RJS 06Jul98 			}
-//DeadCode RJS 06Jul98 			InitItemAnim(animdataptr,itm->shape);					//RJS 13May98
-//DeadCode RJS 06Jul98 			break;
-//DeadCode RJS 06Jul98 	}
 }
 
 //------------------------------------------------------------------------------
@@ -11828,15 +11040,6 @@ SWord shape::InitItemAnim(animptr& adptr,ShapeNum shpno)			//RDH 23Sep96
 			}														//RJS 09Dec96
 				adptr += sizeof(TrainAnimData);						//RJS 07Feb97
 				break;												//RJS 09Dec96
-//DeadCode RJS 21Apr99  			case BRIDGEANIM:										//RJS 20Nov96
-//DeadCode RJS 21Apr99 			case EXPLODEANIM:										//PD 15Apr96
-//DeadCode RJS 21Apr99 				{
-//DeadCode RJS 21Apr99 				ExplodeAnimData* aptr;
-//DeadCode RJS 21Apr99 				aptr = (ExplodeAnimData* )adptr;
-//DeadCode RJS 21Apr99 				aptr->frameno=0;
-//DeadCode RJS 21Apr99 				}
-//DeadCode RJS 21Apr99 				adptr += sizeof(ExplodeAnimData);
-//DeadCode RJS 21Apr99 				break;
 			case TRUCKANIM:											//DAW 14Dec96
 			case TANKANIM:
 			{
@@ -11874,7 +11077,6 @@ SWord shape::InitItemAnim(animptr& adptr,ShapeNum shpno)			//RDH 23Sep96
 				aptr->detailmask |= (1 << COCK3D_PANELGLASSFRONT);			//RJS 25Mar98
 
 //				aptr->compasscount = 0;								//RJS 24Sep96
-	//DeadCode JIM 06Sep96 			aptr->itemstate=ALIVE;
 				}
 				adptr += sizeof(PolyPitAnimData);
 				break;
@@ -11909,45 +11111,7 @@ SWord shape::InitItemAnim(animptr& adptr,ShapeNum shpno)			//RDH 23Sep96
 				adptr += sizeof(SunAnimData);						//PD 24Jun96
 				break;												//PD 24Jun96
 
-//DeadCode RJS 21Apr99 			case FLAMEANIM:											//RJS 10Jul96
-//DeadCode RJS 21Apr99 			{
-//DeadCode RJS 21Apr99 				FireAnimData* aptr;
-//DeadCode RJS 21Apr99 				aptr = (FireAnimData* )adptr;
-//DeadCode RJS 21Apr99 
-//DeadCode RJS 21Apr99 				if (shpno == TroopLauncherShape)					//RJS 10Dec96
-//DeadCode RJS 21Apr99 					aptr->frameno=0;								//RJS 10Dec96
-//DeadCode RJS 21Apr99 				else												//RJS 10Dec96
-//DeadCode RJS 21Apr99 				{													//RJS 10Dec96
-//DeadCode RJS 21Apr99 					if (Math_Lib.rnd() > 60000)							//RJS 06Dec96
-//DeadCode RJS 21Apr99 						aptr->frameno=0;								//RJS 05Dec96
-//DeadCode RJS 21Apr99 					else												//RJS 05Dec96
-//DeadCode RJS 21Apr99 						aptr->frameno=1;								//RJS 05Dec96
-//DeadCode RJS 21Apr99 				}
-//DeadCode RJS 21Apr99 			}
-//DeadCode RJS 21Apr99 			adptr += sizeof(FireAnimData);
-//DeadCode RJS 21Apr99 			break;
-//DeadCode RJS 21Apr99 
-//DeadCode RJS 21Apr99 			case BALLOONANIM:										//RJS 05Aug96
-//DeadCode RJS 21Apr99 				{
-//DeadCode RJS 21Apr99 				BalloonAnimData* aptr;
-//DeadCode RJS 21Apr99 				aptr = (BalloonAnimData* )adptr;
-//DeadCode RJS 21Apr99 				aptr->manjumped=FALSE;
-//DeadCode RJS 21Apr99 				aptr->groundheight=0;
-//DeadCode RJS 21Apr99 				aptr->countdown=10;
-//DeadCode RJS 21Apr99 				aptr->frameno = 0;
-//DeadCode RJS 21Apr99 
-//DeadCode RJS 21Apr99 				}
-//DeadCode RJS 21Apr99 				adptr += sizeof(BalloonAnimData);
-//DeadCode RJS 21Apr99 				break;
 
-	//DeadCode RJS 20Nov96 		case WINDSOCKANIM:										//RJS 12Aug96
-	//DeadCode RJS 20Nov96 			{
-	//DeadCode RJS 20Nov96 			WindsockAnimData* aptr;
-	//DeadCode RJS 20Nov96 			aptr = (WindsockAnimData* )adptr;
-	//DeadCode RJS 20Nov96 			aptr->frameno=0;
-	//DeadCode RJS 20Nov96 			}
-	//DeadCode RJS 20Nov96 			adptr += sizeof(WindsockAnimData);
-	//DeadCode RJS 20Nov96 			break;
 
 			case BARAGEANIM:										//RJS 24Sep96
 				{
@@ -11959,14 +11123,6 @@ SWord shape::InitItemAnim(animptr& adptr,ShapeNum shpno)			//RDH 23Sep96
 				adptr += sizeof(BarageAnimData);
 				break;
 
-//DeadCode RJS 21Apr99 			case FIREBALLANIM:										//RJS 07Oct96
-//DeadCode RJS 21Apr99 				{
-//DeadCode RJS 21Apr99 				ExplodeAnimData* aptr;								//RJS 09Jan97
-//DeadCode RJS 21Apr99 				aptr = (ExplodeAnimData* )adptr;					//RJS 09Jan97
-//DeadCode RJS 21Apr99 				aptr->frameno=0;
-//DeadCode RJS 21Apr99 				}
-//DeadCode RJS 21Apr99 				adptr += sizeof(ExplodeAnimData);					//RJS 09Jan97
-//DeadCode RJS 21Apr99 				break;
 			case TROOPANIM:											//RJS 07Nov96
 				{
 				TroopAnimData* aptr;								
@@ -12105,13 +11261,10 @@ void  shape::AddWeapToAnim(	void*				WeapPtr,
 	//Return weight and drag for this station...
 	addweight = 0;															//RJS 25Aug98
 	adddrag = 0;
-//DeadCode RJS 18Jan99 	if (lchtype == LT_FUEL)
-//DeadCode RJS 18Jan99 		stores = 32767;
 
 	UWord	muzandweapIndex;									//RJS 27May99
 	if (foundweap)
 	{
-//DeadCode RJS 27May99 		UWord	muzandweapIndex;										//RJS 25Aug98
 
 		addweight = WeapRec->LchList[i].Weight;
 		adddrag = WeapRec->LchList[i].Drag;
@@ -12287,7 +11440,6 @@ void	shape::AddMassAndDrag(UByteP	instr_ptr, int	launcher, int count, int mass, 
 			if (launcher == LT_FUEL)
 			{
 				WIPtr->ext_fuel = count;						//RJS 21May99
-//DeadCode RJS 21May99 				WIPtrR->ext_fuel = count;
 				globinitairitem->weap.AircraftStatus.UseIntFuel = FALSE;		//RJS 25Jan99
 				globinitairitem->weap.AircraftStatus.FuelDumped = FALSE;		//RJS 25Jan99
 				globinitairitem->weap.AircraftStatus.StoresDumped = FALSE;		//RDH 04/03/99
@@ -12295,16 +11447,6 @@ void	shape::AddMassAndDrag(UByteP	instr_ptr, int	launcher, int count, int mass, 
 				totdrag = drag;									//RJS 25Jan99
 
 				WIPtr->ext_launcher = launcherindex;			//RJS 21May99
-//DeadCode RJS 21May99 				if (dx < 0)
-//DeadCode RJS 21May99 				{
-//DeadCode RJS 21May99 					WIPtrL->ext_launcher = launcherindex;
-//DeadCode RJS 21May99 					WIPtrR->ext_launcher = launcherindex+1;
-//DeadCode RJS 21May99 				}
-//DeadCode RJS 21May99 				else
-//DeadCode RJS 21May99 				{
-//DeadCode RJS 21May99 					WIPtrR->ext_launcher = launcherindex;
-//DeadCode RJS 21May99 					WIPtrL->ext_launcher = launcherindex+1;
-//DeadCode RJS 21May99 				}
 			}
 			else
 			{													//RJS 25Jan99
@@ -12313,16 +11455,11 @@ void	shape::AddMassAndDrag(UByteP	instr_ptr, int	launcher, int count, int mass, 
 																//RJS 25Jan99
 				WIPtr->reloadmass += totmass;					//RJS 21May99
  				WIPtr->reloaddrag += totdrag;					//RJS 21May99
-//DeadCode RJS 21May99 																//RJS 25Jan99
-//DeadCode RJS 21May99 				WIPtrR->reloadmass += totmass;					//RJS 25Jan99
-//DeadCode RJS 21May99 				WIPtrR->reloaddrag += totdrag;					//RJS 25Jan99
 			}													//RJS 25Jan99
 
 			WIPtr->mass += totmass;								//RJS 21May99
 			WIPtr->drag += totdrag;								//RJS 21May99
 
-//DeadCode RJS 21May99 			WIPtrR->mass += totmass;							//RJS 25Jan99
-//DeadCode RJS 21May99 			WIPtrR->drag += totdrag;							//RJS 25Jan99
 		}
 		else
 		{
@@ -12401,7 +11538,6 @@ SWord shape::InitLauncherAnim(animptr& adptr,ShapeNum shpno,int  packno)
 			instruction = (UWord )*instr_ptr;
 
 			instr_ptr ++;
-//DeadCode RJS 19Dec97 			instruction>>=1;
 
 			if(instruction>dosetglassrangeno || instruction==0)
 				_Error.EmitSysErr(__FILE__":Bad instruction in launcher shape (%d)",instruction);
@@ -12565,7 +11701,6 @@ UByteP shape::GetLauncherPos(ShapeNum	shpno, UByte	offset)
 			instruction = (UWord) *instr_ptr;
 			instr_ptr++;
 
-//DeadCode RJS 19Dec97 			instruction >>= 1;
 
 			if (instruction == dolauncherno)
 				return(instr_ptr);
@@ -12578,40 +11713,6 @@ UByteP shape::GetLauncherPos(ShapeNum	shpno, UByte	offset)
 					_Error.EmitSysErr(__FILE__":Bad launcher instruction (%d)",instruction);
 			}
 
-//DeadCode RJS 21May97 			while (go)
-//DeadCode RJS 21May97 			{
-//DeadCode RJS 21May97 				instruction = (UWord )*instr_ptr;
-//DeadCode RJS 21May97 
-//DeadCode RJS 21May97 				instr_ptr ++;
-//DeadCode RJS 21May97 				instruction>>=1;
-//DeadCode RJS 21May97 
-//DeadCode RJS 21May97 				if(instruction>dosetglassrangeno || instruction==0)
-//DeadCode RJS 21May97 					_Error.EmitSysErr(__FILE__":Bad instruction in launcher GetLauncherPos (%d)",instruction);
-//DeadCode RJS 21May97 
-//DeadCode RJS 21May97 				if(instruction==doretno || instruction==doendno)//JIM 29Sep96
-//DeadCode RJS 21May97 					go=FALSE;
-//DeadCode RJS 21May97 				else
-//DeadCode RJS 21May97 				{
-//DeadCode RJS 21May97 					switch (instruction)
-//DeadCode RJS 21May97 					{
-//DeadCode RJS 21May97 						case dolauncherno:
-//DeadCode RJS 21May97 							{
-//DeadCode RJS 21May97 								if (offset > 0)
-//DeadCode RJS 21May97 									offset--;
-//DeadCode RJS 21May97 								else
-//DeadCode RJS 21May97 								{
-//DeadCode RJS 21May97 									RETURN(instr_ptr);			//JIM 29Sep96
-//DeadCode RJS 21May97 								}
-//DeadCode RJS 21May97 
-//DeadCode RJS 21May97 								instr_ptr += sizeof(DOLAUNCHER);
-//DeadCode RJS 21May97 							}
-//DeadCode RJS 21May97 						break;
-//DeadCode RJS 21May97 						default:
-//DeadCode RJS 21May97 							_Error.EmitSysErr(__FILE__":Bad launcher instruction (%d)",instruction);
-//DeadCode RJS 21May97 					}
-//DeadCode RJS 21May97 				}
-//DeadCode RJS 21May97 
-//DeadCode RJS 21May97 			}
 		}
 	}
 	else														//JIM 29Sep96
@@ -12668,36 +11769,6 @@ void	shape::GetContactPoint(	itemptr itm,LnchrType ct,
 	SLong			xpos, ypos, zpos;							//RJS 12Aug97
 	Bool			inCock = FALSE;
 
-//DeadCode RJS 21Apr99  	if ((itm == Manual_Pilot.ControlledAC2) && View_Point)
-//DeadCode RJS 21Apr99  	{
-//DeadCode RJS 21Apr99  		if (View_Point)
-//DeadCode RJS 21Apr99 		{
-//DeadCode RJS 21Apr99 			if (View_Point->PolyPitEnabled())
-//DeadCode RJS 21Apr99  			{
-//DeadCode RJS 21Apr99 	 			clstyp = Manual_Pilot.ControlledAC2->classtype;
-//DeadCode RJS 21Apr99  				if (View_Point->viewnum.viewmode == VM_Inside)
-//DeadCode RJS 21Apr99  					shpno = clstyp->cockpit1;
-//DeadCode RJS 21Apr99  				else
-//DeadCode RJS 21Apr99  					shpno = clstyp->cockpit2;
-//DeadCode RJS 21Apr99 
-//DeadCode RJS 21Apr99 				inCock = TRUE;
-//DeadCode RJS 21Apr99 			}
-//DeadCode RJS 21Apr99 			else
-//DeadCode RJS 21Apr99 			{
-//DeadCode RJS 21Apr99 				if (View_Point->viewnum.viewmode == VM_InsideCheat)
-//DeadCode RJS 21Apr99 				{
-//DeadCode RJS 21Apr99 					clstyp = Manual_Pilot.ControlledAC2->classtype;
-//DeadCode RJS 21Apr99 					shpno = clstyp->cockpit1;
-//DeadCode RJS 21Apr99 					inCock = TRUE;
-//DeadCode RJS 21Apr99 				}
-//DeadCode RJS 21Apr99 				else
-//DeadCode RJS 21Apr99 					shpno = itm->shape;
-//DeadCode RJS 21Apr99 			}
-//DeadCode RJS 21Apr99  		}
-//DeadCode RJS 21Apr99  		else
-//DeadCode RJS 21Apr99  			shpno = itm->shape;
-//DeadCode RJS 21Apr99  	}
-//DeadCode RJS 21Apr99  	else
 	shpno = itm->shape;											//RJS 21Apr99
 
  	sdptr = SHAPESTUFF.GetShapePtr(shpno);
@@ -12727,21 +11798,12 @@ void	shape::GetContactPoint(	itemptr itm,LnchrType ct,
 
 		if (thislaunch)
 		{
-//DeadCode RJS 17Mar97 			if (thislaunch->lnchrtype==LT_CONTACT)
-//DeadCode RJS 17Mar97 			{
-//DeadCode RJS 17Mar97 				target--;
-//DeadCode RJS 17Mar97 				if (target<0)
-//DeadCode RJS 17Mar97 					break;
-//DeadCode RJS 17Mar97 			}
 
 			if (thislaunch->lnchrtype == ct)
 			{
  				xpos = thislaunch->posx << thisscale;			//RJS 10Feb99
  				ypos = thislaunch->posy << thisscale;			//RJS 10Feb99
  				zpos = thislaunch->posz << thisscale;			//RJS 10Feb99
-//DeadCode RJS 10Feb99 				xpos = thislaunch->posx;						//RJS 27Aug97
-//DeadCode RJS 10Feb99 				ypos = thislaunch->posy;						//RJS 27Aug97
-//DeadCode RJS 10Feb99 				zpos = thislaunch->posz;						//RJS 27Aug97
 
 
 				// Set dummy suspension pushed-in default to fully suspended...
@@ -12757,9 +11819,6 @@ void	shape::GetContactPoint(	itemptr itm,LnchrType ct,
  						dummyoffset.X = dummylaunch->posx << thisscale;//RJS 10Feb99
  						dummyoffset.Y = dummylaunch->posy << thisscale;//RJS 10Feb99
  						dummyoffset.Z = dummylaunch->posz << thisscale;//RJS 10Feb99
-//DeadCode RJS 10Feb99 						dummyoffset.X = dummylaunch->posx;		//RJS 27Aug97
-//DeadCode RJS 10Feb99 						dummyoffset.Y = dummylaunch->posy;		//RJS 27Aug97
-//DeadCode RJS 10Feb99 						dummyoffset.Z = dummylaunch->posz;		//RJS 27Aug97
 					}
 				}
 				break;
@@ -12773,7 +11832,6 @@ void	shape::GetContactPoint(	itemptr itm,LnchrType ct,
 
 	if (goffset)	delete (goffset);
 
-//DeadCode RJS 12Aug97 	return((UByteP) dummylaunch);								//RJS 13Jun97
 }
 
 //------------------------------------------------------------------------------
@@ -12894,40 +11952,7 @@ WeapAnimData* shape::GetWeaponLauncher(itemptr	itm, UByte	index,
  	{
  		ClassPtr			clstyp = Manual_Pilot.ControlledAC2->classtype;
  
-//DEADCODE DAW 12/04/99  		if (View_Point->PolyPitEnabled())
-//DEADCODE DAW 12/04/99  		{
-//DEADCODE DAW 12/04/99  			if (View_Point->viewnum.viewmode == VM_Inside)
-//DEADCODE DAW 12/04/99 			{
-//DEADCODE DAW 12/04/99 				shape = clstyp->cockpit1;//RJS 19Jan99
-//DEADCODE DAW 12/04/99 				scaleshape = shape;								//RJS 15Mar99
-//DEADCODE DAW 12/04/99 // 				tmpsdptr = SHAPESTUFF.GetShapePtr(clstyp->cockpit1);
-//DEADCODE DAW 12/04/99 			}
-//DEADCODE DAW 12/04/99  			else
-//DEADCODE DAW 12/04/99 			{
-//DEADCODE DAW 12/04/99 				shape = clstyp->cockpit2;//RJS 19Jan99
-//DEADCODE DAW 12/04/99  //				tmpsdptr = SHAPESTUFF.GetShapePtr(clstyp->cockpit2);
-//DEADCODE DAW 12/04/99 			}
-//DEADCODE DAW 12/04/99 			incock = TRUE;
-//DEADCODE DAW 12/04/99  		}
-//DEADCODE DAW 12/04/99  		else
-//DEADCODE DAW 12/04/99  		{
-//DEADCODE DAW 12/04/99  			if (View_Point->viewnum.viewmode == VM_InsideCheat)
-//DEADCODE DAW 12/04/99 			{
-//DEADCODE DAW 12/04/99 				shape = clstyp->cockpit1;//RJS 19Jan99
-//DEADCODE DAW 12/04/99 				scaleshape = shape;								//RJS 15Mar99
-//DEADCODE DAW 12/04/99 // 				tmpsdptr = SHAPESTUFF.GetShapePtr(clstyp->cockpit1);
-//DEADCODE DAW 12/04/99 				incock = TRUE;
-//DEADCODE DAW 12/04/99 			}
-//DEADCODE DAW 12/04/99  			else
-//DEADCODE DAW 12/04/99  				tmpsdptr = SHAPESTUFF.GetShapePtr(shape);
-//DEADCODE DAW 12/04/99  		}
 
-//DeadCode RDH 08Dec98  		eyeDelta.X = tmpsdptr->EyeDeltaX;
-//DeadCode RDH 08Dec98  		eyeDelta.Y = tmpsdptr->EyeDeltaY;
-//DeadCode RDH 08Dec98  		eyeDelta.Z = tmpsdptr->EyeDeltaZ;
-//DeadCode RDH 08Dec98  	}
-//DeadCode RDH 08Dec98  	else
-//DeadCode RDH 08Dec98  	{
 		eyeDelta.X = 0;
 		eyeDelta.Y = 0;
 		eyeDelta.Z = 0;
@@ -13149,8 +12174,6 @@ Bool shape::GetNearestTrench(	itemptr	itm,
 			if (	(shape == TrenchShapeBrit)
 				||	(shape == TrenchShapeGerm)	)				//RJS 15Dec96
 			{
-//DeadCode JIM 18Dec96 			if (shape == TrenchShape)
-//DeadCode JIM 18Dec96 			{
 				foundone = TRUE;
 
 				gx += itm->World.X;
@@ -13283,8 +12306,6 @@ SLong	shape::ReduceLauncherLoad(	AirStrucPtr	itm,
 		weapon = (WeapAnimData*) &adptr->weaponlaunchers[index];
 		if ((weapon->LauncherType == LT_FUEL) || (!Save_Data.gamedifficulty[GD_UNLIMITEDARM]))//RJS 06May99
 		{
-//DeadCode RJS 18Jun99 			stores = weapon->LoadedStores;
-//DeadCode RJS 18Jun99 			if (stores)
  			{
 				UWord	index_shpweap = itm->weap.shpweapindex;						//RDH 03Aug98
 				UWord	index_weap;
@@ -13689,8 +12710,6 @@ UByteP shape::CopyAnimData(animptr& adptr,ShapeNum shpno)
 	for (j=0; j < adsize; j++)
 		dstptr[j] = adptr[j];
 
-//DeadCode RJS 21Apr99 	for (j=adsize;j--;)
-//DeadCode RJS 21Apr99 		*dstptr++ = *adptr++;
 
 	return(retval);
 }
@@ -13713,49 +12732,12 @@ void shape::ResetAnimFlags()
 
 	int	j;
 
-//DeadCode RJS 26Nov96 	for (j=MAXANIMFLAG;j--;)
-//DeadCode RJS 26Nov96 		*tmp++=0;
 
 	for (j=MAXANIMFLAG-2;j--;)									//RJS 26Nov96
 		*tmp++=0;
 }
 
-//DeadCode RJS 05Jun97 //------------------------------------------------------------------------------
-//DeadCode RJS 05Jun97 //Procedure		SimpleItemAnim
-//DeadCode RJS 05Jun97 //Author		Paul.   
-//DeadCode RJS 05Jun97 //Date			Wed 27 Mar 1996
-//DeadCode RJS 05Jun97 //
-//DeadCode RJS 05Jun97 //Description	
-//DeadCode RJS 05Jun97 //
-//DeadCode RJS 05Jun97 //Inputs		
-//DeadCode RJS 05Jun97 //
-//DeadCode RJS 05Jun97 //Returns	
-//DeadCode RJS 05Jun97 //
-//DeadCode RJS 05Jun97 //------------------------------------------------------------------------------
-//DeadCode RJS 05Jun97 void shape::SimpleItemAnim(MinAnimData* adptr)
-//DeadCode RJS 05Jun97 {
-//DeadCode RJS 05Jun97 	if (adptr)													//PD 02Apr96
-//DeadCode RJS 05Jun97 		*(animflags+ITEMSTATE) = (UByte )(adptr->itemstate);	//PD 02Apr96
-//DeadCode RJS 05Jun97 }
 
-//DeadCode RJS 05Jun97 //------------------------------------------------------------------------------
-//DeadCode RJS 05Jun97 //Procedure		ExplodeItemAnim
-//DeadCode RJS 05Jun97 //Author		Paul.   
-//DeadCode RJS 05Jun97 //Date			Mon 15 Apr 1996
-//DeadCode RJS 05Jun97 //
-//DeadCode RJS 05Jun97 //Description	
-//DeadCode RJS 05Jun97 //
-//DeadCode RJS 05Jun97 //Inputs		
-//DeadCode RJS 05Jun97 //
-//DeadCode RJS 05Jun97 //Returns	
-//DeadCode RJS 05Jun97 //
-//DeadCode RJS 05Jun97 //------------------------------------------------------------------------------
-//DeadCode RJS 05Jun97 void shape::ExplodeItemAnim(ExplodeAnimData* adptr)
-//DeadCode RJS 05Jun97 {
-//DeadCode RJS 05Jun97 //DeadCode RJS 05Jun97 	SimpleItemAnim((MinAnimData* )adptr);
-//DeadCode RJS 05Jun97 
-//DeadCode RJS 05Jun97 	*(animflags+EXPLODEFRAME) = adptr->frameno;
-//DeadCode RJS 05Jun97 }
 
 //------------------------------------------------------------------------------
 //Procedure		FlameItemAnim
@@ -13772,26 +12754,6 @@ void shape::ResetAnimFlags()
 void shape::FlameItemAnim(FireAnimData* adptr)
 
 {
-//DeadCode RJS 05Jun97 	SimpleItemAnim((MinAnimData* )adptr);
-//DeadCode RJS 16Nov98 
-//DeadCode RJS 16Nov98 	if (!Three_Dee.IsPaused())									//RJS 27Feb98
-//DeadCode RJS 16Nov98 	{
-//DeadCode RJS 16Nov98 		WorldStuff*	worldptr = mobileitem::currworld;				//RJS 08Nov96
-//DeadCode RJS 16Nov98 
-//DeadCode RJS 16Nov98 	//DeadCode RJS 18Oct96 	*(animflags+EXPLODEFRAME) = adptr->frameno;
-//DeadCode RJS 16Nov98 		if (object_obj3d->Shape == TroopLauncherShape)
-//DeadCode RJS 16Nov98 		{
-//DeadCode RJS 16Nov98 			if (adptr->frameno == 0)								
-//DeadCode RJS 16Nov98 				Trans_Obj.LaunchTroops((mobileitem*) object_obj3d->ItemPtr,0,0,0,*worldptr);				//RJS 08Nov96
-//DeadCode RJS 16Nov98 		}
-//DeadCode RJS 16Nov98 		else
-//DeadCode RJS 16Nov98 		{
-//DeadCode RJS 16Nov98 			if (	(Math_Lib.rnd() > 65000)					//RJS 10Dec96
-//DeadCode RJS 16Nov98 				&&  (adptr->frameno == 0)
-//DeadCode RJS 16Nov98 				&&	(object_obj3d->realbz.f < (Float)30000))
-//DeadCode RJS 16Nov98 				Trans_Obj.LaunchBirds((mobileitem*) object_obj3d->ItemPtr,BirdShape,*worldptr);
-//DeadCode RJS 16Nov98 		}
-//DeadCode RJS 16Nov98 	}
 }
 
 //------------------------------------------------------------------------------
@@ -13812,7 +12774,6 @@ void shape::BalloonItemAnim(BalloonAnimData* adptr, Obj3DPtr thisobj3d)
 {
 	SLong	yshift;
 
-//DeadCode RJS 05Jun97 	SimpleItemAnim((MinAnimData* )adptr);
 
 	if (!Three_Dee.IsPaused())									//RJS 27Feb98
 	{
@@ -13862,7 +12823,6 @@ void shape::BalloonItemAnim(BalloonAnimData* adptr, Obj3DPtr thisobj3d)
 					{
 						WorldStuff*	worldptr = mobileitem::currworld;
 						Trans_Obj.LaunchBigExplosion((mobileitem*) thisobj3d->ItemPtr,*worldptr);
-//DeadCode RDH 17Dec96 						worldptr->RemoveFromWorld(thisobj3d->ItemPtr);
 						thisobj3d->ItemPtr->shape = EMPTY;		//RDH 17Dec96
 					}
 				}
@@ -13914,8 +12874,6 @@ void shape::WindsockItemAnim(WindsocAnimData* adptr)			//RJS 05Jun97
 //------------------------------------------------------------------------------
 void shape::MoveGunItemAnim(MoveGunAnimData* adptr)
 {
-//DeadCode RJS 19Jun97  	FPMATRIX		smat;									 	//RJS 14May97
-//DeadCode RJS 19Jun97  	FPMATRIX_PTR	stan_matrix = &smat;					 	//RJS 14May97
  	SWord		pitchscale;
  	UWord		framestep = ANGLES_90Deg / 6;			 
  	ANGLES		thehdg, thepitch;
@@ -13927,16 +12885,11 @@ void shape::MoveGunItemAnim(MoveGunAnimData* adptr)
  		thehdg = (Angles)weapon->hdg;							//RJS 12Jan98
  		thepitch = (Angles)weapon->pitch;						//RJS 12Jan98
  
-//DeadCode RJS 19Jun97 		*stan_matrix=*Three_Dee.fpviewer_matrix;				//RJS 14May97
-//DeadCode RJS 19Jun97 
-//DeadCode RJS 19Jun97  		_matrix.generate2(thehdg,ANGLES_0Deg,ANGLES_0Deg,fpobject_matrix);//RJS 14May97
-//DeadCode RJS 19Jun97  		_matrix.multiply(fpobject_matrix,stan_matrix);			//RJS 14May97
  
 		object_obj3d->AngH = thehdg;							//RJS 19Jun97
 		object_obj3d->AngC = ANGLES_0Deg;						//RJS 19Jun97
 		object_obj3d->AngR = ANGLES_0Deg;						//RJS 19Jun97
 
-//DeadCode RJS 05Jun97  		SimpleItemAnim((MinAnimData* )adptr);
  
   		pitchscale = ((SWord)thepitch / framestep);
  
@@ -13968,7 +12921,6 @@ void shape::TankItemAnim(MoveGunAnimData* adptr)
 	UWord		framestep = ANGLES_90Deg / 6;			 
 	ANGLES		thepitch;
 
-//DeadCode RJS 05Jun97 	SimpleItemAnim((MinAnimData* )adptr);						//RJS 14Nov96
 
 	if ((adptr->itemstate == ALIVE)	&& !Three_Dee.IsPaused())	//RJS 27Feb98
 	{
@@ -13981,7 +12933,6 @@ void shape::TankItemAnim(MoveGunAnimData* adptr)
 			WorldStuff*	worldptr = mobileitem::currworld;			//RJS 13Nov96
 			WeapAnimData*	weapon = (WeapAnimData*) &adptr->weaponlaunchers[0];//RJS 05Jun97
 
-//DeadCode RJS 05Jun97 			SimpleItemAnim((MinAnimData* )adptr);
 
  			pitchscale = ((SWord)weapon->pitch / framestep);			//RJS 05Jun97
 
@@ -14000,8 +12951,6 @@ void shape::TankItemAnim(MoveGunAnimData* adptr)
 
 			if (object_obj3d->ItemPtr->MigStatus.LaunchFlags.size == FORMATIONSIZE)//RJS 15Dec96
 			{
-//DeadCode RJS 20Apr98 				_Miles.PlayLooped(FIL_SFX_TANK_LOOP1, (ItemBasePtr) object_obj3d->ItemPtr,128,8);//RJS 22Nov96
-//DeadCode RJS 27Aug98 				Trans_Obj.LaunchDustTrail((mobileitem*) object_obj3d->ItemPtr,*worldptr,distance);//RJS 13Nov96
 			}
 		}
 	}
@@ -14087,38 +13036,6 @@ void shape::TrainItemAnim(TrainAnimData* adptr)
 //------------------------------------------------------------------------------
 void shape::TroopItemAnim(TroopAnimData* adptr,TroopAnimData* adptr2)
 {
-//DeadCode RJS 05Jun97 	SimpleItemAnim((MinAnimData* )adptr);
-//DeadCode RJS 26Nov98 	UByte	frameno;											//RJS 26Nov96
-//DeadCode RJS 26Nov98 
-//DeadCode RJS 26Nov98 	frameno = *(animflags+TROOPFRAME);							//RJS 26Nov96
-//DeadCode RJS 26Nov98 
-//DeadCode RJS 26Nov98 	if (!Three_Dee.IsPaused())									//RJS 27Feb98
-//DeadCode RJS 26Nov98 	{
-//DeadCode RJS 26Nov98 		if (object_obj3d->ItemPtr->shape == TinyFireShape)		//RJS 06Dec96
-//DeadCode RJS 26Nov98 		{
-//DeadCode RJS 26Nov98 			if (adptr2->frameno < 3)								//RJS 06Dec96
-//DeadCode RJS 26Nov98 				adptr2->frameno++;								//RJS 06Dec96
-//DeadCode RJS 26Nov98 			else												//RJS 06Dec96
-//DeadCode RJS 26Nov98 				adptr2->frameno = 0;								//RJS 06Dec96
-//DeadCode RJS 26Nov98 
-//DeadCode RJS 26Nov98 			*(animflags+EXPLODEFRAME) = adptr2->frameno;		//RJS 06Dec96
-//DeadCode RJS 26Nov98 		}
-//DeadCode RJS 26Nov98 		else
-//DeadCode RJS 26Nov98 		{
-//DeadCode RJS 26Nov98 			if (adptr->itemstate != DEAD)							//RJS 05Dec96
-//DeadCode RJS 26Nov98 			{
-//DeadCode RJS 26Nov98 				if (frameno < 2)									//RJS 26Nov96
-//DeadCode RJS 26Nov98 					frameno++;										//RJS 26Nov96
-//DeadCode RJS 26Nov98 				else
-//DeadCode RJS 26Nov98 					frameno = 0;									//RJS 26Nov96
-//DeadCode RJS 26Nov98 			}
-//DeadCode RJS 26Nov98 			else
-//DeadCode RJS 26Nov98 				frameno = 3;										//RJS 26Nov96
-//DeadCode RJS 26Nov98 
-//DeadCode RJS 26Nov98 			*(animflags+TROOPFRAME) = frameno;					//RJS 06Dec96
-//DeadCode RJS 26Nov98 			*(animflags+EXPLODEFRAME) = frameno;				//RJS 06Dec96
-//DeadCode RJS 26Nov98 		}
-//DeadCode RJS 26Nov98 	}
 }
 
 //------------------------------------------------------------------------------
@@ -14185,7 +13102,6 @@ void shape::BarageItemAnim(BarageAnimData* adptr)
 
 		if (Math_Lib.rnd() > 63000)												//RJS 24Jun99
 			_Miles.PlayDelayed(FIL_SFX_MACHINE_GUN_LOOP1,object_obj3d->ItemPtr);//PD 13Aug99
-//DeadCode DAW 25Jun99 		_Miles.PlayLooped(FIL_SFX_BATTLEFIELD_LOOP, (ItemBasePtr) object_obj3d->ItemPtr,128,8);//RJS 22Nov96
 	}
 }
 
@@ -14203,19 +13119,7 @@ void shape::BarageItemAnim(BarageAnimData* adptr)
 //------------------------------------------------------------------------------
 void shape::FireballItemAnim(ExplodeAnimData* adptr)
 {
-//DeadCode RJS 05Jun97 	SimpleItemAnim((MinAnimData* )adptr);
 
-//DeadCode RJS 26Nov98 	if (!Three_Dee.IsPaused())									//RJS 27Feb98
-//DeadCode RJS 26Nov98 	{
-//DeadCode RJS 26Nov98 		adptr->frameno++;
-//DeadCode RJS 26Nov98 
-//DeadCode RJS 26Nov98 		if (adptr->frameno > 3)
-//DeadCode RJS 26Nov98 			adptr->frameno = 0;
-//DeadCode RJS 26Nov98 
-//DeadCode RJS 26Nov98 		_Miles.PlayLooped(FIL_SFX_SMALL_FIRE_LOOP, (ItemBasePtr) object_obj3d->ItemPtr);//RJS 09Jan97
-//DeadCode RJS 26Nov98 
-//DeadCode RJS 26Nov98 		*(animflags+EXPLODEFRAME) = adptr->frameno;
-//DeadCode RJS 26Nov98 	}
 }
 
 //------------------------------------------------------------------------------
@@ -14232,24 +13136,7 @@ void shape::FireballItemAnim(ExplodeAnimData* adptr)
 //------------------------------------------------------------------------------
 void shape::BridgeItemAnim(ExplodeAnimData* adptr)
 {
-//DeadCode RJS 05Jun97  	SimpleItemAnim((MinAnimData* )adptr);
-//DeadCode RJS 19Jun97  
-//DeadCode RJS 19Jun97  	FPMATRIX		smat;									 	//RJS 14May97
-//DeadCode RJS 19Jun97  	FPMATRIX_PTR	stan_matrix = &smat;					 	//RJS 14May97
-//DeadCode RJS 26Nov98  	ANGLES		thehdg;
-//DeadCode RJS 26Nov98  
-//DeadCode RJS 26Nov98  	thehdg = (Angles) adptr->frameno;
-//DeadCode RJS 26Nov98  
-//DeadCode RJS 19Jun97 	*stan_matrix=*Three_Dee.fpviewer_matrix;					//RJS 14May97
-//DeadCode RJS 19Jun97  
-//DeadCode RJS 19Jun97  	_matrix.generate2(thehdg,ANGLES_0Deg,ANGLES_0Deg,fpobject_matrix);//RJS 14May97
-//DeadCode RJS 19Jun97  	_matrix.multiply(fpobject_matrix,stan_matrix);				//RJS 14May97
-//DeadCode RJS 26Nov98  
-//DeadCode RJS 26Nov98 	object_obj3d->AngH = thehdg;								//RJS 19Jun97
-//DeadCode RJS 26Nov98 	object_obj3d->AngC = ANGLES_0Deg;							//RJS 19Jun97
-//DeadCode RJS 26Nov98 	object_obj3d->AngR = ANGLES_0Deg;							//RJS 19Jun97
 
-//DeadCode RJS 05Jun97  	SimpleItemAnim((MinAnimData* )adptr);
 }	
 
 //------------------------------------------------------------------------------
@@ -14372,84 +13259,6 @@ void shape::PolyPitItemAnim(PolyPitAnimData* adptr)
 //------------------------------------------------------------------------------
 void shape::AircraftAnim(AircraftAnimData* adptr,Bool pitset)
 {
-//DeadCode MS 30Nov98 	if (!Three_Dee.IsPaused() && !pitset && (object_obj3d->ItemPtr->MigStatus.LaunchFlags.size == AirStrucSize))
-//DeadCode MS 30Nov98 	{
-//DeadCode MS 30Nov98 		AirStrucPtr	acptr = (AirStrucPtr) object_obj3d->ItemPtr;
-//DeadCode MS 30Nov98 		if (acptr->fly.pModel)
-//DeadCode MS 30Nov98 		{
-//DeadCode MS 30Nov98 			WorldStuff*	worldptr = mobileitem::currworld;				//RJS 12Jan98
-//DeadCode MS 30Nov98 
-//DeadCode RJS 27Aug98 			if (	adptr->aclegsuspl
-//DeadCode RJS 27Aug98 				|| 	adptr->aclegsuspr
-//DeadCode RJS 27Aug98 				||	adptr->aclegsuspf
-//DeadCode RJS 27Aug98 				||	adptr->aclegsuspb	)
-//DeadCode RJS 27Aug98 			{
-//DeadCode RJS 27Aug98 				if (	adptr->LEFTWHEEL
-//DeadCode RJS 27Aug98 					||	adptr->RIGHTWHEEL
-//DeadCode RJS 27Aug98 					||	adptr->FRONTWHEEL
-//DeadCode RJS 27Aug98 					||	adptr->BACKWHEEL	)
-//DeadCode RJS 27Aug98 				{
-//DeadCode RJS 27Aug98 					// Throw off sparks if on runway...
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 					if (!adptr->hasdust)
-//DeadCode RJS 27Aug98 					{
-//DeadCode RJS 27Aug98 						adptr->hasdust = TRUE;
-//DeadCode RJS 27Aug98 						Trans_Obj.LaunchDustTrail2((mobileitem*)object_obj3d->ItemPtr,*worldptr);
-//DeadCode RJS 27Aug98 						Manual_Pilot.DeathSequenceOverride(object_obj3d->ItemPtr,AUTO_CRASHSKID);
-//DeadCode RJS 27Aug98 					}
-//DeadCode RJS 27Aug98 				}
-//DeadCode RJS 27Aug98 				else
-//DeadCode RJS 27Aug98 				{
-//DeadCode RJS 27Aug98 					adptr->hasdust = FALSE;
-//DeadCode RJS 27Aug98 					if (!adptr->justlanded)
-//DeadCode RJS 27Aug98 					{
-//DeadCode RJS 27Aug98 						adptr->justlanded = TRUE;
-//DeadCode RJS 27Aug98 						_Miles.PlayOnce(FIL_SFX_TYRE_SCREECH1,object_obj3d->ItemPtr);		//RJS 23Feb98
-//DeadCode RJS 27Aug98 					}
-//DeadCode RJS 27Aug98 				}
-//DeadCode RJS 27Aug98 			}
-//DeadCode RJS 27Aug98 			else
-//DeadCode RJS 27Aug98 			{
-//DeadCode RJS 27Aug98 				adptr->hasdust = FALSE;
-//DeadCode RJS 27Aug98 				adptr->justlanded = FALSE;
-//DeadCode RJS 27Aug98 			}
-//DeadCode MS 30Nov98 
-//DeadCode MS 30Nov98 			if (View_Point)
-//DeadCode MS 30Nov98 			{
-//DeadCode MS 30Nov98 				SLong	rpm = acptr->fly.pModel->Inst.Rpm1;
-//DeadCode MS 30Nov98 				SLong	mph = acptr->fly.pModel->Inst.ActualSpeed;
-//DeadCode MS 30Nov98 
-//DeadCode MS 30Nov98 				if ((mph < 50) && (rpm > 0))
-//DeadCode MS 30Nov98 				{
-//DeadCode MS 30Nov98 					adptr->exhaustframe = 0;
-//DeadCode MS 30Nov98 
-//DeadCode MS 30Nov98 					SLong	atimer = adptr->animtimer - View_Point->FrameTime();
-//DeadCode MS 30Nov98 					if (atimer <= 0)
-//DeadCode MS 30Nov98 					{
-//DeadCode MS 30Nov98 						int			maxframe = 32;
-//DeadCode MS 30Nov98 						int			count = 0;
-//DeadCode MS 30Nov98 						SLong		xpos,ypos,zpos;
-//DeadCode MS 30Nov98 						ShapeNum	theShape;
-//DeadCode MS 30Nov98 
-//DeadCode MS 30Nov98 						atimer = maxframe - ((maxframe * mph)/50);
-//DeadCode MS 30Nov98 						if ((rpm > 7000) && (object_obj3d->Shape == F86))
-//DeadCode MS 30Nov98 							theShape = SOOT2;
-//DeadCode MS 30Nov98 						else
-//DeadCode MS 30Nov98 							theShape = SOOT;
-//DeadCode MS 30Nov98 
-//DeadCode MS 30Nov98 						count = GetVapourPoint(acptr,count,LT_CONTRAIL,xpos,ypos,zpos);
-//DeadCode MS 30Nov98 						while (count)
-//DeadCode MS 30Nov98 						{
-//DeadCode MS 30Nov98 							Trans_Obj.LaunchSmokePuff((mobileitem*)object_obj3d->ItemPtr,theShape,xpos,ypos,zpos,*worldptr);
-//DeadCode MS 30Nov98 							count = GetVapourPoint(acptr,count,LT_CONTRAIL,xpos,ypos,zpos);
-//DeadCode MS 30Nov98 						}
-//DeadCode MS 30Nov98 					}
-//DeadCode MS 30Nov98 
-//DeadCode MS 30Nov98 					adptr->animtimer = atimer;
-//DeadCode MS 30Nov98 				}
-//DeadCode MS 30Nov98 			}
-//DeadCode MS 30Nov98 		}
-//DeadCode MS 30Nov98 	}
 	if (adptr->shooting)
 		adptr->muzzleflash = !adptr->muzzleflash;
 	else
@@ -14520,13 +13329,11 @@ UWord	shape::CalcTrailDeltas(	UByteP	thisdrawnobj,
 			opposite = dopoint0.screeny.f - dopoint2.screeny.f;		//RJS 03Dec98
  			adjacent = dopoint2.screenx.f - dopoint0.screenx.f;	//RJS 03Dec98
 
-//DeadCode DAW 07Apr99 			valid = 1;
 
 			if (opposite || adjacent)							//RJS 03Dec98
 			{
 				Float	res = 10430.37835047*FPATan(adjacent,opposite);
 
-//DeadCode RJS 03Dec98 				angleofcyl = Math_Lib.HighArcTan(adjacent,opposite);
  				angleofcyl = SWord(res);
  				angleofcyl -= ANGLES_90Deg;
 
@@ -14536,17 +13343,6 @@ UWord	shape::CalcTrailDeltas(	UByteP	thisdrawnobj,
 
 				valid = 1;										//DAW 07Apr99
 			}
-//DeadCode RJS 03Dec98 			else
-//DeadCode RJS 03Dec98 			{
-//DeadCode RJS 03Dec98 				xoff = radius;
-//DeadCode RJS 03Dec98 				yoff = 0;
-//DeadCode RJS 03Dec98 
-//DeadCode RJS 03Dec98 				if (adjacent)
-//DeadCode RJS 03Dec98 				{
-//DeadCode RJS 03Dec98 					xoff = 0;
-//DeadCode RJS 03Dec98 					yoff = radius;
-//DeadCode RJS 03Dec98 				}
-//DeadCode RJS 03Dec98 			}
 		}
 	}
 
@@ -14660,8 +13456,6 @@ Bool	shape::SampleSmokePnt(	UByteP		smkinfo,
 				{
 				case DEADSMK_DEFAULT:
 	 				trailptr->bitshift = 0;
-//DEADCODE DAW 23/04/99 				listindex = 0;				//RJS 12Apr99
-//DEADCODE DAW 12/04/99 					listindex = -index;
 					DetatchVapourStream(index,LIFETIME_VAPOUR);
 					listindex = NextFreeVapour(0,0,0,smkinfo);										//RJS 23Apr99
 					if (listindex)																	//RJS 23Apr99
@@ -14805,13 +13599,6 @@ SLong	shape::DrawSmokeTrail(	SWord		index,
 				if (apoint->LifeTime)							//RJS 16Jun99
 				{
 					lifegone = apoint->LifeTime - lifeleft;
-//DeadCode DAW 27Sep99 					if (lifegone > 0)							//RJS 27Sep99
-//DeadCode DAW 27Sep99 					{
-//DeadCode DAW 27Sep99 						radius = startradius + ((startradius*lifegone)/grow2time);
-//DeadCode DAW 27Sep99 						apoint->radius = radius;
-//DeadCode DAW 27Sep99 					}
-//DeadCode DAW 27Sep99 					else
-//DeadCode DAW 27Sep99 						apoint->radius = startradius;
 					if (lifegone >= 0)							//RJS 27Sep99
 						radius = startradius + (grow2time ? (startradius*lifegone)/grow2time : SHP_DIV0("DrawSmokeTrail.growth",0));								//RERUN div-by-zero on bad file data
 					else
@@ -14855,10 +13642,6 @@ SLong	shape::DrawSmokeTrail(	SWord		index,
 						else
 							failedcnt++;
 
-//DeadCode DAW 21Jun99 #ifndef NDEBUG
-//DeadCode DAW 21Jun99 						if ((apoint->radius == 0) || ((apoint->LifeTime-apoint->FadeTime)==0))
-//DeadCode DAW 21Jun99 								INT3;
-//DeadCode DAW 21Jun99 #endif
 
 						degcnt = degrade ? distz / degrade : SHP_DIV0("DrawSmokeTrail.DegradeDist",0);								//RERUN div-by-zero on bad file data
 					}												
@@ -15258,29 +14041,6 @@ void	shape::UpdateVapourCoords(itemptr	itm,animptr&	aptr)
 						}
 						case LT_MUDDY:
 						{
-//DeadCode RJS 25Nov98 							if (justlanded)	  //NOT INITIALISED!!
-//DeadCode RJS 25Nov98 								oldindex = Trans_Obj.LaunchVapourStream((UByteP)weapon,(ShapeNum)object_obj3d->Shape);//RJS 09Apr98
-//DeadCode RJS 25Nov98 							else
-//DeadCode RJS 25Nov98 							{
-//DeadCode RJS 25Nov98 								if (weapon->hdg > 0)
-//DeadCode RJS 25Nov98 								{
-//DeadCode RJS 25Nov98 									SHAPE.DetatchVapourStream(weapon->hdg,LIFETIME_VAPOUR);//RJS 09Apr98
-//DeadCode RJS 25Nov98 									weapon->hdg = 0;			
-//DeadCode RJS 25Nov98 								}
-//DeadCode RJS 25Nov98 							}
-//DeadCode RJS 25Nov98 
-//DeadCode RJS 25Nov98 							index = weapon->hdg;
-//DeadCode RJS 25Nov98 							if (index > 0)
-//DeadCode RJS 25Nov98 							{
-//DeadCode RJS 25Nov98 								traillist[index].lastwx = wx;
-//DeadCode RJS 25Nov98 								traillist[index].lastwy = wy;
-//DeadCode RJS 25Nov98 								traillist[index].lastwz = wz;
-//DeadCode RJS 25Nov98 								traillist[index].nextlist = 0;
-//DeadCode RJS 25Nov98 
-//DeadCode RJS 25Nov98 								validpoint = SampleSmokePnt((UByteP)smkptr,(SWord&)weapon->hdg,instr_ptr,weapon->pitch,lifetime);
-//DeadCode RJS 25Nov98 								drifty = (((mobileitem*)itm)->velhori << 7)>>10;
-//DeadCode RJS 25Nov98 							}
-//DeadCode RJS 25Nov98 							break;
 							index = weapon->hdg;					//RJS 12Jan98
 							if (index > 0)
 							{
@@ -15502,42 +14262,19 @@ void	shape::UpdateSmokeDriftCoords(itemptr	itm,animptr&	aptr)
 //					DrawSmokeTrail((SWord)weapon->hdg,(UByteP)smkptr,lifetime,xdrift,ydrift,zdrift,validpoint);	//RJS 02Feb98
 
 					SLong	dist = object_obj3d->Body.Z.f;
-//DeadCode RJS 22Apr99 					Bool	dotrail;
-//DeadCode RJS 22Apr99 
-//DeadCode RJS 22Apr99 					if (dist > 120000)
-//DeadCode RJS 22Apr99 						dotrail = FALSE;
-//DeadCode RJS 22Apr99 					else
-//DeadCode RJS 22Apr99 					{
-//DeadCode RJS 22Apr99 						dotrail = TRUE;
-//DeadCode RJS 22Apr99 						if (dist >= 100000)
-//DeadCode RJS 22Apr99 						{
-//DeadCode RJS 22Apr99 							UWord	oldshape = object_obj3d->Shape;
-//DeadCode RJS 22Apr99 
-//DeadCode RJS 22Apr99 							itm->shape = PLUME1;
-//DeadCode RJS 22Apr99 							Three_Dee.do_object_dummy(itm);
-//DeadCode RJS 22Apr99 							itm->shape = (ShapeNum)oldshape;
-//DeadCode RJS 22Apr99 						}
-//DeadCode RJS 22Apr99 					}
-//DeadCode RJS 22Apr99 
-//DeadCode RJS 22Apr99 					if (dotrail)
-//DeadCode RJS 22Apr99 					{
 						if (SamplePntTime)
 						{
 							if (traillist[index].SampleTime < 1)
 							{
 								SWord	stores = weapon->pitch;
 								SLong	degradetime = 10;						//RJS 07Jun99
-//DeadCode RJS 13May99 								SLong	nojobbies = 1;
 
 								if (dist < 40000)
 								{
 									if (dist < 20000)
 									{
-//DeadCode RJS 13May99 										nojobbies = 3;
 										lifetime = (dist * lifetime)/20000;
 									}
-//DeadCode RJS 13May99 									else
-//DeadCode RJS 13May99 										nojobbies += (2*(40000 - dist))/20000;
 								}
 								else
 								{
@@ -15588,8 +14325,6 @@ void	shape::UpdateSmokeDriftCoords(itemptr	itm,animptr&	aptr)
 										SWord		poovelh = smkptr->VelHori>>1;
 										UWord		reallife;
 
-//DeadCode RJS 13May99 										for (sno=0; sno < nojobbies; sno++)
-//DeadCode RJS 13May99 										{
 											randval = Math_Lib.rnd();
 											vhori = Math_Lib.rnd(smkptr->VelHori);
 											reallife = smkptr->VelHori ? (lifetime * (smkptr->VelHori - vhori))/smkptr->VelHori : SHP_DIV0("UpdateSmokeDrift.VelHori",0);								//RERUN div-by-zero on bad file data
@@ -15602,26 +14337,12 @@ void	shape::UpdateSmokeDriftCoords(itemptr	itm,animptr&	aptr)
 												else
 													Trans_Obj.LaunchSmokePuff2((mobileitem*)itm,&pos,SMKDRK,0,vhori,poovel+Math_Lib.rnd(poovel),Math_Lib.rnd(),(reallife*randval)/45000,65536,*world);
 											}
-//DeadCode RJS 13May99 
-//DeadCode RJS 13May99 										}
 									}
 								}
 							}
 							else
 								traillist[index].SampleTime -= View_Point->FrameTime();
 						}
-//DeadCode RJS 22Apr99 					}
-//DeadCode RJS 22Apr99 					else
-//DeadCode RJS 22Apr99 					{
-//DeadCode RJS 22Apr99 						// Put temporary shape into the binary tree...
-//DeadCode RJS 22Apr99 						UWord	oldshape = object_obj3d->Shape;
-//DeadCode RJS 22Apr99 
-//DeadCode RJS 22Apr99 						itm->shape = PLUME1;
-//DeadCode RJS 22Apr99 						Three_Dee.do_object_dummy(itm);
-//DeadCode RJS 22Apr99 						itm->shape = (ShapeNum)oldshape;
-//DeadCode RJS 22Apr99 
-//DeadCode RJS 22Apr99 						traillist[index].SampleTime = 0;
-//DeadCode RJS 22Apr99 					}
 				}
 			}
 		}
@@ -15690,14 +14411,6 @@ void	shape::KillVapourStream(int	index)
 		_Error.EmitSysErr(__FILE__":(KILL_VAPOUR)    Shouldn't be this : %d\n",index);
 
  	traillist[index].thelist->Wipe();
-//DeadCode RJS 21Apr99  	apoint = traillist[index].thelist;
-//DeadCode RJS 21Apr99  	while (apoint)												//RJS 02Jun97
-//DeadCode RJS 21Apr99  	{															//RJS 02Jun97
-//DeadCode RJS 21Apr99  		nextpoint = (Coords3DListPtr) apoint->next;				//RJS 02Jun97
-//DeadCode RJS 21Apr99 																//RJS 02Jun97
-//DeadCode RJS 21Apr99  		delete apoint;											//RJS 02Jun97
-//DeadCode RJS 21Apr99  		apoint = nextpoint;										//RJS 02Jun97
-//DeadCode RJS 21Apr99  	}															//RJS 02Jun97
 																//RJS 02Jun97
  	traillist[index].thelist = NULL;							//RJS 02Jun97
  	traillist[index].lifetime = 0;								//RJS 02Jun97
@@ -15705,12 +14418,7 @@ void	shape::KillVapourStream(int	index)
  	traillist[index].bitshift = 0;								//RJS 02Jun97
 	traillist[index].nextlist = 0;								//RJS 03Jun97
 	traillist[index].beendrawn = 0;								//RJS 03Jun97
-//DeadCode RJS 14Apr98 	traillist[index].birthtime = 0;								//RJS 18Sep97
 	traillist[index].SampleTime = 0;							//RJS 08Jan98
-//DeadCode RJS 17Feb99 	traillist[index].FakePointPtr = NULL;						//RJS 17Mar98
-//DeadCode RJS 06May99 	traillist[index].InitVelH = 0;								//RJS 09Apr98
-//DeadCode RJS 06May99 	traillist[index].InitVelY = 0;								//RJS 17Mar98
-//DeadCode RJS 06May99 	traillist[index].Acceleration = 0;							//RJS 17Mar98
 	traillist[index].SmkDescPtr = NULL;							//RJS 09Apr98
 	traillist[index].cloudlaunched = FALSE;						//RJS 03Jul98
 	traillist[index].transient = 0;
@@ -15737,7 +14445,6 @@ SLong	shape::DetatchVapourStream(int	index,int	LifeTime, bool novapour)
 	{
 		if (index > 0 && index < REAL_MAX_VAPOURS)
 		{
-//DeadCode DAW 19May99 			if (traillist[index].thelist && LifeTime && (traillist[index].nopoints > 1))//RJS 13Apr99
 			if (	traillist[index].thelist
 				&&	LifeTime
 				&& (traillist[index].nopoints > 1)
@@ -15917,7 +14624,6 @@ void	shape::KillVapourStreamDeadList()
 //dead
 //dead	VapDeadCnt = 0;
 
-//DeadCode RJS 17Feb99 	if (SamplePntTime)
 //	{
 		// and kill unwanted trail points...
 		for (i=0; i < REAL_MAX_VAPOURS; i++)
@@ -16039,9 +14745,6 @@ UByte	shape::NextFreeVapour(SWord	velh,SWord vely, SWord	resistance,UByteP smkpt
 				resistance = 128 - resistance;
 
 				traillist[index].beendrawn = 1;						//RJS 17Sep97
-//DeadCode RJS 06May99 				traillist[index].InitVelY = vely;
-//DeadCode RJS 06May99 				traillist[index].InitVelH = velh;
-//DeadCode RJS 06May99 				traillist[index].Acceleration = -100 * resistance;
 				traillist[index].SmkDescPtr = smkptr;
 				traillist[index].cloudlaunched = FALSE;
 //Dead...				traillist[index].FakePointPtr = NULL;	//always maintain the deadlist...
@@ -16178,7 +14881,6 @@ void shape::BlokesItemAnim(BlokesAnimData* adptr)
 //------------------------------------------------------------------------------
 void shape::WeapItemAnim(WeapAnimData* adptr)
 {
-//DeadCode RJS 01Jun99 	DirectItemAnim((DirectAnimData* )adptr);
 }
 
 //------------------------------------------------------------------------------
@@ -16220,7 +14922,6 @@ void	shape::drawsphere(	int	vertex,
 							int	lumdepth,
 							int	animflag2	)
 {
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr; 			
 	DoPointStruc	dopointr, dopoint0;
 	SWord			RealRadius,BandWidth;
 	Colour			thecol = (Colour) colour;
@@ -16334,7 +15035,6 @@ void	shape::RealImapSphere(	int	vertex,
 								int	animflag,
 								int	animscale	)
 {
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr; 			
 	DoPointStruc	dopointr, dopoint0;
 	SWord			RealRadius;
 	ImageMapNumber	imapno = (ImageMapNumber)imageno;
@@ -16560,7 +15260,6 @@ void shape::imaptrailcyl(UWord   vertex1, UWord vertex2,
 						SWord	xoff0, SWord yoff0,
 						SWord	xoff1, SWord yoff1)
 {
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr; 			
 //	UByte	frameno = adptr[flagoffset] / divfactor;
 //	SWord	minx, miny, maxx, maxy;								
 	ULong	thewidth, theheight;
@@ -16786,8 +15485,6 @@ void	shape::LineStream(	UWord	vertex0,
 	tmpinstptr = (UByteP) &tmpinst3;							//RJS 08Jan98
 	dosetcolour256(tmpinstptr);									//RJS 08Jan98
 
-//DeadCode RJS 30Mar98 	if (transdepth == SMOKED_SOLID)
-//DeadCode RJS 30Mar98 		transdepth = SMOKED_OFF;
 
 	wXStart = WCylStartP->gx;									
 	wYStart = WCylStartP->gy;									
@@ -17577,7 +16274,6 @@ void	shape::ParticleStreamPlain(	UWord	vertex0,
 //PARTICLE.CPP	SLong	RadStep;
 //PARTICLE.CPP	ULong	thetime = 0;
 //PARTICLE.CPP
-//PARTICLE.CPP//DeadCode RJS 30Mar98 	depth = 1 + (depth >> 1);
 //PARTICLE.CPP
 //PARTICLE.CPP	RadStep = ((EndRadius - StartRadius)<<16)/depth;				//RJS 04Feb98
 //PARTICLE.CPP
@@ -18282,7 +16978,6 @@ void shape::imapcylinder(	UWord   vertex1,
 							UWord	frameno,
 							UWord	depth	)					//RJS 20Nov98
 {
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr; 			
 	SWord	minx, miny, maxx, maxy;								
 	ULong	thewidth, theheight;
 	DoPointStruc dopoint0,dopoint1,dopoint2,dopoint3;
@@ -18413,108 +17108,6 @@ void shape::omapcylinder(	UWord vertex,
 							UByte	divfactor,
 							UByte	flagoffset)
 {
-//DeadCode RJS 27Aug98 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr; 			
-//DeadCode RJS 27Aug98 	UByte	frameno = adptr[flagoffset] / divfactor;
-//DeadCode RJS 27Aug98 	SWord	minx, miny, maxx, maxy;								
-//DeadCode RJS 27Aug98 	ULong	thewidth, theheight;
-//DeadCode RJS 27Aug98 	DoPointStruc dopoint0,dopoint1,dopoint2,dopoint3;
-//DeadCode RJS 27Aug98  	Float	xoff, yoff;											//RJS 20Feb97
-//DeadCode RJS 27Aug98   	SWord	angleofcylinder;									
-//DeadCode RJS 27Aug98  	SWord	sin_ang,cos_ang;
-//DeadCode RJS 27Aug98  	Bool	oldcross;
-//DeadCode RJS 27Aug98  	Float	opposite, adjacent;									//RJS 20Feb97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 	minx = minix;		
-//DeadCode RJS 27Aug98 	miny = miniy;		
-//DeadCode RJS 27Aug98 	maxx = maxix - 1;	
-//DeadCode RJS 27Aug98 	maxy = maxiy;
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 	theheight = maxiy - miniy;
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 	//Cycle through the animation frames				
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 	miny += height * frameno;							
-//DeadCode RJS 27Aug98 	maxy = miny + theheight - 1;
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 	oldcross = POLYGON.SetCrossProduct(FALSE);
-//DeadCode RJS 27Aug98  
-//DeadCode RJS 27Aug98  	ImageMapNumber	absimapno = (ImageMapNumber )((imapno<0)?-imapno:imapno);
-//DeadCode RJS 27Aug98  	ImageMapDescPtr imptr = Image_Map.GetImageMapPtr(absimapno);
-//DeadCode RJS 27Aug98  
-//DeadCode RJS 27Aug98  	// Clip Z...
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98  	if (	(newco[vertex].bodyz.f > 0)							//RJS 13Jun97
-//DeadCode RJS 27Aug98  		||	(newco[1].bodyz.f > 0)	)							//RJS 20Jun97
-//DeadCode RJS 27Aug98 	{															//RJS 13Jun97
-//DeadCode RJS 27Aug98 	  	dopoint0 = dopoint1 = newco[vertex];					//RJS 13Jun97
-//DeadCode RJS 27Aug98   		dopoint2 = dopoint3 = newco[1];							//RJS 20Jun97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 	 	opposite = dopoint0.screeny.f - dopoint2.screeny.f;		//RJS 19May97
-//DeadCode RJS 27Aug98 	 	adjacent = dopoint2.screenx.f - dopoint0.screenx.f;		//RJS 19May97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98  		angleofcylinder = Math_Lib.HighArcTan(adjacent,opposite);	//RJS 23Sep96
-//DeadCode RJS 27Aug98  		angleofcylinder -= ANGLES_90Deg;
-//DeadCode RJS 27Aug98  
-//DeadCode RJS 27Aug98  		Math_Lib.high_sin_cos((Angles) angleofcylinder,sin_ang,cos_ang);
-//DeadCode RJS 27Aug98  
-//DeadCode RJS 27Aug98 		xoff = (sin_ang * radius) / ANGLES_FRACT;				//RJS 20Jun97
-//DeadCode RJS 27Aug98   		yoff = (cos_ang * radius) / ANGLES_FRACT;				//RJS 20Jun97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 		if (VapourCyl)											//RJS 14May97
-//DeadCode RJS 27Aug98 		{
-//DeadCode RJS 27Aug98 			dopoint0 = CylPnt1;
-//DeadCode RJS 27Aug98 			dopoint1 = CylPnt2;
-//DeadCode RJS 27Aug98 		}
-//DeadCode RJS 27Aug98 		else
-//DeadCode RJS 27Aug98 		{
-//DeadCode RJS 27Aug98   			dopoint0.bodyx.f += xoff;								//RJS 20Feb97
-//DeadCode RJS 27Aug98   			dopoint0.bodyy.f += yoff;								//RJS 20Feb97
-//DeadCode RJS 27Aug98   
-//DeadCode RJS 27Aug98   			dopoint1.bodyx.f += -xoff;								//RJS 20Feb97
-//DeadCode RJS 27Aug98   			dopoint1.bodyy.f += -yoff;								//RJS 20Feb97
-//DeadCode RJS 27Aug98 		}
-//DeadCode RJS 27Aug98   
-//DeadCode RJS 27Aug98   		dopoint2.bodyx.f += -xoff;								//RJS 20Feb97
-//DeadCode RJS 27Aug98   		dopoint2.bodyy.f += -yoff;								//RJS 20Feb97
-//DeadCode RJS 27Aug98   
-//DeadCode RJS 27Aug98   		dopoint3.bodyx.f += xoff;								//RJS 20Feb97
-//DeadCode RJS 27Aug98   		dopoint3.bodyy.f += yoff;								//RJS 20Feb97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 		current_screen->zclipline(dopoint1,dopoint2);			//RJS 13Jun97
-//DeadCode RJS 27Aug98 		current_screen->zclipline(dopoint0,dopoint3);			//RJS 13Jun97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 		_matrix.SetClipFlags(dopoint0);
-//DeadCode RJS 27Aug98 		_matrix.SetClipFlags(dopoint1);
-//DeadCode RJS 27Aug98 		_matrix.SetClipFlags(dopoint2);
-//DeadCode RJS 27Aug98 		_matrix.SetClipFlags(dopoint3);
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98  		_matrix.body2screen(dopoint0);							//RJS 13Jun97
-//DeadCode RJS 27Aug98  		_matrix.body2screen(dopoint1);							//RJS 13Jun97
-//DeadCode RJS 27Aug98  		_matrix.body2screen(dopoint2);							//RJS 13Jun97
-//DeadCode RJS 27Aug98  		_matrix.body2screen(dopoint3);							//RJS 13Jun97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98  		CylPnt1 = dopoint3;										//RJS 14May97
-//DeadCode RJS 27Aug98 		CylPnt2 = dopoint2;										//RJS 14May97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98  		if (object_obj3d->Shape!=SUN)
-//DeadCode RJS 27Aug98  			POLYGON.SetPixelWidth(1<<Save_Data.pixelsize);
-//DeadCode RJS 27Aug98  
-//DeadCode RJS 27Aug98  		POLYGON.createpoly(imapno);								//RJS 20Jun97
-//DeadCode RJS 27Aug98  		POLYGON.createvert(dopoint0,minx,miny);					//RJS 20Jun97
-//DeadCode RJS 27Aug98 		POLYGON.createvert(dopoint1,maxx,miny);					//RJS 20Jun97
-//DeadCode RJS 27Aug98 		POLYGON.createvert(dopoint2,maxx,maxy);					//RJS 20Jun97
-//DeadCode RJS 27Aug98   		POLYGON.createvert(dopoint3,minx,maxy);					//RJS 20Jun97
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98 		current_screen->SetTransparency(depth);
-//DeadCode RJS 27Aug98 		POLYGON.SetOpacityON();
-//DeadCode RJS 27Aug98  		POLYGON.drawpoly();
-//DeadCode RJS 27Aug98   		current_screen->SetTransparency(SMOKED_OFF);
-//DeadCode RJS 27Aug98 
-//DeadCode RJS 27Aug98  		POLYGON.SetPixelWidth(1);
-//DeadCode RJS 27Aug98   	}
-//DeadCode RJS 27Aug98  
-//DeadCode RJS 27Aug98  	POLYGON.SetCrossProduct(oldcross);
 }
 
 //------------------------------------------------------------------------------
@@ -19013,7 +17606,6 @@ Bool	shape::SampleDustPnt(	UByteP		smkinfo,
 			{
  				trailptr->bitshift = 0;
 				listindex = 0;			//RJS 12/4/99
-//DEADCODE DAW 12/04/99 				listindex = -index;
 				SHAPE.DetatchVapourStream(index,lifetime);
 			}
 		}
@@ -19088,30 +17680,6 @@ void	shape::RipStores(AirStrucPtr	ac)
 				Trans_Obj.DumpFuel(ac,*world,TRUE);				//RJS 04Feb99
 			}
 		}
-//DeadCode CSB 27/04/99		if (ac->weap.AircraftStatus.FuelDumped == FALSE)
-//DeadCode CSB 27/04/99		{
-//DeadCode CSB 27/04/99			SLong	gs = ((ac->fly.pModel->Inst.NormalAcc - 3.0) * 65535.0);
-//DeadCode CSB 27/04/99			if (gs > 0)
-//DeadCode CSB 27/04/99			{
-//DeadCode CSB 27/04/99				bool dodump = false;
-//DeadCode CSB 27/04/99				gs /= 3;
-//DeadCode CSB 27/04/99				if (gs < 65535)
-//DeadCode CSB 27/04/99				{
-//DeadCode CSB 27/04/99					ULong	chance = Math_Lib.rnd();
-//DeadCode CSB 27/04/99					chance = (chance*gs)>>16;
-//DeadCode CSB 27/04/99					if (chance > 64000)
-//DeadCode CSB 27/04/99						dodump = true;
-//DeadCode CSB 27/04/99				}
-//DeadCode CSB 27/04/99				else
-//DeadCode CSB 27/04/99					dodump = true;
-//DeadCode CSB 27/04/99	
-//DeadCode CSB 27/04/99				if (dodump)
-//DeadCode CSB 27/04/99				{
-//DeadCode CSB 27/04/99					WorldStuff*	world = mobileitem::currworld;
-//DeadCode CSB 27/04/99					Trans_Obj.DumpFuel(ac,*world,TRUE);				//RJS 04Feb99
-//DeadCode CSB 27/04/99				}
-//DeadCode CSB 27/04/99			}
-//DeadCode CSB 27/04/99		}
 }
 
 //------------------------------------------------------------------------------
@@ -19227,24 +17795,6 @@ void	shape::GetRadarItem(ItemPtr	itm, SLong	range)
 //------------------------------------------------------------------------------
 void	shape::CalcRadarRange(AirStrucPtr	me)
 {
-//DeadCode RDH 13Apr99 	if (RadarItemPtr)
-//DeadCode RDH 13Apr99 	{
-//DeadCode RDH 29Nov98 		SWord	dummy1, dummy2;
-//DeadCode RDH 29Nov98 		Math_Lib.Intercept(	RadarItemPtr->World.X - me->World.X,
-//DeadCode RDH 29Nov98 							RadarItemPtr->World.Y - me->World.Y,
-//DeadCode RDH 29Nov98 							RadarItemPtr->World.Z - me->World.Z,
-//DeadCode RDH 29Nov98 							RequiredRange,dummy1,dummy2);
-//DeadCode RDH 13Apr99 
-//DeadCode RDH 13Apr99 		RequiredRange = Math_Lib.distance3d(RadarItemPtr->World.X - me->World.X,
-//DeadCode RDH 13Apr99 											RadarItemPtr->World.Y - me->World.Y,
-//DeadCode RDH 13Apr99 											RadarItemPtr->World.Z - me->World.Z	);
-//DeadCode RDH 13Apr99 
-//DeadCode RDH 13Apr99 		if (RequiredRange > 100000)								//RJS 11Dec98
-//DeadCode RDH 13Apr99 			RequiredRange = 100000;								//RJS 11Dec98
-//DeadCode RDH 13Apr99 																//RJS 11Dec98
-//DeadCode RDH 13Apr99 		if (RequiredRange < 20000)								//RJS 11Dec98
-//DeadCode RDH 13Apr99 			RequiredRange = 20000;								//RJS 11Dec98
-//DeadCode RDH 13Apr99 	}
 	bool fixsight;												//CSB 09Jun99
 	if ((me->weap.weapontype & LT_MASK) == LT_BULLET)			//CSB 09Jun99
 		fixsight = false;										//CSB 09Jun99
@@ -19508,7 +18058,6 @@ int	shape::ScanAnimData(itemptr	itm)
 				adptr2++;
 				adptr++;										//DAW 26May99
 
-//DeadCode DAW 26May99 				animdatasize--;
 			}
 
 			adptr2=temp;
@@ -19638,19 +18187,8 @@ void	shape::FixUpColLog()
 
 		//   |--- Hit_Byte ----|
 		//    0000         0000
-//DeadCode DAW 25Jun99 		// if ((Hit_Byte & 1) == 1)   then cast Hit Byte to 00 00000 0    (Hit Element) (Grp Element) (HitBit)
-//DeadCode DAW 25Jun99 		//                            else case Hit Byte to 0000000  0	  (Hit Element) (Grp Element) (HitBit)
 		// if ((Hit_Byte & 1) == 1)   then cast Hit Byte to 00 000000    (Hit Element) (Grp Element) (HitBit)
 		//                            else case Hit Byte to 00000000	  (Hit Element) (Grp Element) (HitBit)
-//DeadCode DAW 25Jun99 		if (ColLog[index].grpel == 0)
-//DeadCode DAW 25Jun99 			Hit_Byte = (CollisionCnt << 1);
-//DeadCode DAW 25Jun99 		else
-//DeadCode DAW 25Jun99 		{
-//DeadCode DAW 25Jun99 			// Can only have 4 hit boxes per group element
-//DeadCode DAW 25Jun99 			Hit_Byte = CollisionCnt << 6;
-//DeadCode DAW 25Jun99 			Hit_Byte |= (ColLog[index].grpel << 1);
-//DeadCode DAW 25Jun99 			Hit_Byte += 1;		// Set hit bit for groups
-//DeadCode DAW 25Jun99 		}
 		if (ColLog[index].grpel == 0)							//AMM 24Jun99
 			Hit_Byte = CollisionCnt;							//AMM 24Jun99
 		else													//AMM 24Jun99
@@ -19692,10 +18230,7 @@ void	shape::FixUpColLog()
 				}
 			}
 
-//DeadCode AMM 18Mar99 			if (!_DPlay.Implemented)
-//DeadCode AMM 18Mar99 			{
 // if in replay can score now - no, wait till collision is processed!
-//DeadCode AMM 18Mar99 			}
 		}
 
 		index++;
@@ -19742,28 +18277,7 @@ void	shape::AddToCollisionList(	SLong	uniqueid,
 			hitel = element;									//AMM 24Jun99
 		}														//AMM 24Jun99
 
-//DeadCode DAW 25Jun99 		if ((element & 1)==1)  // Test hit bit
-//DeadCode DAW 25Jun99 		{
-//DeadCode DAW 25Jun99 			// 00 00000 0	(Hit element) (Grp element)
-//DeadCode DAW 25Jun99 			grpel = (element >> 1) & 31;	
-//DeadCode DAW 25Jun99 			hitel = (element >> 6) & 3;
-//DeadCode DAW 25Jun99 		}
-//DeadCode DAW 25Jun99 		else
-//DeadCode DAW 25Jun99 		{
-//DeadCode DAW 25Jun99 			// 0000000 0	(Hit element) (Grp element)
-//DeadCode DAW 25Jun99 			grpel = 0;
-//DeadCode DAW 25Jun99 			hitel = (element >> 1) & 127;
-//DeadCode DAW 25Jun99 		}
 
-//DeadCode AMM 08Apr99 		// hitter fudge!!
-//DeadCode AMM 30Mar99 #pragma warnmsg("Macca!... Fix this comms hitter fudge!")		
-//DeadCode AMM 08Apr99 
-//DeadCode AMM 08Apr99 // filled in below if info is available
-//DeadCode AMM 08Apr99 
-//DeadCode AMM 08Apr99 		if (!_DPlay.Implemented || (_DPlay.Implemented && _DPlay.GameType>TEAMPLAY))
-//DeadCode AMM 08Apr99 		{
-//DeadCode AMM 08Apr99  			ColLog[ColLogCnt].theShooter = itm;		// needs real hitter.......
-//DeadCode AMM 08Apr99 		}
 
 		ColLog[ColLogCnt].send=0; //AMM27Nov98
 		ColLog[ColLogCnt].item = itm;
@@ -19773,33 +18287,16 @@ void	shape::AddToCollisionList(	SLong	uniqueid,
 		ColLog[ColLogCnt].colstrength = hitstrength;			//AMM 08Apr99
 		ColLog[ColLogCnt].theShooter=NULL; // gets filled in below if we know it//AMM 03Jun99
 		ColLog[ColLogCnt].shapehit=0;//AMM 03Jun99
-//DeadCode AMM 08Apr99 		ColLog[ColLogCnt++].colstrength = hitstrength;
 
 		if (myscorer)
 		{
-//DeadCode AMM 08Apr99 			if (!_Replay.Playback)
 			{
 				ItemPtr hitterscorer;
 
 				hitterscorer=_DPlay.GetHitterScorer(uniqueid,element,hittype,hitstrength,pnum);
 				ColLog[ColLogCnt].theShooter=hitterscorer;	//AMM 08Apr99
 
-//DeadCode AMM 08Apr99 				if (_Replay.Record)
-//DeadCode AMM 08Apr99 				{
-//DeadCode AMM 08Apr99 					itm=(ItemPtr)Persons2::ConvertPtrUID((UniqueID)uniqueid);
-//DeadCode AMM 08Apr99 					ColLog[ColLogCnt].theShooter = itm;
 //					itm->ScoreSimpleItemKilled(true,(AirStrucPtr)hitterscorer);
-//DeadCode AMM 08Apr99 				}
-//DeadCode AMM 08Apr99 				else
-//DeadCode AMM 08Apr99 				{
-//DeadCode AMM 08Apr99 					if (_DPlay.GameType>TEAMPLAY)
-//DeadCode AMM 08Apr99 					{
-//DeadCode AMM 08Apr99 	// comms...
-//DeadCode AMM 08Apr99 // coop games only
-//DeadCode AMM 08Apr99 						if (hitterscorer)
-//DeadCode AMM 08Apr99 							_DPlay.NewScoreClaim(hitterscorer,(UniqueID)uniqueid);
-//DeadCode AMM 08Apr99 					}
-//DeadCode AMM 08Apr99 				}
 			}
 		}
 // in playback we will never know who shooter was but score is not maintained
@@ -19810,16 +18307,7 @@ void	shape::AddToCollisionList(	SLong	uniqueid,
 // for score to be set
 
 // done above
-//DeadCode AMM 03Jun99 		if (_Replay.Playback)
-//DeadCode AMM 03Jun99 			 ColLog[ColLogCnt].theShooter = NULL;	//ColLog[ColLogCnt].item;//DAW 01Jun99
 
-//DeadCode AMM 29Apr99 		else
-//DeadCode AMM 29Apr99 		{
-//DeadCode AMM 29Apr99 // dont know who shooter is yet!
-//DeadCode AMM 29Apr99 // in playback will never know
-//DeadCode AMM 29Apr99 
-//DeadCode AMM 29Apr99 			ColLog[ColLogCnt].theShooter=NULL;
-//DeadCode AMM 29Apr99 		}
 
 		ColLogCnt++;											//AMM 08Apr99
 
@@ -19930,7 +18418,6 @@ void	shape::CollisionPlayback()
 
 							Col_AnimNextPtr += GetElementAnimOffset((ShapeNum)new_damage_Shape);
 
-//DeadCode RJS 30 Jun99							instruction = *((UByteP)instr_ptr2+1);
 							instruction = *((UByteP)instr_ptr2);			//RJS 30Jun99
 							if (instruction == dogroupno)
 								Col_GroupNext = (UByteP)instr_ptr2+1;
@@ -20044,7 +18531,6 @@ void	shape::CollisionPlayback()
 
 		ColLogCnt = 0;
 		CollisionOn = oldcolon;
-//DeadCode AMM 03Jun99 		ColLogCnt = 0;
 	}
 }
 
@@ -20372,9 +18858,6 @@ WeapAnimData* shape::DirectWeaponLauncher(	itemptr	itm,
 	LauncherToWorld(itm,(UByteP) thislaunch,thisscale,xpos,ypos,zpos,goffset);
 
 	// Extract from Rob's new weapon array stuff...
-//DeadCode DAW 29Jul98 	MuzzleVel = 9000;		//Shit fix
-//DeadCode DAW 29Jul98 	MuzzleDelay = 5;		//Shit fix
-//DEADCODE DAW 01/07/99 	theShape = (UWord) BULLET;		//shit fix
 
 	if (goffset)
 		delete goffset;
@@ -20482,15 +18965,9 @@ void	shape::SetGroupDamage(	SLong	element,
 	damage_GrpElmt = element;					
 	damage_GrpAnimPrev = gpa;					
 	damage_GrpAnimNext = gna;
-//DeadCode DAW 30Jun99 	if (gpa != NULL)
 		damage_GrpPrev = gp;
-//DeadCode DAW 30Jun99 	else
-//DeadCode DAW 30Jun99 		damage_GrpPrev = NULL;
 
-//DeadCode DAW 30Jun99 	if (gna != NULL)
 		damage_GrpNext = gn;
-//DeadCode DAW 30Jun99 	else
-//DeadCode DAW 30Jun99 		damage_GrpNext = NULL;
 
 	damage_GrpTokenDep = tkndp;
 }
@@ -20509,37 +18986,6 @@ void	shape::SetGroupDamage(	SLong	element,
 //------------------------------------------------------------------------------
 void	shape::FixUpGroupCol()
 {
-//DeadCode DAW 30Jun99 	ShapeDescPtr	sdptr = (ShapeDescPtr) damage_Sdptr;
-//DeadCode DAW 30Jun99 	UByteP			iptr = (UByteP) sdptr->liveshpref; 
-//DeadCode DAW 30Jun99 	int				groupindex = 0;
-//DeadCode DAW 30Jun99 	MinAnimData*	mad = (MinAnimData*) damage_AnimPtr;
-//DeadCode DAW 30Jun99 	UByteP			PrevIptr;
-//DeadCode DAW 30Jun99 	ShapeNum		newshape;
-//DeadCode DAW 30Jun99 	SLong			ex,ey,ez;
-//DeadCode DAW 30Jun99 	UByteP			Col_GroupPrev = NULL;
-//DeadCode DAW 30Jun99 	UByteP			Col_GroupNext = NULL;
-//DeadCode DAW 30Jun99 	animptr			Col_AnimPrevPtr;
-//DeadCode DAW 30Jun99 	animptr			Col_AnimNextPtr = damage_AnimPtr;
-//DeadCode DAW 30Jun99 	animptr			Col_TokenDepAnim;
-//DeadCode DAW 30Jun99 
-//DeadCode DAW 30Jun99 	while(GetGroupElement(iptr,newshape,ex,ey,ez,0,&PrevIptr))
-//DeadCode DAW 30Jun99 	{
-//DeadCode DAW 30Jun99 		Col_GroupNext = iptr + 1;
-//DeadCode DAW 30Jun99 
-//DeadCode DAW 30Jun99 		damage_AnimPtr = Col_AnimNextPtr;
-//DeadCode DAW 30Jun99 		damage_Shape = newshape;													//RJS 16Nov98
-//DeadCode DAW 30Jun99 
-//DeadCode DAW 30Jun99 		Col_AnimNextPtr += GetElementAnimOffset(newshape);
-//DeadCode DAW 30Jun99 		Col_AnimPrevPtr = Col_AnimNextPtr;						
-//DeadCode DAW 30Jun99 		Col_GroupPrev = PrevIptr;
-//DeadCode DAW 30Jun99 	
-//DeadCode DAW 30Jun99 		if (groupindex != damage_GrpElmt)
-//DeadCode DAW 30Jun99 			groupindex++;								
-//DeadCode DAW 30Jun99 		else
-//DeadCode DAW 30Jun99 			break;
-//DeadCode DAW 30Jun99 	}
-//DeadCode DAW 30Jun99 
-//DeadCode DAW 30Jun99 	SetGroupDamage(damage_GrpElmt,Col_GroupPrev,Col_GroupNext,Col_AnimPrevPtr,Col_AnimNextPtr,Col_TokenDepAnim);
 }
 
 //------------------------------------------------------------------------------
@@ -20756,7 +19202,7 @@ Bool	shape::SampleTrailList()
 			replaysmlsmk.smkindex = adptr->SmkDescIndex;
 			replaysmlsmk.currTime = adptr->currTime;				//RJS 16Jun99
 
-			if (!_Replay.StoreSmlSmkData(&replaysmlsmk,(UByteP)adptr->thelist))
+			if (!_Replay.StoreSmlSmkData(&replaysmlsmk,(UByteP)AnimLink::Load(adptr->thelist)))
 				return FALSE;
 		}
 	}
@@ -20833,7 +19279,6 @@ Bool	shape::GetSmokeTrailList(Bool dummy)
 	}
 
 	UByte	smltrailtot;
-//DeadCode AMM 20Apr99 	if (!_Replay.ReplayRead(&smltrailtot,sizeof(smltrailtot)))
 	if (!_Replay.SmokeRead(&smltrailtot,sizeof(smltrailtot)))
 		return FALSE;
 
@@ -21264,8 +19709,6 @@ void	shape::ProbeStaticTrail(UByteP	rsdptr, itemptr	itm,animptr&	aptr)
 	UByte				istransient = 0;
 
 	pTrailItm = itm;
-//DeadCode RJS 17Feb99 	if (pTrailItm->MigStatus.LaunchFlags.size == TRANSIENTSIZE)			//RJS 15Feb99
-//DeadCode RJS 17Feb99 		istransient = 1;									//RJS 15Feb99
 
 	weapon = (WeapAnimData*) &adptr->weaponlaunchers[0];
 	if (adptr->nopoints == 0)
@@ -21282,7 +19725,7 @@ void	shape::ProbeStaticTrail(UByteP	rsdptr, itemptr	itm,animptr&	aptr)
 		// if the list is empty, draw nothing...
 		if (adptr->thelist)
 		{
-			TrailPtr->thelist = (Coords3DList*) adptr->thelist;
+			TrailPtr->thelist = (Coords3DList*) AnimLink::Load(adptr->thelist);
 			TrailPtr->nopoints = adptr->nopoints;
 			TrailPtr->lifetime = adptr->lifetime;
 			TrailPtr->SmkDescPtr = (UByteP) &SmokeTrlList[adptr->SmkDescIndex];
@@ -21294,7 +19737,7 @@ void	shape::ProbeStaticTrail(UByteP	rsdptr, itemptr	itm,animptr&	aptr)
 
 			DrawSmokeTrail(index,NULL,TrailPtr->lifetime,0,0,0,TRUE);
 
-			adptr->thelist = (uintptr_t)TrailPtr->thelist;
+			AnimLink::Store(adptr->thelist, TrailPtr->thelist);
 			adptr->currTime = TrailPtr->currTime;				//RJS 17Jun99
 		}
 	}
@@ -21613,11 +20056,6 @@ void	shape::UpdateReplayVapourCoords(UByteP	rsdptr, itemptr	itm,animptr&	aptr)
 	pTrailItm = itm;//RJS 02Sep98
 	weapcnt = adptr->nolaunchers;								//RJS 09Apr98
 
-//DeadCode RJS 18Feb99 	if (itm == shititem)
-//DeadCode RJS 18Feb99 	{
-//DeadCode RJS 18Feb99 		int	fuck;
-//DeadCode RJS 18Feb99 		fuck = 1;
-//DeadCode RJS 18Feb99 	}
 
 	Math_Lib.high_sin_cos((ANGLES )((mobileitem*)itm)->hdg,v_sin_ang,v_cos_ang);
 
@@ -21717,12 +20155,10 @@ void	shape::UpdateReplayVapourCoords(UByteP	rsdptr, itemptr	itm,animptr&	aptr)
 
 								if (weapon->LauncherType != dolaunch)
 								{
-//DeadCode AMM 30Mar99 									weapon->LauncherType = dolaunch;
 									if (dolaunch != LT_CONTRAIL)
 									{
 										weapon->LauncherType = dolaunch;//AMM 30Mar99
 										oldindex = Trans_Obj.LaunchVapourStream((UByteP)weapon,itm->shape);//RJS 09Apr98
-//DeadCode AMM 30Mar99 										weapon->pitch = -1;
 									}
 									weapon->pitch = -1;			//AMM 30Mar99
 								}
@@ -21885,29 +20321,6 @@ void	shape::UpdateReplayVapourCoords(UByteP	rsdptr, itemptr	itm,animptr&	aptr)
 						}
 						case LT_MUDDY:
 						{
-//DeadCode RJS 25Nov98 							if (justlanded)	  //NOT INITIALISED!!
-//DeadCode RJS 25Nov98 								oldindex = Trans_Obj.LaunchVapourStream((UByteP)weapon,(ShapeNum)object_obj3d->Shape);//RJS 09Apr98
-//DeadCode RJS 25Nov98 							else
-//DeadCode RJS 25Nov98 							{
-//DeadCode RJS 25Nov98 								if (weapon->hdg > 0)
-//DeadCode RJS 25Nov98 								{
-//DeadCode RJS 25Nov98 									SHAPE.DetatchVapourStream(weapon->hdg,LIFETIME_VAPOUR);//RJS 09Apr98
-//DeadCode RJS 25Nov98 									weapon->hdg = 0;			
-//DeadCode RJS 25Nov98 								}
-//DeadCode RJS 25Nov98 							}
-//DeadCode RJS 25Nov98 
-//DeadCode RJS 25Nov98 							index = weapon->hdg;
-//DeadCode RJS 25Nov98 							if (index > 0)
-//DeadCode RJS 25Nov98 							{
-//DeadCode RJS 25Nov98 								traillist[index].lastwx = wx;
-//DeadCode RJS 25Nov98 								traillist[index].lastwy = wy;
-//DeadCode RJS 25Nov98 								traillist[index].lastwz = wz;
-//DeadCode RJS 25Nov98 								traillist[index].nextlist = 0;
-//DeadCode RJS 25Nov98 
-//DeadCode RJS 25Nov98 								validpoint = SampleSmokePnt((UByteP)smkptr,(SWord&)weapon->hdg,instr_ptr,weapon->pitch,lifetime);
-//DeadCode RJS 25Nov98 								drifty = (((mobileitem*)itm)->velhori << 7)>>10;
-//DeadCode RJS 25Nov98 							}
-//DeadCode RJS 25Nov98 							break;
 							index = weapon->hdg;					//RJS 12Jan98
 							if (index > 0)
 							{
@@ -22020,7 +20433,6 @@ void shape::replay_animate_shape(ItemPtr	itm)
 		animptr	adptr;
 
 		// could fuck if something is being drawn...
-//DeadCode JIM 26Mar99  		object_obj3d  = NULL;									//RJS 19Jun97
 
 		adptr = itm->Anim;
 
@@ -22170,8 +20582,6 @@ Bool	shape::ReplaySampleSmokePnt(	UByteP		smkinfo,
 				{
 				case DEADSMK_DEFAULT:
 	 				trailptr->bitshift = 0;
-//DEADCODE DAW 23/04/99 					listindex = 0;					//RJS 12Apr99
-//DEADCODE DAW 12/04/99 					listindex = -index;
 					SHAPE.DetatchVapourStream(index,LIFETIME_VAPOUR);
 					listindex = NextFreeVapour(0,0,0,smkinfo);										//RJS 23Apr99
 					if (listindex)																	//RJS 23Apr99
@@ -22249,7 +20659,7 @@ void	shape::GenerateProbeTrails()
 			case PROBER_KILL:
 			{
 				TrailPtr = &traillist[MAX_VAPOURS];
-				apoint = (Coords3DList*) adptr->thelist;
+				apoint = (Coords3DList*) AnimLink::Load(adptr->thelist);
 				while (apoint)
 				{
 					dpoint = apoint;
@@ -22314,7 +20724,7 @@ void	shape::GenerateProbeTrails()
 					realnopoints = howmany;
 
 				adptr->nopoints = realnopoints;
-				adptr->thelist = (uintptr_t) TrailPtr->thelist;
+				AnimLink::Store(adptr->thelist, TrailPtr->thelist);
 				adptr->lifetime = TrailPtr->lifetime;
 				adptr->SmkDescIndex = ((UByteP)TrailPtr->SmkDescPtr - (UByteP) &SmokeTrlList[0])/sizeof(SmokeType);
 				adptr->currTime = TrailPtr->currTime;						//RJS 16Jun99
@@ -22327,9 +20737,6 @@ void	shape::GenerateProbeTrails()
 				TrailPtr->nextlist = 0;								
 				TrailPtr->beendrawn = 0;								
 				TrailPtr->SampleTime = 0;							
-//DeadCode RJS 06May99 				TrailPtr->InitVelH = 0;								
-//DeadCode RJS 06May99 				TrailPtr->InitVelY = 0;								
-//DeadCode RJS 06May99 				TrailPtr->Acceleration = 0;						
 				TrailPtr->SmkDescPtr = NULL;						
 				TrailPtr->cloudlaunched = FALSE;
 				TrailPtr->transient = 0;
@@ -22713,7 +21120,6 @@ void shape::SetAnimDataFlags(ShapeNum shpno,animptr& adptr, SLong &animflags)
 					break;
 				case WEAPANIM:
 					flagstuff += 1<<MINANIM;
-//DeadCode RJS 01Jun99 					flagstuff += 1<<DIRECTANIM;
 					flagstuff += 1<<WEAPANIM;
 					break;
 				case AIRCRAFTANIM:
@@ -22767,125 +21173,6 @@ void shape::SetAnimDataFlags(ShapeNum shpno,animptr& adptr, SLong &animflags)
 	adptr = animflags;
 }
 
-//DeadCode DAW 30Jul99 UByte&	animptr::operator[] (int a)
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	assert((size&~(1<<MINANIM))>a);
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 	return UByteP(ptr)[a];
-//DeadCode DAW 30Jul99 }
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 UByte&	animptr::operator[] (SWord a)
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	assert((size&~(1<<MINANIM))>a);
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 	return UByteP(ptr)[a];
-//DeadCode DAW 30Jul99 }
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 UByte&	animptr::operator[] (UWord a)
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	assert((size&~(1<<MINANIM))>a);
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 	return UByteP(ptr)[a];
-//DeadCode DAW 30Jul99 }
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 UByte&	animptr::operator[] (UByte a)
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	assert((size&~(1<<MINANIM))>a);
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 	return UByteP(ptr)[a];
-//DeadCode DAW 30Jul99 }
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 void	animptr::operator += (int a)
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 	ptr = (void*)((UByteP)ptr + a);
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	assert((size&0x3ff) >= a);
-//DeadCode DAW 30Jul99 	size -= ULong(a);
-//DeadCode DAW 30Jul99 	if ((size & 0x3ff)==0)	ptr = 0;							//RJS 26May99
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 }
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 void	animptr::operator ++ ()
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 	ptr = (void*)((UByteP)ptr + 1);
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	assert((size&0x3ff) >= 1);
-//DeadCode DAW 30Jul99 	size -= 1;
-//DeadCode DAW 30Jul99 	if ((size & 0x3ff)==0)	ptr = 0;							//RJS 26May99
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 }
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 animptr::operator MinAnimData*(){assert(size & (1<<MINANIM)); return (MinAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator GrpMinAnimData*(){assert(size & (1<<MINANIM)); return (GrpMinAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator SunAnimData*(){assert(size & (1<<SUNANIM)); return (SunAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator ExplodeAnimData*(){INT3; return (ExplodeAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator FireAnimData*(){INT3; return (FireAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator BalloonAnimData*(){INT3; return (BalloonAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator BarageAnimData*(){assert(size & (1<<BARAGEANIM)); return (BarageAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator TroopAnimData*(){assert(size & (1<<TROOPANIM)); return (TroopAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator TrainAnimData*(){assert(size & (1<<TRAINANIM)); return (TrainAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator BlokesAnimData*(){assert(size & (1<<BLOKESANIM)); return (BlokesAnimData*)ptr;};		
-//DeadCode DAW 30Jul99 animptr::operator WeapAnimData*(){assert(size & (1<<WEAPANIM)); return (WeapAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator MoveGunAnimData*(){assert(size & (1<<MOVEGUNANIM)); return (MoveGunAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator TwoGunAnimData*(){assert(size & (1<<MOVEGUNANIM)); return (TwoGunAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator AircraftAnimData*(){assert(size & (1<<AIRCRAFTANIM)); return (AircraftAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator PolyPitAnimData*(){assert(size & (1<<POLYPITANIM)); return (PolyPitAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator LauncherAnimData*(){assert(size & (1<<LAUNCHERANIM)); return (LauncherAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator WindsocAnimData*(){assert(size & (1<<WINDSOCANIM)); return (WindsocAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator CloneAnimData*(){assert(size & (1<<CLONEANIM)); return (CloneAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator FlareAnimData*(){assert(size & (1<<FLAREANIM)); return (FlareAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator ParachuteAnimData*(){assert(size & (1<<PARACHUTEANIM)); return (ParachuteAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator ThugAnimData*(){assert(size & (1<<THUGANIM)); return (ThugAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator MissileAnimData*(){assert(size & (1<<MISSILEANIM)); return (MissileAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator DebrisAnimData*(){assert(size & (1<<DEBRISANIM)); return (DebrisAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator SmokeTrailAnimData*(){assert(size & (1<<SMOKETRAILANIM)); return (SmokeTrailAnimData*)ptr;};
-//DeadCode DAW 30Jul99 animptr::operator Coords3DList*(){return (Coords3DList*)ptr;};
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 UByteP	animptr::operator & ()
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	if (size & 0x3ff)
-//DeadCode DAW 30Jul99 		return (UByteP)ptr;
-//DeadCode DAW 30Jul99 	
-//DeadCode DAW 30Jul99 	return NULL;
-//DeadCode DAW 30Jul99 #else
-//DeadCode DAW 30Jul99 	return (UByteP)ptr;
-//DeadCode DAW 30Jul99 #endif	
-//DeadCode DAW 30Jul99 };
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 int		animptr::operator - (animptr& a)
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	int	retval = (int)ptr - (int)a.ptr;
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 	assert((retval>=0)&&(retval<(size&0x3ff)));
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 	return (retval);
-//DeadCode DAW 30Jul99 #else
-//DeadCode DAW 30Jul99 	return (int)ptr - (int)a.ptr;
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 }
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 ULong	animptr::Offset(void*	a)
-//DeadCode DAW 30Jul99 {
-//DeadCode DAW 30Jul99 #ifndef	NDEBUG
-//DeadCode DAW 30Jul99 	SLong	offset = (UByteP)a - (UByteP)ptr;
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 	assert ((offset>=0)&&(offset<(size&0x3ff)));
-//DeadCode DAW 30Jul99 
-//DeadCode DAW 30Jul99 	return ULong(offset);
-//DeadCode DAW 30Jul99 #else
-//DeadCode DAW 30Jul99 	return ULong((UByteP)a - (UByteP)ptr);
-//DeadCode DAW 30Jul99 #endif
-//DeadCode DAW 30Jul99 }
 
 
 

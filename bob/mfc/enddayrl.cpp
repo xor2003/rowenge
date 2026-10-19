@@ -66,7 +66,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //
 
 #include "stdafx.h"
-//DEADCODE RDH 14/03/00 #include "bob.h"
 #include "_mfc.h"
 #include "mytime.h"
 #include "EndDayRL.h"

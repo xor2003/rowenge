@@ -125,8 +125,6 @@ BOOL CSQuick2::OnInitDialog()
 	
 	if (_DPlay.PlayerCreated)
 	{
-//DeadCode AMM 16Nov99 		_DPlay.SendInDebriefMessage();
-//DeadCode AMM 16Nov99 		DPlay::H2H_Player[_DPlay.mySlot].status=CPS_DEBRIEF;
 		_DPlay.SendStatusChange(DPlay::CPS_DEBRIEF);
 	}
 	Debrief_Timer=SetTimer(DPlay::TIMER_DEBRIEF,0,NULL);
@@ -134,7 +132,6 @@ BOOL CSQuick2::OnInitDialog()
 	
 	CRStatic*   s=GETDLGITEM(IDC_SMISSIONTITLE);
 	if (CSQuick1::currquickmiss==-1)
-//DEADCODE RDH 08/05/00 		s->SetString(RESSTRING(SINGLEPLAYER1));
 		s->SetString(RESSTRING(RODS_STRINGS));
 	else
 		s->SetString(LoadResString(CSQuick1::quickmissions[CSQuick1::currquickmiss].missionname));

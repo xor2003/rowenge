@@ -145,25 +145,6 @@ BOOL CSelectSession::OnInitDialog()
 	rlistbox->Clear();
 	rlistbox->AddColumn(200);
 
-//DeadCode AMM 13Jul98 	ULong temp=_DPlay.JoinNameCount;
-//DeadCode AMM 13Jul98 	char** Name=_DPlay.JoinNames;
-//DeadCode AMM 13Jul98 
-//DeadCode AMM 13Jul98 	while (temp--)
-//DeadCode AMM 13Jul98 	{
-//DeadCode AMM 13Jul98 		rlistbox->AddString(*Name,0);
-//DeadCode AMM 13Jul98 		*Name++;
-//DeadCode AMM 13Jul98 	}
-//DeadCode AMM 13Jul98 
-//DeadCode AMM 13Jul98 	rlistbox->AddString("Dont forget to get some real sessions",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("and fill in names structure",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("...",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("or people wont be able to join!",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("and that would be a shame",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("...",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("wouldnt it?",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("...",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("...",0);
-//DeadCode AMM 13Jul98 	rlistbox->AddString("how many lines can these things take?",0);
 
 	LPENUMSESSION temp;
 
@@ -174,8 +155,6 @@ BOOL CSelectSession::OnInitDialog()
 		temp=temp->Next;
 	}
 	currsessrow=-1;
-//DeadCode AMM 12Jul98 	string.LoadString(IDS_SESSION);
-//DeadCode AMM 12Jul98 	rlistbox->AddString(string,0);
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -191,13 +170,6 @@ void CSelectSession::OnSelectRlistSelectsession(long row, long column)
 {
 	// TODO: Add your control notification handler code here
 
-//DeadCode AMM 13Jul98 	char** Name=_DPlay.JoinNames;
-//DeadCode AMM 13Jul98 	while (row--)
-//DeadCode AMM 13Jul98 	{
-//DeadCode AMM 13Jul98 		*Name++;
-//DeadCode AMM 13Jul98 	}
-//DeadCode AMM 13Jul98 	
-//DeadCode AMM 13Jul98 	strcpy(&_DPlay.SessionName[0],*Name);
 
 	LPENUMSESSION temp;
 
@@ -217,7 +189,6 @@ void CSelectSession::OnSelectRlistSelectsession(long row, long column)
 				_DPlay.SessionName[59]=0;
 		}else
 		{
-//DEADCODE AMM 10/07/99 			FullPanel()->OnSelectRlistbox(1,1);						  //RDH 03/04/99
 		}
 	}
 }

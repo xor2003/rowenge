@@ -47,14 +47,11 @@ static	SWord	matan[],
 				tan_table[];
 static	UWord	rndlookup[55],
 				Days_in_Month[];
-//DEADCODE DAW 08/05/00 static	UWord	SqrtLookup[];
 void	sin_cos(ANGLES ang, SWord& sin_ang, SWord& cos_ang);
 	void	FillFastSqrt();
 public:
 	enum	{MAX_RND=64};
 
-//DeadCode AMM 19Oct100 	float	FastSqrt(float fl);
-//DeadCode AMM 19Oct100 	UWord SavedRndCount;										//ARM 04Sep96
 
 	MathLib ()
 	{
@@ -66,20 +63,11 @@ public:
 			rndlookup[i] = rand() ^ (rand() << 15);
 		}
 */
-		//DeadCode AMM 19Oct100 		MaxRndCount = 0;										//ARM 25Oct96
-//DEADCODE DAW 08/05/00 		FillFastSqrt();
 	}
 
 	UWord GetRndCount () { return rndcount; }					//ARM 03Sep96
 	void ResetRndCount () { rndcount = 0; }						//ARM 03Sep96
-//DeadCode AMM 19Oct100 	UWord MaxRndCount;											//ARM 03Sep96
-//DeadCode AMM 19Oct100 	UWord thisRndCount;											//ARM 03Sep96
 
-//DeadCode AMM 19Oct100 	void TestRndCount ()										//ARM 03Sep96
-//DeadCode AMM 19Oct100 	{															//ARM 03Sep96
-//DeadCode AMM 19Oct100 		if (thisRndCount > MaxRndCount)							//ARM 03Sep96
-//DeadCode AMM 19Oct100 			MaxRndCount = thisRndCount;							//ARM 03Sep96
-//DeadCode AMM 19Oct100 	}															//ARM 03Sep96
 
 	UWord GetRndLookUp (UWord n);						//ARM 04Sep96
 	void SetRndLookUp (UWord n, UWord val);			//ARM 04Sep96
@@ -91,16 +79,13 @@ public:
 	void Setcval(UWord val) { cval = val; }					//ARM 04Sep96
 
 	enum	SignType {POSITIVE=0,NEGATIVE=-1,SIGN_ALIGN=0x7fff};
-//DeadCode RDH 30Nov95 	void	sin_cos(ANGLES, SWord&, SWord& );
 	ANGLES	arcsin(SWord);
-//DeadCode JON 30Aug00 	ANGLES   arccos(SWord);
 
 //	ANGLES	high_arc_sin(SWord );								//PD 23May96
 //	ANGLES	high_arc_cos(SWord );								//PD 23May96
 
 	ANGLES	ATan256(int index0to256)	{return Angles(matan[index0to256]);}
 	SWord	tan(ANGLES);
-//DeadCode JON 30Aug00 	SLong	hightan(ANGLES ang);
 
 	ULong	distance3d(SLong,SLong,SLong);
 	UWord	Distance_Unsigned(UWord,UWord);
@@ -179,7 +164,6 @@ SWord DofCampFromSecs (SLong secs,SLong beginning);
 RndVal	rnd();
 RndVal	Query();
 
-//DeadCode JIM 12Jul96 SWord	rnd(SWord	M)	{return (SWord) ( ((SLong)M*rnd()) >>16);}
 SLong	rnd(SLong	M)	{return MULSHSIN(rnd(),M,16);}
 Angles	rnd(ANGLES M)	{return (Angles)MULSHSIN(rnd(),M,16);}
 

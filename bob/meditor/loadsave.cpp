@@ -74,7 +74,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "dir.h"
 //#include "memain.h"
 #include "strings.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include "persons2.h"
 #include "fileman.h"
 

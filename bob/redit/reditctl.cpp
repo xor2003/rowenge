@@ -79,7 +79,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//DeadCode JON 26Jun00 BOOL CREditCtrl::m_bDrawing = FALSE;
 bool	flashon;
 enum	{CURSOR_THICK_BORDER=1};
 IMPLEMENT_DYNCREATE(CREditCtrl, COleControl)
@@ -287,7 +286,6 @@ CREditCtrl::~CREditCtrl()
 void CREditCtrl::OnDraw(
 			CDC* pdc, const CRect& rcBounds, const CRect& rcInvalid)
 {
-//DeadCode JON 26Jun00 	m_bDisabled = !GetEnabled();
 	CRect rc = rcBounds;
 	CWnd* parent;
     CFont* pOldFont;
@@ -396,127 +394,6 @@ void CREditCtrl::OnDraw(
 					pdc->SelectObject(oldpen);
 			}
 	}
-//DEADCODE JIM 19/01/00 	if (m_curPos==INT_MAX)
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		m_curPos=InternalGetText().GetLength();
-//DEADCODE JIM 19/01/00 		m_curPoint=pdc->GetTextExtent(InternalGetText()).cx;
-//DEADCODE JIM 19/01/00 //		if (m_hWnd)
-//DEADCODE JIM 19/01/00 //		{
-//DEADCODE JIM 19/01/00 //			partwork = (CBitmap*)this->GetParent()->SendMessage(WM_GETARTWORK,NULL,NULL);
-//DEADCODE JIM 19/01/00 //			if(partwork)
-//DEADCODE JIM 19/01/00 //			{
-//DEADCODE JIM 19/01/00 //				partwork->GetBitmap(&artworkinfo);
-//DEADCODE JIM 19/01/00 //			}
-//DEADCODE JIM 19/01/00 //		}
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00 	if (m_curPoint-(rc.Width()/2)<m_scrollPoint) m_scrollPoint=max(m_curPoint-(rc.Width()/2),0);
-//DEADCODE JIM 19/01/00 	if (m_curPoint-rc.Width()+4>m_scrollPoint) m_scrollPoint=m_curPoint-rc.Width()+4;
-//DEADCODE JIM 19/01/00 	long offsetx;
-//DEADCODE JIM 19/01/00 	long offsety;
-//DEADCODE JIM 19/01/00 	if (m_hWnd)
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		long offsets;
-//DEADCODE JIM 19/01/00 		offsets=parent->SendMessage(WM_GETXYOFFSET,NULL,NULL);
-//DEADCODE JIM 19/01/00 		CRect rect;
-//DEADCODE JIM 19/01/00 		this->GetWindowRect(rect);
-//DEADCODE JIM 19/01/00 		CRect parentrect;
-//DEADCODE JIM 19/01/00 		parent->GetWindowRect(parentrect);
-//DEADCODE JIM 19/01/00 		offsetx=short(offsets & 0x0000FFFF)+parentrect.left-rect.left;
-//DEADCODE JIM 19/01/00 		offsety=short((offsets & 0xFFFF0000)>>16)+parentrect.top-rect.top;
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00 	else
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		offsetx=0;
-//DEADCODE JIM 19/01/00 		offsety=0;
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00     pdc->SetBkMode(TRANSPARENT);
-//DEADCODE JIM 19/01/00     pdc->SetTextAlign(TA_LEFT | TA_TOP);
-//DEADCODE JIM 19/01/00 
-//DEADCODE JIM 19/01/00 //	m_pic.Render(pdc,CRect(offsetx,offsety,hmWidth+offsetx,hmHeight+offsety),rcBounds);
-//DEADCODE JIM 19/01/00 //	if ( artworkinfo.bmWidth)
-//DEADCODE JIM 19/01/00 //	{
-//DEADCODE JIM 19/01/00 //		CDC memDC;
-//DEADCODE JIM 19/01/00 //		memDC.CreateCompatibleDC(pdc);
-//DEADCODE JIM 19/01/00 //		CBitmap* pOldBitmap;
-//DEADCODE JIM 19/01/00 //		pOldBitmap = memDC.SelectObject(partwork);
-//DEADCODE JIM 19/01/00 //		pdc->BitBlt(offsetx,offsety,artworkinfo.bmWidth,artworkinfo.bmHeight,&memDC,0,0,SRCCOPY);
-//DEADCODE JIM 19/01/00 //		memDC.SelectObject(pOldBitmap);
-//DEADCODE JIM 19/01/00 //		memDC.DeleteDC();
-//DEADCODE JIM 19/01/00 //	}
-//DEADCODE JIM 19/01/00 //	else
-//DEADCODE JIM 19/01/00 //	{
-//DEADCODE JIM 19/01/00 //		pdc->FillRect(rcBounds, CBrush::FromHandle((HBRUSH)GetStockObject(BLACK_BRUSH)));
-//DEADCODE JIM 19/01/00 //	}
-//DEADCODE JIM 19/01/00 	FileNum artnum=FIL_NULL;
-//DEADCODE JIM 19/01/00 	BOOL X2flag=FALSE;
-//DEADCODE JIM 19/01/00 	if (m_hWnd && m_FirstSweep != TRUE)
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		artnum = (FileNum)parent->SendMessage(WM_GETARTWORK,NULL,NULL);
-//DEADCODE JIM 19/01/00 		BYTE* pData;
-//DEADCODE JIM 19/01/00 		if (artnum)
-//DEADCODE JIM 19/01/00 		{
-//DEADCODE JIM 19/01/00 			pData = (BYTE*)parent->SendMessage(WM_GETFILE,artnum,NULL);
-//DEADCODE JIM 19/01/00 			if (pData[0]=='B' && pData[1]=='M') // checks if its a bitmap file
-//DEADCODE JIM 19/01/00 			{
-//DEADCODE JIM 19/01/00 				// now render it...
-//DEADCODE JIM 19/01/00 				BITMAPFILEHEADER* pFile=(BITMAPFILEHEADER*)pData;
-//DEADCODE JIM 19/01/00 				BITMAPINFO* pInfo=(BITMAPINFO*)(pData+sizeof(BITMAPFILEHEADER));
-//DEADCODE JIM 19/01/00 				pData+=pFile->bfOffBits;
-//DEADCODE JIM 19/01/00 				VERIFY(SetDIBitsToDevice(pdc->m_hDC,offsetx,offsety,pInfo->bmiHeader.biWidth, pInfo->bmiHeader.biHeight,
-//DEADCODE JIM 19/01/00 					0,0,0,pInfo->bmiHeader.biHeight,pData,pInfo,DIB_RGB_COLORS));
-//DEADCODE JIM 19/01/00 			}
-//DEADCODE JIM 19/01/00 			parent->SendMessage(WM_RELEASELASTFILE,NULL,NULL);
-//DEADCODE JIM 19/01/00 		}
-//DEADCODE JIM 19/01/00 		X2flag=parent->SendMessage(WM_GETX2FLAG,NULL,NULL);
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00 	if (!artnum && m_FirstSweep != TRUE || !m_hWnd)
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		pdc->FillRect(rcBounds, CBrush::FromHandle((HBRUSH)GetStockObject(BLACK_BRUSH)));
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00 	m_FirstSweep = FALSE;
-//DEADCODE JIM 19/01/00 	if (m_FontNum<0)
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		TEXTMETRIC tm;
-//DEADCODE JIM 19/01/00 		pdc->GetTextMetrics(&tm);
-//DEADCODE JIM 19/01/00 		pdc->SetTextColor(RGB(0,0,0));
-//DEADCODE JIM 19/01/00 		int shadowx=GetShadow1XOffset(tm.tmHeight);
-//DEADCODE JIM 19/01/00 		int shadowy=GetShadow1YOffset(tm.tmHeight);
-//DEADCODE JIM 19/01/00 	    pdc->ExtTextOut(2-m_scrollPoint+shadowx, 2+shadowy,
-//DEADCODE JIM 19/01/00 			ETO_CLIPPED, rc, InternalGetText(), InternalGetText().GetLength(), NULL);
-//DEADCODE JIM 19/01/00 		shadowx=GetShadow2XOffset(tm.tmHeight);
-//DEADCODE JIM 19/01/00 		shadowy=GetShadow2YOffset(tm.tmHeight);
-//DEADCODE JIM 19/01/00 	    pdc->ExtTextOut(2-m_scrollPoint+shadowx, 2+shadowy,
-//DEADCODE JIM 19/01/00 			ETO_CLIPPED, rc, InternalGetText(), InternalGetText().GetLength(), NULL);
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00 	if(m_bDisabled == FALSE)
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		pdc->SetTextColor(TranslateColor(GetForeColor()));
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00 	else
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		pdc->SetTextColor(RGB(128,128,128));
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00     pdc->ExtTextOut(2-m_scrollPoint, 2,
-//DEADCODE JIM 19/01/00 		ETO_CLIPPED, rc, InternalGetText(), InternalGetText().GetLength(), NULL);
-//DEADCODE JIM 19/01/00 	if (m_bShowCursor && m_bDisabled == FALSE)
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		SetFocus();
-//DEADCODE JIM 19/01/00 		CPen pen(PS_SOLID,2,TranslateColor(GetForeColor()));
-//DEADCODE JIM 19/01/00 		pdc->SelectObject(pen);
-//DEADCODE JIM 19/01/00 		pdc->MoveTo(m_curPoint-m_scrollPoint+2,3);
-//DEADCODE JIM 19/01/00 		pdc->LineTo(m_curPoint-m_scrollPoint+2,pdc->GetTextExtent("jA").cy+2);
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00 	CPen BlackPen,WhitePen,pen;
-//DEADCODE JIM 19/01/00 	if (!m_hWnd || IsWindowEnabled())
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		BlackPen.CreatePen(PS_SOLID,1,AXC_DARKEDGE);
-//DEADCODE JIM 19/01/00 		WhitePen.CreatePen(PS_SOLID,1,AXC_LITEDGE);
-//DEADCODE JIM 19/01/00 	}
-//DEADCODE JIM 19/01/00 	else
-//DEADCODE JIM 19/01/00 	{
-//DEADCODE JIM 19/01/00 		BlackPen.CreatePen(PS_SOLID,1,AXC_DISABLEDDARKEDGE);
-//DEADCODE JIM 19/01/00 		WhitePen.CreatePen(PS_SOLID,1,AXC_DISABLEDLITEDGE);
-//DEADCODE JIM 19/01/00 	}
 
 //TEMPCODE JIM 19/01/00 	if(m_bDisabled == TRUE)
 //TEMPCODE JIM 19/01/00 	{
@@ -575,37 +452,9 @@ void CREditCtrl::OnResetState()
 
 void CREditCtrl::OnLButtonDown(UINT nFlags, CPoint point) 
 {
-//DeadCode JON 26Jun00 	m_bDisabled = ;
 	if (!GetEnabled()) return;
 	SetToWordUnderCursor(point);
 
-//DEADCODE JIM 20/01/00 	CDC* pdc;
-//DEADCODE JIM 20/01/00 	pdc=GetDC();
-//DEADCODE JIM 20/01/00     CFont* pOldFont;
-//DEADCODE JIM 20/01/00 	if (m_hWnd) pOldFont = pdc->SelectObject((CFont*)this->GetParent()->SendMessage(WM_GETGLOBALFONT,abs(m_FontNum),NULL));
-//DEADCODE JIM 20/01/00 	else pOldFont = pdc->GetCurrentFont();
-//DEADCODE JIM 20/01/00 	// figure out where the user clicked the cursor
-//DEADCODE JIM 20/01/00 	m_curPoint=pdc->GetTextExtent(InternalGetText()).cx;
-//DEADCODE JIM 20/01/00 	m_curPos=InternalGetText().GetLength();
-//DEADCODE JIM 20/01/00 	for (int i=1;i<=m_curPos;i++)
-//DEADCODE JIM 20/01/00 	{
-//DEADCODE JIM 20/01/00 		if (point.x-2+m_scrollPoint<pdc->GetTextExtent(InternalGetText().Left(i)).cx)
-//DEADCODE JIM 20/01/00 		{
-//DEADCODE JIM 20/01/00 			m_curPoint=pdc->GetTextExtent(InternalGetText().Left(i-1)).cx;
-//DEADCODE JIM 20/01/00 			m_curPos=i-1;
-//DEADCODE JIM 20/01/00 			break;
-//DEADCODE JIM 20/01/00 		}
-//DEADCODE JIM 20/01/00 	}
-//DEADCODE JIM 20/01/00 //	pdc->SelectObject(pOldFont);
-//DEADCODE JIM 20/01/00 	this->ReleaseDC(pdc);
-//DEADCODE JIM 20/01/00 	SetFocus();
-//DEADCODE JIM 20/01/00 	if (m_timerID)
-//DEADCODE JIM 20/01/00 	{
-//DEADCODE JIM 20/01/00 		m_bShowCursor=TRUE;
-//DEADCODE JIM 20/01/00 		InvalidateControl();
-//DEADCODE JIM 20/01/00 	}
-//DEADCODE JIM 20/01/00     pdc->SelectObject(pOldFont);
-//DEADCODE JIM 20/01/00 	ReleaseDC(pdc);
  	COleControl::OnLButtonDown(nFlags, point);
 }
 
@@ -621,11 +470,6 @@ void CREditCtrl::OnTimer(UINT nIDEvent)
 		InvalidateRect(CRect(0-1,0-1,0+1,0+linedepth+1),false);
 	}
 
-//DeadCode JON 26Jun00 	if (nIDEvent==m_timerID)
-//DeadCode JON 26Jun00 	{
-//DeadCode JON 26Jun00 		m_bShowCursor=!m_bShowCursor;
-//DeadCode JON 26Jun00 //TEMPCODE JIM 20/01/00 		InvalidateControl();
-//DeadCode JON 26Jun00 	}
 	COleControl::OnTimer(nIDEvent);
 	KillTimer(TIMERNUM);
 }
@@ -665,7 +509,6 @@ void CREditCtrl::OnSetFocus(CWnd* pOldWnd)
 
 void CREditCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {	
-//DeadCode JON 26Jun00 	m_bDisabled = !GetEnabled();
 	if (!GetEnabled()) return;
 	if (wordlist.IsEmpty())
 	{
@@ -681,12 +524,6 @@ void CREditCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		currentword=&wordlist.GetHead();
 		currentchar=0;
 	}
-//DEADCODE MS 02/02/00 	TRACE1("virtual: %c\n",nChar);
-//DEADCODE JIM 20/01/00 	CDC* pdc;
-//DEADCODE JIM 20/01/00 	pdc=GetDC();
-//DEADCODE JIM 20/01/00     CFont* pOldFont;
-//DEADCODE JIM 20/01/00 	if (m_hWnd) pOldFont = pdc->SelectObject((CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT,abs(m_FontNum),NULL));
-//DEADCODE JIM 20/01/00 	else pOldFont = pdc->GetCurrentFont();
 	switch (nChar)
 	{
 		case VK_BACK:
@@ -1085,11 +922,6 @@ void CREditCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			TRACE0("User pressed Enter\n");
 			break;
 	}
-//DEADCODE JIM 20/01/00 	m_curPoint=pdc->GetTextExtent(InternalGetText().Left(m_curPos)).cx;
-//DEADCODE JIM 20/01/00 	SetWindowText(InternalGetText());
-//DEADCODE JIM 20/01/00 //DeadCode DAW 09Mar99 	FireTextChanged(InternalGetText());
-//DEADCODE JIM 20/01/00 	pdc->SelectObject(pOldFont);
-//DEADCODE JIM 20/01/00 	ReleaseDC(pdc);
 //	FireTextChanged(InternalGetText());
 	RepositionWordList();
 	InvalidateChangedWords();
@@ -1098,7 +930,6 @@ void CREditCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CREditCtrl::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-//DeadCode JON 26Jun00 	m_bDisabled = !GetEnabled();
 	if (!GetEnabled()) return;
 	if (nChar>' ' && allowed[nChar])// && nChar!=':' && nChar!='/' && nChar!='\\' && nChar!='$')
 	{
@@ -1471,10 +1302,7 @@ void	CREditCtrl::InvalidateChangedWords()
 			else if (w.flags&w.W_HARDLINE)
 			{
 				InvalidateControl(&CRect(w.startat.x-CURSOR_THICK_BORDER,w.startat.y-CURSOR_THICK_BORDER,r.right+CURSOR_THICK_BORDER,w.startat.y+linedepth+CURSOR_THICK_BORDER));
-//DeadCode JON 26Jun00 				if (p)
 				InvalidateControl(&CRect(r.left-CURSOR_THICK_BORDER,w.startat.y+linedepth-CURSOR_THICK_BORDER,r.right+CURSOR_THICK_BORDER,w.startat.y+linedepth+linedepth/2+CURSOR_THICK_BORDER));
-//DeadCode JON 26Jun00 				else
-//DeadCode JON 26Jun00 					InvalidateControl(&CRect(r.left,w.startat.y+linedepth,r.right,r.bottom));
 			}
 			else if (w.flags&w.W_TAB)
 			{
@@ -1573,7 +1401,6 @@ int	CREditCtrl::GetString(CString &string)
 void	CREditCtrl::SetToWordUnderCursor(CPoint p)
 {
 	POSITION pos=wordlist.GetTailPosition();
-//DeadCode JIM 20Oct00 	int	outlen=0;
 	if (currentword)
 		currentword->flags|=OneWord::W_REDRAW;
 	if (pos)

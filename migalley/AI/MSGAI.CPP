@@ -234,7 +234,6 @@ bool	ArtInt::Visible(AirStrucPtr eye,AirStrucPtr trg)
 	Coords3D* eyepos=_DPlay.GetGoodACPosition(eye);
 	Coords3D* trgpos=_DPlay.GetGoodACPosition(trg);
 	//loads of quick throwouts for target
-//DeadCode JIM 22Apr97 	if (trg->uniqueID.deaded)									//JIM 17Oct96
 	if (trg->MigStatus.LaunchFlags.deadtime)
 		return(false);											//JIM 17Oct96
 	if (trg->leader && trg->FormationInfo.information)
@@ -259,7 +258,6 @@ bool	ArtInt::Visible(AirStrucPtr eye,AirStrucPtr trg)
 
 	if (	delta<visiblerange && delta>-visiblerange
 		&&	delta2<visiblerange && delta2>-visiblerange
-//DEADCODE JIM 29/03/99 		||	(!!(eye->World.Y<Land_Scape.CloudAlt())!=!!(trg->World.Y<Land_Scape.CloudAlt()))
 		)
 	{
 		Item::InterceptandRange(eyepos,trgpos);
@@ -275,8 +273,6 @@ bool	ArtInt::Visible(AirStrucPtr eye,AirStrucPtr trg)
 	}
 }
 
-//DeadCode JIM 06Nov96 #define	SUNPITCH 	ANGLES_30Deg
-//DeadCode JIM 06Nov96 #define	SUNHDG	ANGLES_135Deg	
 
 bool	ArtInt::Seen(AirStrucPtr eye,AirStrucPtr trg)
 {
@@ -284,15 +280,6 @@ bool	ArtInt::Seen(AirStrucPtr eye,AirStrucPtr trg)
 		return(false);
 	else
 	{
-//DeadCode JIM 10Dec96 		if (trg->AutoMoveInfo.nationality!=eye->AutoMoveInfo.nationality)
-//DeadCode JIM 10Dec96 		{
-//DeadCode JIM 10Dec96 			spotcount++;
-//DeadCode JIM 10Dec96 			if (Save_Data.gamedifficulty[GD_TACTICALRANGE])			//JIM 22Oct96
-//DeadCode JIM 10Dec96 			{														//JIM 22Oct96
-//DeadCode JIM 10Dec96 				Timer_Code.AccelToggle(FALSE);						//JIM 22Oct96
-//DeadCode JIM 10Dec96 				Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);		//JIM 22Oct96
-//DeadCode JIM 10Dec96 			}														//JIM 22Oct96
-//DeadCode JIM 10Dec96 		}		
 		if (eye->ai.unfriendly!=trg)
 		{
 			//build up probabilities
@@ -305,12 +292,6 @@ bool	ArtInt::Seen(AirStrucPtr eye,AirStrucPtr trg)
 			ULong	prob=PCW_100;	//NOTE: ALL MATH IS UNSIGNED!!!!
 			ULong	tprob;
 			//range														//0.0km: 100
-//DEADCODE RDH 23/06/99 			if (item::Range<DANGERRANGE*2)								//0.5km:  98
-//DEADCODE RDH 23/06/99 				tprob=PCW_100-item::Range*PCW_5/(DANGERRANGE*2);		//1.0km:  95
-//DEADCODE RDH 23/06/99 			elseif (item::Range<RECOGNISERANGE)														//3.0km:	 50
-//DEADCODE RDH 23/06/99 				tprob=PCW_95-MULDIVSIN(item::Range,PCW_90,RECOGNISERANGE-(DANGERRANGE*2));  				//5.0km:	  5
-//DEADCODE RDH 23/06/99 			else
-//DEADCODE RDH 23/06/99 				tprob=PCW_5-MULDIVSIN(item::Range-RECOGNISERANGE,PCW_5,METRES2000);
 
 
 			int boundary = 	ENGAGERANGE + ((COMBATRANGE - ENGAGERANGE) *(eye->ai.PilotSkills.combatskill))/(SKILL_HERO);
@@ -325,21 +306,6 @@ bool	ArtInt::Seen(AirStrucPtr eye,AirStrucPtr trg)
 				tprob = PCW_1;
 			prob=(prob*tprob)>>16;
 			//sun position
-//DeadCode CSB 06/07/99				if (eye->World.Y>Land_Scape.CloudAlt())
-//DeadCode CSB 06/07/99				{
-//DeadCode CSB 06/07/99					WorldStuff	*worldptr = mobileitem::currworld;
-//DeadCode CSB 06/07/99					if (-worldptr->sunrot<ANGLES_180Deg)
-//DeadCode CSB 06/07/99					{
-//DeadCode CSB 06/07/99						tprob	=Math_Lib.AbsSign((SWord)(item::PitchIntercept-worldptr->sunpitch))				//00deg=  10
-//DeadCode CSB 06/07/99								+Math_Lib.AbsSign((SWord)(item::HdgIntercept-worldptr->sunhdg));				//20deg= 100
-//DeadCode CSB 06/07/99						ANGLES	tang=(Angles)tprob;
-//DeadCode CSB 06/07/99						if (tang<ANGLES_20Deg)										//20+  = 100
-//DeadCode CSB 06/07/99						{
-//DeadCode CSB 06/07/99							tprob=PCW_10+tprob*PCW_90/ANGLES_20Deg;
-//DeadCode CSB 06/07/99							prob=(prob*tprob)>>16;
-//DeadCode CSB 06/07/99						}
-//DeadCode CSB 06/07/99					}
-//DeadCode CSB 06/07/99				}
 			//pointing his way?
 			tprob=	PCW_100												//000Deg= 100								
 					-	Math_Lib.AbsSign((SWord)
@@ -390,8 +356,6 @@ bool	ArtInt::Seen(AirStrucPtr eye,AirStrucPtr trg)
 	   )
   		prob = PCW_100;
 	//Skill:	(Friendly force size)
-//DEADCODE RDH 23/06/99 			tprob=eye->ai.PilotSkills.combatskill			+2;
-//DEADCODE RDH 23/06/99 			prob=prob*tprob/(SKILL_HERO	+2);
 			
 
 	//So, what are the chances?
@@ -435,7 +399,6 @@ void	ArtInt::ExpandMigs(AirStrucPtr placeholder)
 // dont need to send a message for replay because expandmigs uses ghost AC position
 // to expand Migs. In time accel for replay the Migs could get expanded but upon
 // resuming record the block header will record all their positions.
-//DeadCode AMM 13Apr99 	placeholder->MigStatus.LaunchFlags.Drawn=TRUE;
 	if (_DPlay.Implemented)										//AMM 12Apr99
 		_DPlay.SendExpandMigsMessage(placeholder->uniqueID.bitfieldUid.count );//AMM 12Apr99
 	else														//AMM 12Apr99
@@ -563,7 +526,6 @@ void	ArtInt::ReallyExpandMigs(AirStrucPtr placeholder)
 void	ArtInt::VisibleAcCheck()
 {
 	spotcount=0;
-//DeadCode JIM 10Jun96 	((char*)0xb0000)_++;
 	AirStruc* eye=ACArray[ACArrayInd];
 
 	ACArrayInd++;
@@ -610,7 +572,6 @@ void	ArtInt::VisibleAcCheck()
 					Coords3D* trgpos=_DPlay.GetGoodACPosition(trg);
 					if ((trg->FormationInfo.duty&ACTIONCODE)==DA_CAP)
 					{
-//DeadCode DAW 02Sep99 						breakif(Math_Lib.DistAbsSum(trgpos->X-eye->World.X,trgpos->Z-eye->World.Z)<METRES10KM)
 						if(Math_Lib.DistAbsSum(trgpos->X-eye->World.X,trgpos->Z-eye->World.Z)<METRES50KM) //JIM 16/06/99
 							closebomber=true;
 					}
@@ -626,7 +587,6 @@ void	ArtInt::VisibleAcCheck()
 	else
 	if (eye->AutoMoveInfo.movecode!=AUTO_NOPPILOT)	//spare aircraft
 //TEMPCODE JIM 17/03/99 	if (!eye->leader || !eye->FormationInfo.information)
-//DEADCODE RDH 23/02/99 	if (!eye->leader || !eye->FormationInfo.information)
 	if (!eye->AircraftDamaged())
 //rdh 13/1/99	if (!eye->AircraftDamaged() && eye->classtype->aerobaticfactor!=AEROBATIC_LOW)								//JIM 29Aug96
 	if (eye->AutoMoveInfo.movecode!=AUTO_COMBAT || eye->ai.unfriendly==NULL)
@@ -634,16 +594,6 @@ void	ArtInt::VisibleAcCheck()
 		int	indstart=Math_Lib.rnd(100);
 		int indloop=indstart;
 
-//DEADCODE RDH 13/06/99 		if	(	(		eye->leader
-//DEADCODE RDH 13/06/99 					&& ((AirStruc*)*eye->leader)->ai.unfriendly
-//DEADCODE RDH 13/06/99 					&& ((AirStruc*)*eye->leader)->AutoMoveInfo.movecode==AUTO_COMBAT
-//DEADCODE RDH 13/06/99 				)
-//DEADCODE RDH 13/06/99 				||
-//DEADCODE RDH 13/06/99 				(			eye->fly.leadflight
-//DEADCODE RDH 13/06/99 					&& ((AirStruc*)*eye->fly.leadflight)->ai.unfriendly
-//DEADCODE RDH 13/06/99 					&& ((AirStruc*)*eye->fly.leadflight)->AutoMoveInfo.movecode==AUTO_COMBAT
-//DEADCODE RDH 13/06/99 				)
-//DEADCODE RDH 13/06/99 			)
 		if (	(eye->ai.unfriendly==NULL) && (LeadersGroupInCombat(eye)))									  //RDH 13/06/99
 		{//if eye has leader and leader has unfriendly and leader is in combat 
 			if (AttackSpareInLeadersGroup(eye))	return;
@@ -671,7 +621,6 @@ void	ArtInt::VisibleAcCheck()
 						{
 //TEMP							Timer_Code.AccelToggle(FALSE);
 							OverLay.CancelAccel();
-//DEADCODE DAW 10/05/99 							Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);
 						}
 					}
 				if (trg->Range>RECOGNISERANGE)
@@ -702,346 +651,7 @@ void	ArtInt::VisibleAcCheck()
 }
 
 
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 //Procedure		DoesFriendNeedHelp
-//DeadCode RDH 27Mar98 //Author		Jim Taylor
-//DeadCode RDH 27Mar98 //Date			Tue 4 Jun 1996
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Description	Assess wether friendly needs helping out
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Inputs		
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Returns	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 Bool	ArtInt::DoesFriendNeedHelp(AirStruc* eye,AirStruc* trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	if (trg->ai.unfriendly && !((AirStruc*)*trg->ai.unfriendly)->ai.attacker)
-//DeadCode RDH 27Mar98 	{
-//DeadCode RDH 27Mar98 //TEMP		if (trg->ai.eventlog->stage!=EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 //TEMP			Persons_2.AddMessageIfPlayerSq(eye,UserMsg::SIGHTED,TEXT_DOGFIGHTSIGHTED,trg);
-//DeadCode RDH 27Mar98 		if (eye->ai.unfriendly==NULL && eye->AutoMoveInfo.movecode<AUTO_PRECOMBAT)
-//DeadCode RDH 27Mar98 			eye->ai.unfriendly=trg->ai.unfriendly;
-//DeadCode RDH 27Mar98 		if (trg->Range>RECOGNISERANGE)
-//DeadCode RDH 27Mar98 		{//decide wether to attack - they may not know about us
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 		else
-//DeadCode RDH 27Mar98 		if (trg->Range>ATTACKRANGE)
-//DeadCode RDH 27Mar98 		{//decide wether to attack or evade - they can see us
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 		else
-//DeadCode RDH 27Mar98 		{//they are very close... really have to go in!
-//DeadCode RDH 27Mar98 			//force everyone out of formation so they spot indipendently
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 	else
-//DeadCode RDH 27Mar98 		if (trg->Range>RECOGNISERANGE-METRES500)
-//DeadCode RDH 27Mar98 			if (eye->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 			if (trg->ai.eventlog->stage!=EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 			{
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.UpdateLog(trg->ai.eventlog,0,EventLog::SEENBYPLAYERS);
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_FRIENDLYSIGHTED,trg);
-//DeadCode RDH 27Mar98 				eye->PlayerSequenceAudible(FIL_MUSIC_FRIENDLY_SEEN);
-//DeadCode RDH 27Mar98 			}
-//DeadCode RDH 27Mar98 	return(false);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 //Procedure		SpottedNeutral
-//DeadCode RDH 27Mar98 //Author		Jim Taylor
-//DeadCode RDH 27Mar98 //Date			Tue 4 Jun 1996
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Description	do we care about neutrals?
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Inputs		
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Returns	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 Bool	ArtInt::SpottedNeutral(AirStruc* eye,AirStruc* trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	return(false);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 //Procedure		SpottedNewUnfriendly
-//DeadCode RDH 27Mar98 //Author		Jim Taylor
-//DeadCode RDH 27Mar98 //Date			Tue 22 Oct 1996
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Description	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Inputs		
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Returns	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 Bool	ArtInt::SpottedNewUnfriendly(AirStruc* eye,AirStruc* trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	if (eye->leader==NULL)
-//DeadCode RDH 27Mar98 		if (trg->ai.attacker==NULL)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 			int	newrange=trg->Range;
-//DeadCode RDH 27Mar98 			if (newrange<DANGERRANGE)
-//DeadCode RDH 27Mar98 				return(SpottedUnfriendly(eye,trg));
-//DeadCode RDH 27Mar98 			if (newrange<ENGAGERANGE)
-//DeadCode RDH 27Mar98 			{
-//DeadCode RDH 27Mar98 				if (eye->ai.unfriendly==NULL)
-//DeadCode RDH 27Mar98 					return(SpottedUnfriendly(eye,trg));
-//DeadCode RDH 27Mar98 				eye->InterceptandRange(eye->ai.unfriendly);
-//DeadCode RDH 27Mar98 				if (eye->Range>ENGAGERANGE)
-//DeadCode RDH 27Mar98 					return(SpottedUnfriendly(eye,trg));
-//DeadCode RDH 27Mar98 			}
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 	return(false);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 //Procedure		SpottedUnfriendly
-//DeadCode RDH 27Mar98 //Author		Jim Taylor
-//DeadCode RDH 27Mar98 //Date			Tue 4 Jun 1996
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Description	Do we want to attack or evade or tell flight/squad leader?
-//DeadCode RDH 27Mar98 //				Based on character and rule flags.
-//DeadCode RDH 27Mar98 //				First rule flag: go tell the leader.
-//DeadCode RDH 27Mar98 //				This works for followers as well, as only out of formation followers get here!
-//DeadCode RDH 27Mar98 //				Ok... so we decide to engage...
-//DeadCode RDH 27Mar98 //					If range is <danger we just go in. No time to plan.
-//DeadCode RDH 27Mar98 //					If the spotter is the leader then the whole flight can go in
-//DeadCode RDH 27Mar98 //					Any following flights can go in as well
-//DeadCode RDH 27Mar98 //					
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Inputs		
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Returns	TRUE if engaging
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 Bool	ArtInt::SpottedUnfriendly(AirStruc* eye,AirStruc* trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	if (eye->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 		if (trg->ai.unfriendly)
-//DeadCode RDH 27Mar98 			eye->PlayerSequenceAudible(FIL_MUSIC_DOGFIGHT_SEEN);
-//DeadCode RDH 27Mar98 		else
-//DeadCode RDH 27Mar98 		if (trg->classtype->aerobaticfactor!=AEROBATIC_LOW)
-//DeadCode RDH 27Mar98 			eye->PlayerSequenceAudible(FIL_MUSIC_IDENTIFY_ENEMY);
-//DeadCode RDH 27Mar98 		else
-//DeadCode RDH 27Mar98 			eye->PlayerSequenceAudible(FIL_MUSIC_BOMBERS_SEEN);
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 //TEMP	Persons_2.PossibleEvent(eye->currworld,trg,eye);
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	if ( trg->Range>DANGERRANGE && eye->ai.tellleader && eye->formpos )
-//DeadCode RDH 27Mar98 	{	//ok.. we are supposed to tell the leader...
-//DeadCode RDH 27Mar98 		//BUT only if he is not already engaging.
-//DeadCode RDH 27Mar98 		AirStrucPtr	leadac=*eye->leader;
-//DeadCode RDH 27Mar98 		if (leadac==NULL)
-//DeadCode RDH 27Mar98 			leadac=eye->fly.leadflight;
-//DeadCode RDH 27Mar98 		if (leadac && leadac->ai.unfriendly==NULL && leadac->AutoMoveInfo.movecode!=AUTO_COMBAT)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 			eye->AutoMoveInfo.movecode=AUTO_TELLLEADER;
-//DeadCode RDH 27Mar98 			eye->ai.unfriendly=trg;
-//DeadCode RDH 27Mar98 		 	return(true);	//we have decided to run to leader
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 //TEMP		Persons_2.AddMessageIfPlayer(eye,UserMsg::SIGHTED,TEXT_UNFRIENDLYSIGHTED,trg);
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 	//we act indipendently...
-//DeadCode RDH 27Mar98 	if (eye->Range>ATTACKRANGE)
-//DeadCode RDH 27Mar98 	{	//if range is > attack range we can choose based on character of the pilot
-//DeadCode RDH 27Mar98 		//	On spotting the enemy, a tactician will only engage if:
-//DeadCode RDH 27Mar98 		// 				outnumbers enemy
-//DeadCode RDH 27Mar98 		//			&	has surprise
-//DeadCode RDH 27Mar98 		//			&	has altitude advantage & optimum alt range
-//DeadCode RDH 27Mar98 		//
-//DeadCode RDH 27Mar98 		//	Norman	outnumbers enemy &	has altitude advantage
-//DeadCode RDH 27Mar98 		//
-//DeadCode RDH 27Mar98 		//	Cavalier only requires altitude advantage.
-//DeadCode RDH 27Mar98 		//	Alt advantage includes a check for operating altitude
-//DeadCode RDH 27Mar98 		//
-//DeadCode RDH 27Mar98 		// However, you should keep an eye on him!
-//DeadCode RDH 27Mar98 		if (eye->AutoMoveInfo.movecode!=AUTO_COMBAT)							//JIM 27Aug96
-//DeadCode RDH 27Mar98 			eye->ai.unfriendly=trg;								//JIM 27Aug96
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 		switch	(eye->ai.character)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 		case CHAR_CAVALIER:
-//DeadCode RDH 27Mar98 			if (	trg->World.Y > eye->classtype->opceiling	)
-//DeadCode RDH 27Mar98 			{
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.AddMessageIfPlayerSq(eye,UserMsg::SIGHTED,TEXT_UNFRIENDLYSIGHTED,trg);
-//DeadCode RDH 27Mar98 				return(false);
-//DeadCode RDH 27Mar98 			}
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 		case CHAR_MRAVERAGE:
-//DeadCode RDH 27Mar98 			if (	trg->World.Y > eye->classtype->opceiling
-//DeadCode RDH 27Mar98 				||	GuessFormationSize(trg)>CountFormationSize(eye)
-//DeadCode RDH 27Mar98 				)
-//DeadCode RDH 27Mar98 			{
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.AddMessageIfPlayerSq(eye,UserMsg::SIGHTED,TEXT_UNFRIENDLYSIGHTED,trg);
-//DeadCode RDH 27Mar98 				return(false);
-//DeadCode RDH 27Mar98 			}
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 				
-//DeadCode RDH 27Mar98 		case CHAR_TACTICIAN:
-//DeadCode RDH 27Mar98 			if (	trg->World.Y > eye->classtype->fightceiling
-//DeadCode RDH 27Mar98 //DeadCode JIM 24Oct96 				||	trg->World.Y < eye->classtype->fightfloor
-//DeadCode RDH 27Mar98 				||	GuessFormationSize(trg)>CountFormationSize(eye)
-//DeadCode RDH 27Mar98 //DeadCode RDH 23Jul96 				||	SameFlight(eye,*trg->ai.unfriendly)
-//DeadCode RDH 27Mar98 				)
-//DeadCode RDH 27Mar98 			{
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.AddMessageIfPlayerSq(eye,UserMsg::SIGHTED,TEXT_UNFRIENDLYSIGHTED,trg);
-//DeadCode RDH 27Mar98 				return(false);
-//DeadCode RDH 27Mar98 			}
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 				
-//DeadCode RDH 27Mar98 		case CHAR_TIMID:   	//won't attack unless directly threatened
-//DeadCode RDH 27Mar98 			{
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.AddMessageIfPlayerSq(eye,UserMsg::SIGHTED,TEXT_UNFRIENDLYSIGHTED,trg);
-//DeadCode RDH 27Mar98 				return (FALSE);
-//DeadCode RDH 27Mar98 			}
-//DeadCode RDH 27Mar98 		}	
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 	if (trg->Range<DANGERRANGE)
-//DeadCode RDH 27Mar98 	{	//just go straight in. No time to set up
-//DeadCode RDH 27Mar98 		SetEngage(eye,trg);
-//DeadCode RDH 27Mar98 		if (eye->AutoMoveInfo.movecode<AUTO_PRECOMBAT)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 //TEMP			Persons_2.AddMessageIfPlayerSq(eye,UserMsg::ATTACKED,TEXT_BOUNCED,trg);
-//DeadCode RDH 27Mar98 			eye->PlayerSequenceAudible(FIL_MUSIC_SURPRISED);
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 		ClearFollowerFormation(eye);
-//DeadCode RDH 27Mar98 		return(true);
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 	//Go in in formation... try and get advantage if poss!
-//DeadCode RDH 27Mar98 	//how to go in...
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	if (eye->leader)
-//DeadCode RDH 27Mar98 	{
-//DeadCode RDH 27Mar98 		SetPreEngage(eye,trg);
-//DeadCode RDH 27Mar98 		return(true);
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	//find the leader to go for
-//DeadCode RDH 27Mar98 	//Always go for leader of current flight
-//DeadCode RDH 27Mar98 	if (trg->FormationInfo.information && trg->leader)
-//DeadCode RDH 27Mar98 		trg=*trg->leader;
-//DeadCode RDH 27Mar98 	//If we are squad leader consider going for their squad leader
-//DeadCode RDH 27Mar98 	if (eye->formpos==0 && trg->fly.leadflight &&trg->FormationInfo.information)//JIM 03Oct96
-//DeadCode RDH 27Mar98 		trg=trg->fly.leadflight;
-//DeadCode RDH 27Mar98 	//attack him!
-//DeadCode RDH 27Mar98 		SetPreEngage(eye,trg);
-//DeadCode RDH 27Mar98 	//send everyone in our flight against everyone in his flight
-//DeadCode RDH 27Mar98 	AirStrucPtr	currtrg=trg;
-//DeadCode RDH 27Mar98 	AirStrucPtr	currfol=eye;
-//DeadCode RDH 27Mar98 	while ((currfol=*currfol->follower)!=NULL)
-//DeadCode RDH 27Mar98 		currtrg=SetFollowerPreEngage(currfol,currtrg);
-//DeadCode RDH 27Mar98 	//send each flight in our squad against each of his flights
-//DeadCode RDH 27Mar98 	if (eye->formpos==00)
-//DeadCode RDH 27Mar98 	{
-//DeadCode RDH 27Mar98 		currtrg=trg;
-//DeadCode RDH 27Mar98 		currfol=eye;
-//DeadCode RDH 27Mar98 		if (currtrg->leader==NULL)
-//DeadCode RDH 27Mar98 		while ((currfol=currfol->fly.nextflight)!=NULL)
-//DeadCode RDH 27Mar98 			currtrg=SetFlightPreEngage(currfol,currtrg);
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 	return(true);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 //Procedure		SpottedUnknown
-//DeadCode RDH 27Mar98 //Author		Jim Taylor
-//DeadCode RDH 27Mar98 //Date			Tue 4 Jun 1996
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Description	Do we want a closer look?
-//DeadCode RDH 27Mar98 //				At this range, the only criteria are our strength and enemy force 
-//DeadCode RDH 27Mar98 //				size.
-//DeadCode RDH 27Mar98 //				Character can be applied to this.
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Inputs		
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Returns	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 Bool	ArtInt::SpottedUnknown(AirStruc* eye,AirStruc* trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	if (eye->ai.unfriendly==NULL)
-//DeadCode RDH 27Mar98 		if (eye->AutoMoveInfo.nationality!=trg->AutoMoveInfo.nationality)
-//DeadCode RDH 27Mar98 			eye->ai.unfriendly=trg;
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	if (	eye->ai.eventlog->stage==EventLog::TAKEOFF
-//DeadCode RDH 27Mar98 		&&	trg->ai.eventlog->stage!=EventLog::TAKEOFF
-//DeadCode RDH 27Mar98 		)
-//DeadCode RDH 27Mar98 //TEMP		Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_UNKNOWNSIGHTED,eye);
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 		if (eye->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 		 	if(trg->ai.eventlog->stage!=EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 			{
-//DeadCode RDH 27Mar98 				eye->PlayerSequenceAudible(FIL_MUSIC_SPOTTED_UNKNOWN);
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.UpdateLog(trg->ai.eventlog,0,EventLog::SEENBYPLAYERS);
-//DeadCode RDH 27Mar98 			}
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 		elseif(trg->ai.eventlog->stage!=EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 //TEMP			Persons_2.UpdateLog(trg->ai.eventlog,0,EventLog::SEENBYOTHERS);
-//DeadCode RDH 27Mar98 		;
-//DeadCode RDH 27Mar98 	return(false);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 
 
-//DEADCODE RDH 13/06/99 //------------------------------------------------------------------------------
-//DEADCODE RDH 13/06/99 //Procedure		AttackSpareInLeadersFlight
-//DEADCODE RDH 13/06/99 //Author		Jim Taylor
-//DEADCODE RDH 13/06/99 //Date			Tue 4 Jun 1996
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 //Description	
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 //Inputs		
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 //Returns	
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 //------------------------------------------------------------------------------
-//DEADCODE RDH 13/06/99 bool	ArtInt::AttackSpareInLeadersFlight(AirStruc* eye)
-//DEADCODE RDH 13/06/99 {
-//DEADCODE RDH 13/06/99 	AirStruc*	unf=(AirStrucPtr)*((AirStrucPtr)*eye->leader)->ai.unfriendly;
-//DEADCODE RDH 13/06/99 	if (unf->leader)
-//DEADCODE RDH 13/06/99 		unf=(AirStruc*)*unf->leader;
-//DEADCODE RDH 13/06/99 	while (unf)
-//DEADCODE RDH 13/06/99 	{
-//DEADCODE RDH 13/06/99 		if (unf->ai.attacker==NULL)
-//DEADCODE RDH 13/06/99 		{
-//DEADCODE RDH 13/06/99 			eye->InterceptandRange(&unf->World);
-//DEADCODE RDH 13/06/99 			if (unf->Range<RECOGNISERANGE)
-//DEADCODE RDH 13/06/99 
-//DEADCODE RDH 13/06/99 //	Decisions based on character/rules
-//DEADCODE RDH 13/06/99 //	If rules say don't enagage wait until range is 1/2 mile
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 //
-//DEADCODE RDH 13/06/99 			{
-//DEADCODE RDH 13/06/99 				SetEngage(eye,unf,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, FALSE);
-//DEADCODE RDH 13/06/99 				return(true);
-//DEADCODE RDH 13/06/99 			}
-//DEADCODE RDH 13/06/99 		}
-//DEADCODE RDH 13/06/99 		unf=(AirStrucPtr)*unf->follower;
-//DEADCODE RDH 13/06/99 	}
-//DEADCODE RDH 13/06/99 	//everybody is engaged
-//DEADCODE RDH 13/06/99 	
-//DEADCODE RDH 13/06/99 	if (	(unf)	&&	(unf->leader))
-//DEADCODE RDH 13/06/99 	{//if there is a leader then go for it
-//DEADCODE RDH 13/06/99 		SetEngage(eye,unf->Leader(),MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, FALSE);
-//DEADCODE RDH 13/06/99 		return(true);
-//DEADCODE RDH 13/06/99 	}
-//DEADCODE RDH 13/06/99 	return(false);
-//DEADCODE RDH 13/06/99 }
 //------------------------------------------------------------------------------
 //Procedure		AttackSpareInLeadersGroup
 //Author		 //RDH 13/06/99
@@ -1179,21 +789,14 @@ bool	ArtInt::AttackSpareInLeadersGroup(AirStruc* eye)
 			}
 			unf = unf->fly.nextflight;
 		}
-//DeadCode CSB 07/07/99			MANOEUVRE manoeuvre;
-//DeadCode CSB 07/07/99			if (range <	BREAKOFFRANGE)
-//DeadCode CSB 07/07/99				manoeuvre = MANOEUVRE_SELECT;
-//DeadCode CSB 07/07/99			else
-//DeadCode CSB 07/07/99				manoeuvre = MANOEUVRE_GAINHEIGHT;
 		if (trg)
 		{
-//DeadCode CSB 07/07/99				SetEngage(eye,trg,manoeuvre,ANGLES_0Deg,ANGLES_0Deg, FALSE);
 			SetEngage(eye,trg,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, FALSE);	//CSB 07/07/99	
 			return(true);
 		}else
 		{//everybody is engaged
 			if (anytrg)
 			{
-//DeadCode CSB 07/07/99					SetEngage(eye,anytrg,manoeuvre,ANGLES_0Deg,ANGLES_0Deg, FALSE);
 				SetEngage(eye,anytrg,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, FALSE);	//CSB 07/07/99	
 				return(true);
 			}
@@ -1203,279 +806,6 @@ bool	ArtInt::AttackSpareInLeadersGroup(AirStruc* eye)
 }
 
 
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 //Procedure		SetEngage
-//DeadCode RDH 27Mar98 //Author		Jim Taylor
-//DeadCode RDH 27Mar98 //Date			Mon 10 Jun 1996
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Description	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Inputs		Range should be eye .. trg
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Returns	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 void	ArtInt::SetEngage(AirStrucPtr eye,AirStrucPtr trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	if (	eye->ai.unfriendly
-//DeadCode RDH 27Mar98 		&&	eye->ai.unfriendly->MigStatus.LaunchFlags.size==AIRSTRUCSIZE
-//DeadCode RDH 27Mar98 		&& ((AirStrucPtr)*eye->ai.unfriendly)->ai.attacker==eye
-//DeadCode RDH 27Mar98 		)
-//DeadCode RDH 27Mar98 		((AirStrucPtr)*eye->ai.unfriendly)->ai.attacker=NULL;
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	if (trg)
-//DeadCode RDH 27Mar98 	{
-//DeadCode RDH 27Mar98 		if (eye->ai.unfriendly==trg)
-//DeadCode RDH 27Mar98 		{	//informational
-//DeadCode RDH 27Mar98 //TEMP			if (eye==Manual_Pilot.ControlledAC2)
-//DeadCode RDH 27Mar98 //TEMP			{
-//DeadCode RDH 27Mar98 //TEMP				if (trg->formpos==0 && trg->ai.eventlog->name)
-//DeadCode RDH 27Mar98 //TEMP					eye->PlayerSequenceAudible(FIL_MUSIC_ENEMY_ACE_SEEN);
-//DeadCode RDH 27Mar98 //TEMP				if (trg->waypoint)
-//DeadCode RDH 27Mar98 //TEMP					switch (trg->waypoint->action)
-//DeadCode RDH 27Mar98 //TEMP					{
-//DeadCode RDH 27Mar98 //TEMP					case	wpstraffeno:
-//DeadCode RDH 27Mar98 //TEMP						Persons_2.AddMessage(UserMsg::CLOSE,TEXT_ENEMYONGROUNDATTK,trg);
-//DeadCode RDH 27Mar98 //TEMP					break;
-//DeadCode RDH 27Mar98 //TEMP					case	wpballoonbustno:
-//DeadCode RDH 27Mar98 //TEMP						Persons_2.AddMessage(UserMsg::CLOSE,TEXT_THREATTOBALLOON,trg);
-//DeadCode RDH 27Mar98 //TEMP					break;
-//DeadCode RDH 27Mar98 //TEMP					case	wpreccyno:
-//DeadCode RDH 27Mar98 //TEMP						Persons_2.AddMessage(UserMsg::CLOSE,TEXT_ENEMYISRECONN,trg);
-//DeadCode RDH 27Mar98 //TEMP					break;
-//DeadCode RDH 27Mar98 //TEMP					case	wpartspotno:
-//DeadCode RDH 27Mar98 //TEMP						Persons_2.AddMessage(UserMsg::CLOSE,TEXT_ENEMYISSPOTTER,trg);
-//DeadCode RDH 27Mar98 //TEMP					break;
-//DeadCode RDH 27Mar98 //TEMP					default:
-//DeadCode RDH 27Mar98 //TEMP						if (trg->classtype->aerobaticfactor==AEROBATIC_LOW)
-//DeadCode RDH 27Mar98 //TEMP							Persons_2.AddMessage(UserMsg::CLOSE,TEXT_ENEMYISBOMBER,trg);
-//DeadCode RDH 27Mar98 //TEMP						else
-//DeadCode RDH 27Mar98 //TEMP							Persons_2.AddMessage(UserMsg::CLOSE,TEXT_GM_ENEMYACCLOSE,trg);
-//DeadCode RDH 27Mar98 //TEMP					}
-//DeadCode RDH 27Mar98 //TEMP				else
-//DeadCode RDH 27Mar98 //TEMP						if (trg->classtype->aerobaticfactor==AEROBATIC_LOW)
-//DeadCode RDH 27Mar98 //TEMP							Persons_2.AddMessage(UserMsg::CLOSE,TEXT_ENEMYISBOMBER,trg);
-//DeadCode RDH 27Mar98 //TEMP						else
-//DeadCode RDH 27Mar98 //TEMP							Persons_2.AddMessage(UserMsg::CLOSE,TEXT_GM_ENEMYACCLOSE,trg);
-//DeadCode RDH 27Mar98 //TEMP
-//DeadCode RDH 27Mar98 //TEMP			}	
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 		else
-//DeadCode RDH 27Mar98 		{	//new engage
-//DeadCode RDH 27Mar98 //TEMP			if (eye==Manual_Pilot.ControlledAC2)
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.AddMessage(UserMsg::TIME,TEXT_GM_ENEMYACCLOSE,trg);
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	eye->ai.unfriendly=trg;
-//DeadCode RDH 27Mar98 	eye->FormationInfo.information=FALSE;
-//DeadCode RDH 27Mar98 	eye->AutoMoveInfo.movecode=AUTO_COMBAT;
-//DeadCode RDH 27Mar98 	eye->manoeuvretime=0;
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	if(trg)
-//DeadCode RDH 27Mar98 		if (	!trg->ai.attacker
-//DeadCode RDH 27Mar98 			||	((AirStrucPtr)*trg->ai.attacker)->ai.unfriendly!=trg
-//DeadCode RDH 27Mar98 			)
-//DeadCode RDH 27Mar98 			if (eye!=Manual_Pilot.ControlledAC2)				//JIM 01Sep96
-//DeadCode RDH 27Mar98 				trg->ai.attacker=eye;
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	//if (trg->Range>MILES02)
-//DeadCode RDH 27Mar98 	//	Do approach manoeuvre instead
-//DeadCode RDH 27Mar98 	//else
-//DeadCode RDH 27Mar98 		
-//DeadCode RDH 27Mar98 		eye->ai.PilotSkills.manoeuvre=MANOEUVRE_SELECT;
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 //TEMP	Timer_Code.AccelToggle(FALSE);
-//DeadCode RDH 27Mar98 	Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	if (trg)
-//DeadCode RDH 27Mar98 	{
-//DeadCode RDH 27Mar98 		if (eye->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 //TEMP		 	if(trg->ai.eventlog->stage!=EventLog::TAKEOFF)
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.UpdateLog(trg->ai.eventlog,0,EventLog::APPROACHED);
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 		else
-//DeadCode RDH 27Mar98 			if  (	(Manual_Pilot.ControlledAC2->AutoMoveInfo.nationality !=eye->AutoMoveInfo.nationality)//RDH 21Nov96
-//DeadCode RDH 27Mar98 				&&	(trg->ai.eventlog->stage==EventLog::TAKEOFF)//RDH 21Nov96
-//DeadCode RDH 27Mar98 				)												//RDH 21Nov96
-//DeadCode RDH 27Mar98 //TEMP				Persons_2.UpdateLog(eye->ai.eventlog,0,EventLog::HOSTILE);
-//DeadCode RDH 27Mar98 				;
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 void	ArtInt::SetPreEngage(AirStrucPtr eye,AirStrucPtr trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	eye->ai.unfriendly=trg;
-//DeadCode RDH 27Mar98 	eye->FormationInfo.information=FALSE;
-//DeadCode RDH 27Mar98 	eye->AutoMoveInfo.movecode=AUTO_PRECOMBAT;
-//DeadCode RDH 27Mar98 	eye->manoeuvretime=0;
-//DeadCode RDH 27Mar98 	if (trg)
-//DeadCode RDH 27Mar98 	{
-//DeadCode RDH 27Mar98 		if (	!trg->ai.attacker
-//DeadCode RDH 27Mar98 			||	((AirStrucPtr)*trg->ai.attacker)->ai.unfriendly!=trg
-//DeadCode RDH 27Mar98 			)
-//DeadCode RDH 27Mar98 			trg->ai.attacker=eye;
-//DeadCode RDH 27Mar98 		if (eye==Manual_Pilot.ControlledAC2)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 //TEMP			Persons_2.AddMessage(UserMsg::ATTACK,TEXT_GM_ASSIGNEDAC,trg);
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 	//if (trg->Range>MILES02)
-//DeadCode RDH 27Mar98 	//	Do approach manoeuvre instead
-//DeadCode RDH 27Mar98 	//else
-//DeadCode RDH 27Mar98 		eye->ai.PilotSkills.manoeuvre=MANOEUVRE_SELECT;
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 AirStrucPtr	ArtInt::SetFollowerWhoEngage(AirStrucPtr eye,AirStrucPtr trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	AirStrucPtr	tmpt=trg;
-//DeadCode RDH 27Mar98 	if (tmpt==NULL)	return(tmpt);
-//DeadCode RDH 27Mar98 		switch (eye->ai.followeraction)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 		case	NF_CircleSingle:
-//DeadCode RDH 27Mar98 		case	NF_PersonalThreat:
-//DeadCode RDH 27Mar98 			tmpt=NULL;
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		case	NF_Single:
-//DeadCode RDH 27Mar98 			tmpt=nextfol(trg,TRUE);
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		case	NF_Double:
-//DeadCode RDH 27Mar98 			tmpt=nextfol(trg,FALSE);
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		case	NF_ReDouble:
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98 		return	(tmpt);
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 AirStrucPtr	ArtInt::SetFollowerPreEngage(AirStrucPtr eye,AirStrucPtr trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	//Improvement:
-//DeadCode RDH 27Mar98 	//	Go for next most skilled rather than next in formation.
-//DeadCode RDH 27Mar98 	//  (Assume leader has gone for highest skill, so perform skill comparison
-//DeadCode RDH 27Mar98 	eye->FormationInfo.information=FALSE;
-//DeadCode RDH 27Mar98 	AirStrucPtr	tmpt=trg;
-//DeadCode RDH 27Mar98 	if (!eye->AircraftDamaged() && eye->classtype->aerobaticfactor!=AEROBATIC_LOW)								//JIM 29Aug96
-//DeadCode RDH 27Mar98 	if (eye->AutoMoveInfo.movecode<AUTO_PRECOMBAT)
-//DeadCode RDH 27Mar98 	{
-//DeadCode RDH 27Mar98 		tmpt = SetFollowerWhoEngage(eye,trg);
-//DeadCode RDH 27Mar98 		SetPreEngage(eye,tmpt);
-//DeadCode RDH 27Mar98 		if (tmpt)
-//DeadCode RDH 27Mar98 			trg=tmpt;
-//DeadCode RDH 27Mar98 	}	
-//DeadCode RDH 27Mar98 	return(trg);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 AirStrucPtr	ArtInt::SetFlightWhoEngage(AirStrucPtr eye,AirStrucPtr trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	AirStrucPtr	tmpt=trg;
-//DeadCode RDH 27Mar98 	if (tmpt==NULL)	return(tmpt);
-//DeadCode RDH 27Mar98 		switch (eye->ai.leaderaction)
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 		case	NL_OnCourse:		//no change in course
-//DeadCode RDH 27Mar98 		case	NL_CircleSingles:	//not assigned during approach
-//DeadCode RDH 27Mar98 		case	NL_CircleFlights:	//but fly over and assign later
-//DeadCode RDH 27Mar98 			tmpt=NULL;		//CAN'T TELL THESE APART FROM HERE!
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		case	NL_Flights:			//only assign if there are spare flights
-//DeadCode RDH 27Mar98 			tmpt=nextfl(trg,FALSE);
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		case	NL_DoubleFlighs:	//assign to next flight even if already assigned
-//DeadCode RDH 27Mar98 			tmpt=nextfl(trg,TRUE);
-//DeadCode RDH 27Mar98 			if (tmpt)	trg=tmpt;
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		case	NL_PrevRipple:		//assign to curr flight, but from unassigned down
-//DeadCode RDH 27Mar98 			tmpt=nextfol(trg,FALSE);
-//DeadCode RDH 27Mar98 			if (tmpt==NULL)
-//DeadCode RDH 27Mar98 				tmpt=nextfl(trg,TRUE);
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		case	NL_PrevDouble:		//assign to curr flight from leader down
-//DeadCode RDH 27Mar98 //DeadCode JIM 19Aug96 			tmpt=nextfol(trg,TRUE);
-//DeadCode RDH 27Mar98 			tmpt=trg;
-//DeadCode RDH 27Mar98 		break;
-//DeadCode RDH 27Mar98 		}
-//DeadCode RDH 27Mar98  		return (tmpt);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 AirStrucPtr	ArtInt::SetFlightPreEngage(AirStrucPtr eye,AirStrucPtr trg)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	eye->FormationInfo.information=FALSE;
-//DeadCode RDH 27Mar98 	AirStrucPtr	tmpt=trg;
-//DeadCode RDH 27Mar98 
-//DeadCode RDH 27Mar98 	if (eye->AutoMoveInfo.movecode<AUTO_PRECOMBAT)
-//DeadCode RDH 27Mar98 	{
-//DeadCode RDH 27Mar98 		if (eye->ai.leaderaction==NL_OnCourse)
-//DeadCode RDH 27Mar98 			RETURN(trg);
-//DeadCode RDH 27Mar98 		else
-//DeadCode RDH 27Mar98 			tmpt=SetFlightWhoEngage(eye,trg);
-//DeadCode RDH 27Mar98 		if (tmpt)	trg=tmpt;
-//DeadCode RDH 27Mar98 		//assign a/c from tmpt to flight
-//DeadCode RDH 27Mar98 		if (!eye->AircraftDamaged() && eye->classtype->aerobaticfactor!=AEROBATIC_LOW)								//JIM 29Aug96
-//DeadCode RDH 27Mar98 			SetPreEngage(eye,tmpt);
-//DeadCode RDH 27Mar98 		AirStrucPtr	currtrg=tmpt;
-//DeadCode RDH 27Mar98 		AirStrucPtr	currfol=eye;
-//DeadCode RDH 27Mar98 		while ((currfol=*currfol->follower)!=NULL)
-//DeadCode RDH 27Mar98 			currtrg=SetFollowerPreEngage(currfol,currtrg);
-//DeadCode RDH 27Mar98 	}
-//DeadCode RDH 27Mar98 	RETURN	(trg);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 //Procedure		nextfl
-//DeadCode RDH 27Mar98 //Author		Jim Taylor
-//DeadCode RDH 27Mar98 //Date			Wed 26 Jun 1996
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Description	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Inputs		
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //Returns	
-//DeadCode RDH 27Mar98 //
-//DeadCode RDH 27Mar98 //------------------------------------------------------------------------------
-//DeadCode RDH 27Mar98 AirStrucPtr	ArtInt::nextfl(AirStrucPtr trg,Bool unassigned)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	AirStrucPtr	t2=trg;
-//DeadCode RDH 27Mar98 	if (trg)
-//DeadCode RDH 27Mar98 		repeat
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 			if (trg->fly.nextflight)
-//DeadCode RDH 27Mar98 				trg=trg->fly.nextflight;
-//DeadCode RDH 27Mar98 			else
-//DeadCode RDH 27Mar98 				if (trg->fly.leadflight)
-//DeadCode RDH 27Mar98 					trg=trg->fly.leadflight;
-//DeadCode RDH 27Mar98 				else
-//DeadCode RDH 27Mar98 					return(NULL);
-//DeadCode RDH 27Mar98 			if (!!trg->ai.attacker <=!!unassigned)
-//DeadCode RDH 27Mar98 				return(trg);
-//DeadCode RDH 27Mar98 		}	while (t2!=trg);
-//DeadCode RDH 27Mar98 	return(NULL);
-//DeadCode RDH 27Mar98 }
-//DeadCode RDH 27Mar98 AirStrucPtr	ArtInt::nextfol(AirStrucPtr trg,Bool unassigned)
-//DeadCode RDH 27Mar98 {
-//DeadCode RDH 27Mar98 	AirStrucPtr	t2=trg;
-//DeadCode RDH 27Mar98 	if (trg)
-//DeadCode RDH 27Mar98 		repeat
-//DeadCode RDH 27Mar98 		{
-//DeadCode RDH 27Mar98 			if (trg->follower)
-//DeadCode RDH 27Mar98 				trg=*trg->follower;
-//DeadCode RDH 27Mar98 			else
-//DeadCode RDH 27Mar98 				if (trg->leader)
-//DeadCode RDH 27Mar98 					trg=*trg->leader;
-//DeadCode RDH 27Mar98 				else
-//DeadCode RDH 27Mar98 					return(NULL);
-//DeadCode RDH 27Mar98 			if (!!trg->ai.attacker <=!!unassigned)
-//DeadCode RDH 27Mar98 				return(trg);
-//DeadCode RDH 27Mar98 		}	while (t2!=trg);
-//DeadCode RDH 27Mar98 	return(NULL);
-//DeadCode RDH 27Mar98 }
 
 //------------------------------------------------------------------------------
 //Procedure		CountFormation
@@ -1496,8 +826,6 @@ bool	ArtInt::AttackSpareInLeadersGroup(AirStruc* eye)
 //------------------------------------------------------------------------------
 int		ArtInt::GuessFormationSize(AirStrucPtr caller, AirStrucPtr trg)
 {
-//DEADCODE RDH 23/06/99 	if (!trg->leader || trg->FormationInfo.information)
-//DEADCODE RDH 23/06/99 	{
 		if (trg->leader)
 			trg=(AirStrucPtr)*trg->leader;
 		if (		(!trg->fly.leadflight)
@@ -1519,7 +847,6 @@ int		ArtInt::GuessFormationSize(AirStrucPtr caller, AirStrucPtr trg)
 				while (tf && tf->FormationInfo.information);
 				trg=trg->fly.nextflight;
 			}
-//DEADCODE RDH 12/06/99 			while (trg && trg->FormationInfo.information);
 			while (trg);		//we want all ac 
 			return acc;
 		}
@@ -1535,9 +862,6 @@ int		ArtInt::GuessFormationSize(AirStrucPtr caller, AirStrucPtr trg)
 			while (tf && tf->FormationInfo.information);
 			return acc;
 		}
-//DEADCODE RDH 23/06/99 	}
-//DEADCODE RDH 23/06/99 	else	//on our own
-//DEADCODE RDH 23/06/99 		return (spotcount);
 }
 
 int		ArtInt::CountFormationSize(AirStrucPtr trg)
@@ -1603,7 +927,7 @@ bool	ArtInt::SameFlight(AirStrucPtr a,AirStrucPtr b)
 		if (a->leader)	a=*a->leader;
 		if (a->fly.leadflight)	a=a->fly.leadflight;
 	}
-	if (b && a->MigStatus.LaunchFlags.size==AIRSTRUCSIZE)
+	if (b && a && a->MigStatus.LaunchFlags.size==AIRSTRUCSIZE)	//RERUN: tests a's size, so a must be non-null
 	{
 		if (b->leader)	b=*b->leader;
 		if (b->fly.leadflight)	b=b->fly.leadflight;
@@ -1699,8 +1023,6 @@ void	ArtInt::BreakOff(AirStrucPtr ac)
 		if (unf && unf->ai.attacker==ac)
 			unf->ai.attacker=NULL;
 	}
-//DeadCode AMM 05Jul99 	if (ac->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode AMM 05Jul99 		_Miles.DiscardMusic();
 }
 
 bool	ArtInt::OkToAccel()
@@ -1726,7 +1048,6 @@ bool	ArtInt::OkToAccel()
 			&&	(Manual_Pilot.ControlledAC2->InterceptandRange (tmp),tmp->Range</*METRES*/4000000)
 			)
 		{
-//DeadCode RDH 23Oct96 			Persons_2.AddMessage(UserMsg::TIME,TEXT_GM_ENEMYACNEAR,ACArray[i]);//JIM 25Jul96
 //TEMP			if (tmp->AutoMoveInfo.nationality==Manual_Pilot.ControlledAC2->AutoMoveInfo.nationality)
 //TEMP				Persons_2.AddMessage(UserMsg::TIME,//TEMP,ACArray[i]->ai.unfriendly);//JIM 25Jul96
 //TEMP			else
@@ -1815,11 +1136,6 @@ bool	ArtInt::PersonalThreat(AirStrucPtr trg,AirStrucPtr agg,bool process)
 			if (trg->formpos)
 				trg = trg->fly.leadflight;
 			AirStruc*  escortleader = trg->FindAirEscortLeader();
-//DEADCODE RDH 01/07/99 			if (!escortleader)
-//DEADCODE RDH 01/07/99 			{
-//DEADCODE RDH 01/07/99 				if (trg->AutoMoveInfo.nationality == Manual_Pilot.ControlledAC2->AutoMoveInfo.nationality)
-//DEADCODE RDH 01/07/99 					_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_AMUNDERATTACK, MSG_PERSONALTHREAT, trg, agg, Manual_Pilot.ControlledAC2));
-//DEADCODE RDH 01/07/99 			}else
 			if (escortleader)
 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_AMUNDERATTACK, MSG_PERSONALTHREAT, trg, trg, escortleader));
 
@@ -1843,8 +1159,6 @@ bool	ArtInt::PersonalThreat(AirStrucPtr trg,AirStrucPtr agg,bool process)
 			)
 			return(false);
 		//if trg and agg on same side, 1 in 16 chance of reacting
-//DEADCODE DAW 11/05/99 		if (trg->AutoMoveInfo.nationality==agg->AutoMoveInfo.nationality && Math_Lib.rnd(16))
-//DEADCODE DAW 11/05/99 			return(false);
 
 		//if trg is player come out of accel
 		if (trg==Manual_Pilot.ControlledAC2)
@@ -1852,7 +1166,6 @@ bool	ArtInt::PersonalThreat(AirStrucPtr trg,AirStrucPtr agg,bool process)
 //TEMP			Persons_2.AddMessage(UserMsg::ATTACKED,TEXT_TAKINGHITS,agg);
 //TEMP			Timer_Code.AccelToggle(FALSE);
 				OverLay.CancelAccel();
-//DEADCODE DAW 10/05/99 			Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);			  //RDH 03/03/99
 		}
 
 		if (Manual_Pilot.ControlledAC2 == agg)
@@ -1911,12 +1224,8 @@ bool	ArtInt::PersonalThreat(AirStrucPtr trg,AirStrucPtr agg,bool process)
 void	FormationItem::BreakForm()
 { //This code now protects itself against stopped trucks and getting called twice.
 
-//DeadCode AMM 01Jun98 	if (_DPlay.Implemented)										//ARM 06Dec96
-//DeadCode AMM 01Jun98 		return;
 
-//DeadCode DAW 29Jun99 	AutoMoveInfo.movecode=AUTO_NOPPILOT;										//JIM 15Oct96
 	FormationItemPtr	replacement=NULL;
-//DeadCode JIM 15Oct96 	if (follower)
 	replacement=follower;
 	bool	gottrain=(Persons2::getbandfromUID(uniqueID.bitfieldUid.count)==RedTrainBAND);//DAW 22Jun99
 	FormationItemPtr	user=NULL;
@@ -1929,6 +1238,8 @@ void	FormationItem::BreakForm()
 		if (!user && AutoMoveInfo.movecode==AUTO_NOPPILOT)
 			return;				//hopefully already dead so don't remove again!
 		assert(user&&"not member of leaders convoy!");
+		if (!user)				//RERUN: assert is NDEBUG-only - not in convoy means nothing to relink
+			return;
 		user->follower=replacement;
 		if (replacement && gottrain)
 			while (replacement)
@@ -1956,7 +1267,6 @@ void	FormationItem::BreakForm()
 		}
 	}
 	AutoMoveInfo.movecode=AUTO_NOPPILOT;										//JIM 15Oct96
-//DeadCode DAW 29Jun99 	leader=NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -1974,14 +1284,11 @@ void	FormationItem::BreakForm()
 void	AirStruc::BreakForm()
 {
 
-//DeadCode AMM 01Jun98 	if (_DPlay.Implemented)										//ARM 06Dec96
-//DeadCode AMM 01Jun98 		return;
 
 	if (this==Manual_Pilot.ControlledAC2)
 	{
 		OverLay.CancelAccel();
 		//TEMP		Timer_Code.AccelToggle(FALSE);
-//DEADCODE DAW 10/05/99 		Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);
 	}
 
 	AirStrucPtr	replacement=NULL;
@@ -1989,11 +1296,8 @@ void	AirStruc::BreakForm()
 		replacement=fly.nextflight;
 	if (follower)
 		replacement=*follower;
-	//RERUN DEADCODE if (formpos==0 &&	this!=Manual_Pilot.ControlledAC2 &&  replacement )
-	//RERUN DEADCODE 	 ;
 	if (replacement)
 	{	//better version										//JIM 02Dec96
-//DEADCODE JIM 09/07/99 		replacement->formpos=formpos;
 		replacement->FormationInfo.information=FALSE;								  //JIM 09/07/99
 		if (replacement->leader==this)
 			replacement->leader=NULL;
@@ -2044,61 +1348,6 @@ void	AirStruc::BreakForm()
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode DAW 27Jun99 void	ArtInt::PlayerHitConvoy(FormationItemPtr f1)
-//DeadCode DAW 27Jun99 {
-//DeadCode DAW 27Jun99 	FormationItemPtr f=f1->leader;
-//DeadCode DAW 27Jun99 	if (f==NULL)
-//DeadCode DAW 27Jun99 		f=f1;
-//DeadCode DAW 27Jun99 	AirStrucPtr p=Manual_Pilot.ControlledAC2;
-//DeadCode DAW 27Jun99 	if (p->leader==NULL && p->follower!=NULL && p->AutoMoveInfo.movecode!=AUTO_STRAFFE)
-//DeadCode DAW 27Jun99 		if (p->waypoint && p->waypoint->target!=f)
-//DeadCode DAW 27Jun99 		{	//all of players flight will attack convoy...
-//DeadCode DAW 27Jun99 			//insert an extra waypoint to that effect
-//DeadCode DAW 27Jun99 			WayPointPtr w=new WayPoint;
-//DeadCode DAW 27Jun99 			WayPointPtr o=p->waypoint;
-//DeadCode DAW 27Jun99 			if (p->waypoint->prev==NULL)
-//DeadCode DAW 27Jun99 			{	//no prev, but I have stuff pointing there!
-//DeadCode DAW 27Jun99 				*w=*p->waypoint;
-//DeadCode DAW 27Jun99 				w->uniqueID.bitfieldUid.count=UID_Null;
-//DeadCode DAW 27Jun99 				w->next=p->waypoint->next;
-//DeadCode DAW 27Jun99 				p->waypoint->next=w;
-//DeadCode DAW 27Jun99 				w->prev=p->waypoint;
-//DeadCode DAW 27Jun99 				if (w->next)
-//DeadCode DAW 27Jun99 					w->next->prev=w;
-//DeadCode DAW 27Jun99 				w=w->prev;
-//DeadCode DAW 27Jun99 			}
-//DeadCode DAW 27Jun99 			else
-//DeadCode DAW 27Jun99 			{
-//DeadCode DAW 27Jun99 				w->next=p->waypoint;
-//DeadCode DAW 27Jun99 				w->prev=p->waypoint->prev;
-//DeadCode DAW 27Jun99 				p->waypoint->prev=w;
-//DeadCode DAW 27Jun99 				w->prev->next=w;
-//DeadCode DAW 27Jun99 				w->uniqueID.bitfieldUid.count=UID_Null;
-//DeadCode DAW 27Jun99 			}
-//DeadCode DAW 27Jun99 
-//DeadCode DAW 27Jun99 //DeadCode AMM 10Jun98 			w->uniqueID.deaded=TRUE;							//RJS 27Feb98
-//DeadCode DAW 27Jun99 //DeadCode AMM 30Nov98 			w->uniqueID.bitfieldUid.commsmove=TRUE;							//AMM 10Jun98
-//DeadCode DAW 27Jun99 			w->MigStatus.LaunchFlags.Deaded=TRUE;								//AMM 30Nov98
-//DeadCode DAW 27Jun99 			p->AutoMoveInfo.movecode=AUTO_STRAFFE;
-//DeadCode DAW 27Jun99 			w->World.X=0;
-//DeadCode DAW 27Jun99 			w->World.Y=METRES4000;
-//DeadCode DAW 27Jun99 			w->World.Z=0;
-//DeadCode DAW 27Jun99 			w->range=METRES3000-METRES500;
-//DeadCode DAW 27Jun99 			w->vel=0;
-//DeadCode DAW 27Jun99 			w->eta=0;
-//DeadCode DAW 27Jun99 			w->action=wpdivebombstraffeno;
-//DeadCode DAW 27Jun99 			w->target=f;
-//DeadCode DAW 27Jun99 			while (p)
-//DeadCode DAW 27Jun99 			{
-//DeadCode DAW 27Jun99 				if (p->waypoint==o)
-//DeadCode DAW 27Jun99 					p->waypoint=w;
-//DeadCode DAW 27Jun99 				p=*p->follower;
-//DeadCode DAW 27Jun99 			}
-//DeadCode DAW 27Jun99 		}
-//DeadCode DAW 27Jun99 		else
-//DeadCode DAW 27Jun99 			if (p->waypoint && f->follower && f->MigStatus.LaunchFlags.deadtime)
-//DeadCode DAW 27Jun99 			   p->waypoint->target=f->follower;
-//DeadCode DAW 27Jun99 }
 
 //------------------------------------------------------------------------------
 //Procedure		ProcessWPEvents
@@ -2335,11 +1584,6 @@ void	ArtInt::VisibleAAACheck()
 						{
 							AirStrucPtr sender,recipient;
 							recipient=eye->PlayerInGroup();
-//DEADCODE RDH 15/06/99 							if (!recipient)
-//DEADCODE RDH 15/06/99 							{
-//DEADCODE RDH 15/06/99 								sender=recipient=eye;
-//DEADCODE RDH 15/06/99 							}
-//DEADCODE RDH 15/06/99 							else
 							if (!recipient)
 								recipient=eye;
 							else									  //JIM 31/08/99
@@ -2405,38 +1649,6 @@ inline const MESSAGE_STRUC& MESSAGE_STRUC::CheckTargetPlayer() const
 
 bool	ArtInt::SendMsgAndCall(const MESSAGE_STRUC& msg,DecisionAI* processor) //JIM 22/01/99
 {
-//DeadCode DAW 26Mar99 	//if	autodecisions not enabled					//autodecisions does everything...
-//DeadCode DAW 26Mar99 	//	and message recient is player interested		//other groups do own thing
-//DeadCode DAW 26Mar99 	//	and	sender does not equal player [interested]	//myflight told myself to engage!
-//DeadCode DAW 26Mar99 
-//DeadCode DAW 26Mar99 // COMMS: block messages to other players
-//DeadCode DAW 26Mar99 
-//DeadCode DAW 26Mar99 	if (_DPlay.Implemented || _Replay.Record)
-//DeadCode DAW 26Mar99 	{
-//DeadCode DAW 26Mar99 		UByte decision=0;		// 0-100 = 7 bits
-//DeadCode DAW 26Mar99 		UByte option=0;			// 0-9	 = 4 bits
-//DeadCode DAW 26Mar99 		UniqueID trg=UID_NULL;	// UID	 = 14 bits				  
-//DeadCode DAW 26Mar99 
-//DeadCode DAW 26Mar99 		if (msg.target)
-//DeadCode DAW 26Mar99 			trg=msg.target->uniqueID.bitfieldUid.count;
-//DeadCode DAW 26Mar99 
-//DeadCode DAW 26Mar99 		_DPlay.NewWingmanCommand(decision,option,trg);
-//DeadCode DAW 26Mar99 	}
-//DeadCode DAW 26Mar99 	else
-//DeadCode DAW 26Mar99 	{
-//DeadCode DAW 26Mar99 		if (processor.GetMsgOptions()==NULL || 0) //msg.callee.IsPiloted()
-//DeadCode DAW 26Mar99 			return processor.AutoMsgDecision(*msg.callee,msg.target,*msg.caller,this);
-//DeadCode DAW 26Mar99 		else
-//DeadCode DAW 26Mar99 			msg.SetDecision(&processor);
-//DeadCode DAW 26Mar99 	}
-//DeadCode DAW 26Mar99 
-//DeadCode DAW 26Mar99 // in replay record still want to hear message, but as there is too much info for voices
-//DeadCode DAW 26Mar99 // to store, must say message now and have results when packet processed.
-//DeadCode DAW 26Mar99 
-//DeadCode DAW 26Mar99 	if (!_DPlay.Implemented) // && !_Replay.Record)
-//DeadCode DAW 26Mar99 		_Radio.TriggerMsg(msg);
-//DeadCode DAW 26Mar99 
-//DeadCode DAW 26Mar99 	return true;
 	//if	autodecisions not enabled					//autodecisions does everything...
 	//	and message recient is player interested		//other groups do own thing
 	//	and	sender does not equal player [interested]	//myflight told myself to engage!
@@ -2683,7 +1895,6 @@ AirStrucPtr		AirStruc::RemoveElement()
 {//elements in MiG are considered to be flights in our system
 
 	AirStruc*	leadf;
-//DeadCode DAW 21Jul99 	if (fly.leadflight)
 	if (formpos)												  //JIM 21/07/99
 		leadf = fly.leadflight;
 	else
@@ -2775,41 +1986,6 @@ AirStrucPtr		AirStruc::FindAcInGroup()
 	}
 	return (buddy);
 }
-//DEADCODE RDH 05/07/99 AirStrucPtr		AirStruc::FindBandit(int& count)
-//DEADCODE RDH 05/07/99 {//find bandit in visible range
-//DEADCODE RDH 05/07/99 	AcArrayItterator bogey;
-//DEADCODE RDH 05/07/99 	AirStruc*	bandit = NULL;
-//DEADCODE RDH 05/07/99 	SLong range =  VISIBLERANGE;
-//DEADCODE RDH 05/07/99 	count = 0;
-//DEADCODE RDH 05/07/99 	while (bogey.Next())
-//DEADCODE RDH 05/07/99 		if (bogey)
-//DEADCODE RDH 05/07/99 		{
-//DEADCODE RDH 05/07/99 			if (bogey->AutoMoveInfo.nationality != AutoMoveInfo.nationality)
-//DEADCODE RDH 05/07/99 			{
-//DEADCODE RDH 05/07/99 				if (	(!bogey->leader)
-//DEADCODE RDH 05/07/99 					||	(!bogey->FormationInfo.information)
-//DEADCODE RDH 05/07/99 					)
-//DEADCODE RDH 05/07/99 				{
-//DEADCODE RDH 05/07/99 					if  (		(!bogey->leader)
-//DEADCODE RDH 05/07/99 							&&	(bogey->AutoMoveInfo.movecode != AUTO_NOPPILOT)						
-//DEADCODE RDH 05/07/99 						)
-//DEADCODE RDH 05/07/99 						//count all leaders that active
-//DEADCODE RDH 05/07/99 						count++;
-//DEADCODE RDH 05/07/99 					Art_Int.InterceptRangeFromTo(this, bogey);
-//DEADCODE RDH 05/07/99 					if (		(Range < VISIBLERANGE)
-//DEADCODE RDH 05/07/99 							&&	(Range < range)
-//DEADCODE RDH 05/07/99 							&&	(!MigStatus.LaunchFlags.deadtime) 
-//DEADCODE RDH 05/07/99 						)
-//DEADCODE RDH 05/07/99 					{
-//DEADCODE RDH 05/07/99 						range = Range;
-//DEADCODE RDH 05/07/99 						bandit = bogey;
-//DEADCODE RDH 05/07/99 					}
-//DEADCODE RDH 05/07/99 				}
-//DEADCODE RDH 05/07/99 			}
-//DEADCODE RDH 05/07/99 		}
-//DEADCODE RDH 05/07/99 	Range = range;		//range of bandit   
-//DEADCODE RDH 05/07/99 	return (bandit);
-//DEADCODE RDH 05/07/99 }
 AirStrucPtr		AirStruc::FindBandit(int& count)
 {//find bandit in visible range, return count of leader. THis may be 0 even if bandit found
 	AcArrayItterator bogey;
@@ -2849,36 +2025,6 @@ AirStrucPtr		AirStruc::FindBandit(int& count)
 
 
 
-//DEADCODE RDH 05/07/99 AirStrucPtr		AirStruc::FindAnyBandit(SLong& range)
-//DEADCODE RDH 05/07/99 {
-//DEADCODE RDH 05/07/99 	AcArrayItterator bogey;
-//DEADCODE RDH 05/07/99 	AirStruc*	bandit = NULL;
-//DEADCODE RDH 05/07/99 	range =  MILES2000;
-//DEADCODE RDH 05/07/99 
-//DEADCODE RDH 05/07/99 	while (bogey.Next())
-//DEADCODE RDH 05/07/99 		if (bogey)
-//DEADCODE RDH 05/07/99 		{
-//DEADCODE RDH 05/07/99 			if (bogey->AutoMoveInfo.nationality != AutoMoveInfo.nationality)
-//DEADCODE RDH 05/07/99 			{
-//DEADCODE RDH 05/07/99 				if (	(!bogey->leader)
-//DEADCODE RDH 05/07/99 					||	(!bogey->FormationInfo.information)
-//DEADCODE RDH 05/07/99 					)
-//DEADCODE RDH 05/07/99 				{
-//DEADCODE RDH 05/07/99 					
-//DEADCODE RDH 05/07/99 					Art_Int.InterceptRangeFromTo(this, bogey);
-//DEADCODE RDH 05/07/99 					if (		(Range < MILES2000)
-//DEADCODE RDH 05/07/99 							&&	(Range < range)
-//DEADCODE RDH 05/07/99 							&&	(!MigStatus.LaunchFlags.deadtime) 
-//DEADCODE RDH 05/07/99 						)
-//DEADCODE RDH 05/07/99 					{
-//DEADCODE RDH 05/07/99 						range = Range;
-//DEADCODE RDH 05/07/99 						bandit = bogey;
-//DEADCODE RDH 05/07/99 					}
-//DEADCODE RDH 05/07/99 				}
-//DEADCODE RDH 05/07/99 			}
-//DEADCODE RDH 05/07/99 		}
-//DEADCODE RDH 05/07/99 	return (bandit);
-//DEADCODE RDH 05/07/99 }
 AirStrucPtr		AirStruc::FindAnyBandit(SLong& range, int& count)
 {
 	AcArrayItterator bogey;

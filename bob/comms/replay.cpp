@@ -1494,7 +1494,7 @@ Bool	Replay::LoadHeaderID()
 //------------------------------------------------------------------------------
 Bool	Replay::LoadReplayData(char* name)
 {
-	strcpy(pfilename,name);
+	strncpy(pfilename,name,255); pfilename[255]=0;
 	return TRUE;
 }
 
@@ -1517,14 +1517,15 @@ Bool	Replay::SaveReplayData(char* name)
 		strcpy(buffer,"replay.dat");
 	}
 
-	strcpy(buffer2,name);
+	strncpy(buffer2,name,149); buffer2[149]=0;
 
 	GetReplayFilename(buffer);
 	GetReplayFilename(buffer2);
 
 	if (!RestorePosition)
-		strcpy(pfilename,buffer);
-
+	{
+		strncpy(pfilename,buffer,255); pfilename[255]=0;
+	}
 	file=CreateFile(
 		buffer,
 		GENERIC_WRITE,
@@ -4149,7 +4150,7 @@ bool	Replay::ValidReplayFile()
 	bool ok=false;
 	char	temp[256];
 
-	strcpy(temp,pfilename);
+	strncpy(temp,pfilename,255); temp[255]=0;
 	GetReplayFilename(temp);
 
 	f=CreateFile(
@@ -4747,7 +4748,7 @@ bool	Replay::LoadSaveGame()
 
 	if (ReplayRead(savedata,size))
 	{
-		strcpy(dummyname,replaysavebackup);
+		strncpy(dummyname,replaysavebackup,149); dummyname[149]=0;
 
 		_DPlay.GetCommsSavename(dummyname);
 
@@ -4816,7 +4817,7 @@ Bool	Replay::StoreSaveGame()
 		return TRUE;
 	}
 
-	strcpy(savedgamename,replaysavebackup);
+	strncpy(savedgamename,replaysavebackup,149); savedgamename[149]=0;
 	_DPlay.GetCommsSavename(savedgamename);
 
 	savegame=CreateFile(

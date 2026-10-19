@@ -34,7 +34,6 @@
 #ifndef	BITFIELD_Included
 #define	BITFIELD_Included
 /*#ifndef	assert
-//DeadCode DAW 01Oct96 	 #define assert(__ignore) ((void)0)
 	#define assert(txt,str)
 #pragma warnmsg("Assert is non functional!!!")
 #endif
@@ -283,7 +282,6 @@ MakeField&	operator =(src x)
 {
 	operator=(0);
 	operator|=(x);
-//DEADCODE JIM 21/06/00 	return 	*(Make*)this;
 	return *this;
 }
 
@@ -294,42 +292,12 @@ static MakeField	Make(const int s=0)
 	return rv;
 }
 
-//DEADCODE JIM 21/06/00 Make& operator=	(Make& f)
-//DEADCODE JIM 21/06/00 {
-//DEADCODE JIM 21/06/00 	MakeField* g=(MakeField*)&f;
-//DEADCODE JIM 21/06/00 	for (int i=(int)BYTES;i--;)
-//DEADCODE JIM 21/06/00 		dataspace[i]=g->dataspace[i];
-//DEADCODE JIM 21/06/00 	return *(Make*)this;
-//DEADCODE JIM 21/06/00 }
 	/* class end*/
 };	/* class end*/
 
-//DEADCODE JIM 21/06/00 template <class	enumtype,int minval,int maxval>
-//DEADCODE JIM 21/06/00 class	MakeField<enumtype,minval,maxval>::Make:public MakeField<enumtype,minval,maxval>
-//DEADCODE JIM 21/06/00 {	public:
-//DEADCODE JIM 21/06/00 	Make(int zeroor1=0)
-//DEADCODE JIM 21/06/00 	{	MakeField::operator=(zeroor1);	}
-//DEADCODE JIM 21/06/00 	Make& operator,(src x)
-//DEADCODE JIM 21/06/00 	{	return *(Make*)&(this[0]|=x);	}
-//DEADCODE JIM 21/06/00 };
 
 /*---------------------------------------------------*/
 
-//DEADCODE MS 01/02/00   /*constructor*/
-//DEADCODE MS 01/02/00 	MakeField()
-//DEADCODE MS 01/02/00 {
-//DEADCODE MS 01/02/00 	int i;
-//DEADCODE MS 01/02/00 	for (i=(int)BYTES;i--;)
-//DEADCODE MS 01/02/00 		dataspace[i]=0;
-//DEADCODE MS 01/02/00 }
-//DEADCODE MS 01/02/00 	MakeField(src minset,src maxset)
-//DEADCODE MS 01/02/00 {
-//DEADCODE MS 01/02/00 	int i;
-//DEADCODE MS 01/02/00 	for (i=(int)BYTES;i--;)
-//DEADCODE MS 01/02/00 		dataspace[i]=0;
-//DEADCODE MS 01/02/00 	for (i=minset;i<=(int)maxset;i++)
-//DEADCODE MS 01/02/00 		operator |=((src)i);
-//DEADCODE MS 01/02/00 }
 
 //----------------------------------------------------------------------------
 //

@@ -867,8 +867,8 @@ template<class t> inline t MakeRecIndex(const t a,const t b)
 //------------------------------------------------------------------------------
 inline EdgePtr EdgeSetup(const VData* va,const VData* vb)
 {
-	const ULong _indexableLimit=uintptr_t(EdgeList+Indexable_Edges);
-	const ULong _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
+	const uintptr_t _indexableLimit=uintptr_t(EdgeList+Indexable_Edges);
+	const uintptr_t _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
 
 	//check whether we have already created the data for this edge
 
@@ -882,7 +882,7 @@ inline EdgePtr EdgeSetup(const VData* va,const VData* vb)
 	ULong ei=e-EdgeList;
 	edgeRecord[ri]=ei;
 
-	assert(ULong(e)<_realEdgeLimit&&"Edge record o'flow");
+	assert(uintptr_t(e)<_realEdgeLimit&&"Edge record o'flow");
 
 	SLong sf,dx=vb->x-va->x,dy=vb->y-va->y;
 
@@ -904,8 +904,8 @@ inline EdgePtr EdgeSetup(const VData* va,const VData* vb)
 //------------------------------------------------------------------------------
 inline EdgePtr EdgeSetup(const VData* va,const VData* vb,SWord scale)
 {
-	const ULong _indexableLimit=uintptr_t(EdgeList+Indexable_Edges);
-	const ULong _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
+	const uintptr_t _indexableLimit=uintptr_t(EdgeList+Indexable_Edges);
+	const uintptr_t _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
 
 	//check whether we have already created the data for this edge
 
@@ -919,7 +919,7 @@ inline EdgePtr EdgeSetup(const VData* va,const VData* vb,SWord scale)
 	ULong ei=e-EdgeList;
 	edgeRecord[ri]=ei;
 
-	assert(ULong(e)<_realEdgeLimit&&"Edge record o'flow");
+	assert(uintptr_t(e)<_realEdgeLimit&&"Edge record o'flow");
 
 	SLong sf,dx=vb->x-va->x,dy=vb->y-va->y;
 
@@ -941,11 +941,11 @@ inline EdgePtr EdgeSetup(const VData* va,const VData* vb,SWord scale)
 //------------------------------------------------------------------------------
 inline EdgePtr EdgeSetup2(const VData& va,const VData& vb)
 {
-	const ULong _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
+	const uintptr_t _realEdgeLimit=uintptr_t(EdgeList+Real_Max_Edges);
 
 	EdgePtr e=curEdge++;
 
-	assert(ULong(e)<_realEdgeLimit&&"Edge record o'flow");
+	assert(uintptr_t(e)<_realEdgeLimit&&"Edge record o'flow");
 
 	SLong sf,dx=vb.x-va.x,dy=vb.y-va.y;
 
@@ -1025,7 +1025,7 @@ void DDShadowTriangle16(ROWANSURFACEDESC*,VData,VData,VData,SWord);
 //------------------------------------------------------------------------------
 void Triangle(SWord v1,SWord v2,SWord v3)
 {
-	VData v[3];
+	VData v[3]={};	//RERUN: only x/y/v set here - other fields were read uninit downstream
 
 	v[0].x=pointdef[v1].x>>tile_scale;
 	v[0].y=(256-pointdef[v1].z)>>tile_scale;
@@ -1425,7 +1425,7 @@ void Render2Map(UByte* p,const SWord xo,const SWord yo,const SWord scale)
 							SetPalLookup();
 							GetPalLookup();
 						}
-						currentRouteColor16=palLookup[lineCol];
+						currentRouteColor16 = palLookup ? palLookup[lineCol] : UWord(lineCol);	//RERUN: palLookup NULL when no HW palette
 					}
 				}
 
@@ -1517,7 +1517,7 @@ void Render2Map(UByte* p,const SWord xo,const SWord yo,const SWord scale)
 				if (lineCol)
 				{
 					if (ispalettised)	currentRouteColor8=lineCol;
-				 	else	currentRouteColor16=palLookup[lineCol];
+				 	else	currentRouteColor16 = palLookup ? palLookup[lineCol] : UWord(lineCol);	//RERUN
 				}
 
 				sectionCount=*p++;
@@ -3043,6 +3043,7 @@ void SAliasPixel8(SLong x,SLong y)
 {
 	x=Clamp(SWord(x),SpanMin,SSpanMax);
 	y=Clamp(SWord(y),SpanMin,SSpanMax);
+	if (!pdsttxt)	return;							//RERUN: no software dest buffer
 	UByte* ptxtadr=((UByte*)pdsttxt)+(x<<8)+y;
 	*ptxtadr=currentRouteColor8;
 }
@@ -3056,6 +3057,7 @@ void NAliasPixel8(SLong x,SLong y)
 {
 	x=Clamp(SWord(x),SpanMin,SSpanMax);
 	y=Clamp(SWord(y),SpanMin,SSpanMax);
+	if (!pdsttxt)	return;							//RERUN: no software dest buffer
 	UByte* ptxtadr=((UByte*)pdsttxt)+(y<<8)+x;
 	*ptxtadr=currentRouteColor8;
 }
@@ -3069,6 +3071,7 @@ void SAliasPixel16(SLong x,SLong y)
 {
 	x=Clamp(SWord(x),SpanMin,SSpanMax);
 	y=Clamp(SWord(y),SpanMin,SSpanMax);
+	if (!pdsttxt)	return;							//RERUN: no software dest buffer
 	UWord* ptxtadr=((UWord*)pdsttxt)+(x<<8)+y;
 	*ptxtadr=currentRouteColor16;
 }
@@ -3082,6 +3085,7 @@ void NAliasPixel16(SLong x,SLong y)
 {
 	x=Clamp(SWord(x),SpanMin,SSpanMax);
 	y=Clamp(SWord(y),SpanMin,SSpanMax);
+	if (!pdsttxt)	return;							//RERUN: no software dest buffer
 	UWord* ptxtadr=((UWord*)pdsttxt)+(y<<8)+x;
 	*ptxtadr=currentRouteColor16;
 }
@@ -3736,6 +3740,7 @@ void BuildShadowList(WorldStuff *wP,itemptr itemp)
 //------------------------------------------------------------------------------
 void SortedTriangle8(VData* v)
 {
+	if (!pdsttxt)	return;	//RERUN: no software dest buffer - all writes go through p/pdsttxt
 	SLong det;
 	SLong yi,xmin,xmax,ymax;
 	Edge left,right;
@@ -3797,6 +3802,7 @@ void SortedTriangle8(VData* v)
 //------------------------------------------------------------------------------
 void SortedTriangle16(VData* v)
 {
+	if (!pdsttxt)	return;	//RERUN: no software dest buffer - all writes go through p/pdsttxt
 	SLong det;
 	SLong yi,xmin,xmax,ymax;
 	Edge left,right;
@@ -3857,6 +3863,7 @@ void SortedTriangle16(VData* v)
 //------------------------------------------------------------------------------
 void ShadowTriangle8(VData v1,VData v2,VData v3)
 {
+	if (!pdsttxt)	return;	//RERUN: no software dest buffer - all writes go through p/pdsttxt
 	if (v1.y>v2.y) Swap(v1,v2);
 	if (v1.y>v3.y) Swap(v1,v3);
 	if (v2.y>v3.y) Swap(v2,v3);
@@ -3912,6 +3919,7 @@ void ShadowTriangle8(VData v1,VData v2,VData v3)
 //------------------------------------------------------------------------------
 void ShadowTriangle16(VData v1,VData v2,VData v3)
 {
+	if (!pdsttxt)	return;	//RERUN: no software dest buffer - all writes go through p/pdsttxt
 	if (v1.y>v2.y) Swap(v1,v2);
 	if (v1.y>v3.y) Swap(v1,v3);
 	if (v2.y>v3.y) Swap(v2,v3);
@@ -3966,6 +3974,7 @@ void ShadowTriangle16(VData v1,VData v2,VData v3)
 //------------------------------------------------------------------------------
 void SortedTriangle28(VData v1,VData v2,VData v3)
 {
+	if (!pdsttxt)	return;	//RERUN: no software dest buffer - all writes go through p/pdsttxt
 	SLong det;
 	SLong yi,xmin,xmax,ymax;
 	Edge left,right;
@@ -4231,7 +4240,7 @@ void DDSortedTriangle16(VTriPtr sTri,
 		if (xmin<=xmax)
 			for (xmax-=(xmin-1);xmax--;)
 			{
-				*pdst2++=palLookup[*psrc2];
+				*pdst2++ = palLookup ? palLookup[*psrc2] : *psrc2;	//RERUN
 				psrc2+=src_dx;
 			}
 		pdst=(UWord*)(uintptr_t(pdst)+uintptr_t(prsd->lPitch));
@@ -4267,7 +4276,7 @@ void DDSortedTriangle16(VTriPtr sTri,
 		if (xmin<=xmax)
 			for (xmax-=(xmin-1);xmax--;)
 			{
-				*pdst2++=palLookup[*psrc2];
+				*pdst2++ = palLookup ? palLookup[*psrc2] : *psrc2;	//RERUN
 				psrc2+=src_dx;
 			}
 		pdst=(UWord*)(uintptr_t(pdst)+uintptr_t(prsd->lPitch));
@@ -4577,7 +4586,7 @@ void RenderTile2Surface(UByte* pdata,ROWANSURFACEDESC* prsd)
 				SetPalLookup();
 				GetPalLookup();
 			}
-			currentRouteColor16=palLookup[lineCol];
+			currentRouteColor16 = palLookup ? palLookup[lineCol] : UWord(lineCol);	//RERUN
 		}
 
 		UByte sectionCount=*pdata++;

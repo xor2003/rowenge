@@ -66,21 +66,9 @@ class Grid_Byte_File
 		file = fb;
 	}
 
-//DeadCode JON 28Jul00 	DES ~Grid_Byte_File( void )
-//DeadCode JON 28Jul00 	{
-//DeadCode JON 28Jul00 		if ( file )
-//DeadCode JON 28Jul00 		{
-//DeadCode JON 28Jul00 			delete file;
-//DeadCode JON 28Jul00 			file = NULL;
-//DeadCode JON 28Jul00 		}
-//DeadCode JON 28Jul00 	}
 
 	void SetFile( fileblock* fb )
 	{
-//DeadCode JON 28Jul00 		if ( file )
-//DeadCode JON 28Jul00 		{
-//DeadCode JON 28Jul00 			delete file;
-//DeadCode JON 28Jul00 		}
 		file = fb;
 	}
 

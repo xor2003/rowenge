@@ -222,7 +222,7 @@ int		RotExpr::Evaluate(int)
 
 UniqueID	IcptExpr::EvalW(Coords3D& c)
 {
-	Coords3D a,b;
+	Coords3D a={0,0,0},b={0,0,0};	//RERUN: EvalW may not write all fields - c.X=b.X-a.X read garbage
 	UniqueID	rv;
 	if (objA.complex)
 	{
@@ -385,7 +385,7 @@ bool	EventVal::RecalcDeltasToMatch(COORDS3D c)
 	int deltay=0;
 	if (w->uniqueID.complex)
 	{
-		COORDS3D base;
+		COORDS3D base={0,0,0};		//RERUN: EvalW may not write all fields
 		w->uniqueID.EvalW(base);
 		c.X-=base.X;
 		deltay=-base.Y;

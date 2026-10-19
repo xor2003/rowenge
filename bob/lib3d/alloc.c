@@ -45,7 +45,7 @@ alloc_handle_t *AllocInit(void )
 	alloc_block_t *blk;
 	blk=(alloc_block_t*)malloc(sizeof(alloc_block_t));
 	blk->next=0UL;
-	blk->start=(char*)malloc(ALLOC_BLOCK_SIZE+ALIGN_BYTES-1);
+	blk->start=(char*)calloc(1,ALLOC_BLOCK_SIZE+ALIGN_BYTES-1);
 	blk->free=AllocSetToAlignment(blk->start);
 	blk->end=blk->start+ALLOC_BLOCK_SIZE;
 	hdr=(alloc_hdr_t*)malloc(sizeof(alloc_hdr_t));
@@ -94,7 +94,7 @@ char *Alloc(int size)
 			blk->next=(alloc_block_t*)malloc(sizeof(alloc_block_t));
 			blk=blk->next;
 			blk->next=0UL;
-			blk->start=(char*)malloc(ALLOC_BLOCK_SIZE+ALIGN_BYTES-1);
+			blk->start=(char*)calloc(1,ALLOC_BLOCK_SIZE+ALIGN_BYTES-1);
 			blk->end=blk->start+ALLOC_BLOCK_SIZE;
 			blk->free=AllocSetToAlignment(blk->start);
 		}

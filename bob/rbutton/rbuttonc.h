@@ -60,17 +60,14 @@ protected:
 	HICON m_closeUpIcon;
 	HICON m_closeDownIcon;
 	BOOL m_bCloseButton;
-//DeadCode JIM 9Aug00 	BOOL m_bClosePressed;
 
 	HICON m_tickUpIcon;
 	HICON m_tickDownIcon;
 	BOOL m_bTickButton;
-//DeadCode JIM 9Aug00 	BOOL m_bTickPressed;
 
 	HICON m_helpUpIcon;
 	HICON m_helpDownIcon;
 	BOOL m_bHelpButton;
-//DeadCode JIM 9Aug00 	BOOL m_bHelpPressed;
 
 	long m_FontNum;
 	BOOL m_LButtonDown;

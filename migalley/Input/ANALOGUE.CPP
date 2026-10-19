@@ -742,8 +742,10 @@ void	FF_Push::Init(IDirectInputDevice2A* d)
 {
 	triggerX=triggerZ=false;MX=MZ=0x8000;durationX=durationZ=0;
 	dev=d;
-	if (pForceX)  pForceX->Release();	pForceX=NULL;
-	if (pForceY)  pForceY->Release();	pForceY=NULL;
+	if (pForceX)  pForceX->Release();
+	pForceX=NULL;
+	if (pForceY)  pForceY->Release();
+	pForceY=NULL;
 	if (dev)
 	{
 		SWFF_CreateRawAxisForceEffect(dev,&pForceX,0,X_AXIS);

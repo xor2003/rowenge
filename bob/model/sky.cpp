@@ -139,7 +139,6 @@ void Atmosphere::SetMissionWind (SWord month)
 	if (delta < 0)
 		delta = -delta;
 
-	//DeadCode CSB 28/10/99		Frequency = 65535 - 26 * delta;		// 0 = always, 65535 = very infrequent
 	Frequency = 0;	//CSB 28/10/99	
 
 	MaxMagnitude = delta;
@@ -243,81 +242,6 @@ UByte Atmosphere::CloudLayerCover(Coords3D* pos)
 }
 
 
-//DEADCODE DAW 29/01/00 //////////////////////////////////////////////////////////////////////
-//DEADCODE DAW 29/01/00 //
-//DEADCODE DAW 29/01/00 // Function:    SetMissionConditions 
-//DEADCODE DAW 29/01/00 // Date:		29/01/00
-//DEADCODE DAW 29/01/00 // Author:		DAW
-//DEADCODE DAW 29/01/00 //
-//DEADCODE DAW 29/01/00 //Description: 
-//DEADCODE DAW 29/01/00 //
-//DEADCODE DAW 29/01/00 //////////////////////////////////////////////////////////////////////
-//DEADCODE DAW 29/01/00 void Atmosphere::SetMissionPress (SWord month)
-//DEADCODE DAW 29/01/00 {
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 	FP delta;
-//DEADCODE DAW 29/01/00 	delta = month - 6;
-//DEADCODE DAW 29/01/00 	if (delta < 0)
-//DEADCODE DAW 29/01/00 		delta = - delta;
-//DEADCODE DAW 29/01/00 	if (delta < 3)
-//DEADCODE DAW 29/01/00 	{//Summer
-//DEADCODE DAW 29/01/00 		Press0 = 1001 + TempVar;
-//DEADCODE DAW 29/01/00 	}else
-//DEADCODE DAW 29/01/00 	{
-//DEADCODE DAW 29/01/00 		Press0 = 999 - TempVar;
-//DEADCODE DAW 29/01/00 	}
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 	ContrailBandCentre = FEET2CM(32000);		//CSB 10/06/99	
-//DEADCODE DAW 29/01/00 	ContrailBandWidth = FEET2CM(4000);	//CSB 10/06/99	
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 	FP ChanceBad = 0.5 + 0.5 * FCos(month * 6.2831853 / 12.0);		//CSB 02/07/99	
-//DEADCODE DAW 29/01/00 	ChanceBad = 819.2 + 8192.0 * ChanceBad;						//CSB 02/07/99	
-//DEADCODE DAW 29/01/00 	if(Math_Lib.rnd() > ChanceBad)									//CSB 02/07/99	
-//DEADCODE DAW 29/01/00 //DeadCode CSB 02/07/99		if (Press0 > 1000)
-//DEADCODE DAW 29/01/00 	{
-//DEADCODE DAW 29/01/00 		Conditions = 0;
-//DEADCODE DAW 29/01/00 		Visibility = 4000000;
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 	}
-//DEADCODE DAW 29/01/00 	else
-//DEADCODE DAW 29/01/00 	{
-//DEADCODE DAW 29/01/00 		Visibility = 4000000;			//##lower vis possible here
-//DEADCODE DAW 29/01/00 		if (Temp0 < 273)
-//DEADCODE DAW 29/01/00 			Conditions = 2;
-//DEADCODE DAW 29/01/00 		else
-//DEADCODE DAW 29/01/00 			Conditions = 1;
-//DEADCODE DAW 29/01/00 	}
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 	if (		(Press0 < 980)
-//DEADCODE DAW 29/01/00 			&&	(MMC.currtime <  HR09)
-//DEADCODE DAW 29/01/00 		)
-//DEADCODE DAW 29/01/00 		MistInValley = true;
-//DEADCODE DAW 29/01/00 	else
-//DEADCODE DAW 29/01/00 		MistInValley = false;
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 //this will be a function of temp and press
-//DEADCODE DAW 29/01/00 	CloudLayer = 457200;
-//DEADCODE DAW 29/01/00 }
-//DEADCODE DAW 29/01/00 void Atmosphere::SetMissionConditions ()
-//DEADCODE DAW 29/01/00 {
-//DEADCODE DAW 29/01/00 	FCRD wind_at_zero, wind_at_alt;
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00   	SWord	month = 0;
-//DEADCODE DAW 29/01/00 	SWord	day = 0,year = 0;
-//DEADCODE DAW 29/01/00 	Math_Lib.DateFromSecs (MMC.currdate, day,month,year);
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 	SetMissionTemp (month);
-//DEADCODE DAW 29/01/00 	SetMissionPress (month);
-//DEADCODE DAW 29/01/00 	SetMissionDensity();
-//DEADCODE DAW 29/01/00 	SetMissionClouds();
-//DEADCODE DAW 29/01/00 
-//DEADCODE DAW 29/01/00 	SetMissionWind(month);
-//DEADCODE DAW 29/01/00  
-//DEADCODE DAW 29/01/00 	SWord Latitude = 38;
-//DEADCODE DAW 29/01/00 	SetMissionDawnDusk(Latitude, MMC.currdate, MMC.dawntime, MMC.dusktime);
-//DEADCODE DAW 29/01/00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -374,15 +298,10 @@ Bool Atmosphere::GetWindDirVel (SLong alt, SWord& hdg, SLong& speed)
 	if(alt > 914400)	// 30,000 ft
 	{
 		hdg	  = SWord(diralt * 182.04);
-//DeadCode RJS 16Dec99		speed = (51 * windalt) / 10;
 		speed = SLong(5148. * windalt);					//RJS 16Dec99
 		return(TRUE);
 	}
 
-//DeadCode RJS 16Dec99	SWord Dir0   = SWord(182.04 * dir0);
-//DeadCode RJS 16Dec99	SWord DirAlt = SWord(182.04 * diralt);
-//DeadCode RJS 16Dec99
-//DeadCode RJS 16Dec99	SWord DeltaDir = DirAlt - Dir0;
 	FP Dir0   = 182.04 * dir0;							//RJS 16Dec99
 	FP DirAlt = 182.04 * diralt;						//RJS 16Dec99
 
@@ -436,40 +355,6 @@ void Atmosphere::GetWindDirVel (SLong alt, SWord& hdg, FP& speed)
 		}
 	}
 }
-//DEADCODE CB 29/10/99 {
-//DEADCODE CB 29/10/99 	if(!Save_Data.flightdifficulty [FD_WINDEFFECTS])
-//DEADCODE CB 29/10/99 	{
-//DEADCODE CB 29/10/99 		hdg = 0;
-//DEADCODE CB 29/10/99 		speed = 0;
-//DEADCODE CB 29/10/99 		return(TRUE);
-//DEADCODE CB 29/10/99 	}
-//DEADCODE CB 29/10/99 
-//DEADCODE CB 29/10/99 	if(alt < 1036300)	// 34,000 ft 
-//DEADCODE CB 29/10/99 	{
-//DEADCODE CB 29/10/99 		hdg	  = SWord(dir0 * 182.04);
-//DEADCODE CB 29/10/99 		speed = 0;//wind0;
-//DEADCODE CB 29/10/99 		return(TRUE);
-//DEADCODE CB 29/10/99 	}
-//DEADCODE CB 29/10/99 	
-//DEADCODE CB 29/10/99 	if(alt > 1066800)	// 35,000 ft
-//DEADCODE CB 29/10/99 	{
-//DEADCODE CB 29/10/99 		hdg	  = SWord(diralt * 182.04);
-//DEADCODE CB 29/10/99 		speed = (51 * windalt) / 10;
-//DEADCODE CB 29/10/99 		return(TRUE);
-//DEADCODE CB 29/10/99 	}
-//DEADCODE CB 29/10/99 	
-//DEADCODE CB 29/10/99 	SWord Dir0   = SWord(182.04 * dir0);
-//DEADCODE CB 29/10/99 	SWord DirAlt = SWord(182.04 * diralt);
-//DEADCODE CB 29/10/99 
-//DEADCODE CB 29/10/99 	SWord DeltaDir = DirAlt - Dir0;
-//DEADCODE CB 29/10/99 	FP Fract = (alt - 1036300.0) / (1066800.0 - 1036300.0);
-//DEADCODE CB 29/10/99 	FP fdir   = Dir0 + Fract * DeltaDir;
-//DEADCODE CB 29/10/99 	FP fspeed = Fract * windalt * 5.1;
-//DEADCODE CB 29/10/99 	hdg   = SWord(fdir);
-//DEADCODE CB 29/10/99 	speed = SWord(fspeed);
-//DEADCODE CB 29/10/99 	
-//DEADCODE CB 29/10/99 	return(TRUE);
-//DEADCODE CB 29/10/99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GetWind
@@ -663,8 +548,6 @@ void Atmosphere::SetMissionDawnDusk (SWord Latitude, ULong Date, SLong& Dawn, SL
 	Dusk = (int)fDusk;
 
 #pragma warnmsg("***** DAWN AND DUSK FAKED **** //CSB 20/04/00")
-//DeadCode JON 29Sep00 	Dawn = 18000;	//5 am
-//DeadCode JON 29Sep00 	Dusk = 79200;	//10 pm
 	Dawn = 7*60*60; // 7am
 	Dusk = (10+12)*60*60; // 10pm
 

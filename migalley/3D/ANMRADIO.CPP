@@ -230,7 +230,6 @@ void	DamageChat::OtherSideDamageLevel2()
 		AirStrucPtr buddy=acHitter->FindABuddyWithPlayerGivenPriority();
 		if (buddy)
 		{
-	//DeadCode DAW 25Jun99 		_Radio.ClearMessages(MSG_DAMAGELEVEL1,acHit);					//RJS 15Jun99
 			_Radio.ClearMessages(MSG_DAMAGELEVEL1,acHit);			//RJS 24Jun99
 			if (!acHitter->AcIsPlayer())
 			{
@@ -249,7 +248,6 @@ void	DamageChat::OtherSideDamageLevel2()
 				_Radio.ClearMessages(MSG_PLAYERDAMAGELEVEL1,acHit);	//RJS 24Jun99
 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_PLAYERDAMAGELEVEL2, acHitter, acHit, buddy));//RJS 24Jun99
 			}
-	//DeadCode DAW 25Jun99 			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_DAMAGELEVEL2, acHitter, acHit, buddy));
 		}
 		else
 		{
@@ -258,8 +256,6 @@ void	DamageChat::OtherSideDamageLevel2()
 				_Radio.ClearMessages(MSG_DAMAGELEVEL1,acHit);		//RJS 24Jun99
 				_Radio.ClearMessages(MSG_PLAYERDAMAGELEVEL1,acHit);	//RJS 24Jun99
 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_PLAYERDAMAGELEVEL2, acHitter, acHit, acHitter));//RJS 24Jun99
-	//DeadCode DAW 25Jun99 			_Radio.ClearMessages(MSG_DAMAGELEVEL1,acHit);				//RJS 15Jun99
-	//DeadCode DAW 25Jun99 			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_OTHERDAMAGE2HI, MSG_DAMAGELEVEL2, acHitter, acHit, acHitter));//RJS 23May99
 			}
 		}
 	}
@@ -310,8 +306,6 @@ void	DamageChat::PlayerSideDamageLevel1()
  						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE1CONV, MSG_DAMAGELEVEL1, buddy, acHit, acHit));
  						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE1CONVREPLY, MSG_DAMAGELEVEL1REPLY, acHit,acHit,buddy));
 					}
-	//DeadCode DAW 25Jun99  				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE1CONV, MSG_DAMAGELEVEL1, acHit, acHit, buddy));
-	//DeadCode DAW 25Jun99  				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE1CONVREPLY, MSG_DAMAGELEVEL1REPLY, buddy,acHit,acHit));
  				}
  				else
  				{
@@ -329,7 +323,6 @@ void	DamageChat::PlayerSideDamageLevel1()
 					}
 					else
 						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE1HI, MSG_PLAYERDAMAGELEVEL1, acHit, acHit, buddy));//RJS 24Jun99
-	//DeadCode DAW 25Jun99 					_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_PLAYERDAMAGE1HI, MSG_DAMAGELEVEL1, acHit, acHit, buddy));
  				}
  			}
 		}
@@ -433,10 +426,7 @@ void	DamageChat::FuelLeak()
 			AirStrucPtr buddy=acHit->FindABuddyWithPlayerGivenPriority();
 			if (buddy)
 			{
-//DEADCODE RDH 06/05/99   				if (acHitter->ai.PilotSkills.combatskill < SKILL_REGULAR)
 	 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_GOTHIMLEAKING, MSG_DAMAGELEVEL2, acHitter, acHit, buddy));
-//DEADCODE RDH 06/05/99   				else
-//DEADCODE RDH 06/05/99  	 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_GOTHIMLEAKING, MSG_DAMAGELEVEL2, acHitter, NULL, *acHitter->follower));
 			}
  		}
  		else
@@ -449,10 +439,7 @@ void	DamageChat::FuelLeak()
 	}
 	else
 	{
-//DEADCODE RDH 09/05/99 		AirStrucPtr buddy=acHit->FindBuddy();
-//DEADCODE RDH 09/05/99 		if (buddy)
 		_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_GOTHIMLEAKING, MSG_PLAYERLEAKING, acHitter, acHit, acHitter));
-//DeadCode DAW 25Jun99 		_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_GOTHIMLEAKING, (MsgType)(MSG_DAMAGELEVEL2+MSG_DELAY), acHitter, acHit, acHitter));
 	}
 }
 
@@ -770,7 +757,6 @@ void	DamageChat::OtherSideKilled()
 				_Radio.ClearMessages(MSG_DAMAGELEVEL2,acHit);				//RJS 15Jun99
 				_Radio.ClearMessages(MSG_PLAYERDAMAGELEVEL2,acHit);	//RJS 24Jun99
 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OTHERKILLED,MSG_PLAYERKILLREPORT, acHitter, acHit, acHitter));//RJS 24Jun99
-	//DeadCode DAW 25Jun99 			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OTHERKILLED,MSG_KILLREPORT, acHitter, acHit, acHitter));//RDH 18May99
 			}
 		}
 	}
@@ -819,7 +805,7 @@ void	DamageChat::PlayerSideBlewUp(AirStrucPtr	ac)
 			}
 		}
 	}
-	if (!ac->uniqueID.bitfieldUid.commsmove)									  //AMM 07/07/99
+	if (ac && !ac->uniqueID.bitfieldUid.commsmove)							  //AMM 07/07/99	//RERUN: ac may be NULL
 		ac->ai.PilotSkills.radiosilent = TRUE;			//RJS 09Jun99
 }
 
@@ -884,7 +870,7 @@ void	DamageChat::OtherSideBlewUp(AirStrucPtr	ac,AirStrucPtr	acDead,bool	migdead)
 									else
 										_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OTHERSIDEBLEWHI,MSG_BLOWUPREPORT, ac, acDead, buddy));//RDH 18May99
 
-									if (!buddy->AcIsPlayer())
+									if (buddy && !buddy->AcIsPlayer())						//RERUN: this branch runs when buddy is NULL
 										_Radio.TriggerMsg(MESSAGE_STRUC(PHRASE_ROGER2,(MsgType)(MSG_BLOWUPREPORTREPLY+MSG_BLOCKCHATTER), buddy, acDead, ac));//RJS 06Jul99
 								}
 								else
@@ -903,8 +889,6 @@ void	DamageChat::OtherSideBlewUp(AirStrucPtr	ac,AirStrucPtr	acDead,bool	migdead)
 				else
 				{
 					//Don't want to hear 'Splash one' all the time, cos it's annoying
-//DeadCode RJS 01Jul99 					if (Math_Lib.rnd() > 49152)
-//DeadCode RJS 01Jul99 					{
 						_Radio.ClearMessages(MSG_DAMAGELEVEL2,acDead);				//RJS 15Jun99
 						_Radio.ClearMessages(MSG_PLAYERDAMAGELEVEL2,acDead);//RJS 24Jun99
 						buddy = ac->FindBuddy();
@@ -915,7 +899,6 @@ void	DamageChat::OtherSideBlewUp(AirStrucPtr	ac,AirStrucPtr	acDead,bool	migdead)
 						}
 						else
 							_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OTHERSIDEBLEWHI,MSG_PLAYERBLOWUPREPORT, ac, acDead, ac));
-//DeadCode RJS 01Jul99 					}
 				}
 			}
 		}
@@ -986,7 +969,7 @@ void	DamageChat::PlayerSidePiledIn(AirStrucPtr	ac)
 		}
 	}
 
-	if (!ac->uniqueID.bitfieldUid.commsmove)									  //AMM 07/07/99
+	if (ac && !ac->uniqueID.bitfieldUid.commsmove)							  //AMM 07/07/99	//RERUN: ac may be NULL
 		ac->ai.PilotSkills.radiosilent = TRUE;			//RJS 09Jun99
 }
 

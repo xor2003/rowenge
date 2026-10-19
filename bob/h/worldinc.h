@@ -1215,6 +1215,7 @@ static UWord vel_to_aoa[];
 
 	AirStruc()													//ARM 01May97
 	{															//ARM 01May97
+		memset(this,0,sizeof(AirStruc));	//zero uninit members (no vptr in chain)
 		Status.size = AirStrucSize;								//ARM 01May97
 		NewModel (this);										//ARM 01May97
 	}															//ARM 01May97

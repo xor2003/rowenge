@@ -93,8 +93,6 @@ void F80C_Setup (AirStrucPtr const ControlledAC, ULong Version)
 
 	pMainPlane->SetCurves ("F80C", "Cl", "Cd", "CompCd0", "CompK", "Cm");
 	pMainPlane->SetDragPolar (0.0231, 0.0585);	
-//DeadCode AMM 29Jun99 	pMainPlane->StallAoa = Degs2Rads(0);//22.5);//
-//DeadCode AMM 29Jun99 	pMainPlane->UnStallAoa = Degs2Rads(10);
 	pMainPlane->dCMdq = 0;
 	pMainPlane->dCMdp = 0;
 	pMainPlane->dCMdr = 0;
@@ -138,8 +136,6 @@ void F80C_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	new NEWCTRL (pTailPlane2, &Model.Elevator, 30, Degs2Rads(20), Degs2Rads(30));
 	new NEWCTRL (pFin,        &Model.Rudder,   20, Degs2Rads(20), Degs2Rads(20));
 
-//DeadCode AMM 29Jun99 	Model.ControlPower		= 0.1;
-//DeadCode AMM 29Jun99 	Model.ControlResistance = 0;//1000;
 
 	new AERODEVICE (ControlledAC,pModel, AeroDevice::DT_FLAPS, 0.5, 0.15, -0.25, DEGS2RADS(5), 256, FLAPSUPDOWN, &adptr->acflaps);//RJS 14May98
 	new AERODEVICE (ControlledAC,pModel, AeroDevice::DT_SPEEDBRAKES, 0, 0.05, -0.01, 0, 256, SPEEDBRAKE, &adptr->acbreak);//RJS 14May98
@@ -148,7 +144,6 @@ void F80C_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	Model.MaxG = 9;
 	Model.MinG = -4;
 
-//DeadCode CSB 06/07/99		pModel->SetMassInertias (ControlledAC, 26500, 36800, 11000);
 	pModel->SetMassInertias (ControlledAC, 13822, 24480, 11474);
 
 	PENGINE pEngine = new ENGINE (pModel, ET_JET, 20475, 11750, 0.0000001,
@@ -207,53 +202,12 @@ void F80C_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainPort, &adptr->aclegsuspl, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainStbd, &adptr->aclegsuspr, 0, 255);
 
-//DeadCode AMM 29Jun99 	Model.CoordRudder = 512;
 	Model.PowerBoost = (FP)1.5;
 
-//DeadCode AMM 29Jun99 	Model.ContrailBand = FEET2CM(10000);
 	Model.ContrailDuration = 1.0;
 
 	F80C_SetupAI(ControlledAC, Version);
 }
-//DeadCode CSB 10/12/98	//	ACM.pModel = pModel;
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98		ACM.BrakePower = 14;
-//DeadCode CSB 10/12/98		ACM.SteerRatio = 8e-6;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.ClimbRate_Elevator_Damping_Power = 5000;
-//DeadCode CSB 10/12/98	//	ACM.ClimbRate_Elevator_Offset_Power = 50;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.Height_Elevator_Offset_Power = 0.1;
-//DeadCode CSB 10/12/98	//	ACM.Height_Elevator_Limit = 500;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.RollRate_Aileron_Offset_Power = 12500;	// 25000 5/9/97
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	//	ACM.Roll_Aileron_Offset_Power = 5000;
-//DeadCode CSB 10/12/98	//	ACM.Roll_Aileron_MaxBankOffset_Power = 25000;
-//DeadCode CSB 10/12/98		ACM.MaxAileron = 32767;
-//DeadCode CSB 10/12/98	//	ACM.lastdeltaroll = 0;
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	//	ACM.Heading_Aileron_Limit = DEGS2RADS(45);
-//DeadCode CSB 10/12/98	//	ACM.Heading_Aileron_Offset_Power = 5000;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.PitchRate_Elevator_Offset_Power = 2048;
-//DeadCode CSB 10/12/98	//	ACM.PitchRate_Elevator_Damping_Power = 262144;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//DeadCode RDH 17Apr98 	ACM.Pitch_Elevator_Offset_Power = 2048;
-//DeadCode CSB 10/12/98	//DeadCode RDH 17Apr98 	ACM.Pitch_Elevator_Damping_Power = 262144;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98		ACM.DeltaPitchForMaxElevator	= 1.0472;
-//DeadCode CSB 10/12/98		ACM.MaxElevatorForTightTurn	= 25000;
-//DeadCode CSB 10/12/98	//	ACM.DiffPitchForMaxElevator	= 0.1745;
-//DeadCode CSB 10/12/98		ACM.lastdeltapitch = 0;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.Speed_Throttle_Offset_Power = 0.5;
-//DeadCode CSB 10/12/98	//	ACM.Speed_Throttle_Damping_Power = 64;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//DeadCode CSB 06/11/98		Model.ClAileronLoss = 1.50;
-//DeadCode CSB 10/12/98		Model.MElevatorLoss = 1.10;	
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	}
 
 
 

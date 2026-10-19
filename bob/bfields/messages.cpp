@@ -73,7 +73,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"dosdefs.h"
 #include	"worldinc.h"
 #include	"myerror.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"persons2.h"
 #include	"flymodel.h"
 //#include	"Mytime.h"
@@ -81,117 +80,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"rchatter.h"
 
 //------------------------------------------------------------------------------
-//DeadCode RJS 27Jan99 void	Persons2::AddMessageIfPlayerSq(AirStrucPtr eye,UserMsg::Reason r,TextSnip0 t,ItemBasePtr cp)
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	if (eye->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode RJS 27Jan99 		AddMessage(r,t,cp);
-//DeadCode RJS 27Jan99 }
-//DeadCode RJS 27Jan99 void	Persons2::AddMessageIfPlayer(ItemBasePtr eye,UserMsg::Reason r,TextSnip0 t,ItemBasePtr cp)
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	if (eye==Manual_Pilot.ControlledAC2)
-//DeadCode RJS 27Jan99 		AddMessage(r,t,cp);
-//DeadCode RJS 27Jan99 }
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 void	Persons2::AddMessage(UserMsg::Reason r,TextSnip0 t,Coords3D&  cp)
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	if (r!=UserMsg::COURSE)
-//DeadCode RJS 27Jan99 		ClrMessage(UserMsg::COURSE);
-//DeadCode RJS 27Jan99 	int c=0;
-//DeadCode RJS 27Jan99 	for (c=0;c<UserMessages::MAX-1;c++)
-//DeadCode RJS 27Jan99 		breakif (usermessages.line[c].reason==r);
-//DeadCode RJS 27Jan99 	if (usermessages.line[c].reason!=r)
-//DeadCode RJS 27Jan99 	{
-//DeadCode RJS 27Jan99 		usermessages.newmessages=TRUE;
-//DeadCode RJS 27Jan99 	}
-//DeadCode RJS 27Jan99 	for (c=c;c>0;c--)
-//DeadCode RJS 27Jan99 		usermessages.line[c]=usermessages.line[c-1];
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 	UserMsg& umlz=usermessages.line[0];
-//DeadCode RJS 27Jan99 	umlz.reason=r;
-//DeadCode RJS 27Jan99 	umlz.trgname=t;
-//DeadCode RJS 27Jan99 	if (&cp==&umlz.despos)
-//DeadCode RJS 27Jan99 	{
-//DeadCode RJS 27Jan99 		umlz.World=cp;
-//DeadCode RJS 27Jan99 	 	umlz.trgplace=&umlz;
-//DeadCode RJS 27Jan99 	}
-//DeadCode RJS 27Jan99 	else  // should not get here!
-//DeadCode RJS 27Jan99 #ifdef __WATCOMC__
-//DeadCode RJS 27Jan99 		INT3();													//JIM 19Jun97
-//DeadCode RJS 27Jan99 #endif
-//DeadCode RJS 27Jan99 #ifdef __MSVC__
-//DeadCode RJS 27Jan99 		INT3;
-//DeadCode RJS 27Jan99 #endif
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 //DeadCode JIM 14Nov96 		umlz.trgplace=&cp;
-//DeadCode RJS 27Jan99 }
-//DeadCode RJS 27Jan99 void	Persons2::AddMessage(UserMsg::Reason r,TextSnip0 t,ItemBasePtr cp)
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	if (r!=UserMsg::COURSE)
-//DeadCode RJS 27Jan99 		ClrMessage(UserMsg::COURSE);
-//DeadCode RJS 27Jan99 //DeadCode JIM 25Jul96 	if (t!=TextRef_MIN)
-//DeadCode RJS 27Jan99 //DeadCode JIM 25Jul96 		t=_Text.Conv(t,permtextpage);
-//DeadCode RJS 27Jan99 	int c=0;
-//DeadCode RJS 27Jan99 	//look for existing entry
-//DeadCode RJS 27Jan99 	for (c=0;c<UserMessages::MAX-1;c++)		
-//DeadCode RJS 27Jan99 		breakif (usermessages.line[c].reason==r);		//don't check last one
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 	if (usermessages.line[c].reason!=r)					//because checked here anyway
-//DeadCode RJS 27Jan99 	{
-//DeadCode RJS 27Jan99 		usermessages.newmessages=TRUE;
-//DeadCode RJS 27Jan99 	}
-//DeadCode RJS 27Jan99 	//bump earlier entries up over existing entry or over end
-//DeadCode RJS 27Jan99 	for (c=c;c>0;c--)
-//DeadCode RJS 27Jan99 		usermessages.line[c]=usermessages.line[c-1];
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 	UserMsg& umlz=usermessages.line[0];
-//DeadCode RJS 27Jan99 	umlz.reason=r;
-//DeadCode RJS 27Jan99 	umlz.trgname=t;
-//DeadCode RJS 27Jan99 //DeadCode RDH 15Oct96 	if (cp)
-//DeadCode RJS 27Jan99 //TempCode RDH 15Oct96 		if (cp==&AirStruc::despos)
-//DeadCode RJS 27Jan99 //TempCode RDH 15Oct96 		{
-//DeadCode RJS 27Jan99 //TempCode RDH 15Oct96 			umlz.placefields=cp;
-//DeadCode RJS 27Jan99 //TempCode RDH 15Oct96 			umlz.trgplace=&umlz.placefields;
-//DeadCode RJS 27Jan99 //TempCode RDH 15Oct96 		}
-//DeadCode RJS 27Jan99 //TempCode RDH 15Oct96 		else
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 	umlz.trgplace=cp;
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 //DeadCode RDH 15Oct96 	else
-//DeadCode RJS 27Jan99 //DeadCode RDH 15Oct96 	{
-//DeadCode RJS 27Jan99 //DeadCode RDH 15Oct96 		umlz.placefields.X=
-//DeadCode RJS 27Jan99 //DeadCode RDH 15Oct96 			umlz.placefields.Y=
-//DeadCode RJS 27Jan99 //DeadCode RDH 15Oct96 				umlz.placefields.Z=0;
-//DeadCode RJS 27Jan99 //DeadCode RDH 15Oct96 		umlz.trgplace=NULL;
-//DeadCode RJS 27Jan99 //DeadCode RDH 15Oct96 	}
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 }
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 void	Persons2::ClrMessage(UserMsg::Reason r)
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	int c=0;
-//DeadCode RJS 27Jan99 	if (r==UserMsg::NOMSG)
-//DeadCode RJS 27Jan99 	{
-//DeadCode RJS 27Jan99 		for (c=0;c<UserMessages::MAX;c++)
-//DeadCode RJS 27Jan99 			usermessages.line[c].reason=UserMsg::NOMSG;
-//DeadCode RJS 27Jan99 	}
-//DeadCode RJS 27Jan99 	else
-//DeadCode RJS 27Jan99 	{
-//DeadCode RJS 27Jan99 		for (c=0;c<UserMessages::MAX;c++)
-//DeadCode RJS 27Jan99 		{
-//DeadCode RJS 27Jan99 			if (usermessages.line[c].reason==r)
-//DeadCode RJS 27Jan99 				break;
-//DeadCode RJS 27Jan99 		}
-//DeadCode RJS 27Jan99 		if (c<UserMessages::MAX)
-//DeadCode RJS 27Jan99 		{
-//DeadCode RJS 27Jan99 			while (++c<UserMessages::MAX)
-//DeadCode RJS 27Jan99 			{
-//DeadCode RJS 27Jan99 				usermessages.line[c-1]=usermessages.line[c];
-//DeadCode RJS 27Jan99 			}
-//DeadCode RJS 27Jan99 	 		usermessages.line[UserMessages::MAX-1].reason=UserMsg::NOMSG;
-//DeadCode RJS 27Jan99 		}
-//DeadCode RJS 27Jan99 
-//DeadCode RJS 27Jan99 	}
-//DeadCode RJS 27Jan99 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		UpdateLog
 //Author		Jim Taylor
@@ -204,89 +92,18 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DEADCODE DAW 08/03/00 struct EventLog *  Persons2::eventloglist;
-//DEADCODE DAW 08/03/00 struct EventLog *  Persons2::TruckLog;
-//DEADCODE DAW 08/03/00 struct EventLog *  Persons2::TargLog;
-//DEADCODE DAW 08/03/00 struct EventLog *  Persons2::PlayerLog;
 
 void	Persons2::UpdateLog(AirStrucPtr	eventitem,int	credits,EventLog::Stage stage)
 {
 	UpdateLog(eventitem->ai.eventlog,credits,stage,eventitem);
 }
 
-//DEADCODE DAW 08/03/00 void	Persons2::UpdatePlayerLog(AirStrucPtr	eventitem,EventLog::Stage stage)
-//DEADCODE DAW 08/03/00 {
-//DEADCODE DAW 08/03/00 	if (!PlayerLog)
-//DEADCODE DAW 08/03/00 	{
-//DEADCODE DAW 08/03/00 		PlayerLog=new EventLog(eventloglist);
-//DEADCODE DAW 08/03/00 		UpdateLog(PlayerLog,0,stage,eventitem);
-//DEADCODE DAW 08/03/00 		PlayerLog->homebase=eventitem->ai.eventlog->homebase;
-//DEADCODE DAW 08/03/00 		PlayerLog->encounteredtype=eventitem->ai.eventlog->encounteredtype;
-//DEADCODE DAW 08/03/00 		PlayerLog->escorttype=eventitem->ai.eventlog->escorttype;
-//DEADCODE DAW 08/03/00 		PlayerLog->encsize=1;
-//DEADCODE DAW 08/03/00 	}
-//DEADCODE DAW 08/03/00 	else
-//DEADCODE DAW 08/03/00 	{
-//DEADCODE DAW 08/03/00 		UpdateLog(PlayerLog,0,stage);
-//DEADCODE DAW 08/03/00 	}
-//DEADCODE DAW 08/03/00 
-//DEADCODE DAW 08/03/00 
-//DEADCODE DAW 08/03/00 }
 
-//DEADCODE DAW 08/03/00 void	Persons2::UpdateLog(ItemPtr	eventitem,int	credits,EventLog::Stage stage)
-//DEADCODE DAW 08/03/00 {
-//DEADCODE DAW 08/03/00 	if (!TargLog)
-//DEADCODE DAW 08/03/00 	{
-//DEADCODE DAW 08/03/00 		TargLog=new EventLog(eventloglist);
-//DEADCODE DAW 08/03/00 		UpdateLog(TargLog,0,stage,eventitem);
-//DEADCODE DAW 08/03/00 		TargLog->encsize=1;
-//DEADCODE DAW 08/03/00 	}
-//DEADCODE DAW 08/03/00 	else
-//DEADCODE DAW 08/03/00 	{
-//DEADCODE DAW 08/03/00 		UpdateLog(TargLog,0,stage);
-//DEADCODE DAW 08/03/00 	}
-//DEADCODE DAW 08/03/00 
-//DEADCODE DAW 08/03/00 }
-//DEADCODE DAW 08/03/00 void	Persons2::UpdateLog(MobileItemPtr	eventitem,int	credits,EventLog::Stage stage)
-//DEADCODE DAW 08/03/00 {
-//DEADCODE DAW 08/03/00 	if (!TruckLog)
-//DEADCODE DAW 08/03/00 	{
-//DEADCODE DAW 08/03/00 		TruckLog=new EventLog(eventloglist);
-//DEADCODE DAW 08/03/00 		UpdateLog(TruckLog,credits,stage,eventitem);
-//DEADCODE DAW 08/03/00 		TruckLog->encounteredtype=PT_VEHICLES;
-//DEADCODE DAW 08/03/00 		TruckLog->encsize=10;
-//DEADCODE DAW 08/03/00 	}
-//DEADCODE DAW 08/03/00 	else
-//DEADCODE DAW 08/03/00 	{
-//DEADCODE DAW 08/03/00 		UpdateLog(TruckLog,credits,stage);
-//DEADCODE DAW 08/03/00 	}
-//DEADCODE DAW 08/03/00 }
 
 void	Persons2::UpdateLog(EventLogPtr	eventlog,int	credits,EventLog::Stage stage,ItemBasePtr place)
 {
 	if (stage>eventlog.stage)
 		eventlog.stage=stage;
-//DEADCODE AMM 11/01/00 	if (eventlog->stage==EventEntry::TAKEOFF)
-//DEADCODE AMM 11/01/00 		INT3;
-//DEADCODE AMM 11/01/00 //	assert(eventlog&&"AC with no event!");
-//DEADCODE AMM 11/01/00 	if (stage>=eventlog->stage)
-//DEADCODE AMM 11/01/00 	{
-//DEADCODE AMM 11/01/00 		if (stage>eventlog->stage)
-//DEADCODE AMM 11/01/00 		{
-//DEADCODE AMM 11/01/00 			eventlog->stage=stage;
-//DEADCODE AMM 11/01/00 			eventlog->launchtime=Master_3d.currinst->timeofday;
-//DEADCODE AMM 11/01/00 			eventlog->hits=0;
-//DEADCODE AMM 11/01/00 			eventlog->losses=0;
-//DEADCODE AMM 11/01/00 			if (place)
-//DEADCODE AMM 11/01/00 				eventlog->place=RadioChatter::GetPlaceNum(&place->World);
-//DEADCODE AMM 11/01/00 			//return true;
-//DEADCODE AMM 11/01/00 		}
-//DEADCODE AMM 11/01/00 		if (credits>0)
-//DEADCODE AMM 11/01/00 			eventlog->hits+=credits;
-//DEADCODE AMM 11/01/00 		else
-//DEADCODE AMM 11/01/00 			eventlog->losses-=credits;
-//DEADCODE AMM 11/01/00 	}
-//DEADCODE AMM 11/01/00 	//return false;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

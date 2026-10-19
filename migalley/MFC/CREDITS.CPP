@@ -128,7 +128,6 @@ BOOL CCredits::OnInitDialog()
 	text->SetString(LoadResString(creds));
 //	text+=doc;
 //	MessageBox (doc,"Warning",MB_OK);
-//DEADCODE DAW 21/06/99 	m_timerID=SetTimer(1984,12000,NULL);
 	m_timerID=SetTimer(1984,7000,NULL);
 	
 	return TRUE;  // return TRUE unless you set the focus to a control

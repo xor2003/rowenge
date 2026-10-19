@@ -26,7 +26,6 @@ struct FragScreenBody
 	enum	{FE_MAX_PILOTS = 16};
 	struct	FragEntry
 	{
-//DeadCode JIM 24Oct00 		CString AIslotname;
 		CString	playerslotname;
 		bool	playerallowed;
 		bool	playerinslot;
@@ -112,7 +111,6 @@ public:
 protected:
 	 void PositionPilots();
 	 void ResetPlayerEntry(int plyrpos);
-//DeadCode AMM 08Mar00 	 void ResetRemotePlayerEntry(int plyr);
 	 void ResetRemotePlayerEntry();
 	 void SetPlayersPosition(int);
 	 void SetPlayersPositionCamp(int);

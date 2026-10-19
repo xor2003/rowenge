@@ -59,11 +59,9 @@ class	matrix
 
 				void	multiply(MATRIX_PTR,MATRIX_PTR);
 
-//DEADCODE PD 01/12/99 				void 	body2screen(DoPointStruc &);			//PD 25Jul96
 
 //DEAD				void 	body2screen(landvertex &);				//PD 25Jul96
 
-//DEADCODE PD 01/12/99 				void 	body2screen(VERTEX &);					//PD 25Jul96
 
 				Bool 	crossproduct(DoPointStruc &, DoPointStruc &, DoPointStruc &);
 
@@ -114,14 +112,6 @@ class	matrix
 //------------------------------------------------------------------------------
 inline void transformNC(FPMATRIX_PTR T, DoPointStruc* dp)
 {
-//DEADCODE RDH 5/19/00 	double f[3];
-//DEADCODE RDH 5/19/00 	double* mp=(double*)T;
-//DEADCODE RDH 5/19/00 	f[0]=double(dp->bodyx.i);
-//DEADCODE RDH 5/19/00 	f[1]=double(dp->bodyy.i);
-//DEADCODE RDH 5/19/00 	f[2]=double(dp->bodyz.i);
-//DEADCODE RDH 5/19/00 	dp->bodyx.f=f[0]*mp[0]+f[1]*mp[1]+f[2]*mp[2];
-//DEADCODE RDH 5/19/00 	dp->bodyy.f=f[0]*mp[3]+f[1]*mp[4]+f[2]*mp[5];
-//DEADCODE RDH 5/19/00 	dp->bodyz.f=f[0]*mp[6]+f[1]*mp[7]+f[2]*mp[8];
 //	dp->clipFlags=CF3D_NULL;
 }
 

@@ -31,19 +31,6 @@ enum	FlightDifficulty		{FD_MIN = 0,
 				FD_SLIPSTREAMEFFECTS,
 				FD_109FUEL,
 				FD_STORESWEIGHTDRAG,
-//DEADCODE CSB 30/11/99 				FD_THRUSTPOWERCONTROL = 0,
-//DEADCODE DAW 30/11/99 				FD_TORQUEEFFECTS,
-//DEADCODE CSB 30/11/99 				FD_JETFLAMEOUT,
-//DEADCODE CSB 30/11/99 				FD_LIMITEDFUEL,
-//DEADCODE CSB 30/11/99 				FD_AIRCRAFTINTERFERENCE,
-//DEADCODE CSB 30/11/99 				FD_IDEALSANDCONTROL,
-//DEADCODE CSB 30/11/99 				FD_COORDINATEDRUDDER,
-//DEADCODE CSB 30/11/99 				FD_GEARSUSPENSION,
-//DEADCODE CSB 30/11/99 				FD_AUTOTHROTTLE,
-//DeadCode AMM 21Feb100 				FD_FF_GUN,					   //not setup			  //RDH 29/11/99
-//DeadCode AMM 21Feb100 				FD_FF_BUFFET,		//FD_FF_STALL,//not setup			  //RDH 29/11/99
-//DeadCode AMM 21Feb100 				FD_FF_AERODYNAMIC,	//FD_FF_SPEED,//not setup			  //RDH 29/11/99
-//DeadCode AMM 21Feb100 				FD_FF_AIRFRAME,//not setup			  //RDH 29/11/99
 
 								FD_MAX};
 
@@ -53,43 +40,24 @@ MAKEFIELD(FlightDifficulty,FD_MIN,FD_MAX);
 enum	GameDifficulty		{GD_MIN = 0,
 
 		GD_UNLIMITEDARM = 0,									//RJS 06May99
-//DeadCode AMM 9Oct00 		GD_RELOADARMS,											//RJS 25Jan99
-//DeadCode AMM 9Oct00 		GD_USAIRCRAFTFITTEDWITHGUNS,
-//DeadCode AMM 9Oct00 		GD_GUNJAM,
-//DeadCode AMM 9Oct00 		GD_STICKINGORDINANCE,
-//DeadCode AMM 9Oct00 		GD_INSIDECOCKPITONLYAVAILABLE,
-//DeadCode AMM 9Oct00 		GD_TEXTCHATTER,
 		GD_PADLOCKONLYWHENVIS,
-//DeadCode AMM 9Oct00 		GD_ALTXTOEXIT,
 		GD_TACTICALRANGE,
-//DeadCode AMM 9Oct00 		GD_BESTVARIANTS,
 		GD_REALISTICRADARASSISTEDGUNSIGHT,
 		GD_PERFECTRADARASSISTEDGUNSIGHT,
 		GD_VULNERABLE,
 		GD_GROUNDCOLLISIONS,
 		GD_COLLISIONS,
-//DeadCode AMM 9Oct00 		GD_WHITEOUT,
-//DeadCode AMM 9Oct00 		GD_BLACKOUT,	//superceded by geffects and injury effects				//last of 1st set
-//DeadCode AMM 9Oct00 		GD_PERFECTUSGCI,
-//DeadCode AMM 9Oct00 		GD_PERFECTCOMMUNISTGCI,
-//DeadCode AMM 9Oct00 		GD_PERFECTCOMMUNISTAAA,
 		GD_AUTOPADLOCKTOG,										//PD 18Nov97
 		GD_VIEWMODESELECT,										//PD 18Nov97
 		GD_UPTOGGLESTICKS,										//PD 18Nov97
-//DeadCode AMM 9Oct00 		GD_REDOUT,		//superceded by geffects and injury effects
 		GD_AIPILOTSALLTIME,
 		GD_MAXOPTION,
-//DeadCode AMM 9Oct00 		FRAME_RATE_DISPLAY,
 		GD_WEATHEREFFECTS,			//stop using						  //RDH 29/11/99
 		GD_PERIPHERALVISION,
 		GC_MULTIPLAYERVIEWRESTRICTED,
-//DeadCode AMM 10Jul00 		GD_GUNCAMERACOLOUR,
-//DeadCode AMM 9Oct00 		GD_INFOLINESTATUS,
 		GD_UNITS,
 		GD_GUNCAMERAATSTART,
 		GD_GUNCAMERAONTRIGGER,
-//DeadCode AMM 9Oct00 		GD_GEFFECTS,
-//DeadCode AMM 9Oct00 		GD_INJURYEFFECTS,
 		GD_AUTOVECTORING,
 		GD_HUDINSTACTIVE,
 		GD_VISIBLEMIGSCHEAT,
@@ -135,8 +103,6 @@ enum	SG_Detail_3D		{DETAIL3D_MIN = 0,
 							DETAIL3D_INCONSEQUENTIALS,
 							DETAIL3D_AUTODETAIL,
 							DETAIL3D_TRANSSMOKE,
-//DeadCode JON 22Sep00 							DETAIL3D_ITEMSHADING,
-//DeadCode JON 22Sep00 							DETAIL3D_SPECITEM,							//JON 22Sep00
 							DETAIL3D_GROUNDSHADING,
 							DETAIL3D_ITEMSHADOWS,
 							DETAIL3D_AIRCRAFTSHADOWS,
@@ -180,31 +146,6 @@ MAKEFIELD(SG_Detail_Cockpit3D,COCK3D_MIN,COCK3D_MAX);			//RJS 23Jan98
 enum	MapFilters	
 {
 	MAPFILTERSMIN,
-//DeadCode RDH 06Jan100 	FILT_BLUE_CIVILIAN,
-//DeadCode RDH 06Jan100 	FILT_BLUE_SUPPLY,
-//DeadCode RDH 06Jan100 	FILT_BLUE_MYARD,
-//DeadCode RDH 06Jan100 	FILT_BLUE_BRIDGE,
-//DeadCode RDH 06Jan100 	FILT_BLUE_ROADLINK,
-//DeadCode RDH 06Jan100 	FILT_BLUE_RAILLINK,
-//DeadCode RDH 06Jan100 	FILT_BLUE_TRUCK,
-//DeadCode RDH 06Jan100 	FILT_BLUE_TRAIN,
-//DeadCode RDH 06Jan100 	FILT_BLUE_ARTIE,
-//DeadCode RDH 06Jan100 	FILT_BLUE_TROOP,
-//DeadCode RDH 06Jan100 	FILT_BLUE_TANK,
-//DeadCode RDH 06Jan100 	FILT_BLUE_AIRFIELDS,
-//DeadCode RDH 06Jan100 	MAPFILTERSMAXBLUE,
-//DeadCode RDH 06Jan100 	FILT_RED_CIVILIAN,
-//DeadCode RDH 06Jan100 	FILT_RED_SUPPLY,
-//DeadCode RDH 06Jan100 	FILT_RED_MYARD,
-//DeadCode RDH 06Jan100 	FILT_RED_BRIDGE,
-//DeadCode RDH 06Jan100 	FILT_RED_ROADLINK,
-//DeadCode RDH 06Jan100 	FILT_RED_RAILLINK,
-//DeadCode RDH 06Jan100 	FILT_RED_TRUCK,
-//DeadCode RDH 06Jan100 	FILT_RED_TRAIN,
-//DeadCode RDH 06Jan100 	FILT_RED_ARTIE,
-//DeadCode RDH 06Jan100 	FILT_RED_TROOP,
-//DeadCode RDH 06Jan100 	FILT_RED_TANK,
-//DeadCode RDH 06Jan100 	FILT_RED_AIRFIELDS,											//RDH 06Jan100
 
 	FILT_OPERATIONALITEMS,
 	FILT_DAMAGEDITEMS,
@@ -236,17 +177,8 @@ enum	MapFilters
 	FILT_TUNNELS,
 
 	MAPFILTERSMAXITEMS,
-//DEADCODE RDH 13/03/00 	FILT_AUTHENTICPLOTS,
-//DEADCODE RDH 13/03/00 	FILT_ESCORTEDBOMBERS,
-//DEADCODE DAW 01/06/00 	FILT_FIGHTERSWEEPS,
 	FILT_LWARROWS,
-//DEADCODE RDH 13/03/00 	FILT_LWROUTELINES,
 	FILT_LWTARGETLINES,
-//DEADCODE DAW 01/06/00 	FILT_RAFTARGETLINES,
-//DEADCODE DAW 31/05/00 	FILT_MYWAYPOINTS,
-//DEADCODE RDH 10/03/00 	FILT_ONEPLOTPERGESCHWADER,
-//DEADCODE RDH 10/03/00 	FILT_ONEPLOTPERGRUPPE,
-//DEADCODE RDH 10/03/00 	FILT_ONEPLOTPERRAID,
 	FILT_RAFINTERCEPTS,
 	FILT_RAFPATROLS,
 	FILT_BOMBERS,
@@ -254,10 +186,6 @@ enum	MapFilters
 	FILT_RAFSAG,
 	FILT_LWSAG,
 
-//DEADCODE RDH 13/03/00 	  FILT_MAINWP,
-//DEADCODE RDH 13/03/00 	  FILT_SUBWP,
-//DEADCODE RDH 13/03/00 	  FILT_ROUTES,
-//DEADCODE RDH 13/03/00 	  FILT_FRONTLINE,
 
 	MAPFILTERSMAX
 };
@@ -271,10 +199,6 @@ MAKEFIELD(ToolBars,0,TB_TOTAL);
 enum ProcType {PROC_SLOW=0,PROC_MIN,PROC_MED,PROC_MAX};
 
 enum	TargetSize		{TS_MINI = 0,TS_SMALL=0,TS_MEDIUM,TS_LARGE,TS_MAX};//PD 30Aug96
-//DeadCode RDH 24Oct96 	enum					{MAXWEATHERNUM = 3};
-//DEADCODE RDH 10/03/00 enum	LWPlots	{
-//DEADCODE RDH 10/03/00 	LARGEPLOTS, ONEPLOTPERRAID,ONEPLOTPERGESCHWADER, 
-//DEADCODE RDH 10/03/00 		ONEPLOTPERGRUPPE,  ONEPLOTPERSTAFFEL};
 
 //------------------------------------------------------------------------------
 //Author		R. Hyde 
@@ -370,8 +294,6 @@ public:
 			metricspeed:1,
 			metricalt:1;
 	SWord	messagelines;										//RDH 01Oct96
-//DeadCode CSB 27Jul00 	SWord	autopilotskillUN;		//csb remove					  //RDH 24/11/99
-//DeadCode CSB 27Jul00 	SWord	autopilotskillRED;		//csb remove					  //RDH 24/11/99
 	SWord	autopilotskillLW;
 	SWord	autopilotskillRAF;
 	SWord	rangediv,speeddiv;
@@ -432,7 +354,6 @@ public:
 				}	vol;
 	GUID	MusicDevice;
 	GUID	SFXDevice;
-//DEADCODE MS 30/11/99 	SLong	missiontime;										//RDH 22Nov96
 	ULong	hDriver; //PD 03/12/99
 	ULong	hMode; //PD 03/12/99
 	UWord	screenshotframe;
@@ -450,9 +371,7 @@ public:
 	SWord	SeekStep,PingStep,PingDelay,SeekingDelay;
 	ANGLES  fieldOfView;
 	bool	successfulLoad;
-//DEADCODE JIM 02/12/99 	bool	ThreeDeeSound;										//RJS 08Nov99
 
-//DeadCode AMM 19Jan99 	char	CommsPassword[11];									//AMM 14Dec98
 
 //not included until needed	VolumeFactors	volume;
 	protected:
@@ -485,10 +404,6 @@ class	BOStream;
 class	MissMan;
 class	SaveDataNoLoad;
 typedef	SaveDataNoLoad	SaveData;
-//DeadCode RDH 24Sep96 	BIStream& operator	<<	(BIStream&,MissMan&);
-//DeadCode RDH 24Sep96 	BOStream& operator	>>	(BOStream&,MissMan&);
-//DeadCode RDH 24Sep96 	BIStream& operator	<<	(BIStream&,SaveData&);
-//DeadCode RDH 24Sep96 	BOStream& operator	>>	(BOStream&,SaveData&);
 
 //called from mfc\filing.cpp & 
 	BIStream& operator	>>	(BIStream&,MissMan&);
@@ -515,11 +430,6 @@ public:
 	enum	{maxblocksize=1024};			//JIM 04Nov96
 	struct	DeadBlock
 	{
-//DEADCODE JIM 24/02/99 	struct	T_SGT{											
-//DEADCODE JIM 24/02/99 			UWord	value;									
-//DEADCODE JIM 24/02/99 			operator UniqueID()	{return (UniqueID(value));}			
-//DEADCODE JIM 24/02/99 			UniqueID operator = (UniqueID v)	{return (UniqueID(value=v));}
-//DEADCODE JIM 24/02/99 		}	SGT;	
 		ONLYFIELD(UWord,UniqueID,SGT);
 		UWord		dataused;
 		DeadBlock*	nextblock;
@@ -567,7 +477,6 @@ public:
 	int	DecodeDamage(UniqueID SGT,DamageDef* damagetable);
 	static	bool	MainWorldBand(UniqueID u);
 	static	bool	DontRecordBand(UniqueID u);
-//DeadCode JIM 17Aug00 	void	ScoreSGKills();
 	void	FakeDamage(UniqueID,ULong newpercent,bool clearifreducedamage=false);
 
 };

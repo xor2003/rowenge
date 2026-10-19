@@ -73,7 +73,6 @@ questions about this file may be asked at http://www.simhq.com/
 #include "WORLDINC.H"
 #include "MODVEC.H"
 #include "MODEL.H"
-//DeadCode RJS 02Dec97 #include "3dcom.h"
 
 void YAK9_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 {
@@ -103,8 +102,6 @@ void YAK9_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 //	ACM.PitchRate_Elevator_Offset_Power = 2048;
 //	ACM.PitchRate_Elevator_Damping_Power = 262144;
 
-//DeadCode RDH 17Apr98 	ACM.Pitch_Elevator_Offset_Power = 2048;
-//DeadCode RDH 17Apr98 	ACM.Pitch_Elevator_Damping_Power = 262144;
 
 	ACM.DeltaPitchForMaxElevator	= 1.0472;
 	ACM.MaxElevatorForTightTurn	= 25000;

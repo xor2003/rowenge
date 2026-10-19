@@ -25,20 +25,6 @@ public:
 	static RDialog* Make();
 
 	LWReviewStrength(CWnd* pParent = NULL);   // standard constructor
-//DEADCODE RDH 24/05/00 		enum {TOTAL = 6,MAXTYPES = 7};
-//DEADCODE RDH 24/05/00 
-//DEADCODE RDH 24/05/00 	struct	StrengthInfo
-//DEADCODE RDH 24/05/00 	{
-//DEADCODE RDH 24/05/00 		int catA;
-//DEADCODE RDH 24/05/00 		int catB;
-//DEADCODE RDH 24/05/00 		int catC;
-//DEADCODE RDH 24/05/00 		int acready;
-//DEADCODE RDH 24/05/00 		int actotal;
-//DEADCODE RDH 24/05/00 		int	pilots;
-//DEADCODE RDH 24/05/00 	};
-//DEADCODE RDH 24/05/00 
-//DEADCODE RDH 24/05/00 	StrengthInfo	strengthinfo[MAXTYPES];
-//DEADCODE RDH 24/05/00 
 // Dialog Data
 	//{{AFX_DATA(LWReviewStrength)
 	enum { IDD = IDD_LWREVIEWSTRENGTH };

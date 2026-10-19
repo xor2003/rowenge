@@ -130,7 +130,7 @@ WayPoint*	WayPoint::NextWP(UniqueID uniqueID)
 void	mobileitem::NextWayPoint ()
 
 {
-	if (!waypoint->wpnum)
+	if (waypoint && !waypoint->wpnum)							//RERUN: waypoint may be NULL
 		if (MigStatus.LaunchFlags.size==AIRSTRUCSIZE && AirStrucPtr(*this)->AcIsPlayer())
 			switch (waypoint->wpname)
 			{
@@ -149,9 +149,9 @@ void	mobileitem::NextWayPoint ()
 				}
 			break;
 			}
-	waypoint=waypoint->NextWP(uniqueID.bitfieldUid.count);
+	waypoint=waypoint ? waypoint->NextWP(uniqueID.bitfieldUid.count) : NULL;	//RERUN: waypoint may be NULL
 
-	if (MigStatus.LaunchFlags.size==AIRSTRUCSIZE && uniqueID.bitfieldUid.count==waypoint->skipunder)
+	if (MigStatus.LaunchFlags.size==AIRSTRUCSIZE && waypoint && uniqueID.bitfieldUid.count==waypoint->skipunder)
 	{
 		AirStrucPtr ap=*this;
 		if (ap-> formpos)	//wing splitting off
@@ -285,6 +285,7 @@ bool	mobileitem::EscorteePastWP(WayPointPtr	waypoint)
 	if (as->formpos)			 		return false;
 	if (!as->fly.leadflight)	 		return false;
 	if (!as->fly.leadflight->waypoint)	return true;
+	if (!waypoint)						return false;			//RERUN: null wp arg -> do-loop derefs it
 	do	waypoint=waypoint->next; 
 	while (waypoint && waypoint->skipunder);
 	
@@ -503,7 +504,6 @@ void	mobileitem::StartBombing()
 ////TEMPCODE JIM 21/04/99 				Art_Int.BreakOff(*this);
 ////TEMPCODE JIM 21/04/99 			return;		//SKIP PAST ACCEL CLEAR
 ////TEMPCODE JIM 21/04/99 		}
-////TEMPCODE JIM 21/04/99 //DeadCode JIM 05Dec96 			NextWayPoint();
 ////TEMPCODE JIM 21/04/99 		else
 		if  (		((a->FormationInfo.duty&ACTIONCODE)!=DA_CAP)		//don't want cap to get unfriendly set //JIM 23/05/99
 				&&	(AutoMoveInfo.movecode!=AUTO_BOMB)

@@ -141,9 +141,7 @@ static UINT indicators[] =
 	ID_INDICATOR_SCRL,
 };
 
-//DeadCode RJS 03May100 #if !defined (NDEBUG)
 #define NOT_TOPMOST
-//DeadCode RJS 03May100 #endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame construction/destruction
@@ -159,7 +157,6 @@ CMainFrame::CMainFrame()
 	m_bHideToolbars=TRUE;
 /////	FILEMAN.InitFileSystem();
 	havedrawn=havesafe=bAppMinimized=false;
-//DeadCode AMM 7Aug00 	m_oldindebrief=(Bool)2;
 }
 
 CMainFrame::~CMainFrame()
@@ -195,9 +192,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
 
-//DeadCode JIM 29Oct00 #if !defined(NOT_TOPMOST)
-//DeadCode JIM 29Oct00 	cs.dwExStyle|=WS_EX_TOPMOST;
-//DeadCode JIM 29Oct00 #endif
 
 	return CFrameWnd::PreCreateWindow(cs);
 }
@@ -239,15 +233,8 @@ void CMainFrame::OnBye()
 		{
  			_DPlay.ExitDirectPlay();
 		}
-//DEADCODE AMM 17/05/99 		m_oldindebrief=FALSE;
 // About to quit campaign, so...
 // ...Kill shapes, stop sounds
-//DeadCode RJS 1Sep00 		SHAPESTUFF.UnLoadRequiredShapes();								//RJS 28Aug00
-//DeadCode RJS 1Sep00 		_Miles.KillAll();												//RJS 28Aug00
-//DeadCode RJS 1Sep00 		_Radio.Enter3D(false);											//RJS 28Aug00
-//DeadCode RJS 1Sep00 
-//DeadCode RJS 1Sep00 
-//DeadCode RJS 1Sep00 		Todays_Packages.WipeAll();
 
 		ExitCampaign();													//RJS 1Sep00
 
@@ -284,11 +271,6 @@ void CMainFrame::OnGoBig()
 //TEMPCODE DAW 08/05/99 	if (!IsZoomed())
 		ModifyStyle(WS_THICKFRAME,NULL); // Bye bye border
 		HELPWASLAUNCHEDRECENTLY=false;
-//DeadCode JIM 29Oct00 #if !defined(NOT_TOPMOST)
-//DeadCode JIM 29Oct00 				SetWindowPos(&wndTopMost,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
-//DeadCode JIM 29Oct00 #endif
-//DeadCode DAW 17Jun99 		ModifyStyleEx(0,WS_EX_TOPMOST);
-//DeadCode MS 16Aug00 		MoveWindow(0,0,1050,800);
 	ShowWindow(SW_SHOWMAXIMIZED);
 //	m_wndSystemBox.GetDlgItem(ID_GONORMAL)->ShowWindow(SW_SHOW);
 //	m_wndSystemBox.GetDlgItem(ID_GOBIG)->ShowWindow(SW_HIDE);
@@ -298,11 +280,7 @@ void CMainFrame::OnGoNormal()
 {
 //TEMPCODE DAW 08/05/99 	if (IsZoomed())
 		ModifyStyle(NULL,WS_THICKFRAME); // Come back border!
-//DeadCode DAW 17Jun99 	ModifyStyleEx(WS_EX_TOPMOST,0);
 	ShowWindow(SW_SHOWNORMAL);
-//DeadCode JIM 29Oct00 #if !defined(NOT_TOPMOST)
-//DeadCode JIM 29Oct00 				SetWindowPos(&wndBottom,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
-//DeadCode JIM 29Oct00 #endif
 //	m_wndSystemBox.GetDlgItem(ID_GONORMAL)->ShowWindow(SW_HIDE);
 //	m_wndSystemBox.GetDlgItem(ID_GOBIG)->ShowWindow(SW_SHOW);
 }
@@ -312,14 +290,6 @@ void CMainFrame::Initialise()
 	CMIGView* view = (CMIGView*)GetActiveView();
 		m_doIExist=2;	
 		// Init toolbars
-//DeadCode JIM 05Jul98 		m_toolbar1.Create(CMainToolbar::IDD,view);
-//DeadCode JIM 05Jul98 		CRect rect;
-//DeadCode JIM 05Jul98 		m_toolbar1.GetWindowRect(rect);
-//DeadCode JIM 05Jul98 		m_toolbar1.Init(this,rect.Width(),rect.Width(),40,AFX_IDW_DOCKBAR_TOP,0);
-//DeadCode JIM 05Jul98 		m_toolbar2.Create(CMainToolbar::IDD,view);
-//DeadCode JIM 05Jul98 		m_toolbar2.Init(this,rect.Width(),rect.Width(),40,AFX_IDW_DOCKBAR_TOP,0);
-//DeadCode JIM 05Jul98 		m_toolbar4.Create(CScaleBar::IDD,view);
-//DeadCode JIM 05Jul98 		m_toolbar4.Init(this,200,400,40,AFX_IDW_DOCKBAR_LEFT,4);
 
 		CRect rect;
 
@@ -335,9 +305,6 @@ void CMainFrame::Initialise()
 		m_toolbar2.Create(CMainToolbar::IDD,view);
 		m_toolbar2.GetWindowRect(rect);
 		m_toolbar2.Init(this,rect.Width(),rect.Width(),CRToolBar::TOOBAR_THICKNESS,AFX_IDW_DOCKBAR_BOTTOM,0,CBRS_ALIGN_TOP | CBRS_ALIGN_BOTTOM);
-//DEADCODE RDH 08/11/99 		m_toolbar5.Create(CDebriefToolbar::IDD,view);
-//DEADCODE RDH 08/11/99 		m_toolbar5.GetWindowRect(rect);
-//DEADCODE RDH 08/11/99 		m_toolbar5.Init(this,rect.Width(),rect.Width(),CRToolBar::TOOBAR_THICKNESS,AFX_IDW_DOCKBAR_BOTTOM,0);
 		m_reportbar.Create(m_reportbar.IDD,view);
 		m_reportbar.GetWindowRect(rect);
 		m_reportbar.Init(this,rect.Width(),rect.Width(),CRToolBar::TOOBAR_THICKNESS,AFX_IDW_DOCKBAR_BOTTOM,0,CBRS_ALIGN_TOP | CBRS_ALIGN_BOTTOM);
@@ -402,7 +369,6 @@ void CMainFrame::OnPaint()
 //	CRect windrect;
 //	GetWindowRect(windrect);
 //	pDC->FillSolidRect(0,0,windrect.Width(),windrect.Height(),RGB(0,0,0));
-//DeadCode JIM 20Oct00 	CMIGView* view = (CMIGView*)GetActiveView();
 	havedrawn=true;
 	if (m_doIExist==0)
 	{
@@ -412,7 +378,6 @@ void CMainFrame::OnPaint()
 	}
 	if (m_doIExist==1)
 	{
-//DEADCODE JIM 14/06/00 		PositionSysBox();
 	}
 	PAINTSTRUCT ps;
 	::BeginPaint(m_hWnd, &ps);
@@ -478,7 +443,6 @@ void CMainFrame::HideToolbars()
 //	m_toolbar2.ShowWindow(SW_HIDE);
 //	m_toolbar3.ShowWindow(SW_HIDE);
 //	m_toolbar4.ShowWindow(SW_HIDE);
-//DEADCODE RDH 08/11/99 	m_toolbar5.ShowWindow(SW_HIDE);
 	m_spacebar.ShowWindow(SW_HIDE);
 	m_wndSystemBox->InDialAncestor()->ShowWindow(SW_HIDE);
 	UpdateToolbars(true);
@@ -490,36 +454,11 @@ void CMainFrame::ShowToolbars(bool firsttime)
 {
 #ifndef	BOB_DEMO_VER
 	m_bHideToolbars=FALSE;
-//DEADCODE RDH 09/11/99 	m_titlebar.ShowWindow(SW_SHOW);
-//DEADCODE RDH 09/11/99 	m_toolbar1.ShowWindow(SW_SHOW);
-//DEADCODE RDH 09/11/99 
-//DEADCODE RDH 09/11/99 	m_toolbar2.ShowWindow(SW_SHOW);
-//DEADCODE RDH 09/11/99 	m_toolbar3.ShowWindow(SW_SHOW);
-//DEADCODE RDH 09/11/99 	m_toolbar4.ShowWindow(SW_SHOW);
-//DEADCODE RDH 08/11/99 	m_toolbar5.ShowWindow(SW_SHOW);
-//DEADCODE RDH 09/11/99 	m_spacebar.ShowWindow(SW_SHOW);
 	m_wndSystemBox->InDialAncestor()->ShowWindow(SW_SHOW);
 	UpdateToolbars(false);
-//DEADCODE RDH 09/11/99 	RecalcLayout();
 #endif #ifndef	BOB_DEMO_VER
 //	if  (firsttime && (RFullPanelDial::incomms && _DPlay.UIPlayerType==PLAYER_GUEST))
 //		m_oldindebrief=TRUE;
-//DEADCODE JIM 14/05/99  	if (firsttime)
-//DEADCODE JIM 14/05/99  	{
-//DEADCODE  14/05/99  		//first time in set this flag to opposite of what we want to ensure we
-//DEADCODE  14/05/99  		//get a refresh. 
-//DEADCODE  14/05/99  		if  (		(RFullPanelDial::incomms)
-//DEADCODE  14/05/99  				&&	(_DPlay.UIPlayerType==PLAYER_GUEST)
-//DEADCODE  14/05/99  			)
-//DEADCODE  14/05/99  			m_oldindebrief=FALSE;
-//DEADCODE  14/05/99  		else
-//DEADCODE  14/05/99  			if 	(MMC.indebrief)
-//DEADCODE  14/05/99  				m_oldindebrief=FALSE;
-//DEADCODE  14/05/99  			else
-//DEADCODE  14/05/99  				m_oldindebrief=TRUE;
-//DEADCODE  14/05/99 	}
-//DEADCODE  14/05/99 */
-//DEADCODE JIM 30/03/00 	UpdateToolbars(false);
 }
 
 void CMainFrame::RePositionLayout(int dx,int dy) 
@@ -573,7 +512,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	int total;
 	int priority;
 	CRToolBar* pToolbar;
-	CRToolBar* pPriorityToolbar;
+	CRToolBar* pPriorityToolbar=NULL;
 	BOOL foundend;
 	POSITION position;
 	CRect rect;
@@ -599,6 +538,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	row=0;
 	total=0;
 	priority=0;
+	pPriorityToolbar=NULL;
 	foundend=FALSE;
 	for (y=0;y<count;y++)
 	{
@@ -620,7 +560,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 		// found a row now draw it
 		if (foundend || y==count-1)
 		{
-			pPriorityToolbar->m_currentlength+=totalwidth-total;
+			if (pPriorityToolbar) pPriorityToolbar->m_currentlength+=totalwidth-total;
 			position=m_top.FindIndex(start);
 			total=0;
 			for (x=start;x<=y;x++)
@@ -642,6 +582,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 				total=0;
 				foundend=FALSE;
 				priority=0;
+				pPriorityToolbar=NULL;
 			}
 		}
 	}
@@ -662,6 +603,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	row=count-1;
 	total=0;
 	priority=0;
+	pPriorityToolbar=NULL;
 	foundend=FALSE;
 	int	currbottom=0,worstheight=0;
 
@@ -746,6 +688,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	row=0;
 	total=0;
 	priority=0;
+	pPriorityToolbar=NULL;
 	foundend=FALSE;
 	for (y=0;y<count;y++)
 	{
@@ -766,7 +709,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 		// found a row now draw it
 		if (foundend || y==count-1)
 		{
-			pPriorityToolbar->m_currentlength+=totalheight-total;
+			if (pPriorityToolbar) pPriorityToolbar->m_currentlength+=totalheight-total;
 			position=m_left.FindIndex(start);
 			total=0;
 			for (x=start;x<=y;x++)
@@ -787,6 +730,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 				total=0;
 				foundend=FALSE;
 				priority=0;
+				pPriorityToolbar=NULL;
 			}
 		}
 	}
@@ -797,6 +741,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	start=0;
 	row=0;
 	priority=0;
+	pPriorityToolbar=NULL;
 	foundend=FALSE;
 	
 	int	yfix=0;
@@ -822,7 +767,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 		// found a row now draw it
 		if (foundend || y==count-1)
 		{
-			pPriorityToolbar->m_currentlength+=totalheight-total;
+			if (pPriorityToolbar) pPriorityToolbar->m_currentlength+=totalheight-total;
 			position=m_right.FindIndex(start);
 			total=yfix;
 			yfix=0;
@@ -844,11 +789,10 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 				total=0;
 				foundend=FALSE;
 				priority=0;
+				pPriorityToolbar=NULL;
 			}
 		}
 	}
-//DeadCode MS 21Nov00 	__asm	{	int 3
-//DeadCode MS 21Nov00 	};
 	// create the border depending on borderrect
 	rect-=rect2.TopLeft();
 	view->MoveWindow(CRect(rect.left+m_borderRect.left,rect.top+m_borderRect.top,rect.right-m_borderRect.right,rect.bottom-m_borderRect.bottom));
@@ -860,14 +804,6 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 //	Invalidate();
 }
 
-//DEADCODE DAW 07/05/99 void CMainFrame::OnNcPaint() 
-//DEADCODE DAW 07/05/99 {
-//DEADCODE DAW 07/05/99 //	CDC* pDC=GetWindowDC();
-//DEADCODE DAW 07/05/99 //	CRect windrect;
-//DEADCODE DAW 07/05/99 //	GetWindowRect(windrect);
-//DEADCODE DAW 07/05/99 //	pDC->FillSolidRect(0,0,windrect.Width(),windrect.Height(),RGB(0,0,0));
-//DEADCODE DAW 07/05/99 	// Do not call CFrameWnd::OnNcPaint() for painting messages
-//DEADCODE DAW 07/05/99 }
 void	Campaign::GlobalRefreshData()
 {
 #ifndef	BOB_DEMO_VER
@@ -885,7 +821,6 @@ bool	Campaign::AnyDialogsOpen()
 
 	if (MainToolBar().LoggedChild()!=-1) return true;
 	if (MiscToolBar().LoggedChild()>MiscToolBar().ZOOMLEVEL) return true;
-//DEADCODE RDH 14/04/00 	if (TitleBarPtr().LoggedChild()!=-1) return true;
 #endif
 	return false;
 }
@@ -893,8 +828,6 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 #ifndef NDEBUG
 	// TODO: Add your specialized code here and/or call the base class
-//DEADCODE DAW 07/06/99 	CRect rect;														  //DAW 07/06/99
-//DEADCODE DAW 07/06/99 	AfxGetMainWnd()->GetWindowRect(rect);							  //DAW 07/06/99
 //TempCode JIM 11Oct00 static int r=0;
 //TempCode JIM 11Oct00 	if ( message!=0x113)	//message!=0x363 &&
 //TempCode JIM 11Oct00 	{
@@ -928,31 +861,11 @@ void CMainFrame::UpdateToolbars(bool	hideall)
 				else
 					toolbars[t]->ReAttach(false,false);
 	}
-//DeadCode MS 21Nov00 	__asm	{int 3
-//DeadCode MS 21Nov00 	};
 	RecalcLayout();
-//DeadCode MS 21Nov00 	__asm	{int 3
-//DeadCode MS 21Nov00 	};
 	MainToolBar().TailorHints();
-//DeadCode MS 21Nov00 	__asm	{int 3
-//DeadCode MS 21Nov00 	};
 	m_toolbar3.m_dialids[m_toolbar3.DIRECTIVESTOGGLE].SetPressed(!MMC.directivespopup);
 	m_toolbar3.m_dialids[m_toolbar3.DIRECTIVESTOGGLE].SetHintString(RESSTRING(DIRECTIVES)+": "+RESLIST(OFF,!MMC.directivespopup));
 
-//DEADCODE RDH 08/11/99 #ifndef	BOB_DEMO_VER
-//DEADCODE RDH 08/11/99 	if (m_oldindebrief==MMC.indebrief) return;
-//DEADCODE RDH 08/11/99 	m_oldindebrief=MMC.indebrief;
-//DEADCODE RDH 08/11/99 	if (MMC.indebrief)// && m_toolbar2.IsWindowVisible())
-//DEADCODE RDH 08/11/99 	{
-//DEADCODE RDH 08/11/99 		m_toolbar5.ShowWindow(SW_SHOW);
-//DEADCODE RDH 08/11/99 		m_toolbar2.Replace(&m_toolbar5);
-//DEADCODE RDH 08/11/99 	}
-//DEADCODE RDH 08/11/99 	else// if (!MMC.indebrief && m_toolbar5.IsWindowVisible())
-//DEADCODE RDH 08/11/99 	{
-//DEADCODE RDH 08/11/99 		m_toolbar2.ShowWindow(SW_SHOW);
-//DEADCODE RDH 08/11/99 		m_toolbar5.Replace(&m_toolbar2);
-//DEADCODE RDH 08/11/99 	}
-//DEADCODE RDH 08/11/99 #endif
 }
 
 #endif
@@ -977,8 +890,6 @@ void CMainFrame::OnHelp()
 	if (!Inst3d::InThe3D())
 	{
 		HELPWASLAUNCHEDRECENTLY=true;
-//DEADCODE JIM 21/06/00 		HWND upperwnd=HWND_BOTTOM;  
-//DEADCODE JIM 21/06/00 		::SetWindowPos(m_hWnd,upperwnd,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
 		CFrameWnd::OnHelp() ;
 	}
 }
@@ -1051,15 +962,12 @@ void CMainFrame::WinHelp(DWORD dwData, UINT nCmd)
 	switch (nCmd)
 	{
 	case	HELP_CONTEXT:
- //DeadCode RJS 03May100			nCmd=HH_DISPLAY_TOPIC;
 			nCmd=HH_HELP_CONTEXT;
 			break;
 	}
 
 
 	// finally, run the Windows Help engine
-//DeadCode RJS 03May100 	if (!HtmlHelp(pWnd->m_hWnd, CString(pApp->m_pszHelpFilePath)+"::/asset.htm", nCmd, 0))
-//DEADCODE DAW 15/05/00 	if (!HtmlHelp(NULL, pApp->m_pszHelpFilePath, nCmd, dwData&0xffff))
 	if (!HtmlHelp(pWnd->m_hWnd, pApp->m_pszHelpFilePath, nCmd, dwData&0xffff))
 	{
 		dwData=IDD_RAFCOMMANDBRIEFING;
@@ -1077,12 +985,6 @@ void CMainFrame::WinHelp(DWORD dwData, UINT nCmd)
 //------------------------------------------------------------------------------
 void CMainFrame::OnMove(int x, int y) 
 {
-//DEADCODE DAW 07/05/99 	CRect oldpos;
-//DEADCODE DAW 07/05/99 	GetWindowRect(oldpos);
-//DEADCODE DAW 07/05/99 	CFrameWnd::OnMove(x, y);
-//DEADCODE DAW 07/05/99 	x-=oldpos.left;
-//DEADCODE DAW 07/05/99 	y-=oldpos.top;
-//DEADCODE DAW 07/05/99 	RePositionLayout(x,y);
 //	RecalcLayout();
 	// TODO: Add your message handler code here
 	
@@ -1146,10 +1048,6 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 
 void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized) 
 {
-//DeadCode DAW 22Jun99 		TRACE2("Activate %i ==> %08x\n",nState,::GetWindowThreadProcessId(pWndOther->m_hWnd, NULL) );
-//DeadCode DAW 22Jun99 	else
-//DeadCode DAW 22Jun99 	{
-//DeadCode DAW 22Jun99 		TRACE1("Activate %i xxx\n",nState);
 		//If in the 3D && state==0 then discard DD here
 #ifdef NDEBUG
  	if (!pWndOther)
@@ -1165,7 +1063,6 @@ void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 			}
 		}
 #endif
-//DeadCode DAW 22Jun99 	}
 
 	CFrameWnd::OnActivate(nState, pWndOther, bMinimized);
 	
@@ -1185,7 +1082,6 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD hTask)
 #endif
 {
 	CFrameWnd::OnActivateApp(bActive,  hTask);
-//DeadCode DAW 22Jun99 	TRACE2("Activate Ap %i ==>%08x\n",bActive,hTask);
 	
 	// TODO: Add your message handler code here
 	//BOOL SetWindowPos( const CWnd* pWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags );
@@ -1203,13 +1099,6 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD hTask)
 		{  
 //TEMPCODE JIM 05/04/00 			HWND upperwnd=HWND_BOTTOM;  
 //TEMPCODE JIM 05/04/00 			::SetWindowPos(m_hWnd,upperwnd,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
-//DEADCODE DAW 16/06/99 			if (hTask)
-//DEADCODE DAW 16/06/99 				EnumThreadWindows((int)hTask,EnumThreadWndProc,(int)&upperwnd);
-//DEADCODE DAW 16/06/99  			if (upperwnd!=HWND_BOTTOM)
-//DEADCODE DAW 16/06/99 			{
-//DEADCODE DAW 16/06/99 				::SetWindowPos(m_hWnd,HWND_TOP,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
-//DEADCODE DAW 16/06/99 				::SetWindowPos(upperwnd,HWND_TOP,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
-//DEADCODE DAW 16/06/99 			}
 		}
 		else
 		{
@@ -1271,7 +1160,6 @@ void CMainFrame::OnDevModeChange(LPTSTR lpDeviceName)
 	CFrameWnd::OnDevModeChange(lpDeviceName);
 	
 	// TODO: Add your message handler code here
-//DEADCODE JIM 04/04/00 	ShowWindow(SW_SHOWMAXIMIZED);
 
 	
 }
@@ -1281,25 +1169,5 @@ LRESULT CMainFrame::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	// TODO: Add your specialized code here and/or call the base class
 	
 	int rv= CFrameWnd::DefWindowProc(message, wParam, lParam);
-//DeadCode JIM 11Oct00 	switch (message)
-//DeadCode JIM 11Oct00 	{
-//DeadCode JIM 11Oct00 	case	WM_NCCREATE:			case	0x036d:	//WM_FLOATSTATUS
-//DeadCode JIM 11Oct00 	case	WM_NCCALCSIZE:			case	0x04c8:	//MCIWNDM_NOTIFY:
-//DeadCode JIM 11Oct00 	case	WM_CREATE:				case	WM_NCPAINT:
-//DeadCode JIM 11Oct00 	case	WM_SIZE:				case	WM_SETCURSOR:
-//DeadCode JIM 11Oct00 	case	WM_MOVE:				case	WM_SETFONT:
-//DeadCode JIM 11Oct00 	case	WM_INITDIALOG:			case	WM_DISPLAYCHANGE:
-//DeadCode JIM 11Oct00 	case	WM_CTLCOLORSTATIC:		case	WM_IDLEUPDATECMDUI:
-//DeadCode JIM 11Oct00 	case	WM_GETFONT:				case	WM_ACTIVATE:
-//DeadCode JIM 11Oct00 	case	WM_WINDOWPOSCHANGING:	case	WM_NCACTIVATE:
-//DeadCode JIM 11Oct00 	case	WM_SHOWWINDOW:			case	WM_PARENTNOTIFY:	case	WM_SYNCPAINT:		
-//DeadCode JIM 11Oct00 	case	WM_PAINT:				case	WM_GETTEXT:			case	WM_GETMINMAXINFO:
-//DeadCode JIM 11Oct00 	case	WM_WINDOWPOSCHANGED:	case	WM_SETTEXT:			case	WM_KILLFOCUS:
-//DeadCode JIM 11Oct00 	case	 WM_NCHITTEST:			case	WM_STYLECHANGING:	case	WM_STYLECHANGED:
-//DeadCode JIM 11Oct00 
-//DeadCode JIM 11Oct00 
-//DeadCode JIM 11Oct00 
-//DeadCode JIM 11Oct00 		return rv;
-//DeadCode JIM 11Oct00 	}
 	return rv;
 }

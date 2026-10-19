@@ -136,17 +136,9 @@ BOOL SideSelect::OnInitDialog()
 
 	CRButton*	topbut = GETDLGITEM(IDC_RAF);
 	CRButton*	btmbut = GETDLGITEM(IDC_LUFTWAFFE);
-//DEADCODE DAW 24/11/99 	if (scrn == 0)
-//DEADCODE DAW 24/11/99 	{
 
 		topbut->SetString(RESSTRING(RAF));
 		btmbut->SetString(RESSTRING(LUFTWAFFE));
-//DEADCODE RDH 07/01/00 //DEADCODE DAW 24/11/99 	}else
-//DEADCODE DAW 24/11/99 	{
-//DEADCODE DAW 24/11/99 		topbut->SetString(RESSTRING(COMMANDER));
-//DEADCODE DAW 24/11/99 		btmbut->SetString(RESSTRING(PILOT));
-//DEADCODE DAW 24/11/99 	}
-//DEADCODE DAW 24/11/99 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }

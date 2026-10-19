@@ -160,7 +160,6 @@ TransObj(void );
 void LaunchDummyExplosion(mobileitem);									//MGA 29Feb96
 void LaunchDitchEffect(mobileitem, WorldStuff& );								//MGA 01Mar96
 void LaunchCrater(mobileitem*, WorldStuff&);									//RJS 19Nov98
-//Old_Code PD 29Apr96 void TransObj::LaunchDeadACPart(AirStruc&,BitFlags,WorldStuff& );//PD 19Apr96
  	void	LaunchDeadACPart(AirStruc*,BitFlags,WorldStuff&,Bool blowup=FALSE );//RJS 20Feb97
 
 	void	LaunchBitsOffPart(ItemPtr,UByteP,WorldStuff&,UByte,UByteP,UWord blowup=0,Bool noFlash=FALSE);//RJS 15Sep98

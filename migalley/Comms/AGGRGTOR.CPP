@@ -93,7 +93,7 @@ void Aggregator::AggregatorGetPackets(Bool reset, Bool timercall)
 	myDPID	from;
 	//RERUN DWORD	BufferLen;
 	ULONG	BufferLen; //RERUN
-	char* Buffer;
+	char* Buffer=NULL;											//RERUN: ReceiveMessage stub leaves it untouched
 	bool	SendResult;
 
 	static Bool	buffer=FALSE;	// are all players synched. if so buffer packets
@@ -742,7 +742,7 @@ UByte	Aggregator::GetAggFrameCount()
 //------------------------------------------------------------------------------
 HRESULT	Aggregator::ReceiveMessage(char*&buf,ULong& buflen,ULong& from)
 {
-	HRESULT res = 0;
+	HRESULT res = DPERR_GENERIC;	//RERUN: stub returns "no message", not OK-on-garbage
 #if 0 //RERUN
 	ULong to=_DPlay.aggID,temp;
 	from=0;

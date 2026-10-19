@@ -76,7 +76,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
   //	#include	<stdio.h>
 	//DON'T WRITE INCLUDE FILES HERE, PUT THEM IN BFCOMMON
-//DEADCODE JIM 09/02/00 	#include	"text.h"
 	#include	"dosdefs.h"
 	#include	"myerror.h"
 //#define	TEXTREF_Included
@@ -98,8 +97,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //	#include	"bfcommon.h"
 	#include	"bfnumber.h"	//intensional double include
 	//DON'T WRITE INCLUDE FILES HERE, PUT THEM IN BFCOMMON
-//DeadCode JIM 28Mar96 extern	PlaneType&	camel;										//RDH 23Feb96
-//Old_Code PD 27Aug96  	MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);
 	extern	ULong	GR_FriendlyScoutType00;
 	extern	ULong	GR_GlobalSkillMin;
 	extern	ULong	GR_GlobalSkillMax;
@@ -390,7 +387,6 @@ void	Persons2::make_itemS(info_itemS& I)
 			else
 				J->uniqueID.count=UniqueID(v1);
 		J->bfieldindex=currbfindex;
-//DeadCode RDH 11Feb98 		J->uniqueID.sector=loadingmainworld;
 		J->uniqueID.changed=FALSE;
 //		J->uniqueID.deaded=FALSE;
 		J->position.EvalW(J->World);
@@ -774,14 +770,6 @@ void	Persons2::delUID(UniqueID u)
 ITEM_STATUS	Persons2::ItemStatus(UniqueID u,ITEM_STATUS s)
 {
 
-//DeadCode JIM 20Jun97 	ItemBasePtr	i=ConvertPtrUID(u);
-//DeadCode JIM 20Jun97 	if (i)
-//DeadCode JIM 20Jun97 	{
-//DeadCode JIM 20Jun97 		ITEM_STATUS	rv=i->Status;
-//DeadCode JIM 20Jun97 		i->Status.deadtime=s.deadtime;
-//DeadCode JIM 20Jun97 		i->Status.deadscale=s.deadscale;
-//DeadCode JIM 20Jun97 		return (rv);
-//DeadCode JIM 20Jun97 	}
 //	else
 	{
 		ITEM_STATUS	rv={FALSE};
@@ -791,10 +779,6 @@ ITEM_STATUS	Persons2::ItemStatus(UniqueID u,ITEM_STATUS s)
 
 ITEM_STATUS	Persons2::ItemStatus(UniqueID u)
 {
-//DeadCode JIM 20Jun97 	ItemBasePtr	i=ConvertPtrUID(u);
-//DeadCode JIM 20Jun97 	if (i)
-//DeadCode JIM 20Jun97 		return (i->Status);
-//DeadCode JIM 20Jun97 	else
 	{
 		ITEM_STATUS	rv={FALSE};
 		return rv;
@@ -803,30 +787,6 @@ ITEM_STATUS	Persons2::ItemStatus(UniqueID u)
 
 ITEM_STATUS	Persons2::ConvoyStatus(UniqueID uid,UniqueID& nextwp,UniqueID& nextwptarg,SLong& livelength)
 {
-//DeadCode JIM 20Jun97 	FormationItemPtr	f=*ConvertPtrUID(uid);
-//DeadCode JIM 20Jun97 	if (f)
-//DeadCode JIM 20Jun97 	{
-//DeadCode JIM 20Jun97 		livelength=0;
-//DeadCode JIM 20Jun97 		WayPointPtr w=f->waypoint;
-//DeadCode JIM 20Jun97
-//DeadCode JIM 20Jun97 		nextwp=w->uniqueID.count;
-//DeadCode JIM 20Jun97 		ItemBasePtr	i=w->target;
-//DeadCode JIM 20Jun97 		if (i)
-//DeadCode JIM 20Jun97 			nextwptarg=i->uniqueID.count;
-//DeadCode JIM 20Jun97 		else
-//DeadCode JIM 20Jun97 			nextwptarg=IllegalSepID;
-//DeadCode JIM 20Jun97 		while (f)
-//DeadCode JIM 20Jun97 		{
-//DeadCode JIM 20Jun97 			if (f->Status.deadtime==0)
-//DeadCode JIM 20Jun97 			  	livelength++;
-//DeadCode JIM 20Jun97 			f=f->follower;
-//DeadCode JIM 20Jun97 		}
-//DeadCode JIM 20Jun97 		if (i)
-//DeadCode JIM 20Jun97 			return (i->Status);
-//DeadCode JIM 20Jun97 		else
-//DeadCode JIM 20Jun97 			return (w->Status);
-//DeadCode JIM 20Jun97 	}
-//DeadCode JIM 20Jun97 	else
 	{
 		ITEM_STATUS	rv={FALSE};
 		return rv;

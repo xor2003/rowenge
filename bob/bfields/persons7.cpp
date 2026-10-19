@@ -72,7 +72,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 // 
 #include	"dosdefs.h"
 #include	"uniqueid.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"mymath.h"
 #ifndef	__BCPLUSPLUS__
 #include	"files.g"

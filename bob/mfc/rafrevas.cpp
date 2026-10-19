@@ -128,12 +128,6 @@ void RAFReviewAsset::FillTrgInfo(int out, int in, int cnt)
 	TargetNoDetail* trg = Node_Data[dr->trgarray[in].target[cnt].target];
 	int status;
 	status=trg->PlayerStatus();
-//DeadCode JON 4Sep00 		if (		(RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DeadCode JON 4Sep00 				&&	(!Save_Data.gamedifficulty[GD_LWINTELL])
-//DeadCode JON 4Sep00 			)
-//DeadCode JON 4Sep00 		status = trg->knownstatus;
-//DeadCode JON 4Sep00 	else
-//DeadCode JON 4Sep00 		status = trg->truestatus;
 	if		(status > Target::TS_MAXIMUM)		trginfo[out].unknown++;
 	elseif		(status >= Target::TS_NEARLYDESTROYED)	trginfo[out].destroyed++;
 	elseif	(status>=Target::TS_BADDAMAGE)		trginfo[out].damaged++;
@@ -178,8 +172,6 @@ void RAFReviewAsset::FillTrgInfoArray()
 				trgtype = trg->falsetargtype;
 			else
 				trgtype = trg->truetargtype;
-//DeadCode JIM 3Jul00 			if ( trgtype == Target::TT_AS_KNOWN)
-//DeadCode JIM 3Jul00 				trgtype = trg->truetargtype;
 		if (trgtype == Target::TT_CHAINHOME)
 			out = CHAINHOME;
 		else
@@ -200,8 +192,6 @@ void RAFReviewAsset::FillTrgInfoArray()
 				trgtype = trg->falsetargtype;
 			else
 				trgtype = trg->truetargtype;
-//DeadCode JIM 3Jul00 			if ( trgtype == Target::TT_AS_KNOWN)
-//DeadCode JIM 3Jul00 				trgtype = trg->truetargtype;
 		if	(		(trgtype == Target::TT_SPITASSEMBLY)
 				||	(trgtype == Target::TT_HURRASSEMBLY)
 			)
@@ -250,7 +240,6 @@ BOOL RAFReviewAsset::OnInitDialog()
 	
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00  	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(140);				//MIKE
  	//rlistbox->AddColumn(70);
@@ -293,45 +282,6 @@ BOOL RAFReviewAsset::OnInitDialog()
 	}
 
 
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("20",4);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",4);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",4);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",4);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",4);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",4);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",4);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",4);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",4);
 
 
 	return TRUE;  // return TRUE unless you set the focus to a control

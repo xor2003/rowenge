@@ -834,7 +834,6 @@ DES Land_Stream::~Land_Stream()
 
 }
 
-//DeadCode PD 09Dec97 extern void GlobalTestCode(void);
 
 //
 //Procedure		Init
@@ -1371,7 +1370,6 @@ void Land_Stream::UnpackColorData(UByte*& srcptr,UByte* destptr)
 {
 	beginbuffer = destptr;
 
-//DeadCode JIM 09Jan97 	UByte* endbuffer;
 
 	UByte*	lastdest;
 
@@ -1410,7 +1408,6 @@ void Land_Stream::UnpackColorData(UByte*& srcptr,UByte* destptr)
 
 	lastdest=NULL;
 
-//Old_Code DAW 07Jan97 	for (;destptr<endbuffer;FindNextPosition(destptr))			//PD 02Jan97
 	for (;;)			//PD 02Jan97
 	{
 		FindNextPosition(destptr);
@@ -1764,8 +1761,6 @@ void Land_Stream::Maps512MirrorXY(	UByte srccol,
 
 	imagep = colorindex[srccol].imagep;
 
-//Old_Code PD 04Dec96 	imagey = delta / DestBytesPerScanLine;
-//Old_Code PD 04Dec96 	imagex = delta % DestBytesPerScanLine;
 
 	ASM_DivMod(delta,DestBytesPerScanLine,&imagey,&imagex);
 
@@ -1930,8 +1925,6 @@ void Land_Stream::Maps512MirrorX(	UByte srccol,
 
 	imagep = colorindex[srccol].imagep;
 
-//Old_Code PD 04Dec96 	imagey = delta / DestBytesPerScanLine;
-//Old_Code PD 04Dec96 	imagex = delta % DestBytesPerScanLine;
 
 	ASM_DivMod(delta,DestBytesPerScanLine,&imagey,&imagex);
 
@@ -2330,8 +2323,6 @@ void Land_Stream::Maps256MirrorXY(	UByte srccol,
 
 	imagep = colorindex[srccol].imagep;
 
-//Old_Code PD 04Dec96 	imagey = delta / DestBytesPerScanLine;
-//Old_Code PD 04Dec96 	imagex = delta % DestBytesPerScanLine;
 
 	ASM_DivMod(delta,DestBytesPerScanLine,&imagey,&imagex);
 
@@ -2479,8 +2470,6 @@ void Land_Stream::Maps256MirrorX(	UByte srccol,
 
 	imagep = colorindex[srccol].imagep;
 
-//Old_Code PD 04Dec96 	imagey = delta / DestBytesPerScanLine;
-//Old_Code PD 04Dec96 	imagex = delta % DestBytesPerScanLine;
 
 	ASM_DivMod(delta,DestBytesPerScanLine,&imagey,&imagex);
 
@@ -3537,47 +3526,6 @@ void Land_Stream::DeleteCache()
 {
 	DeleteDisplayCache();
 
-//DeadCode DAW 07Jan97 //
-//DeadCode DAW 07Jan97 //Procedure		DeleteCache
-//DeadCode DAW 07Jan97 //Author		Paul.   
-//DeadCode DAW 07Jan97 //Date			Wed 31 Jul 1996
-//DeadCode DAW 07Jan97 //
-//DeadCode DAW 07Jan97 //Description	
-//DeadCode DAW 07Jan97 //
-//DeadCode DAW 07Jan97 //Inputs		
-//DeadCode DAW 07Jan97 //
-//DeadCode DAW 07Jan97 //Returns	
-//DeadCode DAW 07Jan97 //
-//DeadCode DAW 07Jan97 //------------------------------------------------------------------------------
-//DeadCode DAW 07Jan97 void Land_Stream::DeleteCache()
-//DeadCode DAW 07Jan97 {
-//DeadCode DAW 07Jan97 	LDataScales	scalecount;
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 	for (scalecount=LDS_AliasX2;scalecount<LDS_MAX;scalecount=(LDataScales)(scalecount+1))
-//DeadCode DAW 07Jan97 	{
-//DeadCode DAW 07Jan97 		CacheBlockP	scanp,nextp;
-//DeadCode DAW 07Jan97 		
-//DeadCode DAW 07Jan97 		scanp = dumpscale[scalecount];
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 		while (scanp!=NULL)										//PD 01Aug96
-//DeadCode DAW 07Jan97 		{
-//DeadCode DAW 07Jan97 			nextp = scanp->next;
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 			delete (scanp->data);
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 			delete (scanp);
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 			scanp = nextp;
-//DeadCode DAW 07Jan97 		}
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 		dumpscale[scalecount] = NULL;
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 		cachescale[scalecount] = NULL;
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 		cachereq[scalecount] = NULL;
-//DeadCode DAW 07Jan97 
-//DeadCode DAW 07Jan97 		cachecount[scalecount] = 0;
-//DeadCode DAW 07Jan97 	}
 
 	//dispose of cached 257x257 tiles
 
@@ -3669,11 +3617,6 @@ void Land_Stream::DeleteCache()
 
 	if (Land_Scape.landdata!=NULL)								//PD 09Dec96
 	{
-//Old_Code DAW 24Oct97 		ULong*	lptemp;
-//Old_Code DAW 24Oct97 
-//Old_Code DAW 24Oct97 		lptemp=(ULong*)&(Land_Scape.landdata->data);
-//Old_Code DAW 24Oct97 
-//Old_Code DAW 24Oct97 		for (int ldcount=0;ldcount<16*0x4000;*lptemp++=0x0,ldcount++);
 
 		if (currwin && currwin->DoingHardware3D())					//PD 19Nov97
 		{
@@ -4237,33 +4180,6 @@ void Land_Stream::GetColourData(CacheBlockP cbp, LDataScales scale)
 //------------------------------------------------------------------------------
 void Land_Stream::GetAltitudeDataOnly(CacheBlockP cbp, LDataScales scale)
 {
-//Old_Code PD 19Nov96 	COORDS3D coords;
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	ULong coordmask = ~((0x00000001<<(XZ_COL_SCALE+8))-1);
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	coords.X = cbp->wx<<XZ_COL_SCALE; coords.Z = cbp->wz<<XZ_COL_SCALE;
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	UByte* cdestptr = GetBigAltTile(coords);
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	UByte* adestptr = cdestptr + ColourDataSize;
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	coords.X &= coordmask;	coords.Z &= coordmask;
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	//coords holds the coordinates of the decompressed
-//Old_Code PD 19Nov96 	//data block and adestptr points to the decompressed
-//Old_Code PD 19Nov96 	//altitude data
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	//Update altitude data
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	UpdateAltitudeData(coords,adestptr);
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	coords.X >>= XZ_COL_SCALE; coords.Z >>= XZ_COL_SCALE;
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	LandMapDescPtr lmdp = cbp->data;
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	UByte* temp = (UByte*)(&lmdp->tilemap);
-//Old_Code PD 19Nov96 
-//Old_Code PD 19Nov96 	*temp = *cdestptr;
 }
 
 //
@@ -5738,7 +5654,6 @@ void Land_Stream::GetTileCoords(COORDS3D& coords,
 		}
 	}
 
-//Old_Code PD 18Dec96 	altdatap = GetBigAltTile(coords);							//PD 11Oct96
 
 	SLong	world_coord_step = 0x00000001<<XZ_ALT_SCALE;
 	SLong	world_coord_mask = ~(world_coord_step-1);
@@ -5973,8 +5888,6 @@ void Land_Stream::AddSeekRequest(SeekStruc& newseek)
 {
 	{///////DEUG CODE////////
 
-//DeadCode PD 04Dec96 		if (newseek.seekpos>0x30ff000)
-//DeadCode PD 04Dec96 			_Error.EmitSysErr("Request for block past end of file");
 
 		if (newseek.destdata==NULL)
 			_Error.EmitSysErr("NULL destination for data request");
@@ -6043,7 +5956,6 @@ int	loadstream[5]={	BIG_EDGE_SIZE,
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode DAW 14Dec96 static char	fnum=0;
 void Land_Stream::ProcessSeekRequests2()
 {
 	loadtime++;
@@ -6141,21 +6053,6 @@ void Land_Stream::ProcessSeekRequests()
 	if (xindex>5 && xindex<15)
 		if (zindex>5 && zindex<15)
 		{
-//DeadCode DAW 06Sep97 			//Send a CD seek reqest every 10 seconds
-//DeadCode DAW 06Sep97 			//just to stop the CD ROM drive from stopping
-//DeadCode DAW 06Sep97 
-//DeadCode DAW 06Sep97 			pingtimer++;
-//DeadCode DAW 06Sep97 
-//DeadCode DAW 06Sep97 			if (pingtimer>150)
-//DeadCode DAW 06Sep97 			{
-//DeadCode DAW 06Sep97 				pingtimer=0;
-//DeadCode DAW 06Sep97 
-//DeadCode DAW 06Sep97 				if (pingcounter<(BIG_FILE_SIZE*4096/DOSFILE_SEEKSTEP))//PD 14Jun97
-//DeadCode DAW 06Sep97 				{
-//DeadCode DAW 06Sep97 					pingcounter++;
-//DeadCode DAW 06Sep97 					FILEMAN.pingCD();
-//DeadCode DAW 06Sep97 				}
-//DeadCode DAW 06Sep97 			}
 			FILEMAN.pingCD();	//let the ping code do the counting!
 			return;
 		}
@@ -6750,17 +6647,6 @@ void Land_Stream::BigRebuild(MovingItem* fselitemp)
 //------------------------------------------------------------------------------
 void Land_Stream::SetArea(MovingItem* fselitemp)
 {
-//Old_Code DAW 27Jan97 	const	SLong	Area1SW_X = 16777216;
-//Old_Code DAW 27Jan97 	const	SLong	Area1SW_Z = 20971520;
-//Old_Code DAW 27Jan97 
-//Old_Code DAW 27Jan97 	const	SLong	Area1NE_X = 31457280;
-//Old_Code DAW 27Jan97 	const	SLong	Area1NE_Z = 35651584;
-//Old_Code DAW 27Jan97 
-//Old_Code DAW 27Jan97 	const	SLong	Area2SW_X = 34603008;
-//Old_Code DAW 27Jan97 	const	SLong	Area2SW_Z = 8388608;
-//Old_Code DAW 27Jan97 
-//Old_Code DAW 27Jan97 	const	SLong	Area2NE_X = 49283072;
-//Old_Code DAW 27Jan97 	const	SLong	Area2NE_Z = 23068672;
 
 	SLong	itemX = fselitemp->World.X;
 	SLong	itemZ = fselitemp->World.Z;
@@ -6772,20 +6658,10 @@ void Land_Stream::SetArea(MovingItem* fselitemp)
 			AreaBaseX = Area1SW_X;
 			AreaBaseZ = Area1SW_Z;
 
-//DeadCode PD 08Aug97 			if (Demoversion==FALSE)								//PD 28Jan97
-//DeadCode PD 08Aug97 			{
 				AreaFiles[0] = FIL_AREAW_NUM;
 				AreaFiles[1] = FIL_AREAN_NUM;
 				AreaFiles[2] = FIL_AREAE_NUM;
 				AreaFiles[3] = FIL_AREAS_NUM;
-//DeadCode PD 08Aug97 			}
-//DeadCode PD 08Aug97 			else
-//DeadCode PD 08Aug97 			{
-//DeadCode PD 08Aug97 				AreaFiles[0] = FIL_DEMO1W_NUM;
-//DeadCode PD 08Aug97 				AreaFiles[1] = FIL_DEMO1N_NUM;
-//DeadCode PD 08Aug97 				AreaFiles[2] = FIL_DEMO1E_NUM;
-//DeadCode PD 08Aug97 				AreaFiles[3] = FIL_DEMO1S_NUM;
-//DeadCode PD 08Aug97 			}
 
 			FILEMAN.SetupAreaFiles(AreaFiles);					//PD 18Nov96
 
@@ -6964,25 +6840,11 @@ void Land_Stream::BigInit(ViewPoint* View_Point)
 
 				bigareacahe[cachecurrentindex]->fileblk=startfileoffset/4096;
 
-//DeadCode DAW 07Jan97 				if (cachecurrentindex==195)
-//DeadCode DAW 07Jan97 				{
-//DeadCode DAW 07Jan97 					FILE * fp=fopen("\\fly\\src\\poo1.bin","wb");
-//DeadCode DAW 07Jan97 					for (int bc=1226;bc<0x1000;bc++)
-//DeadCode DAW 07Jan97 						fputc(((UByte*)fbp->GetData())[bc],fp);
-//DeadCode DAW 07Jan97 					fclose(fp);
-//DeadCode DAW 07Jan97 				}
 
 				bigareacahe[cachecurrentindex]->data=*(CachedDataBlock*)fbp->GetData();
 
 				delete (fbp);
 
-//DeadCode JIM 09Jan97 				if (cachecurrentindex==195)
-//DeadCode JIM 09Jan97 				{
-//DeadCode JIM 09Jan97 					FILE * fp=fopen("\\fly\\src\\poo2.bin","wb");
-//DeadCode JIM 09Jan97 					for (int bc=1226;bc<0x1000;bc++)
-//DeadCode JIM 09Jan97 						fputc(bigareacahe[cachecurrentindex]->data.data[bc],fp);
-//DeadCode JIM 09Jan97 					fclose(fp);
-//DeadCode JIM 09Jan97 				}
 
 				cachecurrentindex += cacheseqindex;
 
@@ -7332,17 +7194,6 @@ Bool Land_Stream::OverTheEdge(itemptr itmp,SLong& dx,SLong& dz)
 	const	SLong	TILE_STEP=0x20000;
 	const	SLong	BORDER_SIZE=6*TILE_STEP;
 
-//Old_Code DAW 27Jan97 	const	SLong	Area1SW_X = 16777216;
-//Old_Code DAW 27Jan97 	const	SLong	Area1SW_Z = 20971520;
-//Old_Code DAW 27Jan97 
-//Old_Code DAW 27Jan97 	const	SLong	Area1NE_X = 31457280;
-//Old_Code DAW 27Jan97 	const	SLong	Area1NE_Z = 35651584;
-//Old_Code DAW 27Jan97 
-//Old_Code DAW 27Jan97 	const	SLong	Area2SW_X = 34603008;
-//Old_Code DAW 27Jan97 	const	SLong	Area2SW_Z = 8388608;
-//Old_Code DAW 27Jan97 
-//Old_Code DAW 27Jan97 	const	SLong	Area2NE_X = 49283072;
-//Old_Code DAW 27Jan97 	const	SLong	Area2NE_Z = 23068672;
 
 	Bool	retval=FALSE;
 

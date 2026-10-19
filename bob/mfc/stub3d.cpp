@@ -858,7 +858,8 @@ View3d::View3d(Inst3d* ofinst,HWND newwin,CWnd* d):
 	window=newwin;
 	inst=ofinst;
 	View_Point=NULL;
- 	lastrealframetime=5;			//should be in for photo rotation //DAW 19/6/99
+ 	lastrealframetime=5;
+	frametime=lastframetime=realframetime=timeSinceLastMove=0;			//should be in for photo rotation //DAW 19/6/99
 	mode=WinMode::NONE;
 	drawing=D_NO;
 

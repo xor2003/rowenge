@@ -124,7 +124,6 @@ BOOL LWReviewAircraft::OnInitDialog()
 	
 		CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(120);		 //MIKE
 	//rlistbox->AddColumn(42);										  //RDH 02/06/99
@@ -152,7 +151,6 @@ BOOL LWReviewAircraft::OnInitDialog()
 	rlistbox->AddString("   "+ RESSTRING(DESTROYED),0);
 	rlistbox->AddString("   "+ RESSTRING(NEW),0);
 	rlistbox->AddString("   "+ RESSTRING(CFCOMBATREADY),0);
-//DeadCode RDH 28Jun00 	rlistbox->AddString("   "+ RESSTRING(FULLCOMPLEMENT),0);
 	rlistbox->AddString(RESSTRING(FACTORIES),0);
 	rlistbox->AddString("   "+ RESSTRING(MAXPRODUCTION),0);
 	rlistbox->AddString("   "+ RESSTRING(ACTUALPRODUCTION),0);
@@ -201,7 +199,6 @@ BOOL LWReviewAircraft::OnInitDialog()
 			rlistbox->AddString(CSprintf("%4.1f",(MMC.thisweekreview.lw[i].potentialrepairs/4.5)),i+1);
 			rlistbox->AddString(CSprintf("%4.1f",(MMC.thisweekreview.lw[i].newrepairs/4.5)),i+1);
 		}
-//DeadCode RDH 28Jun00 		rlistbox->AddString("",1+i);
 		totalavailablestart += MMC.thisweekreview.lw[i].availablestart;
 		totaldamaged += MMC.thisweekreview.lw[i].damaged;
 		totalrepaired += MMC.thisweekreview.lw[i].repaired;
@@ -232,56 +229,8 @@ BOOL LWReviewAircraft::OnInitDialog()
 		rlistbox->AddString(CSprintf("%4.1f",totalmaxrep),7);
 		rlistbox->AddString(CSprintf("%4.1f",totalrep),7);
 	}
-//DeadCode RDH 28Jun00 	rlistbox->AddString("",7);
 
 
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",1);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",2);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",3);
 
 
 	

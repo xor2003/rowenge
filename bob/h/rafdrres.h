@@ -46,10 +46,6 @@ public:
 // Implementation
 protected:
 	void	Refresh();
-//DEADCODE RDH 02/03/00 	static int AirfieldSuitable(int afnum, Target::Location loc0, Target::Location loc1, Target::Location loc2);
-//DEADCODE RDH 02/03/00 	static void MoveSquadron(int sqnum, Target::Location loc0, Target::Location loc1, Target::Location loc2);
-//DEADCODE RDH 02/06/00 	void MoveSquadron(int sqnum,  int loc0, int loc1, int loc2);
-//DEADCODE RDH 02/06/00 	int FindAirfield(int priority, int maxaf);
 
 
 

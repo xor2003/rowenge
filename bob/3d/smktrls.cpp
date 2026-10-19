@@ -77,7 +77,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	"DOSDefs.h"
 	//#include	"MAClib.h"f
 #define F_GRAFIX												//DAW 05Aug96
-//DeadCode RJS 17Oct96 #define F_SOUNDS
 #define F_BATTLE
 	#include 	"myerror.h"
 	#include 	"Palette.h"
@@ -344,8 +343,6 @@ const	int	shiftFactor = 8;												//RJS 30Jun00
 			RandyDelta >>= 2;
 
 			sphco = dopointRoot;
-//DEADCODE JON 5/22/00 			sphco.incPosX( RandxDelta ); 
-//DEADCODE JON 5/22/00 			sphco.incPosY( RandyDelta );
 			sphco.incPos( RandxDelta, RandyDelta, 0.0 );
 
 			RSeed -= 128;
@@ -360,9 +357,6 @@ const	int	shiftFactor = 8;												//RJS 30Jun00
 //Draw a sphere...
 			g_lpLib3d->DrawTransformedSphere(HMATERIAL(Image_Map.GetImageMapPtr(imapno)),sphco,Radius,ANGLES_0Deg,minix0,miniy0,maxix0,maxiy0);//RJS 20Mar00
 
-//DEADCODE JON 5/22/00 			dopointRoot.bodyx.f += RelX;
-//DEADCODE JON 5/22/00 			dopointRoot.bodyy.f += RelY;
-//DEADCODE JON 5/22/00   			dopointRoot.bodyz.f += RelZ;
 			dopointRoot.incPos( RelX, RelY, RelZ );
 
 			xDelta += XoffGap;
@@ -467,8 +461,6 @@ void	TrailInfo::ParticleCylinderImapd()
 			RandyDelta -= yDelta;
 
 			sphco = dopointRoot;
-//DEADCODE JON 5/22/00 			sphco.bodyx.f += RandxDelta;
-//DEADCODE JON 5/22/00 			sphco.bodyy.f += RandyDelta;
 			sphco.incPos( RandxDelta, RandyDelta, 0.0 );				//RJS 6Jun00
 
 
@@ -492,16 +484,13 @@ void	TrailInfo::ParticleCylinderImapd()
 
 				Dist = MaxDist - Dist;
 
-				Radius = 2 + ((Dist*MaxRadius)/MaxDist);
+				Radius = 2 + (MaxDist>0 ? (Dist*MaxRadius)/MaxDist : 0);	//RERUN: INT_MIN deltas can leave MaxDist==0
 	
 				g_lpLib3d->SetGlobal(TOGGLE_GLOBALALPHA,(Radius*255)/MaxRadius);
 				g_lpLib3d->DrawTransformedSphere(HMATERIAL(Image_Map.GetImageMapPtr(imapno)),sphco,Radius,ANGLES_0Deg,minix0,miniy0,maxix0,maxiy0);
 			}
 
 
-//DEADCODE JON 5/22/00 			dopointRoot.bodyx.f += RelX;
-//DEADCODE JON 5/22/00 			dopointRoot.bodyy.f += RelY;
-//DEADCODE JON 5/22/00   			dopointRoot.bodyz.f += RelZ;
 			dopointRoot.incPos( RelX, RelY, RelZ );
 
 
@@ -535,10 +524,6 @@ void TrailInfo::imaptrailcylWrapped()
 #ifndef _REDO_ME2_
 	ULong	thewidth, theheight;
 	DoPointStruc dopoint0,dopoint1,dopoint2,dopoint3,oldpoint,sphco;
-//DeadCode RJS 20Oct00  	Float	xdelt1 = (Float) xoff0;
-//DeadCode RJS 20Oct00  	Float	ydelt1 = (Float) yoff0;
-//DeadCode RJS 20Oct00  	Float	xdelt2 = (Float) xoff1;
-//DeadCode RJS 20Oct00  	Float	ydelt2 = (Float) yoff1;
  	Bool	oldcross;
 	SLong	nopixels;
 	SLong	dx,dy,dz;
@@ -581,7 +566,6 @@ void TrailInfo::imaptrailcylWrapped()
 
 		if (dosphere && imagemap1)
 		{
-//DeadCode RJS 20Oct00 			SLong	pooradius = 0.75*radius;
 /*			if (pooradius)
 			{
 				int		nospheres = 1 + ((pixpercyl * visibility)>>8);
@@ -620,9 +604,6 @@ void TrailInfo::imaptrailcylWrapped()
 		{
 			sphco = oldpoint;
 
-//DEADCODE JON 5/22/00 			sphco.bodyx.f = (dopoint0.bodyx.f + dopoint2.bodyx.f)/2;
-//DEADCODE JON 5/22/00 			sphco.bodyy.f = (dopoint0.bodyy.f + dopoint2.bodyy.f)/2;
-//DEADCODE JON 5/22/00 			sphco.bodyz.f = (dopoint0.bodyz.f + dopoint2.bodyz.f)/2;
 //			D3DVALUE tx, ty, tz;
 //			tx = ( dopoint0.getPosX() + dopoint2.getPosX() )/2;
 //			ty = ( dopoint0.getPosY() + dopoint2.getPosY() )/2;
@@ -666,7 +647,6 @@ Bool	shape::ClipSphereRatio(	DoPointStruc	&dp0,
 		Rady = Float(rady);
 		Rady *= SphereYScale;
 
-//DeadCode RJS 26May99 		if (vp->PolyPitEnabled() || (vp->viewnum.viewmode == VM_InsideCheat))
 		if (vp->roll)									//RJS 26May99
 		{
 			SWord 	sinAng,cosAng;
@@ -920,8 +900,6 @@ void	TrailInfo::DblParticleCylinderImapd()
 			RandyDelta -= yDelta;
 
 			sphco = dopointRoot;
-//DEADCODE JON 5/22/00 			sphco.bodyx.f += RandxDelta;
-//DEADCODE JON 5/22/00 			sphco.bodyy.f += RandyDelta;
 			sphco.incPos( RandxDelta, RandyDelta, 0.0 );
 
 			xDeltCap >>= 1;
@@ -944,7 +922,7 @@ void	TrailInfo::DblParticleCylinderImapd()
 
 				Dist = MaxDist - Dist;
 
-				Radius = 2 + ((Dist*maxradius)/MaxDist);
+				Radius = 2 + (MaxDist>0 ? (Dist*maxradius)/MaxDist : 0);	//RERUN: INT_MIN deltas can leave MaxDist==0
 	
 				imapno = imapdefaultno;
 				subframe = 16;
@@ -976,9 +954,6 @@ void	TrailInfo::DblParticleCylinderImapd()
 										text_maxy[subframe]	);
 			}
 
-//DEADCODE JON 5/22/00 			dopointRoot.bodyx.f += RelX;
-//DEADCODE JON 5/22/00 			dopointRoot.bodyy.f += RelY;
-//DEADCODE JON 5/22/00   			dopointRoot.bodyz.f += RelZ;
 
 			dopointRoot.incPos( RelX, RelY, RelZ );
 
@@ -1097,8 +1072,6 @@ void	TrailInfo::FadeParticleCylinderImapd()
 			RandyDelta -= yDelta;
 
 			sphco = dopointRoot;
-//DEADCODE JON 5/22/00 			sphco.bodyx.f += RandxDelta;
-//DEADCODE JON 5/22/00 			sphco.bodyy.f += RandyDelta;
 			sphco.incPos( RandxDelta, RandyDelta, 0.0 );
 
 			xDeltCap >>= 1;
@@ -1121,7 +1094,7 @@ void	TrailInfo::FadeParticleCylinderImapd()
 
 				Dist = MaxDist - Dist;
 
-				Radius = 2 + ((Dist*maxradius)/MaxDist);
+				Radius = 2 + (MaxDist>0 ? (Dist*maxradius)/MaxDist : 0);	//RERUN: INT_MIN deltas can leave MaxDist==0
 	
 				realFade = (Radius*255)/maxradius;
 				realFade = (realFade*subcounter)/depth;
@@ -1137,9 +1110,6 @@ void	TrailInfo::FadeParticleCylinderImapd()
 										maxiy0	);
 			}
 
-//DEADCODE JON 5/22/00 			dopointRoot.bodyx.f += RelX;
-//DEADCODE JON 5/22/00 			dopointRoot.bodyy.f += RelY;
-//DEADCODE JON 5/22/00   			dopointRoot.bodyz.f += RelZ;
 
 			dopointRoot.incPos( RelX, RelY, RelZ );
 

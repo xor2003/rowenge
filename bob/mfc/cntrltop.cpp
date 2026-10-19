@@ -110,10 +110,6 @@ RDialog*	ControlTopLevel::Make()
 
 
 
-//DeadCode JIM 9Aug00 	return
-//DeadCode JIM 9Aug00 		MakeTopDialog(::Place(POSN_CENTRE,POSN_CENTRE),
-//DeadCode JIM 9Aug00 			DialBox(FIL_NULL,new ControlTopLevel())
-//DeadCode JIM 9Aug00 			);
 }
 
 

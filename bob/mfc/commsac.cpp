@@ -196,10 +196,7 @@ void CCommsDeathMatchAc::OnTextChangedCurrentac(LPCTSTR text, short Xindex)
 
 // dont need this csquick set up when game is launched
 
-//DeadCode AMM 23Oct00 	CSQuick1::quickdef.UpdateAcType();
 
-//DeadCode JIM 12Jan99 	RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
-//DEADCODE RDH 25/03/99 	FullPanel()->LaunchDial(new CCurrEmblem,1);
 	FullPanel()->PaintShopDesc();
 
 #endif

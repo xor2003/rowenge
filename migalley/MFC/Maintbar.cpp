@@ -909,14 +909,11 @@ void CMainToolbar::OnClickedFrag2()
 		//manage stores_destroyed									  //RDH 25/05/99
 		SupplyTree::ProcessStoresDestroyed ();
 
-	//DeadCode AMM 27Nov98 	RDialog::m_pView->LaunchFullPane(&RFullPanelDial::singlefrag);	
 //	RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
 	RFullPanelDial::SetDefaultPilotPositions();
-//DeadCode AMM 27Nov98 	RDialog::m_pView->LaunchFullPane(&RFullPanelDial::singlefrag);	
 
 		if (_DPlay.PlayerCreated && _DPlay.Host)
 		{
-//DeadCode PD 23May99 			_DPlay.SendSaveGame();
 			_DPlay.SendSaveGame(false,false);
 		}
 
@@ -924,7 +921,6 @@ void CMainToolbar::OnClickedFrag2()
 			RDialog::m_pView->LaunchFullPane(&RFullPanelDial::singlefrag);	//AMM 27Nov98
 		else														//AMM 27Nov98
 		{
-//DEADCODE rdh 23/04/99 			RDialog::m_pView->LaunchFullPane(&RFullPanelDial::commsfrag);	//AMM 27Nov98
 			if	(_DPlay.Side)
 					if (_DPlay.UIPlayerType == PLAYER_HOST)
 						RDialog::m_pView->LaunchFullPane(&RFullPanelDial::readyroomhostcampaign);	

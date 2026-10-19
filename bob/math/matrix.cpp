@@ -396,7 +396,6 @@ void fpTan(ANGLES ang, Float& tanAng)
 //#endif
 //#endif
 
-//DeadCode PD 13Oct98 fpmatrix_ matrix::IDENTITY={1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0};
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure	matrix
@@ -1136,24 +1135,6 @@ UWord matrix::scaleto16bit(SLong& x, SLong& y, SLong& z)
 //Returns		FALSE if the body Z for the point was negative.
 //
 //------------------------------------------------------------------------------
-//DEADCODE PD 01/12/99 void matrix::body2screen(DoPointStruc &dopoint)					//PD 25Jul96
-//DEADCODE PD 01/12/99 {
-//DEADCODE PD 01/12/99 	if (mat_win->DoingHardware3D())
-//DEADCODE PD 01/12/99 	{
-//DEADCODE PD 01/12/99 		Float scalex,scaley;
-//DEADCODE PD 01/12/99 		scalex=Float(mat_win->VirtualWidth)/Float(mat_win->PhysicalWidth);
-//DEADCODE PD 01/12/99 		scaley=Float(mat_win->VirtualHeight)/Float(mat_win->PhysicalHeight);
-//DEADCODE PD 01/12/99 		mat_win->DoBody2Screen(dopoint);
-//DEADCODE PD 01/12/99 		dopoint.screenx.f*=scalex;
-//DEADCODE PD 01/12/99 		dopoint.screeny.f*=scaley;
-//DEADCODE PD 01/12/99 	}
-//DEADCODE PD 01/12/99 	else
-//DEADCODE PD 01/12/99 	{
-//DEADCODE PD 01/12/99 		R3DVALUE rw=R3DVALUE(1./(POLYGON.viewdata.hoD*dopoint.bodyz.f));
-//DEADCODE PD 01/12/99 		dopoint.screenx.f=R3DVALUE(POLYGON.viewdata.scalex*dopoint.bodyx.f*rw+POLYGON.viewdata.originx);
-//DEADCODE PD 01/12/99 		dopoint.screeny.f=R3DVALUE(-POLYGON.viewdata.scaley*dopoint.bodyy.f*rw+POLYGON.viewdata.originy);
-//DEADCODE PD 01/12/99 	}
-//DEADCODE PD 01/12/99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		body2screen
@@ -1212,36 +1193,6 @@ DEAD*/
 //Returns		FALSE if the body Z for the point was negative.
 //
 //------------------------------------------------------------------------------
-//DEADCODE PD 03/12/99 void matrix::body2screen(VERTEX &vertex)						//PD 25Jul96
-//DEADCODE PD 03/12/99 {
-//DEADCODE PD 03/12/99 	if (mat_win->DoingHardware3D())
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		DoPointStruc temp;
-//DEADCODE PD 03/12/99 		temp.bodyx.f=vertex.bx.f;
-//DEADCODE PD 03/12/99 		temp.bodyy.f=vertex.by.f;
-//DEADCODE PD 03/12/99 		temp.bodyz.f=vertex.bz.f;
-//DEADCODE PD 03/12/99 		Float scalex,scaley;
-//DEADCODE PD 03/12/99 		scalex=Float(mat_win->VirtualWidth)/Float(mat_win->PhysicalWidth);
-//DEADCODE PD 03/12/99 		scaley=Float(mat_win->VirtualHeight)/Float(mat_win->PhysicalHeight);
-//DEADCODE PD 03/12/99 		mat_win->DoBody2Screen(temp);
-//DEADCODE PD 03/12/99 		temp.screenx.f*=scalex;
-//DEADCODE PD 03/12/99 		temp.screeny.f*=scaley;
-//DEADCODE PD 03/12/99 		vertex.sx.f=temp.screenx.f;
-//DEADCODE PD 03/12/99 		vertex.sy.f=temp.screeny.f;
-//DEADCODE PD 03/12/99 	}
-//DEADCODE PD 03/12/99 	else
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		DoPointStruc dopoint;
-//DEADCODE PD 03/12/99 		dopoint.bodyx.f=vertex.bx.f;
-//DEADCODE PD 03/12/99 		dopoint.bodyy.f=vertex.by.f;
-//DEADCODE PD 03/12/99 		dopoint.bodyz.f=vertex.bz.f;
-//DEADCODE PD 03/12/99 		R3DVALUE rw=R3DVALUE(1./(POLYGON.viewdata.hoD*dopoint.bodyz.f));
-//DEADCODE PD 03/12/99 		dopoint.screenx.f=R3DVALUE(POLYGON.viewdata.scalex*dopoint.bodyx.f*rw+POLYGON.viewdata.originx);
-//DEADCODE PD 03/12/99 		dopoint.screeny.f=R3DVALUE(-POLYGON.viewdata.scaley*dopoint.bodyy.f*rw+POLYGON.viewdata.originy);
-//DEADCODE PD 03/12/99 		vertex.sx.f=dopoint.screenx.f;
-//DEADCODE PD 03/12/99 		vertex.sy.f=dopoint.screeny.f;
-//DEADCODE PD 03/12/99 	}
-//DEADCODE PD 03/12/99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		crossproduct
@@ -1293,31 +1244,6 @@ Bool matrix::crossproduct(DoPointStruc &v1,DoPointStruc &v2,DoPointStruc &v3)
 	return FALSE;
 }
 
-//Old_Code PD 28Oct98 {
-//Old_Code PD 28Oct98 	IFShare	temp1,temp2;
-//Old_Code PD 28Oct98 	IFShare	y2y1, x2x3, x2x1, y2y3;
-//Old_Code PD 28Oct98
-//Old_Code PD 28Oct98 	Bool	retval;
-//Old_Code PD 28Oct98
-//Old_Code PD 28Oct98 	y2y1.f = v2.screeny.f-v1.screeny.f;
-//Old_Code PD 28Oct98 	x2x3.f = v2.screenx.f-v3.screenx.f;
-//Old_Code PD 28Oct98
-//Old_Code PD 28Oct98 	temp1.f= y2y1.f*x2x3.f;
-//Old_Code PD 28Oct98
-//Old_Code PD 28Oct98 	x2x1.f = v2.screenx.f-v1.screenx.f;
-//Old_Code PD 28Oct98 	y2y3.f = v2.screeny.f-v3.screeny.f;
-//Old_Code PD 28Oct98
-//Old_Code PD 28Oct98 	temp2.f= x2x1.f*y2y3.f;
-//Old_Code PD 28Oct98
-//Old_Code PD 28Oct98 	temp1.f-=temp2.f;
-//Old_Code PD 28Oct98
-//Old_Code PD 28Oct98 	if(temp1.f<(Float)0.0)
-//Old_Code PD 28Oct98 		retval = FALSE;
-//Old_Code PD 28Oct98 	else
-//Old_Code PD 28Oct98 		retval = TRUE;
-//Old_Code PD 28Oct98
-//Old_Code PD 28Oct98 	return(retval);
-//Old_Code PD 28Oct98 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		accuratecrossproduct
@@ -1529,7 +1455,6 @@ void matrix::TransformAnglesB(	SLong	x, SLong y, SLong z,
 	itemroll 	= cdroll;
 }
 
-//DEADCODE PD 03/12/99 extern SWord winmode_w,winmode_h;
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		SetZScale
@@ -1545,9 +1470,6 @@ void matrix::TransformAnglesB(	SLong	x, SLong y, SLong z,
 //------------------------------------------------------------------------------
 void matrix::SetZScale()
 {
-//DEADCODE PD 03/12/99 	fpzscale=(Float)FULLW/2;
-//DEADCODE PD 03/12/99 	fpxscale=Float(winmode_w>>1);
-//DEADCODE PD 03/12/99 	fpyscale=Float(winmode_h>>1);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1781,9 +1703,6 @@ UWord matrix::transformNC(FPMATRIX_PTR T, IFShare& x, IFShare& y, IFShare& z)
 //------------------------------------------------------------------------------
 void matrix::transform(FPMATRIX_PTR T, DoPointStruc& dp)
 {
-//DEADCODE RDH 5/19/00 	Float	fx = Float(dp.bodyx.i),
-//DEADCODE RDH 5/19/00 			fy = Float(dp.bodyy.i),
-//DEADCODE RDH 5/19/00 			fz = Float(dp.bodyz.i);
 	D3DVALUE	fx,fy,fz;
 
 	dp.getPosition(fx,fy,fz);
@@ -1795,7 +1714,6 @@ void matrix::transform(FPMATRIX_PTR T, DoPointStruc& dp)
 	//Now generates clip flags based
 	//on the current view cone
 
-//DEADCODE PD 03/12/99 	SetClipFlags(dp);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1841,10 +1759,6 @@ UWord matrix::fptrans(FPMATRIX_PTR T, IFShare& x, IFShare& y, IFShare& z)
 	//on the current view cone
 
 	UWord retval=0;														//RJS 26Jul00
-//DEADCODE PD 03/12/99 	_clipFB(retval,z.f,1.,fpMaximumZ);
-//DEADCODE PD 03/12/99
-//DEADCODE PD 03/12/99 	_clipLR(retval,x.f,z.f);
-//DEADCODE PD 03/12/99 	_clipTB(retval,y.f,z.f);
 	return retval;
 }
 
@@ -1927,19 +1841,6 @@ void matrix::multiply(FPMATRIX_PTR t, FPMATRIX_PTR sip)
 //------------------------------------------------------------------------------
 void matrix::SetViewParams(Window* win,ANGLES viewCone,SLong viewRange)
 {
-//DEADCODE PD 03/12/99 	//Clip the view cone to min/max
-//DEADCODE PD 03/12/99 	if (viewCone<ANGLES_40Deg)		viewCone=ANGLES_40Deg;
-//DEADCODE PD 03/12/99 	else if (viewCone>ANGLES_90Deg)	viewCone=ANGLES_90Deg;
-//DEADCODE PD 03/12/99
-//DEADCODE PD 03/12/99 	viewConeAngle=Angles(UWord(viewCone)>>1);
-//DEADCODE PD 03/12/99 	fpTan(viewConeAngle,FoV);
-//DEADCODE PD 03/12/99
-//DEADCODE PD 03/12/99 	aspectRatio=Float(win->VirtualHeight)/Float(win->VirtualWidth);
-//DEADCODE PD 03/12/99 	aspectRatio*=FoV;
-//DEADCODE PD 03/12/99
-//DEADCODE PD 03/12/99  	fpMaximumZ=Float(viewRange);
-//DEADCODE PD 03/12/99
-//DEADCODE PD 03/12/99 	win->DoSetAspectRatio(aspectRatio,FoV);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

@@ -14,9 +14,6 @@
 //TempCode JIM 14Nov00 #undef NDEBUG
 
 #define NO_AFX_AUTO
-//DEADCODE JIM 08/06/00 typedef union _LARGE_INTEGER {
-//DEADCODE JIM 08/06/00     __int64 QuadPart;
-//DEADCODE JIM 08/06/00 } LARGE_INTEGER;
 //#include	"stdafx.h"
 #define NOATL
 #include	"DOSDEFS.H"

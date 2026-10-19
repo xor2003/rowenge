@@ -218,7 +218,6 @@ void AcmModel::Pilot (AirStrucPtr const ControlledAC)
 	if((pModel->Rudder < 3277) && (pModel->Rudder > -3277))
 	{
 		pModel->Rudder = -pModel->RotVel.y / pModel->AirVel.z * yawmodifier;
-//DEADCODE CSB 19/01/00 		pModel->Rudder = -pModel->AirVel.x / pModel->AirVel.z * yawmodifier;
 		MODLIMIT(pModel->Rudder, 3276);
 	}
 
@@ -240,7 +239,6 @@ void AcmModel::Pilot (AirStrucPtr const ControlledAC)
 		pModel->Rudder = OldRudder - MaxDelta;
 
 
-//DEADCODE CSB 19/01/00 	OldAoa = 0.5 * (pModel->MainPlaneList->aoa[0][0] + pModel->MainPlaneList->aoa[1][0]);
 	OldAoa = pModel->MainPlaneList->aoa[0][0];
 	if(pModel->MainPlaneList->aoa[1][0] * pModel->MainPlaneList->aoa[1][0] > OldAoa * OldAoa)
 		OldAoa = pModel->MainPlaneList->aoa[1][0];
@@ -402,47 +400,8 @@ PrintVar(50, 23, "MRoll %.1f ", FP(CtrlRoll * 57.3));
 PrintVar(65, 23, "%.1f ", FP(pModel->fRoll * 57.3));
 #endif
 
-//DEADCODE CSB 18/01/00 	const	FP	DIFFAILERONFORMAXAILERON = F1PIE2/2;
-//DEADCODE CSB 18/01/00 	PMODEL pModel = ControlledAC->fly.pModel;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP modifier = rollmodifier;
-//DEADCODE CSB 18/01/00 	FP intmodifier = rollintmodifier;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP deltaroll = AngleSign (CtrlRoll - pModel->fRoll);
-//DEADCODE CSB 18/01/00 	FP delta = AngleSign (OldCtrlRoll - CtrlRoll);
-//DEADCODE CSB 18/01/00 	FP deltapos = delta;
-//DEADCODE CSB 18/01/00 	if (delta < 0)
-//DEADCODE CSB 18/01/00 		deltapos = -delta;
-//DEADCODE CSB 18/01/00 	if (deltapos > 0.08)
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		deltarollsum = deltarollsum=0;
-//DEADCODE CSB 18/01/00 		ControlledAC->ai.deltapitchsum = 0;
-//DEADCODE CSB 18/01/00 		OldCtrlRoll = CtrlRoll;
-//DEADCODE CSB 18/01/00 	}
-//DEADCODE CSB 18/01/00 	deltaroll = AngleSign (deltaroll);
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	int MaxIntAileron = MaxAileron;
-//DEADCODE CSB 18/01/00  
-//DEADCODE CSB 18/01/00 	pModel->Aileron = modifier * MaxAileron * deltaroll/F1PIE2;
 
 //integral control
-//DeadCode CSB 19/03/99		if (deltarollsum > IntRollForMaxAileron)
-//DeadCode CSB 19/03/99		{
-//DeadCode CSB 19/03/99			pModel->Aileron += MaxIntAileron;
-//DeadCode CSB 19/03/99			if (deltaroll < 0)
-//DeadCode CSB 19/03/99				deltarollsum += deltaroll;
-//DeadCode CSB 19/03/99		}
-//DeadCode CSB 19/03/99		else if (deltarollsum < -IntRollForMaxAileron)
-//DeadCode CSB 19/03/99		{
-//DeadCode CSB 19/03/99			pModel->Aileron -= MaxIntAileron;
-//DeadCode CSB 19/03/99			if (deltaroll >=0)
-//DeadCode CSB 19/03/99				deltarollsum += deltaroll;
-//DeadCode CSB 19/03/99		}
-//DeadCode CSB 19/03/99		else
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		pModel->Aileron +=  intmodifier *MaxIntAileron * deltarollsum;// / IntRollForMaxAileron;
-//DEADCODE CSB 18/01/00 		deltarollsum += deltaroll;
-//DEADCODE CSB 18/01/00 	}
 }
 
 
@@ -517,13 +476,6 @@ inline void AcmModel::SetThrust (AirStrucPtr const ControlledAC)
 {
 	PMODEL pModel = ControlledAC->fly.pModel;
 
-//DEADCODE CSB 18/01/00 	if (CtrlThrust >= 0)
-//DEADCODE CSB 18/01/00 		SpeedBrakesIn();
-//DEADCODE CSB 18/01/00 	if (CtrlThrust < 0)
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		SpeedBrakesOut();	  
-//DEADCODE CSB 18/01/00 		CtrlThrust = 0;
-//DEADCODE CSB 18/01/00 	}
 	ControlledAC->fly.thrustpercent = CtrlThrust;
 	pModel->ModelThrottle = CtrlThrust;
 	for(PENGINE pEngine = pModel->EngineList; pEngine; pEngine = pEngine->List.NextItem() )
@@ -594,44 +546,6 @@ inline void AcmModel::ModAoA (AirStrucPtr const ControlledAC)
 #endif
 
 ///////////////////////////////////////////////////
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		if (deltapitch > DeltaPitchForMaxElevator)
-//DEADCODE CSB 18/01/00 			pModel->Elevator = MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 		else if (deltapitch < -DeltaPitchForMaxElevator)
-//DEADCODE CSB 18/01/00 			pModel->Elevator = -MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 		else
-//DEADCODE CSB 18/01/00 			pModel->Elevator =  pitchmodifier * MaxElevatorForTightTurn * deltapitch / DeltaPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 //Integral control
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		if (deltapitchsum > IntPitchForMaxElevator)
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		{
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 			pModel->Elevator += MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 			deltapitchsum = IntPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		}
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		else if (deltapitchsum < -IntPitchForMaxElevator)
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		{
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 			pModel->Elevator -= MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 			deltapitchsum = -IntPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		}
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		else
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 			pModel->Elevator +=  pitchintmodifier *MaxElevatorForTightTurn * deltapitchsum / IntPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		if (pModel->Elevator > MaxElevatorForTightTurn)
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 			pModel->Elevator = MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 		if (pModel->Elevator < -MaxElevatorForTightTurn)
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 			pModel->Elevator = -MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 19/11/99 
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 		if  (		(ControlledAC->roll > ANGLES_90Deg)
-//DEADCODE CSB 18/01/00 				&&	(ControlledAC->roll < ANGLES_270Deg)
-//DEADCODE CSB 18/01/00 			)
-//DEADCODE CSB 18/01/00 				pModel->Elevator = -pModel->Elevator; 
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 		lastdeltapitch = deltapitch;
-//DEADCODE CSB 18/01/00 		deltapitchsum += deltapitch;
-//DEADCODE CSB 18/01/00 	}
 }
 
 
@@ -815,38 +729,6 @@ PrintVar(65, 24, "%.1f ", FP(ControlledAC->pitch / 182.04));
 #endif
 
 ///////////////////////////
-//DEADCODE CSB 18/01/00 	static FP velpitch = 0;
-//DEADCODE CSB 18/01/00 	PMODEL pModel = ControlledAC->fly.pModel;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	CtrlPitch = AngleSign (CtrlPitch);
-//DEADCODE CSB 18/01/00 	velpitch = Rowan2Rads(ControlledAC->pitch);
-//DEADCODE CSB 18/01/00 	velpitch = AngleSign(velpitch);
-//DEADCODE CSB 18/01/00 	FP deltapitch = CtrlPitch - velpitch;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP TempElevator = -pitchmodifier * MaxElevatorForTightTurn * deltapitch / DeltaPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 	MODLIMIT(TempElevator, 32767);
-//DEADCODE CSB 18/01/00 	Float sin, cos;													  //JIM 10/12/99
-//DEADCODE CSB 18/01/00 	Math_Lib.high_sin_cos(ControlledAC->roll, sin, cos);
-//DEADCODE CSB 18/01/00 	pModel->Elevator = TempElevator;
-//DEADCODE CSB 18/01/00 	if(cos < 0) 
-//DEADCODE CSB 18/01/00 		pModel->Elevator *= cos;
-//DEADCODE CSB 18/01/00 	pModel->Rudder   = TempElevator * sin;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP aoa	  = (pModel->MainPlaneList->aoa[0][0] + pModel->MainPlaneList->aoa[1][0]) / 2;
-//DEADCODE CSB 18/01/00 	FP maxaoa = pModel->MainPlaneList->ACMmaxaoa;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP AoaRate = (aoa - OldAoa) / MODEL_DT;
-//DEADCODE CSB 18/01/00 	if(aoa * AoaRate > 0)
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		if(aoa < 0) 
-//DEADCODE CSB 18/01/00 		{
-//DEADCODE CSB 18/01/00 			maxaoa *= -1;
-//DEADCODE CSB 18/01/00 			AoaRate *= -1;
-//DEADCODE CSB 18/01/00 		}
-//DEADCODE CSB 18/01/00 		FP f_aoa = (1.0 - aoa / maxaoa) / (AoaRate / 0.005);
-//DEADCODE CSB 18/01/00 		MODMAXMIN(f_aoa, 0, 1);
-//DEADCODE CSB 18/01/00 		pModel->Elevator *= f_aoa;
-//DEADCODE CSB 18/01/00 	}
 }
 
 
@@ -884,38 +766,6 @@ PrintVar(65, 24, "%.1f ", FP(ControlledAC->fly.cpitch / 182.04));
 #endif
 
 ///////////////////////
-//DEADCODE CSB 18/01/00 	static FP velpitch = 0;
-//DEADCODE CSB 18/01/00 	PMODEL pModel = ControlledAC->fly.pModel;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	CtrlPitch = AngleSign (CtrlPitch);
-//DEADCODE CSB 18/01/00 	velpitch = Rowan2Rads(ControlledAC->fly.cpitch);
-//DEADCODE CSB 18/01/00 	velpitch = AngleSign(velpitch);
-//DEADCODE CSB 18/01/00 	FP deltapitch = CtrlPitch - velpitch;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP TempElevator = -pitchmodifier * MaxElevatorForTightTurn * deltapitch / DeltaPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 	MODLIMIT(TempElevator, 32767);
-//DEADCODE CSB 18/01/00 	Float sin, cos;													  //JIM 10/12/99
-//DEADCODE CSB 18/01/00 	Math_Lib.high_sin_cos(ControlledAC->roll, sin, cos);
-//DEADCODE CSB 18/01/00 	pModel->Elevator = TempElevator;
-//DEADCODE CSB 18/01/00 	if(cos < 0) 
-//DEADCODE CSB 18/01/00 		pModel->Elevator *= cos;
-//DEADCODE CSB 18/01/00 	pModel->Rudder   = TempElevator * sin;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP aoa	  = (pModel->MainPlaneList->aoa[0][0] + pModel->MainPlaneList->aoa[1][0]) / 2;
-//DEADCODE CSB 18/01/00 	FP maxaoa = pModel->MainPlaneList->ACMmaxaoa;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP AoaRate = (aoa - OldAoa) / MODEL_DT;
-//DEADCODE CSB 18/01/00 	if(aoa * AoaRate > 0)
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		if(aoa < 0) 
-//DEADCODE CSB 18/01/00 		{
-//DEADCODE CSB 18/01/00 			maxaoa *= -1;
-//DEADCODE CSB 18/01/00 			AoaRate *= -1;
-//DEADCODE CSB 18/01/00 		}
-//DEADCODE CSB 18/01/00 		FP f_aoa = (1.0 - aoa / maxaoa) / (AoaRate / 0.005);
-//DEADCODE CSB 18/01/00 		MODMAXMIN(f_aoa, 0, 1);
-//DEADCODE CSB 18/01/00 		pModel->Elevator *= f_aoa;
-//DEADCODE CSB 18/01/00 	}
 }
 
 
@@ -957,33 +807,6 @@ inline void AcmModel::ModSpeedWithElevators (AirStrucPtr const ControlledAC)
 PrintString(50, 23, "ModSpeedWithElevators       ");
 PrintString(50, 24, "PitchIntModifier            ");
 #endif
-//DEADCODE CSB 18/01/00 	PMODEL pModel = ControlledAC->fly.pModel;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP delta = pModel->Inst.I_MachNo - CtrlMach;
-//DEADCODE CSB 18/01/00 	if (delta > 0.8)
-//DEADCODE CSB 18/01/00 		CtrlPitch = -MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 	else if (delta < -0.8)
-//DEADCODE CSB 18/01/00 		CtrlElevator = MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 	else
-//DEADCODE CSB 18/01/00 		CtrlElevator = - MaxElevatorForTightTurn * delta / 0.8;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	if (deltapitchsum > IntPitchForMaxElevator)
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		pModel->Elevator += MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 		deltapitchsum = IntPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 	}
-//DEADCODE CSB 18/01/00 	else if (deltapitchsum < -IntPitchForMaxElevator)
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		pModel->Elevator -= MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 		deltapitchsum = -IntPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 	}
-//DEADCODE CSB 18/01/00 	else
-//DEADCODE CSB 18/01/00 		CtrlElevator -=  pitchintmodifier *MaxElevatorForTightTurn * deltapitchsum / IntPitchForMaxElevator;
-//DEADCODE CSB 18/01/00 	deltapitchsum += delta;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	ModElevator(ControlledAC);
-//DEADCODE CSB 18/01/00 
 }
 
 
@@ -1012,56 +835,6 @@ PrintVar(65, 24, "%.1f ", FP(-pModel->RotVel.x * 57.3 * 100.0));
 #endif
 
 ///////////////////////////////////////////////
-//DEADCODE CSB 18/01/00 	
-//DEADCODE CSB 18/01/00 	FP CtrlTurnRateAbs;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP modifier = turnmodifier;
-//DEADCODE CSB 18/01/00 	FP intmodifier = turnintmodifier;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	
-//DEADCODE CSB 18/01/00 	MODLIMIT(CtrlTurnRate, 0.5);
-//DEADCODE CSB 18/01/00 	CtrlTurnRateAbs = CtrlTurnRate;
-//DEADCODE CSB 18/01/00 	if (CtrlTurnRate < 0)
-//DEADCODE CSB 18/01/00 		CtrlTurnRateAbs = -CtrlTurnRate;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	
-//DEADCODE CSB 18/01/00 	maxaoa = 
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	
-//DEADCODE CSB 18/01/00 #ifdef PRINT_AI_DATA
-//DEADCODE CSB 18/01/00 	PrintString(60, 6, "               ");
-//DEADCODE CSB 18/01/00 #endif
-//DEADCODE CSB 18/01/00 	if( (aoa0 > maxaoa) || (aoa1 > maxaoa) )
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		if (aoa0 < aoa1) aoa0 = aoa1;
-//DEADCODE CSB 18/01/00 		if(CtrlTurnRate <= 0)
-//DEADCODE CSB 18/01/00 			deltapitchsum = 0;
-//DEADCODE CSB 18/01/00 	
-//DEADCODE CSB 18/01/00 #ifdef PRINT_AI_DATA
-//DEADCODE CSB 18/01/00 		PrintString(60, 6, "**** STALL ****");
-//DEADCODE CSB 18/01/00 #endif
-//DEADCODE CSB 18/01/00 		deltapitchsum -= 4 * CtrlTurnRate;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 		OldCtrlTurnRate = CtrlTurnRate;
-//DEADCODE CSB 18/01/00 	 
-//DEADCODE CSB 18/01/00 		int MaxIntElevatorForTightTurn = MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 		CtrlElevator -= intmodifier * MaxIntElevatorForTightTurn * deltapitchsum;// / 20;
-//DEADCODE CSB 18/01/00 			
-//DEADCODE CSB 18/01/00 		if(		((CtrlElevator <  MaxIntElevatorForTightTurn) && (CtrlTurnRate < 0))
-//DEADCODE CSB 18/01/00 			||	((CtrlElevator > -MaxIntElevatorForTightTurn) && (CtrlTurnRate > 0)) )
-//DEADCODE CSB 18/01/00 				deltapitchsum += CtrlTurnRate;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 #ifdef PRINT_AI_DATA
-//DEADCODE CSB 18/01/00 			PrintVar(50, 14, "CtrlTurnR %.2f ", (FP)CtrlTurnRate);
-//DEADCODE CSB 18/01/00 			PrintVar(50, 15, "CtrlElevr %.0f ", (FP)CtrlElevator);
-//DEADCODE CSB 18/01/00 			PrintVar(50, 16, "dPitchSum %.1f ", (FP)deltapitchsum);
-//DEADCODE CSB 18/01/00 #endif
-//DEADCODE CSB 18/01/00 	}	
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	CtrlElevator += aoamodifier * AoaRate * 1000;
-//DEADCODE CSB 18/01/00 	ModElevator(ControlledAC);
 }
 
 
@@ -1160,48 +933,6 @@ PrintVar(50, 24, "MLift %.1f ", FP(CtrlAoA * 57.3));
 #endif
 
 ////////////////////////////////
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 //	FP liftmodifier = 1000; 
-//DEADCODE CSB 18/01/00 	PMODEL pModel = ControlledAC->fly.pModel;
-//DEADCODE CSB 18/01/00   
-//DEADCODE CSB 18/01/00 	UByte	FlyingFactor = ControlledAC->FlyingFactor();
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP highest_aoa = 0;
-//DEADCODE CSB 18/01/00 	for(SWord n = 0; n < 2; n++)
-//DEADCODE CSB 18/01/00 		for(SWord m = 0; m < 2; m++)
-//DEADCODE CSB 18/01/00 		{
-//DEADCODE CSB 18/01/00 			FP temp_aoa = AngleSign(pModel->MainPlaneList->aoa[m][n]);
-//DEADCODE CSB 18/01/00 			if(temp_aoa > highest_aoa)
-//DEADCODE CSB 18/01/00 				highest_aoa = temp_aoa;
-//DEADCODE CSB 18/01/00 		}
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 //If it is right to get to the lift limit, then the better pilots will get closer
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99		if (!NearMaxAoA(ControlledAC))
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99			if (aoa0 < aoa1)
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99				aoa0 = aoa1;
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99	//DeadCode CSB 08/03/99			FP velmodifier = 110/pModel->Speed;	//fix this !!!!
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99			FP velmodifier = 1;	//CSB 08/03/99
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99			FP modifier = liftmodifier * velmodifier * velmodifier;
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99	
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99	
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99			CtrlElevator = pModel->Elevator + modifier * (aoa0 - maxaoa);
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 		FP AoaRate = (0.5 * (pModel->MainPlaneList->aoa[0][0] + pModel->MainPlaneList->aoa[1][0]) - OldAoa) / Timer_Code.FRAMETIME;
-//DEADCODE CSB 18/01/00 		FP DesAoaRate = (maxaoa - highest_aoa) * 0.1;
-//DEADCODE CSB 18/01/00 		FP DesElevator = -(DesAoaRate - AoaRate) * MaxElevatorForTightTurn * 250;
-//DEADCODE CSB 18/01/00 		MODLIMIT(DesElevator, MaxElevatorForTightTurn);
-//DEADCODE CSB 18/01/00 		pModel->Elevator = DesElevator;
-//DEADCODE CSB 18/01/00 		
-//DEADCODE CSB 18/01/00 	}
-//DEADCODE CSB 18/01/00 //DeadCode CSB 21/03/99		ModElevator(ControlledAC);
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 //			if (pModel->Elevator > MaxElevatorForTightTurn)
-//DEADCODE CSB 18/01/00 //			pModel->Elevator = MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 //		if (pModel->Elevator < -MaxElevatorForTightTurn)
-//DEADCODE CSB 18/01/00 //			pModel->Elevator = -MaxElevatorForTightTurn;
-//DEADCODE CSB 18/01/00 
 }
 
 
@@ -1214,51 +945,6 @@ PrintVar(50, 24, "M0_SP %.0f ", FP(0));
 #endif
 
 ///////////////////////////////////////////////////////////
-//DEADCODE CSB 18/01/00 	PMODEL pModel = ControlledAC->fly.pModel;
-//DEADCODE CSB 18/01/00   
-//DEADCODE CSB 18/01/00 	UByte	FlyingFactor = ControlledAC->FlyingFactor();
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP highest_aoa = 0;
-//DEADCODE CSB 18/01/00 	for(SWord n = 0; n < 2; n++)
-//DEADCODE CSB 18/01/00 		for(SWord m = 0; m < 2; m++)
-//DEADCODE CSB 18/01/00 		{
-//DEADCODE CSB 18/01/00 			FP temp_aoa = AngleSign(pModel->MainPlaneList->aoa[m][n]);
-//DEADCODE CSB 18/01/00 			if(temp_aoa > highest_aoa)
-//DEADCODE CSB 18/01/00 				highest_aoa = temp_aoa;
-//DEADCODE CSB 18/01/00 		}
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 //to sustain the speed and turn don't go to the lift limit. Poor pilots will tend towards the lift limit
-//DEADCODE CSB 18/01/00 	FP maxaoa = pModel->MainPlaneList->ACMmaxaoa * (512.0 + FP(FlyingFactor)) / (512.0 + 256.0);
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	FP aoa = maxaoa;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 //***** The following code is good for jets but not for Piston Prop aircraft ***** //CB 12/11/99
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 		//((256 - FlyingFactor) * 0.174)/256;	//* 5 degs
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 	
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 	FP sustainedaoa = ControlledAC->classtype->maxturnrateaoaSL * (ControlledAC->classtype->abs_ceiling - ControlledAC->World.Y)/ControlledAC->classtype->abs_ceiling;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 	aoa = sustainedaoa;	// + (maxaoa - sustainedaoa) * (256 - FlyingFactor)/256;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 //modify max to account for skill
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 	FP f;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 	f = FlyingFactor;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 	f = f/256;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 	maxaoa = 0.087 + (maxaoa - 0.087) * f;
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 	if (aoa > maxaoa)
-//DEADCODE CSB 18/01/00 //DEADCODE CB 12/11/99 		aoa = maxaoa;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 #ifdef PRINT_AI_DATA
-//DEADCODE CSB 18/01/00 PrintVar(60, 8, "%.1f ", (FP)(aoa * 57.3) );
-//DEADCODE CSB 18/01/00 #endif
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 //DeadCode CSB 08/03/99		FP velmodifier = 110/pModel->Speed;
-//DEADCODE CSB 18/01/00 //DeadCode CSB 08/03/99		FP modifier = aoamodifier * velmodifier * velmodifier;
-//DEADCODE CSB 18/01/00 //DeadCode CSB 08/03/99	
-//DEADCODE CSB 18/01/00 //DeadCode CSB 08/03/99		CtrlElevator = pModel->Elevator + modifier * (aoa0 - aoa);
-//DEADCODE CSB 18/01/00 	FP DeltaAoa = aoa - highest_aoa;
-//DEADCODE CSB 18/01/00 	CtrlElevator = pModel->Elevator - aoamodifier * DeltaAoa;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	ModElevator(ControlledAC);
 }
 
 
@@ -1285,16 +971,6 @@ inline void AcmModel::ModRudder(AirStrucPtr const ControlledAC)
 {
 	ControlledAC->fly.pModel->Rudder = CtrlRudder;
 
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 //DEADCODE AMM 24/11/99 	int maxdef = 6553 * pModel->MODEL_DT;
-//DEADCODE CSB 19/01/00 	int maxdef = 6553 * MODEL_DT; //AMM 24/11/99
-//DEADCODE CSB 19/01/00 	int drudder = CtrlRudder - pModel->Rudder;
-//DEADCODE CSB 19/01/00 	if (drudder > maxdef)
-//DEADCODE CSB 19/01/00 		drudder = maxdef;
-//DEADCODE CSB 19/01/00 	if (drudder < -maxdef)
-//DEADCODE CSB 19/01/00 		drudder = -maxdef;
-//DEADCODE CSB 19/01/00 	pModel->Rudder = pModel->Rudder + (SWord)drudder;
-//DEADCODE CSB 19/01/00 //		pModel->Rudder = CtrlRudder;
 }
 
 
@@ -1302,23 +978,6 @@ inline void AcmModel::ModElevator(AirStrucPtr const ControlledAC)
 {
 	ControlledAC->fly.pModel->Elevator = CtrlElevator;
 
-//DEADCODE CSB 19/01/00 	PMODEL pModel = ControlledAC->fly.pModel;
-//DEADCODE CSB 19/01/00 //	int maxdef = 65536 * pModel->MODEL_DT/100
-//DEADCODE CSB 19/01/00 //DEADCODE AMM 24/11/99 	int maxdef = 6553 * pModel->MODEL_DT;
-//DEADCODE CSB 19/01/00 	int maxdef = 6553 * MODEL_DT; //AMM 24/11/99
-//DEADCODE CSB 19/01/00 	int delevator = CtrlElevator - pModel->Elevator;
-//DEADCODE CSB 19/01/00 	if (delevator > maxdef)
-//DEADCODE CSB 19/01/00 		delevator = maxdef;
-//DEADCODE CSB 19/01/00 	if (delevator < -maxdef)
-//DEADCODE CSB 19/01/00 		delevator = -maxdef;
-//DEADCODE CSB 19/01/00 	int newelevator = pModel->Elevator + (SWord)delevator;
-//DEADCODE CSB 19/01/00 	if (newelevator > 32767)
-//DEADCODE CSB 19/01/00 		newelevator = 32767;
-//DEADCODE CSB 19/01/00 	if (newelevator < -32767)
-//DEADCODE CSB 19/01/00 		newelevator = -32767;
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 	pModel->Elevator = newelevator;
-//DEADCODE CSB 19/01/00 //	pModel->Elevator = CtrlElevator;
 }
 
 
@@ -1326,17 +985,6 @@ inline void AcmModel::ModAileron(AirStrucPtr const ControlledAC)
 {
 	ControlledAC->fly.pModel->Aileron = CtrlAileron;
 
-//DEADCODE CSB 19/01/00 	PMODEL pModel = ControlledAC->fly.pModel;
-//DEADCODE CSB 19/01/00 
-//DEADCODE CSB 19/01/00 //DeadCode AMM 24Nov99 	int maxdef = 6553 * pModel->MODEL_DT;
-//DEADCODE CSB 19/01/00 	int maxdef = 6553 * MODEL_DT;								//AMM 24Nov99
-//DEADCODE CSB 19/01/00 	int daileron = CtrlAileron - pModel->Aileron;
-//DEADCODE CSB 19/01/00 	if (daileron > maxdef)
-//DEADCODE CSB 19/01/00 		daileron = maxdef;
-//DEADCODE CSB 19/01/00 	if (daileron < -maxdef)
-//DEADCODE CSB 19/01/00 		daileron = -maxdef;
-//DEADCODE CSB 19/01/00 	pModel->Aileron = pModel->Aileron + (SWord)daileron;
-//DEADCODE CSB 19/01/00 //	pModel->Aileron = CtrlAileron;
 }
 
 
@@ -1405,26 +1053,6 @@ Bool AcmModel::Logic (AirStrucPtr const ControlledAC)
 //------------------------------------------------------------------------------
 void AcmModel::Control (FORI& Ori, FP Speed)
 {
-//DeadCode ARM 05Sep97 	Model& Mod = *pModel;
-//DeadCode ARM 05Sep97 
-//DeadCode ARM 05Sep97 	Mod.Elevator = (SWord)0;
-//DeadCode ARM 05Sep97 	Mod.Aileron = (SWord)0;
-//DeadCode ARM 05Sep97 	Mod.Rudder = (SWord)0;
-//DeadCode ARM 05Sep97 
-//DeadCode ARM 05Sep97 	Mod.Throttle = (SWord)0;
-//DeadCode ARM 05Sep97 
-//DeadCode ARM 05Sep97 	Mod.LeftWheelBrake = (SWord)0;
-//DeadCode ARM 05Sep97 	Mod.RightWheelBrake = (SWord)0;
-//DeadCode ARM 05Sep97 
-//DeadCode ARM 05Sep97 	Mod.SpeedBrake = (SWord)0;
-//DeadCode ARM 05Sep97 
-//DeadCode ARM 05Sep97 	if (Mod.DynamicPressure < Mod.SlatOutPressure)
-//DeadCode ARM 05Sep97 		Mod.Slats = 0x4000;
-//DeadCode ARM 05Sep97 	if (Mod.DynamicPressure > Mod.SlatInPressure)
-//DeadCode ARM 05Sep97 		Mod.Slats = 0x0000;	
-//DeadCode ARM 05Sep97 
-//DeadCode ARM 05Sep97 	Mod.Flaps = 0x4000;
-//DeadCode ARM 05Sep97 	Mod.Flaps = 0x0000;
 }
 
 

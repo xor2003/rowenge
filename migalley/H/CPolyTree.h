@@ -54,8 +54,8 @@ class CPolyTree
             return false;		//new one then return false to indicate that the
             //new poly should be discarded
 
-            //check for any polys closer than pScan
-            if (pScan->lptr!=NULL)
+        //check for any polys closer than pScan
+        if (pScan->lptr!=NULL)
             {
                 if (pLast==NULL)	pHead=pScan->lptr;
                 else				pLast->rptr=pScan->lptr;

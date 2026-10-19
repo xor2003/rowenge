@@ -83,28 +83,8 @@ static char THIS_FILE[] = __FILE__;
 
 RDialog*	BasesLuftflotte::Make()
 {
-//DeadCode JIM 20Oct00 	int numopts = 1;
-//DeadCode JIM 20Oct00 	DialBox* ND = NULL;
 	CString	tabtitle[4];
 
-//DEADCODE RDH 06/04/00 	if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DEADCODE RDH 06/04/00 	{
-//DEADCODE RDH 06/04/00 		tabtitle[0] = RESSTRING(L_JAGD); 
-//DEADCODE RDH 06/04/00 		tabtitle[1] = RESSTRING(ZEROSTORER); 
-//DEADCODE RDH 06/04/00 		tabtitle[2] = RESSTRING(KAMPF);
-//DEADCODE RDH 06/04/00 		tabtitle[3] = RESSTRING(STUKA);
-//DEADCODE RDH 06/04/00 		return
-//DEADCODE RDH 06/04/00 		MakeTopDialog(::Place(POSN_MIN,POSN_MIN),
-//DEADCODE RDH 06/04/00 				DialList(DialBox(FIL_NULL,new BasesLuftflotte,Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE)),
-//DEADCODE RDH 06/04/00 					HTabBox(FIL_NULL,IdList(tabtitle[0],tabtitle[1],tabtitle[2],tabtitle[3]),Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX,EDGE::ALIGN_MAX), 
-//DEADCODE RDH 06/04/00 						DialBox(FIL_D_GESCH,new GroupGeschwader(0)),
-//DEADCODE RDH 06/04/00 						DialBox(FIL_D_GESCH,new GroupGeschwader(1)),
-//DEADCODE RDH 06/04/00 						DialBox(FIL_D_GESCH,new GroupGeschwader(2)),
-//DEADCODE RDH 06/04/00 						DialBox(FIL_D_GESCH,new GroupGeschwader(3))
-//DEADCODE RDH 06/04/00 
-//DEADCODE RDH 06/04/00 									)	)	);
-//DEADCODE RDH 06/04/00 
-//DEADCODE RDH 06/04/00 	}else
 	{
 		tabtitle[0] = RESSTRING(GROUP10); 
 		tabtitle[1] = RESSTRING(GROUP11); 

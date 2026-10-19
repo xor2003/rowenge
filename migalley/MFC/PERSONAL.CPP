@@ -176,7 +176,6 @@ void	CPilotsPersonalDetails::DrawOnePilotDetail(CRStatic&	m_name, CRListBox& m_l
 	CRStatic*   s;
 
 		s=GETDLGITEM(name);
-//DEADCODE JIM 21/05/99 		s->SetString(RESLIST(PILOTNAMES_START,MMC.Active_Pilots[24*groupnum+i+baseac].name.nameref));
 			int player;
 		rlistbox=GETDLGITEM(listbox);
 		rlistbox->Clear();
@@ -288,89 +287,6 @@ BOOL CPilotsPersonalDetails::OnInitDialog()
 
 
 
-//DeadCode RDH 10Aug98 //	CRListBox* rlistbox;
-//DeadCode RDH 10Aug98 	rlistbox=(CRListBox*)this->GetDlgItem(IDC_RLIST_DETAILS_PILOT2);
-//DeadCode RDH 10Aug98 	rlistbox->Clear();
-//DeadCode RDH 10Aug98 	rlistbox->AddColumn(87);
-//DeadCode RDH 10Aug98 	rlistbox->AddColumn(60);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_SORTIES);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_COMBATS);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_KILLS);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_AGGRESION);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_MORALE);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_FLYINGSKILL);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_COMBATSKILL);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 
-//DeadCode RDH 10Aug98 	rlistbox->AddString("2",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("2",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("1",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("High",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Good",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Good",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Average",1);
-//DeadCode RDH 10Aug98 
-//DeadCode RDH 10Aug98 //	CRListBox* rlistbox;
-//DeadCode RDH 10Aug98 	rlistbox=(CRListBox*)this->GetDlgItem(IDC_RLIST_DETAILS_PILOT3);
-//DeadCode RDH 10Aug98 	rlistbox->Clear();
-//DeadCode RDH 10Aug98 	rlistbox->AddColumn(87);
-//DeadCode RDH 10Aug98 	rlistbox->AddColumn(60);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_SORTIES);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_COMBATS);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_KILLS);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_AGGRESION);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_MORALE);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_FLYINGSKILL);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_COMBATSKILL);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 
-//DeadCode RDH 10Aug98 	rlistbox->AddString("2",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("2",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("1",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("High",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Good",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Good",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Average",1);
-//DeadCode RDH 10Aug98 
-//DeadCode RDH 10Aug98 //	CRListBox* rlistbox;
-//DeadCode RDH 10Aug98 	rlistbox=(CRListBox*)this->GetDlgItem(IDC_RLIST_DETAILS_PILOT4);
-//DeadCode RDH 10Aug98 	rlistbox->Clear();
-//DeadCode RDH 10Aug98 	rlistbox->AddColumn(87);
-//DeadCode RDH 10Aug98 	rlistbox->AddColumn(60);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_SORTIES);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_COMBATS);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_KILLS);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_AGGRESION);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_MORALE);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_FLYINGSKILL);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 	string.LoadString(IDS_COMBATSKILL);
-//DeadCode RDH 10Aug98 	rlistbox->AddString(string,0);
-//DeadCode RDH 10Aug98 
-//DeadCode RDH 10Aug98 	rlistbox->AddString("2",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("2",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("1",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("High",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Good",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Good",1);
-//DeadCode RDH 10Aug98 	rlistbox->AddString("Average",1);
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE

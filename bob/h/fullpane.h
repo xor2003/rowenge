@@ -77,7 +77,6 @@ class RFullPanelDial : public RowanDialog
 public:
 	static	bool	incomms,in3d,specialevent;
 	enum	GameStates	{TITLE,QUICK,HOT,MATCH, PILOT, COMMANDER, DIARY};
-//DEADCODE RDH 06/04/00 		CAMP,WAR,MATCH, PILOT, COMMANDER, DIARY};
 
 	static	GameStates	gamestate;
 	enum	GameSide	{SIDE_RAF, SIDE_LW};
@@ -156,12 +155,9 @@ public:
 		enddayreview,													//RDH 14/03/00
 		lastdayreview,
 		credits,
-//DEADCODE RDH 27/01/00 		variants,
 		mapspecials,
-//DEADCODE RDH 03/04/00 		endcamp,
 		deadpilot,
 		specialdebrief,												  //RDH 26/06/99
-//DEADCODE RDH 03/04/00 		warendcamp,
 		addvisitorsbook,
 		paintshop,
 //		readyroom,
@@ -240,14 +236,11 @@ public:
 	Bool PaintShopInit();
 	Bool ReadyRoomInit();
 	Bool	MapSpecialsInit();
-//DEADCODE RDH 03/04/00 	Bool	EndCampInit();
 	Bool	DeadPilotInit();
-//DEADCODE RJS 3/21/00 	Bool	SpecialsInit();
 
 
 	Bool StartFlying();
 	bool LoadCampaignData();
-//DeadCode AMM 21Aug00 	static void SetDefaultPilotPositions();
 	bool DuplicateCommsPlayer(int pos, int player, int squadnum);
 
 
@@ -283,7 +276,6 @@ public:
 	Bool ResetMessages(FullScreen*&fs);
 	Bool SelectRRVariants(FullScreen*&fs);									//AMM 27Jun99
 
-//DeadCode AMM 06Aug98 	Bool RefreshSessions();
 	Bool CommsSelectFly(FullScreen*&fs);
 	Bool InitReplay(FullScreen*&fs);
 	Bool CleanUpComms(FullScreen*&fs);
@@ -302,8 +294,6 @@ public:
 	Bool	StartCampObjectives2(FullScreen*&fs);
 	Bool	SetUpHotShot(FullScreen*&fs);
 	Bool	SetQuickState(FullScreen*&fs);
-//DEADCODE RDH 26/10/99 	Bool	SetCampState(FullScreen*&fs);
-//DEADCODE RDH 26/10/99 	Bool	SetUpFullWar(FullScreen*&fs);
 	Bool	SetUpLW(FullScreen*&fs);
 	Bool	SetUpRAF(FullScreen*&fs);
 	Bool	SetUpCommander(FullScreen*&fs);
@@ -320,7 +310,6 @@ public:
 	Bool	ReloadBecauseDead(FullScreen*&fs);
 	void	ResetLoadGameOption();
 	void	ResetQuitOption();
-//DeadCode AMM 2Oct00 	static	Bool	PrepareForFrag(FullScreen*&fs);
 	void	ResetVariantOption();
 	Bool	ExitVariant(FullScreen*&fs);
 	Bool 	CheckLobby(FullScreen*&fs);
@@ -358,7 +347,6 @@ public:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	//}}AFX_VIRTUAL
-//DeadCode RJS 03May100 	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 
 // Implementation
 public:

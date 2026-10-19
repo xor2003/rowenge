@@ -146,8 +146,6 @@ BOOL CVisitorsBook::OnInitDialog()
 	
 	vis_timer=SetTimer(DPlay::TIMER_VISITORS,0,NULL); // set sheet up first before starting timer
 
-//DeadCode AMM 16Nov99 	_DPlay.SendInVisitorsBookMessage();
-//DeadCode AMM 16Nov99 	DPlay::H2H_Player[_DPlay.mySlot].status=CPS_VISITORBOOK;
 	_DPlay.SendStatusChange(DPlay::CPS_VISITORBOOK);
 
 	return TRUE;  // return TRUE unless you set the focus to a control

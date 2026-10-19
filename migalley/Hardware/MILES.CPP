@@ -166,8 +166,8 @@ int	NCIndex(char*	s, const char*	t)									//RJS 21Sep99
 	for(i=0;s[i]!='\0';i++)
 	{
 		for(j=i,k=0;t[k]!='\0' && toupper(s[j])==toupper(t[k]);j++,k++);
-			if(t[k]=='\0')
-				return(i);
+		if(t[k]=='\0')
+			return(i);
 	}
 	return(-1);
 }

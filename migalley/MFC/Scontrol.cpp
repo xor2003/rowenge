@@ -984,17 +984,6 @@ void SController::OnTextChangedCboRudderdeadzone(LPCTSTR text)
 	}
 }
 
-//DeadCode DAW 22Dec98 BOOL SController::OnInitDialog() 
-//DeadCode DAW 22Dec98 {
-//DeadCode DAW 22Dec98 	CDialog::OnInitDialog();
-//DeadCode DAW 22Dec98 
-//DeadCode DAW 22Dec98 	ControlsPref_Timer=SetTimer(TIMER_PREFSCONTROLS,0,NULL);
-//DeadCode DAW 22Dec98 	
-//DeadCode DAW 22Dec98 	// TODO: Add extra initialization here
-//DeadCode DAW 22Dec98 	
-//DeadCode DAW 22Dec98 	return TRUE;  // return TRUE unless you set the focus to a control
-//DeadCode DAW 22Dec98 	              // EXCEPTION: OCX Property Pages should return FALSE
-//DeadCode DAW 22Dec98 }
 
 BOOL SController::OnInitDialog() 
 {

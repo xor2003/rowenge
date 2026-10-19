@@ -269,21 +269,6 @@ static RequiredAileronElement 	RequiredAileronData[] =
 			};
 
 
-//DeadCode RDH 01Nov96 static RequiredBankDataElement 	CombatReqBankData[] =
-//DeadCode RDH 01Nov96 			{
-//DeadCode RDH 01Nov96 				{ANGLES_FifthDeg, ANGLES_0Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_HalfDeg, ANGLES_3Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_1Deg, ANGLES_4Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_2Deg, ANGLES_5Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_3Deg, ANGLES_7Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_4Deg, ANGLES_9Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_5Deg, ANGLES_11Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_6Deg, ANGLES_16Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_10Deg, ANGLES_30Deg},
-//DeadCode RDH 01Nov96 //DeadCode RDH 17Jul96 				{ANGLES_22Deg, ANGLES_60Deg},
-//DeadCode RDH 01Nov96 				{ANGLES_30Deg, MAXCOMBATROLL},
-//DeadCode RDH 01Nov96 				{ANGLES_180BareDeg, MAXCOMBATROLL}
-//DeadCode RDH 01Nov96 			};
 //TempCode RDH 17Jul96 			{
 //TempCode RDH 17Jul96 				{ANGLES_FifthDeg, ANGLES_0Deg},
 //TempCode RDH 17Jul96 				{ANGLES_HalfDeg, ANGLES_3Deg},
@@ -357,7 +342,6 @@ Bool	AirStruc::SubjectOnTargetTail(ANGLES angle)
 //	ANGLES	temp;
 //	
 //	temp = HdgIntercept + angle - unfriendly->hdg; 
-////DeadCode RDH 30Mar98 	if (temp < (2 * angle))
 //	if (temp << (angle + angle))
 //	{
 //		temp = PitchIntercept + angle - unfriendly->pitch;
@@ -441,7 +425,6 @@ Bool	AirStruc::TargetFacingSubject(ANGLES angle)
 {
 	AirStrucPtr	unfriendly = *ai.unfriendly;
 
-//DeadCode RDH 30Mar98 	if ((HdgIntercept + ANGLES_180Deg + angle - unfriendly->hdg) < (2 * angle))
 	if ((HdgIntercept + ANGLES_180Deg + angle - unfriendly->hdg) << (angle + angle))//RDH 19Sep97
 	{
 	 	return (TRUE);
@@ -466,7 +449,6 @@ Bool	AirStruc::TargetFacingSubject(ANGLES angle)
 //------------------------------------------------------------------------------
 Bool	AirStruc::SubjectFacingTarget(ANGLES angle)
 {
-//DeadCode RDH 30Mar98 	if ((HdgIntercept + angle - hdg) < (2* angle))
 	if ((HdgIntercept + angle - hdg) << (angle + angle))	//RDH 19Sep97
 	{
 	 	return (TRUE);
@@ -498,11 +480,6 @@ Bool	AirStruc::AircraftDamaged()
 	if(!fly.numinsag)
 	{
 		AircraftAnimData* acanim = (AircraftAnimData*)(ac->Anim);
-//DeadCode DAW 26Oct00 		int damage =  acanim->LEFTWINGOUT + acanim->LEFTWINGIN + acanim->RIGHTWINGOUT + acanim->RIGHTWINGIN
-//DeadCode DAW 26Oct00 					+ acanim->ENGINELEFT + acanim->ENGINERIGHT + acanim->TAIL + acanim->FINLEFT + acanim->FINRIGHT
-//DeadCode DAW 26Oct00 					+ acanim->FRONT + acanim->LEFTWHEEL + acanim->RIGHTWHEEL + acanim->FUELTANK + acanim->CANOPY + acanim->OTHER;
-//DeadCode DAW 26Oct00 		if(damage > 255 * 4)
-//DeadCode DAW 26Oct00 			return(TRUE);
 		if(		(acanim->LEFTWINGOUT	> 63)
 			||	(acanim->LEFTWINGIN		> 63)
 			||	(acanim->RIGHTWINGOUT	> 63)
@@ -523,10 +500,6 @@ Bool	AirStruc::AircraftDamaged()
 	else
 	{
 		SimpleAircraftAnimData* acanim = (SimpleAircraftAnimData*)(ac->Anim);
-//DeadCode DAW 26Oct00 		int damage =  acanim->LEFTWINGOUT + acanim->LEFTWINGIN + acanim->RIGHTWINGOUT + acanim->RIGHTWINGIN
-//DeadCode DAW 26Oct00 					+ acanim->ENGINELEFT + acanim->ENGINERIGHT + acanim->OTHER;
-//DeadCode DAW 26Oct00 		if(damage > 255 * 2)
-//DeadCode DAW 26Oct00 			return(TRUE);
 		if(		(acanim->LEFTWINGOUT	> 63)
 			||	(acanim->LEFTWINGIN		> 63)
 			||	(acanim->RIGHTWINGOUT	> 63)
@@ -539,25 +512,6 @@ Bool	AirStruc::AircraftDamaged()
 
 	return(FALSE);
 
-//DeadCode CSB 6Sep00 	if(Anim != NULL)
-//DeadCode CSB 6Sep00 	{
-//DeadCode CSB 6Sep00 		AircraftAnimData*		acanim  = NULL;
-//DeadCode CSB 6Sep00 		SimpleAircraftAnimData*	saganim = NULL;
-//DeadCode CSB 6Sep00 		if(fly.numinsag)
-//DeadCode CSB 6Sep00 			saganim = (SimpleAircraftAnimData*)Anim;
-//DeadCode CSB 6Sep00 		else
-//DeadCode CSB 6Sep00 			acanim = (AircraftAnimData*)Anim;
-//DeadCode CSB 6Sep00 		
-//DeadCode CSB 6Sep00 		SLong totaldamage = 0;
-//DeadCode CSB 6Sep00 		if(acanim != NULL)
-//DeadCode CSB 6Sep00 			totaldamage = acanim->ENGINELEFT + acanim->LEFTWINGIN + acanim->RIGHTWINGIN;
-//DeadCode CSB 6Sep00 		else if(saganim != NULL)
-//DeadCode CSB 6Sep00 			totaldamage = saganim->ENGINELEFT + saganim->LEFTWINGIN + saganim->RIGHTWINGIN;
-//DeadCode CSB 6Sep00 
-//DeadCode CSB 6Sep00 		if(totaldamage > 255)
-//DeadCode CSB 6Sep00 			return(TRUE);
-//DeadCode CSB 6Sep00 	}
-//DeadCode CSB 6Sep00 	return(FALSE);
 }
 
 
@@ -657,12 +611,6 @@ void	ACMAirStruc::SelectNextDisengageManoeuvre ()
 		if((!ai.unfriendly) || (!TargetFacingSubject(ANGLES_90Deg)))
 		{
 			SetUnfriendly(NULL);										//CSB 1Aug00
-//DeadCode CSB 1Aug00 			if(unfriendly)
-//DeadCode CSB 1Aug00 			{
-//DeadCode CSB 1Aug00 				ai.unfriendly = NULL;
-//DeadCode CSB 1Aug00 				if(unfriendly->ai.attacker == this)
-//DeadCode CSB 1Aug00 					unfriendly->ai.attacker = NULL;
-//DeadCode CSB 1Aug00 			}
 			ai.manoeuvre = MANOEUVRE_REGROUP;
 			ai.ManStep = 0;
 			return;
@@ -701,24 +649,14 @@ void	ACMAirStruc::SelectNextDisengageManoeuvre ()
 		if(u)
 		{
 			SetUnfriendly(NULL);										//CSB 1Aug00
-//DeadCode CSB 1Aug00 			ai.unfriendly = NULL;
-//DeadCode CSB 1Aug00 			if(u->ai.attacker == this)
-//DeadCode CSB 1Aug00 				u->ai.attacker = NULL;
 		}
 	}
 	else if(	(!unfriendly)
 			||	(Range > BREAKOFFRANGE)		)
-//DeadCode CSB 25Aug00 			||	((unfriendly->classtype->aerobaticfactor == AEROBATIC_LOW) && (Range > INSIDEWEAPONSRANGE))	)
-//DeadCode CSB 21Jun00 			&& (ai.manoeuvre != MANOEUVRE_GAINHEIGHT))
 	{
 		ai.manoeuvre = MANOEUVRE_DISENGAGED;
 		SetUnfriendly(NULL);										//CSB 1Aug00
 		ai.simpleacm = TRUE;
-//DeadCode CSB 25Aug00 		ai.manoeuvre = MANOEUVRE_LOOKROUND;
-//DeadCode CSB 25Aug00 		unfriendly = *ai.unfriendly;
-//DeadCode CSB 1Aug00 		if(unfriendly->ai.attacker == this)
-//DeadCode CSB 1Aug00 			unfriendly->ai.attacker = NULL;
-//DeadCode CSB 1Aug00 		ai.unfriendly = NULL;
 	}
 	else
 	{
@@ -778,11 +716,6 @@ void	ACMAirStruc::PanicManoeuvres()
 		}
 		case	1:
 		{
-//DEADCODE CSB 24/01/00 						if (		(ai.combatskill < SKILL_REGULAR)
-//DEADCODE CSB 24/01/00 								&&	(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 24/01/00 							)
-//DEADCODE CSB 24/01/00 							ai.manoeuvre = MANOEUVRE_BAILOUT;
-//DEADCODE CSB 24/01/00 						else 
 			if (World.Y > FT_3000)
 				ai.manoeuvre = MANOEUVRE_DIVEFORHOME;
 			else
@@ -809,9 +742,6 @@ void	ACMAirStruc::PanicManoeuvres()
 		}
 		case	5:
 		{
-//DEADCODE CSB 24/01/00 						if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 24/01/00 						ai.manoeuvre = MANOEUVRE_BAILOUT;
-//DEADCODE CSB 24/01/00 						else
 			ai.manoeuvre = MANOEUVRE_PANICTURN;
 			break;
 		}
@@ -850,10 +780,6 @@ void	ACMAirStruc::BanditHighManoeuvre()
 		{
 			if(Math_Lib.rnd(2))
 			{
-//DEADCODE CSB 24/01/00 				if(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 24/01/00 //DEADCODE RDH 10/05/99 				if	(classtype->visible == MIG15)
-//DEADCODE CSB 24/01/00 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_ZOOM);
-//DEADCODE CSB 24/01/00 				else
 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_BREAKTURN);
 			}else
 			ai.manoeuvre = MANOEUVRE_GAINHEIGHT;
@@ -1030,17 +956,11 @@ void	ACMAirStruc::SetACMType()
 			)
 			&& (classtype->visible != DEF)						//CSB 17Jan99
 			&& (classtype->visible != JU87)						//CSB 17Jan99
-//DEADCODE RDH 18/06/99 			&&
-//DEADCODE RDH 18/06/99 			(World.Y >= FT_1000)									//RDH 05Jun97 problems with manual acm on takeoff
 		)
 	{
-//DeadCode DAW 12May99 		if(classtype->aerobaticfactor == AEROBATIC_LOW)	//CSB 06/05/99	
-//DeadCode DAW 12May99 			INT3;
-//DeadCode DAW 12May99 		//TRYING TO RUN FLIGHT MODEL FOR HEAVY BOMBERS
 		if(ai.simpleacm)
 		{
 			Manual_Pilot.InitFlightModelPos(this);
-//DeadCode CSB 13/07/99				int Breakpoint = 0;	//CSB 18/06/99	
 		}
 		ai.simpleacm = FALSE;
 	}
@@ -1130,8 +1050,6 @@ void ACMAirStruc::SelectNextEngageManoeuvre()
 	   			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_REGROUP, MSG_STATUSREPORT, *this, NULL, Follower()));
 			else if(fly.nextflight)
 	   			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_REGROUP, MSG_STATUSREPORT, *this, NULL, fly.nextflight));
-//DeadCode CSB 13Sep00 			if(Math_Lib.rnd(RndValMAX) < RND25PC)
-//DeadCode CSB 13Sep00 	   			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_ALLGOHOME, MSG_STATUSREPORT, *this, NULL, callee));
 		}
 		advantage = FALSE;
 		disadvantage = FALSE;
@@ -1404,15 +1322,7 @@ void ACMAirStruc::SelectNextEngageManoeuvre()
 								else							ai.manoeuvre = MANOEUVRE_STEEPDIVE;
 								return;
 						case 2:	ai.manoeuvre = MANOEUVRE_HIGBARRELROLL;	return;
-		//DeadCode CSB 5Nov00 				case 2:	return(MANOEUVRE_ZOOM);
-		//DeadCode CSB 21Oct00 				case 3:	return(MANOEUVRE_STALLTURN);
 					}
-//DeadCode CSB 5Nov00 					{
-//DeadCode CSB 5Nov00 						case 0:	ai.manoeuvre = MANOEUVRE_STEEPDIVE;		return;
-//DeadCode CSB 5Nov00 						case 1:	ai.manoeuvre = MANOEUVRE_HIGBARRELROLL;	return;
-//DeadCode CSB 5Nov00 						case 2:	ai.manoeuvre = MANOEUVRE_ZOOM;			return;
-//DeadCode CSB 5Nov00 //DeadCode CSB 21Oct00 						case 3:	ai.manoeuvre = MANOEUVRE_STALLTURN;		return;
-//DeadCode CSB 5Nov00 					}
 				else if(choosebad)
 					switch(Math_Lib.rnd(5))
 					{
@@ -1525,185 +1435,6 @@ void ACMAirStruc::SelectNextEngageManoeuvre()
 }
 
 
-//DeadCode CSB 4Sep00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode CSB 4Sep00 //Procedure		SelectNextEngageManoeuvre
-//DeadCode CSB 4Sep00 //Author		R. Hyde 
-//DeadCode CSB 4Sep00 //Date			Tue 12 Mar 1996
-//DeadCode CSB 4Sep00 //
-//DeadCode CSB 4Sep00 //Description	
-//DeadCode CSB 4Sep00 //
-//DeadCode CSB 4Sep00 //Inputs		PitchIntercept, HdgIntercept and Range set 
-//DeadCode CSB 4Sep00 //
-//DeadCode CSB 4Sep00 //Returns	
-//DeadCode CSB 4Sep00 //
-//DeadCode CSB 4Sep00 //------------------------------------------------------------------------------
-//DeadCode CSB 4Sep00 void	ACMAirStruc::SelectNextEngageManoeuvre ()
-//DeadCode CSB 4Sep00 {
-//DeadCode CSB 4Sep00   	SWord	startpoint;
-//DeadCode CSB 4Sep00 	Bool	oldadvantage, olddisadvantage;
-//DeadCode CSB 4Sep00 	MANOEUVRE	oldmanoeuvre = ai.manoeuvre;
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 	SetACMType();
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 	oldadvantage = advantage;
-//DeadCode CSB 4Sep00 	olddisadvantage = disadvantage;
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 	if((ai.unfriendly == NULL) || (ai.unfriendly->Status.deaded))
-//DeadCode CSB 4Sep00 	{//break link with dead unfriendly
-//DeadCode CSB 4Sep00 		ai.ManStep = PHASE0;
-//DeadCode CSB 4Sep00 		if(		((fly.pModel->Type == AT_SPITFIRE) || (fly.pModel->Type == AT_HURRICANE))
-//DeadCode CSB 4Sep00 			&&	(ai.morale > MORALE_MEDIUM) && (!Math_Lib.rnd(10))	)
-//DeadCode CSB 4Sep00 			ai.manoeuvre = MANOEUVRE_ROLL360;
-//DeadCode CSB 4Sep00 		else
-//DeadCode CSB 4Sep00 //DeadCode CSB 25Aug00 			ai.manoeuvre = MANOEUVRE_LOOKROUND;						//JIM 18Oct96
-//DeadCode CSB 4Sep00 			ai.manoeuvre = MANOEUVRE_DISENGAGED;
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 		SetUnfriendly(NULL);										//CSB 1Aug00
-//DeadCode CSB 4Sep00 //DeadCode CSB 1Aug00 		if((ai.unfriendly) && (((AirStrucPtr)*ai.unfriendly)->ai.attacker == this))
-//DeadCode CSB 4Sep00 //DeadCode CSB 1Aug00 			((AirStrucPtr)*ai.unfriendly)->ai.attacker = NULL;
-//DeadCode CSB 4Sep00 //DeadCode CSB 1Aug00 		ai.unfriendly = NULL;
-//DeadCode CSB 4Sep00 		return;
-//DeadCode CSB 4Sep00 	}
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00   	ai.ManStep = PHASE0;
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 	if(TimeToChangeToDisengage())
-//DeadCode CSB 4Sep00 	{
-//DeadCode CSB 4Sep00 		if (AcIsGroupLeader())
-//DeadCode CSB 4Sep00 		{
-//DeadCode CSB 4Sep00 			AirStruc*	callee = FindABuddyWithPlayerGivenPriority();
-//DeadCode CSB 4Sep00 			if	(Math_Lib.rnd(RndValMAX) < RND25PC)
-//DeadCode CSB 4Sep00 	   			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_REGROUP, MSG_STATUSREPORT, *this, NULL, callee));
-//DeadCode CSB 4Sep00 			if	(Math_Lib.rnd(RndValMAX) < RND25PC)
-//DeadCode CSB 4Sep00 	   			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_ALLGOHOME, MSG_STATUSREPORT, *this, NULL, callee));
-//DeadCode CSB 4Sep00 		}
-//DeadCode CSB 4Sep00 		advantage = FALSE;
-//DeadCode CSB 4Sep00 		disadvantage = FALSE;
-//DeadCode CSB 4Sep00 		SelectNextDisengageManoeuvre ();
-//DeadCode CSB 4Sep00 		return;
-//DeadCode CSB 4Sep00 	}
-//DeadCode CSB 4Sep00 	ChooseRadioMessage();
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 	if(		(classtype->aerobaticfactor < AEROBATIC_HIGH) && (ai.morale < MORALE_GOOD) 
-//DeadCode CSB 4Sep00 		&&	(Art_Int.CountSquadronSize(this) >= 6)	)
-//DeadCode CSB 4Sep00 		ai.manoeuvre = MANOEUVRE_LUFBERRY;
-//DeadCode CSB 4Sep00 	else if(World.Y - ai.unfriendly->World.Y > FT_3000)
-//DeadCode CSB 4Sep00 	{
-//DeadCode CSB 4Sep00  		BanditLowManoeuvre();
-//DeadCode CSB 4Sep00 	}
-//DeadCode CSB 4Sep00 	else if(World.Y - ai.unfriendly->World.Y < -FT_3000)
-//DeadCode CSB 4Sep00 	{
-//DeadCode CSB 4Sep00  		BanditHighManoeuvre();
-//DeadCode CSB 4Sep00 	}
-//DeadCode CSB 4Sep00 //DeadCode RDH 30Nov98   	elseif ((ai.morale < MORALE_VERYPOOR) || (ai.combatskill  < SKILL_POOR))
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00   	elseif (			(ai.combatskill  <= SKILL_POOR)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 				   &&	(classtype->phrasename == OLDPHRASE_MIGS)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 			)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00   	{
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 		advantage = FALSE;
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 		disadvantage = FALSE;
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 		RndVal	rndnum = Math_Lib.rnd();
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 		if (		(classtype->phrasename == OLDPHRASE_MIGS)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 //DEADCODE RDH 10/05/99 		if	(		(classtype->visible == MIG15)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 				&&	(rndnum > RND99PC)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 				&&	(Range	< INSIDEWEAPONSRANGE)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 				&&	TargetFacingSubject(ANGLES_45Deg)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 			)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 			ai.manoeuvre = MANOEUVRE_BAILOUT;
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 		else 
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 		{
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 			if (ai.combatskill  < SKILL_POOR)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 	  			ai.manoeuvre = MANOEUVRE_STRAIGHTANDLEVEL;
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 			else
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 	  	 		ai.manoeuvre = MANOEUVRE_LAZYTURN;
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 		}
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00  	}else if (		(ai.morale <= MORALE_POOR)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 			   &&	(classtype->phrasename == OLDPHRASE_MIGS)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 			)
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00 	{
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00  		PanicManoeuvres();
-//DeadCode CSB 4Sep00 //DEADCODE CSB 24/01/00		}
-//DeadCode CSB 4Sep00 	elseif	(SubjectFacingTarget(ANGLES_45Deg))
-//DeadCode CSB 4Sep00 	{
-//DeadCode CSB 4Sep00 		if (LooseDeuceSituation())
-//DeadCode CSB 4Sep00 		   TakeLooseDeuceOption();
-//DeadCode CSB 4Sep00 		else if (TargetFacingSubject(ANGLES_45Deg))
-//DeadCode CSB 4Sep00 			SelectNoseToNoseManoeuvre();
-//DeadCode CSB 4Sep00 		else if (SubjectOnTargetTail(ANGLES_45Deg))
-//DeadCode CSB 4Sep00 			SelectNoseToTailManoeuvre();
-//DeadCode CSB 4Sep00 		else
-//DeadCode CSB 4Sep00 			SelectNoseToBeamManoeuvre();
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 		advantage = TRUE;
-//DeadCode CSB 4Sep00 		disadvantage = FALSE;
-//DeadCode CSB 4Sep00   		
-//DeadCode CSB 4Sep00 	}elseif (TargetOnSubjectTail(ANGLES_45Deg))
-//DeadCode CSB 4Sep00 	{
-//DeadCode CSB 4Sep00 		if (TargetFacingSubject(ANGLES_45Deg))
-//DeadCode CSB 4Sep00 		{
-//DeadCode CSB 4Sep00 			AirStruc* callee = FindABuddyWithPlayerGivenPriority();
-//DeadCode CSB 4Sep00 			if(callee)
-//DeadCode CSB 4Sep00 			{
-//DeadCode CSB 4Sep00 				RndVal rndpc = (RndVal)Math_Lib.rnd(RndValMAX);
-//DeadCode CSB 4Sep00 				if(rndpc > RND90PC)
-//DeadCode CSB 4Sep00 					_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_OUTTURN, MSG_OUTTURN, *this, NULL, callee));
-//DeadCode CSB 4Sep00 				else if(rndpc > RND75PC)
-//DeadCode CSB 4Sep00 					_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_TURNINSIDE, MSG_OUTTURN, *this, NULL, callee));
-//DeadCode CSB 4Sep00 			}
-//DeadCode CSB 4Sep00 			
-//DeadCode CSB 4Sep00 			SelectTailToNoseManoeuvre();
-//DeadCode CSB 4Sep00 			advantage = FALSE;
-//DeadCode CSB 4Sep00 			disadvantage = TRUE;
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 		}else if (SubjectOnTargetTail(ANGLES_45Deg))
-//DeadCode CSB 4Sep00 		{
-//DeadCode CSB 4Sep00 			SelectTailToTailManoeuvre();
-//DeadCode CSB 4Sep00 			advantage = FALSE;
-//DeadCode CSB 4Sep00 			disadvantage = FALSE;
-//DeadCode CSB 4Sep00 		}else	
-//DeadCode CSB 4Sep00 		{// target on subject tail and subject on target beam
-//DeadCode CSB 4Sep00 			SelectTailToBeamManoeuvre();
-//DeadCode CSB 4Sep00 			advantage = FALSE;
-//DeadCode CSB 4Sep00 			disadvantage = FALSE;
-//DeadCode CSB 4Sep00 		}
-//DeadCode CSB 4Sep00 	}else
-//DeadCode CSB 4Sep00 	{	if (LooseDeuceSituation())
-//DeadCode CSB 4Sep00 			TakeLooseDeuceOption();
-//DeadCode CSB 4Sep00 		else if (TargetFacingSubject(ANGLES_45Deg))
-//DeadCode CSB 4Sep00 		{
-//DeadCode CSB 4Sep00 			SelectBeamToNoseManoeuvre();
-//DeadCode CSB 4Sep00 			advantage = FALSE;
-//DeadCode CSB 4Sep00 			disadvantage = TRUE;
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 		}else if (SubjectOnTargetTail(ANGLES_45Deg))
-//DeadCode CSB 4Sep00 		{
-//DeadCode CSB 4Sep00 			SelectBeamToTailManoeuvre();
-//DeadCode CSB 4Sep00 			advantage = FALSE;
-//DeadCode CSB 4Sep00 			disadvantage = FALSE;
-//DeadCode CSB 4Sep00 		}else
-//DeadCode CSB 4Sep00 		{
-//DeadCode CSB 4Sep00 			SelectBeamToBeamManoeuvre();
-//DeadCode CSB 4Sep00 			advantage = FALSE;
-//DeadCode CSB 4Sep00 			disadvantage = FALSE;
-//DeadCode CSB 4Sep00 		}
-//DeadCode CSB 4Sep00 	}
-//DeadCode CSB 4Sep00 	if (oldmanoeuvre != ai.manoeuvre)
-//DeadCode CSB 4Sep00 	{
-//DeadCode CSB 4Sep00 //DeadCode CSB 09/03/99			fly.pAcmModel->ZeroIntControl();	//CSB 09/03/99
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 		if (_DPlay.Implemented)
-//DeadCode CSB 4Sep00 		{
-//DeadCode CSB 4Sep00 			if (this->CommsOwner==Persons2::PlayerSeenAC->uniqueID.count)	//AMM 11Jan99
-//DeadCode CSB 4Sep00 			{												//AMM 11Jan99
-//DeadCode CSB 4Sep00 				_DPlay.AddAIACToPositionList(this);			//AMM 11Jan99
-//DeadCode CSB 4Sep00 			}												//AMM 11Jan99
-//DeadCode CSB 4Sep00 		}
-//DeadCode CSB 4Sep00 	}
-//DeadCode CSB 4Sep00 
-//DeadCode CSB 4Sep00 	MoraleMod();
-//DeadCode CSB 4Sep00 }
 
 
 //------------------------------------------------------------------------------
@@ -1712,54 +1443,6 @@ void	ACMAirStruc::MoraleMod()
 {
 	return;	//CSB 07/07/99	
 
-//DeadCode CSB 07/07/99			SWord	inc = 0;
-//DeadCode CSB 07/07/99			SWord	incsum = 0;
-//DeadCode CSB 07/07/99			if (Range < COLLISIONRANGE)
-//DeadCode CSB 07/07/99				inc = 20;
-//DeadCode CSB 07/07/99			else if (Range < WEAPONSRANGE)
-//DeadCode CSB 07/07/99				inc = 10;
-//DeadCode CSB 07/07/99			else if (Range < DANGERRANGE)
-//DeadCode CSB 07/07/99				inc = 5;
-//DeadCode CSB 07/07/99			else if (Range < ENGAGERANGE)
-//DeadCode CSB 07/07/99				inc = 2;
-//DeadCode CSB 07/07/99			if (advantage == TRUE)
-//DeadCode CSB 07/07/99			{
-//DeadCode CSB 07/07/99				incsum = ai.moraleinc +	inc; 
-//DeadCode CSB 07/07/99				if (incsum > 127)
-//DeadCode CSB 07/07/99					incsum = 127;
-//DeadCode CSB 07/07/99				ai.moraleinc = incsum;
-//DeadCode CSB 07/07/99			}
-//DeadCode CSB 07/07/99			if  (		(disadvantage == TRUE)
-//DeadCode CSB 07/07/99					&&	(ai.morale <= MORALE_GOOD)
-//DeadCode CSB 07/07/99				)
-//DeadCode CSB 07/07/99			{
-//DeadCode CSB 07/07/99				incsum = ai.moraleinc -	inc; 
-//DeadCode CSB 07/07/99				if (incsum < -127)
-//DeadCode CSB 07/07/99					incsum = -127;
-//DeadCode CSB 07/07/99				ai.moraleinc = incsum;
-//DeadCode CSB 07/07/99			}
-//DeadCode CSB 07/07/99			if (ai.manoeuvre == MANOEUVRE_BREAKTURN)
-//DeadCode CSB 07/07/99				ai.moraleinc -=	4;
-//DeadCode CSB 07/07/99	
-//DeadCode CSB 07/07/99			if (ai.moraleinc > MORALEINC_STEP)
-//DeadCode CSB 07/07/99			{
-//DeadCode CSB 07/07/99				ai.moraleinc = 0;
-//DeadCode CSB 07/07/99				if (	(MORALE_TOPMORALE - ai.morale) > MORALE_STAGE)
-//DeadCode CSB 07/07/99					ai.morale = ai.morale + MORALE_STAGE;
-//DeadCode CSB 07/07/99				else
-//DeadCode CSB 07/07/99					ai.morale = MORALE_TOPMORALE;
-//DeadCode CSB 07/07/99	
-//DeadCode CSB 07/07/99			}else if (ai.moraleinc < -MORALEINC_STEP)
-//DeadCode CSB 07/07/99			{
-//DeadCode CSB 07/07/99				ai.moraleinc = 0;
-//DeadCode CSB 07/07/99				if (ai.morale > MORALE_STAGE)
-//DeadCode CSB 07/07/99					ai.morale = ai.morale - MORALE_STAGE;
-//DeadCode CSB 07/07/99				else
-//DeadCode CSB 07/07/99					ai.morale = MORALE_ROCKBOTTOM;
-//DeadCode CSB 07/07/99			}
-//DeadCode CSB 07/07/99	
-//DeadCode CSB 07/07/99		if (this==Manual_Pilot.ControlledAC2)						//RJS 18Jun99
-//DeadCode CSB 07/07/99			_Miles.SequenceAudible((MoraleType)ai.morale,100,500);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1811,13 +1494,9 @@ void	ACMAirStruc::TakeLooseDeuceOption()
 				||	((ai.combatskill > SKILL_REGULAR)	&& (vel_ < SustainedTurnSpeed()))
 			)
 	{
-//DEADCODE CB 18/11/99 		if (ai.combatskill < SKILL_REGULAR)	
 	  	 	ai.manoeuvre = 	MANOEUVRE_GAINHEIGHT;
-//DEADCODE CB 18/11/99 		else
-//DEADCODE CB 18/11/99 	  	 	ai.manoeuvre = 	MANOEUVRE_CLIMBATSUSTAINEDTURNSPEED;
 	}
 	else	
-//DEADCODE CB 18/11/99 		ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_IMMELMANN,MANOEUVRE_CLIMBATSUSTAINEDTURNSPEED);
 		ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_IMMELMANN,MANOEUVRE_GAINHEIGHT); //CB 18/11/99
 }
 
@@ -1845,9 +1524,6 @@ Bool	ACMAirStruc::TimeToChangeToDisengage ()
 
 	SWord combatfactor = CombatFactor() * 50;
 
-//DeadCode CSB 5Sep00 	if((unfriendly->classtype->aerobaticfactor > AEROBATIC_MEDIUM) && (classtype->aerobaticfactor == AEROBATIC_MEDIUM))
-//DeadCode CSB 5Sep00 	//prop fighter v jet
-//DeadCode CSB 5Sep00 		return (TRUE);											//RDH 20Mar98
 
 	FP gohomefract = 0.5;
 	if((ai.unfriendly) && (AirStrucPtr(ai.unfriendly)->ai.manoeuvre == MANOEUVRE_SCREWYOUGUYSIMGOINGHOME))
@@ -1858,9 +1534,6 @@ Bool	ACMAirStruc::TimeToChangeToDisengage ()
 	if(Range > VISIBLERANGE)									//JIM 21Oct96
 		return (TRUE);											//JIM 21Oct96
 
-//DeadCode CSB 17Oct00 	if(		(!formpos) && (fly.leadflight) && (fly.leadflight->classtype->aerobaticfactor == AEROBATIC_LOW) 
-//DeadCode CSB 17Oct00 		&&	(Distance3DSquared(&fly.leadflight->World) > FP(VISIBLERANGE) * FP(VISIBLERANGE))	)
-//DeadCode CSB 17Oct00 		return(TRUE);
 
 //	if((you are chasing him) and (he is running away) and (he is going faster than you) and (range > f(breakoffrange, morale)))
 	if(unfriendly->vel_ > vel_)
@@ -2013,8 +1686,6 @@ Bool	ACMAirStruc::DisengageAppropriate ()
 {
 	if(		(		(SubjectOnTargetTail(ANGLES_60Deg))
 				&&	(TargetOnSubjectTail(ANGLES_60Deg))
-//DEADCODE CSB 24/01/00 				&&	(!SubjectFacingTarget(ANGLES_60Deg))
-//DEADCODE CSB 24/01/00 				&&	(!TargetFacingSubject(ANGLES_60Deg))
 				&&	(Range > (ENGAGERANGE))
 			)
 		||	 (Range > COMBATRANGE)
@@ -2063,64 +1734,6 @@ void	ACMAirStruc::FrightenBogie()
 	}
 }
 
-//DEADCODE CSB 04/05/00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DEADCODE CSB 04/05/00 //Procedure		InformOfDanger
-//DEADCODE CSB 04/05/00 //Author		R. Hyde 
-//DEADCODE CSB 04/05/00 //Date			RDH 04/03/99
-//DEADCODE CSB 04/05/00 //
-//DEADCODE CSB 04/05/00 //Description	
-//DEADCODE CSB 04/05/00 //
-//DEADCODE CSB 04/05/00 //Inputs		
-//DEADCODE CSB 04/05/00 //
-//DEADCODE CSB 04/05/00 //Returns	
-//DEADCODE CSB 04/05/00 //
-//DEADCODE CSB 04/05/00 //------------------------------------------------------------------------------
-//DEADCODE CSB 04/05/00 void	AirStruc::InformOfDanger(AirStruc* caller, AirStruc* callee)
-//DEADCODE CSB 04/05/00 {
-//DEADCODE CSB 04/05/00 	//NOTE: the caller is the unfriendly of this
-//DEADCODE CSB 04/05/00 	//		HdgIntercept etc is f(caller wrt this)
-//DEADCODE CSB 04/05/00 	//		Standard rel hdg routines can be used
-//DEADCODE CSB 04/05/00 
-//DEADCODE CSB 04/05/00 	RndVal	rndpc = (RndVal)Math_Lib.rnd(RndValMAX);	
-//DEADCODE CSB 04/05/00 	
-//DEADCODE CSB 04/05/00 	//comingin msg are for MiGs only
-//DEADCODE CSB 04/05/00 	if  (		(SubjectOnTargetTail(ANGLES_20Deg))
-//DEADCODE CSB 04/05/00 			&&	(rndpc > RND50PC)
-//DEADCODE CSB 04/05/00 			&&	(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 			&&	SubjectFacingTarget(ANGLES_50Deg)
-//DEADCODE CSB 04/05/00 		)
-//DEADCODE CSB 04/05/00 	{
-//DEADCODE CSB 04/05/00 		_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_COMINGINBEHIND, MSG_INITIALCOMBAT, caller, *this, callee));
-//DEADCODE CSB 04/05/00 	}else if (		(SubjectFacingTarget(ANGLES_30Deg))
-//DEADCODE CSB 04/05/00 				&&	(TargetFacingSubject(ANGLES_60Deg))
-//DEADCODE CSB 04/05/00 				&&	(rndpc > RND50PC)
-//DEADCODE CSB 04/05/00 				&&	(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 			 )
-//DEADCODE CSB 04/05/00 	{
-//DEADCODE CSB 04/05/00 		_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_COMINGINAHEAD, MSG_INITIALCOMBAT, caller, *this, callee));
-//DEADCODE CSB 04/05/00 	}else if (SubjectFacingTarget(ANGLES_40Deg))
-//DEADCODE CSB 04/05/00 	{	
-//DEADCODE CSB 04/05/00 		if (caller->formpos == 0) 
-//DEADCODE CSB 04/05/00 		{
-//DEADCODE CSB 04/05/00 			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_INITALCOMBATLDR, MSG_INITIALCOMBAT, caller, *this, callee));
-//DEADCODE CSB 04/05/00 		}else
-//DEADCODE CSB 04/05/00 		{
-//DEADCODE CSB 04/05/00 #pragma warnmsg("CRAIG:  OLDPHRASE_MIGS is garbage!")
-//DEADCODE CSB 04/05/00 //DEADCODE RJS 5/3/00 			if (		(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RJS 5/3/00 					||	(classtype->phrasename == OLDPHRASE_YAK9S)
-//DEADCODE CSB 04/05/00 //DEADCODE RJS 5/3/00 			   )
-//DEADCODE CSB 04/05/00 //DEADCODE RJS 5/3/00 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_INITALCOMBATWING, MSG_INITIALCOMBAT, caller, *this, callee));
-//DEADCODE CSB 04/05/00 //DEADCODE RJS 5/3/00 			else
-//DEADCODE CSB 04/05/00 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_INITALCOMBATWING_MIGS, MSG_INITIALCOMBAT, caller, *this, callee));
-//DEADCODE CSB 04/05/00 		}
-//DEADCODE CSB 04/05/00 	}else if (		(rndpc > RND50PC)
-//DEADCODE CSB 04/05/00 				&&	(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 				&&	SubjectFacingTarget(ANGLES_90Deg)
-//DEADCODE CSB 04/05/00 			 )	
-//DEADCODE CSB 04/05/00 	{
-//DEADCODE CSB 04/05/00 		_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_COMINGINABEAM, MSG_INITIALCOMBAT, caller, *this, callee));
-//DEADCODE CSB 04/05/00 	}
-//DEADCODE CSB 04/05/00 }  
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2156,11 +1769,6 @@ bool	AirStruc::OutNumbered(AirStruc* trg)
 		}
 		if (count > 2)
 		{
-//DEADCODE CSB 10/02/00 			ScriptTables script = SCRIPT_OUTNUMBERED;
-//DEADCODE CSB 10/02/00 			if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 10/02/00 				script = OLDSCRIPT_OUTNUMBERED_MIGS;
-//DEADCODE CSB 10/02/00 			_Radio.TriggerMsg(MESSAGE_STRUC(script, MSG_INITIALCOMBAT, trg, NULL, Manual_Pilot.ControlledAC2));
-//DEADCODE CSB 10/02/00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_OUTNUMBEREDINFO, MSG_INITIALCOMBATINFO_DELAY, VOICE_DENTIST , trg, Manual_Pilot.ControlledAC2)); //RDH 05/07/99
 			AirStrucPtr callee = FindBuddy();
 			if((callee) && (trg->nationality == NAT_RAF))
 			{
@@ -2258,101 +1866,6 @@ void	AirStruc::FirstTimeInCombatMsg()
 		}
 }
 
-//DEADCODE CSB 10/02/00 	AirStruc*	trg = (AirStruc*)ai.unfriendly;
-//DEADCODE CSB 10/02/00 	if (trg)
-//DEADCODE CSB 10/02/00 	{
-//DEADCODE CSB 10/02/00 		if (nationality != Persons2::PlayerGhostAC->nationality)
-//DEADCODE CSB 10/02/00 		{//player's enemy entering combat
-//DEADCODE CSB 10/02/00 			if (	(trg)	&&	(trg->ai.unfriendly))	// and trg knows of this //RDH 27/06/99
-//DEADCODE CSB 10/02/00 			{
-//DEADCODE CSB 10/02/00 				if (!formpos)				//only the group leader should provide a message
-//DEADCODE CSB 10/02/00 				{
-//DEADCODE CSB 10/02/00 					if (!OutNumbered(trg))
-//DEADCODE CSB 10/02/00 					{
-//DEADCODE CSB 10/02/00 						AirStruc* buddy = trg;
-//DEADCODE CSB 10/02/00 						buddy = trg->FindABuddyWithPlayerGivenPriority();
-//DEADCODE CSB 10/02/00 
-//DEADCODE CSB 10/02/00 						if (TargetFacingSubject(ANGLES_80Deg))
-//DEADCODE CSB 10/02/00 						{
-//DEADCODE CSB 10/02/00 							if ( (buddy) &&	(!trg->AcIsPlayer()))
-//DEADCODE CSB 10/02/00 							if	(		((World.Y - trg->World.Y) > FT_3000)
-//DEADCODE CSB 10/02/00 									&&	(Math_Lib.rnd(RndValMAX) < RND50PC)
-//DEADCODE CSB 10/02/00 									&&	(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 10/02/00 //DEADCODE RDH 10/05/99 									&&	(classtype->visible == MIG15)
-//DEADCODE CSB 10/02/00 								)
-//DEADCODE CSB 10/02/00 							{
-//DEADCODE CSB 10/02/00 								_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_MIGSCOMING, MSG_MIGSCOMING, trg, this, buddy));
-//DEADCODE CSB 10/02/00 							}else
-//DEADCODE CSB 10/02/00 							{
-//DEADCODE CSB 10/02/00 								if (trg->follower)
-//DEADCODE CSB 10/02/00 								{
-//DEADCODE CSB 10/02/00 									if	(		(ai.morale 	> 	MORALE_GOOD)
-//DEADCODE CSB 10/02/00 											&& 	(ai.combatskill < SKILL_REGULAR)
-//DEADCODE CSB 10/02/00 											&&	(Math_Lib.rnd(RndValMAX) < RND10PC)
-//DEADCODE CSB 10/02/00 											&&	(!trg->AcIsPlayer())
-//DEADCODE CSB 10/02/00 										)	
-//DEADCODE CSB 10/02/00 									{
-//DEADCODE CSB 10/02/00 										_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_FEELING, MSG_INITIALCOMBAT, buddy, NULL, trg));
-//DEADCODE CSB 10/02/00 										_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_FEELINGREPLY, MSG_INITIALCOMBATREPLY, trg, NULL, buddy));
-//DEADCODE CSB 10/02/00 									}
-//DEADCODE CSB 10/02/00 								}
-//DEADCODE CSB 10/02/00 								InformOfDanger(trg, buddy);
-//DEADCODE CSB 10/02/00 							}
-//DEADCODE CSB 10/02/00 						}else
-//DEADCODE CSB 10/02/00 						{//standard bandit call
-//DEADCODE CSB 10/02/00 							if ((buddy)	&&	(Range < VISIBLERANGE))		//RJS 09May99
-//DEADCODE CSB 10/02/00 								_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_BANDIT_RELPOS, MSG_MIGSCOMING, trg, this, buddy));
-//DEADCODE CSB 10/02/00 						}
-//DEADCODE CSB 10/02/00 					}
-//DEADCODE CSB 10/02/00 				}
-//DEADCODE CSB 10/02/00 			}
-//DEADCODE CSB 10/02/00 		}else
-//DEADCODE CSB 10/02/00 		{
-//DEADCODE CSB 10/02/00 			AirStruc* ldr = FindGroupLeader();
-//DEADCODE CSB 10/02/00 
-//DEADCODE CSB 10/02/00 			
-//DEADCODE CSB 10/02/00 			if  (		(ldr->AcIsPlayer())
-//DEADCODE CSB 10/02/00 					&&	 (Art_Int.AircraftAreClose(this,ldr))
-//DEADCODE CSB 10/02/00 					&&	(!weap.FuelDumped)
-//DEADCODE CSB 10/02/00 					
-//DEADCODE CSB 10/02/00 				)													  //RDH 10/05/99
-//DEADCODE CSB 10/02/00 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_JETTISONREQUEST, MSG_STATUSREPORT, this, NULL, Manual_Pilot.ControlledAC2));
-//DEADCODE CSB 10/02/00 
-//DEADCODE CSB 10/02/00 			if  (		(trg->ai.unfriendly) 
-//DEADCODE CSB 10/02/00 					&& (trg->ai.unfriendly->Status.size == AIRSTRUCSIZE)
-//DEADCODE CSB 10/02/00 					&&	(trg->ai.unfriendly != this)				  //RDH 18/06/99
-//DEADCODE CSB 10/02/00 				)
-//DEADCODE CSB 10/02/00 			{
-//DEADCODE CSB 10/02/00 					if  (		(!leader)
-//DEADCODE CSB 10/02/00 							||	(		(follower)
-//DEADCODE CSB 10/02/00 									&&	(ai.elementtactics != WELDEDWING)
-//DEADCODE CSB 10/02/00 								)
-//DEADCODE CSB 10/02/00 						)
-//DEADCODE CSB 10/02/00 						
-//DEADCODE CSB 10/02/00 					{
-//DEADCODE CSB 10/02/00 							InterceptandRange (&trg->World, &trg->ai.unfriendly->World);
-//DEADCODE CSB 10/02/00 							if (Art_Int.CallerOnTargetTail(this, trg, ANGLES_45Deg))
-//DEADCODE CSB 10/02/00 							{
-//DEADCODE CSB 10/02/00 								_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_ENGAGETAIL, MSG_STATUSREPORT, this, NULL, trg->ai.Unfriendly()));
-//DEADCODE CSB 10/02/00 									if	(	(Math_Lib.rnd(RndValMAX) < RND25PC)	&& (Range < DANGERRANGE))	
-//DEADCODE CSB 10/02/00 										_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_ENGAGETAIL_REPLY, MSG_STATUSREPORT_REPLY_DELAY, trg->ai.Unfriendly(), NULL, this));
-//DEADCODE CSB 10/02/00 							}else
-//DEADCODE CSB 10/02/00 								_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_ENGAGEBANDIT, MSG_STATUSREPORT, this, NULL, trg->ai.Unfriendly()));
-//DEADCODE CSB 10/02/00 							InterceptandRange (&ai.unfriendly->World);
-//DEADCODE CSB 10/02/00 					}
-//DEADCODE CSB 10/02/00 			}
-//DEADCODE CSB 10/02/00 			if  (		(!leader)
-//DEADCODE CSB 10/02/00 					&&	(follower)
-//DEADCODE CSB 10/02/00 					&&	(ai.elementtactics == WELDEDWING)
-//DEADCODE CSB 10/02/00 				)		
-//DEADCODE CSB 10/02/00 			{
-//DEADCODE CSB 10/02/00 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_COVERME_RAND, MSG_COVERME, this, trg, Follower()));
-//DEADCODE CSB 10/02/00 				if (Math_Lib.rnd(RndValMAX) < RND50PC)	
-//DEADCODE CSB 10/02/00 					_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_ROGER, (MsgType)(MSG_COVERMEREPLYDELAY+MSG_BLOCKCHATTER), Follower(),NULL,this));//RJS 06Jul99
-//DEADCODE CSB 10/02/00 			}
-//DEADCODE CSB 10/02/00 		}
-//DEADCODE CSB 10/02/00 	}
-//DEADCODE CSB 10/02/00 }
 
 	
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2417,44 +1930,8 @@ void	AirStruc::AirCombat()
 	EveryXcs = EVERY512cs;
 
 
-//DeadCode CSB 25Aug00 //rdh 21/10/99
-//DeadCode CSB 25Aug00 //Ever so often, if skill > regular and not on player'side
-//DeadCode CSB 25Aug00 //mmm, don't know if this is right
-//DeadCode CSB 25Aug00 //I thought we were attempt to put in more break calls
-//DeadCode CSB 25Aug00 //but logic looks iffy, not had time to explore
-//DeadCode CSB 25Aug00 	if  (			!(MOD.FrameCount & EveryXcs)
-//DeadCode CSB 25Aug00 //				&&	(ai.unfriendly != Persons2::PlayerGhostAC)
-//DeadCode CSB 25Aug00 				&&	(ai.combatskill >= SKILL_REGULAR)
-//DeadCode CSB 25Aug00 				&&	(nationality != Persons2::PlayerGhostAC->nationality)
-//DeadCode CSB 25Aug00 		)
-//DeadCode CSB 25Aug00 	{
-//DeadCode CSB 25Aug00 		InterceptandRange (&Persons2::PlayerGhostAC->World);
-//DeadCode CSB 25Aug00 		int spotrange = METRES400 + (ai.combatskill - SKILL_REGULAR) * (METRES50/SKILL_SUBSTAGE);
-//DeadCode CSB 25Aug00 		if (		(TargetOnSubjectTail(ANGLES_45Deg))
-//DeadCode CSB 25Aug00 				&&	(Range < spotrange)
-//DeadCode CSB 25Aug00 				&&	((HdgIntercept + ANGLES_180Deg + ANGLES_15Deg - Persons2::PlayerGhostAC->hdg) << (ANGLES_30Deg))
-//DeadCode CSB 25Aug00 			)
-//DeadCode CSB 25Aug00 		{
-//DeadCode CSB 25Aug00 			AirStruc* buddy = FindBuddy();
-//DeadCode CSB 25Aug00 			if(buddy)
-//DeadCode CSB 25Aug00 			{//unfriendly is attacked by aircraft 
-//DeadCode CSB 25Aug00 			   BreakCallandReaction(buddy, this, Persons2::PlayerGhostAC);
-//DeadCode CSB 25Aug00 			}
-//DeadCode CSB 25Aug00 
-//DeadCode CSB 25Aug00 		}
-//DeadCode CSB 25Aug00 	}
 
 //#pragma warnmsg("Paul: need test for accel")
-//DeadCode AMM 13Apr99 	if (currworld->vp->Accel())	//Timer_Code.accel)
-//DeadCode CSB 23Oct00 	if (currworld->vp && currworld->vp->Accel())				//AMM 13Apr99
-//DeadCode CSB 23Oct00 	{//if in accel, break combat if manoeuvre does not involve unfriendly
-//DeadCode CSB 23Oct00 		if (ai.manoeuvre<=MANOEUVRE_TOPCOVER)
-//DeadCode CSB 23Oct00 		{
-//DeadCode CSB 23Oct00 			MOD.Rudder = 0;
-//DeadCode CSB 23Oct00 			Art_Int.BreakOff(this);
-//DeadCode CSB 23Oct00 		}
-//DeadCode CSB 23Oct00 	}
-//DeadCode CSB 23Oct00 	else
 
 	if((!formpos) && ((MOD.FrameCount & 0x1fff) == 0))	//every 82 secs
 	{
@@ -2524,7 +2001,6 @@ void	AirStruc::AirCombat()
 			{
 				MOD.Rudder = 0;
 		  		ai.ManStep = PHASE0;
-//DeadCode CSB 25Aug00 				ai.manoeuvre=MANOEUVRE_LOOKROUND;
 				ai.manoeuvre = MANOEUVRE_DISENGAGED;
 				ai.simpleacm = TRUE;
 			}
@@ -2535,13 +2011,10 @@ void	AirStruc::AirCombat()
 		if((ai.ManStep == PHASERESET) || (ai.manoeuvre == MANOEUVRE_SELECT))
 		{//the first time in either ai.ManStep must be equal to PHASERESET
 		 //or ai.manoeuvre = MANOEUVRE_SELECT 
-//DEADCODE CSB 10/02/00 			FirstTimeInCombatMsg();
 			Manual_Pilot.InitFlightModelPos(this);
 			//drop bombs
 			WorldStuff*	worldptr = mobileitem::currworld;
 			
-//DeadCode CSB 25Aug00 			AirStruc* leader = FindGroupLeader();
-//DeadCode CSB 25Aug00 			if (leader != Persons2::PlayerGhostAC)	//only drop stores if leader is not player
 			if(CheckForWeapon(LT_BOMB))
 			{
 				Trans_Obj.DropAllStores((mobileitem*)this, *worldptr);
@@ -2559,9 +2032,6 @@ void	AirStruc::AirCombat()
 				if((unf->fly.numinsag) && (unf->fly.expandedsag))
 				{
 					SetUnfriendly(unf->fly.expandedsag->FindFreeAcInGroup());	//CSB 1Aug00
-//DeadCode CSB 1Aug00 					if(unf->ai.attacker == this)
-//DeadCode CSB 1Aug00 						unf->ai.attacker = NULL;
-//DeadCode CSB 1Aug00 					ai.unfriendly = unf->fly.expandedsag->FindFreeAcInGroup();
 				}
 			}
 			ACMAS().SelectNextEngageManoeuvre ();
@@ -2590,7 +2060,6 @@ if((ai.unfriendly) && (ai.unfriendly->Status.deadtime) && !_DPlay.Implemented)
 			if (ai.simpleacm)
 				ACMAS().SimpleACM ();
 			else
-//DeadCode CSB 11Sep00 				ACMAS().SimpleACM ();
 				ACMAS().ManualACM ();
 		}
 	}
@@ -2611,14 +2080,7 @@ if((ai.unfriendly) && (ai.unfriendly->Status.deadtime) && !_DPlay.Implemented)
 //------------------------------------------------------------------------------
 void	ACMAirStruc::SimpleACM ()
 {
-//DeadCode CSB 28/04/99		PrintString(0, 22, "SimpleACM ");
 
-//DEADCODE CSB 14/01/00 /* TEST CODE CSB 18/06/99 */	if (Key_Tests.KeyPress3d (RPM_50))	//CSB 18/3/99	
-//DEADCODE CSB 14/01/00 /* TEST CODE CSB 18/06/99 */	{
-//DEADCODE CSB 14/01/00 /* TEST CODE CSB 18/06/99 */		ai.manoeuvre = MANOEUVRE_BAILOUT;	//CSB 18/03/99	
-//DEADCODE CSB 14/01/00 /* TEST CODE CSB 18/06/99 */		ai.ManStep   = 0;
-//DEADCODE CSB 14/01/00 /* TEST CODE CSB 18/06/99 */		SetManoeuvreTime (1500);
-//DEADCODE CSB 14/01/00 /* TEST CODE CSB 18/06/99 */	}
 	
 	SWord oldpitch = pitch;
 
@@ -2767,7 +2229,6 @@ void	ACMAirStruc::SimpleACM ()
 			case MANOEUVRE_IMMELMANNTURN :						
 			{													
 				SimpleImmelmannTurn();
-//DeadCode CSB 4Sep00 				SimpleTurningFight();
 				break;											
 			}													
 			case MANOEUVRE_IMMELMANN :						
@@ -2824,13 +2285,11 @@ void	ACMAirStruc::SimpleACM ()
 			case MANOEUVRE_DIVINGSPIN:
 			{
 				SimpleDivingSpin();
-//DeadCode CSB 4Sep00 				SimpleSplitS();
 				break;
 			}
 			case MANOEUVRE_REVERSETURN:										//RDH 30Mar98
 			{
 				SimpleBreak90();
-//DeadCode CSB 8Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_SELFASBAIT:										//RDH 30Mar98
@@ -2841,37 +2300,31 @@ void	ACMAirStruc::SimpleACM ()
 			case MANOEUVRE_JINK:												//RDH 30Mar98
 			{
 				SimpleScissors();
-//DeadCode CSB 8Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_BREAKTURN:										//RDH 30Mar98
 			{
 				SimpleBreak90();
-//DeadCode CSB 8Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_LAZYTURN:											//RDH 30Mar98
 			{
 				SimpleMildScissors();
-//DeadCode CSB 8Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_BREAKLOW:											//RDH 30Mar98
 			{
 				SimpleBreakLow();
-//DeadCode CSB 4Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_BREAKHIGH:										//RDH 30Mar98
 			{
 				SimpleBreakHigh();
-//DeadCode CSB 4Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_BREAK90:											//RDH 30Mar98
 			{
 				SimpleBreak90();
-//DeadCode CSB 4Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_HIGBARRELROLL:									//RDH 30Mar98
@@ -2882,13 +2335,11 @@ void	ACMAirStruc::SimpleACM ()
 			case MANOEUVRE_PANICTURN:									//RDH 30Mar98
 			{
 				SimpleBreak90();
-//DeadCode CSB 8Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_UNBALANCEDFLIGHT:									//RDH 30Mar98
 			{
 				SimpleScissors();
-//DeadCode CSB 8Sep00 				SimpleTurningFight();
 				break;
 			}
 			case MANOEUVRE_LOWALT:									//RDH 30Mar98
@@ -2906,31 +2357,19 @@ void	ACMAirStruc::SimpleACM ()
 				SimpleTurningFight();
 				break;
 			}
-//DeadCode CSB 7Sep00 			case MANOEUVRE_HIGHYOYO:											//RDH 30Mar98
-//DeadCode CSB 7Sep00 			{
-//DeadCode CSB 7Sep00 				SimpleTurningFight();
-//DeadCode CSB 7Sep00 				break;
-//DeadCode CSB 7Sep00 			}
 			case MANOEUVRE_ZOOM:											//RDH 30Mar98
 			{
  				SimpleZoom();
 				break;
 			}
-//DeadCode CSB 7Sep00 			case MANOEUVRE_LOWYOYO:											//RDH 30Mar98
-//DeadCode CSB 7Sep00 			{
-//DeadCode CSB 7Sep00 				SimpleTurningFight();
-//DeadCode CSB 7Sep00 				break;
-//DeadCode CSB 7Sep00 			}
 			case MANOEUVRE_INTERCEPTHIGH:									//RDH 30Mar98
 			{
 				SimpleInterceptHigh();
-//DeadCode CSB 4Sep00 				TurningFight();
 				break;
 			}
 			case MANOEUVRE_INTERCEPTLOW:									//RDH 30Mar98
 			{
 				SimpleInterceptLow();
-//DeadCode CSB 4Sep00 				TurningFight();
 				break;
 			}
 			case MANOEUVRE_GAINSPEED:						
@@ -3020,7 +2459,6 @@ void	ACMAirStruc::SimpleACM ()
 			}	
 			case MANOEUVRE_COLLIDE:						
 			{													
-//DeadCode CSB 12Oct00 				ai.manoeuvre = MANOEUVRE_SELECT;
 				SimpleCollide();
 				break;											
 			}	
@@ -3065,194 +2503,8 @@ void	ACMAirStruc::SimpleACM ()
 	if((ai.unfriendly!=NULL) && (ai.manoeuvre != MANOEUVRE_WELDEDWINGMAN))
 		AutoShoot(TRUE);
 
-//DeadCode CSB 1Sep00 	weap.ShootDelay = weap.ShootDelay-Timer_Code.FRAMETIME;
-//DeadCode CSB 1Sep00 	if (weap.ShootDelay < 0)
-//DeadCode CSB 1Sep00 		weap.ShootDelay = 0;
 
-//DeadCode CSB 20/01/99		#ifdef DISPLAY_MONO_DATA
-//DeadCode CSB 20/01/99	//test print out		
-//DeadCode CSB 20/01/99			UWord y = 0;
-//DeadCode CSB 20/01/99			if (ai.unfriendly)
-//DeadCode CSB 20/01/99				InterceptandRange (&ai.unfriendly->World);
-//DeadCode CSB 20/01/99			else
-//DeadCode CSB 20/01/99			{
-//DeadCode CSB 20/01/99				HdgIntercept=ANGLES_0Deg;
-//DeadCode CSB 20/01/99				Range=-1;
-//DeadCode CSB 20/01/99	
-//DeadCode CSB 20/01/99			}
-//DeadCode CSB 20/01/99			if (classtype->visible == MIG15)
-//DeadCode CSB 20/01/99					y = 4;
-//DeadCode CSB 20/01/99			char strg [32];
-//DeadCode CSB 20/01/99	 		SWord HI = (SWord) (HdgIntercept - hdg);
-//DeadCode CSB 20/01/99	 		for (UWord n=0; n<32; n++) strg[n] = 0;
-//DeadCode CSB 20/01/99	 		sprintf (strg, "DHdgIntercept  %d ",HI);
-//DeadCode CSB 20/01/99	 		if (strg[31] == 0)
-//DeadCode CSB 20/01/99	 			Mono_Text.PrintAt (40,y,(UByte*)strg);
-//DeadCode CSB 20/01/99	 
-//DeadCode CSB 20/01/99	 		for (n=0; n<32; n++) strg[n] = 0;
-//DeadCode CSB 20/01/99	 		sprintf (strg, "Range,m  %d ",Range/100);
-//DeadCode CSB 20/01/99	 		if (strg[31] == 0)
-//DeadCode CSB 20/01/99	 			Mono_Text.PrintAt (40,y+1,(UByte*)strg);
-//DeadCode CSB 20/01/99	
-//DeadCode CSB 20/01/99	//		for (n=0; n<32; n++) strg[n] = 0;
-//DeadCode CSB 20/01/99	//		sprintf (strg, "ReqRoll  %d ",reqroll);
-//DeadCode CSB 20/01/99	//		if (strg[31] == 0)
-//DeadCode CSB 20/01/99	//			Mono_Text.PrintAt (40,y+2,(UByte*)strg);
-//DeadCode CSB 20/01/99	//
-//DeadCode CSB 20/01/99	
-//DeadCode CSB 20/01/99	#endif
-//DeadCode CSB 20/01/99	//test print out end
 
-//DeadCode CSB 2Oct00 	if (ai.manoeuvre == MANOEUVRE_SELECT)
-//DeadCode CSB 2Oct00 	{
-//DeadCode CSB 2Oct00 		if (ai.unfriendly==NULL)
-//DeadCode CSB 2Oct00 		{
-//DeadCode CSB 2Oct00 			if(	(ai.manoeuvre != MANOEUVRE_TOPCOVER)			//JIM 21Aug96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_LOOKROUND)			//JIM 21Aug96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_DIVEFORHOME)			//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_CLIMBFORHOME)		//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_STRAIGHTDIVE)		//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_GOHOME )				//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_SPINRECOVERY )				//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_REGROUP)				//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_DISENGAGED )				//JIM 15Oct96
-//DeadCode CSB 2Oct00 				)
-//DeadCode CSB 2Oct00 			{
-//DeadCode CSB 2Oct00 		  		ai.ManStep = PHASE0;
-//DeadCode CSB 2Oct00 //DeadCode CSB 25Aug00 				ai.manoeuvre=MANOEUVRE_LOOKROUND;
-//DeadCode CSB 2Oct00 				ai.manoeuvre = MANOEUVRE_DISENGAGED;
-//DeadCode CSB 2Oct00 				ai.simpleacm = TRUE;
-//DeadCode CSB 2Oct00 			}
-//DeadCode CSB 2Oct00 		}else
-//DeadCode CSB 2Oct00 		{
-//DeadCode CSB 2Oct00 			InterceptandRange (&ai.unfriendly->World);
-//DeadCode CSB 2Oct00 			SelectNextEngageManoeuvre ();
-//DeadCode CSB 2Oct00 		  		ai.ManStep = PHASE0;
-//DeadCode CSB 2Oct00 //DEADCODE RDH 16/05/99 			if (ai.manoeuvre != MANOEUVRE_SELECT)
-//DeadCode CSB 2Oct00 //DEADCODE RDH 16/05/99 				ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;						
-//DeadCode CSB 2Oct00 		}
-//DeadCode CSB 2Oct00 	}
-//DeadCode CSB 2Oct00 	if((ai.manoeuvre == MANOEUVRE_SELECT) && (movecode == AUTO_COMBAT))
-//DeadCode CSB 2Oct00 	{
-//DeadCode CSB 2Oct00 		ai.manoeuvre = MANOEUVRE_DISENGAGED;
-//DeadCode CSB 2Oct00 		ai.simpleacm = TRUE;
-//DeadCode CSB 2Oct00 		ai.ManStep = 0;
-//DeadCode CSB 2Oct00 		SetManoeuvreTime(0);
-//DeadCode CSB 2Oct00 		SetUnfriendly(NULL);
-//DeadCode CSB 2Oct00 	}
-//DeadCode CSB 2Oct00 //DeadCode CSB 30Aug00 		movecode=AUTO_FOLLOWWP;
-//DeadCode CSB 2Oct00 //DeadCode CSB 30Aug00 		information = IF_OUT_POS;					//CSB 22Aug00
-//DeadCode CSB 2Oct00 //DeadCode CSB 30Aug00 		manoeuvretime = 0;
-//DeadCode CSB 2Oct00 //DeadCode CSB 30Aug00 
-//DeadCode CSB 2Oct00 //DeadCode CSB 30Aug00 		if((!formpos) && (!PlayerInGroup()) && (!Math_Lib.rnd(20)))
-//DeadCode CSB 2Oct00 //DeadCode CSB 30Aug00 			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_RETURNING, MSG_STATUS, *this, ai.homebase, Persons2::PlayerGhostAC));
-//DeadCode CSB 2Oct00 //DeadCode CSB 5Sep00 	}
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 //temp	if (ai.unfriendly!=NULL)
-//DeadCode CSB 2Oct00 //	{
-//DeadCode CSB 2Oct00 //		AutoShoot(FALSE);
-//DeadCode CSB 2Oct00 //DeadCode RDH 25Oct96 		if ((Range <METRES70) && (fly.thrustpercent == 100))
-//DeadCode CSB 2Oct00 //DeadCode RDH 25Oct96  			MoveToThrust (0);									//RDH 01Oct96
-//DeadCode CSB 2Oct00 //DeadCode RDH 25Oct96 		else
-//DeadCode CSB 2Oct00 //DeadCode RDH 25Oct96  			MoveToThrust (100);									//RDH 01Oct96
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 //	}
-//DeadCode CSB 2Oct00 //DeadCode CSB 06/04/99	#ifndef ACM_PILOT_DATA
-//DeadCode CSB 2Oct00 //DeadCode CSB 06/04/99		#define ACM_PILOT_DATA
-//DeadCode CSB 2Oct00 //DeadCode CSB 06/04/99	#endif
-//DeadCode CSB 2Oct00 #ifdef ACM_PILOT_DATA
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 	PrintVar(0,  10, "T Pitch %.1f ", (FP)( (PitchIntercept - pitch) / 182.04) );
-//DeadCode CSB 2Oct00 	PrintVar(0,  11, "T Headg %.1f ", (FP)( (HdgIntercept - hdg)  / 182.04) );
-//DeadCode CSB 2Oct00 	PrintVar(0,  12, "T Range %.0f ", (FP)(Range / 100) );
-//DeadCode CSB 2Oct00 	PrintVar(0,  13, "D Headg %.1f ", (FP)(ai.desiredhdg / 182.04) );
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 	PrintVar(20,   9, "C Vel   %.1f ", (FP)( (vel) / 10) );
-//DeadCode CSB 2Oct00 	PrintVar(20,  10, "C Pitch %.1f ", (FP)( (pitch) / 182.04) );
-//DeadCode CSB 2Oct00 	PrintVar(20,  11, "C Roll  %.1f ", (FP)( (roll) / 182.04) );
-//DeadCode CSB 2Oct00 	PrintVar(20,  12, "C Headg %.1f ", (FP)( (hdg) / 182.04) );
-//DeadCode CSB 2Oct00 	PrintVar(20,  13, "C Alt   %.0f ", (FP)( (World.Y) / 100.0) );
-//DeadCode CSB 2Oct00 	PrintVar(20,  14, "C Thrst %.0f ", (FP)( (fly.thrustpercent) ) );
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 	
-//DeadCode CSB 2Oct00 	switch (ai.manoeuvre)
-//DeadCode CSB 2Oct00 	{
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SELECT:						{ PrintString(0,  24, "MANOEUVRE_SELECT						");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LOOKROUND:					{ PrintString(0,  24, "MANOEUVRE_LOOKROUND					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_WELDEDWINGMAN:				{ PrintString(0,  24, "MANOEUVRE_WELDEDWINGMAN				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_BAILOUT:						{ PrintString(0,  24, "MANOEUVRE_BAILOUT					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_TOPCOVER:					{ PrintString(0,  24, "MANOEUVRE_TOPCOVER					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LINEABREAST:					{ PrintString(0,  24, "MANOEUVRE_LINEABREAST				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SCATTER:						{ PrintString(0,  24, "MANOEUVRE_SCATTER					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_PINCER:						{ PrintString(0,  24, "MANOEUVRE_PINCER						");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_MULTIWAVE:					{ PrintString(0,  24, "MANOEUVRE_MULTIWAVE					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_DIVEANDZOOM:					{ PrintString(0,  24, "MANOEUVRE_DIVEANDZOOM				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LEADPURSUIT:					{ PrintString(0,  24, "MANOEUVRE_LEADPURSUIT				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LAGPURSUIT:					{ PrintString(0,  24, "MANOEUVRE_LAGPURSUIT					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_CIRCUMVENT:					{ PrintString(0,  24, "MANOEUVRE_CIRCUMVENT					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_ROUNDABOUT:					{ PrintString(0,  24, "MANOEUVRE_ROUNDABOUT					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SPLITMANOEUVRE:				{ PrintString(0,  24, "MANOEUVRE_SPLITMANOEUVRE				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_HEADON:						{ PrintString(0,  24, "MANOEUVRE_HEADON						");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LINEASTERN:					{ PrintString(0,  24, "MANOEUVRE_LINEASTERN					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_BARRELROLLATTACK:			{ PrintString(0,  24, "MANOEUVRE_BARRELROLLATTACK			");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SCISSORS:					{ PrintString(0,  24, "MANOEUVRE_SCISSORS					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_MILDSCISSORS:				{ PrintString(0,  24, "MANOEUVRE_MILDSCISSORS				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_TURNINGFIGHT:				{ PrintString(0,  24, "MANOEUVRE_TURNINGFIGHT				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SPLITS:						{ PrintString(0,  24, "MANOEUVRE_SPLITS						");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_ZOOMANDDROP:					{ PrintString(0,  24, "MANOEUVRE_ZOOMANDDROP				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_STRAIGHTANDLEVEL:			{ PrintString(0,  24, "MANOEUVRE_STRAIGHTANDLEVEL			");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SPINOUT:						{ PrintString(0,  24, "MANOEUVRE_SPINOUT					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_DIVEFORHOME:					{ PrintString(0,  24, "MANOEUVRE_DIVEFORHOME				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_GOHOME:						{ PrintString(0,  24, "MANOEUVRE_GOHOME						");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_MAKEFORFRIENDLY:				{ PrintString(0,  24, "MANOEUVRE_MAKEFORFRIENDLY			");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_MOVEAWAY:					{ PrintString(0,  24, "MANOEUVRE_MOVEAWAY					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_ACCIDENTALSPINOUT:			{ PrintString(0,  24, "MANOEUVRE_ACCIDENTALSPINOUT			");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_VERTICALLOOP:				{ PrintString(0,  24, "MANOEUVRE_VERTICALLOOP				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_IMMELMANNTURN:				{ PrintString(0,  24, "MANOEUVRE_IMMELMANNTURN				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_HEADONOFFSET:				{ PrintString(0,  24, "MANOEUVRE_HEADONOFFSET				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_IMMELMANN:					{ PrintString(0,  24, "MANOEUVRE_IMMELMANN					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_STAYWITHPREY:				{ PrintString(0,  24, "MANOEUVRE_STAYWITHPREY				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_CLIMBFORHOME:				{ PrintString(0,  24, "MANOEUVRE_CLIMBFORHOME				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_STRAIGHTDIVE:				{ PrintString(0,  24, "MANOEUVRE_STRAIGHTDIVE				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_STANDONTAIL:					{ PrintString(0,  24, "MANOEUVRE_STANDONTAIL				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SHOOTTOFRIGHTEN:				{ PrintString(0,  24, "MANOEUVRE_SHOOTTOFRIGHTEN			");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SHOOTTOOEARLY:				{ PrintString(0,  24, "MANOEUVRE_SHOOTTOOEARLY				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_GAINHEIGHT:					{ PrintString(0,  24, "MANOEUVRE_GAINHEIGHT					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LAGROLL:						{ PrintString(0,  24, "MANOEUVRE_LAGROLL					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_EXTENSION:					{ PrintString(0,  24, "MANOEUVRE_EXTENSION					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_DIVINGSPIN:					{ PrintString(0,  24, "MANOEUVRE_DIVINGSPIN					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_REVERSETURN:					{ PrintString(0,  24, "MANOEUVRE_REVERSETURN				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SELFASBAIT:					{ PrintString(0,  24, "MANOEUVRE_SELFASBAIT					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_JINK:						{ PrintString(0,  24, "MANOEUVRE_JINK						");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_BREAKTURN:					{ PrintString(0,  24, "MANOEUVRE_BREAKTURN					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LAZYTURN:					{ PrintString(0,  24, "MANOEUVRE_LAZYTURN					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_BREAK180:					{ PrintString(0,  24, "MANOEUVRE_BREAK180					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_BREAKLOW:					{ PrintString(0,  24, "MANOEUVRE_BREAKLOW					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_BREAKHIGH:					{ PrintString(0,  24, "MANOEUVRE_BREAKHIGH					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_BREAK90:						{ PrintString(0,  24, "MANOEUVRE_BREAK90					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_HIGBARRELROLL:				{ PrintString(0,  24, "MANOEUVRE_HIGBARRELROLL				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_PANICTURN:					{ PrintString(0,  24, "MANOEUVRE_PANICTURN					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_UNBALANCEDFLIGHT:			{ PrintString(0,  24, "MANOEUVRE_UNBALANCEDFLIGHT			");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LOWALT:						{ PrintString(0,  24, "MANOEUVRE_LOWALT						");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SNAPSHOT:					{ PrintString(0,  24, "MANOEUVRE_SNAPSHOT					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_STAYONTAIL:					{ PrintString(0,  24, "MANOEUVRE_STAYONTAIL					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_TURNTOHDGANDPITCH:			{ PrintString(0,  24, "MANOEUVRE_TURNTOHDGANDPITCH			");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_HOTSIDELAGPURSUITFIGHT:		{ PrintString(0,  24, "MANOEUVRE_HOTSIDELAGPURSUITFIGHT		");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SANDWICHMANOEUVRES:			{ PrintString(0,  24, "MANOEUVRE_SANDWICHMANOEUVRES			");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SUSTAINEDTURN:				{ PrintString(0,  24, "MANOEUVRE_SUSTAINEDTURN				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_HIGHYOYO:					{ PrintString(0,  24, "MANOEUVRE_HIGHYOYO					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_ZOOM:						{ PrintString(0,  24, "MANOEUVRE_ZOOM						");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_LOWYOYO:						{ PrintString(0,  24, "MANOEUVRE_LOWYOYO					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_INTERCEPTHIGH:				{ PrintString(0,  24, "MANOEUVRE_INTERCEPTHIGH				");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_CLIMBATSUSTAINEDTURNSPEED:	{ PrintString(0,  24, "MANOEUVRE_CLIMBATSUSTAINEDTURNSPEED	");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_GAINSPEED:					{ PrintString(0,  24, "MANOEUVRE_GAINSPEED					");    break; }
-//DeadCode CSB 2Oct00 		case MANOEUVRE_SPINRECOVERY:				{ PrintString(0,  24, "MANOEUVRE_SPINRECOVERY				");    break; }
-//DeadCode CSB 2Oct00 	}
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 	PrintVar(30, 24, "Phase %.0f ", (FP)ai.ManStep);
-//DeadCode CSB 2Oct00 	PrintVar(40, 24, "Time %.0f ", (FP)manoeuvretime);
-//DeadCode CSB 2Oct00 #endif
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3314,44 +2566,6 @@ SLong ACMAirStruc::SubjectClosure()
 
 	SLong closure = ((tx - sx) * (svx - tvx) + (ty - sy) * (svy - tvy) +  (tz - sz) * (svz - tvz)) / Range;
 	return(closure);
-//DEADCODE CSB 08/11/99 	ANGLES	brg;
-//DEADCODE CSB 08/11/99 	SWord	sinbearing,cosbearing;
-//DEADCODE CSB 08/11/99 	AirStrucPtr	unfriendly = *ai. unfriendly;
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	brg = HdgIntercept - hdg;
-//DEADCODE CSB 08/11/99 	Math_Lib.high_sin_cos(brg,sinbearing,cosbearing);
-//DEADCODE CSB 08/11/99 	if (cosbearing < 0)
-//DEADCODE CSB 08/11/99 		return(FALSE);
-//DEADCODE CSB 08/11/99 	//cal the subject velocity along the hdg intercept (ie horizontal plane)
-//DEADCODE CSB 08/11/99 	SLong vel_s_hi_hori = velhori * cosbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 //	brg = PitchIntercept - fly.cpitch;
-//DEADCODE CSB 08/11/99 	Math_Lib.high_sin_cos(PitchIntercept,sinbearing,cosbearing);
-//DEADCODE CSB 08/11/99 	//cal the subject hori velocity along the pitch intercept
-//DEADCODE CSB 08/11/99 	SLong vel_s_pi_hori = vel_s_hi_hori * cosbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 	
-//DEADCODE CSB 08/11/99 	
-//DEADCODE CSB 08/11/99 	SLong vel_s_pi_vert = vely * sinbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	brg = HdgIntercept - unfriendly->hdg;
-//DEADCODE CSB 08/11/99 	Math_Lib.high_sin_cos(brg,sinbearing,cosbearing);
-//DEADCODE CSB 08/11/99 	SLong vel_t_hi_hori = unfriendly->velhori * cosbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 //	brg = PitchIntercept - unfriendly->fly.cpitch;
-//DEADCODE CSB 08/11/99 	Math_Lib.high_sin_cos(PitchIntercept,sinbearing,cosbearing);
-//DEADCODE CSB 08/11/99 	//cal the subject hori velocity along the pitch intercept
-//DEADCODE CSB 08/11/99 	SLong vel_t_pi_hori = vel_t_hi_hori * cosbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 	
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	SLong vel_t_pi_vert = unfriendly->vely * sinbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 	
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	SLong	closure = (vel_s_pi_hori + vel_s_pi_vert) - (vel_t_pi_hori + vel_t_pi_vert); 
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	return (closure);
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		SubjectClosureGreaterThan
@@ -3440,45 +2654,6 @@ Bool ACMAirStruc::TargetClosureGreaterThan(SLong dvel)
 
 	SLong closure = ((sx - tx) * (tvx - svx) + (sy - ty) * (tvy - svy) +  (sz - tz) * (tvz - svz)) / Range;
 
-//DEADCODE CSB 08/11/99 	SLong	closure;
-//DEADCODE CSB 08/11/99 	ANGLES	brg;
-//DEADCODE CSB 08/11/99 	SWord	sinbearing,cosbearing;
-//DEADCODE CSB 08/11/99 	AirStrucPtr	unfriendly = *ai. unfriendly;
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	brg = ANGLES_180Deg + HdgIntercept - hdg;
-//DEADCODE CSB 08/11/99 	Math_Lib.high_sin_cos(brg,sinbearing,cosbearing);
-//DEADCODE CSB 08/11/99 	if (cosbearing < 0)
-//DEADCODE CSB 08/11/99 		return(FALSE);
-//DEADCODE CSB 08/11/99 	//cal the subject velocity along the hdg intercept (ie horizontal plane)
-//DEADCODE CSB 08/11/99 	SLong vel_s_hi_hori = velhori * cosbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	brg = (- PitchIntercept) - fly.cpitch;
-//DEADCODE CSB 08/11/99 	Math_Lib.high_sin_cos(brg,sinbearing,cosbearing);
-//DEADCODE CSB 08/11/99 	//cal the subject hori velocity along the pitch intercept
-//DEADCODE CSB 08/11/99 	SLong vel_s_pi_hori = vel_s_hi_hori * cosbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 	
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	SLong vel_s_pi_vert = vely * sinbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	brg = ANGLES_180Deg + HdgIntercept - unfriendly->hdg;
-//DEADCODE CSB 08/11/99 	Math_Lib.high_sin_cos(brg,sinbearing,cosbearing);
-//DEADCODE CSB 08/11/99 	SLong vel_t_hi_hori = unfriendly->velhori * cosbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	brg = ( - PitchIntercept) - unfriendly->fly.cpitch;
-//DEADCODE CSB 08/11/99 	Math_Lib.high_sin_cos(brg,sinbearing,cosbearing);
-//DEADCODE CSB 08/11/99 	//cal the subject hori velocity along the pitch intercept
-//DEADCODE CSB 08/11/99 	SLong vel_t_pi_hori = vel_t_hi_hori * cosbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 	
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	SLong vel_t_pi_vert = unfriendly->vely * sinbearing/ANGLES_FRACT;
-//DEADCODE CSB 08/11/99 	
-//DEADCODE CSB 08/11/99 
-//DEADCODE CSB 08/11/99 	closure = (vel_t_pi_hori + vel_t_pi_vert) - (vel_s_pi_hori + vel_s_pi_vert); 
-//DEADCODE CSB 08/11/99 
 
 	if (closure > dvel)
 		return(TRUE);
@@ -3552,16 +2727,9 @@ Bool 	ACMAirStruc::M_FlightSeparation()
 			&&	(PitchIntercept << ANGLES_350Deg)
 		)
 		combatfactor += 10;
-//DEADCODE CSB 08/11/99 	if	( velhori > unfriendly->velhori)
-//DEADCODE CSB 08/11/99 		combatfactor += (velhori - unfriendly->velhori)/10;
 	if(vel_ > unfriendly->vel_)
 		combatfactor += (vel_ - unfriendly->vel_)/10000;
-//DEADCODE CB 18/11/99 	if  (	(combatfactor < 160)
-//DEADCODE CB 18/11/99 		||	( classtype->aerobaticfactor < AEROBATIC_FIGHTER)
-//DEADCODE CB 18/11/99 		)
-		ai.manoeuvre = MANOEUVRE_HEADON;
-//DEADCODE CB 18/11/99 	else
-//DEADCODE CB 18/11/99 		ai.manoeuvre = MANOEUVRE_HEADONOFFSET;
+	ai.manoeuvre = MANOEUVRE_HEADON;
 	return(TRUE);
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3633,7 +2801,6 @@ void	ACMAirStruc::ManoeuvreBasedOnClosure()
 					&&	(ClosureLessThan(MPH15))
 				)
 			ai.manoeuvre = MANOEUVRE_INTERCEPTLOW;
-//DeadCode CSB 7Sep00 			ai.manoeuvre = MANOEUVRE_LOWYOYO;
 		else if (SubjectLeadingTarget())
 		{
 			if (SubjectClosureGreaterThan(MPH50))
@@ -3642,7 +2809,6 @@ void	ACMAirStruc::ManoeuvreBasedOnClosure()
 					ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
 				else	
 					ai.manoeuvre = MANOEUVRE_INTERCEPTHIGH;
-//DeadCode CSB 7Sep00 					ai.manoeuvre = MANOEUVRE_HIGHYOYO;
 			}
 			else if (Range > WEAPONSRANGE)
 			{
@@ -3654,7 +2820,6 @@ void	ACMAirStruc::ManoeuvreBasedOnClosure()
 			ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
 		else	
 			ai.manoeuvre = MANOEUVRE_INTERCEPTHIGH;
-//DeadCode CSB 7Sep00 			ai.manoeuvre = MANOEUVRE_HIGHYOYO;
 		
 }	
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3738,30 +2903,6 @@ Bool 	ACMAirStruc::M_SpinOut()
 }
 
 
-//DeadCode RDH 07Jan99 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode RDH 07Jan99 //Procedure		M_SideSlip
-//DeadCode RDH 07Jan99 //Author		R. Hyde 
-//DeadCode RDH 07Jan99 //Date			Thu 5 Mar 1998
-//DeadCode RDH 07Jan99 //
-//DeadCode RDH 07Jan99 //Description	
-//DeadCode RDH 07Jan99 //
-//DeadCode RDH 07Jan99 //Inputs		
-//DeadCode RDH 07Jan99 //
-//DeadCode RDH 07Jan99 //Returns	
-//DeadCode RDH 07Jan99 //
-//DeadCode RDH 07Jan99 //------------------------------------------------------------------------------
-//DeadCode RDH 07Jan99 Bool 	ACMAirStruc::M_SideSlip()
-//DeadCode RDH 07Jan99 {
-//DeadCode RDH 07Jan99 	if	(	(TargetOnSubjectTail(ANGLES_10Deg))
-//DeadCode RDH 07Jan99 		&&	(TargetFacingSubject(ANGLES_5Deg))
-//DeadCode RDH 07Jan99 		)
-//DeadCode RDH 07Jan99 	{
-//DeadCode RDH 07Jan99 		ai.manoeuvre = MANOEUVRE_UNBALANCEDFLIGHT;
-//DeadCode RDH 07Jan99 		return (TRUE);
-//DeadCode RDH 07Jan99 	}else
-//DeadCode RDH 07Jan99 		return(FALSE);
-//DeadCode RDH 07Jan99 
-//DeadCode RDH 07Jan99 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		M_SelfAsBait
 //Author		R. Hyde 
@@ -3778,25 +2919,6 @@ Bool 	ACMAirStruc::M_SelfAsBait()
 {
 	return(FALSE);													  //CSB 24/01/00
 
-//DEADCODE CSB 24/01/00 	if (	(		(classtype->phrasename != OLDPHRASE_MIGS)
-//DEADCODE CSB 24/01/00 //DEADCODE RDH 10/05/99 	if (	(		(classtype->visible != MIG15)
-//DEADCODE CSB 24/01/00 				&&	(ai.combatskill > SKILL_VETERAN)
-//DEADCODE CSB 24/01/00 				&&	(ai.morale 	> 	MORALE_MEDIUM)
-//DEADCODE CSB 24/01/00 				&&  (Range > DANGERRANGE)
-//DEADCODE CSB 24/01/00 			)
-//DEADCODE CSB 24/01/00 			||
-//DEADCODE CSB 24/01/00 			(		(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 24/01/00 //DEADCODE RDH 10/05/99 			(		(classtype->visible == MIG15)
-//DEADCODE CSB 24/01/00 				&&	(ai.aggressionlevel == AL_ATTACKANYTHING)
-//DEADCODE CSB 24/01/00 				&&  (Range > DANGERRANGE)
-//DEADCODE CSB 24/01/00 			)
-//DEADCODE CSB 24/01/00 		)
-//DEADCODE CSB 24/01/00 	{
-//DEADCODE CSB 24/01/00 			ai.manoeuvre = MANOEUVRE_SELFASBAIT;
-//DEADCODE CSB 24/01/00 			return (TRUE);
-//DEADCODE CSB 24/01/00 	}
-//DEADCODE CSB 24/01/00 	else
-//DEADCODE CSB 24/01/00 			return(FALSE);
 }
 
 
@@ -3909,22 +3031,6 @@ MANOEUVRE	ACMAirStruc::ManoeuvreBasedOnSkill(SkillType combatskill, MANOEUVRE go
 		return(badman);
 }
 
-//DEADCODE CSB 17/02/00 	if (ai.combatskill < combatskill)
-//DEADCODE CSB 17/02/00 	{
-//DEADCODE CSB 17/02/00 		return (badman);
-//DEADCODE CSB 17/02/00 	}else
-//DEADCODE CSB 17/02/00 	{
-//DEADCODE CSB 17/02/00 		int	rndnum = Math_Lib.rnd((int) ai.combatskill);
-//DEADCODE CSB 17/02/00 		if (rndnum < (int)combatskill)
-//DEADCODE CSB 17/02/00 		{
-//DEADCODE CSB 17/02/00 			return (badman);
-//DEADCODE CSB 17/02/00 		}
-//DEADCODE CSB 17/02/00 		else
-//DEADCODE CSB 17/02/00 		{
-//DEADCODE CSB 17/02/00 			return (goodman);
-//DEADCODE CSB 17/02/00 		}
-//DEADCODE CSB 17/02/00 	}
-//DEADCODE CSB 17/02/00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3947,11 +3053,6 @@ Bool	ACMAirStruc::SubjectHasEnergyAdvantage()
 
 	if (		(DeltaAltitude() > FT_2000)
 			||	((vel_ - unfriendly->vel_) > MPH100)
-//DEADCODE CSB 04/05/00 			||	(		(DeltaAltitude() > -FT_1000)
-//DEADCODE CSB 04/05/00 					&&	((vel_ - unfriendly->vel_) > -MPH50)
-//DEADCODE CSB 04/05/00 					&&	(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 					&&	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 				)
 		)
 		return (TRUE);
 	else
@@ -4036,7 +3137,6 @@ Bool 	ACMAirStruc::M_GunDefence(ANGLES lead)
 						if (!AboveGround(FT_3000))
 							ai.manoeuvre = MANOEUVRE_JINK;
 						else
-//DEADCODE CB 18/11/99 							ai.manoeuvre = MANOEUVRE_BREAK180;
 							ai.manoeuvre = MANOEUVRE_BREAK90;		  //CB 18/11/99
 					}
 
@@ -4156,13 +3256,9 @@ Bool 	ACMAirStruc::M_SplitS()
 		)
 		{
 			if	(rndnum < RND25PC)
-//DEADCODE CB 18/11/99 				ai.manoeuvre = MANOEUVRE_BREAK180;
 				ai.manoeuvre = MANOEUVRE_BREAK90;					  //CB 18/11/99
 			else if	(rndnum < RND50PC)
 			{
-//DEADCODE CSB 10/01/00 				if(classtype->visible == F86)				//CSB 08/07/99	
-//DEADCODE CSB 10/01/00 					ai.manoeuvre = MANOEUVRE_DIVINGSPIN;	//CSB 08/07/99	
-//DEADCODE CSB 10/01/00 				else										//CSB 08/07/99	
 					ai.manoeuvre = MANOEUVRE_BREAKLOW;
 			}
 			else
@@ -4175,7 +3271,6 @@ Bool 	ACMAirStruc::M_SplitS()
 		)
 		{
 			if	(rndnum < RND25PC)
-//DEADCODE CB 18/11/99 				ai.manoeuvre = MANOEUVRE_BREAK180;
 				ai.manoeuvre = MANOEUVRE_BREAK90;
 			else if	(rndnum < RND50PC)
 				ai.manoeuvre = MANOEUVRE_BREAKLOW;
@@ -4328,7 +3423,6 @@ void	ACMAirStruc::DefenceManoeuvre()
 							ai.manoeuvre = MANOEUVRE_CLIMBTURN;		break;
 						case AT_BF109:
 						{
-//DeadCode CSB 8Aug00 							if(World.Y > 250000)
 							if(Math_Lib.rnd(2))
 								ai.manoeuvre = MANOEUVRE_STEEPDIVE;
 							else
@@ -4356,25 +3450,6 @@ void	ACMAirStruc::DefenceManoeuvre()
 	}
 }
 
-//DEADCODE CSB 24/01/00 		{
-//DEADCODE CSB 24/01/00 			if (SubjectHasEnergyAdvantage())
-//DEADCODE CSB 24/01/00 				 ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT, MANOEUVRE_BREAKTURN);
-//DEADCODE CSB 24/01/00 			else
-//DEADCODE CSB 24/01/00 				 ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_BREAKTURN, MANOEUVRE_TURNINGFIGHT);
-//DEADCODE CSB 24/01/00 		}
-//DEADCODE CSB 24/01/00 		else
-//DEADCODE CSB 24/01/00 			ai.manoeuvre = MANOEUVRE_EXTENSION;
-//DEADCODE CSB 24/01/00 	}
-//DEADCODE CSB 24/01/00 	else if(ai.morale > MORALE_POOR)
-//DEADCODE CSB 24/01/00 	{
-//DEADCODE CSB 24/01/00 		if (SubjectHasEnergyAdvantage())
-//DEADCODE CSB 24/01/00 			 ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_HIGBARRELROLL);
-//DEADCODE CSB 24/01/00 		else
-//DEADCODE CSB 24/01/00 			 ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_HIGBARRELROLL,MANOEUVRE_TURNINGFIGHT);	////lag roll defense ref1.71
-//DEADCODE CSB 24/01/00 	}
-//DEADCODE CSB 24/01/00 	else
-//DEADCODE CSB 24/01/00 		ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_ZOOM);
-//DEADCODE CSB 24/01/00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -4433,19 +3508,6 @@ SLong		ACMAirStruc::DeltaAltitude()
 //------------------------------------------------------------------------------
 void	ACMAirStruc::AggressivePassManoeuvre()
 {
-//DEADCODE CSB 04/05/00 	RndVal	rndnum = Math_Lib.rnd();
-//DEADCODE CSB 04/05/00 
-//DEADCODE CSB 04/05/00 	if (	(	(classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 	if (	(	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 			&&	(rndnum < RND25PC)
-//DEADCODE CSB 04/05/00 			)
-//DEADCODE CSB 04/05/00 //DEADCODE CSB 10/01/00 			||
-//DEADCODE CSB 04/05/00 //DEADCODE CSB 10/01/00 			(	(classtype->visible == F86)
-//DEADCODE CSB 04/05/00 //DEADCODE CSB 10/01/00 			&&	(rndnum > RND25PC)
-//DEADCODE CSB 04/05/00 //DEADCODE CSB 10/01/00 			)
-//DEADCODE CSB 04/05/00 		)
-//DEADCODE CSB 04/05/00 		ai.manoeuvre = MANOEUVRE_BREAKTURN;
-//DEADCODE CSB 04/05/00 	else
 		ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
 }
 
@@ -4604,13 +3666,6 @@ void	ACMAirStruc::SelectNoseToTailManoeuvre()
 { 
 	if (Range > DANGERRANGE)
 	{
-//DEADCODE CSB 24/01/00 		if(		(ai.combatskill >= SKILL_VETERAN)
-//DEADCODE CSB 24/01/00 			&&  (AboveGround(FT_1000))
-//DEADCODE CSB 24/01/00 			&&	( Range > WEAPONSRANGE)
-//DEADCODE CSB 24/01/00 			&&	(ClosureLessThan(MPH15))
-//DEADCODE CSB 24/01/00 		)
-//DEADCODE CSB 24/01/00 			ai.manoeuvre = MANOEUVRE_LOWYOYO;
-//DEADCODE CSB 24/01/00 		else
 		ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
 	}
 	else
@@ -4724,10 +3779,6 @@ void	ACMAirStruc::SelectBeamToNoseManoeuvre()
 		{
 			if (SubjectHasEnergyAdvantage())
 			{
-//DEADCODE CSB 04/05/00 				if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 				if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_BREAKTURN);
-//DEADCODE CSB 04/05/00 				else
 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_ZOOM);
 			}else
 				ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
@@ -4769,10 +3820,6 @@ void	ACMAirStruc::SelectBeamToTailManoeuvre()
 		{
 			if (SubjectHasEnergyAdvantage())
 			{
-//DEADCODE CSB 04/05/00 				if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 				if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_BREAKTURN);
-//DEADCODE CSB 04/05/00 				else
 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_ZOOM);
 			}else
 				ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
@@ -4783,10 +3830,6 @@ void	ACMAirStruc::SelectBeamToTailManoeuvre()
 		{
 			if (SubjectHasEnergyAdvantage())
 			{
-//DEADCODE CSB 04/05/00 				if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 				if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_BREAKTURN);
-//DEADCODE CSB 04/05/00 				else
 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_ZOOM);
 			}else
 				ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
@@ -4828,10 +3871,6 @@ void	ACMAirStruc::SelectBeamToBeamManoeuvre()
 		{
 			if (SubjectHasEnergyAdvantage())
 			{
-//DEADCODE CSB 04/05/00 				if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 				if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_BREAKTURN);
-//DEADCODE CSB 04/05/00 				else
 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_ZOOM);
 			}else
 				ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
@@ -4843,15 +3882,6 @@ void	ACMAirStruc::SelectBeamToBeamManoeuvre()
 			if (SubjectHasEnergyAdvantage())
 			{
 				MANOEUVRE tempman;
-//DEADCODE CSB 04/05/00 				if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 				if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 				{
-//DEADCODE CSB 04/05/00 					if (DeltaAltitude() > FT_2000)
-//DEADCODE CSB 04/05/00 						tempman = MANOEUVRE_TURNINGFIGHT;
-//DEADCODE CSB 04/05/00 					else
-//DEADCODE CSB 04/05/00 						tempman = MANOEUVRE_GAINHEIGHT; 
-//DEADCODE CSB 04/05/00 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_BREAKTURN);
-//DEADCODE CSB 04/05/00 				}else
 				{
 					if (DeltaAltitude() > FT_2000)
 						tempman = MANOEUVRE_BREAKTURN;
@@ -4910,10 +3940,6 @@ void	ACMAirStruc::SelectTailToTailManoeuvre()
 				ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_IMMELMANN);
 			else if (SubjectHasEnergyAdvantage())
 			{
-//DEADCODE CSB 04/05/00 				if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 				if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_ZOOM);
-//DEADCODE CSB 04/05/00 				else
 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_BREAKTURN);
 			}else
 				ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
@@ -4922,10 +3948,6 @@ void	ACMAirStruc::SelectTailToTailManoeuvre()
 	{
 		if	(ai.morale 	> 	MORALE_MEDIUM)
 		{
-//DEADCODE CSB 04/05/00 			if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 			if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 				ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_GAINHEIGHT);
-//DEADCODE CSB 04/05/00 			else
 				ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_BREAKTURN);
 		}else
 //			ai.manoeuvre = MANOEUVRE_LAZYTURN;
@@ -4958,10 +3980,6 @@ void	ACMAirStruc::SelectTailToBeamManoeuvre()
 		{
 			if (SubjectHasEnergyAdvantage())
 			{
-//DEADCODE CSB 04/05/00 					if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 					if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 						ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_BREAKTURN);
-//DEADCODE CSB 04/05/00 					else
 						ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_ZOOM);
 			}else
 				 ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_ZOOM);
@@ -4973,10 +3991,6 @@ void	ACMAirStruc::SelectTailToBeamManoeuvre()
 			if (SubjectHasEnergyAdvantage())
 
 			{
-//DEADCODE CSB 04/05/00 				if (classtype->phrasename == OLDPHRASE_MIGS)
-//DEADCODE CSB 04/05/00 //DEADCODE RDH 10/05/99 				if	(classtype->visible == MIG15)
-//DEADCODE CSB 04/05/00 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_GAINHEIGHT,MANOEUVRE_BREAKTURN);
-//DEADCODE CSB 04/05/00 				else
 					ai.manoeuvre=ManoeuvreBasedOnSkill(SKILL_REGULAR,MANOEUVRE_TURNINGFIGHT,MANOEUVRE_ZOOM);
 			}else
 				ai.manoeuvre = MANOEUVRE_TURNINGFIGHT;
@@ -5148,15 +4162,7 @@ void AirStruc::SetDesiredVel()
 //------------------------------------------------------------------------------
 void	ACMAirStruc::ManualACM ()
 {
-//DeadCode CSB 28/04/99		PrintString(0, 22, "ManualACM ");
 	
-//DEADCODE DAW 26/11/99 	if(Key_Tests.KeyPress3d (RPM_50))	//CSB 18/3/99	
-//DEADCODE CSB 18/01/00 	if(ai.manoeuvre != MANOEUVRE_HEADONATTACK)
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		ai.manoeuvre = MANOEUVRE_HEADONATTACK;	//CSB 18/03/99	
-//DEADCODE CSB 18/01/00 		ai.ManStep   = 0;
-//DEADCODE CSB 18/01/00 		SetManoeuvreTime (1500);
-//DEADCODE CSB 18/01/00 	}
 
 		switch (ai.manoeuvre)
 		{
@@ -5190,12 +4196,6 @@ void	ACMAirStruc::ManualACM ()
  				LineAbreast();
 				break;
 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_SCATTER:											//RDH 27Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99 //DeadCode RDH 27Apr98 no such manoeuvre 				Scatter();	  //RDH 24/02/99
-//DEADCODE CB 18/11/99 				TurningFight();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
 			case MANOEUVRE_PINCER:											//RDH 27Mar98
 			{
  				Pincer();
@@ -5222,17 +4222,6 @@ void	ACMAirStruc::ManualACM ()
  				LagPursuit();
 				break;
 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_CIRCUMVENT:										//RDH 27Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99 //will not be implemented				Circumvent();
-//DEADCODE CB 18/11/99 				TurningFight();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_ROUNDABOUT:										//RDH 27Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99  				RoundAbout();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
 			case MANOEUVRE_SPLITMANOEUVRE:									//RDH 27Mar98
 			{
  				SplitManoeuvre();									  //RDH 21/02/99
@@ -5301,8 +4290,6 @@ void	ACMAirStruc::ManualACM ()
 			case MANOEUVRE_MAKEFORFRIENDLY :							
 			{													
 				Regroup();
-//DeadCode RDH 27Apr98 				MakeForFriendly ( );									
-//DeadCode CSB 5Sep00 				TurningFight();
 				break;											
 			}													
 			case MANOEUVRE_MOVEAWAY :							
@@ -5324,14 +4311,8 @@ void	ACMAirStruc::ManualACM ()
 			case MANOEUVRE_IMMELMANNTURN :						
 			{													
 				ImmelmannTurn();								
-//DeadCode CSB 4Sep00 				TurningFight();
 				break;											
 			}													
-//DEADCODE CB 18/11/99 			case MANOEUVRE_HEADONOFFSET :						
-//DEADCODE CB 18/11/99 			{													
-//DEADCODE CB 18/11/99   				HeadOnOffset ( );								
-//DEADCODE CB 18/11/99 				break;											
-//DEADCODE CB 18/11/99 			}													
 			case MANOEUVRE_IMMELMANN :						
 			{													
  				Immelmann ( );								
@@ -5351,7 +4332,6 @@ void	ACMAirStruc::ManualACM ()
 			case MANOEUVRE_STRAIGHTDIVE:						
 			{													
 				StraightDive ( );								
-//DeadCode CSB 19/03/99					TurningFight();
 				break;											
 			}													
 			case MANOEUVRE_STANDONTAIL:							
@@ -5415,11 +4395,6 @@ void	ACMAirStruc::ManualACM ()
 				LazyTurn();
 				break;
 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_BREAK180:											//RDH 30Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99  				Break180();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
 			case MANOEUVRE_BREAKLOW:											//RDH 30Mar98
 			{
  				BreakLow();
@@ -5455,63 +4430,21 @@ void	ACMAirStruc::ManualACM ()
  				LowAlt();
 				break;
 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_SNAPSHOT:											//RDH 30Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99 //will not be used	SnapShot();
-//DEADCODE CB 18/11/99 				TurningFight();
-//DEADCODE CB 18/11/99  				
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_STAYONTAIL:										//RDH 30Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99 //will not be used 				StayOnTail();
-//DEADCODE CB 18/11/99 				TurningFight();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
 			case MANOEUVRE_TURNTOHDGANDPITCH:								//RDH 30Mar98
 			{
-//DeadCode RDH 27Apr98 				TurnToHdgAndPitch();
 				TurningFight();
 				break;
 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_HOTSIDELAGPURSUITFIGHT:							//RDH 30Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99 //will not be used  				HotSideLagPursuitFight();
-//DEADCODE CB 18/11/99 				TurningFight();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_SANDWICHMANOEUVRES:								//RDH 30Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99 //DeadCode RDH 27Apr98 				SandwichManoeuvres();
-//DEADCODE CB 18/11/99 				TurningFight();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
 			case MANOEUVRE_TURNINGFIGHT:									//RDH 30Mar98
 			{
 				TurningFight();
 				break;
 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_SUSTAINEDTURN:									//RDH 30Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99 //will not use, covered in turningfight = f(skill)				SustainedTurn();
-//DEADCODE CB 18/11/99  				TurningFight();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
-//DeadCode CSB 7Sep00 			case MANOEUVRE_HIGHYOYO:											//RDH 30Mar98
-//DeadCode CSB 7Sep00 			{
-//DeadCode CSB 7Sep00  				HighYoYo();
-//DeadCode CSB 7Sep00 				break;
-//DeadCode CSB 7Sep00 			}
 			case MANOEUVRE_ZOOM:											//RDH 30Mar98
 			{
  				Zoom();
 				break;
 			}
-//DeadCode CSB 7Sep00 			case MANOEUVRE_LOWYOYO:											//RDH 30Mar98
-//DeadCode CSB 7Sep00 			{
-//DeadCode CSB 7Sep00  				LowYoYo();
-//DeadCode CSB 7Sep00 				break;
-//DeadCode CSB 7Sep00 			}
 			case MANOEUVRE_INTERCEPTHIGH:									//RDH 30Mar98
 			{
 				InterceptHigh();
@@ -5522,14 +4455,8 @@ void	ACMAirStruc::ManualACM ()
 				InterceptLow();
 				break;
 			}
-//DEADCODE CB 18/11/99 			case MANOEUVRE_CLIMBATSUSTAINEDTURNSPEED:						//RDH 30Mar98
-//DEADCODE CB 18/11/99 			{
-//DEADCODE CB 18/11/99 				ClimbAtSustainedTurnSpeed();
-//DEADCODE CB 18/11/99 				break;
-//DEADCODE CB 18/11/99 			}
 			case MANOEUVRE_GAINSPEED:						
 			{													
-//DeadCode RDH 03Dec98 				GainSpeed();
 				if (ai.unfriendly)
 					TurningFight();
 				else
@@ -5618,16 +4545,12 @@ void	ACMAirStruc::ManualACM ()
 			}
 			case MANOEUVRE_COLLIDE:						
 			{													
-//DeadCode CSB 12Oct00 				ai.manoeuvre = MANOEUVRE_SELECT;
 				ai.simpleacm = TRUE;
 				SimpleCollide();
 				break;											
 			}	
 		}
 
-//DeadCode CSB 1Sep00 		weap.ShootDelay = weap.ShootDelay-Timer_Code.FRAMETIME;
-//DeadCode CSB 1Sep00 		if (weap.ShootDelay < 0)
-//DeadCode CSB 1Sep00 			weap.ShootDelay = 0;
 		
 		
 		ai.oldoldoldhdgI = ai.oldoldhdgI;
@@ -5638,73 +4561,12 @@ void	ACMAirStruc::ManualACM ()
 		ai.oldoldpitchI = ai.oldpitchI;
 		ai.oldpitchI = PitchIntercept;
 
-//DEADCODE CSB 24/11/99 	if (	(ai.unfriendly )
-//DEADCODE CSB 24/11/99 		&&	(Save_Data.flightdifficulty [FD_AUTOTHROTTLE])	//THIS NO LONGER EXISTS //CSB 24/11/99
-//DEADCODE CSB 24/11/99 		&&	((ai.unfriendly == Persons2::PlayerGhostAC)
-//DEADCODE CSB 24/11/99 			|| (ai.unfriendly->uniqueID.commsmove))
-//DEADCODE CSB 24/11/99 		&&	(Range  < OUTERCOMBATRANGE)
-//DEADCODE CSB 24/11/99 		&&	(TargetFacingSubject(ANGLES_45Deg))
-//DEADCODE CSB 24/11/99 		&&	(TargetOnSubjectTail(ANGLES_45Deg))
-//DEADCODE CSB 24/11/99 		)
-//DEADCODE CSB 24/11/99 		SetDesiredVel();
 	
 	Manual_Pilot.ACMManualPilot(this);	
 
 		if(ai.unfriendly!=NULL)
 			AutoShoot(TRUE);
 
-//DeadCode CSB 2Oct00 	if (ai.manoeuvre == MANOEUVRE_SELECT)
-//DeadCode CSB 2Oct00 	{
-//DeadCode CSB 2Oct00 		if (ai.unfriendly==NULL)
-//DeadCode CSB 2Oct00 		{
-//DeadCode CSB 2Oct00 			if (	(ai.manoeuvre != MANOEUVRE_TOPCOVER)			//JIM 21Aug96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_LOOKROUND)			//JIM 21Aug96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_DIVEFORHOME)			//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_CLIMBFORHOME)		//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_STRAIGHTDIVE)		//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_GOHOME )				//JIM 15Oct96
-//DeadCode CSB 2Oct00 				&&	(ai.manoeuvre != MANOEUVRE_SPINRECOVERY )				//JIM 15Oct96
-//DeadCode CSB 2Oct00 				)
-//DeadCode CSB 2Oct00 			{
-//DeadCode CSB 2Oct00 		  		ai.ManStep = PHASE0;
-//DeadCode CSB 2Oct00 //DeadCode CSB 25Aug00 				ai.manoeuvre=MANOEUVRE_LOOKROUND;
-//DeadCode CSB 2Oct00 				ai.manoeuvre = MANOEUVRE_DISENGAGED;
-//DeadCode CSB 2Oct00 				ai.simpleacm = TRUE;
-//DeadCode CSB 2Oct00 			}
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 		}else
-//DeadCode CSB 2Oct00 		{
-//DeadCode CSB 2Oct00 			InterceptandRange (&ai.unfriendly->World);
-//DeadCode CSB 2Oct00 			SelectNextEngageManoeuvre ();
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 			if (		(ai.manoeuvre != MANOEUVRE_TURNINGFIGHT)
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 					&&	(ai.manoeuvre != MANOEUVRE_GAINHEIGHT)
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 					&&	(ai.manoeuvre != MANOEUVRE_DIVEANDZOOM)
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 				)
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 			{
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 				MANOEUVRE manoeuvre = ai.manoeuvre;
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 				SelectNextEngageManoeuvre ();
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 				ai.manoeuvre = manoeuvre;
-//DeadCode CSB 2Oct00 //DEADCODE DAW 01/04/99 			}
-//DeadCode CSB 2Oct00 	  		ai.ManStep = PHASE0;
-//DeadCode CSB 2Oct00 
-//DeadCode CSB 2Oct00 		}
-//DeadCode CSB 2Oct00 	}
-//DeadCode CSB 2Oct00 //DEADCODE RDH 06/04/99 	if  (Key_Tests.KeyPress3d(CHEATLIFTKEY))
-//DeadCode CSB 2Oct00 //DEADCODE RDH 06/04/99 	{
-//DeadCode CSB 2Oct00 //DEADCODE RDH 06/04/99 		  		ai.ManStep = PHASE0;
-//DeadCode CSB 2Oct00 //DEADCODE RDH 06/04/99 				ai.manoeuvre= MANOEUVRE_HIGHYOYO;
-//DeadCode CSB 2Oct00 //DEADCODE RDH 06/04/99 	}
-//DeadCode CSB 2Oct00 	if((ai.manoeuvre == MANOEUVRE_SELECT) && (movecode == AUTO_COMBAT))
-//DeadCode CSB 2Oct00 	{
-//DeadCode CSB 2Oct00 		ai.manoeuvre = MANOEUVRE_DISENGAGED;
-//DeadCode CSB 2Oct00 		ai.simpleacm = TRUE;
-//DeadCode CSB 2Oct00 		ai.ManStep = 0;
-//DeadCode CSB 2Oct00 		SetManoeuvreTime(0);
-//DeadCode CSB 2Oct00 		SetUnfriendly(NULL);
-//DeadCode CSB 2Oct00 //DeadCode CSB 5Sep00 		movecode=AUTO_FOLLOWWP;
-//DeadCode CSB 2Oct00 //DeadCode CSB 5Sep00 		information = IF_OUT_POS;					//CSB 22Aug00
-//DeadCode CSB 2Oct00 //DeadCode CSB 5Sep00 		manoeuvretime = 0;
-//DeadCode CSB 2Oct00 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -5756,16 +4618,13 @@ void	AirStruc::BreakCallReaction(AirStrucPtr currac,AirStrucPtr unf)
 		||	(currac->vel_ < currac->classtype->minvel)	)				//CSB 13Jul00
 		return;															//CSB 13Jul00
 		
-		MANOEUVRE manoeuvre = MANOEUVRE_SELECT;
+	MANOEUVRE manoeuvre = MANOEUVRE_SELECT;
 		MANOEUVRE goodmanoeuvre = MANOEUVRE_SELECT;
 		if 	(currac->ai.combatskill >= SKILL_VETERAN)
 			 goodmanoeuvre = MANOEUVRE_SPLITS;
 
 		if 	(currac->ai.combatskill >= SKILL_REGULAR)
 		{
-//DEADCODE CSB 10/01/00 			if((currac->classtype->visible == F86) && (!Math_Lib.rnd(4)))	//CSB 08/07/99	
-//DEADCODE CSB 10/01/00 				manoeuvre = MANOEUVRE_DIVINGSPIN;							//CSB 08/07/99	
-//DEADCODE CSB 10/01/00 			else															//CSB 08/07/99	
 			{
 				RndVal	rndnum = Math_Lib.rnd();
 				if	(rndnum < RND33PC)	//CSB 29/06/99	

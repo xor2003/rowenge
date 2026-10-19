@@ -86,8 +86,6 @@ public:
 	void		Clear()
 	{
 		squadnum = 0;
-//DeadCode RDH 21Feb100 		kills[0]=0;
-//DeadCode RDH 21Feb100 		kills[1]=0;
 		numlosses = 0;
 		numacdamaged = 0;
 		numpilotslost = 0;
@@ -121,7 +119,6 @@ enum	EndFlightStatus
 	EFS_LandedOtherAF,		// Craig	Landed away from home.
 	EFS_LandedField,		// Craig	Landed in a field.
 	EFS_DitchedField,		// Craig	Aircraft ditched.
-//DeadCode RJS 30Oct00 	EFS_BadCrashAF,			//* Craig 3d\transite.cpp (LandedEffect)	Survived a bad crash.
 	EFS_ACLOST,				//*			Aircraft written off.
 	EFS_KIA,				//*			Killed in action.
 	EFS_BadCrashAF,			//Survived a bad crash.
@@ -225,7 +222,6 @@ public:
 
 		UWord		diaryraidgroupindex;
 		UByte		kills[3];									//RDH 21Feb100
-//DeadCode RJS 23Feb00		UByte		pad;
 
 		Gruppen()
 		{
@@ -235,7 +231,6 @@ public:
 		void	Clear()
 		{
 			diaryraidgroupindex = DIARY_EMPTYINDEX;
-//DeadCode RDH 21Feb100 			noaclaunched = 0;
 			kills[0]=0;											//RDH 21Feb100
 			kills[1]=0;											//RDH 21Feb100
 			kills[2]=0;											//RDH 21Feb100
@@ -488,15 +483,6 @@ public:
 	void			CreateLWEntry(Profile*);
 	void			CreateRAFEntry(Profile*,SLong);
 	void			New3DSession();										//RJS 30Oct00
-//DeadCode RJS 30Oct00 	{
-//DeadCode RJS 30Oct00 		vp = NULL;
-//DeadCode RJS 30Oct00 		current_depth = 0;
-//DeadCode RJS 30Oct00 		current_ac = NULL;
-//DeadCode RJS 30Oct00 		current_itemstate = 0;
-//DeadCode RJS 30Oct00 		current_pilotcount = 1;											//RJS 21Sep00
-//DeadCode RJS 30Oct00 
-//DeadCode RJS 30Oct00 		trainingReport = 0;												//RJS 30Oct00
-//DeadCode RJS 30Oct00 	}
 
 
 // User Functions...
@@ -556,11 +542,6 @@ public:
 // Invoked from the 3D...
 
 	void		Enter3D(ViewPoint* thevp);
-//DeadCode RJS 30Oct00 	{
-//DeadCode RJS 30Oct00 		vp = thevp;
-//DeadCode RJS 30Oct00 
-//DeadCode RJS 30Oct00 		trainingReport = 0;												//RJS 30Oct00
-//DeadCode RJS 30Oct00 	}
 
 	void		SetAC(void*,animptr&);							//RJS 21Sep00
 	void		UpdateACDamage();								//RJS 21Feb00
@@ -571,29 +552,9 @@ public:
 	void		CreateTransfer(void*);							//RJS 29Feb00
 	void		SetLandingTime(SquadronBase*);					//RJS 29Feb00
 	void		SetLandingTime(ULong entry);							//RJS 7Sep00
-//DeadCode RJS 7Sep00 	{
-//DeadCode RJS 7Sep00 		SquadronBase*	ptr;
-//DeadCode RJS 7Sep00 		ULong			base = entry&DIARYMASK;
-//DeadCode RJS 7Sep00 		if (entry & GRUPPENMASK)
-//DeadCode RJS 7Sep00 			ptr = &diaryptr->gruppentable[base];
-//DeadCode RJS 7Sep00 		else
-//DeadCode RJS 7Sep00 			ptr = &diaryptr->squadtable[base];
-//DeadCode RJS 7Sep00 
-//DeadCode RJS 7Sep00 		SetLandingTime(ptr);
-//DeadCode RJS 7Sep00 	}
 
 	void		SetDisperseTime(SquadronBase*);					//RJS 29Feb00
 	void		SetDisperseTime(ULong entry);					//RJS 29Feb00
-//DeadCode RJS 7Sep00 	{
-//DeadCode RJS 7Sep00 		SquadronBase*	ptr;
-//DeadCode RJS 7Sep00 		ULong			base = entry&DIARYMASK;
-//DeadCode RJS 7Sep00 		if (entry & GRUPPENMASK)
-//DeadCode RJS 7Sep00 			ptr = &diaryptr->gruppentable[base];
-//DeadCode RJS 7Sep00 		else
-//DeadCode RJS 7Sep00 			ptr = &diaryptr->squadtable[base];
-//DeadCode RJS 7Sep00 
-//DeadCode RJS 7Sep00 		SetDisperseTime(ptr);
-//DeadCode RJS 7Sep00 	}
 
 	void	UpdateIntercept(Intercept*, ItemPtr, const int&);	//RJS 18May00
 

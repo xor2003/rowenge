@@ -126,7 +126,6 @@ short Display::GetDOSRAM(long& buffer, short size)
 	regs.w.ax=0x0100;
 	regs.w.bx=size;												//JIM 25Oct95
 	ASM_DEXint31(&regs);
-//DeadCode ARM 04Jun96 	int386( 0x031, &regs, &regs);
 
 	buffer = regs.w.ax<<4;
 	return(regs.w.dx);
@@ -159,7 +158,6 @@ Bool Display::GetDOSRAM(DPMIMem&	dpmimem,			//Definition for mem region
 	regs.w.ax=0x0100;
 	regs.w.bx=(UWord)size;												//JIM 25Oct95
 	ASM_DEXint31(&regs);
-//DeadCode ARM 04Jun96 	int386( 0x031, &regs, &regs);
 	if (regs.flags & regs.CF)
 		_Error.EmitSysErr("DOS mem request failed for %d",dpmimem.size);
 	dpmimem.desc=regs.w.dx;
@@ -200,7 +198,6 @@ void Display::FreeDOSRAM(short handle)
 	regs.w.ax=0x0101;
 	regs.w.dx=handle;
 	ASM_DEXint31(&regs);
-//DeadCode ARM 04Jun96 	int386( 0x031, &regs, &regs);
 
 #endif
 
@@ -357,7 +354,6 @@ void	Display::ListVesaModes(ScreenRez* modelist)
 	if (	(regs.w.ax!=0x004f)
 		||	(*((ULong*) real_mode_stack)!=*((ULong*) "VESA"))	)
 	{
-//Old_Code PD 04Feb97 		*(modelist++)=-320;
 
 		modelist->width=-320;									//PD 04Feb97
 		modelist++;												//PD 04Feb97
@@ -420,7 +416,6 @@ void	Display::ListVesaModes(ScreenRez* modelist)
 					&&	(25600%h)==0 && (h&3)==0
 					&& (vesainfo.VertRes*4)/h==3)	//lets through 1280/1024 but stops 640x400(2) and 320x400(5)
 				{	//we might be interested... ok... we are interested!
-//Old_Code PD 04Feb97 					*(modelist++)=-h;
 					modelist->width=-h;							//PD 04Feb97
 					modelist++;									//PD 04Feb97
 
@@ -429,7 +424,6 @@ void	Display::ListVesaModes(ScreenRez* modelist)
 					if (	(vesainfo.flags&Modeflagmask&VESA_Linear)
 						&&	videomem>=2*vesainfo.VertRes*h	)
 						{
-//Old_Code PD 04Feb97 						*(modelist++)=h;
 							modelist->width=h;					//PD 04Feb97
 							modelist++;							//PD 04Feb97
 						}
@@ -438,7 +432,6 @@ void	Display::ListVesaModes(ScreenRez* modelist)
 		}
 	}
 	if (done320==FALSE)
-//Old_Code PD 04Feb97 		*(modelist++)=-320;
 	{
 		modelist->width=-320;									//PD 04Feb97
 		modelist++;												//PD 04Feb97
@@ -934,454 +927,6 @@ void	Display::SetTextMode()
 
 
 
-//DeadCode JIM 19Feb96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 19Feb96 //Procedure		SetGraphicsMode
-//DeadCode JIM 19Feb96 //Author		Jim Taylor
-//DeadCode JIM 19Feb96 //Date			Tue 12 Dec 1995
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Description	STUB:	Actually change to the selected mode
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Inputs		
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Returns	
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 void	Display::SetGraphicsMode()
-//DeadCode JIM 19Feb96 {
-//DeadCode JIM 19Feb96  	switch (svgalibmodefix)
-//DeadCode JIM 19Feb96 	{
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_winc:		return	SetGraphicsMode_winc	()
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_winf:		return	SetGraphicsMode_winf	()
-//DeadCode JIM 19Feb96 	case SVGA_CUSTOM_1d:	SetGraphicsMode_CUSTOM_1d	();return;
-//DeadCode JIM 19Feb96 	case SVGA_CUSTOM_1c:	SetGraphicsMode_CUSTOM_1c	();return;
-//DeadCode JIM 19Feb96 	case SVGA_VESAc:	SetGraphicsMode_VESAc	();return;
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_VESAf:	return	SetGraphicsMode_VESAf	()
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_CUSTOM_1:	return	SetGraphicsMode_CUSTOM_1();
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_CUSTOM_2:	return	SetGraphicsMode_CUSTOM_2()
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_CUSTOM_3:	return	SetGraphicsMode_CUSTOM_3()
-//DeadCode JIM 19Feb96 	}
-//DeadCode JIM 19Feb96 }
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 19Feb96 //Procedure		ScreenFlip
-//DeadCode JIM 19Feb96 //Author		Jim Taylor
-//DeadCode JIM 19Feb96 //Date			Tue 12 Dec 1995
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Description	Flip/Swap the screen - physically do it!
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Inputs		
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Returns	
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 void	Display::ScreenFlip()
-//DeadCode JIM 19Feb96 {
-//DeadCode JIM 19Feb96  	switch (svgalibmodefix)
-//DeadCode JIM 19Feb96 	{
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_winc:		return	ScreenFlip_winc	()
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_winf:		return	ScreenFlip_winf	()
-//DeadCode JIM 19Feb96 	case SVGA_CUSTOM_1d:	ScreenFlip_CUSTOM_1d	();return;
-//DeadCode JIM 19Feb96 	case SVGA_CUSTOM_1c:	ScreenFlip_CUSTOM_1c	();return;
-//DeadCode JIM 19Feb96 	case SVGA_VESAc:	ScreenFlip_VESAc	();return;
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_VESAf:	return	ScreenFlip_VESAf	()
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_CUSTOM_1:	return	ScreenFlip_CUSTOM_1();
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_CUSTOM_2:	return	ScreenFlip_CUSTOM_2()
-//DeadCode JIM 19Feb96 //TempCode JIM 12Dec95 	case SVGA_CUSTOM_3:	return	ScreenFlip_CUSTOM_3()
-//DeadCode JIM 19Feb96 	}
-//DeadCode JIM 19Feb96 }
 
-//DeadCode JIM 19Feb96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 19Feb96 //Procedure		SetGraphicsMode_VESAc
-//DeadCode JIM 19Feb96 //Author		Jim Taylor
-//DeadCode JIM 19Feb96 //Date			Tue 12 Dec 1995
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Description	
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Inputs		
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Returns	
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 void	Display::SetGraphicsMode_VESAc	()
-//DeadCode JIM 19Feb96 {
-//DeadCode JIM 19Feb96 	DPMIregs	regs;
-//DeadCode JIM 19Feb96 	regs.w.ax=0x4f02;
-//DeadCode JIM 19Feb96 	regs.w.cx=VESA.mode;
-//DeadCode JIM 19Feb96 	regs.w.bx=VESA.mode;
-//DeadCode JIM 19Feb96 	regs.w.di=0;
-//DeadCode JIM 19Feb96 	ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode JIM 19Feb96 	if (regs.w.ax!=0x004f)
-//DeadCode JIM 19Feb96 	{
-//DeadCode JIM 19Feb96 		INT3();
-//DeadCode JIM 19Feb96 	}
-//DeadCode JIM 19Feb96 }
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 19Feb96 //Procedure		ScreenFlip_VESAc
-//DeadCode JIM 19Feb96 //Author		Jim Taylor
-//DeadCode JIM 19Feb96 //Date			Tue 12 Dec 1995
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Description	Flip the displayed screen by copying
-//DeadCode JIM 19Feb96 //				1) Calculate the base page and offset for the new screen
-//DeadCode JIM 19Feb96 //				2) Copy the data a page at a time
-//DeadCode JIM 19Feb96 //				3) hardware flip if avaialble
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Inputs		
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Returns	
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 void	Display::ScreenFlip_VESAc()
-//DeadCode JIM 19Feb96 {
-//DeadCode JIM 19Feb96 	DPMIregs	regs;
-//DeadCode JIM 19Feb96 int	skipbytes,Lines,Columns,page;
-//DeadCode JIM 19Feb96 	if (++VESA.ScreenNum>=VESA.Screens)
-//DeadCode JIM 19Feb96 		VESA.ScreenNum=0;
-//DeadCode JIM 19Feb96 int	physicaloffset=VESA.ScreenNum*VESA.BytesPerScanLine*VESA.ScanLines;
-//DeadCode JIM 19Feb96 	page=
-//DeadCode JIM 19Feb96 		VESA.pagetop=physicaloffset/VESA.PageShift;
-//DeadCode JIM 19Feb96 	VESA.pageoff=physicaloffset%VESA.PageShift;
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 	if (VESA.BytesPerScanLine==BytesPerScanLine)
-//DeadCode JIM 19Feb96 	{
-//DeadCode JIM 19Feb96 		skipbytes=0;
-//DeadCode JIM 19Feb96 		Lines=1;
-//DeadCode JIM 19Feb96 		Columns=BytesPerScanLine*PhysicalHeight;
-//DeadCode JIM 19Feb96 	}
-//DeadCode JIM 19Feb96 	else
-//DeadCode JIM 19Feb96 	{
-//DeadCode JIM 19Feb96 		skipbytes=VESA.BytesPerScanLine-BytesPerScanLine;
-//DeadCode JIM 19Feb96 		Lines=PhysicalHeight;
-//DeadCode JIM 19Feb96 		Columns=BytesPerScanLine;
-//DeadCode JIM 19Feb96 	}
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 	LogicalPtr	src=logicalscreenptr;
-//DeadCode JIM 19Feb96 	char*		trg=(char*)VESA.writeaddr;
-//DeadCode JIM 19Feb96 	int			off=VESA.pageoff;
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 	//set to page
-//DeadCode JIM 19Feb96 	regs.w.ax=0x4f05;
-//DeadCode JIM 19Feb96 	regs.w.bx=VESA.writewin;
-//DeadCode JIM 19Feb96 	regs.w.dx=page;
-//DeadCode JIM 19Feb96 	ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 	while (Lines--)
-//DeadCode JIM 19Feb96 	{
-//DeadCode JIM 19Feb96 int		colleft=Columns;
-//DeadCode JIM 19Feb96 		while (off+colleft>VESA.PageSize)
-//DeadCode JIM 19Feb96 		{
-//DeadCode JIM 19Feb96 int			tmpleft=VESA.PageSize-off;
-//DeadCode JIM 19Feb96 			colleft=colleft-tmpleft;
-//DeadCode JIM 19Feb96 //TempCode JIM 14Dec95 			ASM_blat(trg+off,src,tmpleft);
-//DeadCode JIM 19Feb96 //TempCode JIM 14Dec95 			src+=tmpleft;
-//DeadCode JIM 19Feb96 			tmpleft=tmpleft>>2;
-//DeadCode JIM 19Feb96 			while (tmpleft--)
-//DeadCode JIM 19Feb96 			{
-//DeadCode JIM 19Feb96 				*((ULong*) (trg+off))=*((LogicalLPtr) src);
-//DeadCode JIM 19Feb96 				src+=4;
-//DeadCode JIM 19Feb96 				off+=4;
-//DeadCode JIM 19Feb96 			}
-//DeadCode JIM 19Feb96 			off=0;
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 			//set to next page
-//DeadCode JIM 19Feb96 			page+=VESA.PageShift;
-//DeadCode JIM 19Feb96 			regs.w.ax=0x4f05;
-//DeadCode JIM 19Feb96 			regs.w.bx=VESA.writewin;
-//DeadCode JIM 19Feb96 			regs.w.dx=page;
-//DeadCode JIM 19Feb96 			ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 		}
-//DeadCode JIM 19Feb96 //TempCode JIM 14Dec95 			ASM_blat(trg+off,src,colleft);
-//DeadCode JIM 19Feb96 //TempCode JIM 14Dec95 			src+=colleft;
-//DeadCode JIM 19Feb96 //TempCode JIM 14Dec95 		off+=colleft;
-//DeadCode JIM 19Feb96 		colleft=colleft>>2;
-//DeadCode JIM 19Feb96 		while (colleft--)
-//DeadCode JIM 19Feb96 		{
-//DeadCode JIM 19Feb96 			*((ULong*) (trg+off))=*((LogicalLPtr) src);
-//DeadCode JIM 19Feb96 			src+=4;
-//DeadCode JIM 19Feb96 			off+=4;
-//DeadCode JIM 19Feb96 		}
-//DeadCode JIM 19Feb96 		off+=skipbytes;
-//DeadCode JIM 19Feb96 	}
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 }
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 19Feb96 //Procedure		SetGraphicsMode_CUSTOM_1d
-//DeadCode JIM 19Feb96 //Author		Jim Taylor
-//DeadCode JIM 19Feb96 //Date			Thu 14 Dec 1995
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Description	Debugable 320x200
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Inputs		
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Returns	
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 void	Display::SetGraphicsMode_CUSTOM_1d()
-//DeadCode JIM 19Feb96 {
-//DeadCode JIM 19Feb96 	DPMIregs	regs;
-//DeadCode JIM 19Feb96  	regs.w.ax=0x0013;
-//DeadCode JIM 19Feb96 	ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode JIM 19Feb96 	logicalscreenptr=(LogicalPtr) ((void*) 0xA0000);
-//DeadCode JIM 19Feb96 }
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 void	Display::ScreenFlip_CUSTOM_1d()
-//DeadCode JIM 19Feb96 {;
-//DeadCode JIM 19Feb96 }
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 void	Display::SetGraphicsMode_CUSTOM_1c()
-//DeadCode JIM 19Feb96 {
-//DeadCode JIM 19Feb96 	DPMIregs	regs;
-//DeadCode JIM 19Feb96  	regs.w.ax=0x0013;
-//DeadCode JIM 19Feb96 	ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03C4,0x0604);
-//DeadCode JIM 19Feb96 	ASM_OutDxAl(0x03C2,0xE3);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,0x0E11);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,0x0D06);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,0x3E07);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,0xEA10);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,0xAE11);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,0xDF12);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03D4,0x0014);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,0xE715);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,0x0616);
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03D4,0xE317);
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 }
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 extern	"C"	void		ASM_CopyMainRAM2VidRAM(LogicalPtr, char *);
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 void	Display::ScreenFlip_CUSTOM_1c()
-//DeadCode JIM 19Feb96 {
-//DeadCode JIM 19Feb96 	ScreenNumOnLogical^=1;
-//DeadCode JIM 19Feb96 	ASM_CopyMainRAM2VidRAM(logicalscreenptr,(char *)(0xA0000+(ScreenNumOnLogical<<15)));
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03d4,(UWord)(0x0C+(ScreenNumOnLogical<<15)));
-//DeadCode JIM 19Feb96 	ASM_OutDxAx(0x03D4,0x0D);
-//DeadCode JIM 19Feb96 }
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 
-//DeadCode JIM 19Feb96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 19Feb96 //Procedure		PalChange
-//DeadCode JIM 19Feb96 //Author		Jim Taylor
-//DeadCode JIM 19Feb96 //Date			Wed 13 Dec 1995
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Description	
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Inputs		
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //Returns	
-//DeadCode JIM 19Feb96 //
-//DeadCode JIM 19Feb96 //------------------------------------------------------------------------------
-//DeadCode JIM 19Feb96 	void	Display::PalChange()	//short UseNewPal=FALSE);
-//DeadCode JIM 19Feb96 {
-//DeadCode JIM 19Feb96  	if(UseNewPal == TRUE)
-//DeadCode JIM 19Feb96  	{
-//DeadCode JIM 19Feb96  		ASM_WaitVBL();
-//DeadCode JIM 19Feb96  		ASM_SetPalette((char *)Palette);
-//DeadCode JIM 19Feb96  	}
-//DeadCode JIM 19Feb96 	UseNewPal=FALSE;
-//DeadCode JIM 19Feb96 }
-//DeadCode JIM 19Feb96 
 
-//DeadCode DAW 26Feb96 //LastModified:	PD 13Feb96
-//DeadCode DAW 26Feb96 //Author		Jim Taylor
-//DeadCode DAW 26Feb96 //Date			Tue 12 Dec 1995
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Description	Flip the displayed screen by copying
-//DeadCode DAW 26Feb96 //				1) Calculate the base page and offset for the new screen
-//DeadCode DAW 26Feb96 //				2) Copy the data a page at a time
-//DeadCode DAW 26Feb96 //				3) hardware flip if avaialble
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Inputs		
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Returns	
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 void	Display::ScreenFlip_VESAc()
-//DeadCode DAW 26Feb96 {
-//DeadCode DAW 26Feb96 	DPMIregs	regs;
-//DeadCode DAW 26Feb96 int	skipbytes,Lines,Columns,page;
-//DeadCode DAW 26Feb96 	if (++VESA.ScreenNum>=VESA.Screens)
-//DeadCode DAW 26Feb96 		VESA.ScreenNum=0;
-//DeadCode DAW 26Feb96 int	physicaloffset=VESA.ScreenNum*VESA.BytesPerScanLine*VESA.ScanLines;
-//DeadCode DAW 26Feb96 	page=
-//DeadCode DAW 26Feb96 		VESA.pagetop=physicaloffset/VESA.PageShift;
-//DeadCode DAW 26Feb96 	VESA.pageoff=physicaloffset%VESA.PageShift;
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 	if (VESA.BytesPerScanLine==BytesPerScanLine)
-//DeadCode DAW 26Feb96 	{
-//DeadCode DAW 26Feb96 		skipbytes=0;
-//DeadCode DAW 26Feb96 		Lines=1;
-//DeadCode DAW 26Feb96 		Columns=BytesPerScanLine*PhysicalHeight;
-//DeadCode DAW 26Feb96 	}
-//DeadCode DAW 26Feb96 	else
-//DeadCode DAW 26Feb96 	{
-//DeadCode DAW 26Feb96 		skipbytes=VESA.BytesPerScanLine-BytesPerScanLine;
-//DeadCode DAW 26Feb96 		Lines=PhysicalHeight;
-//DeadCode DAW 26Feb96 		Columns=BytesPerScanLine;
-//DeadCode DAW 26Feb96 	}
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 	LogicalPtr	src=logicalscreenptr;
-//DeadCode DAW 26Feb96 	char*		trg=(char*)VESA.writeaddr;
-//DeadCode DAW 26Feb96 	int			off=VESA.pageoff;
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 	//set to page
-//DeadCode DAW 26Feb96 	regs.w.ax=0x4f05;
-//DeadCode DAW 26Feb96 	regs.w.bx=VESA.writewin;
-//DeadCode DAW 26Feb96 	regs.w.dx=page;
-//DeadCode DAW 26Feb96 	ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 	while (Lines--)
-//DeadCode DAW 26Feb96 	{
-//DeadCode DAW 26Feb96 int		colleft=Columns;
-//DeadCode DAW 26Feb96 		while (off+colleft>VESA.PageSize)
-//DeadCode DAW 26Feb96 		{
-//DeadCode DAW 26Feb96 int			tmpleft=VESA.PageSize-off;
-//DeadCode DAW 26Feb96 			colleft=colleft-tmpleft;
-//DeadCode DAW 26Feb96 			tmpleft=tmpleft>>2;
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 extern	void ASM_Cp(ULong *dst,LogicalPtr src,SLong len);		//PD 13Feb96
-//DeadCode DAW 26Feb96 #pragma aux	ASM_Cp = 		\
-//DeadCode DAW 26Feb96 			"rep movsd"		\
-//DeadCode DAW 26Feb96 			"mov src,esi"	\
-//DeadCode DAW 26Feb96 			parm [edi] [esi] [ecx]								//PD 13Feb96
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 			ASM_Cp((ULong*)(trg+off),(LogicalPtr )src,tmpleft);
-//DeadCode DAW 26Feb96 			off=0;
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 			//set to next page
-//DeadCode DAW 26Feb96 			page+=VESA.PageShift;
-//DeadCode DAW 26Feb96 			regs.w.ax=0x4f05;
-//DeadCode DAW 26Feb96 			regs.w.bx=VESA.writewin;
-//DeadCode DAW 26Feb96 			regs.w.dx=page;
-//DeadCode DAW 26Feb96 			ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 		}
-//DeadCode DAW 26Feb96 		colleft=colleft>>2;
-//DeadCode DAW 26Feb96 		ASM_Cp((ULong*)(trg+off),(LogicalPtr )src,colleft);
-//DeadCode DAW 26Feb96 //TempCode PD 13Feb96 		while (colleft--)
-//DeadCode DAW 26Feb96 //TempCode PD 13Feb96 		{
-//DeadCode DAW 26Feb96 //TempCode PD 13Feb96 			*((ULong*) (trg+off))=*((LogicalLPtr) src);
-//DeadCode DAW 26Feb96 //TempCode PD 13Feb96 			src+=4;
-//DeadCode DAW 26Feb96 //TempCode PD 13Feb96 			off+=4;
-//DeadCode DAW 26Feb96 //TempCode PD 13Feb96 		}
-//DeadCode DAW 26Feb96 		off+=skipbytes;
-//DeadCode DAW 26Feb96 	}
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 }
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode DAW 26Feb96 //Procedure		SetGraphicsMode_CUSTOM_1d
-//DeadCode DAW 26Feb96 //Author		Jim Taylor
-//DeadCode DAW 26Feb96 //Date			Thu 14 Dec 1995
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Description	Debugable 320x200
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Inputs		
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Returns	
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 void	Display::SetGraphicsMode_CUSTOM_1d()
-//DeadCode DAW 26Feb96 {
-//DeadCode DAW 26Feb96 	DPMIregs	regs;
-//DeadCode DAW 26Feb96  	regs.w.ax=0x0013;
-//DeadCode DAW 26Feb96 	ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode DAW 26Feb96 	logicalscreenptr=(LogicalPtr) ((void*) 0xA0000);
-//DeadCode DAW 26Feb96 }
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 void	Display::ScreenFlip_CUSTOM_1d()
-//DeadCode DAW 26Feb96 {;
-//DeadCode DAW 26Feb96 }
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 void	Display::SetGraphicsMode_CUSTOM_1c()
-//DeadCode DAW 26Feb96 {
-//DeadCode DAW 26Feb96 	DPMIregs	regs;
-//DeadCode DAW 26Feb96  	regs.w.ax=0x0013;
-//DeadCode DAW 26Feb96 	ASM_DOSvia31(0x10,&regs,real_mode_stack,REALMODE_STACK_SIZE,0);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03C4,0x0604);
-//DeadCode DAW 26Feb96 	ASM_OutDxAl(0x03C2,0xE3);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,0x0E11);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,0x0D06);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,0x3E07);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,0xEA10);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,0xAE11);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,0xDF12);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03D4,0x0014);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,0xE715);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,0x0616);
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03D4,0xE317);
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 }
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 extern	"C"	void		ASM_CopyMainRAM2VidRAM(LogicalPtr, char *);
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 void	Display::ScreenFlip_CUSTOM_1c()
-//DeadCode DAW 26Feb96 {
-//DeadCode DAW 26Feb96 	ScreenNumOnLogical^=1;
-//DeadCode DAW 26Feb96 	ASM_CopyMainRAM2VidRAM(logicalscreenptr,(char *)(0xA0000+(ScreenNumOnLogical<<15)));
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03d4,(UWord)(0x0C+(ScreenNumOnLogical<<15)));
-//DeadCode DAW 26Feb96 	ASM_OutDxAx(0x03D4,0x0D);
-//DeadCode DAW 26Feb96 }
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 
-//DeadCode DAW 26Feb96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode DAW 26Feb96 //Procedure		PalChange
-//DeadCode DAW 26Feb96 //Author		Jim Taylor
-//DeadCode DAW 26Feb96 //Date			Wed 13 Dec 1995
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Description	
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Inputs		
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //Returns	
-//DeadCode DAW 26Feb96 //
-//DeadCode DAW 26Feb96 //------------------------------------------------------------------------------
-//DeadCode DAW 26Feb96 	void	Display::PalChange()	//short UseNewPal=FALSE);
-//DeadCode DAW 26Feb96 {
-//DeadCode DAW 26Feb96  	if(UseNewPal == TRUE)
-//DeadCode DAW 26Feb96  	{
-//DeadCode DAW 26Feb96  		ASM_WaitVBL();
-//DeadCode DAW 26Feb96  		ASM_SetPalette((char *)Palette);
-//DeadCode DAW 26Feb96  	}
-//DeadCode DAW 26Feb96 	UseNewPal=FALSE;
-//DeadCode DAW 26Feb96 }
 

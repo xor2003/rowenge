@@ -102,8 +102,8 @@ questions about this file may be asked at http://www.simhq.com/
 static char THIS_FILE[] = __FILE__;
 #endif
 #endif */
-extern	Smack*	OpenSmack(FileNum filenumber,int win,int X,int Y,int w,int h);
-extern	UWord	DoSmack(int poo);
+extern	Smack*	OpenSmack(FileNum filenumber,intptr_t win,int X,int Y,int w,int h);
+extern	UWord	DoSmack(intptr_t poo);
 extern	void	CloseSmack();
 
 /////////////////////////////////////////////////////////////////////////////

@@ -43,12 +43,6 @@ public:
 		delete [] start;
 	}
 
-//DEADCODE AMM 24/01/00 	void ResizeInit(ULong size)
-//DEADCODE AMM 24/01/00 	{
-//DEADCODE AMM 24/01/00 		delete [] start;
-//DEADCODE AMM 24/01/00 		start=curr=next=new T[maxentries=size];
-//DEADCODE AMM 24/01/00 		entries=nextpos=currpos=temppos=0;
-//DEADCODE AMM 24/01/00 	}
 
 	T*	GetCurr()
 	{

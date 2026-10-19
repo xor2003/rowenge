@@ -227,10 +227,8 @@ BOOL RMdlDlg::OnInitDialog()
 	CRStatic* rstatic;
 	CString string;
 	rbutton=GETDLGITEM(IDJ_TITLE);
-//DeadCode JIM 19Sep00 	string.LoadString(m_TitleID);
 	rbutton->SetString(m_TitleID);
 	rstatic=GETDLGITEM(IDC_MESSAGE_TEXT);
-//DeadCode JIM 19Sep00 	string.LoadString(m_MessageID);
 	rstatic->SetString(m_MessageID);
 	rbutton=GETDLGITEM(IDC_OK);
 	if (m_Button0ID)

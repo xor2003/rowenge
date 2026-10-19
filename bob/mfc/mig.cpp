@@ -74,7 +74,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "rdemptyd.h"
 #include	"stub3d.h"
 //#include "Targets.h"
-//DEADCODE DAW 23/11/99 #include "WaveTabs.h"
 //#include "Wave.h"
 //#include "Chain.h"
 //#include "Filters.h"
@@ -114,13 +113,10 @@ static char THIS_FILE[] = __FILE__;
 
 BEGIN_MESSAGE_MAP(CMIGApp, CWinApp)
 	//{{AFX_MSG_MAP(CMIGApp)
-//DEADCODE DAW 24/11/99 	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
 		// NOTE - the ClassWizard will add and remove mapping macros here.
 		//    DO NOT EDIT what you see in these blocks of generated code!
 	//}}AFX_MSG_MAP
 	// Standard file based document commands
-//DEADCODE DAW 24/11/99 	ON_COMMAND(ID_FILE_NEW, CWinApp::OnFileNew)
-//DEADCODE DAW 24/11/99 	ON_COMMAND(ID_FILE_OPEN, CWinApp::OnFileOpen)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -564,8 +560,6 @@ BOOL CMIGApp::InitInstance()
 	std::getchar();
 	return(true);
 #endif
-	//DeadCode JIM 20Oct00 	INT		sysnames[]={COLOR_SCROLLBAR,COLOR_3DDKSHADOW};
-//DeadCode JIM 20Oct00 	DWORD	sysvals[]={0x0000ff00,0x00ff0000};
 //	SetSysColors(2,sysnames,sysvals);
 
 	TRACING("InitInstance starting...\n");
@@ -669,8 +663,6 @@ ReleaseDC (0, screen);
 	AddDocTemplate(pDocTemplate);
 
 	// Enable DDE Execute open
-//DeadCode JIM 10Oct00 	EnableShellOpen();
-//DeadCode JIM 10Oct00 	RegisterShellFileTypes(TRUE);
 
 	// Parse command line for standard shell commands, DDE, file open
 	//CCommandLineInfo cmdInfo;
@@ -832,16 +824,12 @@ int CMIGApp::Run()
 		ULong t;;
 		if (Inst3d::InThe3D()||!bIdle)
 		{
-//DeadCode JIM 9Nov00 			Mono_Text.Print(UByteP("i"));
 			result=MsgWaitForMultipleObjects(Mast3d::NUM_EVENTS,Master_3d.htable,FALSE,INFINITE,QS_ALLINPUT);//wait - forever!
 		}
 		else
 		{
-//DeadCode JIM 9Nov00 			Mono_Text.Print(UByteP("z"));
 			result=MsgWaitForMultipleObjects(Mast3d::NUM_EVENTS,Master_3d.htable,FALSE,0,QS_ALLINPUT);//don't wait - ever!
 		}
-//DEADCODE JIM 21/06/00 		if (result<WAIT_OBJECT_0+Mast3d::NUM_EVENTS)
-//DEADCODE JIM 21/06/00 			Mono_Text.Print(result,(UByteP)"Wait object");
 		switch (result)
 		{
 		case WAIT_OBJECT_0+Mast3d::EVENT_KEYS:
@@ -852,27 +840,6 @@ int CMIGApp::Run()
 			break;
 
 		case WAIT_OBJECT_0+Mast3d::EVENT_AGGREGATOR:
-//DeadCode AMM 28Oct98 			if (_DPlay.Host)
-//DeadCode AMM 28Oct98 			{
-//DeadCode AMM 28Oct98 				if (_DPlay.Implemented)
-//DeadCode AMM 28Oct98 				{
-//DeadCode AMM 28Oct98 					t=1000000;
-//DeadCode AMM 28Oct98 					TRACE0("want message lock\n");
-//DeadCode AMM 28Oct98 					while (LockExchange(&Aggregator::inaggregator,1))
-//DeadCode AMM 28Oct98 					{
-//DeadCode AMM 28Oct98 						Sleep(0);
-//DeadCode AMM 28Oct98 						if (!t--)
-//DeadCode AMM 28Oct98 							_Error.SayAndQuit("run loop exceeds 1000000");
-//DeadCode AMM 28Oct98 					};
-//DeadCode AMM 28Oct98 					TRACE0("got lock for message\n");
-//DeadCode AMM 28Oct98 					_Agg.AggregatorGetPackets(FALSE,FALSE);
-//DeadCode AMM 28Oct98 					LockExchange(&Aggregator::inaggregator,0);
-//DeadCode AMM 28Oct98 					TRACE0("released lock for message\n");
-//DeadCode AMM 28Oct98 				}
-//DeadCode AMM 28Oct98 			}
-//DeadCode AMM 28Oct98 			else
-//DeadCode AMM 28Oct98 				_Error.SayAndQuit("Player receiving aggregator interrupt!!!!");
-//DeadCode AMM 28Oct98 
 			break;
 
 #if     _MSC_VER >= 1300
@@ -885,7 +852,6 @@ int CMIGApp::Run()
 			while (::PeekMessage(&AFXATTR, NULL, NULL, NULL, PM_NOREMOVE))
 			{
 				{static int _pi=0;if(++_pi%2000==1){static bool _pd=getenv("ROWAN_DEBUG_INPUT")!=0;if(_pd)fprintf(stderr,"[pump] iters=%d lastmsg=%x hwnd=%p\n",_pi,AFXATTR.message,AFXATTR.hwnd);}}
-//DEADCODE JIM 21/06/00 				Mono_Text.Print(m_msgCur.message,(UByteP)"Message");
 				bool fIn3d=Inst3d::InThe3D();
 				if ((Rtestsh1::tempblockkeys || fIn3d) && AFXATTR.message>=WM_KEYFIRST &&  AFXATTR.message<=WM_KEYLAST)
 				{
@@ -895,14 +861,6 @@ int CMIGApp::Run()
 				else
 				{
 					//The section below is a debug
-//DeadCode JIM 19Oct00 					if (m_msgCur.message!=0x000f && m_msgCur.message!=0x0113)
-//DeadCode JIM 19Oct00 					{	//messages received:						  //RDH 12/07/99
-//DeadCode JIM 19Oct00  						int msgval=short(m_msgCur.hwnd)*0x10000+short(m_msgCur.message);
-//DeadCode JIM 19Oct00  						static int col=0;
-//DeadCode JIM 19Oct00  						Mono_Text.PrintHexAt(col,0,msgval,8);
-//DeadCode JIM 19Oct00  						col+=10;if (col>80*25) col-=80*25;
-//DeadCode JIM 19Oct00  						Mono_Text.PrintHexAt(col,0,0,8);
-//DeadCode JIM 19Oct00  				}
 					//the section above is a debug
 
 					if (!PumpMessage())
@@ -924,7 +882,6 @@ int CMIGApp::Run()
 ////			*(char*)0xb0A00+=1;
 			if (!OnIdle(lIdleCount++))
 			{
-//DeadCode JIM 9Nov00 			Mono_Text.Print(UByteP("F"));
 				bIdle = FALSE; // assume "no idle" state
 			}
 			else
@@ -942,7 +899,6 @@ int CMIGApp::Run()
 BOOL CMIGApp::OnIdle(LONG lCount) 
 {
 	// TODO: Add your specialized code here and/or call the base class
-//DeadCode JIM 9Nov00 			Mono_Text.Prin(lCount,UByteP("I"));
 	if (CWinApp::OnIdle(lCount))
 		return TRUE;		//Do all system processing 'first'
     if (RDialog::m_pView->m_currentpage==0)

@@ -281,7 +281,6 @@ void ListProp2::OnChangeEditcolumn0()
 	
 	// TODO: Add your control notification handler code here
 //	UByteP(0xB0000)[160*6]++; 
-//DEADCODE JIM 14/12/99 	UpdateData( );
 
 }
 

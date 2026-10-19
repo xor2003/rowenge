@@ -172,10 +172,6 @@ enum 	Ranges
 	SMILES10=	 1609000,
 	SMILES100=	16090000,
 	SMILES1000=160900000,
-//DeadCode DAW 02Apr96 	NEGFT_100 = 0,
-//DeadCode DAW 02Apr96 	NEGFT_500 = 0,
-//DeadCode DAW 02Apr96 	NEGFT_1000 = 0,
-//DeadCode DAW 02Apr96 	NEGFT_2000 = 0,
 
 //1 ft = 30.48 													//MS 21Jan00
 
@@ -331,12 +327,7 @@ enum 	Ranges
 
 //	LOWESTSAFEALT=HIGHESTGROUND+FT_2000,						//PD 19Mar99
 
-//DeadCode PD 19Mar99 	HIGHESTGROUND = 304800,										//RDH 27Mar98
 
-//DeadCode DAW 02Apr96 	IDENTRANGE		= 300000,
-//DeadCode RDH 27Mar98 	BREAKOFFRANGE	= 250000,									//RDH 19Aug96
-//DeadCode RDH 27Mar98 	COMBATRANGE 	= 25000,
-//DeadCode RDH 27Mar98 	SHOOTINGRANGE   = 15000,									//RDH 02Oct96
 	BALLOON_ALT		=	60960,
 	SUNELEVDIST	=	0x048000,
 
@@ -361,23 +352,6 @@ enum 	Ranges
 	BREAKTURNRADIUS	   = 30000
 
 //MIG ALLEY VALUES
-//DEADCODE CSB 17/02/00 	WIND_DIRECTION_CHANGE = 1066800,		//35000ft
-//DEADCODE CSB 17/02/00 	IDEALCOMBATRANGE = 30000,
-//DEADCODE CSB 17/02/00 	OUTERCOMBATRANGE = 150000,
-//DEADCODE CSB 17/02/00 //Following ranges define the maximum at which the condition holds
-//DEADCODE CSB 17/02/00 	CONTRAILRANGE = 3200000,			//if < then contrails can be seen
-//DEADCODE CSB 17/02/00 	VISIBLERANGE = 1280000,			//if < then bogey can be seen
-//DEADCODE CSB 17/02/00 	RECOGNISERANGE  = 480000,		//if < then can distinguish between bandit and friendly
-//DEADCODE CSB 17/02/00 	BREAKOFFRANGE =  480000,		//far enough away to safely break off
-//DEADCODE CSB 17/02/00 	REDUCEDVISIBILITY = 640000,		//used in Seen()
-//DEADCODE CSB 17/02/00 	COMBATRANGE = 320000,			//pre combat: can decide to engage or not
-//DEADCODE CSB 17/02/00 	ENGAGERANGE= 150000,		//combat manoeuvres: must attack or defend
-//DEADCODE CSB 17/02/00 	DANGERRANGE  = 75000,		//must defend self
-//DEADCODE CSB 17/02/00 	WEAPONSRANGE = 50000,		//inside range of guns
-//DEADCODE CSB 17/02/00 	INSIDEWEAPONSRANGE = 40000,		//well inside weaponrange
-//DEADCODE CSB 17/02/00 	COLLISIONRANGE = 30000,		//inside this range must avoid collision
-//DEADCODE CSB 17/02/00 	THRUST_0_RANGE = 21000,							//point when thrust goes to 0 to avoid collision
-//DEADCODE CSB 17/02/00 	BREAKTURNRADIUS = 60000
 
 };
 inline Float operator * (Ranges a,Ranges b)	{return Float(a)*Float(b);}

@@ -537,8 +537,9 @@ void SupplyTree::GenerateSupplyDIS()
 	do
 	{
 		NodeType type;
-		if (currnode)
-			type = currnode->type;
+		if (!currnode)
+			break;
+		type = currnode->type;
 		if (		(currnode->type == LASTONE)
 		   )
 			currnode = FirstNode;
@@ -1418,7 +1419,8 @@ void SupplyTree::UpDateAttacksStructure()
 									if (node->attackstats.aaalevel<aaalevelcut)
 										break;
 								if (node->next==node)
-									MMC.DisDayEntry(Debrief::TARGUID,Todays_Packages.pack[i].packagetarget,Debrief::D_Flak01_H);	break;
+									MMC.DisDayEntry(Debrief::TARGUID,Todays_Packages.pack[i].packagetarget,Debrief::D_Flak01_H);
+								break;
 							}
 							break;
 							case S2U_ROUTE0:
@@ -2106,13 +2108,13 @@ T::Action	nameddecision=T::STAY_HERE;
 	if (teleloc!=us->location)
 	{
 		us->location=teleloc;
-		if (node->mainuid==teleloc)
+		if (node && node->mainuid==teleloc)
 			node->occupier=us;
 		else
-		if (node->in.uid==teleloc)
+		if (node && node->in.uid==teleloc)
 			node->in.occupier=us;
 		else
-		if (node->out.uid==teleloc)
+		if (node && node->out.uid==teleloc)
 			node->out.occupier=us;
 	}
 	if (nextloc!=teleloc)
@@ -2408,21 +2410,24 @@ bool	BattleStruct::NextAttackDecisions()
 				}
 			}
 			//so teleport new force to selected node...
-			if (!node->occupier)
-			{	//can teleport there
-				teamlist[i].action=TeamDef::STAY_HERE;
-				teamlist[i].namedaction=TeamDef::NEW_FORCE;
-				teamlist[i].advantagepriority=teamlist[i].strength/10;
-				teamlist[i].location=node->mainuid;
-				teamlist[i].node=node;
-				node->occupier=teamlist+i;
-			}
-			else
+			if (node)
 			{
-				teamlist[i].action=TeamDef::MERGE_FORCE;
-				MergeForces(node->occupier,&teamlist[i]);
-				node->occupier->namedaction=TeamDef::NEW_FORCE;
-				node->occupier->advantagepriority=node->occupier->strength/10;
+				if (!node->occupier)
+				{	//can teleport there
+					teamlist[i].action=TeamDef::STAY_HERE;
+					teamlist[i].namedaction=TeamDef::NEW_FORCE;
+					teamlist[i].advantagepriority=teamlist[i].strength/10;
+					teamlist[i].location=node->mainuid;
+					teamlist[i].node=node;
+					node->occupier=teamlist+i;
+				}
+				else
+				{
+					teamlist[i].action=TeamDef::MERGE_FORCE;
+					MergeForces(node->occupier,&teamlist[i]);
+					node->occupier->namedaction=TeamDef::NEW_FORCE;
+					node->occupier->advantagepriority=node->occupier->strength/10;
+				}
 			}
 			teamlist[i].DiagnosticOutput("NewForce");
 
@@ -2519,7 +2524,7 @@ void	SupplyLine::NextAttackReports()
 			if (blueteam==TeamDef::HOME)
 			{
 				SuperBattleNode* n=NULL;
-				for (n=groundbattle.teamlist[i].node->innode;n;n=n->innode)
+				for (n=groundbattle.teamlist[i].node?groundbattle.teamlist[i].node->innode:NULL;n;n=n->innode)
 					breakif(n->occupier &&  n->occupier->team!=blueteam);	//stop on red only
 				if (n)
 					if (n->occupier->action==TeamDef::STAY_HERE)

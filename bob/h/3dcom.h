@@ -36,7 +36,6 @@ void AFX_CDECL AfxTrace(LPCTSTR lpszFormat, ...);
 
 struct _D3DVECTOR;			//RJS 04Feb00
 
-//DeadCode PD 15Mar96 const	SWord	shapecodeframetime = 10;						//PD 08Mar96
 class	ViewPoint;
 class	shape;
 //struct	DoPointStruc;
@@ -156,8 +155,6 @@ struct	Coords3DList											//RJS 21Apr99
 					FadeTime:12,								//RJS 16Dec99
 					KillMe:1,									//RJS 16Dec99
 					isFirst:1;									//RJS 16Dec99
-//DEADCODE RJS 3/31/00 	SWord			xdelta;										//RJS 17Sep97
-//DEADCODE RJS 3/31/00 	SWord			ydelta;										//RJS 17Sep97
 #ifdef	_SMOKETRAILDEBUG_
 	UByte			trailIndex;
 	UByte			nextkilled;
@@ -197,9 +194,6 @@ typedef struct	TRAILRECORD										//RJS 17Sep97
 	SWord			LaunchCountdown;							//RJS 24Nov97
 	SWord			SampleTime;									//RJS 08Jan98
 	Coords3DList*	FakePointPtr;								//RJS 25Feb98
-//DeadCode RJS 06May99 	SWord			InitVelY;
-//DeadCode RJS 06May99 	SWord			InitVelH;
-//DeadCode RJS 06May99 	SWord			Acceleration;
 	UByteP			SmkDescPtr;									//RJS 09Apr98
 	Bool			cloudlaunched;								//RJS 03Jul98
 	ULong			currTime;									//RJS 16Jun99
@@ -234,7 +228,6 @@ struct	SLightingRGB;											//RJS 14Apr00
 #define		MAX_VAPOURS	32										//RJS 10Mar98
 #define		REAL_MAX_VAPOURS	33								//RJS 21Jan99
 class	ViewPoint;
-//DeadCode PD 17Oct96 typedef	void (shape::*CMFI)	(UByte *&);
 
 class	shape
 {
@@ -251,7 +244,6 @@ class	shape
 								fade_end,
 								object_dist;
 
-//DeadCode PD 10Jan97 			static MATRIX_PTR 	object_matrix;					//PD 17Oct96
 			static FPMATRIX_PTR fpobject_matrix;				//PD 08Jan97
 			static Obj3DPtr	  	object_obj3d;				//RJS 07Feb00
 			static FPMATRIX_PTR fprealobject_matrix;			//RJS 15Jan99
@@ -297,35 +289,7 @@ class	shape
 			static SWord polyVertCount;
 			static DoPointStruc* polyVertIndex[64];
 			static bool specularEnabled;
-//DeadCode RJS 21Nov96  			struct	myvector
-//DeadCode RJS 21Nov96  			{
-//DeadCode RJS 21Nov96  				SLong	gx,gy,gz;
-//DeadCode RJS 21Nov96  			};
 
-//DeadCode RJS 17Sep97 			typedef	struct	COORDS3DLIST
-//DeadCode RJS 17Sep97 			{
-//DeadCode RJS 17Sep97 				MyGroundVector	trailpoint;						//RJS 21Nov96
-//DeadCode RJS 17Sep97 				SWord			lifetime;						//RJS 16May97
-//DeadCode RJS 17Sep97 				ULong			bornat;							//RJS 02Jun97
-//DeadCode RJS 17Sep97 				UWord			radius:11,						//RJS 17Sep97
-//DeadCode RJS 17Sep97 								frameno:3,						//RJS 17Sep97
-//DeadCode RJS 17Sep97 								depth:2;						//RJS 17Sep97
-//DeadCode RJS 17Sep97 				COORDS3DLIST*	next;							//RJS 21May97
-//DeadCode RJS 17Sep97 			} Coords3DList, *Coords3DListPtr;					//RJS 19Sep96
-//DeadCode RJS 17Sep97
-//DeadCode RJS 17Sep97  			typedef struct	TRAILRECORD
-//DeadCode RJS 17Sep97  			{
-//DeadCode RJS 17Sep97  				Coords3DListPtr	thelist;
-//DeadCode RJS 17Sep97 				SWord			addtime;						//RJS 30May97
-//DeadCode RJS 17Sep97 				UWord			bitshift:5,						//RJS 30May97
-//DeadCode RJS 17Sep97 								nopoints:11;					//RJS 30May97
-//DeadCode RJS 17Sep97 				UWord			lifetime;						//RJS 30May97
-//DeadCode RJS 17Sep97 				SLong			lastwx,							//RJS 21May97
-//DeadCode RJS 17Sep97 								lastwy,							//RJS 21May97
-//DeadCode RJS 17Sep97 								lastwz;							//RJS 21May97
-//DeadCode RJS 17Sep97 				UByte			nextlist:7,						//RJS 30May97
-//DeadCode RJS 17Sep97 								beendrawn:1;					//RJS 30May97
-//DeadCode RJS 17Sep97  			} TrailRecord;										//RJS 20Sep96
 
 			static	TrailRecord		traillist[REAL_MAX_VAPOURS];//RJS 21Jan99
 
@@ -343,7 +307,6 @@ class	shape
 			static	UByte	VapourAnim;							//RJS 20May97
 			static	Bool	IsSubShape;							//RJS 03Jun97
 
-//DeadCode RJS 16Apr98 			Bool	SamplePntTime;								//RJS 18Sep97
 
 
 			static	SByte		VapDeadList[REAL_MAX_VAPOURS];	//RJS 21Jan99
@@ -372,8 +335,6 @@ class	shape
 			static	UByteP		damage_GrpNext;					//RJS 17Sep98
 			static SWord dotNLineFadeValue;
 			static  Float		DistScale;
-//deadcode			static	UByte	staticRed,staticGreen,staticBlue;	//PD 20Jan99
-//deadcode			static	UByte	shadedRed,shadedGreen,shadedBlue;	//PD 20Jan99
 			static	ULong		staticRGBlo,staticRGBhi,staticRGBamb;	//PD 16Feb00
 			static	ULong		shadedRGBlo,shadedRGBhi,shadedRGBamb;	//PD 16Feb00
 			static	animptr		damage_GrpTokenDep;				//RJS 21Apr99
@@ -435,7 +396,6 @@ class	shape
 									SLong	element,
 									SLong	hittype,
 									SLong	hitstrength);
-//DeadCode AMM 16Nov99 									SLong	hitstrength,UByte pnum,bool myscorer	);
 			static	ViewPoint*	View_Point;
 			void	SetView(ViewPoint* v,CLib3D* lib3d) {View_Point=v;g_lpLib3d=lib3d;}
 			static DoPointStruc	*newco;						//RJS 02Dec97
@@ -573,7 +533,6 @@ class	shape
 			void	CollisionPlayback();						//RJS 07Jul98
 			void	InitCloudFade();							//RJS 16Jul98
 			void	SetCloudFade();								//RJS 16Jul98
-//DEADCODE AMM 23/11/99 			WeapAnimData* DirectWeaponLauncher(itemptr,UByte,UWord&,SLong&,SLong&,SLong&,UWord&,UWord&,UByte&); //MACCA98
 			WeapAnimData* DirectWeaponLauncher(itemptr,UByte,UWord&,SLong&,SLong&,SLong&,ULong&,UWord&,UByte&); //AMM 23/11/99
 			Bool	ResetAnimData_NewShape(ItemPtr,ShapeNum,UByte weappack=0,bool sendPacket=false);//RJS 21Apr99
 			void	KillGear(ItemPtr);							//RJS 07Sep98
@@ -663,7 +622,6 @@ class	shape
 			void	MovePointWRTGun(ANGLES&,ANGLES&,Coords3D&,Coords3D&,D3DVECTOR&);//RJS 14Mar00
 
 			void DrawHitBox(Obj3DPtr,MATRIX_PTR);			//RJS 07Feb00
-//DeadCode RJS 20May97 			void animate_shape(Obj3DPtr );						//PD 13Mar96
 			void draw_shape(Obj3DPtr );						//RJS 07Feb00
 
 			void  InitAnimData(itemptr);
@@ -673,48 +631,26 @@ class	shape
 			void	InitUndercarriageAnim(AirStrucPtr);			//RJS 28May98
 			void	FakeLauncherAnim(animptr&,ShapeNum,SLong);	//RJS 08Dec99
 
-//DEADCODE JON 4/12/00 			void  drawsphere(int,int,int,int,int,int,Bool,int,int,int);//RJS 21Jan98
 			void  imapsphere(UWord,UWord,ImageMapNumber,SWord,SWord,SWord,SWord,bool ispivoted=false);//RJS 26Nov98
-//DeadCode RJS 16Dec97 			void  omapsphere(UWord,SLong,ImageMapNumber,SWord,SWord,SWord,SWord,SWord,SWord,UByte,UByte);//RJS 19Feb97
-//DEADCODE JON 4/12/00 			void  RealImapSphere(int,int,int,int,int,int,int,int,int);//RJS 16Dec97
 			void  imapcylinder(UWord,UWord,SLong,ImageMapNumber,UWord,UWord,UWord,UWord,UWord,UWord);//RJS 20Nov98
 			void  omapcylinder(UWord,UWord,SLong,ImageMapNumber,UWord,UWord,UWord,UWord,UWord,UWord,UByte,UByte);//RJS 19Feb97
-//DeadCode RJS 06Feb98 			void  imapsphere2(UWord,SLong,ImageMapNumber,SWord,SWord,SWord,SWord,SWord,SWord,UWord);//RJS 05Feb98
-//DeadCode PD 24Oct96 			void  DrawCheatBox(ShapeDescPtr );					//RJS 23Oct96
 			void  imaptrailcyl(UWord,UWord,ImageMapNumber,SWord,SWord,SWord,SWord,UWord,UWord,UByte,UByte,SWord,SWord,SWord,SWord);//RJS 18Sep97
-//DEADCODE JON 4/12/00 			void  plaincylinder(UWord,UWord,UWord);				//RJS 04Nov97
-//DeadCode RJS 09Feb00 			void  ParticleCylinderPlain(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord);//RJS 04Dec97
-//DeadCode RJS 09Feb00 			void  ParticleCylinderImapd(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord,SWord,SWord,SWord,SWord);//RJS 11Mar98
-//DEADCODE JON 4/12/00 			void  ParticleStreamPlain(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord);//RJS 04Dec97
-//DeadCode RJS 09Feb00 			void  ParticleStreamImapd(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord,SWord,SWord,SWord,SWord);//RJS 11Mar98
-//DeadCode RJS 09Feb00 			void  ParticleBoxPlain(UWord,UWord,UWord,UWord,UWord,MyGroundVectorPtr,SWord,SWord,SWord,Bool);//RJS 04Dec97
-//DeadCode RJS 09Feb00 			void  ParticleBoxImapd(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord,SWord,SWord);//RJS 04Dec97
-//DeadCode RJS 09Feb00 			void  PlainBlobLine(UWord,UWord,UWord);					//RJS 11Dec97
-//DeadCode RJS 09Feb00 			void  ParticleStreamEdgedPlain(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord);//RJS 12Dec97
 			void  LineStream(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord);//RJS 05Jan98
 			void  plaintrailcyl(UWord,UWord,SWord,SWord,SWord,SWord,SWord,SWord);//RJS 09Jan98
-//DEADCODE JON 4/12/00 			void  DrawHeatHaze(int,int,int);					//RJS 30Jan98
 			void  imapsphereQuad(UWord,UWord,ImageMapNumber,SWord,SWord,SWord,SWord);	//RJS 20Feb98
-//DeadCode RJS 09Feb00 			void  ParticleStreamStaggeredImapd(UWord,UWord,SWord,SWord,SWord,SWord,SLong,SLong,SWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord,SWord,SWord,SWord,SWord,SWord);//RJS 31Mar98
 			Bool  ClipSphere(DoPointStruc&,DoPointStruc&,DoPointStruc&,DoPointStruc&,SLong);//RJS 21Aug98
 			Bool  ClipCylinder(DoPointStruc&,DoPointStruc&,DoPointStruc&,DoPointStruc&,SLong,SLong);//RJS 21Aug98
-//DeadCode RJS 09Feb00 			void  imaptrailcylWrapped(UWord,UWord,ImageMapNumber,SWord,ImageMapNumber,SWord,SWord,SWord,SWord,SWord,SWord,SWord,SWord,SWord,SWord,Bool);//RJS 25Nov98
 			Bool  ClipSphereSpin(DoPointStruc&,DoPointStruc&,DoPointStruc&,DoPointStruc&,SLong,SWord);//RJS 19Nov98
 			void  imapspherespin(UWord,UWord,ImageMapNumber,SWord,SWord,SWord,SWord,SWord);//RJS 19Nov98
 			Bool  ClipSphereRatio(DoPointStruc&,DoPointStruc&,DoPointStruc&,DoPointStruc&,SLong,SWord,SWord,bool);//RJS 26Nov98
 			void  FixedPolyOnFloor(Coords3DList*,Coords3DList*,SWord,SWord,SWord,SWord,ImageMapNumber,SWord,SWord,SWord,SWord);//RJS 21Apr99
-//DeadCode RJS 09Feb00 			void  DblParticleCylinderImapd(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord,SWord,SWord,SWord,SWord,SWord,SWord,SWord,SWord);//RJS 16Dec99
-//DeadCode RJS 09Feb00 			void  FadeParticleCylinderImapd(UWord,UWord,SWord,SWord,SWord,SWord,UWord,SWord,MyGroundVectorPtr,MyGroundVectorPtr,SWord,SWord,SWord,SWord,SWord,SWord);//RJS 20Dec99
 
 
 			//Animation code
 
 			void	ResetAnimFlags();							//PD 27Mar96
-//DeadCode RJS 05Jun97 			void	SimpleItemAnim(MinAnimData* );				//PD 27Mar96
 			void	AircraftAnim(AircraftAnimData*,Bool pitset=FALSE );//RJS 12Feb98
 			void	BlokesItemAnim(BlokesAnimData* );			//RJS 01Jun99
-//DeadCode RJS 17Nov99 			void	WeapItemAnim(WeapAnimData* );				//PD 01Apr96
-//DeadCode RJS 05Jun97 			void	ExplodeItemAnim(ExplodeAnimData* );			//PD 15Apr96
 			void	PolyPitItemAnim(PolyPitAnimData* );			//PD 15Apr96
 			void	SunItemAnim(SunAnimData* );						//PD 24Jun96
 			void	SetLauncherData(WeapAnimData* ,ShapeNum );	//PD 01Apr96
@@ -739,7 +675,6 @@ class	shape
 
 			Bool	SampleSmokePnt(UByteP,SWord&,UByteP,SWord&,UWord);			//RJS 07May98
 			SLong	DrawSmokeTrail(SWord,UByteP,ULong,Bool,bool drawIt=true);	//RJS 24Oct00
-//DEADCODE JON 4/12/00 			UWord	CalcTrailDeltas(UByteP,UByteP,UWord,SWord&,SWord&);//RJS 15Apr98
 			void	AddVapourStreamToDeadList(int,ItemPtr);			//RJS 22Apr99
 			Bool	SampleDustPnt(UByteP,SWord&,UByteP,UWord,SLong,SWord);			//RJS 07May98
 			void	AddMassAndDrag(UByteP,int,int,int,int,SLong,SWord);//RJS 25Mar99
@@ -835,8 +770,6 @@ class	shape
 					doneedle,		dosetblendtype,	dousefadeenvelope,	dorestorealpha,
 					docollisiongoto,dosetzbias;					//RJS 21Sep00
 
-//DeadCode RJS 01Dec97 			static	InterpProc*	InterpTable[dosetglassrangeno+1];		//PD 17Oct96
-//DeadCode RJS 01Dec97 			static	void		DrawSubShape(DOCALLSHAPE_PTR);	//RJS 03Mar97
 			static	InterpProc*	*InterpTable;					//RJS 01Dec97
 			static	void		DrawSubShape(UByteP);			//RJS 01Dec97
 		};

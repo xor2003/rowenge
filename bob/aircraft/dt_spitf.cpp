@@ -132,10 +132,6 @@ PCYLINDER	pCylinder3	=	new	CYLINDER	(	pModel	,	275	,	55	,	93	)	;
 	pCylinder3	->	SetOrientation		(	0	,	0	,	0	)	;														
 																										
 																										
-//DEADCODE CB 11/11/99 new	NEWCTRL		(	pMainPlane	,	&Model.Aileron	,	20	,	0.33	,	0.45	)	;												
-//DEADCODE CB 11/11/99 new	NEWCTRL		(	pTailPlane1	,	&Model.Elevator	,	40	,	0.40	,	0.49	)	;												
-//DEADCODE CB 11/11/99 new	NEWCTRL		(	pTailPlane2	,	&Model.Elevator	,	40	,	0.40	,	0.49	)	;												
-//DEADCODE CB 11/11/99 new	NEWCTRL		(	pFin		,	&Model.Rudder	,	50	,	0.49	,	0.49	)	;												
 new	NEWCTRL		(	pMainPlane	,	&Model.Aileron	,	20	,	0.33	,	0.45	)	;												
 new	NEWCTRL		(	pTailPlane1	,	&Model.Elevator	,	40	,	0.27	,	0.33	)	;
 new	NEWCTRL		(	pTailPlane2	,	&Model.Elevator	,	40	,	0.27	,	0.33	)	;												
@@ -157,7 +153,6 @@ new	AERODEVICE(ControlledAC, pModel, AeroDevice::DT_CANOPY, AeroDevice::CT_KEYS,
 				0, 0.02, 0, 0.00, 2, 120, CANOPYEJECT, CANOPYEJECT, 999, &adptr->accanopy);
 																										
 																										
-//DEADCODE CSB 28/01/00 	pModel	->	SetMassInertias		(	ControlledAC	,	7420	,	12224	,	8158	)	;												
 	pModel	->	SetMassInertias		(	ControlledAC	,	14701	,	23596	,	9943	)	;												
 																										
 																										
@@ -218,21 +213,18 @@ PENGINE	pEngine	=	new	ENGINE	(	pModel	,	ET_PISTON	)	;
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLLEFT, w, c1, c2);
 	PGEAR pMainPort = new GEAR (pModel, PORT);
 	pMainPort->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DEADCODE CSB 08/05/00 	pMainPort->SetDimensions (-90, -205, -225-CoG, -90, -175, -225-CoG);
 	pMainPort->SetSuspension (33333, 333330);
 	pMainPort->SetTyres (0.05, 0.4, 2500);
 	
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLRIGHT, w, c1, c2);
 	PGEAR pMainStbd = new GEAR (pModel, STBD);
 	pMainStbd->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DEADCODE CSB 08/05/00 	pMainStbd->SetDimensions (90, -205, -225-CoG, 90, -175, -225-CoG);
 	pMainStbd->SetSuspension (33333, 333330);
 	pMainStbd->SetTyres (0.05, 0.4, 2500);
 
 	SHAPE.GetContactPoint(ControlledAC, CT_WHLBACK, w, c1, c2);
 	PGEAR pTail = new GEAR (pModel, TAIL);
 	pTail->SetDimensions (c1.X - CG.x, c1.Y - CG.y, c1.Z - CG.z, c2.X - CG.x, c2.Y - CG.y, c2.Z - CG.z);
-//DEADCODE CSB 08/05/00 	pTail->SetDimensions (0, -75, -855-CoG, 0, -60, -855-CoG);
 	pTail->SetSuspension (7000, 70000);
 	pTail->SetTyres (0.05, 0.4, 0);
 
@@ -251,7 +243,6 @@ PENGINE	pEngine	=	new	ENGINE	(	pModel	,	ET_PISTON	)	;
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.rudder, &adptr->acrudder);
 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &ControlledAC->fly.rpm, &adptr->acrpm, 0, (255 * 5) / 3);
 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &ControlledAC->fly.rpm, &adptr->acrpm, 0, (255 * 5) / 3);
-//DeadCode RJS 05May99 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &pModel->Inst.Rpm1, &adptr->acrpm, 0, 65536);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pTail, &adptr->aclegsuspb, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainPort, &adptr->aclegsuspl, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainStbd, &adptr->aclegsuspr, 0, 255);
@@ -284,28 +275,6 @@ void SPITFIRE_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 
 	ACM.yawmodifier				= 1e9;
 	
-//DEADCODE CSB 18/01/00 	ACM.BrakePower = 14;
-//DEADCODE CSB 18/01/00 	ACM.SteerRatio = 8e-6;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	ACM.MaxAileron = 32767;
-//DEADCODE CSB 18/01/00 	ACM.MaxElevatorForTightTurn	= 16384;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	ACM.aoamodifier = 750;//1200;
-//DEADCODE CSB 18/01/00 	ACM.DeltaPitchForMaxElevator = 0.5;//	= 1.0472;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	ACM.pitchmodifier = 2.5;
-//DEADCODE CSB 18/01/00 	ACM.pitchintmodifier = 0;
-//DEADCODE CSB 18/01/00 	ACM.IntPitchForMaxElevator	= 0.1;//1000;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	ACM.rollmodifier = 0.75;	
-//DEADCODE CSB 18/01/00 	ACM.rollintmodifier = 0;
-//DEADCODE CSB 18/01/00 	ACM.IntRollForMaxAileron = 100;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	ACM.yawintmodifier = 0;//3;	
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 	ACM.turnmodifier = 1.0;//1.2;
-//DEADCODE CSB 18/01/00 	ACM.turnintmodifier = 0.02;//12;
-//DEADCODE CSB 18/01/00 	ACM.liftmodifier = 1000;//1200;
 
 	ACM.maxdeltaforclosework = 0.1;
 	ACM.lastdeltapitch = 0;

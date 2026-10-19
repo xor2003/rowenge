@@ -299,21 +299,6 @@ inline void _clipLR(UWord& cf,Float x,Float z)
 	else if (x>z) cf|=CF3D_OFFRIGHT;
 }
 
-//Old_Code PD 26Feb99 inline void _clipLR(UWord& cf,Float x,Float z)
-//Old_Code PD 26Feb99 {
-//Old_Code PD 26Feb99  	ULong abs_z_high=*((ULong*)&z+1)&~CF3D_SIGNBITMASK;
-//Old_Code PD 26Feb99 	ULong abs_x_high=*((ULong*)&x+1);
-//Old_Code PD 26Feb99 	if (abs_x_high&CF3D_SIGNBITMASK)
-//Old_Code PD 26Feb99 	{
-//Old_Code PD 26Feb99 		abs_x_high&=~CF3D_SIGNBITMASK;
-//Old_Code PD 26Feb99 		if (abs_x_high>abs_z_high || 
-//Old_Code PD 26Feb99 			(abs_x_high==abs_z_high && *(ULong*)&x>*(ULong*)&z))
-//Old_Code PD 26Feb99 			cf|=CF3D_OFFLEFT;
-//Old_Code PD 26Feb99 	}
-//Old_Code PD 26Feb99 	else if (abs_x_high>abs_z_high || 
-//Old_Code PD 26Feb99 			(abs_x_high==abs_z_high && *(ULong*)&x>*(ULong*)&z))
-//Old_Code PD 26Feb99 			cf|=CF3D_OFFRIGHT;
-//Old_Code PD 26Feb99 }
 
 //������������������������������������������������������������������������������
 //Procedure	_clipTB
@@ -332,21 +317,6 @@ inline void _clipTB(UWord& cf,Float y,Float z)
 	}
 	else if (y>z) cf|=CF3D_OFFTOP;
 }
-//Old_Code PD 26Feb99 inline void _clipTB(UWord& cf,Float y,Float z)
-//Old_Code PD 26Feb99 {
-//Old_Code PD 26Feb99  	ULong abs_z_high=*((ULong*)&z+1)&~CF3D_SIGNBITMASK;
-//Old_Code PD 26Feb99 	ULong abs_y_high=*((ULong*)&y+1);
-//Old_Code PD 26Feb99 	if (abs_y_high&CF3D_SIGNBITMASK)
-//Old_Code PD 26Feb99 	{
-//Old_Code PD 26Feb99 		abs_y_high&=~CF3D_SIGNBITMASK;
-//Old_Code PD 26Feb99 		if (abs_y_high>abs_z_high || 
-//Old_Code PD 26Feb99 			(abs_y_high==abs_z_high && *(ULong*)&y>*(ULong*)&z))
-//Old_Code PD 26Feb99 			cf|=CF3D_OFFBOTTOM;
-//Old_Code PD 26Feb99 	}
-//Old_Code PD 26Feb99 	else if (abs_y_high>abs_z_high || 
-//Old_Code PD 26Feb99 			(abs_y_high==abs_z_high && *(ULong*)&y>*(ULong*)&z))
-//Old_Code PD 26Feb99 			cf|=CF3D_OFFTOP;
-//Old_Code PD 26Feb99 }
 #endif
 
 struct	DoPointStruc

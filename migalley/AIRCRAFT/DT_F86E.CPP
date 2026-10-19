@@ -187,8 +187,11 @@ void F86E_Setup (AirStrucPtr const ControlledAC, ULong Version)
 			
 	PTHRUSTPOINT pThrust = new THRUSTPOINT (pModel, TT_JET, 0,0,-1055-CoG, 0,0);
 	
-	pThrust->SetEngine (pEngine);
-	pEngine->SetThrustPoint (pThrust);
+	if (pEngine)									//RERUN: switch may match no engine type
+	{
+		pThrust->SetEngine (pEngine);
+		pEngine->SetThrustPoint (pThrust);
+	}
 	
 	Coords3D w,c1,c2;
 	FCRD CG;	//Relative to the centre of the shape
@@ -247,51 +250,3 @@ void F86E_Setup (AirStrucPtr const ControlledAC, ULong Version)
 
 	F86E_SetupAI (ControlledAC, Version);
 }
-//DeadCode CSB 10/12/98	//	ACM.Height_Elevator_Offset_Power = 0.1;
-//DeadCode CSB 10/12/98	//	ACM.Height_Elevator_Limit = 500;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.RollRate_Aileron_Offset_Power = 12500;	// 25000 5/9/97
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	//	ACM.Roll_Aileron_Offset_Power = 8;//5000;
-//DeadCode CSB 10/12/98	//	ACM.Roll_Aileron_MaxBankOffset_Power = 1024;//25000;
-//DeadCode CSB 10/12/98		ACM.MaxAileron = 32767;
-//DeadCode CSB 10/12/98	//	ACM.lastdeltaroll = 0;
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	//	ACM.Heading_Aileron_Limit = DEGS2RADS(45);
-//DeadCode CSB 10/12/98	//	ACM.Heading_Aileron_Offset_Power = 5000;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.PitchRate_Elevator_Offset_Power = 2048;
-//DeadCode CSB 10/12/98	//	ACM.PitchRate_Elevator_Damping_Power = 262144;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.Pitch_Elevator_Offset_Power = 2048;//8;//128;//2048;
-//DeadCode CSB 10/12/98	//	ACM.Pitch_Elevator_Damping_Power = 262144;//1024;//16384;//262144;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98		ACM.DeltaPitchForMaxElevator	= 1.0472;
-//DeadCode CSB 10/12/98		ACM.MaxElevatorForTightTurn	= 32767;
-//DeadCode CSB 10/12/98	//	ACM.DiffPitchForMaxElevator	= 0.1745;
-//DeadCode CSB 10/12/98		ACM.lastdeltapitch = 0;
-//DeadCode CSB 10/12/98		ACM.deltapitchsum = 0;
-//DeadCode CSB 10/12/98		ACM.deltayawsum = 0;
-//DeadCode CSB 10/12/98		ACM.yawmodifier = 8;		//10;			//0.2
-//DeadCode CSB 10/12/98		ACM.yawintmodifier = 3;	//1;		//1;
-//DeadCode CSB 10/12/98		ACM.turnmodifier = 1;		//1.1;			//		2;
-//DeadCode CSB 10/12/98		ACM.turnintmodifier = 10;		//1.6;		//1.5;
-//DeadCode CSB 10/12/98		ACM.rollmodifier = 0.7;	//0.6;
-//DeadCode CSB 10/12/98		ACM.pitchratemodifier = 100000;
-//DeadCode CSB 10/12/98		ACM.aoamodifier = 1000;
-//DeadCode CSB 10/12/98		ACM.pitchmodifier = 1;			//2;
-//DeadCode CSB 10/12/98		ACM.pitchintmodifier = 1.5;
-//DeadCode CSB 10/12/98		ACM.liftmodifier = 1000; 
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98			ACM.deltarollsum = 0;
-//DeadCode CSB 10/12/98		ACM.rollintmodifier = 2;	//1;
-//DeadCode CSB 10/12/98		ACM.IntRollForMaxAileron = 80;
-//DeadCode CSB 10/12/98		ACM.IntPitchForMaxElevator	= 1000;
-//DeadCode CSB 10/12/98		ACM.maxdeltaforclosework = 0;
-//DeadCode CSB 10/12/98		//	ACM.Speed_Throttle_Offset_Power = 0.5;
-//DeadCode CSB 10/12/98	//	ACM.Speed_Throttle_Damping_Power = 64;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//DeadCode CSB 06/11/98		Model.ClAileronLoss = 1.25;
-//DeadCode CSB 10/12/98		Model.MElevatorLoss = 0.95;	
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	}

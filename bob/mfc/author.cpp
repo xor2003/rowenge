@@ -132,7 +132,6 @@ BOOL CAuthorise::OnInitDialog()
    {
 	   title->SetString(RESSTRING(ASSETLIST));
    }
-//DeadCode JIM 20Oct00 	RDialog* parent=(RDialog*)GetParent();
 //	parent->SetMaxSize(CRect(0,0,600,600));
 
 	return TRUE;  // return TRUE unless you set the focus to a control

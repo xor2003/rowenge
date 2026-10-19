@@ -307,7 +307,6 @@ Inst3d::Inst3d(bool flag)
 		maxcount=1000;
 	else
 		maxcount=200;
-//DEADCODE DAW 18/02/00 	UByteP(0xB0000)[2]='s';
 	semaphore=CreateSemaphore(
 		NULL,		// security attribs are default
 		0,			// initial count
@@ -317,7 +316,6 @@ Inst3d::Inst3d(bool flag)
 
 	if (!semaphore)
 		_Error.EmitSysErr("Semaphore creation failed");
-//DEADCODE DAW 18/02/00 	UByteP(0xB0000)[2]='m';
 	mutex=CreateMutex(
 		NULL,		// security attribs are default
 		FALSE,		// owner?
@@ -336,7 +334,6 @@ Inst3d::Inst3d(bool flag)
 #endif
 	mapview=flag;
 	mono3d=false;
-//DEADCODE JIM 29/03/99 	FILEMAN.flushcachedfiles();
  	paused=TRUE;
 	accel=FALSE;
 	interactive=FALSE;
@@ -355,25 +352,21 @@ Inst3d::Inst3d(bool flag)
 	commonkeymaps=(KeyMap3d*) Key_Tests.reftable3d.flat;
 	world=new WorldStuff;
 	(&world)->SetViewpoint(NULL);
-//DEADCODE DAW 17/02/00 	blocktick=blockticks=TRUE;	//no movecodes
 	viewedwin=NULL;
 	livelist=NULL;
 	Manual_Pilot.ControlledAC2=NULL;
 	GR_Quit3DNow=0;
 	GR_OkToQuit3DNow=0;
-//DEADCODE DAW 18/02/00 	UByteP(0xB0000)[2]='r';
 	_Replay.DeleteReplayLog(); // want new log every time we enter non-playback 3D//AMM 07Oct98
 	_Replay.SuperHeaderStored=false;
 	_Miles.ResetSoundFlags();
 	Three_Dee.InitialiseCache();
-//DEADCODE DAW 18/02/00 	UByteP(0xB0000)[2]='l';
 	Land_Scape.Init();
 	Three_Dee.current_world=&world;
 	//Load in the shape files requested by the battle field file loads
 	SHAPESTUFF.LoadRequiredShapes();
 	Three_Dee.livelist=livelist;
 	_Collide.tdalt=BOOL_TRUE;
-//DEADCODE DAW 28/03/99 	Timer_Code.accel=FALSE;
 	Trans_Obj.View_Point=NULL;
 	Key_Tests.Reg3dConv(FIL_3D_KEYBOARD_TABLE);
 	timeofday=11*60*60*100;
@@ -456,11 +449,9 @@ Inst3d::Inst3d()
 	commonkeymaps=(KeyMap3d*) Key_Tests.reftable3d.flat;
 
 	world=new WorldStuff;
-//DEADCODE DAW 17/02/00 	blocktick=blockticks=0;
 	viewedwin=NULL;
 	_Replay.inst=this;											//AMM 11May99
 	livelist=NULL;
-//DEADCODE DAW 18/02/00 	UByteP(0xB0000)[2]='B';
 	Persons3	Persons_2(world,NULL,this);
 
 	Manual_Pilot.ControlledAC2 = NULL;							//RDH 24Oct96
@@ -651,7 +642,6 @@ Inst3d::~Inst3d()
 
 		if (_Replay.MapPlayback)									  //AMM 25/06/99
 			_Replay.RestoreSaveGame();
-//DeadCode DAW 25Jun99 		_Replay.RestoreSaveGame();
 		_Replay.ClosePlaybackLog();
 		_Replay.RestorePrefs();
 		RFullPanelDial::gamestate=(RFullPanelDial::GameStates)_Replay.PlaybackGameState;
@@ -738,13 +728,10 @@ View3d::View3d(Inst3d* ofinst,HWND newwin,CWnd* d):
 	coords(0,0,0,0),E(NULL)
 
 {
-//DEADCODE DAW 18/02/00 	UByteP(0xB0000)[4]='V';
 	Log_Stack.Log(LogStack::MESSAGELOOP);
-//DeadCode RJS 18May98 	_Miles.Init((ULong)newwin);									//RJS 03Apr98
 	mfcwin=d;
 	window=newwin;
 	inst=ofinst;
-//DEADCODE DAW 18/02/00 	UByteP(0xB0000)[6]='i';
 	if (ofinst->Interactive())
 	{
 		nextview=ofinst->Interactive()->nextview;
@@ -1038,7 +1025,6 @@ bool Inst3d::Accel(bool newmode)
 				&& !Save_Data.gamedifficulty[GD_GUNCAMERAATSTART])
 				{
 					_Replay.guncameradelay=0;
-//DeadCode AMM 08Jul99 					_Replay.clearreplaybuffers=true;
 					_Replay.stopforaccel=false;
 				}
 				else
@@ -1058,7 +1044,6 @@ bool Inst3d::Accel(bool newmode)
 			_Radio.ClearMessages(MSG_TAKEOFFROLLING);			//RJS 14Jun99
 			_Radio.ClearMessages(PRI_LOW);						//RJS 03Jun99
 			mobileitem::ResetACGears();							//RJS 01Jun99
-//DeadCode AMM 10Jun99 			_DPlay.SendAccelDeselectedMessage();				//AMM 26May99
 
 			if (_Replay.stopforaccel)							//AMM 26May99
 			{													//AMM 26May99
@@ -1233,7 +1218,6 @@ UINT AFX_CDECL View3d::drawloop(LPVOID THISTHIS)
 			return 0;
 		This->DoneFrame();
 
-//DEADCODE DAW 18/02/00 		UByteP(0xB0000)[162]='o';
 		if ((Manual_Pilot.ControlledAC2==NULL || !Manual_Pilot.ControlledAC2->MigStatus.LaunchFlags.deadtime)
 			&& !This->Accel() && OverLay.pCurScr==NULL && Key_Tests.KeyPress3d(KEY_CONFIGMENU))
 		{
@@ -1296,7 +1280,6 @@ void	Mast3d::QuitGame(void )
 {
 }
 
-//DEADCODE DAW 17/02/00 static int	howcamehere;
 void CALLBACK Mast3d::StaticTimeProc(UINT uID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2 )
 {
 	ULong t=0;
@@ -1564,7 +1547,6 @@ void	Inst3d::DoMoveCycle()
 			timeout=true;
 		}
 	}
-//DEADCODE DAW 18/02/00 	UByteP(0xB0000)[202]='t';
 	if (!timeout)
 	{
 #ifndef NDEBUG

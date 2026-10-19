@@ -376,12 +376,8 @@ _AFX_INLINE int PASCAL CString::SafeStrlen(LPCTSTR lpsz)
 // CString support (windows specific)
 _AFX_INLINE int CString::Compare(LPCTSTR lpsz) const
 	{ return strcmp(m_pchData, lpsz); }    // MBCS/Unicode aware
-//DEADCODE DAW 10/03/99 _AFX_INLINE int CString::CompareNoCase(LPCTSTR lpsz) const
-//DEADCODE DAW 10/03/99 	{ return stricmp(m_pchData, lpsz); }   // MBCS/Unicode aware
 // CString::Collate is often slower than Compare but is MBSC/Unicode
 //  aware as well as locale-sensitive with respect to sort order.
-//DeadCode JIM 10Mar99 _AFX_INLINE int CString::Collate(LPCTSTR lpsz) const
-//DeadCode JIM 10Mar99 	{ return _tcscoll(m_pchData, lpsz); }   // locale sensitive
 
 _AFX_INLINE TCHAR CString::GetAt(int nIndex) const
 {

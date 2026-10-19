@@ -208,28 +208,6 @@ INSTANCEAI(CallIn, ItemPtr)
 
 	return true;
 
-//DEADCODE CSB 23/02/00 	AirStrucPtr leader=callee->GroupLeader();
-//DEADCODE CSB 23/02/00 	prioritymessage->caller=leader;
-//DEADCODE CSB 23/02/00 	AirStrucPtr	sayto=leader;
-//DEADCODE CSB 23/02/00 	if (leader!=callee)
-//DEADCODE CSB 23/02/00 		sayto=callee;
-//DEADCODE CSB 23/02/00
-//DEADCODE CSB 23/02/00 	bool	buddy = false;											  //RDH 10/05/99
-//DEADCODE CSB 23/02/00 	for (AirStrucPtr eltlead=leader;eltlead;eltlead=eltlead->fly.nextflight)
-//DEADCODE CSB 23/02/00 		for (AirStrucPtr eltwing=eltlead;eltwing;eltwing=eltwing->Follower())
-//DEADCODE CSB 23/02/00 			if ((eltwing!=leader) &&	(!eltwing->Status.deadtime))	// not comms players
-//DEADCODE CSB 23/02/00 			{
-//DEADCODE CSB 23/02/00 				buddy = true;										  //RDH 10/05/99
-//DEADCODE CSB 23/02/00  				if (eltwing!=callee)
-//DEADCODE CSB 23/02/00 					_Radio.TriggerMsg(MESSAGE_STRUC (SCRIPT_CALLER, MSG_STATUSRESPONSE_DELAY_LP_RPT, eltwing, NULL, sayto));
-//DEADCODE CSB 23/02/00 				else
-//DEADCODE CSB 23/02/00 					_Radio.TriggerMsg(MESSAGE_STRUC (SCRIPT_CALLER, MSG_STATUSRESPONSE_DELAY_LP_RPT, eltwing, NULL, leader));
-//DEADCODE CSB 23/02/00 			}
-//DEADCODE CSB 23/02/00
-//DEADCODE CSB 23/02/00 	if (!buddy)														  //RDH 10/05/99
-//DEADCODE CSB 23/02/00 		_Radio.TriggerMsg(MESSAGE_STRUC(OLDPHRASE_THINKING, MSG_CLEAR_RPT , NULL, NULL, caller)); //RDH 10/05/99
-//DEADCODE CSB 23/02/00
-//DEADCODE CSB 23/02/00 	return true;
 }
 
 
@@ -372,7 +350,6 @@ INSTANCEAI(TightLeftTurn, ItemPtr)
 	{
 		for(AirStrucPtr nf = leader; nf; nf = nf->fly.nextflight)
 			for(AirStrucPtr f = nf; f; f = f->Follower())
-//DeadCode CSB 31Oct00 				if(f->position())
 				{
 					if((f->formation & FORMTYPE_WING) == FTW_SCWARM)
 						f->formation = (f->formation % FORMTYPE_WING) | FTW_BSCRWARM;
@@ -380,8 +357,6 @@ INSTANCEAI(TightLeftTurn, ItemPtr)
 						f->formation = (f->formation % FORMTYPE_WING) | FTW_SCWARM;
 					f->information = IF_OUT_POS;
 				}
-//DeadCode CSB 31Oct00 				else
-//DeadCode CSB 31Oct00 					f->formation = (f->formation & FORMTYPE_WING) | FTI_SCWARM_SWAPPING_FLAG;
 		return(true);
 	}
 	return(false);
@@ -395,7 +370,6 @@ INSTANCEAI(TightRightTurn, ItemPtr)
 	{
 		for(AirStrucPtr nf = leader; nf; nf = nf->fly.nextflight)
 			for(AirStrucPtr f = nf; f; f = f->Follower())
-//DeadCode CSB 31Oct00 				if(f->position())
 				{
 					if((f->formation & FORMTYPE_WING) == FTW_SCWARM)
 						f->formation = (f->formation % FORMTYPE_WING) | FTW_BSCRWARM;
@@ -403,8 +377,6 @@ INSTANCEAI(TightRightTurn, ItemPtr)
 						f->formation = (f->formation % FORMTYPE_WING) | FTW_SCWARM;
 					f->information = IF_OUT_POS;
 				}
-//DeadCode CSB 31Oct00 				else
-//DeadCode CSB 31Oct00 					f->formation = (f->formation & FORMTYPE_WING) | FTI_SCWARM_SWAPPING_FLAG;
 		return(true);
 	}
 	return(false);
@@ -823,7 +795,6 @@ INSTANCEAI(Bandit, ItemPtr)
 				else
 					prioritymessage->SetScript(SCRIPT_BANDITSBEHINDLW);		//RJS 15Sep00
 			}
-//DeadCode RJS 13Sep100 		prioritymessage->target = spottrg;
 		}
 
 		SpottedUnfriendly(caller, AirStrucPtr(spottrg));
@@ -831,8 +802,6 @@ INSTANCEAI(Bandit, ItemPtr)
 		return(true);
 	}
 
-//DeadCode CSB 1Sep00 	prioritymessage->scriptno = SCRIPT_NULL;
-//DeadCode RJS 13Sep100 	prioritymessage->scriptno = PHRASE_THINKING;
 
 	if(caller->follower)
 		_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CANTSEE, MSG_CLEAR_RPT, caller->Follower(), NULL, caller));
@@ -894,14 +863,12 @@ INSTANCEAI(CallBandit, ItemPtr)
 					prioritymessage->SetScript(SCRIPT_BANDITSBEHINDLW);		//RJS 15Sep00
 			}
 		}
-//DeadCode RJS 13Sep100 		prioritymessage->target = spottrg;
 
 		SpottedUnfriendly(lead, AirStrucPtr(spottrg));
 
 		return(true);
 	}
 
-//DeadCode RJS 13Sep100 	prioritymessage->scriptno = PHRASE_THINKING;
 	_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CANTSEE, MSG_CLEAR_RPT, lead, NULL, caller));
 
 
@@ -1037,10 +1004,7 @@ INSTANCEAI(FlakSighted, ItemPtr)
 	{
 		prioritymessage->target = flaktrg;
 		prioritymessage->SetScript(SCRIPT_ACKACKFIRE);
-//DeadCode CSB 2Oct00 		if(!lead->ai.unfriendly)
 			SpottedUnfriendly(lead, AirStrucPtr(flaktrg));
-//DeadCode CSB 2Oct00 		else
-//DeadCode CSB 2Oct00 			SpottedNewUnfriendly(lead, AirStrucPtr(flaktrg));
 		return(true);
 	}
 	else
@@ -1173,7 +1137,6 @@ INSTANCEAI(Regroup, ItemPtr)
 				f->ai.manoeuvre = MANOEUVRE_SCREWYOUGUYSIMGOINGHOME;
 			}
 
-//DeadCode CSB 13Sep00 	DisEngageAll(caller, prioritymessage);
 	return(true);
 }
 
@@ -1443,8 +1406,6 @@ INSTANCEAI(BeginRun, ItemPtr)
 	}
 	else
 	{
-//DEADCODE MS 28/04/00 		if(replier)
-//DEADCODE MS 28/04/00 			_Radio.TriggerMsg(MESSAGE_STRUC(PHRASE_OK, MSG_CLEAR_RPT, replier, NULL, caller));
 		caller->ai.ManStep = PHASE3;
 		for(AirStrucPtr nf = caller; nf; nf = nf->fly.nextflight)
 			for(AirStrucPtr f = nf; f; f = f->Follower())
@@ -1498,11 +1459,9 @@ INSTANCEAI(LeaveArea, ItemPtr)
 		for(AirStrucPtr f = nf; f; f = f->Follower())
 		{
 			f->SetUnfriendly(NULL);		//CSB 1Aug00
-//DeadCode CSB 1Aug00 			f->ai.unfriendly = NULL;						//RJS 09Mar00
 			f->movecode = AUTO_FOLLOWWP;					//RJS 09Mar00
 			f->information = IF_OUT_POS;					//CSB 22Aug00
 			f->manoeuvretime = 0;
-//DeadCode RJS 09Mar00			f->ai.ManStep = 15;
 		}
 	return(true);
 }
@@ -1517,43 +1476,10 @@ INSTANCEAI(LeaveArea, ItemPtr)
 // Description:
 //
 ////////////////////////////////////////////////////////////////////////
-//DeadCode JON 31Oct00 TABLEAI(QuitContinue, ItemPtr)
-//DeadCode JON 31Oct00 {
-//DeadCode JON 31Oct00 	{PhraseTables(PHRASE_TEXT_CONTINUE),	&Continue,		PHRASE_NULL},
-//DeadCode JON 31Oct00 	{PhraseTables(PHRASE_TEXT_QUIT),		&Quit,			PHRASE_NULL},
-//DeadCode JON 31Oct00 	{PHRASE_NULL},
-//DeadCode JON 31Oct00 	{PHRASE_NULL},
-//DeadCode JON 31Oct00 	{PHRASE_NULL},
-//DeadCode JON 31Oct00 	{PHRASE_NULL},
-//DeadCode JON 31Oct00 	{PHRASE_NULL},
-//DeadCode JON 31Oct00 	{PHRASE_NULL}
-//DeadCode JON 31Oct00 };
-//DeadCode JON 31Oct00 INSTANCEAI(QuitContinue, ItemPtr)
-//DeadCode JON 31Oct00 {
-//DeadCode JON 31Oct00 	return(false);
-//DeadCode JON 31Oct00 }
-//DeadCode JON 31Oct00
-//DeadCode JON 31Oct00
-//DeadCode JON 31Oct00 INSTANCEAI(Continue, ItemPtr)
-//DeadCode JON 31Oct00 {
-//DeadCode JON 31Oct00 	return(false);
-//DeadCode JON 31Oct00 }
-//DeadCode JON 31Oct00
-//DeadCode JON 31Oct00 INSTANCEAI(Quit, ItemPtr)
-//DeadCode JON 31Oct00 {
-//DeadCode JON 31Oct00 	_DPlay.SimulateExitKey = TRUE;
-//DeadCode JON 31Oct00 	return(true);
-//DeadCode JON 31Oct00 }
 
 
 INSTANCEAI(SetupQuitContinue, ItemPtr)
 {
-//DeadCode JON 31Oct00 	bool autovectoringon = Save_Data.gamedifficulty[GD_AUTOVECTORING];
-//DeadCode JON 31Oct00 	Save_Data.gamedifficulty %= GD_AUTOVECTORING;
-//DeadCode JON 31Oct00 	bool retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_THINKING, MSG_CLEAR, caller, caller, caller), QuitContinue);
-//DeadCode JON 31Oct00 	if(autovectoringon)
-//DeadCode JON 31Oct00 		Save_Data.gamedifficulty |= GD_AUTOVECTORING;
-//DeadCode JON 31Oct00 	return(retval);
 	OverLay.SetToContinueQuitScr();
 	return false;
 }
@@ -1571,7 +1497,6 @@ INSTANCEAI(SetupQuitContinue, ItemPtr)
 //////////////////////////////////////////////////////////////////////
 TABLEAI(SecretMessages,ItemPtr)
 {
-//DEADCODE DAW 23/02/99 	{PHRASE_INITIATECONTACT,	&InitiateContact, SCRIPT_MAKECONTACTWITHFAC},
 	{PHRASE_NULL,	&SecretStartTrucks,		PHRASE_NULL},
 	{PHRASE_NULL},
 	{PHRASE_NULL}
@@ -1666,18 +1591,11 @@ void ArtInt::DisEngageAll(AirStruc* caller, MESSAGE_STRUC* prioritymessage)
 	AirStruc* callee = caller->FindBuddy();
 	if(callee)
 	{
-//DEADCODE CSB 14/02/00 		if (leader->fly.leadflight)
-//DEADCODE CSB 14/02/00 			leader = leader->fly.leadflight;
 
 		if(leader->movecode == AUTO_COMBAT)
 		{
 			leader->ai.manoeuvre = MANOEUVRE_TOPCOVER;		//this ensure everybody tries to disengage
 			leader->SetUnfriendly(NULL);								//CSB 1Aug00
-//DeadCode CSB 1Aug00 			if(		(leader->ai.unfriendly)
-//DeadCode CSB 1Aug00 				&&	(leader->ai.unfriendly->Status.size == AIRSTRUCSIZE)
-//DeadCode CSB 1Aug00 				&&	(AirStrucPtr(leader->ai.unfriendly)->ai.attacker == leader)	)
-//DeadCode CSB 1Aug00 				((AirStrucPtr)leader->ai.unfriendly)->ai.attacker = NULL;
-//DeadCode CSB 1Aug00 			leader->ai.unfriendly = NULL;
 		}
 		else if(leader->movecode == AUTO_PRECOMBAT)
 			AllBreakOff(leader);
@@ -1690,25 +1608,7 @@ void ArtInt::DisEngageAll(AirStruc* caller, MESSAGE_STRUC* prioritymessage)
 		}
 
 		_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_BREAK_ORBITREPLY, MSG_DISENGAGE_DELAY_LP_RPT, callee, NULL, leader));
-//DEADCODE CSB 13/03/00 		for(AirStrucPtr lead = leader; lead; lead = lead->fly.nextflight)
-//DEADCODE CSB 13/03/00 			for(AirStrucPtr foll = lead; foll; foll = foll->Follower())
-//DEADCODE CSB 13/03/00 				if((foll->fly.callnum % 4) == 0)
-//DEADCODE CSB 13/03/00 					if((foll != leader) && (foll->movecode == AUTO_COMBAT))
-//DEADCODE CSB 13/03/00 						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_BREAK_ORBITREPLY, (MsgType)(MSG_DISENGAGE_DELAY_LP_RPT+MSG_BLOCKCHATTER), foll, NULL, caller));//RJS 06Jul99
 
-//DEADCODE CSB 14/02/00 				{
-//DEADCODE CSB 14/02/00 					if(foll != leader)
-//DEADCODE CSB 14/02/00 					{
-//DEADCODE CSB 14/02/00 						if (	(foll->movecode == AUTO_COMBAT)	||	(foll->movecode == AUTO_PRECOMBAT))
-//DEADCODE CSB 14/02/00 						{
-//DEADCODE CSB 14/02/00 	//DEADCODE RDH 17/05/99 						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLER_DISENGAGING, MSG_DISENGAGE_DELAY_LP_RPT , foll, NULL, caller));
-//DEADCODE CSB 14/02/00 	//we don't have disengaging in the other script so it is silent.
-//DEADCODE CSB 14/02/00 	//solution is to say: roger
-//DEADCODE CSB 14/02/00 							_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLER_ROGER, (MsgType)(MSG_DISENGAGE_DELAY_LP_RPT+MSG_BLOCKCHATTER) , foll, NULL, caller));//RJS 06Jul99
-//DEADCODE CSB 14/02/00 						}else
-//DEADCODE CSB 14/02/00 							_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLER_ROGER, (MsgType)(MSG_DISENGAGE_DELAY_LP_RPT+MSG_BLOCKCHATTER) , foll, NULL, caller));//RJS 06Jul99
-//DEADCODE CSB 14/02/00 					}
-//DEADCODE CSB 14/02/00 				}
 	}else
 		_Radio.TriggerMsg(MESSAGE_STRUC(PHRASE_THINKING, (MsgType)(MSG_CLEAR_RPT+MSG_BLOCKCHATTER) , NULL, NULL, leader));//RJS 27Mar00
 
@@ -1728,28 +1628,6 @@ WayPointPtr WayPoint::FindWP(WPNames name)
 		if(newwp->wpname == name)
 			return(newwp);
 
-//DeadCode AMM 21Sep00 	INT3;	//Can't find the desired waypoint !!!!
 	return(this);
 
-//DeadCode CSB 12Sep00 	WayPointPtr newwp = this;
-//DeadCode CSB 12Sep00 	if (!this)
-//DeadCode CSB 12Sep00 		return this;
-//DeadCode CSB 12Sep00 	if (newwp->wpname >= name)
-//DeadCode CSB 12Sep00 	{
-//DeadCode CSB 12Sep00 		while (	(newwp) && (newwp->wpnum != 0 || newwp->wpname != name))
-//DeadCode CSB 12Sep00 			newwp = newwp->prev;
-//DeadCode CSB 12Sep00 		if (newwp)
-//DeadCode CSB 12Sep00 			return (newwp);
-//DeadCode CSB 12Sep00 		else
-//DeadCode CSB 12Sep00 			return (this);
-//DeadCode CSB 12Sep00 	}else
-//DeadCode CSB 12Sep00 	{
-//DeadCode CSB 12Sep00 		while (	(newwp) && (newwp->wpnum != 0 || newwp->wpname != name))
-//DeadCode CSB 12Sep00 			newwp = newwp->next;
-//DeadCode CSB 12Sep00 		if (newwp)
-//DeadCode CSB 12Sep00 			return (newwp);
-//DeadCode CSB 12Sep00 		else
-//DeadCode CSB 12Sep00 			return (this);
-//DeadCode CSB 12Sep00
-//DeadCode CSB 12Sep00 	}
 }

@@ -270,7 +270,6 @@ void CFlt_Task::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CFlt_Task, CDialog)
 	//{{AFX_MSG_MAP(CFlt_Task)
-//DEADCODE JIM 18/05/99 	ON_BN_CLICKED(IDC_BUTTON1, OnButton1)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE( WM_SELECTTAB, OnSelectTab)
 
@@ -328,8 +327,6 @@ void CFlt_Task::RefreshAll()
 						SetIndex(0); //MS 07/04/99
 		else
 		{
-//DEADCODE JIM 28/05/99 			info_airgrp* ag0;
-//DEADCODE JIM 28/05/99 			ag0=*Persons2::ConvertPtrUID(Todays_Packages[packnum][wavenum][0].uid);
 
 			if (!escortishigh)
 			{
@@ -480,8 +477,6 @@ void	CFlt_Task::SetFlightCount()
 							-Todays_Packages.SquadACUsed(Todays_Packages[packnum][wavenum][groupnum].squadron)
 							+flights)/4;
 		flights/=4;
-//DeadCode DAW 22Jun99 		if (flights!=displayedflights && displayedflights!=-1)
-//DeadCode DAW 22Jun99 			RefreshParent();
 		displayedflights=flights;
 		char buffer[20];
 		sprintf(buffer,"%s (%i/%i)",(const char*)RESLIST(SQ_BF_F86A,Todays_Packages[packnum][wavenum][groupnum].squadron),flights,(int)maxavail);
@@ -976,7 +971,6 @@ void CFlt_Task::OnButton1()
 void CFlt_Task::RefreshData(int datatype)
 {
 	lastaction=REFRESHNONE;
-//DeadCode DAW 22Jun99 	SetFlightCount();
 	Profile::TargetDescript* t=&Todays_Packages[packnum][wavenum][groupnum][acnum/4].primary;
 	switch (datatype)
 	{
@@ -999,8 +993,6 @@ void CFlt_Task::RefreshData(int datatype)
 		}
 		Todays_Packages[packnum].CountWaypoints();
 		RefreshAll();
-//DEADCODE RDH 19/06/99 		RDialog::m_pView->SetHiLightInfo(Todays_Packages.hipack, Todays_Packages.hiwave, 
-//DEADCODE RDH 19/06/99 				Todays_Packages.higroup, Todays_Packages.hiwp,true);
 
 	break;
 	case 3: //secondary target

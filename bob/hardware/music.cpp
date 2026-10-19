@@ -69,7 +69,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //Date           Tue 5 Oct 1999
 //Description    Everything to do with manipulating a piece of music
 //------------------------------------------------------------------------------
-//DEADCODE MS 02/02/00 #define		INITGUID
 
 #include	"dosdefs.h"
 #include	"music.h"
@@ -298,8 +297,6 @@ void Music::ReleasePort()
 //////////////////////////////////////////////////////////////////////
 bool Music::CreateAndAddPort(ULong index)
 {
-//DeadCode AMM 22Nov99 	HRESULT res;
-//DeadCode AMM 22Nov99 	DMUS_PORTPARAMS params;
 
 	if (this && MusicAllowed)
 	{
@@ -366,7 +363,6 @@ bool Music::CreateAndAddPort(GUID portguid)
 
 // create a port with the given port parameters
 
-//DeadCode AMM 22Nov99 	res=gpDMusic->CreatePort(portinfo->port,&params,&gpPort,NULL);
 		res=gpDMusic->CreatePort(portguid,&params,&gpPort,NULL);
 
 		if (res!=S_OK)
@@ -641,10 +637,6 @@ void Music::AttemptFileOpen(void*	dataPtr, int	dataLength, bool MusicTest)
 		ObjDesc.dwValidData=
 				DMUS_OBJ_CLASS
 				| DMUS_OBJ_MEMORY	;
-//DeadCode AMM 22Nov99 		  | DMUS_OBJ_FILENAME
-//DeadCode AMM 22Nov99 		  | DMUS_OBJ_FULLPATH;
-//DeadCode AMM 22Nov99 	wcscpy( ObjDesc.wszFileName, L"c:\\temp\\relie2.mid");
-//DeadCode AMM 15Nov99 			DMUS_OBJ_MEMORY	;
 
 		ObjDesc.pbMemData = (LPBYTE)dataPtr;
 		ObjDesc.llMemLength = dataLength;
@@ -857,10 +849,6 @@ void	Music::SetMasterVolume(int	theVol)
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 22Nov99 bool	Music::IsMusicDeviceValid()
-//DeadCode AMM 22Nov99 {
-//DeadCode AMM 22Nov99 	return false;
-//DeadCode AMM 22Nov99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		AssignDefaultMusicDevice

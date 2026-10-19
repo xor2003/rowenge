@@ -13,7 +13,6 @@
 #define	DEFAULT_SMKTRLS 0
 
 class	CLib3D;
-//DEADCODE JON 5/22/00 struct	R3DVERTEX;
 class	ViewPoint;
 
 class	TrailInfo												//RJS 09Feb00

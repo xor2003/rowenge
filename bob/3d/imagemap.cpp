@@ -89,6 +89,7 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "3DInstr.h"
 #include "shapes.h"
 #include "imagemap.h"
+#include "lbmcpp.h"
 #include "3dcode.h"												//RJS 19Nov96
 //#include "winmove.h"											//RJS 15Dec96
 
@@ -97,7 +98,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"loadpcx.h"
 
 extern Error _Error;
-//DEADCODE PD 03/12/99 extern SWord winmode_bpp;
 
 /*static*/ bool fNot16bit=false;
 
@@ -555,10 +555,10 @@ static	bool	memtable[512][512];
 //------------------------------------------------------------------------------
 void	ImageMap::InitImageMaps()
 {
-	fileblock	*theblock = new fileblock (FIL_IMAP_DIRTABLE);
-	if (theblock)
+	fileblock	theblock(FIL_IMAP_DIRTABLE);
+	if (theblock.getdata())
 	{
-		UWordP		dptr = (UWordP) getdata(theblock);
+		UWordP		dptr = (UWordP) theblock.getdata();
 		assert(dptr);
 		SWord		nodirs = (*dptr++) + 1;//last dir inclusive
 		SWord		i,noimaps;
@@ -582,7 +582,6 @@ void	ImageMap::InitImageMaps()
 				superimagemaptable[i].imagemaptable = NULL;
 		}
 
-		delete theblock;
 	}
 }
 
@@ -783,8 +782,6 @@ void ImageMap::AddImageMapToGlbList(UWord imageno)
 
 	ImageMapBitField* imagemapfield = &superimagemaptable[dir_no].imbf;
 
-//DeadCode MS 26Sep00 	if (file_no == mapoff)
-//DeadCode MS 26Sep00 		INT3;
 
 	if ((realmapno != imageno) && !fNot16bit) //PD 03/12/99
 		*imagemapfield|=(ImageMapBit) (file_no + mapoff);//16bit file
@@ -862,7 +859,6 @@ Bool ImageMap::LoadImageMap(SuperMap*	supermap, UWord file_no,Bool is16bit, Bool
 		if (imgp)
 		{
 			FileNum		imagemapfile;							//RJS 19Oct98
-//DeadCode RJS 27Oct98 			UWord		fnum = DIR_IMAGEMAP + file_no;			//RJS 19Oct98
 
 			supermap->imagemaptable[file_no] = imgp;				//RJS 19Oct98
 
@@ -876,6 +872,24 @@ Bool ImageMap::LoadImageMap(SuperMap*	supermap, UWord file_no,Bool is16bit, Bool
 			fileblock	fblock = imagemapfile;
 
 			imgp->FixLbmImageMap(&fblock);
+			if (getenv("ROWAN_IMAPDBG"))
+			{
+				fprintf(stderr,"[IMAP] file=%lu sz=%lu w=%d h=%d body=%p alfa=%p masked=%d",(unsigned long)imagemapfile,(unsigned long)fblock.getsize(),(int)imgp->w,(int)imgp->h,(void*)imgp->body,(void*)imgp->alpha,(int)imgp->isMasked);
+				if (imgp->body)
+				{  for (int ry=0; ry<imgp->h && ry<512; ry+=8)
+				    {  int dk=0;
+				       for (int rx=0; rx<imgp->w && rx<512; rx+=4)
+				          if (imgp->body[ry*imgp->w+rx]<8) dk++;
+				       fprintf(stderr," %d:%d/%d",ry,dk,(imgp->w<512?imgp->w:512)/4);}
+				if (imgp->w>0 && imgp->h>1)
+				{  fprintf(stderr," b0:");
+				   for (int bi=0;bi<16;bi++) fprintf(stderr,"%02x",imgp->body[bi]);
+				   fprintf(stderr," bR%d:",imgp->h/2);
+				   for (int bi=0;bi<16;bi++) fprintf(stderr,"%02x",imgp->body[(imgp->h/2)*imgp->w+bi]);}
+				}
+				fprintf(stderr,"\n");
+			}
+
 
 			total_image_mem += imgp->w * imgp->h;
 
@@ -965,7 +979,6 @@ void	ImageMap_Desc::FixLbmImageMap(fileblock* fblockptr)
 		lbmSearch.alfa.hunkPtr=
 		lbmSearch.body.hunkPtr=NULL;
 
-//DeadCode RJS 20Oct00 	UByte* start=buffer;
 	UByte	*tmp;
 	SWord	picwidth,picheight,picy,picx,x,y;
 	SLong	blocksize;
@@ -1022,40 +1035,20 @@ void	ImageMap_Desc::FixLbmImageMap(fileblock* fblockptr)
 		alpha = new UByte[picwidth*picheight];
 		if (alpha)
 		{
-//DeadCode RJS 17May00 			blendType = BLEND_AVERAGEALPHA;						//RJS 16May00
 
 			isMasked = 0;
 			ULong	BytesPerScanLine = picwidth;
 			UByteP	logicalscreenptr = alpha;
 
-			int	y, x;
-			for (y=0; y < picheight; y ++)
-			{
-				UByteP	c = tmp;
-				SLong	width = picwidth;
-				SLong	x = 0;
-				SLong	minx = 0;
-				SLong	maxx = picwidth - 1;
-
-//		tmp = Graphic::UnpackRow(tmp,picwidth,x,y++,PhysicalMinX,PhysicalMinX+PhysicalWidth-1);
-//
-//		UnpackRow(UByte *c, SLong width, SLong x, SLong y, SLong minx, SLong maxx)
-
-				#define	TRANSFERVALUESIZE	UByte
-				#define	LOADVALUE(x)	TRANSFERVALUE=x
-				#define	COPYVALUE(t,s)	*t++=s
-				#define	return(s)
-
-				{
-				#include "lbmcpp.h"
-
-				tmp = c;
-				#undef	return
-			}
+			for (int y=0; y < picheight; y++)
+				tmp = LBMUnpackNRow(tmp,buffer+fblockptr->getsize(),alpha,
+									picwidth,picwidth,0,y,0,picwidth-1);
 		}
 	}
 
 	tmp = lbmSearch.body.hunkPtr;
+	if (getenv("ROWAN_IMAPDBG"))
+		fprintf(stderr,"   [HUNKS] bmhd=%p cmap=%p alfa=%p body=%p pic=%dx%d\n",(void*)lbmSearch.bmhd.hunkPtr,(void*)lbmSearch.cmap.hunkPtr,(void*)lbmSearch.alfa.hunkPtr,(void*)lbmSearch.body.hunkPtr,(int)picwidth,(int)picheight);
 	if (tmp)
 	{
 		// blah... alocate buffer body (width * height)
@@ -1068,169 +1061,22 @@ void	ImageMap_Desc::FixLbmImageMap(fileblock* fblockptr)
 			w = picwidth;
 			h = picheight;
 
-			int	y, x;
-			for (y = 0; y < picheight; y++)
+			for (int y = 0; y < picheight; y++)
 			{
-				UByteP	c = tmp;
-				SLong	width = picwidth;
-				SLong	x = 0;
-				SLong	minx = 0;
-				SLong	maxx = picwidth - 1;
-
-				//		tmp = Graphic::UnpackRow(tmp,picwidth,x,y++,PhysicalMinX,PhysicalMinX+PhysicalWidth-1);
-				//
-				//		UnpackRow(UByte *c, SLong width, SLong x, SLong y, SLong minx, SLong maxx)
-
-#define	TRANSFERVALUESIZE	UByte
-#define	LOADVALUE(x)	TRANSFERVALUE=x
-#define	COPYVALUE(t,s)	*t++=s
-#define	return(s)
-
-				{
-#include "lbmcpp.h"
-
-					tmp = c;
-#undef	return
-				}
+				tmp = LBMUnpackNRow(tmp,buffer+fblockptr->getsize(),body,
+									picwidth,picwidth,0,y,0,picwidth-1);
+				if (getenv("ROWAN_IMAPDBG") && y<6)
+					fprintf(stderr,"   [row%d] consumed=%ld\n",y,(long)((char*)tmp-(char*)lbmSearch.body.hunkPtr));
 			}
+
 		}
 
 	}
+
+	}
 	}
 
 
-//Old_Code PD 27Oct98 void	ImageMap_Desc::FixLbmImageMap(fileblock* fblockptr)
-//Old_Code PD 27Oct98 {
-//Old_Code PD 27Oct98 	UByte* buffer = (UByteP) fblockptr->getdata();
-//Old_Code PD 27Oct98 	UByte* start=buffer;
-//Old_Code PD 27Oct98 	UByte	*tmp;
-//Old_Code PD 27Oct98 	SWord	picwidth,picheight,picy,picx,x,y;
-//Old_Code PD 27Oct98 	SLong	blocksize;
-//Old_Code PD 27Oct98 	int		colline;
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 	w=0;
-//Old_Code PD 27Oct98 	h=0;
-//Old_Code PD 27Oct98 	isMasked = 0;												//RJS 26Mar98
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 	tmp = Graphic::SearchIFFHunk((UByte *)"BMHD",buffer);		//Process PBM header
-//Old_Code PD 27Oct98 	if (tmp)
-//Old_Code PD 27Oct98 	{
-//Old_Code PD 27Oct98 		tmp = Graphic::ReadWord(tmp,picwidth);
-//Old_Code PD 27Oct98 		tmp = Graphic::ReadWord(tmp,picheight);
-//Old_Code PD 27Oct98 		tmp += 5;												//RJS 26Mar98
-//Old_Code PD 27Oct98 		if (*tmp)												//RJS 26Mar98
-//Old_Code PD 27Oct98 			isMasked = 1;										//RJS 26Mar98
-//Old_Code PD 27Oct98 	}
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 	tmp = Graphic::SearchIFFHunk((UByte *)"CMAP",buffer);		//Process CMAP hunk - palette
-//Old_Code PD 27Oct98 	if (tmp)
-//Old_Code PD 27Oct98 	{
-//Old_Code PD 27Oct98 		UByteP	palptr;
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 		tmp = Graphic::ReadLong((UByteP)(tmp-4),blocksize);
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 		if (blocksize < 256)									//RJS 24Feb98
-//Old_Code PD 27Oct98 		{
-//Old_Code PD 27Oct98 			// A palette index number, not palette.....
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 			paletteindex = blocksize;
-//Old_Code PD 27Oct98 			tmp += blocksize;									// Keep things safe with dummy data
-//Old_Code PD 27Oct98 		}
-//Old_Code PD 27Oct98 		else
-//Old_Code PD 27Oct98 		{
-//Old_Code PD 27Oct98 			palette = new UByte[blocksize];
-//Old_Code PD 27Oct98 			if (palette)
-//Old_Code PD 27Oct98 			{
-//Old_Code PD 27Oct98 				palptr = palette;
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 				for (colline = 0; colline < blocksize; colline++)
-//Old_Code PD 27Oct98 				{
-//Old_Code PD 27Oct98 					*palptr = *tmp;
-//Old_Code PD 27Oct98 					palptr++;
-//Old_Code PD 27Oct98 					tmp++;
-//Old_Code PD 27Oct98 				}
-//Old_Code PD 27Oct98 			}
-//Old_Code PD 27Oct98 		}														//RJS 24Feb98
-//Old_Code PD 27Oct98 	}
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 	tmp = Graphic::SearchIFFHunk((UByte *)"ALFA",buffer);		//Process PBM header
-//Old_Code PD 27Oct98 	if (tmp)
-//Old_Code PD 27Oct98 	{
-//Old_Code PD 27Oct98 		alpha = new UByte[picwidth*picheight];
-//Old_Code PD 27Oct98 		if (alpha)
-//Old_Code PD 27Oct98 		{
-//Old_Code PD 27Oct98 			ULong	BytesPerScanLine = picwidth;
-//Old_Code PD 27Oct98 			UByteP	logicalscreenptr = alpha;
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 			int	y, x;
-//Old_Code PD 27Oct98 			for (y=0; y < picheight; y ++)
-//Old_Code PD 27Oct98 			{
-//Old_Code PD 27Oct98 				UByteP	c = tmp;
-//Old_Code PD 27Oct98 				SLong	width = picwidth;
-//Old_Code PD 27Oct98 				SLong	x = 0;
-//Old_Code PD 27Oct98 				SLong	minx = 0;
-//Old_Code PD 27Oct98 				SLong	maxx = picwidth - 1;
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 //		tmp = Graphic::UnpackRow(tmp,picwidth,x,y++,PhysicalMinX,PhysicalMinX+PhysicalWidth-1);
-//Old_Code PD 27Oct98 //
-//Old_Code PD 27Oct98 //		UnpackRow(UByte *c, SLong width, SLong x, SLong y, SLong minx, SLong maxx)
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 				#define	TRANSFERVALUESIZE	UByte
-//Old_Code PD 27Oct98 				#define	LOADVALUE(x)	TRANSFERVALUE=x
-//Old_Code PD 27Oct98 				#define	COPYVALUE(t,s)	*t++=s
-//Old_Code PD 27Oct98 				#define	return(s)
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 				{
-//Old_Code PD 27Oct98 				#include "lbmcpp.h"
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 				tmp = c;
-//Old_Code PD 27Oct98 				#undef	return
-//Old_Code PD 27Oct98 			}
-//Old_Code PD 27Oct98 		}
-//Old_Code PD 27Oct98 	}
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 	tmp = Graphic::SearchIFFHunk((UByte *)"BODY",buffer);		//Process PBM header
-//Old_Code PD 27Oct98 	if (tmp)
-//Old_Code PD 27Oct98 	{
-//Old_Code PD 27Oct98 		// blah... alocate buffer body (width * height)
-//Old_Code PD 27Oct98 		body = new UByte[picwidth*picheight];
-//Old_Code PD 27Oct98 		if (body)
-//Old_Code PD 27Oct98 		{
-//Old_Code PD 27Oct98 			ULong	BytesPerScanLine = picwidth;
-//Old_Code PD 27Oct98 			UByteP	logicalscreenptr = body;
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 			w=picwidth;
-//Old_Code PD 27Oct98 			h=picheight;
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 			int	y, x;
-//Old_Code PD 27Oct98 			for (y=0; y < picheight; y ++)
-//Old_Code PD 27Oct98 			{
-//Old_Code PD 27Oct98 				UByteP	c = tmp;
-//Old_Code PD 27Oct98 				SLong	width = picwidth;
-//Old_Code PD 27Oct98 				SLong	x = 0;
-//Old_Code PD 27Oct98 				SLong	minx = 0;
-//Old_Code PD 27Oct98 				SLong	maxx = picwidth - 1;
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 //		tmp = Graphic::UnpackRow(tmp,picwidth,x,y++,PhysicalMinX,PhysicalMinX+PhysicalWidth-1);
-//Old_Code PD 27Oct98 //
-//Old_Code PD 27Oct98 //		UnpackRow(UByte *c, SLong width, SLong x, SLong y, SLong minx, SLong maxx)
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 				#define	TRANSFERVALUESIZE	UByte
-//Old_Code PD 27Oct98 				#define	LOADVALUE(x)	TRANSFERVALUE=x
-//Old_Code PD 27Oct98 				#define	COPYVALUE(t,s)	*t++=s
-//Old_Code PD 27Oct98 				#define	return(s)
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 				{
-//Old_Code PD 27Oct98 				#include "lbmcpp.h"
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 				tmp = c;
-//Old_Code PD 27Oct98 				#undef	return
-//Old_Code PD 27Oct98 			}
-//Old_Code PD 27Oct98 		}
-//Old_Code PD 27Oct98 	}
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98
-//Old_Code PD 27Oct98 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		FixupImageMap
@@ -1246,30 +1092,6 @@ void	ImageMap_Desc::FixLbmImageMap(fileblock* fblockptr)
 //------------------------------------------------------------------------------
 void  ImageMap::FixupImageMap(void*	&dataarea,ULong&	datalengthin)
 {
-//DeadCode DAW 27Oct98 	UByteP	imagestart = (UByteP) dataarea;
-//DeadCode DAW 27Oct98 	ULong	dlength = datalengthin;
-//DeadCode DAW 27Oct98 	ULong	count = 0;
-//DeadCode DAW 27Oct98 	UByte	thiscol;
-//DeadCode DAW 27Oct98 	UByte	newcol;												//RDH 16Dec96
-//DeadCode DAW 27Oct98
-//DeadCode DAW 27Oct98 //	if (_DPlay.SelectedService)	//test for in windows...								//RJS 15Dec96
-//DeadCode DAW 27Oct98 //	{
-//DeadCode DAW 27Oct98 //DeadCode RDH 20Dec96 		if (Three_Dee.lightson)
-//DeadCode DAW 27Oct98 			newcol = 251;										//RDH 20Dec96
-//DeadCode DAW 27Oct98 //DeadCode RDH 20Dec96 		else
-//DeadCode DAW 27Oct98 //DeadCode RDH 20Dec96 			newcol = 0;
-//DeadCode DAW 27Oct98
-//DeadCode DAW 27Oct98 		while (count < dlength)
-//DeadCode DAW 27Oct98 		{
-//DeadCode DAW 27Oct98 			thiscol = *imagestart;
-//DeadCode DAW 27Oct98
-//DeadCode DAW 27Oct98 			if (thiscol == 255)
-//DeadCode DAW 27Oct98 				*imagestart = newcol;
-//DeadCode DAW 27Oct98
-//DeadCode DAW 27Oct98 			imagestart++;
-//DeadCode DAW 27Oct98 			count++;
-//DeadCode DAW 27Oct98 		}
-//DeadCode DAW 27Oct98 //	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1362,19 +1184,6 @@ void ImageMap::UnLoadImageMapPtrs()
 	}
 
 	Three_Dee.newpalettes = NULL;
-//DeadCode RJS 14Jun99
-//DeadCode RJS 14Jun99 	failedcnt = 0;
-//DeadCode RJS 14Jun99 #ifndef	NDEBUG
-//DeadCode RJS 14Jun99 	for (i=0; i < supercnt; i++)
-//DeadCode RJS 14Jun99 	{
-//DeadCode RJS 14Jun99 		mapoff = superimagemaptable[i].nomaps;
-//DeadCode RJS 14Jun99 		for (file_no = 0; file_no < mapoff; file_no++)
-//DeadCode RJS 14Jun99 		{
-//DeadCode RJS 14Jun99 			if (superimagemaptable[i].imagemaptable[file_no])
-//DeadCode RJS 14Jun99 				 failedcnt++;
-//DeadCode RJS 14Jun99 		}
-//DeadCode RJS 14Jun99 	}
-//DeadCode RJS 14Jun99 #endif
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

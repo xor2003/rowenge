@@ -54,17 +54,6 @@ enum	UIComponentFlags
 BITABLE(UIComponentFlags);
 ADDORABLE(UIComponentFlags);
 	#endif
-//Old_Code DAW 23Oct95 class	UICFlags
-//Old_Code DAW 23Oct95 {
-//Old_Code DAW 23Oct95 	protected:
-//Old_Code DAW 23Oct95 	private:
-//Old_Code DAW 23Oct95 	public:
-//Old_Code DAW 23Oct95 				UICFlags::UICFlags();
-//Old_Code DAW 23Oct95 				UICFlags::~UICFlags();
-//Old_Code DAW 23Oct95 		UICFlags& operator|=(const UIComponentFlags& a);
-//Old_Code DAW 23Oct95 		UICFlags& operator|(const UIComponentFlags& a);
-//Old_Code DAW 23Oct95 };
-//Old_Code DAW 23Oct95 
 
 class	Install;
 class	UIListDescComp;
@@ -229,8 +218,6 @@ protected:
 
 	UIComponentPtr	Add(UICompListType,UIComponentPtr); //merged with FullComponentFlags
 
-//Old_Code DAW 15Sep95 		UIComponent*	writeback();
-//Old_Code DAW 15Sep95 		compbaseproc	select,hilight,draw,drawhilight,move,rclickcode;
 
 //routines to service requests from components to die:
 Bool	WriteBack();
@@ -442,8 +429,6 @@ class	UIComponent
 
 public:
 
-//Old_Code DAW 18Oct95 		UIComponent*	Prev;
-//Old_Code DAW 18Oct95 		UIComponent*	Next;
 	UIComponentPtr	nextdraw,		//Draw list link
 					nexttest;		//Test list link
 	ScreenXY	xy;				//component coverage box

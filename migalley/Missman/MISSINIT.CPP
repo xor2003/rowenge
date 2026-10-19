@@ -3755,7 +3755,7 @@ void	Campaign::NextDay()
 		}
 	}else
 	{
-		int squad;
+		int squad = SQ_F51;
 		switch (Miss_Man.currcampaignnum)
 		{
 			case MissMan::F80_CAMPAIGN:
@@ -3961,9 +3961,9 @@ void	Campaign::DisDayEntry(Debrief::TypeFlag type, int msgowner, int msgtextid)
 	//make sure we get last one requested							  //RDH 28/05/99
 	if (i >= Debrief::DISISITFORTODAY)
 		i = Debrief::DISISITFORTODAY - 1;
-		debrief.disday[i].typeflag = type;
-		debrief.disday[i].msgowner = msgowner;
-		debrief.disday[i].msgtextid = msgtextid;
+	debrief.disday[i].typeflag = type;
+	debrief.disday[i].msgowner = msgowner;
+	debrief.disday[i].msgtextid = msgtextid;
 		FileNum smack = FindSmacker(i);
 		if (smack)
 		{

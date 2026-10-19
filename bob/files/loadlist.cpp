@@ -96,27 +96,4 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //------------------------------------------------------------------------------
 void	fileman::preload()
 {
-//DeadCode AM 14Jan97 	fileblock	pl(FIL_PRELOAD_LIST);
-//DeadCode AM 14Jan97 	char* t=(char*)getdata(pl);
-//DeadCode AM 14Jan97 	FileNum f;
-//DeadCode AM 14Jan97 	while (*t<'0')	t++;
-//DeadCode AM 14Jan97 	f=(FileNum)Math_Lib.a2iend(t);
-//DeadCode AM 14Jan97 	while(f)
-//DeadCode AM 14Jan97 		if (dirnum(f)==dirnum(FIL_SUN_NUM))
-//DeadCode AM 14Jan97 		{
-//DeadCode AM 14Jan97 
-//DeadCode AM 14Jan97 			fileblock z(f,shapestuff::FixupShapeFile);
-//DeadCode AM 14Jan97 			while (*t<'0')	t++;
-//DeadCode AM 14Jan97 			f=(FileNum)Math_Lib.a2iend(t);
-//DeadCode AM 14Jan97 		}
-//DeadCode AM 14Jan97 		else
-//DeadCode AM 14Jan97 		{
-//DeadCode AM 14Jan97 			if (dirnum(f)==dirnum(FIL_MUSIC_BASE))				//JIM 15Dec96
-//DeadCode AM 14Jan97 				if (f!=FIL_MUSIC_SPOT_EFFECTS)					//DAW 17Dec96
-//DeadCode AM 14Jan97 					f=(FileNum)(f+_Miles.MusicDir);					//JIM 15Dec96
-//DeadCode AM 14Jan97 			fileblock z(f);
-//DeadCode AM 14Jan97 			while (*t<'0')	t++;
-//DeadCode AM 14Jan97 			f=(FileNum)Math_Lib.a2iend(t);
-//DeadCode AM 14Jan97 		}
-//DeadCode AM 14Jan97 
 }

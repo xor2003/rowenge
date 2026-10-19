@@ -78,7 +78,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	"DOSDefs.h"
 	//#include	"MAClib.h"f
 #define F_GRAFIX												//DAW 05Aug96
-//DeadCode RJS 17Oct96 #define F_SOUNDS
 #define F_BATTLE
 	#include	"Files.g"
 	#include 	"myerror.h"
@@ -101,7 +100,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	"shpbld.h"										//PD 22Jan96
 	#include	"landscap.h"									//MGA 09May96
 	#include "fastmath.h"
-//DeadCode DAW 23Feb98 	#include	"Wrapper.h"										//PD 26Oct95
 
 	#include	"Mytime.h"										//PD 15Mar96
 
@@ -111,221 +109,14 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	"Transite.h"									//PD 24Apr96
 	#include	"mymath.h"										//RJS 25Jul96
 	#include	"savegame.h"									//RJS 12Aug96
-//DEADCODE DAW 29/01/00 	#include	"missman2.h"										//RDH 24Oct96
 	#include	"viewsel.h"										//RJS 30Aug96
 //	#include	"LnchrDat.h"	//launcherdata									//RJS 09Sep96
 	#include	"speed.h"										//RJS 01Oct96
-//DeadCode RJS 05Nov99 	#include	"miles.h"										//RJS 17Oct96
-//DEADCODE DAW 29/01/00 	#include	"BoxCol.h"										//RJS 24Feb97
-//DEADCODE DAW 29/01/00 	#include	"shpweap.h"										//RJS 16Apr97
-//DEADCODE DAW 29/01/00 	#include	"deathnum.g"									//RJS 23May97
-//DEADCODE DAW 29/01/00 	#include "monotxt.h"
-//DEADCODE DAW 29/01/00 	#include "stdio.h"											//ARM 09Jun97
 
 	#include	"shpinstr.h"									//RJS 03Jul98
 	#include	"modinst.h"										//RJS 03Jul98
-//DEADCODE DAW 29/01/00 	#include	"weappak.h"										//RJS 03Jul98
-//DEADCODE DAW 29/01/00 	#include	"model.h"										//RJS 03Jul98
-//DEADCODE DAW 29/01/00 	#include	"smktrl.g"										//RJS 03Jul98
-//DEADCODE DAW 29/01/00 #include	"winmove.h"
-//DEADCODE DAW 29/01/00 #include	"persons2.h"
 #include	"imagemap.g"
 
-//DeadCode RJS 09Feb00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode RJS 09Feb00 //Procedure		ParticleStreamEdgedPlain
-//DeadCode RJS 09Feb00 //Author		Robert Slater
-//DeadCode RJS 09Feb00 //Date			Tue 16 Dec 1997
-//DeadCode RJS 09Feb00 //
-//DeadCode RJS 09Feb00 //Description	
-//DeadCode RJS 09Feb00 //
-//DeadCode RJS 09Feb00 //Inputs		
-//DeadCode RJS 09Feb00 //
-//DeadCode RJS 09Feb00 //Returns	
-//DeadCode RJS 09Feb00 //
-//DeadCode RJS 09Feb00 //------------------------------------------------------------------------------
-//DeadCode RJS 09Feb00 void	shape::ParticleStreamEdgedPlain(UWord	vertex0,
-//DeadCode RJS 09Feb00 							 			UWord	vertex1,
-//DeadCode RJS 09Feb00 							 			SWord	xoff0, SWord yoff0,
-//DeadCode RJS 09Feb00 							 			SWord	xoff1, SWord yoff1,
-//DeadCode RJS 09Feb00 							 			UWord	depth,
-//DeadCode RJS 09Feb00 							 			SWord	StartRadius,
-//DeadCode RJS 09Feb00 										SWord	EndRadius,
-//DeadCode RJS 09Feb00 							 			MyGroundVectorPtr	WCylStartP,
-//DeadCode RJS 09Feb00 							 			MyGroundVectorPtr	WCylEndP,
-//DeadCode RJS 09Feb00 							 			SWord	col,
-//DeadCode RJS 09Feb00 							 			SWord	transdepth)
-//DeadCode RJS 09Feb00 {
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 /*	DoPointStruc dopoint0,dopoint1,dopoint2,dopoint3,dopointRoot,dptmp1,dptmp2;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	Bool	oldcross;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	Float	RelX, RelY, RelZ;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	Float	RelXStep,RelYStep, RelZStep;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	UWord	counter;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	xDelta,yDelta;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	RandxDelta,RandyDelta;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	xDeltCap,yDeltCap;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	UWord	RSeed;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	XoffGap;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	YoffGap;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	Radius;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SWord	MaxRadius;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SWord	RadStep;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	wXStep, wYStep, wZStep;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	wXStart, wYStart, wZStart;							
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	Colour	thecol = (Colour) col;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	MaxDist, Dist;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SWord	realmaxrad = EndRadius;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	depth = 1 + (depth >> 1);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	wXStart = WCylStartP->gx;									
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	wYStart = WCylStartP->gy;									
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	wZStart = WCylStartP->gz;									
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	oldcross = POLYGON.SetCrossProduct(FALSE);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	dopoint1 = dopoint0 = newco[vertex0];								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99    	dopoint3 = dopoint2 = newco[vertex1];
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	wXStep = (WCylEndP->gx - wXStart) / depth;					
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	wYStep = (WCylEndP->gy - wYStart) / depth;					
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	wZStep = (WCylEndP->gz - wZStart) / depth;					
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	XoffGap = (xoff1 - xoff0)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	YoffGap = (yoff1 - yoff0)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	EndRadius = (5*EndRadius)>>3;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	StartRadius = (5*StartRadius)>>3;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	RadStep = (EndRadius - StartRadius)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	MaxRadius = StartRadius;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	xDelta = xoff0;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	yDelta = yoff0;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	POLYGON.SetOpacityON();
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	POLYGON.SetPixelWidth(1);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	dopoint0.bodyx.f += xoff0;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99   	dopoint0.bodyy.f += yoff0;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	_matrix.SetClipFlags(dopoint0);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99   	_matrix.body2screen(dopoint0);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99   	dopoint1.bodyx.f += -xoff0;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	dopoint1.bodyy.f += -yoff0;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	_matrix.SetClipFlags(dopoint1);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	_matrix.body2screen(dopoint1);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99    	dopoint2.bodyx.f += -xoff1;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99    	dopoint2.bodyy.f += -yoff1;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	_matrix.SetClipFlags(dopoint2);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99   	_matrix.body2screen(dopoint2);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99    	dopoint3.bodyx.f += xoff1;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99    	dopoint3.bodyy.f += yoff1;								
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	_matrix.SetClipFlags(dopoint3);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99   	_matrix.body2screen(dopoint3);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	POLYGON.SetPixelWidth(1<<Save_Data.pixelsize);			
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	POLYGON.createpoly(thecol);						
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	POLYGON.createvert(dopoint0);					
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99   	POLYGON.createvert(dopoint1);					
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99   	POLYGON.createvert(dopoint2);					
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	POLYGON.createvert(dopoint3);					
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	POLYGON.drawpoly();			
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	XStep0, YStep0, ZStep0;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	SLong	XStep1, YStep1, ZStep1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	XStep0 = (dopoint3.bodyx.f - dopoint0.bodyx.f)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	YStep0 = (dopoint3.bodyy.f - dopoint0.bodyy.f)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	ZStep0 = (dopoint3.bodyz.f - dopoint0.bodyz.f)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	XStep1 = (dopoint2.bodyx.f - dopoint1.bodyx.f)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	YStep1 = (dopoint2.bodyy.f - dopoint1.bodyy.f)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	ZStep1 = (dopoint2.bodyz.f - dopoint1.bodyz.f)/depth;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	for (counter = 0; counter < depth; counter++)
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	{
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		xDeltCap = xDelta << 1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		yDeltCap = yDelta << 1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		RSeed = Noise(wXStart,wYStart,wZStart);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		RandxDelta = (((RSeed*xDeltCap)>>8) - xDelta)>>3;			
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		RandyDelta = (((RSeed*yDeltCap)>>8) - yDelta)>>3;			
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp1 = dopoint0;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp1.bodyx.f += RandxDelta;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp1.bodyy.f += RandyDelta;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp2 = dptmp1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		_matrix.SetClipFlags(dptmp1);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		_matrix.body2screen(dptmp1);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp2.bodyx.f += MaxRadius;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		_matrix.SetClipFlags(dptmp2);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		_matrix.body2screen(dptmp2);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		Radius = dptmp2.screenx.f - dptmp1.screenx.f;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		if (Radius)
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		{
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 			POLYGON.createsphere(thecol,transdepth);			//RJS 04Dec97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 			POLYGON.createsphvert(dptmp1,Radius);				//RJS 04Dec97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 			POLYGON.drawsphere();								//RJS 04Dec97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		}
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp1 = dopoint1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp1.bodyx.f -= RandxDelta;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp1.bodyy.f -= RandyDelta;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp2 = dptmp1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		_matrix.SetClipFlags(dptmp1);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		_matrix.body2screen(dptmp1);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dptmp2.bodyx.f += MaxRadius;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		_matrix.SetClipFlags(dptmp2);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		_matrix.body2screen(dptmp2);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		Radius = dptmp2.screenx.f - dptmp1.screenx.f;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		if (Radius)
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		{
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 			POLYGON.createsphere(thecol,transdepth);			//RJS 04Dec97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 			POLYGON.createsphvert(dptmp1,Radius);				//RJS 04Dec97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 			POLYGON.drawsphere();								//RJS 04Dec97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		}
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dopoint0.bodyx.f += XStep0;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dopoint0.bodyy.f += YStep0;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dopoint0.bodyz.f += ZStep0;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dopoint1.bodyx.f += XStep1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dopoint1.bodyy.f += YStep1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		dopoint1.bodyz.f += ZStep1;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		xDelta += XoffGap;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		yDelta += YoffGap;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		wXStart += wXStep;										//RJS 12Nov97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		wYStart += wYStep;										//RJS 12Nov97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		wZStart += wZStep;										//RJS 12Nov97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 		MaxRadius += RadStep;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	}
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	dptmp2 = newco[1];
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	dptmp2.bodyx.f += realmaxrad;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	_matrix.SetClipFlags(dptmp2);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	_matrix.body2screen(dptmp2);
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	Radius = dptmp2.screenx.f - newco[1].screenx.f;
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	POLYGON.createsphere(thecol,transdepth);			//RJS 04Dec97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	POLYGON.createsphvert(newco[1],Radius);				//RJS 04Dec97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	POLYGON.drawsphere();
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 	current_screen->SetTransparency(SMOKED_OFF);				//RJS 18Jun97
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99 
-//DeadCode RJS 09Feb00 //DeadCode RJS 20Dec99  	POLYGON.SetCrossProduct(oldcross);*/
-//DeadCode RJS 09Feb00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ParticleStreamImapd
@@ -374,13 +165,7 @@ void	shape::ParticleStreamImapd(	UWord	vertex0,
 	ULong	thetime = 0;
 	ULong	depth;												//RJS 10Dec98
 
-//DeadCode RJS 30Mar98 	depth = 1 + (depth >> 1);
-//DeadCode MS 10Dec98 
-//DeadCode MS 10Dec98 	RadStep = ((EndRadius - StartRadius)<<16)/depth;				//RJS 04Feb98
 
-//DeadCode RJS 20Dec99	wXStart = WCylStartP->gx;									
-//DeadCode RJS 20Dec99	wYStart = WCylStartP->gy;									
-//DeadCode RJS 20Dec99	wZStart = WCylStartP->gz;									
 
 	maxx = minx + iW;													
 	maxy = miny + iH;													
@@ -437,7 +222,6 @@ void	shape::ParticleStreamImapd(	UWord	vertex0,
 		depth <<= 7;											//RJS 10Dec98
 		depth /= depthscale;									//RJS 10Dec98
 		if (depth <= 0)	depth = 1;								//RJS 25Jun99
-//DeadCode DAW 25Jun99 		depth ++;												//RJS 10Dec98
 
 		RadStep = ((EndRadius - StartRadius)<<16)/depth;				//RJS 04Feb98
 
@@ -509,12 +293,6 @@ void	shape::ParticleStreamImapd(	UWord	vertex0,
 					*pRVert++=dopoint2;
 					*pRVert++=dopoint3;
 					g_lpLib3d->EndPoly();
-//deadcode					POLYGON.createpoly(imapno);
-//deadcode					POLYGON.createvert(dopoint0,minx,miny);
-//deadcode					POLYGON.createvert(dopoint1,maxx,miny);
-//deadcode					POLYGON.createvert(dopoint2,maxx,maxy);
-//deadcode					POLYGON.createvert(dopoint3,minx,maxy);
-//deadcode					POLYGON.drawpoly();
 				}
 			}
 
@@ -627,7 +405,6 @@ void	shape::ParticleStreamStaggeredImapd(UWord	vertex0,
 //	depth /= fadedist;
 	depth = (depth*3)>>2;
 	if (depth <= 0)	depth = 1;								//RJS 25Jun99
-//DeadCode DAW 25Jun99 	depth += 1;
 
 	if (depth > MaxDepth)
 		depth = MaxDepth;
@@ -659,7 +436,6 @@ void	shape::ParticleStreamStaggeredImapd(UWord	vertex0,
 	zDelta = RelZ;
 	zDelta >>= 1;
 
-//deadcode	POLYGON.SetOpacityON();
 //DEAD 	POLYGON.SetPixelWidth(1);
 
 	for (counter = 0; counter < depth; counter++)
@@ -710,12 +486,6 @@ void	shape::ParticleStreamStaggeredImapd(UWord	vertex0,
 				*pRVert++=dopoint2;
 				*pRVert++=dopoint3;
 				g_lpLib3d->EndPoly();
-//deadcode				POLYGON.createpoly(imapno);
-//deadcode				POLYGON.createvert(dopoint0,minx,miny);
-//deadcode				POLYGON.createvert(dopoint1,maxx,miny);
-//deadcode				POLYGON.createvert(dopoint2,maxx,maxy);
-//deadcode				POLYGON.createvert(dopoint3,minx,maxy);
-//deadcode				POLYGON.drawpoly();
 			}
 		}
 
@@ -807,7 +577,6 @@ void	shape::ParticleCylinderPlain(UWord	vertex0,
 	xDelta = xoff0;
 	yDelta = yoff0;
 
-//deadcode	POLYGON.SetOpacityON();
 //DEAD 	POLYGON.SetPixelWidth(1);
 
 	for (counter = 0; counter < depth; counter++)
@@ -850,13 +619,9 @@ void	shape::ParticleCylinderPlain(UWord	vertex0,
 
 				Radius = 2 + ((Dist*MaxRadius)/MaxDist);
 
-//deadcode				_matrix.SetClipFlags(dopoint0);
-//deadcode				_matrix.body2screen(dopoint0);
 
 				dopoint1.bodyx.f += Radius;
 
-//deadcode				_matrix.SetClipFlags(dopoint1);
-//deadcode				_matrix.body2screen(dopoint1);
 
 				R3DVALUE screenx0,screeny0,screenz0,screenx1,screeny1,screenz1;
 				g_lpLib3d->BodyToScreen(dopoint0,screenx0,screeny0,screenz0);
@@ -867,9 +632,6 @@ void	shape::ParticleCylinderPlain(UWord	vertex0,
 
 				g_lpLib3d->SetGlobal(TOGGLE_GLOBALALPHA,transdepth);
 				g_lpLib3d->DrawSphere(HMATERIAL(thecol),dopoint0,Radius3d,ANGLES_0Deg,0,0,0,0);
-//deadcode				POLYGON.createsphere(thecol,transdepth);		//RJS 04Dec97
-//deadcode				POLYGON.createsphvert(dopoint0,Radius3d);		//RJS 04Dec97
-//deadcode				POLYGON.drawsphere();							//RJS 04Dec97
 			}
 		}
 
@@ -986,7 +748,6 @@ void	shape::ParticleCylinderImapd(UWord	vertex0,
 		depth = (traillength*density) / HalfRadius;					//RJS 10Dec98
 		depth >>= 15;												//RJS 10Dec98
 		if (depth <= 0)	depth = 1;								//RJS 25Jun99
-//DeadCode DAW 25Jun99 		depth ++;
 
 		fDepth = 1. / Float(depth);
 
@@ -1004,7 +765,6 @@ void	shape::ParticleCylinderImapd(UWord	vertex0,
 		xDelta = xoff0;
 		yDelta = yoff0;
 
-//deadcode		POLYGON.SetOpacityON();
 //DEAD 		POLYGON.SetPixelWidth(1);
 
 		for (counter = 0; counter < depth; counter++)
@@ -1073,12 +833,6 @@ void	shape::ParticleCylinderImapd(UWord	vertex0,
 						*pRVert++=dopoint2;
 						*pRVert++=dopoint3;
 						g_lpLib3d->EndPoly();
-//deadcode						POLYGON.createpoly(imapno);
-//deadcode						POLYGON.createvert(dopoint0,minx,miny);
-//deadcode						POLYGON.createvert(dopoint1,maxx,miny);
-//deadcode						POLYGON.createvert(dopoint2,maxx,maxy);
-//deadcode						POLYGON.createvert(dopoint3,minx,maxy);
-//deadcode						POLYGON.drawpoly();
 					}
 				}
 			}
@@ -1186,46 +940,6 @@ Bool	shape::ClipCylinder(DoPointStruc	&dp0,
 							SLong			xRadius,
 							SLong			yRadius	)
 {
-//Old_Code RJS 08Feb00 	Bool	Clipped = TRUE;
-//Old_Code RJS 08Feb00 	Float	xRad = Float(xRadius);
-//Old_Code RJS 08Feb00 	Float	yRad = Float(yRadius);
-//Old_Code RJS 08Feb00 
-//Old_Code RJS 08Feb00 	xRad *= SphereXScale;
-//Old_Code RJS 08Feb00 	yRad *= SphereYScale;
-//Old_Code RJS 08Feb00 
-//Old_Code RJS 08Feb00 	dp0.bodyx.f += xRad;						
-//Old_Code RJS 08Feb00 	dp0.bodyy.f += yRad;						
-//Old_Code RJS 08Feb00 																
-//Old_Code RJS 08Feb00 	dp1.bodyx.f -= xRad;						
-//Old_Code RJS 08Feb00 	dp1.bodyy.f -= yRad;						
-//Old_Code RJS 08Feb00 																
-//Old_Code RJS 08Feb00 	dp2.bodyx.f -= xRad;						
-//Old_Code RJS 08Feb00 	dp2.bodyy.f -= yRad;						
-//Old_Code RJS 08Feb00 																
-//Old_Code RJS 08Feb00 	dp3.bodyx.f += xRad;						
-//Old_Code RJS 08Feb00 	dp3.bodyy.f += yRad;						
-//Old_Code RJS 08Feb00 																
-//Old_Code RJS 08Feb00 	_matrix.SetClipFlags(dp0);
-//Old_Code RJS 08Feb00 	_matrix.SetClipFlags(dp1);
-//Old_Code RJS 08Feb00 	_matrix.SetClipFlags(dp2);
-//Old_Code RJS 08Feb00 	_matrix.SetClipFlags(dp3);
-//Old_Code RJS 08Feb00 
-//Old_Code RJS 08Feb00 	andedFlags=CF3D_ALL;
-//Old_Code RJS 08Feb00 	andedFlags&=dp0.clipFlags;
-//Old_Code RJS 08Feb00 	andedFlags&=dp1.clipFlags;
-//Old_Code RJS 08Feb00 	andedFlags&=dp2.clipFlags;
-//Old_Code RJS 08Feb00 	andedFlags&=dp3.clipFlags;
-//Old_Code RJS 08Feb00 	if (andedFlags==0)
-//Old_Code RJS 08Feb00 	{
-//Old_Code RJS 08Feb00 		Clipped = FALSE;
-//Old_Code RJS 08Feb00 		if (!doingHW3D)
-//Old_Code RJS 08Feb00 		{
-//Old_Code RJS 08Feb00 			_matrix.body2screen(dp0);
-//Old_Code RJS 08Feb00 			_matrix.body2screen(dp1);
-//Old_Code RJS 08Feb00 			_matrix.body2screen(dp2);
-//Old_Code RJS 08Feb00 			_matrix.body2screen(dp3);
-//Old_Code RJS 08Feb00 		}
-//Old_Code RJS 08Feb00 	}
 
 	Bool	Clipped = TRUE;
 	Float	xRad = Float(xRadius);
@@ -1272,7 +986,6 @@ void shape::imaptrailcylWrapped(UWord   vertex1, UWord vertex2,
 								SWord	maxix2,SWord maxiy2,
 								Bool	nocylinder	)
 {
-//DeadCode RJS 21Apr99 	UByteP	adptr = (UByteP) object_obj3d->AnimPtr; 			
 	ULong	thewidth, theheight;
 	DoPointStruc dopoint0,dopoint1,dopoint2,dopoint3,oldpoint;
  	Float	xdelt1 = (Float) xoff0;
@@ -1301,11 +1014,6 @@ void shape::imaptrailcylWrapped(UWord   vertex1, UWord vertex2,
 		dy = dopoint0.bodyy.f - dopoint2.bodyy.f;
 		dz = dopoint0.bodyz.f - dopoint2.bodyz.f;
 
-//deadcode		double hypdist=dx*dx+dy*dy+dz*dz;
-//deadcode		_asm {	fld hypdist;
-//deadcode				fsqrt;
-//deadcode				fstp hypdist;
-//deadcode		}
 		R3DVALUE hypdist=dx*dx+dy*dy+dz*dz;
 		hypdist=fastMath.FastSqrt(hypdist);
 
@@ -1339,34 +1047,16 @@ void shape::imaptrailcylWrapped(UWord   vertex1, UWord vertex2,
 		{
 			dopoint0.bodyx.f += xdelt1;								
   			dopoint0.bodyy.f += ydelt1;
-//deadcode			_matrix.SetClipFlags(dopoint0);
 
   			dopoint1.bodyx.f += -xdelt1;								
  			dopoint1.bodyy.f += -ydelt1;								
-//deadcode			_matrix.SetClipFlags(dopoint1);
 
    			dopoint2.bodyx.f += -xdelt2;								
    			dopoint2.bodyy.f += -ydelt2;								
-//deadcode			_matrix.SetClipFlags(dopoint2);
 
    			dopoint3.bodyx.f += xdelt2;								
    			dopoint3.bodyy.f += ydelt2;								
-//deadcode			_matrix.SetClipFlags(dopoint3);
 
-//deadcode			andedFlags=CF3D_ALL;
-//deadcode			andedFlags&=dopoint0.clipFlags;
-//deadcode			andedFlags&=dopoint1.clipFlags;
-//deadcode			andedFlags&=dopoint2.clipFlags;
-//deadcode			andedFlags&=dopoint3.clipFlags;
-//deadcode			if (andedFlags==0)
-//deadcode			{
-//deadcode				if (!doingHW3D)
-//deadcode				{
-//deadcode					_matrix.body2screen(dopoint0);
-//deadcode					_matrix.body2screen(dopoint1);
-//deadcode					_matrix.body2screen(dopoint2);
-//deadcode					_matrix.body2screen(dopoint3);
-//deadcode				}
 
 //DEAD   				POLYGON.SetPixelWidth(1<<Save_Data.pixelsize);			
 
@@ -1389,16 +1079,8 @@ void shape::imaptrailcylWrapped(UWord   vertex1, UWord vertex2,
 				*pRVert++=dopoint0;
 				g_lpLib3d->EndPoly();
 
-//deadcode   				POLYGON.createpoly(imapno);								
    								
-//deadcode				maxiy--;
-//deadcode				miniy++;
-//deadcode				POLYGON.createvert(dopoint3,maxix,miniy);					
-//deadcode   				POLYGON.createvert(dopoint2,maxix,maxiy);					
-//deadcode   				POLYGON.createvert(dopoint1,minix,maxiy);					
-//deadcode  				POLYGON.createvert(dopoint0,minix,miniy);
    																
-//deadcode   				POLYGON.drawpoly();									
 //DEAD   				POLYGON.SetPixelWidth(1);
 			}
 		}
@@ -1473,29 +1155,12 @@ Bool	shape::ClipSphereSpin(	DoPointStruc	&dp0,
 	return FALSE;
 	/*
 	Bool	Clipped = TRUE;
-//DeadCode RJS 26May99 	Float	RadX = Float(Radius);
-//DeadCode RJS 26May99 	Float	RadY;
  	SWord 	sinAng,cosAng;
 	SLong	x0,x1,x2,x3;
 	SLong	y0,y1,y2,y3;
 	SLong 	m[4];
 	SLong	nx,ny;
 
-//DeadCode RJS 26May99 	RadY = RadX;
-//DeadCode RJS 26May99 	RadX *= SphereXScale;
-//DeadCode RJS 26May99 	RadY *= SphereYScale;
-//DeadCode RJS 26May99 
-//DeadCode RJS 26May99 	x0 = -RadX;
-//DeadCode RJS 26May99 	y0 = RadY;
-//DeadCode RJS 26May99 
-//DeadCode RJS 26May99 	x1 = RadX;
-//DeadCode RJS 26May99 	y1 = RadY;
-//DeadCode RJS 26May99 
-//DeadCode RJS 26May99 	x2 = RadX;
-//DeadCode RJS 26May99 	y2 = -RadY;
-//DeadCode RJS 26May99 
-//DeadCode RJS 26May99 	x3 = -RadX;
-//DeadCode RJS 26May99 	y3 = -RadY;
 
 	x0 = -Radius;
 	y0 = Radius;
@@ -1616,7 +1281,6 @@ Bool	shape::ClipSphereRatio(	DoPointStruc	&dp0,
 		Rady = Float(rady);
 		Rady *= SphereYScale;
 
-//DeadCode RJS 26May99 		if (View_Point->PolyPitEnabled() || (View_Point->viewnum.viewmode == VM_InsideCheat))
 		if (View_Point->roll)									//RJS 26May99
 		{
 			SWord 	sinAng,cosAng;
@@ -1778,11 +1442,6 @@ void shape::FixedPolyOnFloor(Coords3DList*	adptr,
 		dp0.bodyy.f += newco[1].bodyy.f;
 		dp0.bodyz.f += newco[1].bodyz.f;
 
-//deadcode		_matrix.SetClipFlags(dp0);
-//deadcode		if (!doingHW3D) _matrix.body2screen(dp0);
-//deadcode		dp0.intensity=
-//deadcode		dp0.specFlip=
-//deadcode		dp0.specular=-1;
 	
 		dp1.bodyx.i = xoff0;
 		dp1.bodyy.i = 0;
@@ -1794,11 +1453,6 @@ void shape::FixedPolyOnFloor(Coords3DList*	adptr,
 		dp1.bodyy.f += newco[1].bodyy.f;
 		dp1.bodyz.f += newco[1].bodyz.f;
 
-//deadcode		_matrix.SetClipFlags(dp1);
-//deadcode		if (!doingHW3D) _matrix.body2screen(dp1);
-//deadcode		dp1.intensity=
-//deadcode		dp1.specFlip=
-//deadcode		dp1.specular=-1;		
 
 		dp2.bodyx.i = -xoff1;
 		dp2.bodyy.i = 0;
@@ -1810,11 +1464,6 @@ void shape::FixedPolyOnFloor(Coords3DList*	adptr,
 		dp2.bodyy.f += newco[0].bodyy.f;
 		dp2.bodyz.f += newco[0].bodyz.f;
 
-//deadcode		_matrix.SetClipFlags(dp2);
-//deadcode		if (!doingHW3D) _matrix.body2screen(dp2);
-//deadcode		dp2.intensity=
-//deadcode		dp2.specFlip=
-//deadcode		dp2.specular=-1;
 
 		dp3.bodyx.i = xoff1;
 		dp3.bodyy.i = 0;
@@ -1826,11 +1475,6 @@ void shape::FixedPolyOnFloor(Coords3DList*	adptr,
 		dp3.bodyy.f += newco[0].bodyy.f;
 		dp3.bodyz.f += newco[0].bodyz.f;
 
-//deadcode		_matrix.SetClipFlags(dp3);
-//deadcode		if (!doingHW3D) _matrix.body2screen(dp3);
-//deadcode		dp3.intensity=
-//deadcode		dp3.specFlip=
-//deadcode		dp3.specular=-1;
 
 		SLong	dx = SLong(newco[0].bodyx.f - newco[1].bodyx.f);
 		SLong	dy = SLong(newco[0].bodyy.f - newco[1].bodyy.f);
@@ -1860,12 +1504,6 @@ void shape::FixedPolyOnFloor(Coords3DList*	adptr,
 		*pRVert++=dp2;
 		*pRVert++=dp3;
 		g_lpLib3d->EndPoly();
-//deadcode		POLYGON.createpoly(imapno);
-//deadcode		POLYGON.createvert(dp0,minx,miny);
-//deadcode		POLYGON.createvert(dp1,maxx,miny);
-//deadcode		POLYGON.createvert(dp2,maxx,maxy);
-//deadcode		POLYGON.createvert(dp3,minx,maxy);
-//deadcode		POLYGON.drawpoly();
 	}
 }
 
@@ -2024,7 +1662,6 @@ void	shape::DblParticleCylinderImapd(UWord	vertex0,
 		xDelta = xoff0;
 		yDelta = yoff0;
 
-//deadcode		POLYGON.SetOpacityON();
 
 		for (counter = 0; counter < depth; counter++)
 		{
@@ -2109,12 +1746,6 @@ void	shape::DblParticleCylinderImapd(UWord	vertex0,
 						*pRVert++=dopoint3;
 						g_lpLib3d->EndPoly();
 
-//deadcode						POLYGON.createpoly(imapno);
-//deadcode						POLYGON.createvert(dopoint0,text_minx[subframe],text_miny[subframe]);
-//deadcode						POLYGON.createvert(dopoint1,text_maxx[subframe],text_miny[subframe]);
-//deadcode						POLYGON.createvert(dopoint2,text_maxx[subframe],text_maxy[subframe]);
-//deadcode						POLYGON.createvert(dopoint3,text_minx[subframe],text_maxy[subframe]);
-//deadcode						POLYGON.drawpoly();
 					}
 				}
 			}
@@ -2267,7 +1898,6 @@ void	shape::FadeParticleCylinderImapd(UWord	vertex0,
 		xDelta = xoff0;
 		yDelta = yoff0;
 
-//deadcode		POLYGON.SetOpacityON();
 
 		for (counter = 0; counter < depth; counter++)
 		{
@@ -2328,13 +1958,6 @@ void	shape::FadeParticleCylinderImapd(UWord	vertex0,
 						*pRVert++=dopoint3;
 						g_lpLib3d->EndPoly();
 
-//deadcode						current_screen->DoSetGlobalAlpha(realFade);
-//deadcode						POLYGON.createpoly(imapno);
-//deadcode						POLYGON.createvert(dopoint0,minx,miny);
-//deadcode						POLYGON.createvert(dopoint1,maxx,miny);
-//deadcode						POLYGON.createvert(dopoint2,maxx,maxy);
-//deadcode						POLYGON.createvert(dopoint3,minx,maxy);
-//deadcode						POLYGON.drawpoly();
 					}
 				}
 			}

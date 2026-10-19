@@ -70,19 +70,11 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include ".\load.cpp"
 #ifndef BOB_DEMO_VER
 
-//DEADCODE DAW 26/11/99 #include ".\Frag.cpp"
-//DEADCODE DAW 26/11/99 #include ".\FragPilt.cpp"
 
 
 //Dangling dialogs
-//DEADCODE DAW 29/01/00 #include ".\Career.cpp"
-//DEADCODE DAW 29/01/00 #include ".\LstMsnlg.cpp"
-//DEADCODE DAW 29/01/00 #include ".\Misn_log.cpp"
-//DEADCODE DAW 29/01/00 #include ".\General.cpp"
 #include ".\dosbut.cpp"
-//DEADCODE DAW 29/01/00 #include ".\Dossier.cpp"
 //#include ".\Notes.cpp"
-//DEADCODE DAW 29/01/00 #include ".\Plyr_log.cpp"
 #include ".\Weather.cpp"
 
 

@@ -145,26 +145,3 @@ void CSaveProf::OnOK()
 	CDialog::OnOK();
 }
 
-//DeadCode RDH 11Jul99 CString&	PackageList::CSprintf(const char* format,...)
-//DeadCode RDH 11Jul99 {
-//DeadCode RDH 11Jul99 	class	CS2:public CString
-//DeadCode RDH 11Jul99 {
-//DeadCode RDH 11Jul99 public:
-//DeadCode RDH 11Jul99 	void FormatV(LPCTSTR lpszFormat, va_list argList)
-//DeadCode RDH 11Jul99 	{CString::FormatV(lpszFormat,argList);}
-//DeadCode RDH 11Jul99 };
-//DeadCode RDH 11Jul99 	va_list v;
-//DeadCode RDH 11Jul99 	va_start(v,format);
-//DeadCode RDH 11Jul99 	static CS2 rv;
-//DeadCode RDH 11Jul99 	rv.FormatV(format,v);
-//DeadCode RDH 11Jul99 	va_end(v);
-//DeadCode RDH 11Jul99 	return rv;
-//DeadCode RDH 11Jul99 
-//DeadCode RDH 11Jul99 
-//DeadCode RDH 11Jul99 }
-//DeadCode RDH 11Jul99 
-//DeadCode RDH 11Jul99 BOStream& BOStream::operator<<(const CString& s)
-//DeadCode RDH 11Jul99 {
-//DeadCode RDH 11Jul99 	return operator << ((const char*)s);
-//DeadCode RDH 11Jul99 }
-//DeadCode RDH 11Jul99 

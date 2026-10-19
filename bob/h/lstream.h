@@ -24,34 +24,14 @@
 #include	"Mytime.h"
 #include	"viewsel.h"											//PD 28Aug96
 
-//DeadCode PD 08Aug97 extern	Bool	Demoversion;									//PD 28Jan97
 
 enum	LandMapNum{LandMapNumMIN=0,LandMapNumMAX=64,LandMapNum_Align=0x7FFF};
 
 MAKEFIELD (LandMapNum,LandMapNumMIN,LandMapNumMAX);
 
 //origin currently set to south west corner of block 340000		//PD 10Nov96
-//DeadCode PD 12Nov96 const	SLong WorldBaseX = 0x1000000;							//PD 10Nov96
-//DeadCode PD 12Nov96 const	SLong WorldBaseZ = 0x1800000;							//PD 10Nov96
 
-//Old_Code PD 28Jan97 #ifndef	DEMOVERSION												//PD 27Jan97
-//Old_Code PD 28Jan97 	const 	int 	BIG_FILE_SIZE =	112;
-//Old_Code PD 28Jan97 	const	SLong	Area1SW_X = 16777216;
-//Old_Code PD 28Jan97 	const	SLong	Area1SW_Z = 20971520;
-//Old_Code PD 28Jan97 	const	SLong	Area1NE_X = 31457280;
-//Old_Code PD 28Jan97 	const	SLong	Area1NE_Z = 35651584;
-//Old_Code PD 28Jan97 #else
-//Old_Code PD 28Jan97 	const 	int 	BIG_FILE_SIZE =	56;
-//Old_Code PD 28Jan97 	const	SLong	Area1SW_X = 0x12e0000;
-//Old_Code PD 28Jan97 	const	SLong	Area1SW_Z = 0x1800000;
-//Old_Code PD 28Jan97 	const	SLong	Area1NE_X = 0x19e0000;
-//Old_Code PD 28Jan97 	const	SLong	Area1NE_Z = 0x1f00000;
-//Old_Code PD 28Jan97 #endif
 
-//Old_Code PD 28Jan97 const	SLong	Area2SW_X = 34603008;							//PD 27Jan97
-//Old_Code PD 28Jan97 const	SLong	Area2SW_Z = 8388608;
-//Old_Code PD 28Jan97 const	SLong	Area2NE_X = 49283072;
-//Old_Code PD 28Jan97 const	SLong	Area2NE_Z = 23068672;
 
 const	int	DestBytesPerScanLine = 257;
 const	int	AltBytesPerScanLine = 35;
@@ -62,8 +42,6 @@ const	int	ColourRanges = 14;
 const	int	ColourDataSize = DestBytesPerScanLine*DestBytesPerScanLine+1;
 const	int	AltDataSize = AltBytesPerScanLine*AltBytesPerScanLine+1;
 
-//DeadCode PD 08Nov96 const	int	FilesListWidth = 8;
-//DeadCode PD 08Nov96 const	int	FilesListHeight = 8;
 
 const	ULong	SectorMask = 0x0000FFFF;
 const	int	SectorShift = 16;
@@ -531,7 +509,6 @@ inline SWord	ASM_UpdateJitter(SWord num)
 
 #endif
 #endif
-//Old_Code DAW 27Jan97 const int BIG_FILE_SIZE		=	112;
 const int BIG_CACHE_SIZE	=	21;
 const int BIG_EDGE_SIZE		=	5;
 
@@ -818,7 +795,6 @@ class	Land_Stream
 
 	private:
 
-//DeadCode PD 12Nov96 	void	TestCache();										//PD 12Nov96
 
 	void	SetArea(MovingItem*);								//PD 12Nov96
 
@@ -837,7 +813,6 @@ class	Land_Stream
 	void	ScrollWest();
 	void	RecenterBuffer(SLong,SLong,SLong,SLong);
 
-//Old_Code PD 20Aug97 	Bool	DiskAccessRequired(COORDS3D&);						//PD 20Aug97
 	void	AddSeekRequest(SeekStruc&);							//PD 31Oct96
 	void 	DecompressTile(UByte*,UByte*&);						//PD 25Sep96
 	void	FakeTile(Colour,UByte*&);							//PD 04Oct96
@@ -1174,10 +1149,6 @@ class	Land_Stream
 		return ((sectorz<<16) + sectorx);
 	}
 
-//Old_Code PD 09Nov96 	void	GetBigTileFile(	COORDS3D&	coords,
-//Old_Code PD 09Nov96 							FileNum& 	f,
-//Old_Code PD 09Nov96 							ULong& 		seekpos,
-//Old_Code PD 09Nov96 							ULong& 		blksize);
 
 	UByte*	GetBigTileFile(COORDS3D&);							//PD 09Nov96
 

@@ -16,11 +16,9 @@
 #define	PLANETYP_Included
 #include	"DosDefs.h"
 #include	"files.g"		//NON-GRAPHICS FILES				//RDH 16Jul96
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"myANGLES.h"											//ARM 02Aug96
 #include	"flyinit.h"											//ARM 02Aug96
 #include	"worldinc.h"										//ARM 03Feb97
-//DeadCode JIM 19Jul96 #include	"TextRef.h"
 
 #ifdef	DEFAULT_PLANETYP
 //
@@ -64,33 +62,12 @@
 enum	ModelPatch	{PATCHWW1=1,PATCHWW2,PATCHWW3,PATCHMAX=0xffffffff};
 enum	InstType	{lightinstrumtypes=0};
 
-//DeadCode RDH 02Jul96 enum	ScaleFactor	{WW1SCALEFACTOR=1,WW2SCALEFACTOR=10,WW3SCALEFACTOR=100};
-//DeadCode ARM 02Aug96 moved to flyinit
-//DeadCode ARM 02Aug96 enum 	AerobaticFactor {AEROBATIC_LOW,AEROBATIC_MEDIUM,AEROBATIC_HIGH};
 
-//DeadCode CSB 28/09/98	MINMAX(WingSpan,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(AileronSpan,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(MaxAilDeflect,0,65535);
-//DeadCode CSB 28/09/98	MINMAX(WingArea,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(ParasiticDragArea,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(Wing_AR,0,300);
-//DeadCode CSB 28/09/98	MINMAX(AdverseYawEffect,0,100);
-//DeadCode CSB 28/09/98	MINMAX(TailSpan,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(TailArea,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(TailLiftModifier,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(TailDragModifier,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(RudderLiftModifier,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(RudderDragModifier,0,32767);
-//DeadCode CSB 28/09/98	MINMAX(Tail_AR,0,300);
-//DeadCode CSB 28/09/98	MINMAX(Fin_AR,0,300);
-//DeadCode CSB 28/09/98	MINMAX(FinArea,0,32767);
 MINMAX(WeightEmpty,0,100000);
 MINMAX(FuelLoad,0,2000000000);
 MINMAX(FuelTankCap,0,200000000);
 MINMAX(FuelTankXpos,-32767,32767);
-//DeadCode CSB 28/09/98	MINMAX(FuelABon,0,65535);
 MINMAX(FuelABoff,0,65535);
-//DeadCode CSB 18/11/98	MINMAX(FuelCruise,0,65535);
 MINMAX(ThrustperStage,0,65535);
 MINMAX(ABStages,0,65535);
 MINMAX(MilMax,0,65535);
@@ -122,48 +99,9 @@ MINMAX(MaxVelDive_20km,0,2147483648);	//CSB 28/09/98
 
 MINMAX(MovableFireZoneType,-32768,32767);
 MINMAX(Damage,0,65535);
-//DEADCODE CSB 08/11/99 MINMAX(MoI,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(RotMoI,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(RotDirection,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(GyroEffectPerThou,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CMAlfa,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CMDelta,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CMQ,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CMO,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CMGamma,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CMPee,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CM_acwb,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(XChord,-32768,32767);									//ARM 04Jun96
-//DEADCODE CSB 08/11/99 MINMAX(CoG_Neut,-1000,1000);
-//DEADCODE CSB 08/11/99 MINMAX(TailDistance,0,32767);
-//DEADCODE CSB 08/11/99 MINMAX(Wing_Incidence,0,65535);
-//DEADCODE CSB 08/11/99 MINMAX(Tail_Incidence,0,65535);
-//DEADCODE CSB 08/11/99 MINMAX(Ailmin,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(ABrake,0,65535);
-//DEADCODE CSB 08/11/99 MINMAX(TrimMin,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(TrimMax,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(FinSlope,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(ClFinNom,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CLFinDenom,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(LiftFlapAngle,-32768,32767);
-//DeadCode RDH 17Jun96 MINMAX(LiftAngle,0,65535);
-//DeadCode RDH 26Mar98 MINMAX(LiftCurve,-32768,32767);
-//DeadCode RDH 26Mar98 MINMAX(StallAngle,0,65535);
-//DeadCode RDH 17Jun96 MINMAX(LiftBase,-32768,32767);
-//DeadCode RDH 26Mar98 MINMAX(DragCurve,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(CDenom,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(Friction,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(Efff,-32768,32767);
-//DEADCODE CSB 08/11/99 MINMAX(MaxIRot,-32768,32767);
-//DeadCode CSB 16/11/98	MINMAX(ThrustCurve,-32767,32767);
-//DEADCODE CSB 08/11/99 MINMAX(Abstage,0,32767);
 
 enum	ACFlags	{hooka=1,bda=2,HUDINACTIVE=4,etca=8};
-//DeadCode CSB 19/11/98	MINMAX(MaxCeilingGoodW,	0,10000000);
-//DeadCode CSB 19/11/98	MINMAX(MaxCeilingBadW,	0,10000000);
-//DeadCode CSB 19/11/98	MINMAX(OpCeiling,		0,10000000);
 MINMAX(FightCeiling,	0,10000000);
-//DeadCode CSB 19/11/98	MINMAX(FightFloor,		0,10000000);
 MINMAX(Abs_Ceiling,		0,10000000);	//CSB 29/09/98
 MINMAX(MuzzleVel,		0,2147483648);
 #endif
@@ -172,7 +110,6 @@ MINMAX(MuzzleVel,		0,2147483648);
 //TempCode JIM 23Jan96 basestruct(PlaneInit)	//stuff from planetype that is only used for initialisation
 
 //TempCode JIM 23Jan96 isbasestruct(TextBlockKnown);
-//DeadCode JIM 23Jan96 #define	II_TextBlockKnown	dummy();
 struct	DumbPlaneType;
 struct	PlaneType;
 
@@ -192,7 +129,6 @@ substruct(WheeledType,PlaneInit)
 	PlaneTypeSelect			planetext;	//	TextSnip0	planetext;
 	ShapeNum	visible,SAGsubshape,commsVisible;				//RJS 12Oct00
 	FuelABoff	fuelaboff;
-//DeadCode CSB 18/11/98		FuelCruise	fuelcruise;
 	
 	int	/*MaxVel*/		 	maxvel;
 	int	/*MinVel*/			minvel;
@@ -224,22 +160,16 @@ substruct(DumbPlaneType,WheeledType)
 	ANGLESInst		deckangle;
 	UWord			deckshunt;
 	MaxRollRate	maxrollrate;
-//DeadCode CSB 22/02/99		MaxTurnRate	maxturnrate;
 	MaxPitchRate	maxpitchrate;
 	LandingSpeed	landingspeed;
 	MaxDiveRpm	 	maxdiverpm;
 	FreeRpm	 	freerpm;
 	MaxRpm	 	maxrpm;
 	MinRpm	 	minrpm;
-//DeadCode CSB 19/11/98		MaxSafeVel	 	maxsafevel;
 	MovableFireZoneType	movablefirezonetype;
 	Damage		damage;
 	   
-//DeadCode CSB 19/11/98		MaxCeilingGoodW	maxceilinggoodw;
-//DeadCode CSB 19/11/98		MaxCeilingBadW	maxceilingbadw;
-//DeadCode CSB 19/11/98		OpCeiling		opceiling;	
 	FightCeiling	fightceiling;
-//DeadCode CSB 19/11/98		FightFloor		fightfloor;	
 	Abs_Ceiling		abs_ceiling;
 	Float	 	maxturnrateaoaSL;
 
@@ -259,8 +189,6 @@ substruct(PlaneType,DumbPlaneType)
 
 	InstType	insttype;
 	ACFlags		acflags;
-//DeadCode CSB 16/11/98		ThrustCurve	thrustcurve[14];
-//DeadCode CSB 16/11/98		Float		thrustaltcurve[21];
 
 	BestClimbAng	bestclimbang[21];	//CSB 28/09/98
 	BestClimbSpeed  bestclimbspeed[21];	//CSB 28/09/98

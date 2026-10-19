@@ -497,7 +497,6 @@ void	ManualPilot::FlightModelFixedTime(AirStrucPtr const ControlledAC2)
 	UWord	loopcount;
 	ANGLES	test;
 
-//Old_Code RDH 21Oct96 	groundlevel = Land_Scape.GetGroundLevel(ControlledAC2);
 	groundlevel = _Collide.LowestSafeAlt(ControlledAC2,
 											ControlledAC2->pitch,
 											ControlledAC2->roll);//RDH 21Oct96

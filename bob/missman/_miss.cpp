@@ -69,7 +69,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //#pragma warnmsg("here")
 #include "..\MISSMAN\Missinit.cpp"
 //#pragma warnmsg("here")
-//DEADCODE RJS 16/11/99 #include "..\MISSMAN\Node.cpp"
 #include "..\MISSMAN\packages.cpp"
 //#pragma warnmsg("here")
 #include "..\MISSMAN\Savegame.cpp"

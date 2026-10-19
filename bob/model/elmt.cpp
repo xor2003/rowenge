@@ -88,7 +88,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "replay.h"
 
 #define	CylinderCD 0.75
-//DEADCODE CSB 28/01/00 #define EasyModel (!Save_Data.flightdifficulty[FD_SPINS])
 #define EasyModel 0		// FD_SPINS is now used to run the full flight model or arcade flight model	 //CSB 28/01/00
 #define IsPlayer  (Manual_Pilot.ControlledAC2 == ControlledAC)
 
@@ -110,10 +109,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 
 	FILE* fp;
 
-//DeadCode AMM 4Jul00 	if (_Replay.replayframecount==9 && !ControlledAC->fly.pModel->Controlled)
-//DeadCode AMM 4Jul00 	{
-//DeadCode AMM 4Jul00 		fp=fopen("plop.txt","at");
-//DeadCode AMM 4Jul00 	}
 
 	if(!(pModel->FrameCount & EVERY8cs) || (pModel->FirstCycle) )
 	{
@@ -129,12 +124,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 			_buffetM1 *= 1.414213562;
 		}
 
-//DeadCode AMM 4Jul00 	if (_Replay.replayframecount==9 && !ControlledAC->fly.pModel->Controlled)
-//DeadCode AMM 4Jul00 		fprintf(fp,"fCd0Mach=%f fKMach=%f buffetM0=%f buffetM1=%f\n",
-//DeadCode AMM 4Jul00 			fCd0Mach,
-//DeadCode AMM 4Jul00 			fKMach,
-//DeadCode AMM 4Jul00 			buffetM0,
-//DeadCode AMM 4Jul00 			buffetM1);
 
 		BuffetAoaMin = pModel->Inst.I_MachNo / _buffetM0;
 		BuffetAoaMin = BuffetAoaMin * BuffetAoaMin * BuffetAoaMin * BuffetAoaMin;	// (M/M0)^4
@@ -146,10 +135,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 		BuffetAoaMax = buffetAoa1 * (1 - BuffetAoaMax);	// Cl(Max) = Cl1 * (1-(M/M1)^4)
 		if(BuffetAoaMax < 0) BuffetAoaMax = 0;
 
-//DeadCode AMM 4Jul00 		if (_Replay.replayframecount==9 && !ControlledAC->fly.pModel->Controlled)
-//DeadCode AMM 4Jul00 			fprintf(fp,"I_MachNo=%f\n",
-//DeadCode AMM 4Jul00 				pModel->Inst.I_MachNo
-//DeadCode AMM 4Jul00 				);
 
 	}
 
@@ -173,18 +158,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 			CPrd(Vel, Pos[wing][section], pModel->RotVel);
 			SubVec(AirVelAc, pModel->AirVel, Vel);
 
-//DeadCode AMM 4Jul00 			if (_Replay.replayframecount==9 && !ControlledAC->fly.pModel->Controlled)
-//DeadCode AMM 4Jul00 				fprintf(fp,"Pos[%d][%d]=%f RotVelX=%f RotVelY=%f RotVelZ=%f\nAirVelX%f AirVelY=%f AirVelZ=%f\n",
-//DeadCode AMM 4Jul00 					wing,
-//DeadCode AMM 4Jul00 					section,
-//DeadCode AMM 4Jul00 					Pos[wing][section],
-//DeadCode AMM 4Jul00 					pModel->RotVel.x,
-//DeadCode AMM 4Jul00 					pModel->RotVel.y,
-//DeadCode AMM 4Jul00 					pModel->RotVel.z,
-//DeadCode AMM 4Jul00 					pModel->AirVel.x,
-//DeadCode AMM 4Jul00 					pModel->AirVel.y,
-//DeadCode AMM 4Jul00 					pModel->AirVel.z
-//DeadCode AMM 4Jul00 					);
 			FP MomentSlipstream = 0;
 
 			if((IsPlayer) && (Save_Data.flightdifficulty [FD_SLIPSTREAMEFFECTS]) && (pSlipThrustPoint[wing] != NULL) && (section == 0) )
@@ -211,11 +184,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 			if(AirVelEl.z > 0) AirVelHori *= -1;
 			Aoa		 = AngleSign( CalcAngle(AirVelHori, AirVelEl.y) );	
 
-//DEADCODE CB 01/11/99 			if((IsPlayer) && (!EasyModel))
-//DEADCODE CB 01/11/99 				if((section == 1) && ((pModel->Type == AT_MIG15) || (pModel->Type == AT_MIG15BIS)) )
-//DEADCODE CB 01/11/99 					if((pModel->Pos.y < 300000) && (pModel->Speed > 285))
-//DEADCODE CB 01/11/99 						if(Aoa > aoa[1-wing][1])		//This wing at higher aoa than other wing
-//DEADCODE CB 01/11/99 							TIP_STALL = TRUE;
 
 					
 			Cl = Cd = Cmx = Cmy = Cmz = 0.0;
@@ -315,7 +283,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 				else if(AbsAoa > BuffetAoaMax) 	BuffetIntensity = 1.0;
 				else 
 					BuffetIntensity = (AbsAoa - BuffetAoaMin) / (BuffetAoaMax - BuffetAoaMin);
-//DeadCode CSB 26/02/99						PrintVar (12 - (1-2*wing)*(1+section)*5, 24, "%.2f", BuffetIntensity);
 
 			pModel->TotalBuffet += BuffetIntensity;// * BuffetIntensity;
 
@@ -334,13 +301,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 					ExtraDamping.z += -0.5;
 				}
 			}
-//DEADCODE CB 01/11/99 			else
-//DEADCODE CB 01/11/99 				if((pModel->Type == AT_F51D) || (pModel->Type == AT_YAK9))
-//DEADCODE CB 01/11/99 				{
-//DEADCODE CB 01/11/99 //DeadCode CSB 29/06/99						ExtraDamping.x += -5.0;
-//DEADCODE CB 01/11/99 					ExtraDamping.y += -1;
-//DEADCODE CB 01/11/99 //DeadCode CSB 29/06/99						ExtraDamping.z += -0.5;
-//DEADCODE CB 01/11/99 				}
 
 			if(airspeed > 0)
 			{
@@ -376,10 +336,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 			momZ += MomentSlipstream;
 
 
-//DEADCODE CB 12/11/99 if((wing == 1) && (section == 1))	PrintVar(60, 10, "CL %.3f ", FP(Cl));
-//DEADCODE CB 12/11/99 if((wing == 1) && (section == 0))	PrintVar(60, 11, "CL %.3f ", FP(Cl));
-//DEADCODE CB 12/11/99 if((wing == 0) && (section == 0))	PrintVar(60, 12, "CL %.3f ", FP(Cl));
-//DEADCODE CB 12/11/99 if((wing == 0) && (section == 1))	PrintVar(60, 13, "CL %.3f ", FP(Cl));
 
 //Implement the effects of damage
 			AircraftAnimData*	adptr;
@@ -444,29 +400,6 @@ void MainPlane::Process (AirStrucPtr const ControlledAC)
 			pModel->Spinning = TRUE;
 
 
-//DeadCode CSB 5Sep00 		if(		((aoa[1][1] > 0.3054) || (aoa[0][1] > 0.3054))		//17.5 deg
-//DeadCode CSB 5Sep00 			&&	((pModel->RotVel.y > 0.0025) || (pModel->RotVel.y < -0.0025))	)																
-//DeadCode CSB 5Sep00 			{																
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 				if((Manual_Pilot.ControlledAC2 == ControlledAC) && (pModel->Spinning == FALSE))			  //RDH 01/03/99
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 				{
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 					_Miles.SequenceAudible(FIL_MUSIC_SPIRALLING);	  //RDH 01/03/99
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 PrintString(0, 24, "@@ SPINNING @@");
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 				}
-//DeadCode CSB 5Sep00 				pModel->Spinning = TRUE;							  //RDH 01/03/99
-//DeadCode CSB 5Sep00 			}
-//DeadCode CSB 5Sep00 			else													  //RDH 01/03/99
-//DeadCode CSB 5Sep00 			{
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 				if((Manual_Pilot.ControlledAC2 == ControlledAC) && (pModel->Spinning == TRUE))												  //RDH 01/03/99
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 				{
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 					_Miles.SequenceMute(500);						  //RJS 18/06/99
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 PrintString(0, 24, "              ");
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 				}
-//DeadCode CSB 5Sep00 //DeadCode CSB 15Aug00 
-//DeadCode CSB 5Sep00 				pModel->Spinning = FALSE;							  //RDH 01/03/99
-//DeadCode CSB 5Sep00 			}
-//DeadCode CSB 5Sep00 
-//DeadCode AMM 4Jul00 	if (_Replay.replayframecount==9 && !ControlledAC->fly.pModel->Controlled)
-//DeadCode AMM 4Jul00 		fclose(fp);
 
 }
 
@@ -586,30 +519,6 @@ void Surface::Process (AirStrucPtr const ControlledAC)
 	if(pNewCtrls != NULL)
 		pNewCtrls->Process (dAoa, dCl, FALSE);
 
-//DEADCODE CSB 18/01/00 	if(aoa * dAoa < 0)
-//DEADCODE CSB 18/01/00 	{
-//DEADCODE CSB 18/01/00 		FP factor = aoa;
-//DEADCODE CSB 18/01/00 		if(factor < 0) factor *= -1;
-//DEADCODE CSB 18/01/00 
-//DEADCODE CSB 18/01/00 		for(;;)
-//DEADCODE CSB 18/01/00 		{
-//DEADCODE CSB 18/01/00 			if(factor < Degs2Rads(15) )
-//DEADCODE CSB 18/01/00 			{
-//DEADCODE CSB 18/01/00 				factor = 1;
-//DEADCODE CSB 18/01/00 				break;
-//DEADCODE CSB 18/01/00 			}
-//DEADCODE CSB 18/01/00 			if(factor > Degs2Rads(22.5) )
-//DEADCODE CSB 18/01/00 			{
-//DEADCODE CSB 18/01/00 				factor = 0;
-//DEADCODE CSB 18/01/00 				break;
-//DEADCODE CSB 18/01/00 			}
-//DEADCODE CSB 18/01/00 			factor = (factor - Degs2Rads(15) ) / Degs2Rads(22.5 - 15);
-//DEADCODE CSB 18/01/00 			factor = 1 - factor * factor;
-//DEADCODE CSB 18/01/00 			break;
-//DEADCODE CSB 18/01/00 		}
-//DEADCODE CSB 18/01/00 		dAoa *= factor;
-//DEADCODE CSB 18/01/00 		dCl  *= factor;
-//DEADCODE CSB 18/01/00 	}
 					
 
 	if(AirVel.z > 0) 

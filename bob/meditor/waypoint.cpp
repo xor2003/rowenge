@@ -85,7 +85,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //#include "choosebf.h"
 //#include "mainevt.h"
 
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include "strings.h"
 #include	"myangles.h"
 #include	"bfnumber.h"
@@ -100,7 +99,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 //---------------------------------------------------------------------------
 #pragma link "sampreg"
-//DeadCode DAW 03Sep97 #pragma link "spin"
 #pragma resource "*.dfm"
 TWayPointForm *WayPointForm;
 //enum	SquadSelect
@@ -381,7 +379,6 @@ void __fastcall TWayPointForm::InsertWPBefore(UniqueID	nextu)
 	{
 		info_waypoint*	newwp=new info_waypoint;
 		newwp->bfieldindex=MissionEditor->bfieldbeingfilled;
-//DeadCode RDH 11Feb98 		newwp->uniqueID.sector=FALSE;
 		newwp->position.MakeAbsWorldPos();
 		MissionEditor->currwp =
 			newwp->uniqueID.count=Persons2::assignuid(WayPointBAND);
@@ -1197,7 +1194,6 @@ void	__fastcall TWayPointForm::FillRouteList()
 
 	RouteListBox->Items->Clear();
 	LoadString(HInstance,TEXT_STARTWP,buff,sizeof(buff));
-//DeadCode RDH 16Oct97 	RouteListBox->Items->Add("Start");
 	RouteListBox->Items->Add(buff);
 
 	info_grndgrp* G=*Persons2::ConvertPtrUID(MissionEditor->currobj);
@@ -1222,7 +1218,6 @@ void	__fastcall TWayPointForm::FillRouteList()
 			}
 		}
 		else
-//DeadCode RDH 16Oct97 			RouteListBox->Items->Add("Final");
 		{
 			LoadString(HInstance,TEXT_FINALWP,buff,sizeof(buff));
 			RouteListBox->Items->Add(buff);

@@ -2607,8 +2607,8 @@ void CDecompressData::GeneratePointFlags(UWord edgePointCount)
 	if (edgePointCount<Max_Points){
 		UByte* pData=PolyStream;
 		UByte code;
-		UByte type;
-		UByte flag;
+		UByte type=0;
+		UByte flag=0;
 
 		while ((code=*pData++)!=JOIN_ROAD_NEXT){
 	 		if (code==JOIN_POLY_NEXT){
@@ -2619,17 +2619,16 @@ void CDecompressData::GeneratePointFlags(UWord edgePointCount)
 				UByte point=*pData++;
 				pointFlags[point]++;		//Increment first point usage count
 				UByte rIndex=routeCon[point].count;
-				routeCon[point].types[rIndex++]=type;
+				if (rIndex<8){routeCon[point].types[rIndex++]=type;}
 				routeCon[point].flags|=flag;
-				assert(rIndex<9&&"More than 8 connection points?");
 				routeCon[point].count=rIndex;
 			}
 			else{
 				pointFlags[code]++;
 			 	UByte rIndex=routeCon[code].count;
+			 	if (rIndex>=8)	rIndex=0;
 				routeCon[code].types[rIndex++]=type;
 				routeCon[code].flags|=flag;
-				assert(rIndex<9&&"More than 8 connection points?");
 				routeCon[code].count=rIndex;
 			}
 		}
@@ -2650,8 +2649,7 @@ void CDecompressData::GeneratePointFlags(UWord edgePointCount)
 				UByte point=*pData++;
 				pointFlags[point]=3;			//forced to be a junction
 				UByte rIndex=routeCon[point].count;
-				routeCon[point].types[rIndex++]=type;
-				assert(rIndex<9&&"More than 8 connection points?");
+				if (rIndex<8){routeCon[point].types[rIndex++]=type;}
 				routeCon[point].count=rIndex;
 				routeCon[point].flags|=flag;
 				if (lastCode!=JOIN_ROAD_NEXT)
@@ -2659,9 +2657,9 @@ void CDecompressData::GeneratePointFlags(UWord edgePointCount)
 			}
 			else{
 			 	UByte rIndex=routeCon[code].count;
+			 	if (rIndex>=8)	rIndex=0;
 				routeCon[code].types[rIndex++]=type;
 				routeCon[code].flags|=flag;
-				assert(rIndex<9&&"More than 8 connection points?");
 				routeCon[code].count=rIndex;
 			}
 			lastCode=code;
@@ -3251,8 +3249,11 @@ UWord CPrimaryCB::Search(int wx,int wz,int rez,CPrimaryDB*& pDBlk)
 			}
 			pScan=pScan->pEast;
 		}
-		pDBlk = pFound->pData;
-		if (pFound->resolution!=UWord(rez)) retval=1;
+		if (pFound){
+			pDBlk = pFound->pData;
+			if (pFound->resolution!=UWord(rez)) retval=1;
+		}else
+			retval=0;
 	}
 	return retval;
 }

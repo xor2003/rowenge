@@ -69,15 +69,11 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //Date           Wed 16 Oct 1996
 //Description    
 //------------------------------------------------------------------------------
-//DeadCode DAW 23Feb98 #include	"dosdefs.h"
 
 
 //TempCode JIM 14Nov00 #undef NDEBUG
 
 #define NO_AFX_AUTO
-//DEADCODE JIM 08/06/00 typedef union _LARGE_INTEGER {
-//DEADCODE JIM 08/06/00     __int64 QuadPart;
-//DEADCODE JIM 08/06/00 } LARGE_INTEGER;
 //#include	"stdafx.h"
 #define NOATL
 #include	"dosdefs.h"
@@ -396,12 +392,6 @@ void	MonoText::BinToHEX(SLong v,UByte* c)
 //TempCode CSB 13Jul00 
 //TempCode CSB 13Jul00 ProbeTime::~ProbeTime()
 //TempCode CSB 13Jul00 {
-//TempCode CSB 13Jul00 //DEADCODE JIM 08/06/00 	if (Key_Tests.KeyPress3d(RESURRECTKEY))
-//TempCode CSB 13Jul00 //DEADCODE JIM 08/06/00 	{
-//TempCode CSB 13Jul00 //DEADCODE JIM 08/06/00 		timergo=!timergo;
-//TempCode CSB 13Jul00 //DEADCODE JIM 08/06/00 		for (int i=0;i<80;i++)
-//TempCode CSB 13Jul00 //DEADCODE JIM 08/06/00 			coltimes[i]=colinsts[i]=0;
-//TempCode CSB 13Jul00 //DEADCODE JIM 08/06/00 	}
 //TempCode CSB 13Jul00 	LARGE_INTEGER	ticker2;
 //TempCode CSB 13Jul00 	QueryPerformanceCounter(&ticker2);
 //TempCode CSB 13Jul00 	ticker2.QuadPart-=ticker;

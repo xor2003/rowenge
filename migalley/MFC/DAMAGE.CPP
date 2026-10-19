@@ -273,7 +273,6 @@ void	CDamage::FillList()
 					str=GetTargName(UniqueID(wavenum));
 				l->AddString(str,0);
 			}
-//DEADCODE RDH 28/04/99 			l->AddString(GetTargName(UniqueID(wavenum)),0);
 			if (damagedelements[0].loadedid==wavenum)
 			{
 				DeadStream::DeadBlockItterator itt(Dead_Stream.firstblock,UID_NULL);
@@ -320,7 +319,6 @@ void	CDamage::FillList()
 						{
 							UniqueID startpoint=UID_NULL;
 							UniqueID findpoint=(UniqueID)wavenum;
-//DEADCODE JIM 07/06/99 							if (wavenum!=groupnum)
 							{
 								if (!DeadStream::MainWorldBand(UniqueID(i)))
 									startpoint=findpoint;
@@ -376,7 +374,6 @@ void	CDamage::FillList()
 				if (str.IsEmpty() || str[0u]=='_')
 					str=GetTargName(UniqueID(wavenum));
 				l->AddString(str,0);
-//DEADCODE RDH 28/04/99 				l->AddString(GetTargName(UniqueID(wavenum)),0);
 
 				DeadStream::DeadBlockItterator itt(Dead_Stream.firstblock,UID_NULL);
 				itt.SkipToItem(UniqueID(wavenum));
@@ -640,18 +637,12 @@ ItemPtr	FormationItem::SelectTarget(ItemPtr currtarget,int* selectedelt,int coun
 			//count up live tokens
 			//if (damage-100*livetokens>700)
 			//		pick another target
-//DEADCODE DAW 01/07/99 			Bool	bombableSGT=CheckForWeapon(LT_BOMB);			  //DAW 01/07/99
 			UniqueID SGT=currtarget->SGT;
 			if (SGT==UID_NULL)
 				SGT=currtarget->uniqueID.bitfieldUid.count;
 			
-//DeadCode DAW 01Jul99 			if (!bombableSGT && Persons2::getbandfromUID(SGT)!=AmberAirfieldBAND && Persons2::getbandfromUID(SGT)!=AmberBridgeBAND)
-//DeadCode DAW 01Jul99 				bombableSGT=TRUE;
 
 			int damage=0,livetokens=0;
-//DeadCode DAW 01Jul99 			if (!bombableSGT && !currtarget->SGT)
-//DeadCode DAW 01Jul99 				damage=800;
-//DeadCode DAW 01Jul99 			else
 			if (currtarget->shape==EMPTY)
 				damage=1000;
 			else
@@ -672,18 +663,12 @@ ItemPtr	FormationItem::SelectTarget(ItemPtr currtarget,int* selectedelt,int coun
 				rv=currtarget;
 			else
 			{
-//DeadCode DAW 27Jun99 				UniqueID SGT=currtarget->SGT;
-//DeadCode DAW 27Jun99 				if (SGT==UID_NULL)
-//DeadCode DAW 27Jun99 					SGT=currtarget->uniqueID.count;
 				ItemPtr	test=*Persons2::ConvertPtrUID(SGT);
 				int	lowestdamage=900;
 				int	scan=-1;
 				if (test)
 					do{
 						damage=0;livetokens=0;
-//DeadCode DAW 01Jul99 						if (!bombableSGT)
-//DeadCode DAW 01Jul99 							damage=1000;
-//DeadCode DAW 01Jul99 						else
 
 						if (test->shape==EMPTY)						  //JIM 01/09/99
 							damage=1000;
@@ -696,7 +681,6 @@ ItemPtr	FormationItem::SelectTarget(ItemPtr currtarget,int* selectedelt,int coun
 									if (gi.IsStoresToken())
 										livetokens++;
 							}
-//DeadCode DAW 01Jul99 						bombableSGT=TRUE;
 						if (damage-livetokens*200<lowestdamage)
 						{
 							rv=test;
@@ -714,39 +698,11 @@ ItemPtr	FormationItem::SelectTarget(ItemPtr currtarget,int* selectedelt,int coun
 			if (rv && selectedelt)												//DAW 27Jun99
 				*selectedelt=SelectElement(rv,counter);			//DAW 27Jun99
 		}
-//DeadCode DAW 27Jun99 	if (rv && selectedelt)
-//DeadCode DAW 27Jun99 		if (rv->Status.size>=FORMATIONSIZE)
-//DeadCode DAW 27Jun99 		{
-//DeadCode DAW 27Jun99 			selectedelt=0;
-//DeadCode DAW 27Jun99 			rv=SelectConvoyMember(*rv,counter);
-//DeadCode DAW 27Jun99 		}
-//DeadCode DAW 27Jun99 		else
 	if(!rv)
 		return currtarget;
 	return	rv;
 }
 
-//DeadCode DAW 27Jun99 FormationItemPtr	FormationItem::SelectConvoyMember(FormationItemPtr curr,int count)
-//DeadCode DAW 27Jun99 {
-//DeadCode DAW 27Jun99 	if (count)
-//DeadCode DAW 27Jun99 	{
-//DeadCode DAW 27Jun99 		if (curr->Leader())
-//DeadCode DAW 27Jun99 		{
-//DeadCode DAW 27Jun99 			count--;
-//DeadCode DAW 27Jun99 			curr=curr->Leader();
-//DeadCode DAW 27Jun99 		}
-//DeadCode DAW 27Jun99 		while (count)
-//DeadCode DAW 27Jun99 		{
-//DeadCode DAW 27Jun99 			if (curr->follower)
-//DeadCode DAW 27Jun99 				curr=curr->Follower();
-//DeadCode DAW 27Jun99 			else
-//DeadCode DAW 27Jun99 				if (curr->Leader())
-//DeadCode DAW 27Jun99 					curr=curr->Leader();	//make it loop....
-//DeadCode DAW 27Jun99 			count--;
-//DeadCode DAW 27Jun99 		}
-//DeadCode DAW 27Jun99 	}
-//DeadCode DAW 27Jun99 	return curr;
-//DeadCode DAW 27Jun99 }
 
 bool	FormationItem::SelectedElement(ItemPtr currtarget,int counter/*=0*/,Coords3D* coords/*=&despos*/)
 {
@@ -1255,7 +1211,7 @@ struct	WeightScheme
 		perhangar,	perrevetment,	persupply,	perrunway,	pernoscore;
 
 	int	totalscore,	damagescore,	damagebf,	damagemw,	tokenslost;
-	Attacks*	scorestore;
+	Attacks*	scorestore=NULL;
 	UniqueID	SGTuid;
 	SupplyNode*	SGTnode;
 	SupplyTree::Supply2UID	SGTrel;
@@ -1285,6 +1241,7 @@ struct	WeightScheme
 		case SupplyTree::S2U_AF2:
 		{
 			AirFieldInfo*	af=SupplyTree::FindAirfieldForItem(SGT);
+			if (!af)	break;
 			perhangar=af->hangarfactor;
 			perrevetment=af->rivetfactor;
 			persupply=af->supplyfactor;
@@ -1300,10 +1257,11 @@ struct	WeightScheme
 			SupplyRoute*	route=SupplyTree::FindBridge(SGT,node->route[rel-SupplyTree::S2U_ROUTE0]);
 			peritem=1;
 			perbridge=99;
-			scorestore=&route->attackstats;
+			scorestore=route?&route->attackstats:&node->attackstats;
 		}
 		break;
 		}
+		if (!scorestore)	return;
 		damagebf=scorestore->damageinbf;
 		damagemw=scorestore->damageinmw;
 		damagescore=damagebf+damagemw;
@@ -1312,6 +1270,7 @@ struct	WeightScheme
 
 	void	ClearDamage(bool subworld)
 	{
+		if (!scorestore)	return;
 		if (subworld)
 		{
 			damagebf=0;
@@ -1328,6 +1287,7 @@ struct	WeightScheme
 	enum	{FIX_PERCENT=150};
 	void	AddWeightDamage(ShapeNum s,UniqueID member,DeadStream::DeadBlockItterator& gi,bool subworld)
 	{	//totalise damage and tokens if interested in tokens.. but who cares!
+		if (!scorestore)	return;
 		{
 			int totaldamage=0,totaltokens=0,damagedtokens=0;
 			int	damageLB=0,damageSB=0;
@@ -1398,6 +1358,7 @@ struct	WeightScheme
 	void	AddWeightTotal(ShapeNum s,UniqueID member,bool subworld)
 	{	//only interested in totalising members if members are tokens...
 
+		if (!scorestore)	return;
 		if (peritem==0)
 		{	//airfields have total damage=1000
 			scorestore->totalinmw=0;
@@ -1544,7 +1505,7 @@ void	DeadStream::ScoreSGKills()
 						if (used==SGT || ItemPtr(*Persons2::ConvertPtrUID(used))->SGT==SGT)
 							weights.AddWeightDamage(ShapeNum(b.lastshape),used,b,false);
 					}
-					if (weights.scorestore->totalinmw<=1 && weights.scorestore->totalinbf<=1)//DAW 02Jul99
+					if (weights.scorestore && weights.scorestore->totalinmw<=1 && weights.scorestore->totalinbf<=1)//DAW 02Jul99
 						if (weights.damagemw>0)
 						{
 							weights.scorestore->totalinbf=0;
@@ -1570,7 +1531,7 @@ void	DeadStream::ScoreSGKills()
 					b.SkipToSGT(SGT);
 					while (b.SkipItem())
 						weights.AddWeightDamage(ShapeNum(b.lastshape),UniqueID(b.lastuniqueID),b,true);
-					if (weights.scorestore->totalinbf<=1 && weights.damagebf>0)
+					if (weights.scorestore && weights.scorestore->totalinbf<=1 && weights.damagebf>0)
 					{	//if had some effect on total damage then need comparator.	
 						weights.scorestore->totalinbf=0;
 						weights.scorestore->totalinmw=0;
@@ -1652,10 +1613,6 @@ void	GroupItterator::InitGroupFields()
 						MinAnimData*	mad = (MinAnimData*) animdata;
 						status = mad->itemstate;
 						deadittfirstbyteptr=&animdata[0];		//RJS 27Apr99 //CSB 04/06/99
-//DEADCODE DAW 26/04/99 #pragma message ("Deadbits need fixing Robert")
-//DEADCODE DAW 26/04/99 						deadittfirstbyte=*animptr;
-//DEADCODE DAW 26/04/99 						status = ((MinAnimData*)animdata)->itemstate;
-//DeadCode DAW 26Apr99 						status = ((MinAnimData*)animptr)->itemstate;
 					}
 					percentdamage=ptr->element_number;
 				}
@@ -1681,13 +1638,10 @@ void	GroupItterator::InitGroupFields()
 		{
 			MinAnimData*	mad = (MinAnimData*) animdata;
 			status = mad->itemstate;
-//DEADCODE DAW 26/04/99 #pragma message ("Deadbits need fixing Robert")
 			deadittfirstbyteptr=&animdata[0];		//RJS 27Apr99	  //CSB 04/06/99
-//DEADCODE DAW 26/04/99 			status = ((MinAnimData*)animdata)->itemstate;
 		}
 		percentdamage=300;
 
-//DEADCODE RDH 20/05/99 		hitlimit=true;
 	}
 }
 
@@ -1923,8 +1877,6 @@ char*	GroupItterator::PostLauncherDataLoc()
 		animptr	newanimdata = animdata;
 
 		newanimdata += EltLauncherDataSize(newanimdata);	//RJS 27Apr99
-//DEADCODE DAW 28/04/99 Now in ELDS
-//DEADCODE DAW 28/04/99 		newanimdata += sizeof(MinAnimData);
 
 		return((char*)&newanimdata);
 	}
@@ -1948,13 +1900,11 @@ void	GroupItterator::ResetLaunchers()
 {
 	if (animdata != NULL)
 	{
-//DeadCode RJS 21Apr99 		animptr			mad = animdata;
 		MinAnimData*	madold = (MinAnimData*) animdata;
 
 		UByte	oldinvisible = madold->IsInvisible;
 
 		SHAPE.InitGlobalItem();
-//DeadCode RJS 21Apr99 		SHAPE.InitItemAnim(mad,shape);
 		SHAPE.InitItemAnim(animdata,shape);						//RJS 21Apr99
 
 		madold->IsInvisible = oldinvisible;
@@ -2003,7 +1953,7 @@ void	AirStruc::MissionDiceThrow(WayPointPtr startwp)
 			WayPointPtr targwp=startwp;
 			while (targwp && targwp->wpnum)	  //SQ_B29=6 SQ_F86A=0
 				targwp=targwp->prev;
-				int	numkills=Math_Lib.rnd(HARDER+1+ai.squadnum()*3)/HARDER;
+			int	numkills=Math_Lib.rnd(HARDER+1+ai.squadnum()*3)/HARDER;
 				//F86=rnd(HARDER+1)/HARDER
 				//B29=rnd(HARDER+7)/HARDER
 				if ((FormationInfo.duty&ACTIONCODE)==DA_CAP)				//H=2						//H=5
@@ -2072,15 +2022,14 @@ void	AirStruc::MissionDiceThrow(WayPointPtr startwp)
 							SupplyRoute* sr=NULL;
 							AirFieldInfo* af=NULL;
 							Attacks* attacks=NULL;
-							if (sn != NULL)
-								switch (nodetype)
+							if (sn != NULL) switch (nodetype)
 								{
 								case SupplyTree::S2U_AF0:
 								case SupplyTree::S2U_AF1:
 								case SupplyTree::S2U_AF2:
 								{
 									af=SupplyTree::FindAirfieldForItem(targuid);
-									attacks=&af->attackstats;
+									attacks=af?&af->attackstats:&sn->attackstats;
 								}
 								break;
 								case SupplyTree::S2U_ROUTE0:
@@ -2088,7 +2037,7 @@ void	AirStruc::MissionDiceThrow(WayPointPtr startwp)
 								case SupplyTree::S2U_ROUTE2:
 								{
 									sr=SupplyTree::FindBridge(targuid,sn->route[nodetype-SupplyTree::S2U_ROUTE0]);
-									attacks=&sr->attackstats;
+									attacks=sr?&sr->attackstats:&sn->attackstats;
 								}
 								break;
 								default:
@@ -2128,7 +2077,7 @@ void	AirStruc::MissionDiceThrow(WayPointPtr startwp)
 								break;
 								case DC_AR:
 								{	//find the right routes and kill some trucks
-									if (!sr)
+									if (!sr && sn != NULL)
 									{
 										UniqueID t1=UID_NULL,t2=UID_NULL;
 										WayPoint* wp=startwp;
@@ -2149,7 +2098,7 @@ void	AirStruc::MissionDiceThrow(WayPointPtr startwp)
 										int r=Math_Lib.rnd()|0xffff0000;
 										int route=r&3;
 										for (int i=0;i<3;i++)
-											if (sn->route[i])
+											if (sn->route[i] && sn->route[i]->supplier)
 												if (	sn->route[i]->supplier->associated_item==t1
 													||	sn->route[i]->supplier->associated_item==t2
 													||	sn->route[i]->supplier->associated_town==t1
@@ -2169,7 +2118,6 @@ void	AirStruc::MissionDiceThrow(WayPointPtr startwp)
 									if (sr)
 									{									
 										sr->stores_destroyed+=3*numkills;//DAW 02Sep99
-//DeadCode DAW 02Sep99 										sr->stores_destroyed+=sr->storespermobile*numkills/2;
 										if (sr->stores_destroyed>sr->storeslaunched)
 											sr->stores_destroyed=sr->storeslaunched;
 									}

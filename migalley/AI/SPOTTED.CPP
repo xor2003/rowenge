@@ -457,7 +457,6 @@ INSTANCEAI(SetUpPincerAttack, AirStrucPtr)
 //------------------------------------------------------------------------------
 INSTANCEAI(SetUpMultiWave, AirStrucPtr)
 {
-//DEADCODE RDH 12/06/99 		if (prioritymessage)
 	{																  //RDH 23/02/99
 		tGroupLevel group;
 		FindGroupAndLeader2(caller, callee, group);
@@ -663,13 +662,6 @@ INSTANCEAI(AttackingManoeuvre,AirStrucPtr)
 			script = (ScriptTables)PHRASE_ENGAGE;			//RJS 09May99
 		}
 
-//DEADCODE RDH 06/04/99 		
-//DEADCODE RDH 06/04/99  		if 	(caller->AutoMoveInfo.nationality != NAT_RED)
-//DEADCODE RDH 06/04/99 		{
-//DEADCODE RDH 06/04/99 			caller->ai.firsttactic = TACTIC_DIVEANDZOOM;
-//DEADCODE RDH 06/04/99 			retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_WELLENGAGE,MSG_CHOSENMANOEUVRE,caller,trg,NULL), SetupDiveAndZoom);	
-//DEADCODE RDH 06/04/99 			return(retval);
-//DEADCODE RDH 06/04/99 		}
 
 
 		
@@ -746,28 +738,19 @@ INSTANCEAI(AttackingManoeuvre,AirStrucPtr)
 			if	(trg->classtype->aerobaticfactor == AEROBATIC_LOW)
 			{
 					RndVal	rndpc = (RndVal)Math_Lib.rnd(RndValMAX);
-//DEADCODE RDH 04/07/99 					if (rndpc <  RND25PC)
-//DEADCODE RDH 04/07/99 					{
-//DeadCode CSB 05/07/99	//DEADCODE RDH 04/07/99 						caller->ai.firsttactic = TACTIC_LINEABREAST;
-//DeadCode CSB 05/07/99							caller->SetFollowersTactic(TACTIC_LINEABREAST);
-//DEADCODE RDH 04/07/99 						retval = SendMsgAndCall(MESSAGE_STRUC(script,MSG_CHOSENMANOEUVRE,caller,trg,NULL), SetupLineAbreast);	
-//DEADCODE RDH 04/07/99 					}else if (rndpc <  RND50PC)
 
 					if(rndpc < RND33PC)	//CSB 07/07/99	
 					{
-//DeadCode CSB 05/07/99							caller->ai.firsttactic = TACTIC_LINEASTERN;
 						caller->SetFollowersTactic(TACTIC_LINEASTERN);
 						retval = SendMsgAndCall(MESSAGE_STRUC(script,MSG_CHOSENMANOEUVRE,caller,trg,NULL), SetupLineAstern);	
 					}
 					else if (rndpc < RND67PC)	//CSB 07/07/99	
 					{
-//DeadCode CSB 05/07/99							caller->ai.firsttactic = TACTIC_ROUNDABOUT;
 						caller->SetFollowersTactic(TACTIC_ROUNDABOUT);
 						retval = SendMsgAndCall(MESSAGE_STRUC(script,MSG_CHOSENMANOEUVRE,caller,trg,NULL), SetupRoundAbout);	
 					}
 					else
 					{
-//DeadCode CSB 05/07/99							caller->ai.firsttactic = TACTIC_DIVEANDZOOM;
 						caller->SetFollowersTactic(TACTIC_DIVEANDZOOM);
 						retval = SendMsgAndCall(MESSAGE_STRUC(script,MSG_CHOSENMANOEUVRE,caller,trg,NULL), SetupDiveAndZoom);	
 					}
@@ -820,7 +803,7 @@ TABLEAI(DefensiveManoeuvre, AirStrucPtr)
 INSTANCEAI(DefensiveManoeuvre, AirStrucPtr)
 {
 	tGroupLevel group = GroupLevel(caller);
-	bool retval;
+	bool retval=FALSE;											//RERUN: uninit when no buddy
 	bool	splitmanappropriate = false;
 
 
@@ -878,13 +861,12 @@ INSTANCEAI(DefensiveManoeuvre, AirStrucPtr)
 //------------------------------------------------------------------------------
 bool	ArtInt::SpottedUnfriendly(AirStruc* caller,AirStruc* trg)
 {
-	bool retval;
+	bool retval=FALSE;											//RERUN: uninit when no buddy
 	InterceptRangeFromTo(caller,trg);
 	if  (		((caller->FormationInfo.duty&ACTIONCODE)!=DA_CAP)
 			||	(caller->classtype->aerobaticfactor == AEROBATIC_LOW) //RDH 21/06/99
 		)
 
-//DEADCODE RDH 12/05/99 	if (caller->classtype->aerobaticfactor == AEROBATIC_LOW)
 	{//non cap a/c including medium bomber
 		retval = AlertFighters((AirStruc*)caller,trg,caller);
 	}else
@@ -908,7 +890,7 @@ bool	ArtInt::SpottedUnfriendly(AirStruc* caller,AirStruc* trg)
 INSTANCEAI(SendFlight, AirStrucPtr)
 {
 
-	bool retval;
+	bool retval=FALSE;											//RERUN: uninit when no buddy
 	if (prioritymessage)
 	{
 		RndVal	rndpc = (RndVal)Math_Lib.rnd(RndValMAX);	
@@ -944,10 +926,6 @@ INSTANCEAI(SendFlight, AirStrucPtr)
 INSTANCEAI(AllGo, AirStrucPtr)
 {
 	//use selecttarget instead
-//DEADCODE RDH 20/06/99  	if (	(caller->Follower())	&& (caller->ai.elementtactics == WELDEDWING))
-//DEADCODE RDH 20/06/99  		_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLER_CALLEE_FOLLOWME, MSG_FOLLOWME, caller, NULL, caller->Follower()));
-//DEADCODE RDH 20/06/99 	SetEngage(caller,trg, MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, FALSE);
-//DEADCODE RDH 20/06/99 	SetUpRemainderOfGroupToEngage(caller,trg,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg,FALSE);
 	return(true);
 
 };
@@ -966,7 +944,7 @@ INSTANCEAI(AllGo, AirStrucPtr)
 //------------------------------------------------------------------------------
 INSTANCEAI(RelaySighting, AirStrucPtr)
 {
-	bool retval;
+	bool retval=FALSE;											//RERUN: uninit when no buddy
 	retval = AlertFighters(caller,trg,callee);
 	return(retval);
 };
@@ -999,12 +977,6 @@ INSTANCEAI(UnFriendlyFar, AirStrucPtr)
 	ScriptTables script;
 
 //remove chance of recurse
-//DEADCODE DAW 19/05/99 	if	(		(caller->ai.unfriendly != NULL)
-//DEADCODE DAW 19/05/99 			&&	( RangeFromTo(caller,trg) > RangeFromTo(caller,(AirStruc*)caller->ai.unfriendly))
-//DEADCODE DAW 19/05/99 		)	
-//DEADCODE DAW 19/05/99 	{
-//DEADCODE DAW 19/05/99 		retval = AlertFighters(caller,trg);
-//DEADCODE DAW 19/05/99 	}else 
 	if(		TrgIsVulnerable(caller, trg)
 			)
 	{
@@ -1143,8 +1115,6 @@ bool	ArtInt::AlertFighters(AirStruc* caller,AirStruc* trg, AirStruc* friendlytha
 	{//only concerned with leaders not under attack
 		while (	(currac))
 		{
-//DEADCODE RDH 19/06/99 			if (currac ==  Persons2::PlayerGhostAC)
-//DEADCODE RDH 19/06/99 				INT3;
 			if  (	((currac->FormationInfo.duty&ACTIONCODE)==DA_CAP)
 					&&	(currac->classtype->aerobaticfactor != AEROBATIC_LOW) //RDH 21/06/99
 					&&	(currac->formpos == 0)
@@ -1224,25 +1194,6 @@ bool	ArtInt::AlertFighters(AirStruc* caller,AirStruc* trg, AirStruc* friendlytha
 //------------------------------------------------------------------------------
 bool	ArtInt::SpottedNewUnfriendly(AirStruc* caller,AirStruc* trg)
 {
-//DEADCODE RDH 20/05/99 	bool retval = FALSE;
-//DEADCODE RDH 20/05/99 	
-//DEADCODE RDH 20/05/99 	AirStruc* trggrplead = trg->FindGroupLeader();
-//DEADCODE RDH 20/05/99 	AirStruc* unfgrplead = (AirStruc*)caller->ai.unfriendly;
-//DEADCODE RDH 20/05/99 	if (caller->ai.unfriendly)
-//DEADCODE RDH 20/05/99 	{
-//DEADCODE RDH 20/05/99 		 unfgrplead = ((AirStruc*)caller->ai.unfriendly)->FindGroupLeader();
-//DEADCODE RDH 20/05/99 	}
-//DEADCODE RDH 20/05/99 	if (((AirStruc*)caller->ai.unfriendly)->AutoMoveInfo.nationality == caller->AutoMoveInfo.nationality)
-//DEADCODE RDH 20/05/99 		retval = ChooseManoeuvre(caller,trg,FALSE);
-//DEADCODE RDH 20/05/99 	else if (trggrplead != unfgrplead)
-//DEADCODE RDH 20/05/99 	{
-//DEADCODE RDH 20/05/99 		InterceptRangeFromTo(caller,trg);
-//DEADCODE RDH 20/05/99 		if 	(caller->Range  < ENGAGERANGE)
-//DEADCODE RDH 20/05/99 			if (caller->leader==NULL)
-//DEADCODE RDH 20/05/99 				if (trg->ai.attacker==NULL)
-//DEADCODE RDH 20/05/99 					retval = ChooseManoeuvre(caller,trg,FALSE);
-//DEADCODE RDH 20/05/99 	}
-//DEADCODE RDH 20/05/99 	return(retval);
 
 	bool retval = FALSE;
 	
@@ -1288,7 +1239,7 @@ bool	ArtInt::SpottedNewUnfriendly(AirStruc* caller,AirStruc* trg)
 //------------------------------------------------------------------------------
 bool	ArtInt::ChooseManoeuvre(AirStruc* caller,AirStruc* trg, bool newspot)
 {
-	bool retval;
+	bool retval=FALSE;											//RERUN: uninit when no buddy
 	tGroupLevel group = GroupLevel(caller);
 	if (group == GROUP_LONER)
 	{
@@ -1623,12 +1574,6 @@ bool	ArtInt::EyeIsAndTrgIsNotInPlayersGroup(AirStruc* caller,AirStruc* trg)
 	else
 		return(false);
 
-//DEADCODE RDH 22/06/99  	if 	(		(caller->IsUsingPilotedAcLog())
-//DEADCODE RDH 22/06/99  			&& (!trg->IsUsingPilotedAcLog())
-//DEADCODE RDH 22/06/99  		)
-//DEADCODE RDH 22/06/99  			return(true);
-//DEADCODE RDH 22/06/99  		else
-//DEADCODE RDH 22/06/99  			return(false);
 }
 
 
@@ -1646,7 +1591,7 @@ bool	ArtInt::EyeIsAndTrgIsNotInPlayersGroup(AirStruc* caller,AirStruc* trg)
 //------------------------------------------------------------------------------
 bool ArtInt::EngageAppropriate(AirStruc* caller,AirStruc* trg)
 {
-	bool retval;
+	bool retval=FALSE;											//RERUN: uninit when no buddy
 	if (	(caller->ai.threatlevel > BANDITFIRING)
 		||	((caller->Range < WEAPONSRANGE) &&	(caller->ai.threatlevel >= BANDITINWEAPONSRANGE))
 		||	((caller->Range < DANGERRANGE) &&	(caller->ai.threatlevel >= BANDITINDANGERRANGE))
@@ -1660,8 +1605,6 @@ bool ArtInt::EngageAppropriate(AirStruc* caller,AirStruc* trg)
 	   )
 	{//according to threat level it is ok for caller to respond 
 
-//DEADCODE RDH 08/03/99 		if 	(!DecoysInGroup(caller))
-//DEADCODE RDH 08/03/99 		{
 			if (!(	(caller->Range > DANGERRANGE)
 					&&
 					(		(caller->ai.aggressionlevel == AL_TRAINING)
@@ -1687,8 +1630,6 @@ bool ArtInt::EngageAppropriate(AirStruc* caller,AirStruc* trg)
 					retval = true;
 			}else
 				retval = false;
-//DEADCODE RDH 08/03/99 		}else
-//DEADCODE RDH 08/03/99 			retval = false;
 	}else
 		//## wait for threatlevel is setup, change to false then 
 		retval = true;
@@ -1828,20 +1769,6 @@ ArtInt::tGroupLevel ArtInt::GroupLevel(AirStruc* caller)
 		else
 			return(GROUP_FLIGHT);
 
-//DEADCODE RDH 23/02/99 		 AirStruc*	currac = caller->fly.nextflight;
-//DEADCODE RDH 23/02/99 		 int count = 1;
-//DEADCODE RDH 23/02/99 		 while  (		(currac->fly.nextflight)
-//DEADCODE RDH 23/02/99 					&&	(currac->fly.nextflight->FormationInfo.information)
-//DEADCODE RDH 23/02/99 				)
-//DEADCODE RDH 23/02/99 		 {
-//DEADCODE RDH 23/02/99 			currac = currac->fly.nextflight;
-//DEADCODE RDH 23/02/99 			count++;
-//DEADCODE RDH 23/02/99 		 }
-//DEADCODE RDH 23/02/99 		if (count >= 6)
-//DEADCODE RDH 23/02/99 			//squadron is 6 or more "elements" or flights in internal naming
-//DEADCODE RDH 23/02/99 			return(GROUP_SQUADRON);
-//DEADCODE RDH 23/02/99 		else
-//DEADCODE RDH 23/02/99 			return(GROUP_FLIGHT);
 
 	}else
 	{
@@ -2019,22 +1946,17 @@ void	ArtInt::SetUpRemainderOfGroupToEngage(AirStruc* caller,AirStruc* trg,MANOEU
 	AirStrucPtr	currfol=caller;
 	while	(		((currfol=*currfol->Follower())!=NULL)
 				&&	(		(currfol->FormationInfo.information)
-//DEADCODE RDH 19/05/99 when needed? relying on information for split force						||	(AircraftAreClose(currfol, caller))
 					)
 			)
 		currtrg=SetFollowerEngage(currfol,currtrg, manoeuvre,desiredhdg, desiredpitch,surprised);
 
 	//send each flight in our squad against each of his flights
 
-//DEADCODE RDH 06/04/99 	force back to ordinary stuff for testing only
-//DEADCODE RDH 06/04/99 	manoeuvre = MANOEUVRE_SELECT;
 
 	currtrg=trg;
 	currfol=caller;
-//DEADCODE RDH 23/02/99 	need to be able to set upon a follower if (currtrg->leader==NULL)
 	while 	(		((currfol=currfol->fly.nextflight)!=NULL)
 				&&	(		(currfol->FormationInfo.information)
-//DEADCODE RDH 19/05/99 when needed? relying on information for split force						||	(AircraftAreClose(currfol, caller))
 					)
 				
 			)
@@ -2069,7 +1991,6 @@ void	ArtInt::PrepareForCombat(AirStrucPtr caller)
  
   		if	(		(caller->classtype->visible != F86)
 				&&	(caller->classtype->phrasename != PHRASE_MIGS)
-//DEADCODE RDH 10/05/99   				&&	(caller->classtype->visible != MIG15)
  				&&	(!caller->weap.AircraftStatus.StoresDumped)
   			)
   			SendMsgAndCall(MESSAGE_STRUC(SCRIPT_JETTISONSTORES, MSG_STATUSREQUEST, caller, NULL, callee), JettisonStores);	
@@ -2102,23 +2023,12 @@ void	ArtInt::SetEngage(AirStrucPtr caller,AirStrucPtr trg,MANOEUVRE manoeuvre,AN
 		caller=Persons2::PlayerGhostAC;							//AMM 28Aug98
 
 //I don't know why we did this, it messes up links 
-//DEADCODE RDH 13/06/99 	if (	caller->ai.unfriendly
-//DEADCODE RDH 13/06/99 		&&	caller->ai.unfriendly->MigStatus.LaunchFlags.size==AIRSTRUCSIZE
-//DEADCODE RDH 13/06/99 		&& ((AirStrucPtr)*caller->ai.unfriendly)->ai.attacker==caller
-//DEADCODE RDH 13/06/99 		)
-//DEADCODE RDH 13/06/99 		((AirStrucPtr)*caller->ai.unfriendly)->ai.attacker=NULL;
 	if (trg)
 	{
 		if (Manual_Pilot.ControlledAC2 == trg)
 		{
 			trg = Persons2::PlayerGhostAC;
 		}
-//DeadCode AMM 28Aug98 		if (!_Replay.Playback && caller==Persons2::PlayerGhostAC)
-//DeadCode AMM 28Aug98 		{
-//DeadCode AMM 28Aug98 	//		Manual_Pilot.AutoToggle(Manual_Pilot.AUTO);
-//DeadCode AMM 28Aug98 //			Manual_Pilot.AutoToggle(Manual_Pilot.AUTO);
-//DeadCode AMM 28Aug98 			caller= Manual_Pilot.ControlledAC2;
-//DeadCode AMM 28Aug98 		}
 
 		if  (		(caller->ai.unfriendly==trg)
 				&&	(caller->AutoMoveInfo.movecode != AUTO_TRACKINGBOGIE)
@@ -2133,7 +2043,6 @@ void	ArtInt::SetEngage(AirStrucPtr caller,AirStrucPtr trg,MANOEUVRE manoeuvre,AN
 					caller->FormationInfo.information=FALSE;
 					caller->manoeuvretime=0;
 					caller->AutoMoveInfo.movecode=AUTO_COMBAT;
-//DEADCODE RDH 06/04/99 					caller->ai.PilotSkills.manoeuvre = MANOEUVRE_SELECT;
 
 				}else if (caller->AutoMoveInfo.movecode != AUTO_COMBAT)
 				{
@@ -2155,20 +2064,6 @@ void	ArtInt::SetEngage(AirStrucPtr caller,AirStrucPtr trg,MANOEUVRE manoeuvre,AN
 				caller->ai.desiredhdg = ANGLES_0Deg;
 				caller->ai.desiredpitch = ANGLES_0Deg;
 			
-//DEADCODE RDH 24/02/99 				if (caller->ai.firsttactic == TACTIC_LINEASTERN)
-//DEADCODE RDH 24/02/99 					caller->ai.PilotSkills.manoeuvre = MANOEUVRE_LINEASTERN;
-//DEADCODE RDH 24/02/99 				else if (caller->ai.firsttactic == TACTIC_LINEABREAST)
-//DEADCODE RDH 24/02/99 					caller->ai.PilotSkills.manoeuvre = MANOEUVRE_LINEABREAST;
-//DEADCODE RDH 24/02/99 				else if (caller->ai.firsttactic == TACTIC_DIVEANDZOOM)
-//DEADCODE RDH 24/02/99 					caller->ai.PilotSkills.manoeuvre = MANOEUVRE_DIVEANDZOOM;
-//DEADCODE RDH 24/02/99 				else if (caller->ai.firsttactic == TACTIC_SCATTER)
-//DEADCODE RDH 24/02/99 					caller->ai.PilotSkills.manoeuvre = MANOEUVRE_LEADPURSUIT;
-//DEADCODE RDH 05/04/99 				if (	(caller->ai.firsttactic == TACTIC_ROUNDABOUT)
-//DEADCODE RDH 05/04/99 							&&		(caller->ai.threatlevel != BANDITFIRING)	
-//DEADCODE RDH 05/04/99 							&&		(caller->ai.threatlevel != BANDITINENGAGERANGEOFFRIENDLY)
-//DEADCODE RDH 05/04/99 						)
-//DEADCODE RDH 05/04/99 					SetRoundAboutAc(caller);
-//DEADCODE RDH 05/04/99 				else
 					caller->ai.PilotSkills.manoeuvre=MANOEUVRE_SELECT;
 			}
 			if (trg)
@@ -2199,18 +2094,14 @@ void	ArtInt::SetEngage(AirStrucPtr caller,AirStrucPtr trg,MANOEUVRE manoeuvre,AN
 			else
 			{
 				caller->FormationInfo.information=FALSE;
-//DeadCode CSB 24/06/99					caller->manoeuvretime=0;
 				caller->AutoMoveInfo.movecode=AUTO_COMBAT;
 			}
-//DEADCODE RDH 19/05/99 			if (caller->Range < INSIDEWEAPONSRANGE)
-//DEADCODE RDH 19/05/99 				caller->ai.PilotSkills.manoeuvre=MANOEUVRE_SELECT;			//surprised so no preplanning
 //##rdh test purposes
 			if (caller==Persons2::PlayerGhostAC)
 			{
 				caller= Manual_Pilot.ControlledAC2;
 				caller->ai.unfriendly=trg;
 				caller->FormationInfo.information=FALSE;
-//DeadCode CSB 24/06/99					caller->manoeuvretime=0;
 				caller->AutoMoveInfo.movecode=AUTO_COMBAT;
 				caller->ai.PilotSkills.manoeuvre=MANOEUVRE_SELECT;
 
@@ -2305,20 +2196,11 @@ bool ArtInt::MakeForceToRespond (AirStruc* caller, AirStruc* trg, tGroupLevel gr
 			{// 	consider split manoeuvre
 				int minacnum = 2 * respondnum;
 				
-//DEADCODE RDH 23/02/99 				int minacnum;
-//DEADCODE RDH 23/02/99 				 if  (group == GROUP_ELEMENT)
-//DEADCODE RDH 23/02/99 					 minacnum = 2;
-//DEADCODE RDH 23/02/99 				else  if (group == GROUP_FLIGHT)
-//DEADCODE RDH 23/02/99 					 minacnum = 4;
-//DEADCODE RDH 23/02/99 				else if (group == GROUP_SQUADRON)
-//DEADCODE RDH 23/02/99 					 minacnum = 8;
 
 				if (minacnum <= callernum )
 				{//can split force into 2 for tactical advantage
 					respondnum = minacnum;
 					splitmanappropriate = true;
-//DEADCODE DAW 13/05/99 					else
-//DEADCODE DAW 13/05/99 						splitmanappropriate = false;		
 				}
 // 	consider split force
 				int	count = 1;
@@ -2386,29 +2268,6 @@ bool	ArtInt::CallerOnTargetTail(AirStruc*  caller, AirStruc*  trg, ANGLES angle)
 		return(false);
 
 }
-//DEADCODE RDH 08/03/99 bool	ArtInt::DecoysInGroup(AirStruc*  caller)
-//DEADCODE RDH 08/03/99 {
-//DEADCODE RDH 08/03/99 
-//DEADCODE RDH 08/03/99 		AirStrucPtr	currfol=caller;
-//DEADCODE RDH 08/03/99 
-//DEADCODE RDH 08/03/99 		
-//DEADCODE RDH 08/03/99 		if (caller->leader==NULL)
-//DEADCODE RDH 08/03/99 		{
-//DEADCODE RDH 08/03/99 			while 	(		((currfol=currfol->fly.nextflight)!=NULL)
-//DEADCODE RDH 08/03/99 							&&	(currfol->FormationInfo.information)
-//DEADCODE RDH 08/03/99 					)
-//DEADCODE RDH 08/03/99 			{
-//DEADCODE RDH 08/03/99 				if	(	(currfol->ai.firsttactic == TACTIC_DECOYACTIVE)
-//DEADCODE RDH 08/03/99 					||	(currfol->ai.firsttactic == TACTIC_DECOYPASSIVE)
-//DEADCODE RDH 08/03/99 					)
-//DEADCODE RDH 08/03/99 					{
-//DEADCODE RDH 08/03/99 						SetDecoysInGroup(currfol);
-//DEADCODE RDH 08/03/99 						return(true);
-//DEADCODE RDH 08/03/99 					}
-//DEADCODE RDH 08/03/99 			}
-//DEADCODE RDH 08/03/99 		}
-//DEADCODE RDH 08/03/99 		return(false);
-//DEADCODE RDH 08/03/99 }
 //------------------------------------------------------------------------------
 AirStrucPtr	ArtInt::SetFlightWhoCanEngage(AirStrucPtr caller,AirStrucPtr trg)
 {
@@ -2429,7 +2288,7 @@ AirStrucPtr	ArtInt::SetFlightWhoCanEngage(AirStrucPtr caller,AirStrucPtr trg)
 			if (!tmpt)
 				//can't fimd a next flight so go down the followers
 				tmpt=nextfol(trg,true);
-				if (!tmpt)
+			if (!tmpt)
 				{
  					if (trg->fly.leadflight)
 					{	
@@ -2527,13 +2386,6 @@ AirStrucPtr	ArtInt::SetFlightEngage(AirStrucPtr caller,AirStrucPtr trg,MANOEUVRE
 	{
 		tmpt=SetFlightWhoCanEngage(caller,trg);
 		//null means not found or not allowed
-//DEADCODE RDH 12/05/99 		if (!tmpt)
-//DEADCODE RDH 12/05/99 		{
-//DEADCODE RDH 12/05/99 			if (caller->ai.flighttactics == LOOSEDEUCE)
-//DEADCODE RDH 12/05/99 				 tmpt = trg;
-//DEADCODE RDH 12/05/99 		}
-//DEADCODE RDH 12/05/99 		if ((tmpt) && !(tmpt->FormationInfo.information))
-//DEADCODE RDH 12/05/99 			tmpt = trg;
 		if (tmpt)	trg=tmpt;
 		//assign a/c from tmpt to flight
 		if (!caller->AircraftDamaged() && caller->classtype->aerobaticfactor!=AEROBATIC_LOW)								//JIM 29Aug96
@@ -2580,8 +2432,6 @@ AirStrucPtr	ArtInt::SetFollowerEngage(AirStrucPtr caller,AirStrucPtr trg, MANOEU
 				if (caller->ai.elementtactics == LOOSEDEUCE)
 					 tmpt = trg;
 			}
-//DEADCODE RDH 12/05/99 			if ((tmpt) && !(tmpt->FormationInfo.information))
-//DEADCODE RDH 12/05/99 				tmpt = trg;
 		}
 		SetEngage(caller,tmpt, manoeuvre,desiredhdg, desiredpitch, surprised);
 		if (tmpt)
@@ -2631,15 +2481,6 @@ void	ArtInt::FindGroupAndLeader2(AirStruc*& caller, AirStruc*& caller2,tGroupLev
 		if (caller->fly.nextflight)
 			caller2 =  caller->fly.nextflight->fly.nextflight;
 
-//DEADCODE RDH 23/02/99 		int count = 1;
-//DEADCODE RDH 23/02/99 		caller2 = caller->fly.nextflight;
-//DEADCODE RDH 23/02/99 		while ((count < 6) && (caller2->fly.nextflight != NULL))
-//DEADCODE RDH 23/02/99 		{
-//DEADCODE RDH 23/02/99 			caller2 = caller2->fly.nextflight;
-//DEADCODE RDH 23/02/99 			count++;
-//DEADCODE RDH 23/02/99 		}
-//DEADCODE RDH 23/02/99 		if (count < 6)
-//DEADCODE RDH 23/02/99 			caller2 =  caller->fly.nextflight;
 
 	}else
 		caller2 = NULL;
@@ -2665,62 +2506,7 @@ void	ArtInt::SwitchCallerToLeft(AirStruc*& caller, AirStruc*& callee)
 void	ArtInt::SetRoundAboutAc(AirStruc*  ac)
 {
 
-//DEADCODE RDH 03/03/99 	AirStrucPtr	currldr, lastldr;
-//DEADCODE RDH 03/03/99 	AirStrucPtr	squadldr = ac->fly.leadflight;
-//DEADCODE RDH 03/03/99 
-//DEADCODE RDH 03/03/99 	int	countelement = 0;
-//DEADCODE RDH 03/03/99 	int thiselement = 0;
-//DEADCODE RDH 03/03/99 		
-//DEADCODE RDH 03/03/99 		if (squadldr != NULL)
-//DEADCODE RDH 03/03/99 		{
-//DEADCODE RDH 03/03/99 			currldr = squadldr;
-//DEADCODE RDH 03/03/99 			while 	(		((currldr=currldr->fly.nextflight)!=NULL)
-//DEADCODE RDH 03/03/99 							&&	(currldr->FormationInfo.information)
-//DEADCODE RDH 03/03/99 					)
-//DEADCODE RDH 03/03/99 			{
-//DEADCODE RDH 03/03/99 				if	(currldr->fly.position() == FLIGHTLEADER)		  //JIM 20/01/99
-//DEADCODE RDH 03/03/99 					countelement++;
-//DEADCODE RDH 03/03/99 				if  (		(currldr == ac)
-//DEADCODE RDH 03/03/99 						||	(currldr == ac->fly.leadflight)
-//DEADCODE RDH 03/03/99 					)
-//DEADCODE RDH 03/03/99 					thiselement = countelement;
-//DEADCODE RDH 03/03/99 			}
-//DEADCODE RDH 03/03/99 		}
-//DEADCODE RDH 03/03/99 	if (countelement <= 1)
-//DEADCODE RDH 03/03/99 	{//not sufficient aircraft to do roundabout
-//DEADCODE RDH 03/03/99 		ac->ai.threatlevel = BANDITANYWHERE;
-//DEADCODE RDH 03/03/99 		ac->ai.PilotSkills.manoeuvre=MANOEUVRE_SELECT;
-//DEADCODE RDH 03/03/99 
-//DEADCODE RDH 03/03/99 	}else
-//DEADCODE RDH 03/03/99 	{
-//DEADCODE RDH 03/03/99 		ac->ai.PilotSkills.manoeuvre = MANOEUVRE_ROUNDABOUT;
-//DEADCODE RDH 03/03/99 		if (countelement == thiselement)
-//DEADCODE RDH 03/03/99 		{
-//DEADCODE RDH 03/03/99 			ac->ai.threatlevel = BANDITFIRING;	
-//DEADCODE RDH 03/03/99 		}else
-//DEADCODE RDH 03/03/99 		{
-//DEADCODE RDH 03/03/99 			ac->ai.threatlevel = BANDITINENGAGERANGEOFFRIENDLY;
-//DEADCODE RDH 03/03/99 		}
-//DEADCODE RDH 03/03/99 		ac->ai.desiredalt = ac->World.Y - FT_2000 + (countelement - thiselement) * FT_2000;
-//DEADCODE RDH 03/03/99 	}
 }
-//DEADCODE RDH 08/03/99 void	ArtInt::SetDecoysInGroup(AirStruc*  ac)
-//DEADCODE RDH 08/03/99 {
-//DEADCODE RDH 08/03/99 	ac->FormationInfo.information = FALSE;
-//DEADCODE RDH 08/03/99 	AirStrucPtr	currfol=ac;
-//DEADCODE RDH 08/03/99 	do
-//DEADCODE RDH 08/03/99 	{
-//DEADCODE RDH 08/03/99 			currfol->AutoMoveInfo.movecode = AUTO_FOLLOWWP;
-//DEADCODE RDH 08/03/99 			currfol->ai.threatlevel = BANDITINWEAPONSRANGE;
-//DEADCODE RDH 08/03/99 			if (currfol->ai.firsttactic == TACTIC_DECOYACTIVE)
-//DEADCODE RDH 08/03/99 				currfol->NextWayPoint ();
-//DEADCODE RDH 08/03/99 			currfol=currfol->fly.nextflight;
-//DEADCODE RDH 08/03/99 	}
-//DEADCODE RDH 08/03/99 	while 	(		(currfol!=NULL)
-//DEADCODE RDH 08/03/99 				&&	(currfol->FormationInfo.information)
-//DEADCODE RDH 08/03/99 			);
-//DEADCODE RDH 08/03/99 	
-//DEADCODE RDH 08/03/99 }
 //------------------------------------------------------------------------------
 //Procedure		nextfl
 //Author		Jim Taylor
@@ -2735,22 +2521,6 @@ void	ArtInt::SetRoundAboutAc(AirStruc*  ac)
 //------------------------------------------------------------------------------
 AirStrucPtr	ArtInt::nextfl(AirStrucPtr trg,bool unassigned)
 {
-//DEADCODE RDH 12/05/99 	AirStrucPtr	t2=trg;
-//DEADCODE RDH 12/05/99 	if (trg)
-//DEADCODE RDH 12/05/99 		repeat
-//DEADCODE RDH 12/05/99 		{
-//DEADCODE RDH 12/05/99 			if (	(trg->fly.nextflight)	&&	(trg->fly.nextflight->FormationInfo.information))
-//DEADCODE RDH 12/05/99 				trg=trg->fly.nextflight;
-//DEADCODE RDH 12/05/99 			else
-//DEADCODE RDH 12/05/99 				if (	(trg->fly.leadflight)	&&	(trg->FormationInfo.information))
-//DEADCODE RDH 12/05/99 					trg=trg->fly.leadflight;
-//DEADCODE RDH 12/05/99 				else
-//DEADCODE RDH 12/05/99 					return(NULL);
-//DEADCODE RDH 12/05/99 ////			if (!!trg->ai.attacker <=unassigned)
-//DEADCODE RDH 12/05/99 			if (!trg->ai.attacker || unassigned)
-//DEADCODE RDH 12/05/99 				return(trg);
-//DEADCODE RDH 12/05/99 		}	while (t2!=trg);
-//DEADCODE RDH 12/05/99 	return(NULL);
 
 	SLong	oldrange = trg->Range;
  	AirStrucPtr	t2=NULL;
@@ -2787,10 +2557,7 @@ bool	ArtInt::AircraftAreClose(AirStrucPtr trg, AirStrucPtr foll)
 {
 
 	
-//DEADCODE RDH 23/06/99 	SLong	oldrange = trg->Range;
-//DEADCODE RDH 23/06/99  	AirStrucPtr	t2=NULL;
 
-//DEADCODE RDH 23/06/99    trg->InterceptandRange(&foll->World);
 	SLong deltax = trg->World.X - foll->World.X;
 	if (deltax < 0)
 		deltax = -deltax;
@@ -2822,22 +2589,6 @@ bool	ArtInt::AircraftAreClose(AirStrucPtr trg, AirStrucPtr foll)
 //------------------------------------------------------------------------------
 AirStrucPtr	ArtInt::nextfol(AirStrucPtr trg,bool unassigned)
 {
-//DEADCODE RDH 12/05/99 	AirStrucPtr	t2=trg;
-//DEADCODE RDH 12/05/99 	if (trg)
-//DEADCODE RDH 12/05/99 		repeat
-//DEADCODE RDH 12/05/99 		{
-//DEADCODE RDH 12/05/99 			if (		(trg->Follower())	&&	(trg->Follower()->FormationInfo.information))
-//DEADCODE RDH 12/05/99 				trg=*trg->Follower();
-//DEADCODE RDH 12/05/99 			else
-//DEADCODE RDH 12/05/99 				if ((	trg->leader)	&&	(trg->FormationInfo.information))
-//DEADCODE RDH 12/05/99 					trg=*trg->leader;
-//DEADCODE RDH 12/05/99 //				else
-//DEADCODE RDH 12/05/99   //					return(NULL);
-//DEADCODE RDH 12/05/99 ////			if (!!trg->ai.attacker <=unassigned)
-//DEADCODE RDH 12/05/99 			if (!trg->ai.attacker || unassigned)
-//DEADCODE RDH 12/05/99 				return(trg);
-//DEADCODE RDH 12/05/99 		}	while (t2!=trg);
-//DEADCODE RDH 12/05/99 	return(NULL);
 
 	SLong	oldrange = trg->Range;
  	AirStrucPtr	t2=NULL;
@@ -2908,7 +2659,6 @@ AirStruc* ArtInt::FreeUpAFlight(AirStruc* caller, AirStruc*  currtrg)
 	ItemBase* ldrtrg = 	(AirStrucPtr(*leader)->ai.unfriendly);
 	if (		(!ldrtrg)
 			||	(ldrtrg->MigStatus.LaunchFlags.size!=AIRSTRUCSIZE)
-//DEADCODE RDH 06/06/99 			||	(AirStrucPtr(*ldrtrg)->ai.unfriendly->MigStatus.LaunchFlags.size!=AIRSTRUCSIZE)
 	   )
 	{
 		callee = leader;
@@ -3073,13 +2823,11 @@ bool	ArtInt::SpottedUnknown(AirStruc* caller,AirStruc* trg)
 {
 //rdh 19/1/99	if (caller->ai.unfriendly==NULL)
 //rdh 19/1/99	{
-//rdh 19/1/99//DEADCODE JIM 21/12/98 			caller->ai.unfriendly=trg;
 //rdh 19/1/99
 //rdh 19/1/99//##temp rdh			if  (	(caller->ai.threatlevel >=BANDITANYWHERE)
 //rdh 19/1/99//				&&	caller->AutoMoveInfo.movecode < AUTO_TRACKINGBOGIE
 //rdh 19/1/99//				&&	caller->ai.aggressionlevel >= AL_DEFENSIVE
 //rdh 19/1/99//				)
-//rdh 19/1/99//DEADCODE JIM 21/12/98 				caller->AutoMoveInfo.movecode = AUTO_TRACKINGBOGIE;
 //rdh 19/1/99
 //rdh 19/1/99}
 
@@ -3098,13 +2846,11 @@ bool	ArtInt::SpottedUnknown(AirStruc* caller,AirStruc* trg)
 	}
 	if (caller->ai.unfriendly==NULL)
 	{
-//DEADCODE JIM 21/12/98 			caller->ai.unfriendly=trg;
 
 //##temp rdh			if  (	(caller->ai.threatlevel >=BANDITANYWHERE)
 //				&&	caller->AutoMoveInfo.movecode < AUTO_TRACKINGBOGIE
 //				&&	caller->ai.aggressionlevel >= AL_DEFENSIVE
 //				)
-//DEADCODE JIM 21/12/98 				caller->AutoMoveInfo.movecode = AUTO_TRACKINGBOGIE;
 
 	}
 	return(true);
@@ -3330,511 +3076,4 @@ bool ArtInt::Winchester(AirStruc* trg)
 {
 	return(true);
 }
-//DeadCode AMM 14Jul99 /*
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		SpottedUnFriendly
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Fri 27 Feb 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 bool	ArtInt::SpottedUnfriendly(AirStruc* caller,AirStruc* trg)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 //temp
-//DeadCode AMM 14Jul99 	caller->ai.threatlevel = BANDITANYWHERE;
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 	if (caller->classtype->aerobaticfactor == AEROBATIC_LOW)
-//DeadCode AMM 14Jul99 	{//medium bomber
-//DeadCode AMM 14Jul99 		return(AlertFighters(caller,trg));
-//DeadCode AMM 14Jul99 	}else if (	(caller->ai.threatlevel > BANDITFIRING)
-//DeadCode AMM 14Jul99 		||	((caller->Range < WEAPONSRANGE) &&	(caller->ai.threatlevel >= BANDITINWEAPONSRANGE))
-//DeadCode AMM 14Jul99 		||	((caller->Range < DANGERRANGE) &&	(caller->ai.threatlevel >= BANDITINDANGERRANGE))
-//DeadCode AMM 14Jul99 		||	((caller->Range < ENGAGERANGE) &&	(caller->ai.threatlevel >= BANDITINENGAGERANGE))
-//DeadCode AMM 14Jul99 		||	((caller->Range < COMBATRANGE) &&	(caller->ai.threatlevel >= BANDITINCOMBATRANGE))
-//DeadCode AMM 14Jul99 		||	(caller->ai.threatlevel >= BANDITANYWHERE)
-//DeadCode AMM 14Jul99 		||	(		(caller->ai.threatlevel == BANDITINENGAGERANGEOFFRIENDLY)
-//DeadCode AMM 14Jul99 				&& 	(trg->ai.unfriendly)
-//DeadCode AMM 14Jul99 //##				&& 	(RangeFromTo(trg, trg->ai.unfriendly) < ENGAGERANGE)
-//DeadCode AMM 14Jul99 			)
-//DeadCode AMM 14Jul99 	   )
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		if 	(!DecoysInGroup(caller))
-//DeadCode AMM 14Jul99 		{
-//DeadCode AMM 14Jul99 			if	(	(caller->Range > DANGERRANGE)
-//DeadCode AMM 14Jul99 					&&
-//DeadCode AMM 14Jul99 					(	(caller->ai.aggressionlevel == AL_TRAINING)
-//DeadCode AMM 14Jul99 					||	(	(caller->ai.aggressionlevel == AL_DEFENSIVE) 
-//DeadCode AMM 14Jul99 							&&
-//DeadCode AMM 14Jul99 							(		((trg->AutoMoveInfo.nationality == NAT_RED) && (!AcHasBombs(trg)))
-//DeadCode AMM 14Jul99 								||	((trg->AutoMoveInfo.nationality == NAT_BLUE) && ((caller->World.Y - trg->World.Y) > FT_3000)))
-//DeadCode AMM 14Jul99 							)
-//DeadCode AMM 14Jul99 					||	((caller->ai.aggressionlevel == AL_ATTACKBOMBERSONLY) && (trg->classtype->aerobaticfactor >= AEROBATIC_FIGHTER))
-//DeadCode AMM 14Jul99 					||	((caller->ai.aggressionlevel == AL_SPLITFORCE) && (!ForceHasBombers(trg)))
-//DeadCode AMM 14Jul99 					||	((caller->ai.aggressionlevel == AL_ATTACKWEAKNESSES) &&	(	!BingoFuel(trg)
-//DeadCode AMM 14Jul99 																				&&	!trg->AircraftDamaged()
-//DeadCode AMM 14Jul99 																				&&	!Winchester(trg)
-//DeadCode AMM 14Jul99 																				)
-//DeadCode AMM 14Jul99 						)															
-//DeadCode AMM 14Jul99 					)
-//DeadCode AMM 14Jul99 				)
-//DeadCode AMM 14Jul99 			{//may have to evade first
-//DeadCode AMM 14Jul99 				//##ChooseBanditRelToPilotMsg()
-//DeadCode AMM 14Jul99 				caller->AutoMoveInfo.movecode = AUTO_FOLLOWWP;
-//DeadCode AMM 14Jul99 				return(false);
-//DeadCode AMM 14Jul99 			}else
-//DeadCode AMM 14Jul99 			{//should move to precombat or combat
-//DeadCode AMM 14Jul99 			
-//DeadCode AMM 14Jul99 				//find the leader to go for
-//DeadCode AMM 14Jul99 				//Always go for leader of current flight
-//DeadCode AMM 14Jul99 				if (trg->FormationInfo.information && trg->leader)
-//DeadCode AMM 14Jul99 					trg=*trg->leader;
-//DeadCode AMM 14Jul99 				GroupEngage(caller,trg);
-//DeadCode AMM 14Jul99 				return(true);
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 			}
-//DeadCode AMM 14Jul99 		}
-//DeadCode AMM 14Jul99 	}
-//DeadCode AMM 14Jul99 	return(false);
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 	
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		GroupLevel
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Mon 16 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 ArtInt::tGroupLevel ArtInt::GroupLevel(AirStruc* caller)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	if 	(		(caller->fly.nextflight)
-//DeadCode AMM 14Jul99 	   		&&  (caller->fly.nextflight->FormationInfo.information)
-//DeadCode AMM 14Jul99 		)
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		if 	(		(caller->fly.nextflight->fly.nextflight)
-//DeadCode AMM 14Jul99 		   		&&  (caller->fly.nextflight->fly.nextflight->FormationInfo.information)
-//DeadCode AMM 14Jul99 			)
-//DeadCode AMM 14Jul99 			return(GROUP_SQUADRON);
-//DeadCode AMM 14Jul99 		else
-//DeadCode AMM 14Jul99 			return(GROUP_FLIGHT);
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 	}else
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		if  (	(caller->Follower())
-//DeadCode AMM 14Jul99 	   		&&  (caller->Follower()->FormationInfo.information)
-//DeadCode AMM 14Jul99 			)
-//DeadCode AMM 14Jul99 			return(GROUP_ELEMENT);
-//DeadCode AMM 14Jul99 		else
-//DeadCode AMM 14Jul99 			return(GROUP_LONER);
-//DeadCode AMM 14Jul99 	}
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		DefensiveSplit
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Tue 17 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 void	ArtInt::DefensiveSplit(AirStruc* caller,AirStruc* caller2,AirStruc* trg,ANGLES leftpitch,ANGLES rightpitch)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	SetEngage(caller,trg,MANOEUVRE_SPLITMANOEUVRE, ANGLES_270Deg,leftpitch,true);
-//DeadCode AMM 14Jul99 	SetUpRemainderOfGroupToEngage(caller,trg,MANOEUVRE_SPLITMANOEUVRE, ANGLES_270Deg,leftpitch,true);
-//DeadCode AMM 14Jul99 	SetEngage(caller2,trg,MANOEUVRE_SPLITMANOEUVRE, ANGLES_270Deg,leftpitch,true);
-//DeadCode AMM 14Jul99 	SetUpRemainderOfGroupToEngage(caller2,trg,MANOEUVRE_SPLITMANOEUVRE, ANGLES_90Deg, rightpitch,true);
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		SetUpBracket
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Tue 17 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 void	ArtInt::SetUpPincer(AirStruc* caller,AirStruc* caller2,AirStruc* trg)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	SetEngage(caller,trg,MANOEUVRE_PINCER, ANGLES_270Deg,ANGLES_90Deg,FALSE);
-//DeadCode AMM 14Jul99 	SetUpRemainderOfGroupToEngage(caller,trg,MANOEUVRE_PINCER, ANGLES_90Deg, ANGLES_0Deg,FALSE);
-//DeadCode AMM 14Jul99 	SetEngage(caller2,trg,MANOEUVRE_PINCER, ANGLES_270Deg,ANGLES_270Deg,FALSE);
-//DeadCode AMM 14Jul99 	SetUpRemainderOfGroupToEngage(caller2,trg,MANOEUVRE_PINCER, ANGLES_270Deg, ANGLES_0Deg,FALSE);
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		SetUpMultiWave
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Wed 18 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 void	ArtInt::SetUpMultiWave(AirStruc* caller,AirStruc* caller2,AirStruc* trg)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	SetEngage(caller,trg,MANOEUVRE_HEADON, ANGLES_0Deg, ANGLES_0Deg,FALSE);
-//DeadCode AMM 14Jul99 	SetUpRemainderOfGroupToEngage(caller,trg,MANOEUVRE_HEADON, ANGLES_0Deg, ANGLES_0Deg,FALSE);
-//DeadCode AMM 14Jul99 	SetEngage(caller2,trg,MANOEUVRE_HEADON, ANGLES_0Deg, ANGLES_0Deg,FALSE);
-//DeadCode AMM 14Jul99 	SetUpRemainderOfGroupToEngage(caller2,trg,MANOEUVRE_MULTIWAVE, ANGLES_0Deg, ANGLES_0Deg,FALSE);
-//DeadCode AMM 14Jul99 }	
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		DefensiveSplitHiHi
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Tue 17 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 void	ArtInt::DefensiveSplitHiLo(AirStruc* caller,AirStruc* caller2,AirStruc* trg)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	ANGLES	rightpitch, leftpitch;
-//DeadCode AMM 14Jul99 	if ((Math_Lib.rnd(RndValMAX)) > RND50PC)	
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		leftpitch == ANGLES_0Deg;
-//DeadCode AMM 14Jul99 		rightpitch = BESTCLIMBPITCH;
-//DeadCode AMM 14Jul99 	}else
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		leftpitch = BESTCLIMBPITCH;
-//DeadCode AMM 14Jul99 		rightpitch = ANGLES_0Deg;
-//DeadCode AMM 14Jul99 	}
-//DeadCode AMM 14Jul99 	DefensiveSplit(caller,caller2,trg, leftpitch, rightpitch);
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		ChooseSplitManoeuvre
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Tue 17 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 void	ArtInt::ChooseSplitManoeuvre(AirStruc* caller,AirStruc* caller2,AirStruc* trg)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 //we want caller on the left for standard move
-//DeadCode AMM 14Jul99 //can invert later if we want them to cross
-//DeadCode AMM 14Jul99 	if (RelHdgIntFromTo(caller,caller2))
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		AirStruc* tmp = caller;
-//DeadCode AMM 14Jul99 		caller = caller2;
-//DeadCode AMM 14Jul99 		caller2 = tmp;
-//DeadCode AMM 14Jul99 	}
-//DeadCode AMM 14Jul99 	RndVal	rndnum = ((RndVal)Math_Lib.rnd(2));
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 	if  (		TargetOnCallerTail(caller, trg, ANGLES_45Deg)
-//DeadCode AMM 14Jul99 			&&	TargetFacingCaller(caller, trg, ANGLES_45Deg)
-//DeadCode AMM 14Jul99 		)
-//DeadCode AMM 14Jul99 	{//attacked from rear
-//DeadCode AMM 14Jul99 		if (caller->classtype->visible != MIG15)
-//DeadCode AMM 14Jul99 		{
-//DeadCode AMM 14Jul99 			if (caller->ai.morale < MORALE_MEDIUM)
-//DeadCode AMM 14Jul99 			{
-//DeadCode AMM 14Jul99 				if (RndVal)
-//DeadCode AMM 14Jul99 					DefensiveSplit(caller,caller2,trg, ANGLES_0Deg,ANGLES_0Deg);
-//DeadCode AMM 14Jul99 				else
-//DeadCode AMM 14Jul99 					DefensiveSplitHiLo(caller2,caller,trg);
-//DeadCode AMM 14Jul99 			}
-//DeadCode AMM 14Jul99 			else if (caller->ai.PilotSkills.combatskill > SKILL_REGULAR)
-//DeadCode AMM 14Jul99 				DefensiveSplit(caller,caller2,trg, BESTCLIMBPITCH, BESTCLIMBPITCH);
-//DeadCode AMM 14Jul99 			else
-//DeadCode AMM 14Jul99 				DefensiveSplitHiLo(caller,caller2,trg);
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 		}else
-//DeadCode AMM 14Jul99 		{
-//DeadCode AMM 14Jul99 			if (caller->ai.morale < MORALE_MEDIUM)
-//DeadCode AMM 14Jul99 				if (RndVal)
-//DeadCode AMM 14Jul99 					DefensiveSplit(caller,caller2,trg, BESTCLIMBPITCH, BESTCLIMBPITCH);
-//DeadCode AMM 14Jul99 				else
-//DeadCode AMM 14Jul99 					DefensiveSplitHiLo(caller2,caller,trg);
-//DeadCode AMM 14Jul99 			else if (caller->ai.PilotSkills.combatskill >  SKILL_REGULAR)
-//DeadCode AMM 14Jul99 				DefensiveSplit(caller,caller2,trg, ANGLES_0Deg,ANGLES_0Deg);
-//DeadCode AMM 14Jul99 			else
-//DeadCode AMM 14Jul99 				DefensiveSplitHiLo(caller,caller2,trg);
-//DeadCode AMM 14Jul99 		}
-//DeadCode AMM 14Jul99 	}else if  (		CallerFacingTarget(caller, trg, ANGLES_45Deg)
-//DeadCode AMM 14Jul99 				&&	TargetFacingCaller(caller, trg, ANGLES_45Deg)
-//DeadCode AMM 14Jul99 				)
-//DeadCode AMM 14Jul99 	{//head on
-//DeadCode AMM 14Jul99 		if (caller->ai.firsttactic == TACTIC_PINCER)
-//DeadCode AMM 14Jul99 			SetUpPincer(caller,caller2,trg);
-//DeadCode AMM 14Jul99 		else if (caller->ai.firsttactic == TACTIC_MULTIWAVE)
-//DeadCode AMM 14Jul99 			SetUpMultiWave(caller,caller2,trg);
-//DeadCode AMM 14Jul99 		else
-//DeadCode AMM 14Jul99 		{
-//DeadCode AMM 14Jul99 			SetEngage(caller,trg, MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, FALSE);
-//DeadCode AMM 14Jul99 			SetUpRemainderOfGroupToEngage(caller,trg,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg,FALSE);		
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 		}
-//DeadCode AMM 14Jul99 	}else
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		if (caller->ai.firsttactic == TACTIC_MULTIWAVE)
-//DeadCode AMM 14Jul99 			SetUpMultiWave(caller,caller2,trg);
-//DeadCode AMM 14Jul99 		else
-//DeadCode AMM 14Jul99 		{
-//DeadCode AMM 14Jul99 			SetEngage(caller,trg,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, true);
-//DeadCode AMM 14Jul99 			SetUpRemainderOfGroupToEngage(caller,trg,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg,FALSE);		
-//DeadCode AMM 14Jul99 		}
-//DeadCode AMM 14Jul99 	}
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 }	
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		Engage
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Mon 16 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 void	ArtInt::GroupEngage(AirStruc* caller,AirStruc* trg)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 //try to include: 	High morale, low ability
-//DeadCode AMM 14Jul99 //					hothead: break form and attack alone
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 	//find the leader to go for
-//DeadCode AMM 14Jul99 	//Always go for leader of target's flight
-//DeadCode AMM 14Jul99 	if (trg->FormationInfo.information && trg->leader)
-//DeadCode AMM 14Jul99 		trg=*trg->leader;
-//DeadCode AMM 14Jul99 	//go for their squad leader
-//DeadCode AMM 14Jul99 	if (trg->fly.leadflight && trg->FormationInfo.information)
-//DeadCode AMM 14Jul99 		trg=trg->fly.leadflight;
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 	//caller is either a leader or loner
-//DeadCode AMM 14Jul99 	tGroupLevel group = GroupLevel(caller);
-//DeadCode AMM 14Jul99 	if (MakeForceToRespond (caller,trg,group))
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 	
-//DeadCode AMM 14Jul99 			
-//DeadCode AMM 14Jul99 		if  ((group == GROUP_ELEMENT)	&&	(caller->ai.elementtactics == LOOSEDEUCE))
-//DeadCode AMM 14Jul99 			ChooseSplitManoeuvre(caller,((AirStruc *)caller->Follower()),trg);
-//DeadCode AMM 14Jul99 		else if ((group == GROUP_FLIGHT)	&&	(caller->ai.flighttactics == LOOSEDEUCE))
-//DeadCode AMM 14Jul99 			ChooseSplitManoeuvre(caller,caller->fly.nextflight,trg);
-//DeadCode AMM 14Jul99 		else if ((group == GROUP_SQUADRON)	&&	(caller->ai.squadrontactics == LOOSEDEUCE))
-//DeadCode AMM 14Jul99 			ChooseSplitManoeuvre(caller,caller->fly.nextflight->fly.nextflight,trg);
-//DeadCode AMM 14Jul99 		else
-//DeadCode AMM 14Jul99 		{
-//DeadCode AMM 14Jul99 			//attack him!
-//DeadCode AMM 14Jul99 			SetEngage(caller,trg, MANOEUVRE_SELECT, ANGLES_0Deg,ANGLES_0Deg, FALSE);
-//DeadCode AMM 14Jul99 			SetUpRemainderOfGroupToEngage(caller,trg, MANOEUVRE_SELECT, ANGLES_0Deg,ANGLES_0Deg, FALSE);
-//DeadCode AMM 14Jul99 		}
-//DeadCode AMM 14Jul99 	}
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		SubsequentIDasUnfriendly
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Tue 3 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //void	ArtInt::SubsequentIDasUnfriendly(AirStruc* caller,AirStruc* trg)
-//DeadCode AMM 14Jul99 //{
-//DeadCode AMM 14Jul99 //}
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		AlertFighters
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Tue 3 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 /*bool	ArtInt::AlertFighters(AirStruc* caller,AirStruc* trg)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	return(false);
-//DeadCode AMM 14Jul99 //TempCode RDH 27Mar98 	Blue ac will call out sightings
-//DeadCode AMM 14Jul99 //TempCode RDH 27Mar98 	Blue Fighter have to decide whether to respond
-//DeadCode AMM 14Jul99 //TempCode RDH 27Mar98 	if (respond())
-//DeadCode AMM 14Jul99 //TempCode RDH 27Mar98 		TrackBogey();
-//DeadCode AMM 14Jul99 //TempCode RDH 27Mar98 
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		InCombatWithoutUnfriendly
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Fri 27 Feb 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	What does wingman do when he spots enemy ac with leader in combat
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 void	ArtInt::InCombatWithoutUnfriendly(AirStruc* caller,AirStruc*  trg)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	switch(caller->ai.elementtactics)
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		case	WELDEDWING:
-//DeadCode AMM 14Jul99 		case	TOPCOVER:
-//DeadCode AMM 14Jul99 		{
-//DeadCode AMM 14Jul99 			if	(	(	(trg == ((AirStruc*)caller->leader)->ai.attacker)
-//DeadCode AMM 14Jul99 					||	(trg == caller->ai.attacker)
-//DeadCode AMM 14Jul99 					)
-//DeadCode AMM 14Jul99 //				&&	trgtonsix
-//DeadCode AMM 14Jul99 				&&	(caller->Range < DANGERRANGE)
-//DeadCode AMM 14Jul99 				)
-//DeadCode AMM 14Jul99 				{
-//DeadCode AMM 14Jul99 					caller->ai.unfriendly = trg;
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 					_DPlay.OwnerChangeDecision(caller,trg);		//AMM 27Nov98
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 				}
-//DeadCode AMM 14Jul99 			break;
-//DeadCode AMM 14Jul99 		}	
-//DeadCode AMM 14Jul99 	}
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		ResetUnfriendly()
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			Tue 17 Mar 1998
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 void ArtInt::ResetUnfriendly()
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	//look through the leader unfriendlies group and fix on best target
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //Procedure		
-//DeadCode AMM 14Jul99 //Author		R. Hyde 
-//DeadCode AMM 14Jul99 //Date			21 Jan 1999
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Description	
-//DeadCode AMM 14Jul99 //			   	
-//DeadCode AMM 14Jul99 //				
-//DeadCode AMM 14Jul99 //Inputs		
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //Returns	
-//DeadCode AMM 14Jul99 //
-//DeadCode AMM 14Jul99 //------------------------------------------------------------------------------
-//DeadCode AMM 14Jul99 //at top
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 TABLEAI(DefensiveManoeuvre, AirStrucPtr)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 	{PHRASE_DEFENSIVESPLITSHORT,			&SetUpDefensiveSplit,	PHRASE_DEFENSIVESPLIT},		
-//DeadCode AMM 14Jul99 	{PHRASE_DEFENSIVESPLITLEFTHISHORT,	&SetUpDefensiveSplitLeftHi,	PHRASE_DEFENSIVESPLITLEFTHI},
-//DeadCode AMM 14Jul99 	{PHRASE_DEFENSIVESPLITRIGHTHISHORT,	&SetUpDefensiveSplitRightHi, PHRASE_DEFENSIVESPLITRIGHTHI},
-//DeadCode AMM 14Jul99 	{PHRASE_DEFENSIVESPLITBOTHHISHORT,	&SetUpDefensiveSplitBothHi, PHRASE_DEFENSIVESPLITBOTHHI},
-//DeadCode AMM 14Jul99 	{PHRASE_SELECTTARGETS,				&SelectTarget,	PHRASE_SELECTYOUROWNTARGETS},
-//DeadCode AMM 14Jul99 	{PHRASE_CONTINUE,					&DoNothing,		PHRASE_IGNOREFORNOW}
-//DeadCode AMM 14Jul99 	{PHRASE_PARTS_S},
-//DeadCode AMM 14Jul99 	{PHRASE_PARTS_S}
-//DeadCode AMM 14Jul99 };
-//DeadCode AMM 14Jul99 INSTANCEAI(DefensiveManoeuvre, AirStrucPtr)
-//DeadCode AMM 14Jul99 {
-//DeadCode AMM 14Jul99 /*	tGroupLevel group = GroupLevel(caller);
-//DeadCode AMM 14Jul99 	
-//DeadCode AMM 14Jul99 	if (		(EngageAppropriate())
-//DeadCode AMM 14Jul99 			&&	(MakeForceToRespond (caller,trg,group))
-//DeadCode AMM 14Jul99 		)		
-//DeadCode AMM 14Jul99 	{
-//DeadCode AMM 14Jul99 		if  (		((group == GROUP_ELEMENT)	&&	(caller->ai.elementtactics == LOOSEDEUCE))
-//DeadCode AMM 14Jul99 				||	((group == GROUP_FLIGHT)	&&	(caller->ai.flighttactics == LOOSEDEUCE))
-//DeadCode AMM 14Jul99 				||	((group == GROUP_SQUADRON)	&&	(caller->ai.squadrontactics == LOOSEDEUCE))
-//DeadCode AMM 14Jul99 			)
-//DeadCode AMM 14Jul99 			{//split appropriate
-//DeadCode AMM 14Jul99 				if (caller->classtype->visible != MIG15)
-//DeadCode AMM 14Jul99 				{
-//DeadCode AMM 14Jul99 					if (caller->ai.morale < MORALE_MEDIUM)
-//DeadCode AMM 14Jul99 					{
-//DeadCode AMM 14Jul99 						if (RndVal)
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLIT,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplit);
-//DeadCode AMM 14Jul99 call for sender to do his part of his split
-//DeadCode AMM 14Jul99 						else
-//DeadCode AMM 14Jul99 							if ((Math_Lib.rnd(RndValMAX)) > RND50PC)	
-//DeadCode AMM 14Jul99 								retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITLEFTHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitLeftHi);
-//DeadCode AMM 14Jul99 							else
-//DeadCode AMM 14Jul99 								retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITRIGHTHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitRightHi);
-//DeadCode AMM 14Jul99 						
-//DeadCode AMM 14Jul99 					}
-//DeadCode AMM 14Jul99 					else if (caller->ai.PilotSkills.combatskill > SKILL_REGULAR)
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITBOTHHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitBothHi);
-//DeadCode AMM 14Jul99 					else
-//DeadCode AMM 14Jul99 						if ((Math_Lib.rnd(RndValMAX)) > RND50PC)	
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITLEFTHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitLeftHi);
-//DeadCode AMM 14Jul99 						else
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITRIGHTHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitRightHi);
-//DeadCode AMM 14Jul99 		
-//DeadCode AMM 14Jul99 				}else
-//DeadCode AMM 14Jul99 				{
-//DeadCode AMM 14Jul99 					if (caller->ai.morale < MORALE_MEDIUM)
-//DeadCode AMM 14Jul99 					{
-//DeadCode AMM 14Jul99 						if (RndVal)
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITBOTHHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitBothHi);
-//DeadCode AMM 14Jul99 						else
-//DeadCode AMM 14Jul99 						if ((Math_Lib.rnd(RndValMAX)) > RND50PC)	
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITLEFTHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitLeftHi);
-//DeadCode AMM 14Jul99 						else
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITRIGHTHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitRightHi);
-//DeadCode AMM 14Jul99 					}else if (caller->ai.PilotSkills.combatskill >  SKILL_REGULAR)
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLIT,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplit);
-//DeadCode AMM 14Jul99 					else
-//DeadCode AMM 14Jul99 						if ((Math_Lib.rnd(RndValMAX)) > RND50PC)	
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITLEFTHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitLeftHi);
-//DeadCode AMM 14Jul99 						else
-//DeadCode AMM 14Jul99 							retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_DEFENSIVESPLITRIGHTHI,CHOSENMANOEUVRE,caller,trg,caller), SetUpDefensiveSplitRightHi);
-//DeadCode AMM 14Jul99 				}
-//DeadCode AMM 14Jul99 			}else
-//DeadCode AMM 14Jul99 				retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_SELECTYOUROWNTARGETS,caller,trg,NULL, SelectTarget);		
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 	}else
-//DeadCode AMM 14Jul99 	   	retval = SendMsgAndCall(MESSAGE_STRUC(PHRASE_IGNOREFORNOW,SPOTTEDASNEWUNFRIENDLY,caller,trg,caller),DoNothing);
-//DeadCode AMM 14Jul99 
-//DeadCode AMM 14Jul99 	return(retval);
-//DeadCode AMM 14Jul99 }
-//DeadCode AMM 14Jul99  */
-//DeadCode AMM 14Jul99 
+*/

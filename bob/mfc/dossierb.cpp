@@ -203,9 +203,6 @@ bool Dossier::ReconnRequired()
 	TargetNoDetail* trg = Node_Data[uid];
 	if (trg)
 	{
-//DeadCode JIM 3Jul00 		int dstatus = trg->knownstatus - trg->truestatus;
-//DeadCode JIM 3Jul00 		if (dstatus < 0)
-//DeadCode JIM 3Jul00 			dstatus = -dstatus;
 		if (		(RFullPanelDial::gameside == RFullPanelDial::SIDE_LW) 
 				&&	(!Save_Data.gamedifficulty[GD_LWINTELL])			//JIM 18Aug00
 				&&	(trg->ReconAdvised())
@@ -374,7 +371,6 @@ void Dossier::OnClickedAuthorise()
 				RDialog::RMessageBox(IDS_WARNING, IDS_NOAIRCRAFTAVAIL,NULL,NULL,IDS_CONTINUE);
 			else
 			{
-	//DeadCode JIM 16Oct00 			Todays_Packages[packnum].CalcRoutePositionsAndTime();
 				MainToolBar().OnClickedMissionfolder();
 				Todays_Packages.InvalidateRoute(&Todays_Packages[packnum],true,true);
 			}

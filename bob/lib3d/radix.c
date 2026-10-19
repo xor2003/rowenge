@@ -159,7 +159,6 @@ radix_sort_t *RadixSortAscending(radix_sort_t *iptr,int offset)
 	if (ptr->pNext==0UL)
 		return ptr;
 
-//DEADCODE JON 2/10/00 	RadixReset();
 
 	while (ptr!=0UL)
 	{
@@ -181,7 +180,6 @@ radix_sort_t *RadixSortAscending(radix_sort_t *iptr,int offset)
 
 	ptr=RadixRelink();
 
-//DEADCODE JON 2/10/00 	RadixReset();
 
 	offset++;
 

@@ -211,7 +211,6 @@ void CMapDlg::OnClickItem(int m_buttonid)
 	typedef	HideEdgeControl::EdgeCtrl	Edge;
 	typedef	HideEdgeControl	EDGE;
 	_Miles.UIPlaySample(FIL_SFX_OFFICE_PAPER3);					//RDH 12Apr99
-//DeadCode RJS 12Mar99 	_Miles.ProcessInterfaceSpot();		//RJS 17Nov98				  //RDH 03/03/99
 
 	if (TargetSelectSink)
 	{
@@ -229,7 +228,6 @@ void CMapDlg::OnClickItem(int m_buttonid)
 		int pack, wave, g;
 		if (Profile::GetPackageFromWP((UniqueID)m_buttonid, pack, wave, g))
 		{
-//DEADCODE RDH 19/03/99 			RDialog::m_pView->SetHiLightInfo(pack,  wave, g, (UniqueID)m_buttonid);
 
 			//we need to reset the highlight before opening dialogue
 			//so that correct wp info is shown
@@ -239,7 +237,6 @@ void CMapDlg::OnClickItem(int m_buttonid)
 				CMissionFolder::Make();
 				CMissionFolder::OpenOneProfile(pack);
 			}
-//DEADCODE RDH 25/03/99 			RDialog::m_pView->SetHiLightInfo(pack,  wave, g, (UniqueID)m_buttonid); //RDH 19/03/99
 //			CProfile* p;
 //			RDialog::MakeTopDialog(CRect(50,450,0,0),
 //				DialBox(FIL_MAP_PROFILE,p=new CProfile(true, pack))//,Edges(EDGE::ALIGN_MIN + EDGE::ACTIONS_SPLITTER,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE))
@@ -546,13 +543,10 @@ void CMapDlg::OnMouseMove(UINT nFlags, CPoint point)
 	if (m_LButtonDown && m_bDragging && m_buttonid)
 	{
 		ItemBasePtr p=Persons2::ConvertPtrUID(UniqueID(m_buttonid));
-//DEADCODE JIM 16/02/99 		RDialog::m_pView->ScreenXY(p,px,py,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
 		InvalidateRoutes(UniqueID(m_buttonid));
 
 		RDialog::m_pView->WorldXY(p->World,point.x,point.y); //JIM 16/02/99
 
-//DEADCODE JIM 16/02/99 		p->World.X=(65536*(point.x+RDialog::m_pView->m_scrollpoint.x+(384*RDialog::m_pView->m_zoom)))/RDialog::m_pView->m_zoom;
-//DEADCODE JIM 16/02/99  		p->World.Z=-65536*(point.y+RDialog::m_pView->m_scrollpoint.y-(1792*RDialog::m_pView->m_zoom))/RDialog::m_pView->m_zoom;
 		InvalidateDragIcon(m_point.x,m_point.y,point.x,point.y);
 		m_oldpoint=m_point;
 		m_point=point;
@@ -699,40 +693,12 @@ void CMapDlg::InvalidateLine(UniqueID thiswp,UniqueID nextwp)
 	pt1=Persons2::ConvertPtrUID(UniqueID(thiswp));
 	pt2=Persons2::ConvertPtrUID(UniqueID(nextwp));
 	if (!pt1 || !pt2) return;
-//DEADCODE RDH 18/04/99 	if (thiswp==UID_Japan)
-//DEADCODE RDH 18/04/99 		RDialog::m_pView->ScreenXY(pt1->World.X + 40000000,pt1->World.Z - 20000000,px1,py1,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE RDH 18/04/99 	else
 		RDialog::m_pView->ScreenXY(pt1,px1,py1,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE RDH 18/04/99 	if (nextwp==UID_Japan)
-//DEADCODE RDH 18/04/99 		RDialog::m_pView->ScreenXY(pt2->World.X + 40000000,pt2->World.Z - 20000000,px2,py2,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE RDH 18/04/99 	else
 		RDialog::m_pView->ScreenXY(pt2,px2,py2,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
 	InvalidateLine(CPoint(px1,py1),CPoint(px2,py2));
 	InvalidateIcon(px1,py1);										  //JIM 02/06/99
 }
 
-//DEADCODE JIM 16/03/99 void CMapDlg::InvalidateMovedLine(UniqueID thiswp,UniqueID nextwp,BOOL japanwp)
-//DEADCODE JIM 16/03/99 {
-//DEADCODE JIM 16/03/99 
-//DEADCODE JIM 16/03/99 	if (thiswp!=m_buttonid && nextwp!=m_buttonid)
-//DEADCODE JIM 16/03/99 		return;
-//DEADCODE JIM 16/03/99 	if (thiswp!=m_buttonid)
-//DEADCODE JIM 16/03/99 	{
-//DEADCODE JIM 16/03/99 		UniqueID swap;
-//DEADCODE JIM 16/03/99 		swap=thiswp;
-//DEADCODE JIM 16/03/99 		thiswp=nextwp;
-//DEADCODE JIM 16/03/99 		nextwp=swap;
-//DEADCODE JIM 16/03/99 	}
-//DEADCODE JIM 16/03/99 	int px2,py2;
-//DEADCODE JIM 16/03/99 	ItemBasePtr pt2;
-//DEADCODE JIM 16/03/99 	pt2=Persons2::ConvertPtrUID(UniqueID(nextwp));
-//DEADCODE JIM 16/03/99 	if (japanwp)
-//DEADCODE JIM 16/03/99 		RDialog::m_pView->ScreenXY(pt2->World.X + 40000000,pt2->World.Z - 20000000,px2,py2,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE JIM 16/03/99 	else
-//DEADCODE JIM 16/03/99 		RDialog::m_pView->ScreenXY(pt2,px2,py2,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE JIM 16/03/99 	InvalidateLine(m_point,CPoint(px2,py2));
-//DEADCODE JIM 16/03/99 	InvalidateLine(m_oldpoint,CPoint(px2,py2));
-//DEADCODE JIM 16/03/99 }
 
 #if 0 //RERUN ndef	NDEBUG
 

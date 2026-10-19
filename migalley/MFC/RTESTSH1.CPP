@@ -182,10 +182,6 @@ void Rtestsh1::OnCancel()
 static int debugcounter=0;
 void	Rtestsh1::OnOK()
 {
-//DEADCODE JIM 15/04/99 Interesting! Hit AltX then Moue debrief. 
-//DEADCODE JIM 15/04/99 This comes up after syserr for double delete!
-//DEADCODE JIM 15/04/99  	if (debugcounter++)
-//DEADCODE JIM 15/04/99 		INT3;
 
 	if (!nestedcallsblocker)
 	{

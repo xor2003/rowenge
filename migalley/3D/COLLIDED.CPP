@@ -522,13 +522,6 @@ Bool Collide::TouchedGround(	AirStrucPtr ac,
 		else
 		{
 			glevel = Land_Scape.GetGroundLevel(coords);				//RJS 13Jan99
-	//DeadCode RJS 13Jan99 		groundlevel = glevel + ac->World.Y - coords.Y;				//RJS 02Jul98
-	//DeadCode RJS 13Jan99 
-	//DeadCode RJS 13Jan99 		if (ac->World.Y <= groundlevel)								//PD 15Nov96
-	//DeadCode RJS 13Jan99 		{
-	//DeadCode RJS 13Jan99 			ac->World.Y = groundlevel;								//PD 08Oct96
-	//DeadCode RJS 13Jan99 			retval = TRUE;
-	//DeadCode RJS 13Jan99 		}
 			if (coords.Y <= glevel)									//RJS 13Jan99
 				retval = TRUE;										//RJS 13Jan99
 		}
@@ -536,11 +529,6 @@ Bool Collide::TouchedGround(	AirStrucPtr ac,
 
 	if (!retval)
 		pos = Collide::NOTTOUCHED;
-//DeadCode RJS 20Apr99 	else														//RJS 14Apr99
-//DeadCode RJS 20Apr99 	{															//RJS 14Apr99
-//DeadCode RJS 20Apr99 		ac->pitch = newpitch;									//RJS 14Apr99
-//DeadCode RJS 20Apr99 		ac->roll = newroll;										//RJS 14Apr99
-//DeadCode RJS 20Apr99 	}															//RJS 14Apr99
 
 	return(retval);
 }
@@ -644,7 +632,6 @@ void Collide::FindRelPitchAndRoll(	AirStrucPtr ac,
 	Coords3D	thecoord = ac->World;						//RJS 20Apr99
 
  	Three_Dee.pMigLand->GetShadowAngles(thecoord,ac->hdg,newpitch,newroll);//RJS 20Apr99	//CSB 01Jul99
-//DeadCode DAW 01Jul99 	Three_Dee.pMigLand->GetShadowAngles(thecoord,ac->hdg,newpitch,newroll);//RJS 01Jul99
 	heading=ac->hdg;
 	pitch=(ANGLES)newpitch;
 	roll=(ANGLES)newroll;

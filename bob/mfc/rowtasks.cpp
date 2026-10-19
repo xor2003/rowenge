@@ -147,7 +147,10 @@ int		RowanTasks::StartTask()
 			breakif (taskstacks[++count]==0);
 	if (count==lasttasknum)
 		INT3;	//oh dear... run out of tasks?
-	taskstacks[count]=uintptr_t(&count);	//get address of local variable...
+	ULong	v=(ULong)uintptr_t(&count);			//get address of local variable...
+	__asm__ volatile ("" : "+r"(v));				//RERUN: opaque barrier - taskstacks stores stack
+												//positions as ordering tokens, never dereferenced
+	taskstacks[count]=v;
 	return count;
 }
 

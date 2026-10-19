@@ -11,36 +11,8 @@
 #define	Dinstr_Included
 
 
-//DeadCode RJS 21Apr99 enum	AnimSizes	{MINANIM=0,									//RJS 11Feb97
-//DeadCode RJS 21Apr99 					AIRCRAFTANIM,
-//DeadCode RJS 21Apr99 					WEAPANIM,									//PD 01Apr96
-//DeadCode RJS 21Apr99 					DIRECTANIM,
-//DeadCode RJS 21Apr99 					EXPLODEANIM,								//PD 15Apr96
-//DeadCode RJS 21Apr99 					POLYPITANIM,								//PD 24Jun96
-//DeadCode RJS 21Apr99 					SUNANIM,									//PD 24Jun96
-//DeadCode RJS 21Apr99 					FLAMEANIM,									//RJS 10Jul96
-//DeadCode RJS 21Apr99 					BALLOONANIM,								//RJS 05Aug96
-//DeadCode RJS 21Apr99 					WINDSOCANIM,								//RJS 05Jun97
-//DeadCode RJS 21Apr99 					MOVEGUNANIM,								//RJS 26Sep96
-//DeadCode RJS 21Apr99 					BARAGEANIM,									//RJS 26Sep96
-//DeadCode RJS 21Apr99 					FIREBALLANIM,								//RJS 07Oct96
-//DeadCode RJS 21Apr99 					TANKANIM,									//RJS 17Oct96
-//DeadCode RJS 21Apr99 					TRUCKANIM,									//RJS 17Oct96
-//DeadCode RJS 21Apr99 					TRAINANIM,									//RJS 17Oct96
-//DeadCode RJS 21Apr99 					TROOPANIM,									//RJS 18Oct96
-//DeadCode RJS 21Apr99 					BRIDGEANIM,									//RJS 20Nov96
-//DeadCode RJS 21Apr99 					LAUNCHERANIM,								//RJS 03Mar97
-//DeadCode RJS 21Apr99 					CLONEANIM,									//RJS 01Oct97
-//DeadCode RJS 21Apr99 					FLAREANIM,									//RJS 21Jan98
-//DeadCode RJS 21Apr99 					THUGANIM,									//RJS 03Mar98
-//DeadCode RJS 21Apr99 					MISSILEANIM,								//RJS 03Mar98
-//DeadCode RJS 21Apr99 					DEBRISANIM,									//RJS 20Jan99
-//DeadCode RJS 21Apr99 					SMOKETRAILANIM,								//RJS 21Jan99
-//DeadCode RJS 21Apr99 					PARACHUTEANIM								//RJS 25Mar99
-//DeadCode RJS 21Apr99 					};											//PD 24Jun96
 
 //Offset in animdata...
-//DeadCode RJS 30Nov99#define	ABITOFF		9											//RJS 21Apr99
 
 enum	AnimSizes	{MINANIM=0,									//RJS 30Nov99
 					AIRCRAFTANIM,

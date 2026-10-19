@@ -76,7 +76,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"precomp.h"
 #include "sgselect.h"
 
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"persons2.h"
 #include	"fileman.h"
 #include	"bfenum.h"
@@ -485,7 +484,6 @@ bool TBfieldForm::SaveMission(int bfindex)
 			MissionEditor->CheckObjectives();
 //			FindWorldTemplateFiles(ActiveCampaign.mission[currmission].region);//DAW 06Sep97
             Persons4	Persons_2;
-//DeadCode JIM 31May98             Persons2	Persons_2(NULL,NULL);
 			Persons_2.currbfindex=bfindex;
 
             Persons_2.SaveBF(	MissionEditor->loadedbfs[bfindex].fnum,     	//get directory name

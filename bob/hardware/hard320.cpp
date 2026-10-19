@@ -141,7 +141,6 @@ inline void ASM_Copy4ILace(void* num1,void* num2,UWord num3)
 void	Display::XX_ScreenFlip()
 {
 	ScreenNumOnLogical^=1;
-//DeadCode JIM 19Feb96 	ASM_CopyMainRAM2VidRAM(logicalscreenptr,(char *)(0xA0000+(ScreenNumOnLogical<<15)));
 	ASM_OutDxAl(0x3ce,4);		//setup the hardware
 	ASM_OutDxAl(0x3c4,2);
 	ASM_OutDxAl(0x3c5,1);		//stompetty
@@ -204,10 +203,6 @@ ULong	Display::XX_PlotPixelNoClip(UWord	x, UWord	y, ULong	thecol)
 	return(oldcol);
 }
 
-//DeadCode RJS 14Mar96 void	Display::XX_PhysMouseMove(MouseSave* oldpos,void* MouseShape,MouseSave* newpos)
-//DeadCode RJS 14Mar96 {
-//DeadCode RJS 14Mar96 	INT3();
-//DeadCode RJS 14Mar96 }
 
 Bool	Display::XX_CopyP2L(LogicalPtr	,int ,int )
 {
@@ -216,8 +211,6 @@ Bool	Display::XX_CopyP2L(LogicalPtr	,int ,int )
 
 void	Display::XX_ResetGraphicsMode()
 {
-//DeadCode RDH 30Oct96 	if (NumberOfScreens>1)
-//DeadCode RDH 30Oct96 		LogicalScreenPtr=NULL;	//block deletion
 }
 
 	STUBEND(Display);											//JIM 21Feb96

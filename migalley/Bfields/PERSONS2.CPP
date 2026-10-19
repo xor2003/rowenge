@@ -98,7 +98,6 @@ questions about this file may be asked at http://www.simhq.com/
 extern	ULong&	GR_TakeOffTime;
 //#undef source
 	//DON'T WRITE INCLUDE FILES HERE, PUT THEM IN BFCOMMON
-//Old_Code PD 27Aug96  	MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);
 //	Persons2	Persons_2;
 //	extern	ULong	GR_FriendlyScoutType00;
 
@@ -572,8 +571,7 @@ void	Persons2::processbfieldtoplevel(string& bfieldptr)
 {
 currsupergroup=UID_Null;
 int	loopcount=getloopcount(bfieldptr);
-	while (loopcount--)
-		switch (*(bfieldptr++))
+	while (loopcount--) switch (*(bfieldptr++))
 		{
 			case T_comment:		toplevel_string(bfieldptr,T_comment);		break;
 			case T_name:		toplevel_string(bfieldptr,T_name);			break;
@@ -1733,8 +1731,7 @@ Bool	Persons2::lowlevel_squadron(string& bfieldptr,info_airgrp& I)
 	else
 	{
 int	loopcount=getloopcount(bfieldptr);
-	while (loopcount--)
-		switch (*(bfieldptr++))
+	while (loopcount--) switch (*(bfieldptr++))
 		{
 		case T_paintscheme:
 					I.paintrules[I.usedpaintrules++]=constructvalue(bfieldptr,TRUE);
@@ -1797,7 +1794,7 @@ bool	Persons2::BFLoaded(FileNum f)
 	for (int i=0;i<LOADEDBFS;i++)
 		if(loadedBF[i]==f)
 			return true;
-		return false;
+	return false;
 }
 
 bool	Persons2::GetSpareBFNumber(int& number)
@@ -1808,7 +1805,7 @@ bool	Persons2::GetSpareBFNumber(int& number)
 			number=i;
 			return true;
 		}
-		return false;
+	return false;
 }
 
 int		Persons2::DeleteOldestBF()	//need schema to flag accesses...

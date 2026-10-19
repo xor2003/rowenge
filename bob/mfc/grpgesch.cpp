@@ -199,12 +199,6 @@ void	GroupGeschwader::RefreshRAF()
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL2);
 	rlistbox->ShowWindow(false);
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode JIM 25Aug00 	rlistbox->Clear();
-//DeadCode JIM 25Aug00 	rlistbox->AddColumn(SQUADRONPLUSFIELDWIDTH);
-//DeadCode JIM 25Aug00 	rlistbox->AddColumn(SQUADRONPLUSFIELDWIDTH);										  //RDH 02/06/99
-//DeadCode JIM 25Aug00 	rlistbox->AddColumn(SQUADRONPLUSFIELDWIDTH);										  //RDH 02/06/99
-//DeadCode JIM 25Aug00 	rlistbox->AddColumn(SQUADRONPLUSFIELDWIDTH);										  //RDH 02/06/99
-//DeadCode JIM 25Aug00 	rlistbox->AddColumn(SQUADRONPLUSFIELDWIDTH);										  //RDH 02/06/99
 
 	FindAirfields();
 
@@ -243,12 +237,6 @@ BOOL GroupGeschwader::OnInitDialog()
 	
 
 
-//DEADCODE RDH 09/12/99 	rlistbox->AddString("Northolt (5/6)",0);
-//DEADCODE RDH 09/12/99 	rlistbox->AddString("Biggin Hill (5/6)",0);
-//DEADCODE RDH 09/12/99 	rlistbox->AddString("Northolt (1/4)",1);
-//DEADCODE RDH 09/12/99 	rlistbox->AddString("Heathrow (1/1)",2);
-//DEADCODE RDH 09/12/99 	rlistbox->AddString("Hendon (1/2)",3);
-//DEADCODE RDH 09/12/99 
 
 	if (group == IDS_GROUP_13)
 		RefreshGr13();

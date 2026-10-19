@@ -72,7 +72,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "Static.h"
 #include "GrndGrp.h"
 
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include "strings.h"
 #include	"myangles.h"
 #include	"bfnumber.h"
@@ -159,33 +158,6 @@ int __fastcall TStaticForm::FindNationality(UniqueID uid)
 void	__fastcall TStaticForm::OpenForm()
 {
 //not needed for MiG Alley, I think rdh
-//DeadCode RDH 19Feb98 	char buff[50];
-//DeadCode RDH 19Feb98         WayPointForm->Close();
-//DeadCode RDH 19Feb98 	
-//DeadCode RDH 19Feb98 		int	nat = FindNationality(MissionEditor->currtemplateitem);
-//DeadCode RDH 19Feb98 		LoadString(HInstance,nat,buff,sizeof(buff));
-//DeadCode RDH 19Feb98 		NatLabel->Caption = buff;
-//DeadCode RDH 19Feb98 
-//DeadCode RDH 19Feb98 
-//DeadCode RDH 19Feb98 		info_itemS*	I= *Persons_2.ConvertPtrUID(MissionEditor->currtemplateitem);
-//DeadCode RDH 19Feb98 		int shapenameindex = GroundGroupForm->GeneralFindShapes(I->shape);
-//DeadCode RDH 19Feb98 		LoadString(HInstance,shapenameindex,buff,sizeof(buff));
-//DeadCode RDH 19Feb98 		ShapeLabel->Caption = buff;
-//DeadCode RDH 19Feb98 
-//DeadCode RDH 19Feb98 		int text = MissionEditor->GetBandorShapeText(MissionEditor->currtemplateitem);
-//DeadCode RDH 19Feb98 		LoadString(HInstance,text,buff,sizeof(buff));
-//DeadCode RDH 19Feb98 		BandLabel->Caption = buff;
-//DeadCode RDH 19Feb98 
-//DeadCode RDH 19Feb98 
-//DeadCode RDH 19Feb98 
-//DeadCode RDH 19Feb98 		LoadString(HInstance,MissionEditor->currtemplateitem,buff,sizeof(buff));
-//DeadCode RDH 19Feb98 		if (buff[0] == 0)
-//DeadCode RDH 19Feb98 		{
-//DeadCode RDH 19Feb98 			int text = MissionEditor->GetBandorShapeText(MissionEditor->currtemplateitem);
-//DeadCode RDH 19Feb98 			LoadString(HInstance,text,buff,sizeof(buff));
-//DeadCode RDH 19Feb98 		}
-//DeadCode RDH 19Feb98 
-//DeadCode RDH 19Feb98 		Caption = buff;
 
 	Show();
 }

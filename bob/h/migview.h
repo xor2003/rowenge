@@ -18,8 +18,6 @@ class	CScaleBar;
 #pragma once
 #endif // _MSC_VER >= 1000
 
-//DEADCODE JIM 21/01/00 const int AIRSTRIPS = 4;
-//DEADCODE JIM 21/01/00 const int BRIDGES = 2;
 //#include "CustBB.h"
 #define ZOOMMIN 0.25
 #define ZOOMMAX	100
@@ -104,7 +102,6 @@ public:
 
 	BOOL IsIconVisible(ItemBasePtr id, int&px, int&py);
 	void	DrawIcon(CDC* hDC,int px,int py,IconsUI f);
-//DEADCODE JIM 21/01/00 	void	DrawIcon(HDC hDC,int px,int py,BYTE* pData,BITMAPINFO* pInfo);
 	void	DrawIconText(CDC* pDC,int px,int py,UniqueID u, bool hilight);
 	void	DrawIconExtra(CDC* hDC,int px,int py,IconsUI	f,UniqueID	i, bool hilight);
 	void	LollyOut(CDC* pDC,int x,int y,CString shortname);
@@ -188,7 +185,6 @@ public:
 	int m_oldstartx;
 	int m_oldendy;
 	int m_oldendx;
-//DEADCODE ROD 16/12/99 	int m_iconradius;
 	BOOL m_isPaletteCreated;
 	HDC m_hDC;
 	fileblock* m_pfileblock;
@@ -208,11 +204,8 @@ protected:
 
 	void PlotFrontLine(CDC* pDC);
 	void PlotLine(CDC* pDC, UniqueID thiswp,UniqueID nextwp, BOOL japanwp=FALSE);
-//DeadCode RDH 19Apr99 	FileNum DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,UniqueIDField& redUIDs); 
-//DeadCode RDH 19Apr99 	void DrawIcons(HDC hDC, CDC* pDC,UniqueIDField& redUIDs);
 	void DrawIcons(CDC* pDC,CRect& bounds);//,UniqueIDField& redUIDs, FileNum* FL_Icon);
 	void DrawTextInIcon(IconsUI	f,UniqueID	i);
-//DEADCODE DAW 29/01/00 	void PlotMainRoute(CDC* pDC,SupplyLine* SL, int red, int green, int blue);
 	void PlotDebugInfo(CDC* pDC);
 	void PlotSupplyingRoutes(CDC* pDC);
 	void DrawLine(CDC* pDC, int wx,int wz,int &px1, int &py1,int &px2,int &py2, 

@@ -74,7 +74,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //#include "mainevt.h"
 #include "currshp.h"
 #include "SGroups.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"shapenum.g"
 #include "memain.h"
 #include	"worldinc.h"

@@ -87,11 +87,13 @@ inline int GetConsoleScreenBufferInfo(void*, CONSOLE_SCREEN_BUFFER_INFO* i) {
     return 1;
 }
 inline int FillConsoleOutputCharacter(void*, char, unsigned long, COORD, DWORD* w) {
-    if (w) *w = 0; return 1;
+    if (w) *w = 0;
+    return 1;
 }
 inline int SetConsoleCursorPosition(void*, COORD) { return 1; }
 inline int WriteConsoleOutputCharacter(void*, const char*, unsigned long n, COORD, unsigned long* w) {
-    if (w) *w = n; return 1;
+    if (w) *w = n;
+    return 1;
 }
 #endif
 

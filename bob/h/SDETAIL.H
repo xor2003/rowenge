@@ -1,0 +1,1 @@
+sdetail.h

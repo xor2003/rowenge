@@ -122,7 +122,6 @@ BOOL CCurrEmblem::OnInitDialog()
 	{
 		rbutton->ShowWindow(SW_SHOW);
 		s->ShowWindow(SW_SHOW);
-//DEADCODE AMM 17/01/00 		int decal = DPlay::H2H_Player[_DPlay.mySlot].decal;
 		int decal=0;
 		assert (decal>=0 && decal<32);
 		if (decal < 16)

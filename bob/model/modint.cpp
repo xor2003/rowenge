@@ -251,8 +251,6 @@ void Model::ResetAngles (AirStrucPtr const ControlledAC,UWord hdg, UWord pitch, 
 //------------------------------------------------------------------------------
 void Model::UpdateAirStruc (AirStrucPtr const ControlledAC)
 {
-//DeadCode AMM 24Nov98 	if (_Replay.Playback && ControlledAC==Persons2::PlayerSeenAC)
-//DeadCode AMM 24Nov98 		return;
 
 //	if (_Replay.Record || _Replay.Playback)
 //		_Replay.Record=_Replay.Record;
@@ -291,10 +289,6 @@ void Model::SetAirStrucPosition (AirStrucPtr const ControlledAC)
 	ControlledAC->World.Y = (SLong)(Pos.y + 0.5 - CoGOffset.y);
 	ControlledAC->World.Z = (SLong)(Pos.z + 0.5 - CoGOffset.z);
 
-//DeadCode CSB 18/06/99	/* TEST CODE CSB 18/06/99 */	if(		(OldWorld.X - ControlledAC->World.X > 1000) || (ControlledAC->World.X - OldWorld.X > 1000) 
-//DeadCode CSB 18/06/99	/* TEST CODE CSB 18/06/99 */		||	(OldWorld.Y - ControlledAC->World.Y > 1000) || (ControlledAC->World.Y - OldWorld.Y > 1000) 
-//DeadCode CSB 18/06/99	/* TEST CODE CSB 18/06/99 */		||	(OldWorld.Z - ControlledAC->World.Z > 1000) || (ControlledAC->World.Z - OldWorld.Z > 1000) )
-//DeadCode CSB 18/06/99	/* TEST CODE CSB 18/06/99 */		int BreakPoint = 0;
 
 
 	ControlledAC->uniqueID.changed = TRUE;
@@ -340,7 +334,6 @@ void Model::SetAirStrucOrientation (AirStrucPtr const ControlledAC)
 
 	RotVecXSC (vecx, vecx, vecz.y, vecz.z);
 
-//DeadCode AMM 29Jun99 	OldfRoll = fRoll;
 	fRoll = CalcAngle (vecx.x, -vecx.y);
 
 	if(ControlledAC == Persons2::PlayerSeenAC)
@@ -360,7 +353,6 @@ void Model::SetAirStrucOrientation (AirStrucPtr const ControlledAC)
 	velpitch = AngleSign (velpitch);
 	ControlledAC->fly.cpitch = (Angles)(Rads2Rowan(velpitch));
 
-//DeadCode AMM 29Jun99 	grndhdg = ControlledAC->hdg;									//RJS 05May98
 
 }
 
@@ -386,7 +378,6 @@ void Model::SetAirStrucVelocity (AirStrucPtr const ControlledAC)
 	ControlledAC->vel_y = (SLong)(10000 * Vel.y - wy);
 	ControlledAC->vel_z = (SLong)(10000 * Vel.z - wz);
 
-//DEADCODE CSB 08/11/99 	ControlledAC->velhori = (SWord)(VecLen2D(ControlledAC->velx, ControlledAC->velz) );	//CSB 10/06/99
 	FCRD temp;
 	temp.x = ControlledAC->vel_x;
 	temp.y = ControlledAC->vel_y;
@@ -645,10 +636,6 @@ void ModelAnim::ProcAnimGenericFP ()
 	else
 		*(UWord*)pAnim = 255 + (255 * val) / Scale;
 
-//DEADCODE CSB 29/02/00 	if(Scale > 0)
-//DEADCODE CSB 29/02/00 		*(UWord*)pAnim = (val * Scale)>>16;
-//DEADCODE CSB 29/02/00 	else
-//DEADCODE CSB 29/02/00 		*(UWord*)pAnim = 255 + ((val * Scale)>>16);
 }
 
 
@@ -705,26 +692,6 @@ void Model::Animations (AirStrucPtr const ControlledAC, bool forced)
 
 		}
 
-//DeadCode RJS 27Mar00 //#define PRINT_ANIM_VALS
-//DeadCode RJS 27Mar00 #ifdef PRINT_ANIM_VALS
-//DeadCode RJS 27Mar00 SWord y = 15;
-//DeadCode RJS 27Mar00 pModelAnim = AnimList;
-//DeadCode RJS 27Mar00 while (pModelAnim != NULL)
-//DeadCode RJS 27Mar00 {
-//DeadCode RJS 27Mar00 	if((pModelAnim->Type == MA_SURFACE) || (pModelAnim->Type == MA_GENERICFP))
-//DeadCode RJS 27Mar00 	{
-//DeadCode RJS 27Mar00 		PrintVar(40, y, "%.0f ", FP(*(SWord*)pModelAnim->pSrce));
-//DeadCode RJS 27Mar00 		PrintVar(50, y, "%.0f ", FP(*(SWord*)pModelAnim->pAnim));
-//DeadCode RJS 27Mar00 		y++;
-//DeadCode RJS 27Mar00 	}
-//DeadCode RJS 27Mar00 	pModelAnim = pModelAnim->List.NextItem ();
-//DeadCode RJS 27Mar00 }
-//DeadCode RJS 27Mar00 #endif
-//DeadCode RJS 27Mar00 
-//DeadCode RJS 27Mar00 	// Gear Up/Down
-//DeadCode RJS 27Mar00 
-//DeadCode RJS 27Mar00 //Deadcode CSB 13/01/00		if (Gear)
-//DeadCode RJS 27Mar00 //Deadcode CSB 13/01/00			SetGearAnimPos(ControlledAC,ANIM_GEAR_AUTO);							//RJS 08Apr98
 }
 
 
@@ -761,59 +728,6 @@ void	Model::SetGearAnimPos(AirStrucPtr const ControlledAC,SWord	val,Bool	killnow
 	}
 
 #pragma warnmsg("***** SetGearAnimPos	DEADED *****")
-//DEADCODE CSB 24/02/00 // not for superairgroups...
-//DEADCODE CSB 24/02/00 	ShapeDescPtr	sdptr = SHAPESTUFF.GetShapePtr(ControlledAC->shape);//RJS 27Jan00
-//DEADCODE CSB 24/02/00 	if (SHAPESTUFF.GetShapeScale(sdptr) != SHP_GRP)					//RJS 27Jan00
-//DEADCODE CSB 24/02/00 	{
-//DEADCODE CSB 24/02/00 		AircraftAnimData* adptr = (AircraftAnimData* )ControlledAC->Anim;
-//DEADCODE CSB 24/02/00 		SLong	geardamage = 0;										//RJS 07Sep98
-//DEADCODE CSB 24/02/00 
-//DEADCODE CSB 24/02/00 		if (killnow==TRUE)											//RJS 07Sep98
-//DEADCODE CSB 24/02/00 			adptr->animtoggle = 1;									//RJS 07Sep98
-//DEADCODE CSB 24/02/00 		else			
-//DEADCODE CSB 24/02/00 			geardamage = (adptr->LEFTWHEEL + adptr->RIGHTWHEEL)>>1;	//RJS 17Nov99
-//DEADCODE CSB 24/02/00 	//DeadCode RJS 17/11/99		geardamage = (adptr->LEFTWHEEL + adptr->RIGHTWHEEL + adptr->FRONTWHEEL + adptr->BACKWHEEL)/4;//RJS 07Sep98
-//DEADCODE CSB 24/02/00 			geardamage = (adptr->LEFTWHEEL + adptr->RIGHTWHEEL) / 2;//RJS 07Sep98
-//DEADCODE CSB 24/02/00 														
-//DEADCODE CSB 24/02/00 		if (geardamage < BS_DAMLV2)									//RJS 07Sep98
-//DEADCODE CSB 24/02/00 		{
-//DEADCODE CSB 24/02/00 	//	_DPlay.NewCollision(NULL,NULL,PIDC_ACTION,ACTION_GEAR);
-//DEADCODE CSB 24/02/00 
-//DEADCODE CSB 24/02/00 //DeadCode AMM 21Feb100 			if (_Replay.Record || _DPlay.Implemented)
-//DEADCODE CSB 24/02/00 //DeadCode AMM 21Feb100 			{
-//DEADCODE CSB 24/02/00 //DeadCode AMM 21Feb100 				if (ControlledAC==Persons2::PlayerSeenAC)				  //AMM 23/06/99
-//DEADCODE CSB 24/02/00 //DeadCode AMM 21Feb100 					_DPlay.NewGearThingy(val);
-//DEADCODE CSB 24/02/00 //DeadCode AMM 21Feb100 			}
-//DEADCODE CSB 24/02/00 
-//DEADCODE CSB 24/02/00 			if (val < ANIM_GEAR_DOWN)
-//DEADCODE CSB 24/02/00 			{
-//DEADCODE CSB 24/02/00 				if(ControlledAC == Manual_Pilot.ControlledAC2)
-//DEADCODE CSB 24/02/00 				{
-//DEADCODE CSB 24/02/00 					if (EngineList->Type == ET_PISTON)
-//DEADCODE CSB 24/02/00 						_Miles.PlayOnce(FIL_SFX_GEAR_P51,ControlledAC);		
-//DEADCODE CSB 24/02/00 					else
-//DEADCODE CSB 24/02/00 						_Miles.PlayOnce(FIL_SFX_GEAR_JET,ControlledAC);		
-//DEADCODE CSB 24/02/00 				}
-//DEADCODE CSB 24/02/00 
-//DEADCODE CSB 24/02/00 				if (adptr->animtoggle)									
-//DEADCODE CSB 24/02/00 					adptr->animtoggle = -adptr->animtoggle;				
-//DEADCODE CSB 24/02/00 				else													
-//DEADCODE CSB 24/02/00 					adptr->animtoggle = 1;								
-//DEADCODE CSB 24/02/00 			}
-//DEADCODE CSB 24/02/00 			else
-//DEADCODE CSB 24/02/00 			{
-//DEADCODE CSB 24/02/00 				if (val == ANIM_GEAR_DOWN)
-//DEADCODE CSB 24/02/00 					adptr->animtoggle = -1;
-//DEADCODE CSB 24/02/00 				else
-//DEADCODE CSB 24/02/00 					adptr->animtoggle = 1;
-//DEADCODE CSB 24/02/00 
-//DEADCODE CSB 24/02/00 				adptr->acleglowerf = val;
-//DEADCODE CSB 24/02/00 				adptr->acleglowerl = val;
-//DEADCODE CSB 24/02/00 				adptr->acleglowerr = val;
-//DEADCODE CSB 24/02/00 				adptr->acleglowerb = val;
-//DEADCODE CSB 24/02/00 			}
-//DEADCODE CSB 24/02/00 		}
-//DEADCODE CSB 24/02/00 	}
 
 }
 
@@ -932,7 +846,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 				case 3:		C_Magnetos0 = 0;	break;
 			}
 
-//DeadCode AMM 24Jul00 			switch(pModel->FuelCockPos)
 			switch(ControlledAC->fly.FuelCockPos)
 			{
 				case 0:		C_FuelCock0 = 3;	break;
@@ -1062,7 +975,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 			C_StarterButton0 = SWord(pModel->EngineList->Starting);
 			C_BoostControlCutout = SWord(pModel->BoostCutout);
 
-//DeadCode AMM 24Jul00 			switch(pModel->FuelCockPos)
 			switch(ControlledAC->fly.FuelCockPos)
 			{
 				case 0:		C_FuelCock0 = 0;	break;
@@ -1124,8 +1036,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 //Some engine instruments to go in here
 			I_EngineRpm0 = pModel->EngineList->Speed * 954.93;
 			I_Boost0 = 1 + pModel->EngineList->ThrottleSetting * I_EngineRpm0 * (0.4 / (90.0 * 2400.0));;
-//DeadCode RJS 10Jul00 			I_PropPitch0 = pModel->EngineList->PropInc - pModel->EngineList->PropMinPitch;
-//DeadCode RJS 10Jul00 			I_PropPitch0 /= pModel->EngineList->PropMaxPitch - pModel->EngineList->PropMinPitch;
 			
 			I_NormalAcc = pModel->Acc.y / GRAVITY + pModel->Ori.y.y;
 
@@ -1169,7 +1079,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 			C_Magnetos0 = pModel->EngineList->Magnetos;
 			C_StarterButton0 = SWord(pModel->EngineList->Starting);
 			C_BoostControlCutout = SWord(pModel->BoostCutout);
-//DeadCode AMM 24Jul00 			C_FuelCock0 = SWord(pModel->FuelCockPos);
 			C_FuelCock0 = SWord(ControlledAC->fly.FuelCockPos);
 
 			break;
@@ -1238,8 +1147,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 			I_EngineRpm0 = pEngine->Speed * 954.93;
 			I_Boost0 = 1 + pEngine->ThrottleSetting * I_EngineRpm0 * (0.4 / (90.0 * 2400.0));;
 			I_PropPitch0 = pEngine->PropInc * 57.3 - 35.0;
-//DeadCode RJS 10Jul00 			I_PropPitch0 = pEngine->PropInc - pEngine->PropMinPitch;
-//DeadCode RJS 10Jul00 			I_PropPitch0 /= pEngine->PropMaxPitch - pEngine->PropMinPitch;
 			C_Throttle0 = pEngine->ThrottleSetting;
 			C_PropPitch0 = pEngine->PropSetting * 100.0;	
 			I_RadiatorTemperature0 = pEngine->Temperature;
@@ -1250,8 +1157,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 			I_EngineRpm1 = pEngine->Speed * 954.93;
 			I_Boost1 = 1 + pEngine->ThrottleSetting * I_EngineRpm1 * (0.4 / (90.0 * 2400.0));;//RJS 05Jul00
 			I_PropPitch1 = pEngine->PropInc * 57.3 - 35.0;
-//DeadCode RJS 10Jul00 			I_PropPitch1 = pEngine->PropInc - pEngine->PropMinPitch;
-//DeadCode RJS 10Jul00 			I_PropPitch1 /= pEngine->PropMaxPitch - pEngine->PropMinPitch;
 			C_Throttle1 = pEngine->ThrottleSetting;
 			C_PropPitch1 = pEngine->PropSetting * 100.0;	
 			I_RadiatorTemperature1 = pEngine->Temperature;
@@ -1292,7 +1197,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 			C_ElevatorTrim = 32767.0 * FP(pModel->ElevatorTrim) / FP(pModel->MaxElevatorTrim);
 			C_RudderTrim   = 32767.0 * FP(pModel->RudderTrim)   / FP(pModel->MaxRudderTrim);
 
-//DeadCode AMM 24Jul00 			switch(pModel->FuelCockPos)
 			switch(ControlledAC->fly.FuelCockPos)
 			{
 				case 0:		C_FuelCock0 = 0;	C_FuelCock1 = 0;	break;
@@ -1360,7 +1264,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 				if(pDevice->Type == AeroDevice::DT_DIVEBRAKES)
 				{
 					C_DiveBrakeLever = 1 - pDevice->ReqVal;
-//DeadCode CSB 19Sep00 					if((pDevice->ReqVal > 0) && (I_RadioAltitude > 2300) && (I_RadioAltitude < 4300))
 					if (ControlledAC == Persons2::PlayerSeenAC)			//RJS 25Oct00
 					{
 						if((pDevice->ReqVal > 0) && (I_RadioAltitude > 700) && (I_RadioAltitude < 1300))
@@ -1373,11 +1276,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 						else												//RJS 25Oct00
 							_Miles.diveBrakesOn = false;					//RJS 25Oct00
 					}
-//DeadCode RJS 25Oct00 
-//DeadCode RJS 25Oct00 					if(pDevice->ReqVal == 1)
-//DeadCode RJS 25Oct00 						_Miles.PlayOnce(FIL_SFX_SIREN_JERICHO, 255);
-//DeadCode RJS 25Oct00 					else
-//DeadCode RJS 25Oct00 						_Miles.PlayOnce(FIL_SFX_SIREN_JERICHO, 0);
 				}
 
 			I_NormalAcc = pModel->Acc.y / GRAVITY + pModel->Ori.y.y;
@@ -1392,7 +1290,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 			C_PropPitch0 = pModel->EngineList->PropSetting * 100.0;		//RJS 01Dec99
 
 			I_FuelPressure = 0;
-//DEADCODE CSB 13/01/00 			I_DivePresetIndicator = 0;
 
 			I_RadiatorTemperature0 = pModel->EngineList->Temperature;
 			I_OilTemperature = pModel->EngineList->Temperature;
@@ -1400,8 +1297,6 @@ void INSTRUMENTS::SetInstruments (AirStrucPtr const ControlledAC,PMODEL pModel)
 			I_OilContent = 128 - adptr->ENGINELEFT / 2;
 
 			C_Magnetos0 = 3 - pModel->EngineList->Magnetos;
-//DeadCode AMM 24Jul00 			C_FuelCock0	= pModel->FuelCockPos & 0x01;
-//DeadCode AMM 24Jul00 			C_FuelCock1 = pModel->FuelCockPos & 0x02;
 			C_FuelCock0	= ControlledAC->fly.FuelCockPos & 0x01;
 			C_FuelCock1 = ControlledAC->fly.FuelCockPos & 0x02;
 			C_StarterButton0 = SWord(pModel->EngineList->Starting);
@@ -1511,32 +1406,12 @@ void	INSTRUMENTS::SetCockpitAnims(ItemPtr	itm, UByteP	animptr)
 	//Red ON,	Green OFF	1
 	//Red OFF,	Green ON	2
 
-//DEADCODE RJS 4/18/00 	adptr->acundercarriage  = I_UndercarraigePosition0 & 0x01;
-//DEADCODE RJS 4/18/00 	adptr->acundercarriage2 = (I_UndercarraigePosition0 & 0x02) / 2;
-//DEADCODE RJS 4/18/00 
-//DEADCODE RJS 4/18/00 	adptr->acundercarriage3 = I_UndercarraigePosition1 & 0x01;
-//DEADCODE RJS 4/18/00 	adptr->acundercarriage4 = (I_UndercarraigePosition1 & 0x02) / 2;
 
-//DEADCODE CSB 14/01/00 	adptr->acfuelwarning  = I_FuelWarningLamp0;
-//DEADCODE CSB 14/01/00 	adptr->acfuelwarning2 = I_FuelWarningLamp1;
-//DEADCODE CSB 14/01/00 	adptr->acfuelwarning3 = I_FuelWarningLamp2;
-//DEADCODE CSB 14/01/00 	adptr->acfuelwarning4 = I_FuelWarningLamp3;
 
 	// Faked dials....
 
 	TotalEngineDamage = EngineDamage((UByteP)adptr,1);   // 1 is number of engines
 
-//DEADCODE CSB 14/01/00  	if (adptr->acvoltmeter < 64)								//RJS 26Nov99
-//DEADCODE CSB 14/01/00  	{															//RJS 26Nov99
-//DEADCODE CSB 14/01/00  		adptr->acpitch = 255;									//RJS 26Nov99
-//DEADCODE CSB 14/01/00  		adptr->acfuelpressure = 0;								//RJS 26Nov99
-//DEADCODE CSB 14/01/00  		adptr->acoilpressure = 0;								//RJS 26Nov99
-//DEADCODE CSB 14/01/00  	}															//RJS 26Nov99
-//DEADCODE CSB 14/01/00  	else														//RJS 26Nov99
-//DEADCODE CSB 14/01/00  	{															//RJS 26Nov99
-//DEADCODE CSB 14/01/00  		adptr->acoilpressure = (75*(255-adptr->ENGINELEFT))/100;	//RJS 26Nov99
-//DEADCODE CSB 14/01/00  		adptr->acfuelpressure = (55*(255-adptr->ENGINELEFT))/100;	//RJS 26Nov99
-//DEADCODE CSB 14/01/00  	}															//RJS 26Nov99
 																//RJS 26Nov99
 	// Now scale to timer...									//RJS 26Nov99
 	for (index = 0; index < TimedDialCnt; index++)				//RJS 26Nov99
@@ -1617,11 +1492,6 @@ void	DialSpec::SetDialValue(ItemPtr	itm, UByteP	adptr,UByteP	*SrcListPtr)
 
 		theValue -= minIntval;
 
-//DeadCode RJS 01Dec99		if (theValue >= maxIntval)
-//DeadCode RJS 01Dec99			theValue = maxIntval-1;
-//DeadCode RJS 01Dec99
-//DeadCode RJS 01Dec99		theValue <<= shiftdest;
-//DeadCode RJS 01Dec99		theValue /= Intvalscale;
 
 		if (theValue >= maxIntval)
 		{

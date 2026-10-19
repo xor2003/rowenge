@@ -129,7 +129,6 @@ BOOL RAFReviewAircraft::OnInitDialog()
 	
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(140);			MIKE
 	//rlistbox->AddColumn(80);			
@@ -148,7 +147,6 @@ BOOL RAFReviewAircraft::OnInitDialog()
 	rlistbox->AddString("   "+ RESSTRING(DESTROYED),0);
 	rlistbox->AddString("   "+ RESSTRING(NEW),0);
 	rlistbox->AddString("   "+ RESSTRING(CFCOMBATREADY),0);
-//DeadCode RDH 28Jun00 	rlistbox->AddString("   "+ RESSTRING(FULLCOMPLEMENT),0);
 	rlistbox->AddString(RESSTRING(FACTORIES),0);
 	rlistbox->AddString("   "+ RESSTRING(MAXPRODUCTION),0);
 	rlistbox->AddString("   "+ RESSTRING(ACTUALPRODUCTION),0);
@@ -198,7 +196,6 @@ BOOL RAFReviewAircraft::OnInitDialog()
 			rlistbox->AddString(CSprintf("%4.1f",(MMC.thisweekreview.raf[i].potentialrepairs/4.5)),1+i);
 			rlistbox->AddString(CSprintf("%4.1f",(MMC.thisweekreview.raf[i].newrepairs/4.5)),1+i);
 		}
-//DeadCode RDH 28Jun00 		rlistbox->AddString("",1+i);
 		totalavailablestart += MMC.thisweekreview.raf[i].availablestart;
 		totaldamaged += MMC.thisweekreview.raf[i].damaged;
 		totalrepaired += MMC.thisweekreview.raf[i].repaired;
@@ -229,71 +226,8 @@ BOOL RAFReviewAircraft::OnInitDialog()
 		rlistbox->AddString(CSprintf("%4.1f",totalmaxrep),3);
 		rlistbox->AddString(CSprintf("%4.1f",totalrep),3);
 	}
-//DeadCode RDH 28Jun00 	rlistbox->AddString("",3);
 
-//DeadCode JIM 20Sep00 
-//DeadCode JIM 20Sep00    		rlistbox->AddString("",1);
-//DeadCode JIM 20Sep00 		rlistbox->AddString("",2);
-//DeadCode JIM 20Sep00 		rlistbox->AddString("",3);
-//DeadCode JIM 20Sep00 
-//DeadCode JIM 20Sep00 
-//DeadCode JIM 20Sep00 
-//DeadCode JIM 20Sep00 		rlistbox->AddString("15",1);
-//DeadCode JIM 20Sep00 		rlistbox->AddString("15",2);
-//DeadCode JIM 20Sep00 		rlistbox->AddString("30",3);
-//DeadCode JIM 20Sep00 
-//DeadCode JIM 20Sep00 		rlistbox->AddString(CSprintf("%i",Node_Data.production[0].acperweek),1);
-//DeadCode JIM 20Sep00 		rlistbox->AddString(CSprintf("%i",Node_Data.production[2].acperweek),2);
-//DeadCode JIM 20Sep00 		rlistbox->AddString(CSprintf("%i",Node_Data.production[2].acperweek +
-//DeadCode JIM 20Sep00 											Node_Data.production[0].acperweek),3);
 
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",1);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",2);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("5",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("65",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("20",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",3);
 
 	
 	return TRUE;  // return TRUE unless you set the focus to a control

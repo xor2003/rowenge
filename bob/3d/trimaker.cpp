@@ -416,9 +416,7 @@ typedef struct BigPnt{
 						//reject immediately if the intersection
 						//point is the starting point ie. the
 						//test point lies on the line
-//Old_Code PD 12Jun98 						if (((brx+0x7FFF)&0xFFFF0000)==btx)
 						if (((brx+0x7F)&0xFFFFFF00)==btx)
-//DeadCode PD 06Aug98 						if (((brx+0x7FF)&0xFFFFF000)==btx)
 							//I know that the X ordinate is on the
 							//line. Test the Y ordinate to make sure
 							//that the point is on the line

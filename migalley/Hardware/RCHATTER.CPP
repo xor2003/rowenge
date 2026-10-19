@@ -1409,6 +1409,8 @@ Bool	RADIOMESSAGE::BuildMessageAsSamples()
 			for (count = 0; count < nophrases; count++)
 			{
 				srcptr = (ULong*) phraselist[count].address;
+				if (!srcptr)										//RERUN: phrase not loaded
+					continue;
 				if (noCrossFade)
 				{
 					for (sampcnt = 0; sampcnt < phraselist[count].size; sampcnt++)
@@ -1560,6 +1562,9 @@ RadioSampleRec*	RadioChatter::LoadSample(	RadioMessageP	MessPtr,
 	FileNum			thefile = (FileNum) (thedir + fileindex);
 																//RJS 17Mar99
 	StartOff = SampleSize = 0;									//RJS 17Mar99
+	if (fileindex < 1 || fileindex > MaxSamples
+		|| voiceoffset < 0 || voiceoffset >= VOICE_MAX)
+		return NULL;											//no sample for this phrase
 	SamplePtr = &radiosamples[fileindex-1][voiceoffset];		//RJS 17Mar99
 	if (!SamplePtr->blockptr)
 	{

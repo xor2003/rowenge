@@ -80,7 +80,6 @@ void	Display::XX_SetGraphicsMode()
 	regs.l.eax=regs.l.ebx=regs.l.ecx=regs.l.edx=0;				//PD 01Oct96
 	regs.l.edi=regs.l.ebp=regs.l.esi=regs.l.esp=0;				//PD 01Oct96
 	regs.s.ds=regs.s.es=regs.s.cs=regs.s.ss=regs.s.fs=regs.s.gs=0;//PD 01Oct96
-//DeadCode JIM 13Dec96 	regs.flags=0;												//PD 01Oct96
 
 	regs.l.eax=0x4f02;
 	regs.l.ecx=VFLAT.mode;
@@ -120,10 +119,6 @@ void	Display::XX_PalChange()
 		ASM_OutSB(0x3c9,Palette,768);
 }
 
-//DeadCode RJS 14Mar96 void	Display::XX_PhysMouseMove(MouseSave* oldpos,void* MouseShape,MouseSave* newpos)
-//DeadCode RJS 14Mar96 {
-//DeadCode RJS 14Mar96 	INT3();
-//DeadCode RJS 14Mar96 }
 
 ULong	Display::XX_PlotPixelNoClip(UWord	x, UWord	y, ULong	thecol)
 {

@@ -92,9 +92,7 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"comms.h"
 
 extern DPlay _DPlay;
-//DeadCode JIM 29Oct96 #pragma	dump_object_model	AirStruc
 
-//DeadCode JIM 29Oct96 #pragma	dump_object_model PolyPitAnimData
 
 //	1	devices not coded
 //
@@ -110,7 +108,6 @@ extern DPlay _DPlay;
 		 	MAXKEY_COUNT 	=	1,//4,	//CSB 29/01/99
 		 	MINSENSITIVITY	=	1,//0,	//CSB 29/01/99
 		 	MAXSENSITIVITY	=	4,//3,	//CSB 29/01/99
-//DeadCode RDH 19Dec95 ULong const 	MAXRUDDER 		=	64;							//RDH 19Dec95
 		 	RUDDER_STEP 		=	5 * RUDDERFACTOR,
 		 	NEGATIVE		=	0,
 		 	ABRPM	=	2000,
@@ -346,16 +343,8 @@ PrintVar(73, temp, "%.0f", FP(pModel->Elevator));
 			else
 				if(PropSettingChanged)
 					pEngine->PropSetting = FP(pModel->ModelPropSetting) * 0.01;
-//DEADCODE CB 12/11/99
-//DEADCODE CB 12/11/99 			PrintVar(65+pEngine->pThrustPoint->Pos.x / 50, 22, "ET %.0f ", FP(pEngine->ThrottleSetting));
-//DEADCODE CB 12/11/99 			PrintVar(65+pEngine->pThrustPoint->Pos.x / 50, 23, "EP %.2f ", FP(pEngine->PropSetting));
-//DEADCODE CB 12/11/99 			PrintVar(65+pEngine->pThrustPoint->Pos.x / 50, 24, "%.0f ",    FP(pEngine->Speed * 954.9));
 		}
 
-//DEADCODE CB 12/11/99 	PrintVar(60, 20, "AT %.0f ", FP(ControlledAC->fly.thrustpercent));
-//DEADCODE CB 12/11/99 	PrintVar(70, 20, "MT %.0f ", FP(pModel->ModelThrottle));
-//DEADCODE CB 12/11/99 	PrintVar(60, 21, "AP %.0f ", FP(ControlledAC->fly.propsetting));
-//DEADCODE CB 12/11/99 	PrintVar(70, 21, "MP %.0f ", FP(pModel->ModelPropSetting));
 
 	if(Save_Data.flightdifficulty[FD_ENGINEMANAGMENT])
 		GetComplexEngineKeys(ControlledAC);
@@ -703,7 +692,6 @@ void	ManualPilot::GetRPMABKeys(AirStrucPtr const ControlledAC)
 // Called from GetStickKeys, at end						//ARM 11Apr97
 
 //rdh needed to know whether on internal or external here
-//DEADCODE CSB 05/11/99  	if	(ControlledAC->weap.centre.int_fuel >0)
  	{
 		if (Key_Tests.KeyPress3d (RPM_BIG_UP))
  			ControlledAC->fly.thrustpercent += BIGTHRUSTSTEP;
@@ -774,29 +762,6 @@ void	ManualPilot::GetRPMABKeys(AirStrucPtr const ControlledAC)
 //------------------------------------------------------------------------------
 void	ManualPilot::SensitivityMsg(AirStrucPtr const ControlledAC)
 {
-//DeadCode  10Aug00 		switch (Save_Data.keysensitivity)
-//DeadCode  10Aug00 		{
-//DeadCode  10Aug00 			case	0:
-//DeadCode  10Aug00 			{
-//DeadCode  10Aug00 //TEMP			 	Persons_2.AddMessage(UserMsg::TIME,TEXT_SENSITIVITY0,NULL);//RDH 03Dec96
-//DeadCode  10Aug00 				break;
-//DeadCode  10Aug00 			}
-//DeadCode  10Aug00 			case	1:
-//DeadCode  10Aug00 			{
-//DeadCode  10Aug00 //TEMP			 	Persons_2.AddMessage(UserMsg::TIME,TEXT_SENSITIVITY1,NULL);//RDH 03Dec96
-//DeadCode  10Aug00 				break;
-//DeadCode  10Aug00 			}
-//DeadCode  10Aug00 			case	2:
-//DeadCode  10Aug00 			{
-//DeadCode  10Aug00 //TEMP			 	Persons_2.AddMessage(UserMsg::TIME,TEXT_SENSITIVITY2,NULL);//RDH 03Dec96
-//DeadCode  10Aug00 				break;
-//DeadCode  10Aug00 			}
-//DeadCode  10Aug00 			case	3:
-//DeadCode  10Aug00 			{
-//DeadCode  10Aug00 //TEMP			 	Persons_2.AddMessage(UserMsg::TIME,TEXT_SENSITIVITY3,NULL);//RDH 03Dec96
-//DeadCode  10Aug00 				break;
-//DeadCode  10Aug00 			}
-//DeadCode  10Aug00 		}
 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GetStickKeys
@@ -816,7 +781,6 @@ void	ManualPilot::GetStickKeys (AirStrucPtr const ControlledAC)
 	{
 		if (Key_Tests.KeyPress3d (CHEATLIFTKEY))					//RDH 21Jul96
 		{															//RDH 21Jul96
-//DEADCODE AMM 26/11/99 			if (!_DPlay.Implemented || (_DPlay.Implemented && _DPlay.liftcheat))
 #ifdef NDEBUG
  			if (!_DPlay.Implemented)
 #endif
@@ -832,10 +796,6 @@ void	ManualPilot::GetStickKeys (AirStrucPtr const ControlledAC)
 						_DPlay.AddDeltas(ControlledAC,TRUE,0);			//AMM 12Jul00
 						_DPlay.BackupSeen();							//AMM 12Jul00
 
-//DeadCode AMM 12Jul00 						if (!_Replay.Playback)
-//DeadCode AMM 12Jul00 						{
-//DeadCode AMM 12Jul00 							_DPlay.Deltas.lastpos.Y+=FT_1000;
-//DeadCode AMM 12Jul00 						}
 					}
 			}
 		}															//RDH 21Jul96
@@ -874,7 +834,6 @@ void	ManualPilot::GetStickKeys (AirStrucPtr const ControlledAC)
 		OverLay.TriggerMessage(COverlay::SENSMESS,Save_Data.keysensitivity);
 	}
 
-//DeadCode AMM 24Nov99 		FP fDelta = 32767 * Save_Data.keysensitivity / MAXSENSITIVITY * ControlledAC->fly.pModel->MODEL_DT / 100;
 		FP fDelta = 32767 * Save_Data.keysensitivity / MAXSENSITIVITY * MODEL_DT / 100;//AMM 24Nov99
 		SWord Delta1 = (int)fDelta;
 		SWord Delta2 = (int)(2 * fDelta);
@@ -1020,9 +979,6 @@ void	ManualPilot::GetStickKeys (AirStrucPtr const ControlledAC)
 		flight_ctl* Fly = &ControlledAC->fly;
 		SLong delta, fsmooth;
 
-//DeadCode MS 3Oct00 		const dEle  = 4000;		const sEle1	= 4;		const sEle2	= 1;
-//DeadCode MS 3Oct00 		const dAil  = 1;		const sAil1 = 1;		const sAil2	= 1;
-//DeadCode MS 3Oct00 		const dRud  = 4;		const sRud1	= 4;		const sRud2	= 1;
 
 		const int dEle  = 4000;		const int sEle1	= 4;		const int sEle2	= 1;
 		const int dAil  = 1;		const int sAil1 = 1;		const int sAil2	= 1;
@@ -1244,16 +1200,6 @@ void ManualPilot::SecondaryControls (AirStrucPtr const ControlledAC2)
 		pModel->ElevatorTrim = temptrim;
 	}
 
-//DeadCode CSB 03/12/99		if((Key_Tests.KeyPress3d(FK_AILERONTRIM)) && (pModel->MaxAileronTrim > 0))
-//DeadCode CSB 03/12/99		{
-//DeadCode CSB 03/12/99			SLong temptrim = pModel->MaxAileronTrim;
-//DeadCode CSB 03/12/99			SLong delta = _Interactive.GetDelta(INST_AILERON, temptrim);
-//DeadCode CSB 03/12/99
-//DeadCode CSB 03/12/99			temptrim += (delta * pModel->MaxAileronTrim)>>7;
-//DeadCode CSB 03/12/99			MODLIMIT(temptrim, pModel->MaxAileronTrim);
-//DeadCode CSB 03/12/99
-//DeadCode CSB 03/12/99			pModel->MaxAileronTrim = temptrim;
-//DeadCode CSB 03/12/99		}
 
 	if((Key_Tests.KeyPress3d(FK_RUDDERTRIM)) && (pModel->MaxRudderTrim > 0))
 	{
@@ -1272,17 +1218,14 @@ void ManualPilot::SecondaryControls (AirStrucPtr const ControlledAC2)
 		{
 			case ES_PORT:
 				pModel->EngineSelected = ES_STBD;
-//DEADCODE CSB 02/03/00 				PrintString(75, 24, "STBD");
 				_Radio.TriggerMsg(MESSAGE_STRUC(PHRASE_STARBOARD, MSG_HIPRIORITY,Manual_Pilot.ControlledAC2,NULL,NULL));
 				break;
 			case ES_STBD:
 				pModel->EngineSelected = ES_BOTH;
-//DEADCODE CSB 02/03/00 				PrintString(75, 24, "BOTH");
 				_Radio.TriggerMsg(MESSAGE_STRUC(PHRASE_BOTH, MSG_HIPRIORITY,Manual_Pilot.ControlledAC2,NULL,NULL));
 				break;
 			case ES_BOTH:
 				pModel->EngineSelected = ES_PORT;
-//DEADCODE CSB 02/03/00 				PrintString(75, 24, "PORT");
 				_Radio.TriggerMsg(MESSAGE_STRUC(PHRASE_PORT, MSG_HIPRIORITY,Manual_Pilot.ControlledAC2,NULL,NULL));
 				break;
 		}

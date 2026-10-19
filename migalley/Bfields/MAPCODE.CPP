@@ -243,7 +243,7 @@ void	PackageList::SaveGame(BOStream& bos)
 void	PackageList::FixupAircraft(int packnum)
 {
 		int wave=-1;
-		int group;
+		int group=0;											//RERUN: uninit when no wpref seen yet
 		int i;
 		UniqueID	baseac=Persons2::assignuid(BlueAcBAND);
 
@@ -260,10 +260,13 @@ void	PackageList::FixupAircraft(int packnum)
 					pack[packnum][wave].firstwp=a->wpref;
 				}
 				else
-					if(!pack[packnum][wave][group].numflights)
+					if(wave>=0 && !pack[packnum][wave][group].numflights)	//RERUN: wave==-1 until first wpref
 						group++;
-				pack[packnum][wave][group].uid=UniqueID(i);
-	 			pack[packnum][wave][group].SetSquad(pack[packnum][wave][group].squadron);
+				if (wave>=0)											//RERUN: no pack slot until first wpref
+				{
+					pack[packnum][wave][group].uid=UniqueID(i);
+	 				pack[packnum][wave][group].SetSquad(pack[packnum][wave][group].squadron);
+				}
 
 				group++;
 			}

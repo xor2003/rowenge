@@ -26,7 +26,7 @@ class	 Error
 
 		Error& ExitMode();
 		Error& Say(const char *, ...);
-		Error& SayAndQuit(const char *, ...);
+		Error& SayAndQuit(const char *, ...) __attribute__((noreturn));
 		void Quit();
 #ifdef __WATCOMC__
 #pragma	aux Quit			aborts;

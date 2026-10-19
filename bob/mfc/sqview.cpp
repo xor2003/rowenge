@@ -143,10 +143,6 @@ BOOL CQuickView::OnInitDialog()
 	s=GETDLGITEM(IDC_TARGNAME);
 	s->SetString(GetTargName(CSQuick1::quickdef.targets[targtype][targentry]));
 
-//DEADCODE RDH 08/05/00 	s=GETDLGITEM(IDC_WEATHER);
-//DEADCODE RDH 08/05/00 	s->SetString(RESLIST(WEATHER_CLEAR, CSQuick1::quickdef.weather));
-//DEADCODE RDH 25/02/00 	s=GETDLGITEM(IDC_CLOUD);
-//DEADCODE RDH 25/02/00 	s->SetString(CSprintf("%i", 5000 + 1000 * CSQuick1::quickdef.cloudbaseK));
 	
 
 	

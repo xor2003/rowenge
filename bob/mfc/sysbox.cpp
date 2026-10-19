@@ -84,12 +84,10 @@ static char THIS_FILE[] = __FILE__;
 void	CSystemBox::OnOK()	
 {
 	INT3;
-//DeadCode MS 16Nov00 	CDialog::OnOK();
 }
 void	CSystemBox::OnCancel()				
 {
 	INT3;
-//DeadCode MS 16Nov00 	CDialog::OnCancel();
 }
 
 
@@ -174,7 +172,6 @@ void CSystemBox::OnClickedThumbnail()
 	if (RDialog::m_pView->m_currentpage != 0)							//RJS 29Oct00
  		return;															//RJS 29Oct00
 
-//DEADCODE RDH 09/11/99 	m_pParent->OnGoSmall();
 	if (!LoggedChild(0))
 		LogChild(0,ToolBarControl::Make()
 						);
@@ -190,7 +187,6 @@ void CSystemBox::OnClickedZoomin()
  		return;															//RJS 29Oct00
 
 	// TODO: Add your control notification handler code here
-//DeadCode JIM 20Oct00 	CRButton* z=GETDLGITEM(IDC_ZOOMIN);
 	if (m_pParent->IsZoomed())	//z->GetPressed())
 		m_pParent->OnGoNormal();
 	else

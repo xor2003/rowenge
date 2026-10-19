@@ -19,8 +19,8 @@ enum	BFieldWaypointActions
 	{	
 	wpacnoactionno			,
 	wpatakeoffno			,
-	wpacircleno				,//DeadCode RDH 11Oct96 	wpacruiseformno			,//DeadCode RDH 11Oct96 	wpaccombatformno		,
-	wpalandingno		,														 //DeadCode JIM 04Nov96 	wpinitlandno			,						
+	wpacircleno				,
+	wpalandingno		,
 	wpstartloopno			,					
 	wpstoploopchkno 		,					
 	wpreccyno				,						

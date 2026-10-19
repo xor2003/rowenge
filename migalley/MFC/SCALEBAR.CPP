@@ -185,9 +185,6 @@ void CScaleBar::OnPaint()
 			{
 				if (counter%20==0 || (counter%10==0 && zoom>0.5) || zoom>=1.5)
 				{
-//DEADCODE DAW 07/05/99 					if (counter==0)
-//DEADCODE DAW 07/05/99 						sprintf(string,"0 %s",);
-//DEADCODE DAW 07/05/99 					else
 						sprintf(string,"%d",counter*10);
 					pDC->TextOut(x,15,string);
 					if (counter==0)
@@ -254,9 +251,6 @@ void CScaleBar::OnPaint()
 			{
 				if (counter%20==0 || (counter%10==0 && zoom>0.5) || zoom>=1.5)
 				{
-//DEADCODE DAW 07/05/99 					if (counter==0)
-//DEADCODE DAW 07/05/99 						sprintf(string,"0\n%s",);
-//DEADCODE DAW 07/05/99 					else
 						sprintf(string,"%d",counter*10);
 					pDC->TextOut(x,0,string);
 					if (counter==0)

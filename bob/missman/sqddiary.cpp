@@ -911,7 +911,7 @@ void	Diary::CreateRAFEntry(Profile*	startProfile, SLong packno)
 
 				if (uidband == SagBAND)
 				{
-					if (Todays_Packages.GetACSquadEntry(trguid,lwpack,sqnum))
+					if (Todays_Packages.GetACSquadEntry(trguid,lwpack,&sqnum))
 					{
 						Profile& lwpk = Todays_Packages.pack[lwpack];
 

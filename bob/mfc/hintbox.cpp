@@ -76,7 +76,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 static char THIS_FILE[] = __FILE__;
 #endif
 #endif
-//DeadCode JIM 11Oct00 #pragma message ("HintBox")
 /////////////////////////////////////////////////////////////////////////////
 // CHintBox dialog
 
@@ -135,21 +134,12 @@ LRESULT CHintBox::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 #ifndef NDEBUG
 	// TODO: Add your specialized code here and/or call the base class
-//DeadCode JIM 11Oct00 	if (message>=WM_KEYFIRST && message<=WM_KEYLAST && parentshandle)
-//DeadCode JIM 11Oct00 		return ::PostMessage(parentshandle,message,wParam,lParam);
-//DeadCode JIM 11Oct00 	else
 		return CDialog::WindowProc(message, wParam, lParam);
 #else
 	return 0;
 #endif
 }
 
-//DeadCode JIM 11Oct00 BOOL CHintBox::OnHelpInfo(HELPINFO* pHelpInfo) 
-//DeadCode JIM 11Oct00 {
-//DeadCode JIM 11Oct00 	// TODO: Add your message handler code here and/or call default
-//DeadCode JIM 11Oct00 	
-//DeadCode JIM 11Oct00 	return CDialog::OnHelpInfo(pHelpInfo);
-//DeadCode JIM 11Oct00 }
 
 void CHintBox::OnShowWindow(BOOL bShow, UINT nStatus) 
 {

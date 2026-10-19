@@ -72,7 +72,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "MIG.h"
 
 #include "MIGDoc.h"
-//DEADCODE DAW 24/11/99 #include "CntrItem.h"
 
 #ifdef _DEBUG
 //#define new DEBUG_NEW

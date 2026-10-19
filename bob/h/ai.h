@@ -9,11 +9,6 @@
 									// regardless of ambient packing - class/file-layout ODR.
 #ifndef	AI_Included
 #define	AI_Included
-//DEADCODE MS 31/01/00 #ifndef	__BCPLUSPLUS__
-//DEADCODE MS 31/01/00 #include	"rchatter.h"
-//DEADCODE MS 31/01/00 #else
-//DEADCODE MS 31/01/00 	typedef	int	PhraseTables;
-//DEADCODE MS 31/01/00 #endif
 #include "radio.g"
 #include "rchatter.h"
 #ifndef	__BCPLUSPLUS__
@@ -69,7 +64,6 @@ class	ArtInt
 	friend 	class	MoveAirStruc;											//CSB 10/03/00
 	friend	struct	SleepList;											//CSB 20/03/00
 	int		spotcount;
-//DEADCODE CSB 02/02/00 	enum	{ACARRAYSIZE = 256,	MEMBERLISTSIZE = 4};				  //CSB 01/02/00
 protected:
 	enum	{ACARRAYSIZE = 128,	MEMBERLISTSIZE = 4,	COLLIDECHECKLISTSIZE = 16,	COLLIDEAGAINSTLISTSIZE = 32};				  //CSB 01/02/00
 	int		gunstimer;
@@ -85,13 +79,11 @@ public:
 	int		ACArrayInd;
 	int		MemberListInd;											  //CSB 01/02/00
 	int		CollideListInd;											  //CSB 03/02/00
-//DeadCode AMM 20Oct100 	int		GetGroundSpotter(ItemPtr trg);	//returns UID of potential spotter
 	UniqueID	GetSecondarySpotter(Coords3D& trg,UniqueID primary,int slot);
 	UniqueID	GetSecondarySpotter(Coords3D& trg,UniqueID primary);//ALL SLOTS
 	int		GroundVisible(Coords3D& trg,int* failedspotter);		//returns UID of spotter if spotted
 	int		GroundVisible(ItemPtr trg,int* failedspotter)	{return  GroundVisible(trg->World,failedspotter);}
 	int		GroundVisible(ItemPtr trg)	{int dummy;return GroundVisible(trg,&dummy);}
-//DeadCode AMM 20Oct100 	void	SpottedFromGround( AirStruc* trg);
 	bool	Add(AirStruc*);
 	bool	Remove(AirStruc*);
 	bool	Visible(AirStruc*,AirStruc*);
@@ -103,19 +95,10 @@ public:
 	void	VisibleAcCheck();
 	void	MakeMemberList(AirStrucPtr ac);
 	void	AddToMemberList(AirStrucPtr eye, AirStrucPtr ac, float dist2);	  //CSB 02/02/00
-//DeadCode AMM 20Oct100 	void	ArtInt::ProcessWPEvents();
-//DeadCode AMM 20Oct100 	void	ArtInt::LaunchMiGs(AirStruc* trg,tAggressionLevel al);
-//DeadCode AMM 20Oct100 	void	ArtInt::VisibleContrailsCheck();
 	void	VisibleAAACheck();
-//DeadCode AMM 20Oct100 	void	ArtInt::SpottedContrails(AirStruc* eye,AirStruc* trg);
-//DeadCode AMM 20Oct100 	void	ArtInt::SpottedOldContrails(AirStruc* eye,AirStruc* trg);
 	bool	AlertFighters(AirStruc* eye,AirStruc* trg, AirStruc* friendlythatneedshelp);
 	void InterceptRangeFromTo(AirStruc* from, AirStruc* to);
 	SLong RangeFromTo(AirStruc* from, AirStruc* to);
-//DeadCode AMM 20Oct100 	bool ArtInt::AcHasBombs(AirStruc* trg);
-//DeadCode AMM 20Oct100 	bool ArtInt::ForceHasBombers(AirStruc* trg);
-//DeadCode AMM 20Oct100 	bool ArtInt::BingoFuel(AirStruc* trg);
-//DeadCode AMM 20Oct100 	bool ArtInt::Winchester(AirStruc* trg);
 	void ResetUnfriendly();
 	bool LeaveTopCover(AirStruc* caller, AirStruc* trg);	  //CSB 21/01/00
  	bool EngageFormation(AirStrucPtr caller, AirStrucPtr trg);	  //CSB 21/01/00
@@ -123,22 +106,11 @@ public:
  	bool MeBombersYouFighters(AirStrucPtr caller, AirStrucPtr trg);	  //CSB 21/01/00
  	bool MeFightersYouBombers(AirStrucPtr caller, AirStrucPtr trg);	  //CSB 21/01/00
 
-//DeadCode AMM 20Oct100 	void	ArtInt::GroupEngage(AirStruc* caller,AirStruc* trg);
 	tGroupLevel GroupLevel(AirStruc* caller);
 	tGroupLevel GroupLevelNotInFormation(AirStruc* caller);	  //RDH 10/05/99
 
-//DeadCode AMM 20Oct100 	void	ArtInt::DefensiveSplitHiLo(AirStruc* caller,AirStruc* caller2,AirStruc* trg);
-//DeadCode AMM 20Oct100 	void	ArtInt::ChooseSplitManoeuvre(AirStruc* caller,AirStruc* caller2,AirStruc* trg);
-//DeadCode AMM 20Oct100 	void	ArtInt::SetUpPincer(AirStruc* caller,AirStruc* caller2,AirStruc* trg);
 	void	SetUpRemainderOfGroupToEngage(AirStruc* caller,AirStruc* trg,MANOEUVRE manoeuvre,ANGLES desiredhdg,ANGLES  desiredpitch, bool TRUE);
-//DeadCode AMM 20Oct100 	bool	ArtInt::MakeForceToRespond (AirStruc* caller, AirStruc* trg, tGroupLevel group, bool& splitmanappropriate);
-//DeadCode AMM 20Oct100 	bool	ArtInt::TrgIsVulnerable(AirStruc* caller, AirStruc* trg);
 
-//DeadCode AMM 20Oct100 	void	ArtInt::SubsequentIDasUnfriendly(AirStruc* caller,AirStruc* trg);
-//DeadCode AMM 20Oct100 	void	ArtInt::InCombatWithoutUnfriendly(AirStruc* caller,AirStruc*  trg);
-//DeadCode AMM 20Oct100 	void	ArtInt::SetRoundAboutAc(AirStruc*  ac);
-//DeadCode AMM 20Oct100 	AirStruc* FreeUpAFlight(AirStruc* caller, AirStruc*  currtrg);
-//DeadCode AMM 20Oct100 	AirStruc* FindFreeFlight(AirStruc* caller);
 	AirStruc* FindEscort(AirStruc* caller);
     #ifndef __BCPLUSPLUS__
 	ScriptTables BreakCall(AirStrucPtr caller, AirStrucPtr callee, AirStrucPtr agg);			  //CSB 08/02/00
@@ -150,9 +122,7 @@ public:
 	MESSAGE_STRUC	ChooseBanditOnTailMsg(MsgType mtype, AirStruc* caller,AirStruc* trg, AirStruc* callee, bool newspot);
 	MESSAGE_STRUC	ChooseBanditHeadOnMsg(MsgType mtype, AirStruc* caller,AirStruc* trg, AirStruc* callee, bool newspot);
 #endif
-//DeadCode AMM 20Oct100 	bool		EyeIsAndTrgIsNotInPlayersGroup(AirStruc* caller,AirStruc* trg);
 	bool		EngageAppropriate(AirStruc* caller,AirStruc* trg);
-//DeadCode AMM 20Oct100 	bool		Escorting(AirStruc* ac);
 
 
 	bool CallerOnRight(AirStruc* ac,AirStruc* trg);					  //RDH 18/02/99
@@ -162,22 +132,14 @@ public:
 
 	ANGLES HdgIntFromTo(AirStruc* ac,AirStruc* trg);
 	bool	TargetOnCallerTail(AirStruc*  caller,AirStruc*  trg,ANGLES angle);
-//DeadCode AMM 20Oct100 	bool	ArtInt::CallerOnTargetTail(AirStruc*  caller,AirStruc*  trg,ANGLES angle);
 
 	bool	TargetFacingCaller(AirStruc*  caller,AirStruc*  trg,ANGLES angle);
-//DeadCode AMM 20Oct100 	bool	ArtInt::CallerFacingTarget(AirStruc*  caller,AirStruc*  trg,ANGLES angle);
 	AirStrucPtr	SetFollowerEngage(AirStrucPtr eye,AirStrucPtr trg,MANOEUVRE  manoeuvre,ANGLES desiredhdg,ANGLES  desiredpitch, bool surprised);
-//DeadCode AMM 20Oct100 	AirStrucPtr	ArtInt::SetFlightEngage(AirStrucPtr eye,AirStrucPtr trg,MANOEUVRE  manoeuvre,ANGLES desiredhdg,ANGLES  desiredpitch, bool surprised);
 
 
-//DeadCode AMM 20Oct100 	bool	DoesFriendNeedHelp(AirStruc* eye,AirStruc* trg);
-//DeadCode AMM 20Oct100 	bool	SpottedNeutral(AirStruc* eye,AirStruc* trg);
 	bool	SpottedUnfriendly(AirStruc* eye,AirStruc* trg);
-//DeadCode AMM 20Oct100 	bool	SpottedUnknown(AirStruc* eye,AirStruc* trg);
-//DeadCode AMM 20Oct100 	bool	SpottedNewUnfriendly(AirStruc* eye,AirStruc* trg);
 	ScriptTables ChooseSpottedScript(AirStrucPtr caller, AirStrucPtr trg); //CSB 08/02/00
 	bool	AttackSpareInLeadersGroup(AirStruc* eye);				  //RDH 13/06/99
-//DeadCode AMM 20Oct100 	bool	LeadersGroupInCombat(AirStruc* eye);
 
 	void	SetEngage(AirStrucPtr eye,AirStrucPtr trg,MANOEUVRE manoeuvre,ANGLES   desiredhdg,ANGLES   desiredpitch, bool surprised);
 	void	PrepareForCombat(AirStrucPtr caller);			  //RDH 04/03/99
@@ -337,14 +299,5 @@ EXTERNAI(RealTestGuns,AirStrucPtr);
 EXTERNAI(SetupQuitContinue,AirStrucPtr);
 EXTERNAI(SecretMessages,ItemPtr);
 
-//DEADCODE CSB 11/02/00 EXTERNAI(JettisonStores,AirStrucPtr);
-//DEADCODE CSB 11/02/00 EXTERNAI(JettisonTanks,AirStrucPtr);
-//DEADCODE CSB 11/02/00 EXTERNAI(DoNothing,AirStrucPtr);
-//DEADCODE CSB 11/02/00 EXTERNAI(TestGuns,AirStrucPtr);
-//DEADCODE CSB 11/02/00 EXTERNAI(AllDisengage,AirStrucPtr);
-//DEADCODE CSB 11/02/00 EXTERNAI(Rendezvous,AirStrucPtr);
-//DEADCODE CSB 11/02/00 EXTERNAI(SecretMessages,ItemPtr);
-//DEADCODE CSB 11/02/00 EXTERNAI(PreCombatMsg,ItemPtr);
-//DEADCODE CSB 11/02/00 EXTERNAI(FACMsg,ItemPtr);	enum	{FAC_BombsAway=6};
 #pragma pack(pop)
 #endif

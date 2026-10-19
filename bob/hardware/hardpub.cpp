@@ -96,10 +96,6 @@ ULong	Display::PlotPixelNoClip(UWord	x, UWord	y, ULong	thecol)
 {
 	return(Display::XX_PlotPixelNoClip(x, y, thecol));
 }
-//DeadCode RJS 12Mar96 void	Display::PhysMouseMove(MouseSave* oldpos,void* MouseShape,MouseSave* newpos)
-//DeadCode RJS 12Mar96 {
-//DeadCode RJS 12Mar96 	Display::XX_PhysMouseMove(oldpos,MouseShape,newpos);
-//DeadCode RJS 12Mar96 }
 Bool	Display::CopyP2L(LogicalPtr	t,int w,int h)
 {
 	return(XX_CopyP2L(t,w,h));

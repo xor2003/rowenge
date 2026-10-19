@@ -131,7 +131,6 @@ void PilotLogBook::RAFRefreshList()
 {
 		CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(70);            //MIKE
 	//rlistbox->AddColumn(60);										  //RDH 02/06/99
@@ -139,14 +138,12 @@ void PilotLogBook::RAFRefreshList()
 	//rlistbox->AddColumn(90);										  //RDH 02/06/99
 	//rlistbox->AddColumn(280);
 	//rlistbox->AddColumn(45);										  //RDH 02/06/99
-//DeadCode JIM 18Oct00 	rlistbox->AddColumn(30);										  //RDH 02/06/99
 	rlistbox->AddString(RESSTRING(DATE),0);
 	rlistbox->AddString(RESSTRING(HOUR),1);
 	rlistbox->AddString(RESSTRING(ACTYPE),2);
 	rlistbox->AddString(RESSTRING(DUTY),3);
 	rlistbox->AddString(RESSTRING(REMARKS),4);
 	rlistbox->AddString(RESSTRING(CLAIMS),5);
-//DeadCode JIM 18Oct00 	rlistbox->AddString(RESSTRING(FLYINGHOURS),6);
 
 	Diary::Player*	pptr;
 //TEMPCODE RDH 05/04/00 	//###temp
@@ -242,7 +239,6 @@ void PilotLogBook::LWRefreshList()
 	
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(70);
 	//rlistbox->AddColumn(60);										  //RDH 02/06/99
@@ -250,14 +246,12 @@ void PilotLogBook::LWRefreshList()
 	//rlistbox->AddColumn(90);										  //RDH 02/06/99
 	//rlistbox->AddColumn(280);
 	//rlistbox->AddColumn(45);										  //RDH 02/06/99
-//DeadCode JIM 18Oct00 	rlistbox->AddColumn(30);										  //RDH 02/06/99
 	rlistbox->AddString(RESSTRING(DATE),0);
 	rlistbox->AddString(RESSTRING(HOUR),1);
 	rlistbox->AddString(RESSTRING(ACTYPE),2);
 	rlistbox->AddString(RESSTRING(DUTY),3);
 	rlistbox->AddString(RESSTRING(REMARKS),4);
 	rlistbox->AddString(RESSTRING(CLAIMS),5);
-//DeadCode JIM 18Oct00 	rlistbox->AddString(RESSTRING(FLYINGHOURS),6);
 
 	Diary::Player*	pptr;
 
@@ -316,29 +310,6 @@ void PilotLogBook::LWRefreshList()
 																		//RJS 9Nov00
 					rlistbox->AddString(remarkstring,4);				//RJS 9Nov00
 
-//DeadCode RJS 9Nov00 					bool acdamage = false;
-//DeadCode RJS 9Nov00 					int maxdam = 0, maxdamtype;
-//DeadCode RJS 9Nov00 					for(int i = 0; i < DIARY_MAXDAMAGE; i++)
-//DeadCode RJS 9Nov00 						if (pptr->specificdamage[i] >50)
-//DeadCode RJS 9Nov00 						{
-//DeadCode RJS 9Nov00 							acdamage = true;
-//DeadCode RJS 9Nov00 							if (pptr->specificdamage[i] > maxdam)
-//DeadCode RJS 9Nov00 							{
-//DeadCode RJS 9Nov00 								maxdam = pptr->specificdamage[i];
-//DeadCode RJS 9Nov00 								maxdamtype = i;
-//DeadCode RJS 9Nov00 							}
-//DeadCode RJS 9Nov00 						}
-//DeadCode RJS 9Nov00 
-//DeadCode RJS 9Nov00 					if (	acdamage									//RJS 9Nov00
-//DeadCode RJS 9Nov00 						&&	(pptr->howendedmission < EFS_BadCrashAF)	)	//RJS 9Nov00
-//DeadCode RJS 9Nov00 					{
-//DeadCode RJS 9Nov00 						if (maxdam < 200)
-//DeadCode RJS 9Nov00 							rlistbox->AddString(RESLIST(DIARYDAM_LEFTWING, maxdamtype),4);	//RJS 9Nov00
-//DeadCode RJS 9Nov00 						else
-//DeadCode RJS 9Nov00 							rlistbox->AddString(RESLIST(DIARYDEST_LEFTWING, maxdamtype),4);	//RJS 9Nov00
-//DeadCode RJS 9Nov00 
-//DeadCode RJS 9Nov00 					}else
-//DeadCode RJS 9Nov00 						rlistbox->AddString(RESLIST(EFS_NULL, pptr->howendedmission),4);
 
 
 					int kills = pptr->kills[0] + pptr->kills[1];
@@ -359,35 +330,6 @@ void PilotLogBook::LWRefreshList()
 }
 
 
-//DEADCODE RDH 24/02/00 		//###temp fix
-//DEADCODE RDH 24/02/00  		if (!squad)
-//DEADCODE RDH 24/02/00 		{
-//DEADCODE RDH 24/02/00 			int squadnum = -1;
-//DEADCODE RDH 24/02/00 			int pack=0;
-//DEADCODE RDH 24/02/00 			while (	(squadnum == -1)	&&	(pack < Profile::MAX_PACKS))
-//DEADCODE RDH 24/02/00 			{
-//DEADCODE RDH 24/02/00 				if (Todays_Packages.pack[pack].packagestatus!=Profile::PS_SPARE)
-//DEADCODE RDH 24/02/00 				{
-//DEADCODE RDH 24/02/00 				 	Profile& pk = Todays_Packages.pack[pack];
-//DEADCODE RDH 24/02/00 					if  (pk.attackmethod >= Profile::AM_LWPACKS)
-//DEADCODE RDH 24/02/00 					{
-//DEADCODE RDH 24/02/00 						int i=0;
-//DEADCODE RDH 24/02/00 						while (	(squadnum == -1)	&&	(i < pk.squadlist))
-//DEADCODE RDH 24/02/00 						{
-//DEADCODE RDH 24/02/00 							squadnum = pk[i].squadnum;
-//DEADCODE RDH 24/02/00 							i++;
-//DEADCODE RDH 24/02/00 						}
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 					}
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 				}
-//DEADCODE RDH 24/02/00 				pack++;
-//DEADCODE RDH 24/02/00 			}
-//DEADCODE RDH 24/02/00 			squad = Squad_Diary.FindLast((SquadNum)squadnum);
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 		}
-//DEADCODE RDH 24/02/00 		//##end temp
-//DEADCODE RDH 24/02/00 
 
 
 
@@ -398,21 +340,6 @@ BOOL PilotLogBook::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("Aug 8th",0);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("12:45",1);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("Spitfire",2);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("Patrol",3);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("Beachy Head. No combat",4);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("0",5);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("1",6);
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("Aug 9th",0);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("12:45",1);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("Spitfire",2);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("Intercept",3);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("Croydon. 200 + Ju88.",4);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("0",5);
-//DEADCODE RDH 24/02/00 	rlistbox->AddString("1",6);
 
 	CREdit* edit=GETDLGITEM(IDC_NAME);
 	edit->SetCaption(MMC.PlayerName);

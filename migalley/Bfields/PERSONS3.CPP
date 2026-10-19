@@ -84,8 +84,6 @@ questions about this file may be asked at http://www.simhq.com/
 #include "CONTLIST.H"
 #include	"GLOBREFS.H"
 #include "NODE.H" // RERUN
-//DeadCode JIM 28Mar96 extern	PlaneType&	camel;										//RDH 23Feb96
-//Old_Code PD 27Aug96  	MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);
 //	extern	ULong	GR_FriendlyScoutType00;
 //	extern	ULong	GR_GlobalSkillMin;
 //	extern	ULong	GR_GlobalSkillMax;
@@ -104,11 +102,6 @@ questions about this file may be asked at http://www.simhq.com/
 
 //ItemBasePtr		*Persons2::pItem;
 
-//DEADCODE JIM 25/03/99 char	CustomMissionDesc[300];
-//DEADCODE JIM 25/03/99 char	CustomMissionNews[300];
-//DEADCODE JIM 25/03/99 char	CustomMissionTitle[100];
-//DEADCODE JIM 25/03/99 MissionType	CustomMission;
-//DEADCODE JIM 25/03/99 
 
 #define EvalOrDefault(field,type,expr,defaultv)				\
 		{													\
@@ -396,7 +389,6 @@ Persons3::GearState	Persons3::setpositionMIG(AirStrucPtr currac,EventVal* pos,Ta
 		if (pos)
 		{
 //ptr not set yet!			currac->ai.eventlog->stage=eventloglist->EMPTY;
-//DeadCode CSB 12/07/99				return setposition(currac,*pos,TRUE)==TRUE;
 			setposition(currac,*pos,TRUE);	//CSB 12/07/99	
 		}
 		else
@@ -411,7 +403,6 @@ Persons3::GearState	Persons3::setpositionMIG(AirStrucPtr currac,EventVal* pos,Ta
 	{	//USE UP HALF THE FUEL!!!
 		currac->vel=currac->classtype->cruisevel;
 		if (pos && pos->complex)
-//DeadCode CSB 12/07/99				return setposition(currac,*pos,TRUE)==TRUE;
 		{
 			if(setposition(currac,*pos,TRUE)==TRUE)	//CSB 12/07/99	
 				return GS_PARKED;					//CSB 12/07/99	
@@ -644,7 +635,6 @@ Persons3::GearState	Persons3::setpositionMIG(AirStrucPtr currac,EventVal* pos,Ta
 	return GS_GEAR;//false;//true;//	//CSB 12/07/99	
 	case TOS_RUNWAY:
 	{
-//DEADCODE DAW 04/06/99 		int FPOS = currac->position();	//Fix This !!!!
 		int fuelused=0;
 		ANGLES h=GetTakeOffOffset(currac,posn1,posn0);
 		currac->hdg=h;
@@ -986,8 +976,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 							firstac=*ConvertPtrUID((UniqueID)I.leader.Evaluate());
 					if (firstac==NULL)
 						_Error.EmitSysErr("Leader not loaded before used");
-//DEADCODE JIM 01/03/99 					while (flleadac->fly.nextflight)
-//DEADCODE JIM 01/03/99 						flleadac=flleadac->fly.nextflight;
 
 					//cludge to set escort flights that are 
 					//same type and formation as leader to
@@ -1037,7 +1025,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 //			currac->fly.slip = ANGLES_0Deg;
 			currac->fly.cpitch = ANGLES_0Deg;		
 //			currac->ai.lastdeltapitch = ANGLES_0Deg;
-//DEADCODE JIM 28/04/99 			currac->ai.lastdeltaroll = ANGLES_0Deg;		
 			currac->fly.aileron = 0;						
 			currac->fly.elevator = 0;					
 			currac->fly.rudder = 0;						
@@ -1124,8 +1111,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 				{
 					if (_DPlay.GameType>TEAMPLAY)
 					{
-//DeadCode AMM 17Nov98 						if (DPlay::H2H_Player[n].position==v1
-//DeadCode AMM 17Nov98 						&& DPlay::H2H_Player[n].squadron==GR_Pack_Sq_Used[v1])
 						if (DPlay::H2H_Player[n].position==GR_Pack_Sq_Used[v1]//AMM 17Nov98
 						&& DPlay::H2H_Player[n].squadron==v1)	//AMM 17Nov98
 						{
@@ -1171,9 +1156,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 							dummypilot.SetCombSkill(SKILL_REGULAR);
 					dummypilot.morale=Miss_Man.camp.migsquad[v1].morale;
 					dummypilot.decal=Miss_Man.camp.migsquad[v1].colourscheme;
-//DeadCode DAW 09Jul99 					dummypilot.SetCombSkill(SkillType(Miss_Man.camp.migsquad[v1].generalskill-Math_Lib.rnd(6)));
-//DeadCode DAW 09Jul99 					dummypilot.morale=Miss_Man.camp.migsquad[v1].morale;
-//DeadCode DAW 09Jul99 					dummypilot.decal=Miss_Man.camp.migsquad[v1].colourscheme;
 				}
 				pilotskillinfoptr=&dummypilot;
 			}
@@ -1305,8 +1287,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 						setpointer((ItemBase**)&currac->ai.homebase,UID_Japan);
 					
 
-	//DeadCode AMM 20Aug97 			else
-	//DeadCode AMM 20Aug97 				_Error.EmitSysErr("No homebase defined???");
 			}
 			else
 				setpointer((ItemBase**)&currac->ai.homebase,UniqueID(v1));
@@ -1458,7 +1438,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 
 			//Everybody goes through colourruleplayersquadron now!!!!!
 			ColourRulePlayerSquadron(currac,currac->formpos,cols,pilotskillinfoptr);			//RDH 16Apr96
-//DeadCode DAW 09Jul99 			if (takeoffstate>TOS_TAKENOFF)
 			if(onground != GS_INAIR)
 			{
 				currac->fly.pModel->GearDown(currac);
@@ -1648,13 +1627,9 @@ UniqueID	Persons3::make_waypoint(info_waypoint& I)
 		WayPointPtr	newwaypoint=new WayPoint;
 		if (I.events!=0)
 		{
-//DeadCode AMM 10Jun98 			newwaypoint->uniqueID.deaded=TRUE;
-//DeadCode AMM 30Nov98 			newwaypoint->uniqueID.UniqueID.bitfieldUid.commsmove=TRUE;				//AMM 10Jun98
 			newwaypoint->MigStatus.LaunchFlags.deaded=TRUE;					//AMM 30Nov98
 			make_events(I.events,newwaypoint);
 		}
-//DeadCode AMM 10Jun98  		newwaypoint->uniqueID.deaded=FALSE;
-//DeadCode AMM 30Nov98  		newwaypoint->uniqueID.UniqueID.bitfieldUid.commsmove=FALSE;					//AMM 10Jun98
  		newwaypoint->MigStatus.LaunchFlags.deaded=FALSE;						//AMM 30Nov98
  ////		newwaypoint->bfieldindex=1;
 		newwaypoint->eta = 0;										//RDH 19Feb96
@@ -1707,7 +1682,7 @@ UniqueID	Persons3::make_waypoint(info_waypoint& I)
 		}
 
 		if ((v1=I.range.Evaluate())!=ENABLE_COMPLEX_VAL)
-			if (I.rangeispercent)
+			if (I.rangeispercent && tmpwp)					//RERUN: tmpwp NULL when no prev waypoint
 			{
 				assert(tmpwp&&"RangePC but no prev");
 				SLong r;
@@ -1864,7 +1839,6 @@ void	Persons3::make_itemS(info_itemS& I,bool enabled)
 	if (firstobject==IllegalSepID)
 		firstobject=tmpitem->uniqueID.bitfieldUid.count;
 
-//DeadCode JIM 08Jan96 		AddToWorld(tmpitem);
 }
 
 //------------------------------------------------------------------------------
@@ -2034,86 +2008,6 @@ FormationItemPtr
 //------------------------------------------------------------------------------
 void	Persons3::make_events(info_event_ptr&	I,ItemBasePtr P)
 {
-//DEADCODE JIM 17/03/99 	if (justscanning)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		return;
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 	info_event_ptr J=I;
-//DEADCODE JIM 17/03/99 	I=NULL;
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		info_event_ptr I=J;
-//DEADCODE JIM 17/03/99 	while (I)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 		EventRecPtr	newevent;
-//DEADCODE JIM 17/03/99 		int count=10;
-//DEADCODE JIM 17/03/99 		int bfnum;
-//DEADCODE JIM 17/03/99 		do
-//DEADCODE JIM 17/03/99 		{
-//DEADCODE JIM 17/03/99 			bfnum=I->bfields.Evaluate();
-//DEADCODE JIM 17/03/99 			breakif (bfnum==ENABLE_COMPLEX_VAL);
-//DEADCODE JIM 17/03/99 			if (BITTEST(usedevents,bfnum&255))
-//DEADCODE JIM 17/03/99 				bfnum=ENABLE_COMPLEX_VAL;
-//DEADCODE JIM 17/03/99 			else
-//DEADCODE JIM 17/03/99 			{	//more complex: load the battlefield and
-//DEADCODE JIM 17/03/99 				//test for used fixed UID flag
-//DEADCODE JIM 17/03/99 				UsedFixedUID=FALSE;
-//DEADCODE JIM 17/03/99 				{
-//DEADCODE JIM 17/03/99 					WorldStuff* wpbackup=myworld;
-//DEADCODE JIM 17/03/99 ////					justscanning=SCANNAMES;
-//DEADCODE JIM 17/03/99 					{
-//DEADCODE JIM 17/03/99 						LoadSubPiece(NULL,(FileNum)bfnum,(int)Persons2::LOADEDBFS-1,SCANNAMES);
-//DEADCODE JIM 17/03/99 					}
-//DEADCODE JIM 17/03/99 					myworld=wpbackup;
-//DEADCODE JIM 17/03/99 	////				justscanning=LOAD;
-//DEADCODE JIM 17/03/99 				}
-//DEADCODE JIM 17/03/99 				if (UsedFixedUID)
-//DEADCODE JIM 17/03/99 					BITSET(usedevents,bfnum&255);
-//DEADCODE JIM 17/03/99 			}
-//DEADCODE JIM 17/03/99 		} while (bfnum==ENABLE_COMPLEX_VAL && count--);
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 		int i=I->usedsetvals;
-//DEADCODE JIM 17/03/99 		if (bfnum!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 		{
-//DEADCODE JIM 17/03/99 			newevent=new EventRec (P,i+1);
-//DEADCODE JIM 17/03/99 			newevent->eventlist[i].Index=EventSet::GV_EVENT_EVENT;
-//DEADCODE JIM 17/03/99 			newevent->eventlist[i].Value=bfnum;
-//DEADCODE JIM 17/03/99 		}
-//DEADCODE JIM 17/03/99 		else
-//DEADCODE JIM 17/03/99 			newevent=new EventRec (P,i);
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 		int v1;
-//DEADCODE JIM 17/03/99 		newevent->eventwstart=
-//DEADCODE JIM 17/03/99 			newevent->eventwend=0;
-//DEADCODE JIM 17/03/99 		if ((v1=I->starts.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwstart+=v1*100;
-//DEADCODE JIM 17/03/99 		if ((v1=I->startm.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwstart+=v1*60*100;
-//DEADCODE JIM 17/03/99 		if ((v1=I->starth.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwstart+=v1*60*60*100;
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 		if ((v1=I->wins.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwend+=v1*100;
-//DEADCODE JIM 17/03/99 		if ((v1=I->winm.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwend+=v1*60*100;
-//DEADCODE JIM 17/03/99 		if ((v1=I->winh.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwend+=v1*60*60*100;
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 	
-//DEADCODE JIM 17/03/99 		while (--i>=0)
-//DEADCODE JIM 17/03/99 		{
-//DEADCODE JIM 17/03/99 			newevent->eventlist[i].Index=I->setvals[i].index;
-//DEADCODE JIM 17/03/99 			newevent->eventlist[i].Value=I->setvals[i].Evaluate();
-//DEADCODE JIM 17/03/99 		}
-//DEADCODE JIM 17/03/99 		if (newevent->eventwend)								//JIM 04Nov96
-//DEADCODE JIM 17/03/99 			newevent->eventwend+=newevent->eventwstart+Timer_Code.realtime;
-//DEADCODE JIM 17/03/99 		if (newevent->eventwstart)								//JIM 14Aug96
-//DEADCODE JIM 17/03/99 			newevent->eventwstart+=Timer_Code.realtime;
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 		I=(info_event_ptr)I->next;
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 
 }
 
 //------------------------------------------------------------------------------
@@ -2151,66 +2045,21 @@ void	Persons3::make_setval(EventVar& es)
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DEADCODE JIM 25/03/99 extern	MissionType CustomMission;
-//DEADCODE JIM 25/03/99 extern	char	CustomMissionDesc[];
-//DEADCODE JIM 25/03/99 extern	char	CustomMissionNews[];
-//DEADCODE JIM 25/03/99 extern	char	CustomMissionTitle[];
 
 
 void	Persons3::make_string(string src,int len,TokenCode t)
 {
-//DEADCODE JIM 25/03/99 	MissionType*	M=&CustomMission;
 
 	if (justscanning)
 	{
 		switch (t)
 		{
 			case T_comment:
-//DEADCODE JIM 25/03/99 				if ((UWord&)CustomMissionDesc[0])
-//DEADCODE JIM 25/03/99 				{
-//DEADCODE JIM 25/03/99 					if (!(UWord&)CustomMissionNews[0])
-//DEADCODE JIM 25/03/99 					{
-//DEADCODE JIM 25/03/99 						CustomMissionNews[1]=1;
-//DEADCODE JIM 25/03/99 						strncpy(CustomMissionNews,src,len);
-//DEADCODE JIM 25/03/99 						CustomMissionNews[len]=0;
-//DEADCODE JIM 25/03/99 					}
-//DEADCODE JIM 25/03/99 				}
-//DEADCODE JIM 25/03/99 				else
-//DEADCODE JIM 25/03/99 				{
-//DEADCODE JIM 25/03/99 					CustomMissionDesc[1]=1;
-//DEADCODE JIM 25/03/99 					strncpy(CustomMissionDesc,src,len);
-//DEADCODE JIM 25/03/99 					CustomMissionDesc[len]=0;
-//DEADCODE JIM 25/03/99 				}
 			break;
 			case T_name:
-//DEADCODE JIM 25/03/99 				strncpy(CustomMissionTitle,src,len);
-//DEADCODE JIM 25/03/99 				CustomMissionTitle[len]=0;
 			break;
 			case T_family:
 			{
-//DEADCODE JIM 25/03/99 				char dummyc;
-//DEADCODE JIM 25/03/99 				int	dummyi;
-//DEADCODE JIM 25/03/99 				sscanf(src,
-//DEADCODE JIM 25/03/99 					"%i %i "
-//DEADCODE JIM 25/03/99 					"%hi %hi "
-//DEADCODE JIM 25/03/99 					"%c %c "
-//DEADCODE JIM 25/03/99 					"%hi %hi %hi "
-//DEADCODE JIM 25/03/99 					"%hi %hi %hi "
-//DEADCODE JIM 25/03/99 					"%hi %hi "
-//DEADCODE JIM 25/03/99 					"%hi %hi "
-//DEADCODE JIM 25/03/99 					"%hi %hi %hi"
-//DEADCODE JIM 25/03/99 					,
-//DEADCODE JIM 25/03/99 					&M->missiondate,&M->timeofday,
-//DEADCODE JIM 25/03/99 					&M->numofsquadronac,&M->numofflightac,
-//DEADCODE JIM 25/03/99 					&dummyc/*M->PlayerNationality*/,&M->formationtypeindex,
-//DEADCODE JIM 25/03/99 					&M->weathernum,&M->windspeed,&M->winddirection,
-//DEADCODE JIM 25/03/99 					&dummyi,&dummyi,&dummyi,	//&M->era,&M->region,&M->PlayerAcType,
-//DEADCODE JIM 25/03/99 					&dummyi,&dummyi,			//&M->PlayerHomeBase,&M->EnemyHomeBase,
-//DEADCODE JIM 25/03/99 					&M->wplist->wpset[0]->mainobjective,&M->wplist->wpset[0]->subobjective,
-//DEADCODE JIM 25/03/99 					&M->wplist->wpset[0]->wp1,&M->wplist->wpset[0]->wp2,&M->wplist->wpset[0]->wp3
-//DEADCODE JIM 25/03/99 					);
-//DEADCODE JIM 25/03/99 				//M->PlayerNationality&=31;
-//DEADCODE JIM 25/03/99 				M->formationtypeindex=FormationTypeIndex(M->formationtypeindex&31);
 			}
 			break;
 		}
@@ -2396,8 +2245,6 @@ COORDS3D*	Persons3::setfolloweroffset(AirStrucPtr	newac)
 {
 	COORDS3D	*despos;
 
-//DeadCode RDH 27Feb96 	if (newac->pitch == ANGLES_180Deg)
-//DeadCode RDH 27Feb96 		SetAngles (newac);
 	newac->HdgIntercept=newac->hdg;
 	if (newac->formpos != 0)
 	{
@@ -2405,7 +2252,6 @@ COORDS3D*	Persons3::setfolloweroffset(AirStrucPtr	newac)
 			||	(newac->fly.leadflight && newac->fly.leadflight->AutoMoveInfo.movecode == AUTO_TAKEOFF)	)
 		{
 			newac->pitch = newac->classtype->deckangle;			//JIM 04Dec96
-//DeadCode JIM 27Nov96 			newac->pitch=ANGLES_5Deg;
 			newac->AutoMoveInfo.movecode=AUTO_TAKEOFF;
 			newac->vel = 0;										//RDH 30Sep96
 			newac->fly.vel_cms = 	0;							//RDH 30Sep96
@@ -2424,7 +2270,6 @@ COORDS3D*	Persons3::setfolloweroffset(AirStrucPtr	newac)
 					newac->pitch=ANGLES_0Deg;
 				}
 			return despos;										//AMM 19Aug97
-//DeadCode AMM 20Aug97 			return (newac->PositionWRTLeader ());
 		}
 	}elser
 	{
@@ -2984,7 +2829,6 @@ Bool	Persons3::anyoutstanding()
 
 void Persons3::InitGamePiece()
 {
-//DEADCODE DAW 12/05/99 	File_Man.DiscardDirList(FIL_RUNTIMEPACK0);
 	for (int i=0;i<LOADEDBFS;i++)
 		loadedBF[i]=FIL_NULL;
 
@@ -3072,8 +2916,6 @@ void Persons3::FinishSetPiece()
 		_DPlay.SendBFieldsToPlayers(false);
 	}
 
-//DeadCode AMM 17Nov98 //	if (_Replay.Record)
-//DeadCode AMM 17Nov98 		_Replay.AddFileAndGlobRefsToList(FIL_NULL);
 
 	if (!_Replay.Playback)
 		SENT_REQ=FALSE;
@@ -3110,10 +2952,6 @@ void Persons3::FinishSetPiece()
 		
 	}
 
-//DeadCode AMM 23Jul98 	if (_Replay.Playback)
-//DeadCode AMM 23Jul98 	{
-//DeadCode AMM 23Jul98 		Manual_Pilot.controlmode==ManualPilot::AUTO;
-//DeadCode AMM 23Jul98 	}
 
 	Persons2::PlayerGhostAC=Manual_Pilot.ControlledAC2;
 
@@ -3167,64 +3005,6 @@ void Persons3::FinishSetPiece()
 
 /// move to after mobileitem::world has been set up
 
-//DeadCode AMM 19Nov98 // record or playback from beginning?	
-//DeadCode AMM 19Nov98 																	 
-//DeadCode AMM 19Nov98 	if (_Replay.Record)
-//DeadCode AMM 19Nov98 	{
-//DeadCode AMM 19Nov98 		_Replay.StoreFinalRecordData();
-//DeadCode AMM 19Nov98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		_Replay.Record=FALSE;
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		Timer_Code.msgcounttime=0; // reset rounding
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		if (_Replay.StoreFileAndGlobRefList())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 			if (_Replay.StorePilots())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 				if (_Replay.StoreItemAnims())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 					if (_Replay.StoreItemData())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 						if (_Replay.StoreInitFrameCounts())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 						{
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 // in this case beginning of file is 0, so current pos is length of header
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 	
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 							if (_Replay.StoreHeaderLength(0))
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 								_Replay.Record=TRUE;
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 						}
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		if (!_Replay.Record)
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 			_Error.EmitSysErr("Error writing to record log");
-//DeadCode AMM 19Nov98 	}
-//DeadCode AMM 19Nov98 	else
-//DeadCode AMM 19Nov98 	if (_Replay.Playback)
-//DeadCode AMM 19Nov98 	{
-//DeadCode AMM 19Nov98 		_Replay.LoadFinalPlaybackData();
-//DeadCode AMM 19Nov98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		_Replay.Playback=FALSE;
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		Timer_Code.msgcounttime=0; // reset rounding
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		if (_Replay.LoadPilots())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 			if (_Replay.LoadItemAnims())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 				if (_Replay.LoadItemData())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 					if (_Replay.LoadFrameCounts())
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 					{
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 						ULong n;
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 						n=_Replay.LoadHeaderLength();
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98  						if (n!=0)
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98  						{
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98  							_Replay.headlength[_Replay.numblocks++]=n;
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98  							_Replay.currblock++;
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98  							_Replay.Playback=TRUE;
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98  						}
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98  					}
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		if (!_Replay.Playback)
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 			_Error.EmitSysErr("Error reading playback log");
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 
-//DeadCode AMM 19Nov98 //DeadCode AMM 01Oct98 		Manual_Pilot.controlmode=ManualPilot::AUTO;
-//DeadCode AMM 19Nov98 
-//DeadCode AMM 19Nov98 		if (!_Replay.Playback)
-//DeadCode AMM 19Nov98 			_Error.EmitSysErr("Error reading playback log");
-//DeadCode AMM 19Nov98	}
 }
 //------------------------------------------------------------------------------
 //Procedure		AddToWorld
@@ -3245,8 +3025,6 @@ void		Persons3::AddToWorld(ItemPtr	tmpitem)
  //	{	//1M=10km	- .5m=5km
 //TempCode RDH 20Apr98  		tmpitem->World.X=(tmpitem->World.X&0x3ffff)+0x5000000;
 //TempCode RDH 20Apr98  		tmpitem->World.Z=(tmpitem->World.Z&0x3ffff)+0x3000000;
-//DeadCode DAW 28Apr98  		tmpitem->World.X=(tmpitem->World.X&0x3ffff)+0x2600000;
-//DeadCode DAW 28Apr98  		tmpitem->World.Z=(tmpitem->World.Z&0x3ffff)+0x5400000;
 //TempCode MS 11May98  		tmpitem->World.X=(tmpitem->World.X&0x3ffff)+0x2600000;
 //TempCode MS 11May98  		tmpitem->World.Z=(tmpitem->World.Z&0x3ffff)+0x5400000-0x200000-0x40000;
 
@@ -3276,144 +3054,6 @@ void		Persons3::AddToWorld(ItemPtr	tmpitem)
 //
 //------------------------------------------------------------------------------
 //extern	ULong	GR_CWP,GR_CPP;
-//DEADCODE JIM 17/03/99 Bool		Persons3::PossibleEvent(WorldStuff *worldptr,ItemBasePtr target,ItemBasePtr actor)
-//DEADCODE JIM 17/03/99 {
-//DEADCODE JIM 17/03/99 	if (target)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		FileNum	eventbf=INVALIDFILENUM;
-//DEADCODE JIM 17/03/99 		EventRecPtr	evind=EventRec::eventbase;
-//DEADCODE JIM 17/03/99 		while (evind)
-//DEADCODE JIM 17/03/99 		{
-//DEADCODE JIM 17/03/99 			if (evind->attitem==target && Timer_Code.realtime>=evind->eventwstart)
-//DEADCODE JIM 17/03/99 			{
-//DEADCODE JIM 17/03/99 				EventRecPtr	tmpnext=evind->eventlink;
-//DEADCODE JIM 17/03/99 				//need start/window tests here!
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 				//need to set GR_CPP,GR_CWP
-//DEADCODE JIM 17/03/99 				GR_CWP=target->uniqueID.bitfieldUid.count;
-//DEADCODE JIM 17/03/99 				GR_CPP=actor->uniqueID.bitfieldUid.count;
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 				eventbf=ActionEvent(evind,mobileitem::currworld,target);
-//DEADCODE JIM 17/03/99 				if (eventbf!=INVALIDFILENUM)
-//DEADCODE JIM 17/03/99 				{
-//DEADCODE JIM 17/03/99 					lastbfloaded=eventbf;
-//DEADCODE JIM 17/03/99 					lasttarg=target;
-//DEADCODE JIM 17/03/99 					lastact=actor;
-//DEADCODE JIM 17/03/99 //DeadCode JIM 12Aug96 					LoadSubPiece(worldptr,eventbf);
-//DEADCODE JIM 17/03/99 //DeadCode JIM 12Aug96 					assert(!anyoutstanding()&&"Sub event not complete!");
-//DEADCODE JIM 17/03/99 //DeadCode RDH 11Oct96 					if (Save_Data.gamedifficulty[GD_TACTICALRANGE])
-//DEADCODE JIM 17/03/99 //DeadCode RDH 11Oct96 					{
-//DEADCODE JIM 17/03/99 //DeadCode RDH 11Oct96 						Timer_Code.AccelToggle(FALSE);
-//DEADCODE JIM 17/03/99 //DeadCode RDH 11Oct96 						Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);
-//DEADCODE JIM 17/03/99 //DeadCode RDH 11Oct96 					}
-//DEADCODE JIM 17/03/99 					return TRUE;
-//DEADCODE JIM 17/03/99 				}
-//DEADCODE JIM 17/03/99 				evind=tmpnext;
-//DEADCODE JIM 17/03/99 			}
-//DEADCODE JIM 17/03/99 			else
-//DEADCODE JIM 17/03/99 				evind=evind->eventlink;
-//DEADCODE JIM 17/03/99 		}
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 	else
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		if (lastbfloaded)
-//DEADCODE JIM 17/03/99 		{
-//DEADCODE JIM 17/03/99 		 	LoadSubPiece(mobileitem::currworld,lastbfloaded,currbfindex+1);
-//DEADCODE JIM 17/03/99 //			if (	lasttarg->MigStatus.LaunchFlags.size==WayPointSize
-//DEADCODE JIM 17/03/99 //				&&	((WayPointPtr)*lasttarg)->target
-//DEADCODE JIM 17/03/99 //				)
-//DEADCODE JIM 17/03/99 //				eventloglist->area=_Text.ConvSnip0(((WayPointPtr)*lasttarg)->target->uniqueID.bitfieldUid.count);
-//DEADCODE JIM 17/03/99 			lastbfloaded=FIL_NULL;
-//DEADCODE JIM 17/03/99 			if (anyoutstanding())
-//DEADCODE JIM 17/03/99 				_Error.EmitSysErr("Unresolved UIDS! One is: %x",rootuidnode->uidattack);
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 //DeadCode JIM 22Oct96 NEVER WANT TO QUIT ACCEL HERE
-//DEADCODE JIM 17/03/99 //DeadCode JIM 22Oct96 
-//DEADCODE JIM 17/03/99 //DeadCode JIM 22Oct96 			if (Save_Data.gamedifficulty[GD_TACTICALRANGE])		//RDH 11Oct96
-//DEADCODE JIM 17/03/99 //DeadCode JIM 22Oct96 			{
-//DEADCODE JIM 17/03/99 //DeadCode JIM 22Oct96 				Timer_Code.AccelToggle(FALSE);
-//DEADCODE JIM 17/03/99 //DeadCode JIM 22Oct96 				Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);
-//DEADCODE JIM 17/03/99 //DeadCode JIM 22Oct96 			}
-//DEADCODE JIM 17/03/99 //DeadCode JIM 30Nov96 			AddMessage(UserMsg::TIME,TextSnip0MIN,
-//DEADCODE JIM 17/03/99 //DeadCode JIM 30Nov96 				ConvertPtrUID(eventloglist->targetuid));
-//DEADCODE JIM 17/03/99 			if (lasttarg)
-//DEADCODE JIM 17/03/99 			{
-//DEADCODE JIM 17/03/99 				target=lasttarg;
-//DEADCODE JIM 17/03/99 				lasttarg=NULL;
-//DEADCODE JIM 17/03/99 				PossibleEvent(mobileitem::currworld,target,lastact);
-//DEADCODE JIM 17/03/99 				return TRUE;
-//DEADCODE JIM 17/03/99 			}
-//DEADCODE JIM 17/03/99 		}
-//DEADCODE JIM 17/03/99 		else
-//DEADCODE JIM 17/03/99 		{	//Look for timed out events on player's waypoint	//JIM 14Aug96
-//DEADCODE JIM 17/03/99 			MobileItemPtr a=*actor;
-//DEADCODE JIM 17/03/99 			target=a->waypoint;
-//DEADCODE JIM 17/03/99 			FileNum	eventbf=INVALIDFILENUM;
-//DEADCODE JIM 17/03/99 			EventRecPtr	evind=EventRec::eventbase;
-//DEADCODE JIM 17/03/99 			while (evind)
-//DEADCODE JIM 17/03/99 			{
-//DEADCODE JIM 17/03/99 				if (evind->eventwend && evind->attitem==target && Timer_Code.realtime>=evind->eventwend)
-//DEADCODE JIM 17/03/99 				{
-//DEADCODE JIM 17/03/99 					EventRecPtr	tmpnext=evind->eventlink;
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 					//need to set GR_CPP,GR_CWP
-//DEADCODE JIM 17/03/99 					GR_CWP=target->uniqueID.bitfieldUid.count;
-//DEADCODE JIM 17/03/99 					GR_CPP=actor->uniqueID.bitfieldUid.count;
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 					eventbf=ActionEvent(evind,mobileitem::currworld,target);
-//DEADCODE JIM 17/03/99 					if (eventbf!=INVALIDFILENUM)
-//DEADCODE JIM 17/03/99 					{
-//DEADCODE JIM 17/03/99 						lastbfloaded=eventbf;
-//DEADCODE JIM 17/03/99 						lasttarg=target;
-//DEADCODE JIM 17/03/99 						lastact=actor;
-//DEADCODE JIM 17/03/99 //DeadCode JIM 12Aug96 					LoadSubPiece(worldptr,eventbf);
-//DEADCODE JIM 17/03/99 //DeadCode JIM 12Aug96 					assert(!anyoutstanding()&&"Sub event not complete!");
-//DEADCODE JIM 17/03/99 //DeadCode RDH 11Oct96 						Timer_Code.AccelToggle(FALSE);
-//DEADCODE JIM 17/03/99 //DeadCode RDH 11Oct96 						Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);
-//DEADCODE JIM 17/03/99 						return TRUE;
-//DEADCODE JIM 17/03/99 					}
-//DEADCODE JIM 17/03/99 					evind=tmpnext;
-//DEADCODE JIM 17/03/99 				}
-//DEADCODE JIM 17/03/99 				else
-//DEADCODE JIM 17/03/99 					evind=evind->eventlink;
-//DEADCODE JIM 17/03/99 			}
-//DEADCODE JIM 17/03/99 		}
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 	return FALSE;
-//DEADCODE JIM 17/03/99 }
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 //------------------------------------------------------------------------------
-//DEADCODE JIM 17/03/99 //Procedure		ActionEvent
-//DEADCODE JIM 17/03/99 //Author		Jim Taylor
-//DEADCODE JIM 17/03/99 //Date			Fri 29 Mar 1996
-//DEADCODE JIM 17/03/99 //
-//DEADCODE JIM 17/03/99 //Description	
-//DEADCODE JIM 17/03/99 //
-//DEADCODE JIM 17/03/99 //Inputs		
-//DEADCODE JIM 17/03/99 //
-//DEADCODE JIM 17/03/99 //Returns	
-//DEADCODE JIM 17/03/99 //
-//DEADCODE JIM 17/03/99 //------------------------------------------------------------------------------
-//DEADCODE JIM 17/03/99 FileNum		Persons3::ActionEvent(EventRecPtr	evind,WorldStuff *worldptr,ItemBasePtr target)
-//DEADCODE JIM 17/03/99 {
-//DEADCODE JIM 17/03/99 	FileNum	eventbf=INVALIDFILENUM;
-//DEADCODE JIM 17/03/99 	int	els=evind->eventlistsize;
-//DEADCODE JIM 17/03/99 	while (els--)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		if (evind->eventlist[els].Index>=0)
-//DEADCODE JIM 17/03/99 			SetLoc(evind->eventlist[els].Index,evind->eventlist[els].Value);
-//DEADCODE JIM 17/03/99 		elseif (evind->eventlist[els].Index==evind->eventlist[els].GV_EVENT_EVENT)
-//DEADCODE JIM 17/03/99 			eventbf=(FileNum)evind->eventlist[els].Value;
-//DEADCODE JIM 17/03/99 		elseif (evind->eventlist[els].Index==evind->eventlist[els].GV_EVENT_NEST)
-//DEADCODE JIM 17/03/99 			if (eventbf!=INVALIDFILENUM)
-//DEADCODE JIM 17/03/99 				ActionEvent(evind->eventlist[els].Nesting,mobileitem::currworld,target);
-//DEADCODE JIM 17/03/99 			else
-//DEADCODE JIM 17/03/99 				eventbf=ActionEvent(evind->eventlist[els].Nesting,mobileitem::currworld,target);
-//DEADCODE JIM 17/03/99 
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 	delete evind;
-//DEADCODE JIM 17/03/99 	return(eventbf);
-//DEADCODE JIM 17/03/99 }
 
 
 
@@ -3479,7 +3119,6 @@ void		Persons3::AddToWorld(ItemPtr	tmpitem)
 
 void	Persons3::ColourRulePlayerSquadron(AirStrucPtr	newac,FormationIndex formpos,UByte* s,PilotType* pilot)
 {	//EVERYTHING COMES HERE NOW!!!!!
-//DeadCode RDH 23Sep96 	if (SHAPE.SetAnimData(newac)!=sizeof(AircraftAnimData))
 	if (SHAPE.SetAnimData(newac,s[COLS_BOMBS])!=sizeof(AircraftAnimData))	//DAW 12May98... 0 is weapon pack
 		_Error.EmitSysErr("Animation not aircraft");
 	newac->weap.AircraftStatus.Weapons=s[COLS_BOMBS];									//AMM 07Apr99
@@ -3504,11 +3143,9 @@ void	Persons3::ColourRulePlayerSquadron(AirStrucPtr	newac,FormationIndex formpos
 //	inwingpos+=outwingpos;
 
 
-//DEADCODE JIM 25/02/99 	newac->ai.followeraction = 	pilot->nextfollact;//RDH 18Aug96
 //	newac->ai.PilotSkills.combatskill 	= 	pilot->PilotSkills.combatskill;		//RDH 18Aug96
 //	newac->ai.PilotSkills.combatskill 	= 	pilot->flyingskill;		//RDH 11Aug98
 //	newac->ai.character = 		pilot->character;	//RDH 11Aug98
-//DeadCode CSB 05/07/99		newac->ai.morale 	= 		pilot->morale;		//RDH 18Aug96
 
 
 
@@ -3575,14 +3212,12 @@ void	Persons3::ColourRulePlayerSquadron(AirStrucPtr	newac,FormationIndex formpos
 }
 //void	Persons3::ColourRulePlayerAuto(AirStrucPtr	newac,FormationIndex formpos,UByte* s)
 //{
-//DeadCode RDH 23Sep96 	if (SHAPE.SetAnimData(newac)!=sizeof(AircraftAnimData))
 //	if (SHAPE.SetAnimData(newac,0)!=sizeof(AircraftAnimData))	//DAW 12May98... 0 is weapon pack
 //		_Error.EmitSysErr("Animation not aircraft");
 //	AircraftAnimData*	anim=(AircraftAnimData*)newac->Anim;
 //	int inwingpos,outwingpos;
 //	inwingpos=formpos&InWingMAX;
 //	outwingpos=formpos&InFormMAX;
-//DeadCode RDH 17Feb97 	outwingpos*=Miss_Man.camp.squad[0].pilotsperflight;			//RDH 17Feb97
 //	outwingpos*=4;												//RDH 17Feb97
 //	inwingpos+=outwingpos;
 //	anim->imagemaptail		=MMC.Active_Pilots[inwingpos].imagemaps.tail;
@@ -3603,14 +3238,12 @@ void	Persons3::ColourRulePlayerSquadron(AirStrucPtr	newac,FormationIndex formpos
 
 //void	Persons3::ColourRulePaintShop(AirStrucPtr	newac,FormationIndex formpos,UByte* s)
 //{
-//DeadCode RDH 23Sep96 	if (SHAPE.SetAnimData(newac)!=sizeof(AircraftAnimData))
 //	if (SHAPE.SetAnimData(newac,0)!=sizeof(AircraftAnimData))	//DAW 12May98... 0 is weapon pack
 //		_Error.EmitSysErr("Animation not aircraft");
 //	AircraftAnimData*	anim=(AircraftAnimData*)newac->Anim;
 //	int inwingpos,outwingpos;
 //	inwingpos=formpos&InWingMAX;
 //	outwingpos=formpos&InFormMAX;
-//DeadCode RDH 17Feb97 	outwingpos*=Miss_Man.camp.squad[0].pilotsperflight;			//RDH 17Feb97
 //	outwingpos*= 4;												//RDH 17Feb97
 //	inwingpos+=outwingpos;
 //	anim->imagemaptail		=MMC.Active_Pilots[inwingpos].imagemaps.tail;
@@ -3667,7 +3300,6 @@ void	Persons3::FreeRoutes()
 
 void	Persons3::FreeEvents()
 {
-//DEADCODE JIM 17/03/99 	while (EventRec::eventbase)	delete EventRec::eventbase;
 
 }
 
@@ -3778,11 +3410,8 @@ void	Persons3::FreeEvents()
 //------------------------------------------------------------------------------
 void	Persons3::PreScanBF(FileNum f)
 {
-//DEADCODE JIM 25/03/99 	(UWord&)CustomMissionDesc[0]=0;
-//DEADCODE JIM 25/03/99 	(UWord&)CustomMissionNews[0]=0;
 //	justscanning=SCANNAMES;
 	LoadSubPiece(NULL,f,(int)LOADEDBFS-1,SCANNAMES);
-//DEADCODE JIM 25/03/99 	CustomMission.playerbf=f;
   //	justscanning=LOAD;
 }
 //

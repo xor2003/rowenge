@@ -220,8 +220,6 @@ void CCommsDeathMatchAc::OnTextChangedCurrentac(LPCTSTR text)
 		DPlay::H2H_Player[_DPlay.mySlot].squadron = index + SQ_R_FLYABLE;	
 
 	CSQuick1::quickdef.UpdateAcType();
-//DeadCode JIM 12Jan99 	RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
-//DEADCODE RDH 25/03/99 	FullPanel()->LaunchDial(new CCurrEmblem,1);
 	FullPanel()->PaintShopDesc();
 
 

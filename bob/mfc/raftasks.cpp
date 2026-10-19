@@ -384,30 +384,6 @@ BOOL RAFTaskSummary::OnInitDialog()
 
 	Refresh();
 
-//DEADCODE RDH 17/01/00    	CRSpinBut* spinbut;
-//DEADCODE RDH 17/01/00 	spinbut=GETDLGITEM(IDC_RSPINBUT_BOMBERS);
-//DEADCODE RDH 17/01/00 	spinbut->Clear();
-//DEADCODE RDH 17/01/00 	spinbut->AddString("Squadron Leader");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("Singleton");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("Element");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("Flight");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("2 Flights");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("1 Squadron");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("2 Squadrons");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("3 Squadrons");
-//DEADCODE RDH 17/01/00 
-//DEADCODE RDH 17/01/00 
-//DEADCODE RDH 17/01/00  	spinbut=GETDLGITEM(IDC_RSPINBUT_FIGHTERS);
-//DEADCODE RDH 17/01/00 	spinbut->Clear();
-//DEADCODE RDH 17/01/00 	spinbut->AddString("Squadron Leader");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("Singleton");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("Element");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("Flight");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("2 Flights");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("1 Squadron");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("2 Squadrons");
-//DEADCODE RDH 17/01/00 	spinbut->AddString("3 Squadrons");
-//DEADCODE RDH 17/01/00 
 	
 	
 
@@ -431,15 +407,6 @@ END_EVENTSINK_MAP()
 
 void RAFTaskSummary::OnTextChangedRspinbutHurricanes(LPCTSTR caption, short Index) 
 {  
-//DeadCode JIM 19Oct00 
-//DeadCode JIM 19Oct00 	if (	Index==0 
-//DeadCode JIM 19Oct00 		&&	Todays_Packages.pack[Todays_Packages.hipack].squadlist.Max()==1 
-//DeadCode JIM 19Oct00 		&&	Todays_Packages.pack[Todays_Packages.hipack][0].Squadron().AcType()>=PT_HURR_A
-//DeadCode JIM 19Oct00 		)
-//DeadCode JIM 19Oct00 	{	//Can spin both to zero!										//JIM 19Oct00
-//DeadCode JIM 19Oct00 		GETDLGITEM(IDC_RSPINBUT_HURRICANES)->SetIndex(1);
-//DeadCode JIM 19Oct00 		return;
-//DeadCode JIM 19Oct00 	}
 		Profile& pk = Todays_Packages.pack[Todays_Packages.hipack];
 	int reqac=-1,reqsq=0;
 	int orgac=-1,orgsq=0;
@@ -461,7 +428,6 @@ void RAFTaskSummary::OnTextChangedRspinbutHurricanes(LPCTSTR caption, short Inde
 		pk.RAFResetAcNumbers(MMC.directives.raf.userprofiles[rafdirectivemisstype].acselectionrules, orgsq, reqsq, reqac);
 		Todays_Packages.CheckHilightValid();
 		Todays_Packages.SetRAFTaskData();
-//DeadCode JIM 15Sep00 		pk.ReShareSecondaries();
 		typedef	Profile::AttackMethod AttackMethod;
 		MAKEFIELD(AttackMethod,Profile::AM_FIELD_MIN,Profile::AM_FIELD_MAX);
 		AttackMethodField	am={0};//pk.ScanAttackMethods();
@@ -498,7 +464,6 @@ void RAFTaskSummary::OnTextChangedRspinbutSpitfires(LPCTSTR caption, short Index
 			pk.DeleteNumerousSquadrons(oppositerule);
 			pk.RAFResetAcNumbers(newmixtype,pk.squadlist.Max(),oldsquads,oldacs);
 			Todays_Packages.SetRAFTaskData();
-	//DeadCode JIM 15Sep00 		pk.ReShareSecondaries();
 			typedef	Profile::AttackMethod AttackMethod;
 			MAKEFIELD(AttackMethod,Profile::AM_FIELD_MIN,Profile::AM_FIELD_MAX);
 			AttackMethodField	am={0};//pk.ScanAttackMethods();

@@ -59,7 +59,6 @@ enum MATERIAL_FLAGS
     IS_SPECULAR = 1<<5,
 };
 const ULong MAX_TEXTURE_OPTS = 10;
-//DeadCode JON 13Jul00 const D3DVALUE zSMALL = 0.000001;
 
 const ULong COL_NULL = 0xFF000000;
 const ULong SPECULAR_NO_FOG = 0xFF000000;
@@ -219,17 +218,6 @@ enum ClipCode
 
 #define DISCARD_POLYGON(p1)	AllocDiscard((char*)(p1));
 
-//DEADCODE JON 5/23/00 struct R3DTNLVERTEX
-//DEADCODE JON 5/23/00 {
-//DEADCODE JON 5/23/00 	union {D3DVALUE sx; D3DVALUE dvSX;};
-//DEADCODE JON 5/23/00 	union {D3DVALUE sy; D3DVALUE dvSY;};
-//DEADCODE JON 5/23/00 	union {D3DVALUE sz; D3DVALUE dvSZ;};
-//DEADCODE JON 5/23/00 	union {D3DVALUE rhw; D3DVALUE dvRHW;};
-//DEADCODE JON 5/23/00 	union {D3DCOLOR color; D3DCOLOR dcColor;};
-//DEADCODE JON 5/23/00 	union {D3DCOLOR specular; D3DCOLOR dcSpecular;};
-//DEADCODE JON 5/23/00 	union {D3DVALUE tu; D3DVALUE dvTU;};
-//DEADCODE JON 5/23/00 	union {D3DVALUE tv; D3DVALUE dvTV;};
-//DEADCODE JON 5/23/00 };
 
 typedef struct VPDESC
 {
@@ -379,8 +367,6 @@ struct R3DMATRIX
         return true;
     }
 
-//DeadCode JON 19Sep00     R3DMATRIX_VAL& operator()(int iRow, int iColumn) { return m[iRow][iColumn]; }
-//DeadCode JON 19Sep00     const R3DMATRIX_VAL& operator()(int iRow, int iColumn) const { return m[iRow][iColumn]; }
 };
 #endif
 
@@ -532,9 +518,7 @@ const UWord NULL_LAND_TEXT_REF = 0xFFFF;
 
 typedef ULong HDRIVER;
 typedef ULong HMODE;
-//deadcode typedef ULong HMATERIAL;
 typedef ULong HTEXTUREMAP;
-//DeadCode JON 17Sep00 typedef ULong HRENDERTARGET;
 
 enum RENDERTARGET_TYPE
 {
@@ -584,9 +568,6 @@ public:
 #define	MAX_MODES		128
 #define	MAX_TEXT_LENGTH	64
 
-//DeadCode JON 17Sep00 #define RENDERTARGET_PRIMARY HRENDERTARGET(0)
-//DeadCode JON 17Sep00 #define RENDERTARGET_LANDSCAPE HRENDERTARGET(1)
-//DeadCode JON 17Sep00 #define RENDERTARGET_MIRROR HRENDERTARGET(2)
 
 #define NUM_PALETTES	8
 
@@ -709,6 +690,8 @@ typedef struct Material
         f=0x00;
         isLand=0;
         isMasked=MSK_NONE;
+        materialFlags=0;
+        pad0=pad1=0;
         uniqueTextID = TIT_PLAIN+cc;
         p[0]=p[1]=p[2]=NULL;
         tsW[0]=tsW[1]=tsW[2]=0;
@@ -723,6 +706,8 @@ typedef struct Material
         f=0;
         c=0;
         isLand=0;
+        materialFlags=0;
+        pad0=pad1=0;
         uniqueTextID = TIT_NULL;
     } // blank constructor - check
     Material(MAPDESC *p0,MAPDESC *p1=NULL,MAPDESC *p2=NULL) // construct with imagemaps.
@@ -732,7 +717,6 @@ typedef struct Material
         p[1]=p1;
         p[2]=p2;
         f=0x00;
-//DEADCODE JON 2/16/00 		isMasked=(p[0]->isMasked || p[0]->alpha!=NULL)?0x01:0x00;
         if ( p[0]->isMasked )
         {
             isMasked=MSK_MASKED;
@@ -757,6 +741,8 @@ typedef struct Material
 //		if ( p[1] )
 //			uniqueTextID = p[0]->hTextureMap + ((p[1]->hTextureMap<<11)&TIT_MASK_SECONDARY);
 //		else
+        materialFlags=0;
+        pad0=pad1=0;
         uniqueTextID = p[0]->hTextureMap;
     }
 }
@@ -882,11 +868,6 @@ class _R3DVERTEX3 : public R3DVERTEX2
 public: // we will steal these 8 bytes as we never use 3 textures
     ULong pad0;
     ULong pad1;
-//DeadCode JON 30Oct00 	ULong clipcode;
-//DeadCode JON 30Oct00 	UWord vertIndex;
-//DeadCode JON 30Oct00 	UWord uploadPass;
-//DeadCode JON 30Oct00 	union {D3DVALUE tu2; D3DVALUE dvTU2; SWord ix2;};
-//DeadCode JON 30Oct00 	union {D3DVALUE tv2; D3DVALUE dvTV2; SWord iy2;};
 };
 
 #ifndef _NO_VERTEX_SHARING_HDR
@@ -903,7 +884,6 @@ enum DoPointFlags
     WORLD_COORDS		= 1<<3,//0x00000008,															//3
     TEXTURE_COORDS		= 1<<4,//0x00000010,															//4
     TEXTURE1_COORDS		= 1<<5,//0x00000020,															//5
-//DeadCode JON 30Oct00 	TEXTURE2_COORDS		= 1<<6,//0x00000040,															//6
     LIGHT_NORMAL		= 1<<6,//0x00000080,															//7
     DO_CLIP				= 1<<7,//0x00000100, // added in at a later stage.								//8
     DO_SW_FOG			= 1<<8,//0x00000200, // as above												//9
@@ -914,16 +894,6 @@ enum DoPointFlags
     PLAINCOL_FLAG		= 1<<31,		// used outside... - MUST be top bit...
 //	PLAINCOLSHIFT		= 31-7,			// the right shift to go to the lightnormal pos
 //	PLAINCOLTEXTSHIFT	= 31-4,			// the right shift to go to the textureflag...
-//DeadCode JON 20Sep00 	LIGHTMODE_FLAG		= 1<<30,		// used outside...
-//DeadCode JON 20Sep00 	LIGHTMODE_FLAG1		= 1<<29,		// used outside...
-//DeadCode JON 20Sep00 	LIGHTMODE_FLAG2		= 1<<28,		// used outside...
-//DeadCode JON 20Sep00
-//DeadCode JON 20Sep00 	LIGHTMODE_MASK		= (LIGHTMODE_FLAG|LIGHTMODE_FLAG1|LIGHTMODE_FLAG2),
-//DeadCode JON 20Sep00 	LIGHTMODE_NUM_SHIFT = 28,
-//DeadCode JON 20Sep00 	LIGHTMODE_NUM_MASK	= (1<<2)+(1<<1)+1,
-//DeadCode JON 20Sep00 	LIGHTMODESHIFT		= 30-7,			// the right shift needed to move from lightmode flag to LIGHT_NORMAL.
-//DeadCode JON 20Sep00 	LIGHTMODESHIFT1		= 29-7,			// the right shift needed to move from lightmode flag to LIGHT_NORMAL.
-//DeadCode JON 20Sep00 	LIGHTMODESHIFT2		= 28-7,			// the right shift needed to move from lightmode flag to LIGHT_NORMAL.
 };
 
 #ifndef _NO_VERTEX_SHARING_HDR
@@ -1014,8 +984,6 @@ public:
     {
         return flags&TEXTURE1_COORDS;
     }
-//DeadCode JON 30Oct00 	void setInvalidTexture2( void )			{ flags&=~TEXTURE2_COORDS; }
-//DeadCode JON 30Oct00 	ULong isTexture2Valid( void ) const		{ return flags&TEXTURE2_COORDS; }
     void setInvalidNormal( void )
     {
         flags&=~LIGHT_NORMAL;
@@ -1032,7 +1000,6 @@ public:
     {
         lightModeCount = 0;
     }
-//DeadCode JON 20Sep00 		flags&=~LIGHTMODE_MASK; }
 
 };
 #endif
@@ -1060,8 +1027,6 @@ public:
         return *this;
     }
 */
-//DEADCODE JON 5/24/00 #pragma message ( __HERE__ "sort out this" )
-//DEADCODE JON 5/24/00 	R3DVERTEX& operator + () {return *this;}					//RJS 19May00
 
     const R3DVERTEX2& getR3DVert() const
     {
@@ -1222,10 +1187,6 @@ public:
         return nz;
     }
 
-//DeadCode JON 30Jun00 	R3DCOLOUR getVertexCol( void ) const // get a colour off a vertex - cannot be used in conjunction with normal info
-//DeadCode JON 30Jun00 	{
-//DeadCode JON 30Jun00 		return color;
-//DeadCode JON 30Jun00 	}
 
     D3DCOLOR getVertexCol( void ) const // get a colour off a vertex - cannot be used in conjunction with normal info
     {
@@ -1275,27 +1236,6 @@ public:
     {
         return iy1;
     }
-//DeadCode JON 30Oct00 	void setIMapCoords2( const SWord newX, const SWord newY ) // set the image map coords for 3rd texture
-//DeadCode JON 30Oct00 	{
-//DeadCode JON 30Oct00 		ix2 = newX;
-//DeadCode JON 30Oct00 		iy2 = newY;
-//DeadCode JON 30Oct00 #ifndef _NO_VERTEX_SHARING_HDR
-//DeadCode JON 30Oct00 		info.setInvalidTexture2();
-//DeadCode JON 30Oct00 #endif
-//DeadCode JON 30Oct00 	}
-//DeadCode JON 30Oct00 	void getIMapCoords2( SWord &rx, SWord &ry ) const
-//DeadCode JON 30Oct00 	{
-//DeadCode JON 30Oct00 		rx = ix2;
-//DeadCode JON 30Oct00 		ry = iy2;
-//DeadCode JON 30Oct00 	}
-//DeadCode JON 30Oct00 	SWord getIMapX2( void  ) const
-//DeadCode JON 30Oct00 	{
-//DeadCode JON 30Oct00 		return ix2;
-//DeadCode JON 30Oct00 	}
-//DeadCode JON 30Oct00 	SWord getIMapY2( void  ) const
-//DeadCode JON 30Oct00 	{
-//DeadCode JON 30Oct00 		return iy2;
-//DeadCode JON 30Oct00 	}
 
 };
 
@@ -1303,13 +1243,6 @@ class SVertex : public DoPointStruc
 {
     friend class CLib3D;
 public:
-//DEADCODE JON 5/24/00 	union
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		R3DVERTEX3		r3dvert;
-//DEADCODE JON 5/24/00 		R3DVERTEX		d3dtlvert;
-//DEADCODE JON 5/24/00 		R3DVERTEX2		d3dtlvert2;
-//DEADCODE JON 5/24/00 		R3DVERTEX3		d3dtlvert3;
-//DEADCODE JON 5/24/00 	};
     SVertex *pNext;
 #ifndef _NO_VERTEX_SHARING_HDR
     SVertex *identical;
@@ -1348,8 +1281,6 @@ public:
                    tv	==	o.tv	&&
                    tu1	==	o.tu1	&&
                    tv1	==	o.tv1	&&
-//DeadCode JON 30Oct00 			tu2	==	o.tu2	&&
-//DeadCode JON 30Oct00 			tv2	==	o.tv2	&&
                    hw	==	o.hw	);
     }
 
@@ -1406,14 +1337,6 @@ public:
 
     void Transform( const R3DMATRIX* mat )
     {
-//DEADCODE JON 5/24/00 		D3DVALUE x = r3dvert.x; // temporary store
-//DEADCODE JON 5/24/00 		D3DVALUE y = r3dvert.y;
-//DEADCODE JON 5/24/00 		D3DVALUE z = r3dvert.z;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 		r3dvert.x	= mat->_11*x + mat->_21*y + mat->_31*z + mat->_41;
-//DEADCODE JON 5/24/00 		r3dvert.y	= mat->_12*x + mat->_22*y + mat->_32*z + mat->_42;
-//DEADCODE JON 5/24/00 		r3dvert.z	= mat->_13*x + mat->_23*y + mat->_33*z + mat->_43;
-//DEADCODE JON 5/24/00 		hw			= mat->_14*x + mat->_24*y + mat->_34*z + mat->_44;
         R3DMATRIX_VAL tx = x; // temporary store
         R3DMATRIX_VAL ty = y;
         R3DMATRIX_VAL tz = z;
@@ -1428,13 +1351,6 @@ public:
     {
         // Just bring the sphere forward by the radius...
         //...must be called after the vertex has been transformed to the viewer
-//DEADCODE JON 5/24/00 		D3DVALUE	oldZ = r3dvert.z;
-//DEADCODE JON 5/24/00 		r3dvert.z -= radius;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 		D3DVALUE fudgeScale = r3dvert.z/oldZ;
-//DEADCODE JON 5/24/00 		radius *= fudgeScale;
-//DEADCODE JON 5/24/00 		r3dvert.x *= fudgeScale;
-//DEADCODE JON 5/24/00 		r3dvert.y *= fudgeScale;
 
         D3DVALUE	oldZ = z;
         z -= radius;
@@ -1452,16 +1368,6 @@ typedef SVertex Lib3DPoint;
 
 //typedef DWORD D3DCOLOR, *LPD3DCOLOR;
 
-//DEADCODE JON 5/24/00 struct R3DTLVERTEX
-//DEADCODE JON 5/24/00 {
-//DEADCODE JON 5/24/00 	union {D3DVALUE sx; D3DVALUE dvSX;};
-//DEADCODE JON 5/24/00 	union {D3DVALUE sy; D3DVALUE dvSY;};
-//DEADCODE JON 5/24/00 	union {D3DVALUE sz; D3DVALUE dvSZ;};
-//DEADCODE JON 5/24/00 	union {D3DVALUE rhw; D3DVALUE dvRHW;};
-//DEADCODE JON 5/24/00 	union {D3DCOLOR color; D3DCOLOR dcColor;};
-//DEADCODE JON 5/24/00 	union {D3DVALUE tu; D3DVALUE dvTU; SWord ix;};
-//DEADCODE JON 5/24/00 	union {D3DVALUE tv; D3DVALUE dvTV; SWord iy;};
-//DEADCODE JON 5/24/00 };
 struct _DDCOLORKEY;
 typedef _DDCOLORKEY DDCOLORKEY;
 struct ROWANSURFACEDESC
@@ -1565,7 +1471,6 @@ public:
 
     virtual HRESULT VisibleCheck(D3DVECTOR*,ULong,ULong*)=0;
     virtual HRESULT VisibleCheck(D3DVECTOR*,D3DVALUE*,ULong,ULong*)=0;
-//DEADCODE JON 5/24/00 	virtual HRESULT VisibleCheck(R3DVERTEX*,ULong,ULong*)=0;
     virtual HRESULT VisibleCheck(DoPointStruc*,ULong,ULong*)=0;
 
     virtual HRESULT SetProjectionMatrix(const Angles& fov,const D3DVALUE& aspect,const D3DVALUE& zN,const D3DVALUE& zF,const bool noFogInScene = false)=0;
@@ -1586,7 +1491,6 @@ public:
     virtual HRESULT DecGlobal(const TOGGLES&)=0;
 
     virtual	HRESULT CreateTexture(MAPDESC*,const TCFLAGS&)=0;
-//DeadCode JON 17Sep00 	virtual HRESULT UploadTexture( const UWord&)=0;
     virtual HRESULT UploadTexture()=0;
     virtual HRESULT ReduceLandQuality(UWord& sourceTextIndex, UWord& destTextIndex )=0;	//JON 6/6/00
 
@@ -1604,39 +1508,23 @@ public:
     virtual HRESULT SetMaterial(UWord,MAPDESC *pmap=NULL)=0; // set to use a landscape material
     virtual HRESULT SetMaterial(const HMATERIAL& mat)=0; // set to use a non landscape material
 
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginPoly(const ULong&,R3DVERTEX*&)=0;
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginPoly(const HMATERIAL&,const ULong&,R3DVERTEX*&)=0;
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginPoly(const HMATERIAL&,const ULong&,R3DTLVERTEX*&)=0;
     virtual Lib3DPoint* BeginPoly(const ULong&)=0; // assume the material is already set.
     virtual Lib3DPoint* BeginPoly( const HMATERIAL& mat, const ULong& vertexCount )=0;
     virtual HRESULT EndPoly()=0;
 
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginStrip(const ULong&,R3DVERTEX*&)=0;
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginStrip(const HMATERIAL&,const ULong&,R3DVERTEX*&)=0;
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginStrip(const HMATERIAL&,const ULong&,R3DTLVERTEX*&)=0;
-//DEADCODE JON 5/19/00 	virtual HRESULT EndStrip()=0;
 
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginFan(const ULong&,R3DVERTEX*&)=0;
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginFan(const HMATERIAL&,const ULong&,R3DVERTEX*&)=0;
-//DEADCODE JON 5/19/00 	virtual HRESULT BeginFan(const HMATERIAL&,const ULong&,R3DTLVERTEX*&)=0;
     virtual Lib3DPoint* BeginFan( const ULong& vertexCount )=0;
     virtual Lib3DPoint* BeginFan( const HMATERIAL& mat, const ULong& vertexCount )=0;
     virtual HRESULT EndFan()=0;
 
-//DEADCODE JON 5/22/00 	virtual HRESULT DrawSphere(const HMATERIAL&,const R3DVERTEX&,const D3DVALUE&,const Angles,const SWord,const SWord,const SWord,const SWord)=0;
     virtual HRESULT DrawSphere(const HMATERIAL&,const DoPointStruc&,const D3DVALUE&,const Angles,const SWord,const SWord,const SWord,const SWord)=0;
     virtual HRESULT DrawTransformedSphere(const HMATERIAL&,const DoPointStruc&,const D3DVALUE&,const Angles,const SWord,const SWord,const SWord,const SWord)=0;//RJS 20Mar00
-//DEADCODE JON 5/22/00 	virtual HRESULT DrawLine(const HMATERIAL&,const R3DVERTEX&,const R3DVERTEX&)=0;
-//DEADCODE JON 5/19/00 	virtual HRESULT DrawLine(const HMATERIAL&,const R3DTLVERTEX&,const R3DTLVERTEX&)=0;
     virtual HRESULT DrawLine(const HMATERIAL&,const DoPointStruc&,const DoPointStruc&)=0;
     virtual HRESULT DrawTransformedLine(const HMATERIAL&,const DoPointStruc&,const DoPointStruc&)=0;
 
-//DeadCode JON 19Oct00 	virtual HRESULT DrawPoint(const HMATERIAL&,const DoPointStruc&)=0;
 
     virtual HRESULT	GiveHint(const HINTS&)=0;
 
-//DEADCODE JON 5/22/00 	virtual HRESULT DrawCylinder(const HMATERIAL&,const R3DVERTEX&,const R3DVERTEX&,
-//DEADCODE JON 5/22/00 								const D3DVALUE&,const SWord,const SWord,const SWord,const SWord)=0;//RJS 14Feb00
     virtual HRESULT DrawCylinder(const HMATERIAL&,const DoPointStruc&,const DoPointStruc&,
                                  const D3DVALUE&,const SWord,const SWord,const SWord,const SWord)=0;//RJS 14Feb00
     virtual	HRESULT CylinderOffsets(const DoPointStruc&,const DoPointStruc&,const D3DVALUE&,D3DVALUE&,D3DVALUE&,DoPointStruc&)=0;
@@ -1662,10 +1550,6 @@ public:
     virtual HRESULT DrawPivotedSphere(const HMATERIAL&,const DoPointStruc&,const D3DVALUE&,const Angles,const SWord,const SWord,const SWord,const SWord)=0;//RJS 06Jun00
 
     virtual HRESULT SetMirrorTexture( const HMATERIAL& )=0;						//JON 3Jul00
-//DeadCode JON 17Sep00 	HRESULT UploadMirror( void )
-//DeadCode JON 17Sep00 	{
-//DeadCode JON 17Sep00 		return UploadTexture( /*0*/ );
-//DeadCode JON 17Sep00 	}
 
     virtual HRESULT Wipe( const D3DCOLOR )=0;							//JON 4Jul00
 
@@ -1865,9 +1749,7 @@ private:
     D3DVALUE zSMALL;						// smallest distance for one z value	//JON 13Jul00
     HMATERIAL mirrorTexture;				// where the mirror is put...
     SVertex dummyVertex;					// a dummy vertex to point to in the list
-//DeadCode JON 20Sep00 	ULong lightModeFlag;						// store which lightmode (or colour) we are in...
     ULong lightModeCount;					// store which lightmode (or colour) we are in...
-//DeadCode JON 28Oct00 	D3DVALUE guardBandMod;					// the guard band modification. JON 12Jun00
     D3DVALUE guardBandModLeft;
     D3DVALUE guardBandModRight;
     D3DVALUE guardBandModTop;
@@ -1898,10 +1780,6 @@ private:
     RECT backBufferRect;
 
     SVertex* lastDoPoint[ MAX_DOPOINTS+1 ];								//JON 5/25/00
-//DeadCode JON 4Sep00 	D3DVALUE	landscapeTextScaleX, landscapeTextScaleY;				//JON 5/26/00
-//DeadCode JON 4Sep00 	D3DVALUE	landscapeTextOffsetX, landscapeTextOffsetY;				//JON 5/26/00
-//DeadCode JON 5Sep00 	D3DVALUE landscapeTextScale;
-//DeadCode JON 5Sep00 	D3DVALUE landscapeTextOffset;
 
 
     SLong		projMatStackPos;
@@ -1912,15 +1790,10 @@ private:
     R3DMATRIX 	projectionMatrix[MATRIX_STACK_SIZE];//current projection matrix
     R3DMATRIX 	viewerMatrix[MATRIX_STACK_SIZE];	//current viewer matrix
     R3DMATRIX 	objectMatrix[MATRIX_STACK_SIZE];	//current object matrix
-//DeadCode JON 7Sep00 	R3DMATRIX	transpMatrix[MATRIX_STACK_SIZE];	//matrices needed 4 transparent polys on TNL.
     R3DMATRIX	objViewMatrix;											//JON 7Sep00
     R3DMATRIX	combinedMatrix;
     R3DMATRIX	clippingMatrix;
-//DeadCode JON 19Sep00 	ULong		combMatBits;
 //TempCode JON 21Aug00 	ULong 		projMatBits[MATRIX_STACK_SIZE*NUM_Z_LAYERS];
-//DeadCode JON 19Sep00 	ULong 		projMatBits[MATRIX_STACK_SIZE];
-//DeadCode JON 19Sep00 	ULong 		viewMatBits[MATRIX_STACK_SIZE];
-//DeadCode JON 19Sep00 	ULong 		objMatBits[MATRIX_STACK_SIZE];
     D3DVALUE	backProjectX;											//JON 11Sep00
     D3DVALUE	backProjectY;		// these multiplying projected x and y by these will give -ve eye space...
 
@@ -1936,7 +1809,6 @@ private:
     HWND	hwTop;
     HWND	hwOther;
     Flags	flags;
-//DeadCode JON 12Jun00 	Flags	hwClipFlag;
     LIGHTFLAG lightflag;
     ULong	gFogColour;
     ULong	gFontColour;
@@ -2002,7 +1874,6 @@ private:
 
     DDSURFACEDESC2	primarySurfaceDesc;
 
-//DeadCode JON 26Sep00 	UByte			paletteTable[256*3*NUM_PALETTES];
     UByte*	paletteTable;
 #ifndef NO_HARD_TNL
     D3DMATERIAL7	materialTable[256];
@@ -2024,10 +1895,6 @@ private:
     SLong landTextureMaxOnScreen[LAND_TEXT_BANDS];						//JON 31Jul00
 
 
-//DeadCode JON 18Jul00 	SLong&	num1024Textures,	num512Textures, // note these should be depriciated
-//DeadCode JON 18Jul00 			num256Textures,		num128Textures, // set to point to part of table above in constuctor
-//DeadCode JON 18Jul00 			num64Textures,		num32Textures,
-//DeadCode JON 18Jul00 			num16Textures,		num8Textures;
 
     HMATERIAL hLastMaterial;
     bool fDoMasked;
@@ -2035,21 +1902,15 @@ private:
     static bool fixZbuffer;
 
     ULong plainPolyVCnt;
-//DeadCode JON 21Aug00 	ULong *textPolyVCntP;
     ULong textPolyVCnt;
-//DeadCode JON 21Aug00 	ULong textPolyVCnt[NUM_Z_LAYERS];										//JON 14Aug00
     SPolygon *plainPolys,*transparentPolys,*localspheres;//JIM 22Jun100
     SPolygon *texturedPolys;
     // layer 1 of the textured polys is behind layer 2 if they are co-planer.
-//DeadCode JON 21Aug00 	SPolygon* texturedPolys[NUM_Z_LAYERS];									//JON 14Aug00
-//DeadCode JON 21Aug00 	SPolygon** texturedPolysP;
 
     SLine *aliasLineList;
     SLine *lineList;
     SPoint *pointList;
 
-//DeadCode JON 5Sep00 	ULong gFreeRAM;
-//DeadCode JON 5Sep00 	ULong g_usedRAM;
 
     alloc_handle_t *memPool;
 
@@ -2071,29 +1932,18 @@ private:
     static	HRESULT lastError;
     static	D3DDEVICEDESC7 selectedDevice;
     static	WORD polyVerts[MAX_VERTICES];
-//DEADCODE JON 5/19/00 	static	DWORD polyVertCount;
     static	DWORD vertexType;
-//DEADCODE JON 5/19/00 	static	R3DVERTEX *polyVertArray;
     SPolygon* currentPoly;												//JON 5/19/00
-//DEADCODE JON 5/24/00 	static	R3DTLVERTEX *polyVertArrayTL;
     static	R3DMATRIX IDENTITY;
 //	static	ULong fastSqrtTable[0x10000];
     ULong* fastSqrtTable;
-//DeadCode JON 13Oct00 	static SWord tableCode1[65536];
-//DeadCode JON 13Oct00 	static SWord tableCode2[256];
     static	ULong refCnt;
     static	VPDESC vpDesc;
     //RJS 24Mar00
     static	DWORD	texturesTotalRAM;									//RJS 24Mar00
 
-//DEADCODE JON 5/25/00 	static	R3DVERTEX	vertArray[MAX_VERTICES];
-//DEADCODE JON 5/25/00 	static	R3DVERTEX2	vertArray2[MAX_VERTICES];
-//DEADCODE JON 5/25/00 	static	R3DVERTEX3	vertArray3[MAX_VERTICES];
 
-//DEADCODE JON 5/24/00 	static	R3DTLVERTEX tlVertArray[MAX_VERTICES];
     static	UByte fogTable[1024];
-//DeadCode JON 7Sep00 	static	NaffDriverID naffDriverTable[];
-//DeadCode JON 7Sep00 	static	int ND_Max;
     static R3DCOLOUR lightingTable[256];
     static R3DCOLOUR specularTable[256];
 private:
@@ -2102,10 +1952,6 @@ private:
 //			LIGHTMODE_NUM_SHIFT = 29,
 //			LIGHTMODE_NUM_MASK	= (1<<1)+1,
         lightModeCount++;
-//DeadCode JON 20Sep00 		lightModeFlag >>= LIGHTMODE_NUM_SHIFT;
-//DeadCode JON 20Sep00 		lightModeFlag++;
-//DeadCode JON 20Sep00 		lightModeFlag&=LIGHTMODE_NUM_MASK;
-//DeadCode JON 20Sep00 		lightModeFlag <<= LIGHTMODE_NUM_SHIFT;
     }
 #pragma warnmsg("many of these functions don't need this ptr. 4035 will only squelch at TOP l")
 #pragma warning(disable:4035)  // don't tell me there is no return value
@@ -2143,13 +1989,6 @@ private:
 
     inline bool SameMaterial(const Material& a,const Material& b)
     {
-//DEADCODE JON 5/10/00 		if (a.isLand!=0)						return bool (a.isLand==b.isLand && a.p[1]==b.p[1]);
-//DEADCODE JON 5/10/00 		if (a.f!=b.f)							return false;
-//DEADCODE JON 5/10/00 		if (a.f==0)								return bool(a.c==b.c);
-//DEADCODE JON 5/10/00 		if (a.p[0]!=b.p[0])						return false;
-//DEADCODE JON 5/10/00 		if (a.p[1]!=b.p[1])						return false;
-//DEADCODE JON 5/10/00 		if (a.p[2]!=b.p[2])						return false;
-//DEADCODE JON 5/10/00 		return true;
         return (
                    a.uniqueTextID == b.uniqueTextID &&
                    a.p[1] == b.p[1] &&
@@ -2158,12 +1997,6 @@ private:
     }
     inline bool SameTransMat(const Material& a,const Material& b)
     {
-//DEADCODE JON 5/10/00 		if (a.c!=b.c)							return false;
-//DEADCODE JON 5/10/00 		if (a.f!=b.f)							return false;
-//DEADCODE JON 5/10/00 		if (a.p[0]!=b.p[0])						return false;
-//DEADCODE JON 5/10/00 		if (a.p[1]!=b.p[1])						return false;
-//DEADCODE JON 5/10/00 		if (a.p[2]!=b.p[2])						return false;
-//DEADCODE JON 5/10/00 		return true;
         return ( SameMaterial( a, b ) && a.c==b.c );
     }
     //
@@ -2314,38 +2147,7 @@ private:
         FloatToInt(&val,f);
         return val==0;
     }
-//DEADCODE JON 5/19/00 	ULong ClipCodeLRTB(D3DTLVERTEX *pV)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		ULong clipCode;
-//DEADCODE JON 5/19/00 		D3DVALUE sz;
-//DEADCODE JON 5/19/00 		FP_BITS(sz)=FP_ABS_BITS(pV->rhw);
-//DEADCODE JON 5/19/00 		if (pV->sx<-sz)		clipCode=CLIP_LEFT;
-//DEADCODE JON 5/19/00 		else if (pV->sx>sz)	clipCode=CLIP_RIGHT;
-//DEADCODE JON 5/19/00 		else				clipCode=0UL;
-//DEADCODE JON 5/19/00 		if (pV->sy<-sz)		clipCode+=CLIP_BOTTOM;
-//DEADCODE JON 5/19/00 		else if (pV->sy>sz)	clipCode+=CLIP_TOP;
-//DEADCODE JON 5/19/00 		return clipCode;
-//DEADCODE JON 5/19/00 	}
-//DEADCODE JON 5/19/00 	ULong ClipCodeTB(D3DTLVERTEX *pV)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		ULong clipCode;
-//DEADCODE JON 5/19/00 		D3DVALUE sz;
-//DEADCODE JON 5/19/00 		FP_BITS(sz)=FP_ABS_BITS(pV->rhw);
-//DEADCODE JON 5/19/00 		if (pV->sy<-sz)		clipCode=CLIP_BOTTOM;
-//DEADCODE JON 5/19/00 		else if (pV->sy>sz)	clipCode=CLIP_TOP;
-//DEADCODE JON 5/19/00 		else				clipCode=0UL;
-//DEADCODE JON 5/19/00 		return clipCode;
-//DEADCODE JON 5/19/00 	}
 
-//DEADCODE JON 5/19/00 	void TransformNormal(D3DVALUE& dvX,D3DVALUE& dvY,D3DVALUE& dvZ,const R3DMATRIX* pM)
-//DEADCODE JON 5/19/00 	{
-//DEADCODE JON 5/19/00 		D3DVALUE tx,ty,tz,tw;
-//DEADCODE JON 5/19/00 		tw=1.f/pM->_44;
-//DEADCODE JON 5/19/00 		tx=(pM->_11*dvX+pM->_21*dvY+pM->_31*dvZ)*tw;
-//DEADCODE JON 5/19/00 		ty=(pM->_12*dvX+pM->_22*dvY+pM->_32*dvZ)*tw;
-//DEADCODE JON 5/19/00 		tz=(pM->_13*dvX+pM->_23*dvY+pM->_33*dvZ)*tw;
-//DEADCODE JON 5/19/00 		dvX=tx; dvY=ty; dvZ=tz;
-//DEADCODE JON 5/19/00 	}
 
     inline D3DVALUE DotProduct(const D3DVALUE &ai, const D3DVALUE &aj, const D3DVALUE &ak, const D3DVALUE &bi, const D3DVALUE &bj, const D3DVALUE &bk)
     {
@@ -2355,28 +2157,7 @@ private:
     inline bool	MatrixEqu( const R3DMATRIX &a, const R3DMATRIX &b )
     {
         return ( a==b );
-//DeadCode JON 19Sep00 		for (ULong i=16,*aptr=(ULong*)&a,*bptr=(ULong*)&b;i!=0;aptr++,bptr++)
-//DeadCode JON 19Sep00 			if (*aptr!=*bptr) return false;
-//DeadCode JON 19Sep00 		return true;
     }
-//deadcode
-//deadcode		return ( a._11 == b._11 &&
-//deadcode				 a._12 == b._12 &&
-//deadcode				 a._13 == b._13 &&
-//deadcode				 a._14 == b._14 &&
-//deadcode				 a._21 == b._21 &&
-//deadcode				 a._22 == b._22 &&
-//deadcode				 a._23 == b._23 &&
-//deadcode				 a._24 == b._24 &&
-//deadcode				 a._31 == b._31 &&
-//deadcode				 a._32 == b._32 &&
-//deadcode				 a._33 == b._33 &&
-//deadcode				 a._34 == b._34 &&
-//deadcode				 a._41 == b._41 &&
-//deadcode				 a._42 == b._42 &&
-//deadcode				 a._43 == b._43 &&
-//deadcode				 a._44 == b._44 );
-//deadcode	}
     D3DVALUE Interp(D3DVALUE in,D3DVALUE out,D3DVALUE frac)
     {
         return in+(out-in)*frac;
@@ -2406,19 +2187,15 @@ private:
 
     inline void ADD_POLYGON( SPolygon* &l1, SPolygon* &p1 );
 
-//DEADCODE JON 5/25/00 	inline void PROJECT_SETZ( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
 
-//DEADCODE JON 5/25/00 	inline void PROJECT_SPHERE( SPolygon* p1, const D3DVALUE& cx, const D3DVALUE& cy, const D3DVALUE& sx, const D3DVALUE& sy)//, const D3DVALUE& radius)
 
     inline void PROJECT_LINE( SLine* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy);
 
     inline void PROJECT_POINT( SVertex* pp, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy);
 
-//DeadCode JON 27Sep00 	inline void PROJECT( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
 
     inline void PROJECT( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy);
 
-//DEADCODE JON 5/25/00 	inline void PROJECT_2D( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
 
 //TempCode JON 14Jul00 	inline void PROJECT_2DSETCOL( SPolygon* p1, D3DVALUE cx, D3DVALUE cy, D3DVALUE sx, D3DVALUE sy)
 
@@ -2557,12 +2334,9 @@ private:
 
     HRESULT MakeMipLevel(LPDIRECTDRAWSURFACE7,LPDIRECTDRAWSURFACE7);
     void	CalculateClipPlanes();
-//DeadCode JON 31Aug00 	void	ScaleTextureCoordinates(const HMATERIAL&, SPolygon* );//R3DVERTEX*,ULong);
     void	SetAntiAliasing( const HMATERIAL& mat );
     void	SetCurrentMaterial(const HMATERIAL&, const ULong flags);
     void	InlineSetCurrentMaterial(const HMATERIAL& mat, const ULong flags);	//JON 17Aug00
-//DeadCode JON 17Aug00 	void 	SetTransCurrentMaterial(const HMATERIAL&);
-//DeadCode JON 17Aug00 	void	SetPlainMaterial(/*const HMATERIAL&*/);						//JON 5/9/00
     void	CalcFog(D3DTLVERTEX& v);
     void	FillFogTable(D3DVALUE,D3DVALUE);
 
@@ -2606,7 +2380,6 @@ private:
     void	CombineMatrices();
     void	CombineTranspMat();
     HRESULT	TNLUploadMatrixes();			//jon 8/2/2000
-//DeadCode JON 19Sep00 	ULong	MatrixFlags(R3DMATRIX*);
     HRESULT CreateTextureMap(MAPDESC*,LPDIRECTDRAWSURFACE7&,SLong);
     static	BOOL WINAPI DDEnumCallbackEx(GUID FAR *,LPSTR,LPSTR,LPVOID,HMONITOR);
     static	HRESULT WINAPI EnumModesCallback2(LPDDSURFACEDESC2,LPVOID);
@@ -2692,7 +2465,6 @@ public:
 
     HRESULT VisibleCheck(D3DVECTOR*,ULong,ULong*);
     HRESULT VisibleCheck(D3DVECTOR*,D3DVALUE*,ULong,ULong*);
-//DEADCODE JON 5/24/00 	HRESULT VisibleCheck(R3DVERTEX* v,ULong num,ULong* res);		//JON 5/5/00
     HRESULT VisibleCheck(DoPointStruc* v,ULong num,ULong* res);
 
     HRESULT SetProjectionMatrix(const Angles&,const D3DVALUE&,const D3DVALUE&,const D3DVALUE&,const bool justVisCheck = false);
@@ -2712,7 +2484,6 @@ public:
     HRESULT DecGlobal(const TOGGLES&); 									//JON 14Aug00
 
     HRESULT CreateTexture(MAPDESC*,const TCFLAGS&);
-//DeadCode JON 17Sep00 	HRESULT UploadTexture(const UWord&);
     HRESULT UploadTexture();
     HRESULT ReduceLandQuality(UWord& sourceTextIndex, UWord& destTextIndex );
 
@@ -2731,21 +2502,11 @@ public:
     HRESULT SetMaterial(UWord,MAPDESC *pmap=NULL);
     HRESULT SetMaterial(const HMATERIAL&);
 
-//DEADCODE JON 5/19/00 	HRESULT BeginPoly(const ULong&,R3DVERTEX*&);
-//DEADCODE JON 5/19/00 	HRESULT BeginPoly(const HMATERIAL&,const ULong&,R3DVERTEX*&);
-//DEADCODE JON 5/19/00 	HRESULT BeginPoly(const HMATERIAL&,const ULong&,R3DTLVERTEX*&);
 
     Lib3DPoint* BeginPoly(const ULong&);
     Lib3DPoint* BeginPoly( const HMATERIAL& mat, const ULong& vertexCount );
     HRESULT EndPoly();
 
-//DEADCODE JON 5/19/00 	HRESULT BeginStrip(const ULong&,R3DVERTEX*&);
-//DEADCODE JON 5/19/00 	HRESULT BeginStrip(const HMATERIAL&,const ULong&,R3DVERTEX*&);
-//DEADCODE JON 5/19/00 	HRESULT BeginStrip(const HMATERIAL&,const ULong&,R3DTLVERTEX*&);
-//DEADCODE JON 5/19/00 	HRESULT EndStrip();
-//DEADCODE JON 5/19/00 	HRESULT BeginFan(const ULong&,R3DVERTEX*&);
-//DEADCODE JON 5/19/00 	HRESULT BeginFan(const HMATERIAL&,const ULong&,R3DVERTEX*&);
-//DEADCODE JON 5/19/00 	HRESULT BeginFan(const HMATERIAL&,const ULong&,R3DTLVERTEX*&);
 
     Lib3DPoint* BeginFan( const ULong& vertexCount );
     Lib3DPoint* BeginFan( const HMATERIAL& mat, const ULong& vertexCount );
@@ -2756,16 +2517,11 @@ public:
                        const Angles,const SWord,const SWord,const SWord,const SWord);
     HRESULT DrawTransformedSphere(const HMATERIAL&,const DoPointStruc&,const D3DVALUE&,
                                   const Angles,const SWord,const SWord,const SWord,const SWord);//RJS 20Mar00
-//DEADCODE JON 5/22/00 	HRESULT DrawLine(const HMATERIAL&,const R3DVERTEX&,const R3DVERTEX&);
-//DEADCODE JON 5/22/00 	HRESULT DrawLine(const HMATERIAL&,const R3DTLVERTEX&,const R3DTLVERTEX&);
     HRESULT DrawLine(const HMATERIAL&,const DoPointStruc&,const DoPointStruc&);
     HRESULT DrawTransformedLine(const HMATERIAL&,const DoPointStruc&,const DoPointStruc&);
-//DeadCode JON 19Oct00 	HRESULT DrawPoint(const HMATERIAL&,const DoPointStruc&);
 
     HRESULT	GiveHint(const HINTS&);
 
-//DEADCODE JON 5/22/00 	HRESULT DrawCylinder(const HMATERIAL&,const R3DVERTEX&,const R3DVERTEX&,
-//DEADCODE JON 5/22/00 						const D3DVALUE&,const SWord,const SWord,const SWord,const SWord);//RJS 14Feb00
     HRESULT DrawCylinder(const HMATERIAL&,const DoPointStruc&,const DoPointStruc&,
                          const D3DVALUE&,const SWord,const SWord,const SWord,const SWord);//RJS 14Feb00
     HRESULT CylinderOffsets(const DoPointStruc&,const DoPointStruc&,const D3DVALUE&,D3DVALUE&,D3DVALUE&,DoPointStruc&);

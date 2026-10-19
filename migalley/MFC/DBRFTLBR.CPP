@@ -350,12 +350,10 @@ void CDebriefToolbar::OnClickedNextPeriod()
 		main->m_toolbar1.SetFiltersFromSaveGame();
 		m_pView->m_mapdlg.Invalidate();
 
-//DEADCODE RDH 12/06/99 		main->m_titlebar.Redraw();
 
 		MMC.EndDebrief();
 		main->m_titlebar.Redraw();									  //RDH 12/06/99
 		bool  campend = MMC.ChkEndCampaign();
-//DEADCODE RDH 28/06/99 		Persons4::StartUpMapWorld();
 		if (MMC.Active_Pilots[MMC.playersquadron*24+MMC.playeracnum].status >= IS_DEAD)
 			RDialog::m_pView->LaunchFullPane(&RFullPanelDial::deadpilot);
 		else if (campend)

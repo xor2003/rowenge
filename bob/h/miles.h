@@ -170,8 +170,6 @@ public:
 	static	MusicRequest	request;
 	static	SampleLibrary	wavetable;
 	static	SampleRec		*thesample;							//MS 23Sep98
-//DeadCode MS 23Sep98 	static	SampleRec		thesample[MAXSAMPLES];
-//DeadCode RJS 01Jun98 	static	SampleRec		radiosamples[MAXSAMPLES];				//RJS 19Dec97
 	static	PlayingRec*		soundqueue;
 	static	StatusRec		status;
 	static	HTIMER			timer;
@@ -249,7 +247,6 @@ typedef	AirStruc		*AirStrucPtr;
 
 class Sound:public SoundBase
 {
-//DeadCode RJS 07Jun99 	Bool		CockpitView;
 	void*		pooMidiDev;
 	SLong		bestDrivers[16];
 	ULong		uDriverID;
@@ -368,8 +365,6 @@ void		StopSequence(FileNum	thefile, int	sequenceno=0);
 void		SequenceMute(FileNum	thefile, int	sequenceno=0, SLong	fadeval=0);
 void		reporterror(int	eno, char	*text=NULL);
 SampleRec*	LoadSample(FileNum	thefile,Bool inUI=FALSE);				//RJS 25May99
-//DeadCode RJS 16Oct97 SQueuePtr	FindFreeHandler(int	priority, int	spos, ItemBasePtr	sampleitem, SQueuePtr &oldqueue, UByte	looplength=2);//RJS 16Oct97
-//DeadCode RJS 17Oct97 void		OverrideSample(SQueuePtr, FileNum	thefile, SLong	vol=-1, SLong	pan=0, SLong	newfreq=-1);//RJS 17Oct97
 SLong		ClipVolume(SLong	maxvol, SLong	vol);
 inline void	ClipVolume(SLong& theVol);									//RJS 14Sep00
 SLong		ClipPan(SLong	pan);
@@ -393,7 +388,6 @@ void		UpdateEngine();										//RJS 03Dec96
 void		PlaySampleEcho(FileNum, ItemBasePtr, SLong	vol = 128);//RJS 05Dec96
 void		ProcessInterfaceSpot();								//RJS 17Nov98
 void		SequenceAudible(MoraleType, SLong	vol=127, SLong	fadeval=500);//RJS 03Feb99
-//DEADCODE RJS 5/8/00 void		UIPlayAmbient(FileNum,SLong,SLong vol=128);			//RJS 12Mar99
 
 private:
 
@@ -453,10 +447,8 @@ void		UIProcessAmbience();								//RJS 08May00
 void		ChatterStatus(bool);										//RJS 16Aug00
 
 //COMMS
-//DEADCODE AMM 14/01/00 ULong		GetSysTime();										//AMM 11Jun99
 //MOVE
 void		ResetSoundFlags();									//RJS 12Jul96
-//DeadCode RJS 13Jan00 void		PlayEngine(SLong,AirStrucPtr,SLong	rpm, SLong	vel,SWord);//RJS 17Nov98
 void		PlayEngine(AirStrucPtr,EngineInfo&,EngineInfo&);	//RJS 13Jan00
 void		PlayLanded(ItemBasePtr	sampleitem, SLong	velocity,Bool skid);//RJS 14Jan99
 void		PlayBuffet(SLong vol, SLong pan=0);					//RJS 28Jan99

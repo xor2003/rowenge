@@ -123,7 +123,6 @@ BOOL RAFReviewClaims::OnInitDialog()
 	
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(120);
 	//rlistbox->AddColumn(80);										  //RDH 02/06/99
@@ -188,39 +187,6 @@ BOOL RAFReviewClaims::OnInitDialog()
 	rlistbox->AddString(CSprintf("%i",totaltotallosses),3);
 
 
-//DeadCode RDH 22Jun00 	rlistbox->AddString("30",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("10",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("4",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("3",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("80",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("120",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",1);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("80",1);
-//DeadCode RDH 22Jun00 
-//DeadCode RDH 22Jun00 	rlistbox->AddString("30",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("10",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("4",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("3",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("80",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("120",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",2);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("80",2);
-//DeadCode RDH 22Jun00 
-//DeadCode RDH 22Jun00 
-//DeadCode RDH 22Jun00 	rlistbox->AddString("30",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("10",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("4",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("3",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("80",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("120",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("",3);
-//DeadCode RDH 22Jun00 	rlistbox->AddString("80",3);
 
 	
 	return TRUE;  // return TRUE unless you set the focus to a control

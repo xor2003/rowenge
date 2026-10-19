@@ -30,7 +30,6 @@ public:
 	int currindex;
 		void	RefreshData(int targetid);
 	int udl;
-//DeadCode JIM 28Sep00 	SaveData Save_Data_tmp;
 // Dialog Data
 	//{{AFX_DATA(SelectTarget)
 	enum { IDD = IDD_SELTRG };

@@ -703,6 +703,8 @@ void Model::Animations (AirStrucPtr const ControlledAC)
 //------------------------------------------------------------------------------
 void	Model::SetGearAnimPos(AirStrucPtr const ControlledAC,SWord	val,Bool	killnow)
 {
+	if (!ControlledAC)											//RERUN: caller may pass NULL
+		return;
 	AircraftAnimData* adptr = (AircraftAnimData* )ControlledAC->Anim;
 	SLong	geardamage = 0;										//RJS 07Sep98
 
@@ -1086,7 +1088,7 @@ void	INSTRUMENTS::UpdateCockpitTimers(SLong	theframetime)
 void	DialSpec::SetDialValue(ItemPtr	itm, UByteP	adptr,UByteP	*SrcListPtr)
 {
 	UByteP	SrcValPtr = NULL;
-	SLong	theValue;
+	SLong	theValue=0;	//RERUN: inner switch has no default - left garbage
 
 	switch (btype)
 	{

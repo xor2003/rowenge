@@ -337,7 +337,6 @@ void	CMissionFolder::FillProfileRow(CRListBox* rlistbox,int i)
 //	rlistbox->ReplaceString(buffer,i+1,1);
 	info_airgrp* g=
 		*Persons2::ConvertPtrUID(Todays_Packages[i][0][0].uid);
-//DEADCODE JIM 10/04/99 	rlistbox->AddString(RESLIST(DUTY_BOMB,g->duty.Evaluate()/8),1);
 	rlistbox->AddString(RESLIST(DUTY_BOMB,g->duty.Evaluate()/ACTIONSUBCODEMAX),1);
 
 //	CRListBox* rlistbox=(CRListBox*)this->GetDlgItem(IDC_RLISTBOXCTRL1);

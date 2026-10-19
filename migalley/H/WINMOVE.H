@@ -39,20 +39,13 @@ typedef struct IDirectPlay4			*LPDIRECTPLAY4A;  // directX 6.0
 
 // some goodies
 
-//DeadCode AMM 10Mar99 #define MAXSERVICES 20
-//DeadCode AMM 10Mar99 #define SERVICETEXTSIZE 50
-//DeadCode AMM 10Mar99 #define MAXNUMSERVICENAMECHAR 50
 
-//DeadCode AMM 10Mar99 #define MAXSESSIONS 50
 //RERUN typedef struct IDirectPlayLobby3	*LPDIRECTPLAYLOBBY3A; // directX 6.0
 
 // some goodies
 
 #define	RNDPACKETSIZE 57 // random list size + 2
 
-//DeadCode AMM 02Jul99 #define BULTABLESIZE 16
-//DeadCode AMM 02Jul99 #define COLLTABLESIZE 32
-//DeadCode AMM 10Mar99 #define DAMTABLESIZE 32
 #define BUFFERLENGTH		128
 #define HISTBUFFERLENGTH	BUFFERLENGTH*2
 

@@ -109,22 +109,16 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //------------------------------------------------------------------------------
 
 
-//DeadCode DAW 29Feb96 #include	"dosdefs.h"
-//DeadCode DAW 29Feb96 #include	"Files.G"
-//DeadCode DAW 29Feb96 #include	"uniqueid.g"
-//DeadCode JIM 16Nov95 #include	"text.G"
 //#include	"miss_man.h"
 //#undef	MISS_MAN_Included
 //------------------------------------------------------------------------------
 
 
-//DeadCode JIM 30Apr96 #include	"miss_man.h"
 //#include	"ui.h"												//JIM 30Apr96
 //LastModified:	JIM 24Jul96
 
 #include	"dosdefs.h"
 #include	"files.g"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"ranges.h"
 #include	"mytime.h"											//RDH 12Jan96
 #include	"uniqueid.h"
@@ -169,10 +163,6 @@ Form_LWVIC =
 //TempCode MS 31May00 	35,//	/*name*/		(TextRef)TEXT_FLATV,
 	35,//	/*name*/		(TextRef)TEXT_FLATV,
 	{
-//DeadCode MS 25Jan00 		{	FT_90,ANGLES_135Deg,METRES00},
-//DeadCode MS 25Jan00 		{	FT_90,ANGLES_225Deg,METRES00},
-//DeadCode MS 25Jan00 		{	FT_180,ANGLES_135Deg,METRES00},
-//DeadCode MS 25Jan00 		{	FT_180,ANGLES_225Deg,METRES00},
 		{	FT_150,ANGLES_120Deg,FT_10},
 		{	FT_150,ANGLES_240Deg,FT_10},
 		{	FT_300,ANGLES_120Deg,FT_20},
@@ -1079,8 +1069,6 @@ EForm_ABRESTVIC=
 	{
 //TempCode MS 30May00 		{	FT_1000,ANGLES_120Deg,FT_300},
 //TempCode MS 30May00 		{	FT_1000,ANGLES_240Deg,FT_300},
-//DeadCode MS 19Jun00 		{	FT_1000,ANGLES_120Deg,FT_100},
-//DeadCode MS 19Jun00 		{	FT_1000,ANGLES_240Deg,FT_100},
 		{	FT_1000,ANGLES_90Deg,0},//FT_100},
 		{	FT_1000,ANGLES_270Deg,0},//FT_100},
 	}
@@ -1315,30 +1303,6 @@ EForm_BRITVIC4	=
 		{	FT_1500,ANGLES_235Deg,FT_500},	//index 1
 	}
 },
-//DeadCode JIM 15Sep00 EForm_BRITASTERN=
-//DeadCode JIM 15Sep00 {
-//DeadCode JIM 15Sep00 	3,
-//DeadCode JIM 15Sep00 	{
-//DeadCode JIM 15Sep00 		{	FT_1000,ANGLES_180Deg,FT_100},
-//DeadCode JIM 15Sep00 		{	FT_2000,ANGLES_180Deg,FT_200},
-//DeadCode JIM 15Sep00 	}
-//DeadCode JIM 15Sep00 },
-//DeadCode JIM 15Sep00 EForm_BRITABREST=
-//DeadCode JIM 15Sep00 {
-//DeadCode JIM 15Sep00 	3,
-//DeadCode JIM 15Sep00 	{
-//DeadCode JIM 15Sep00 		{	FT_1000,ANGLES_90Deg,FT_100},
-//DeadCode JIM 15Sep00 		{	FT_1000,ANGLES_270Deg,FT_100},
-//DeadCode JIM 15Sep00 	}
-//DeadCode JIM 15Sep00 },
-//DeadCode JIM 15Sep00 EForm_BRITABOVE=
-//DeadCode JIM 15Sep00 {
-//DeadCode JIM 15Sep00 	3,
-//DeadCode JIM 15Sep00 	{
-//DeadCode JIM 15Sep00 		{	FT_750,ANGLES_180Deg,FT_500},
-//DeadCode JIM 15Sep00 		{	FT_1500,ANGLES_180Deg,FT_1000},
-//DeadCode JIM 15Sep00 	}
-//DeadCode JIM 15Sep00 },
 
 ///////////////////////
 ENDLIST={0};
@@ -1352,8 +1316,6 @@ TakeOff_FormationWing=
 		{	FT_188,ANGLES_265Deg,0},
 		{	FT_375,ANGLES_95Deg,0},
 		{	FT_375,ANGLES_265Deg,0},
-//DEADCODE JIM 25/05/00 	},
-//DEADCODE JIM 25/05/00 	{
 		//Pairs
 		{	FT_375,ANGLES_270Deg,0},
 		{	FT_750,ANGLES_270Deg,0},
@@ -1390,8 +1352,6 @@ Truck_VFormation=
 		{	FT_10,ANGLES_260Deg,0},
 		{	FT_20,ANGLES_100Deg,0},
 		{	FT_20,ANGLES_260Deg,0},
-//DEADCODE JIM 25/05/00 	},
-//DEADCODE JIM 25/05/00 	{
 		{	FT_30,ANGLES_100Deg,0},
 		{	FT_30,ANGLES_260Deg,0},
 		{	FT_40,ANGLES_100Deg,0},
@@ -1414,8 +1374,6 @@ Truck_LineFormation=
 		{	FT_100,ANGLES_180Deg,0},
 		{	FT_150,ANGLES_180Deg,0},
 		{	FT_200,ANGLES_180Deg,0},
-//DEADCODE JIM 25/05/00 	},
-//DEADCODE JIM 25/05/00 	{
 		{	FT_250,ANGLES_180Deg,0},
 		{	FT_300,ANGLES_180Deg,0},
 		{	FT_350,ANGLES_180Deg,0},
@@ -1432,22 +1390,6 @@ Ship_Formation1=
 {
 	15,
 	{
-//DeadCode MS 26Jun00 		{	FT_500,ANGLES_120Deg,0},
-//DeadCode MS 26Jun00 		{	FT_500,ANGLES_225Deg,0},
-//DeadCode MS 26Jun00 		{	FT_1000,ANGLES_180Deg,0},
-//DeadCode MS 26Jun00 		{	FT_1500,ANGLES_160Deg,0},
-//DeadCode MS 26Jun00 //DEADCODE JIM 25/05/00 	},
-//DeadCode MS 26Jun00 //DEADCODE JIM 25/05/00 	{
-//DeadCode MS 26Jun00 		{	FT_1500,ANGLES_210Deg,0},
-//DeadCode MS 26Jun00 		{	FT_2000,ANGLES_180Deg,0},
-//DeadCode MS 26Jun00 		{	FT_2500,ANGLES_170Deg,0},
-//DeadCode MS 26Jun00 		{	FT_2500,ANGLES_190Deg,0},
-//DeadCode MS 26Jun00 		{	FT_3000,ANGLES_180Deg,0},
-//DeadCode MS 26Jun00 		{	FT_3500,ANGLES_180Deg,0},
-//DeadCode MS 26Jun00 		{	FT_3500,ANGLES_175Deg,0},
-//DeadCode MS 26Jun00 		{	FT_4000,ANGLES_180Deg,0},
-//DeadCode MS 26Jun00 		{	FT_4000,ANGLES_175Deg,0},
-//DeadCode MS 26Jun00 		{	FT_4300,ANGLES_180Deg,0}
 		{	METRES500,ANGLES_140Deg,0},		//300,-400
 		{	METRES550,ANGLES_220Deg,0},		//-300,-400
 		{	METRES800,ANGLES_175Deg,0},		//50,-800
@@ -1742,22 +1684,6 @@ WPO_MAINFL=
 //TempCode MS 24Oct00 	{-20*SECS100,	-METRES2000,			FT_2000},
 //TempCode MS 24Oct00 	{-25*SECS100,	0,						FT_2500},
 
-//DeadCode MS 24Oct00 	{0,				0,						0},
-//DeadCode MS 24Oct00 	{-20*SECS100,	METRES500,				FT_500},
-//DeadCode MS 24Oct00 	{-10*SECS100,	0,						FT_1000},
-//DeadCode MS 24Oct00 	{-25*SECS100,	-METRES500,				FT_1500},
-//DeadCode MS 24Oct00 	{-15*SECS100,	0,						FT_2000},
-//DeadCode MS 24Oct00 	{-30*SECS100,	METRES500,				FT_2500},
-//DeadCode MS 24Oct00 	{-20*SECS100,	0,						FT_2500},
-//DeadCode MS 24Oct00 	{-35*SECS100,	-METRES500,				FT_2500},
-//DeadCode MS 24Oct00 	{-25*SECS100,	0,						FT_2500},
-//DeadCode MS 24Oct00 	{-40*SECS100,	METRES500,				FT_2500},
-//DeadCode MS 24Oct00 	{-30*SECS100,	0,						FT_2500},
-//DeadCode MS 24Oct00 	{-45*SECS100,	-METRES500,				FT_2500},
-//DeadCode MS 24Oct00 	{-35*SECS100,	0,						FT_2500},
-//DeadCode MS 24Oct00 	{-50*SECS100,	METRES500,				FT_2500},
-//DeadCode MS 24Oct00 	{-40*SECS100,	0,						FT_2500},
-//DeadCode MS 24Oct00 	{-55*SECS100,	-METRES500,				FT_2500},
 
 //TempCode MS 25Oct00 	{0,				0,						0},
 //TempCode MS 25Oct00 	{-10*SECS100,	0,						FT_500},
@@ -2062,13 +1988,7 @@ void	formationitem::GetFollower_xyz (FormationTypeIndex	formationtype, Formation
 	if(leader == NULL)
 	{
 		leader=*this->leader;
-//DEADCODE DAW 17/03/00 		if (!leader)
-//DEADCODE DAW 17/03/00 			leader=AirStrucPtr(*this)->fly.leadelt();
 	}
-//DEADCODE DAW 17/03/00 	if (leader->follower==this && formationpos>0)
-//DEADCODE DAW 17/03/00 	{
-//DEADCODE DAW 17/03/00 		formationpos=formationpos/2+formtype->numentries-1;	//pilot3=formatoionpos2 ==>4
-//DEADCODE DAW 17/03/00 	}
 	Formation_xyz(leader->hdg,formtype,formationpos);
 	despos += leader->World;
 }
@@ -2093,7 +2013,6 @@ void	AirStruc::GetFollower_xyz (FormationTypeIndex	formationtype, AirStrucPtr le
 	despos += leader->World;
 }
 
-//DEADCODE JIM 11/02/00 #define SIZEDIV32K(who)	((ANGLES_FRACT/5)+(ANGLES_FRACT*4*52/5)/SHAPESTUFF.GetShapePtr( who )->Size)
 COORDS3D*	Item::Formation_xyz(ANGLES hdg,FormationType* formtype,int formindex)
 {
 	ANGLES	brg=hdg+formtype->wingpos [formindex].bearing;

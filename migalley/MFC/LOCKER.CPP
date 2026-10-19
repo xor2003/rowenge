@@ -183,7 +183,6 @@ void CLockerRoom::RedrawSide()
 
 	if (	(_DPlay.GameType == DEATHMATCH)
 		||	(		(_DPlay.GameType == COMMSCAMPAIGN)
-//DEADCODE AMM 10/06/99 				&&	(_DPlay.UIPlayerType == PLAYER_HOST)
 			)
 		)
 		pradio->ShowWindow(SW_HIDE);
@@ -217,7 +216,6 @@ void CLockerRoom::RedrawCombo()
 		}
 	}
 
-//DeadCode DAW 01Nov99 	if (_DPlay.UIPlayerType==PLAYER_GUEST)
 		combo->SetEnabled(false);
 #ifndef	MIG_DEMO_VER
 		if (_DPlay.UIPlayerType==PLAYER_HOST)
@@ -254,8 +252,6 @@ BOOL CLockerRoom::OnInitDialog()
 		pradio->AddButton(string);
 		string.LoadString(IDS_QUICKMISSIONCOMM);
 		pradio->AddButton(string);
-//DEADCODE RDH 22/06/99 		string.LoadString(IDS_CAMPAIGNCOMMS);
-//DEADCODE RDH 22/06/99 		pradio->AddButton(string);
 
 		pradio=GETDLGITEM(IDC_RRADIO_SELECTSIDE);
 		pradio->AddButton(RESSTRING(UN));
@@ -283,13 +279,8 @@ BOOL CLockerRoom::OnInitDialog()
 			pradio->AddButton(string);
 			break;
 
-//DEADCODE RDH 22/06/99 		case COMMSCAMPAIGN:
-//DEADCODE RDH 22/06/99 			string.LoadString(IDS_CAMPAIGNCOMMS);
-//DEADCODE RDH 22/06/99 			pradio->AddButton(string);
-//DEADCODE RDH 22/06/99 			break;
 
 		default :
-//DeadCode AMM 14Dec98 			MessageBox("Invalid Game Type",MB_OK);
 			_DPlay.GameType=DEATHMATCH;
 			break;
 		}
@@ -425,7 +416,8 @@ void CLockerRoom::UpDateDPlay()
 	if (m_IDCX_GAME_TITLE.m_hWnd)
 	{
 		m_IDCX_GAME_TITLE.GetWindowText(buffer);
-		strcpy(_DPlay.SessionName,buffer);
+		strncpy(_DPlay.SessionName,buffer,SESSIONNAMELEN-1);
+		_DPlay.SessionName[SESSIONNAMELEN-1]='\0';
 	}
 	else
 	{
@@ -437,7 +429,8 @@ void CLockerRoom::UpDateDPlay()
 	if (m_IDCX_PLAYERCHAT.m_hWnd)
 	{
 		m_IDCX_PLAYERCHAT.GetWindowText(buffer);
-		strcpy(_DPlay.Password,buffer);
+		strncpy(_DPlay.Password,buffer,PASSWORDNAMELEN-1);
+		_DPlay.Password[PASSWORDNAMELEN-1]='\0';
 	}
 	else
 	{
@@ -476,11 +469,6 @@ void CLockerRoom::UpDateDPlay()
 		CSQuick1::quickdef.MakeTeamPlayMission(index);
 
 	}
-//DeadCode AMM 05May99 	else if (_DPlay.GameType == COMMSCAMPAIGN)
-//DeadCode AMM 05May99 	{
-//DeadCode AMM 05May99 		strncpy(_DPlay.GameName,RESLIST(SCAMPAIGNSELECT1, index),59);
-//DeadCode AMM 05May99 		_DPlay.GameName[59]=NULL;
-//DeadCode AMM 05May99 	}
 //	else
 //		strcpy(_DPlay.GameName,"");
 

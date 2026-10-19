@@ -329,8 +329,6 @@ void RAFDiaryDetails::Refresh()
 			{
 				s->SetString(RESLIST(SPIT_A,Node_Data[SquadNum(sqdtlsptr[*currentptr]->squadnum)].AcType()));
 				ss->SetString(Node_Data[SquadNum(sqdtlsptr[*currentptr]->squadnum)].SubName());
-//DeadCode JIM 23Oct00 				s->ShowWindow(false);
-//DeadCode JIM 23Oct00 				ss->ShowWindow(false);
 			}else																			
 			{
 				s->ShowWindow(true);
@@ -345,8 +343,6 @@ void RAFDiaryDetails::Refresh()
 				}
 				s->SetString(string);
 			}			
-//DEADCODE RDH 16/05/00 			s=GETDLGITEM(IDC_RSTATICPERSONNEL);
-//DEADCODE RDH 16/05/00 			s->SetString("");
 			if (intercept->interceptloc)
 			{
 				CString str;
@@ -361,7 +357,6 @@ void RAFDiaryDetails::Refresh()
 				Squad_Diary.GetMissResult(sqdtlsptr[*currentptr],raidgroup,missString);
 
 				GETDLGITEM(IDC_RSTATICINTERCEPT2)->SetString(missString);								//RJS 9Nov00
-//DeadCode RJS 09Nov100 				GETDLGITEM(IDC_RSTATICINTERCEPT2)->SetString(RESLIST(MR_NULL,raidgroup->missresult));
 			}
 			else
 			{
@@ -433,8 +428,6 @@ void RAFDiaryDetails::Refresh()
 
 			s=GETDLGITEM(IDC_RSTATICDIARYDATE);
 			s->SetString("");
-//DEADCODE CSB 08/05/00 			s=GETDLGITEM(IDC_RSTATICPERSONNEL);
-//DEADCODE CSB 08/05/00 			s->SetString("");
 			s=GETDLGITEM(IDC_RSTATICINTERCEPT1);
 			s->SetString("");
 			s=GETDLGITEM(IDC_RSTATICINTERCEPT2);
@@ -499,9 +492,7 @@ void RAFDiaryDetails::TotalEncounteredAc()
 				if (	(index >=0)	&&	(index < (PT_LWTOTAL)))
 				{
 					enemyac[index].seen += othergr->noaclaunched;
-//DeadCode RJS 14Sep00 					enemyac[index].killed +=  othergr->numlosses;;
 					enemyac[PT_LWTOTAL].seen += othergr->noaclaunched;
-//DeadCode RJS 14Sep00 					enemyac[PT_LWTOTAL].killed +=  othergr->numlosses;;
 				}
 
 				othergr = Squad_Diary.GetNextSquadron(othergr);
@@ -540,72 +531,6 @@ BOOL RAFDiaryDetails::OnInitDialog()
 
 	Refresh();
 	
-//DEADCODE  09/02/00 	CRRadio* pradio;
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	pradio=GETDLGITEM(IDC_RRADIODISPLAY);
-//DEADCODE  09/02/00 	pradio->AddButton(RESSTRING(VIEWSINGLE));
-//DEADCODE  09/02/00 	pradio->AddButton(RESSTRING(ALL));
-//DEADCODE  09/02/00 	pradio->SetCurrentSelection(0);
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	CRListBox* rlistbox;
-//DEADCODE  09/02/00 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DEADCODE  09/02/00 	rlistbox->Clear();
-//DEADCODE  09/02/00 	rlistbox->AddColumn(60);
-//DEADCODE  09/02/00 	rlistbox->AddColumn(80);										  //RDH 02/06/99
-//DEADCODE  09/02/00 	rlistbox->AddColumn(60);										  //RDH 02/06/99
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(TYPE),0);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(JU88),0);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(L_ME109),0);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(TOTAL),0);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(ENCOUNTERED),1);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(CLAIMS),2);
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	rlistbox->AddString("10",1);
-//DEADCODE  09/02/00 	rlistbox->AddString("4",2);
-//DEADCODE  09/02/00 	rlistbox->AddString("20",1);
-//DEADCODE  09/02/00 	rlistbox->AddString("3",2);
-//DEADCODE  09/02/00 	rlistbox->AddString("30",1);
-//DEADCODE  09/02/00 	rlistbox->AddString("7",2);
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	rlistbox=GETDLGITEM(IDC_RLISTBOXOTHERS);
-//DEADCODE  09/02/00 	rlistbox->Clear();
-//DEADCODE  09/02/00 	rlistbox->AddColumn(60);
-//DEADCODE  09/02/00 	rlistbox->AddColumn(60);										  //RDH 02/06/99
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(SQUADRON),0);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(TASK),1);
-//DEADCODE  09/02/00 	rlistbox->AddString("222",0);
-//DEADCODE  09/02/00 	rlistbox->AddString("Bombers",1);
-//DEADCODE  09/02/00 	
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	CRStatic*   s;
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICDIARYDATE);
-//DEADCODE  09/02/00 	s->SetString("20 July 1940");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICPERSONNEL);
-//DEADCODE  09/02/00 	s->SetString("Captain White went missing today");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICINTERCEPT1);
-//DEADCODE  09/02/00 	s->SetString("Over Dover. 18,000ft");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICSTRIKEFORCE);
-//DEADCODE  09/02/00 	s->SetString("30 Ju88");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICINTERCEPT2);
-//DEADCODE  09/02/00 	s->SetString("Over Biggin Hill. 20,000ft");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICTASK);
-//DEADCODE  09/02/00 	s->SetString("Intercept");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICTIME);
-//DEADCODE  09/02/00 	s->SetString("13:40");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICDETACHEDFORCE);
-//DEADCODE  09/02/00 	s->SetString("30 Me109");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICATTACHEDFORCE);
-//DEADCODE  09/02/00 	s->SetString("20 Me110");
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICDAMAGED);
-//DEADCODE  09/02/00 	s->SetString("4");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICDESTROYED);
-//DEADCODE  09/02/00 	s->SetString("5");
-//DEADCODE  09/02/00 	s=GETDLGITEM(IDC_RSTATICAIRCREW);
-//DEADCODE  09/02/00 	s->SetString("8");
 
 	rafdiary_timer=SetTimer(DPlay::TIMER_DEBRIEF,0,NULL); // set sheet up first before starting timer
 	_DPlay.SendStatusChange(DPlay::CPS_DEBRIEF);
@@ -654,7 +579,7 @@ void RAFDiaryDetails::OnSelectRlistboxothers(long row, long column)
 			else
 				othersq = Squad_Diary.GetNextSquadron(othersq);
 		}
-		if (index == row)
+		if (index == row && othersq)
 		{	
 			*sqnumptr = (SquadNum)othersq->squadnum;
 			RAFDiary::FillSquadronDetails(*sqnumptr,othersq,sqdtlsptr,*currentptr);

@@ -619,15 +619,14 @@ void LandScape::ManageHighLandTextures(SLong px,SLong pz)
  	{
  		if (lastPx!=-1 && lastPz!=-1)
  		{
- 			Dropped* droppedTextures=new Dropped;
+ 			Dropped droppedTextures;
  			ScrollGrid(px-lastPx,pz-lastPz,pLastGrid);
- 			ScrollGridDis(px-lastPx,pz-lastPz,pHTextureGrid,droppedTextures);
- 			for (i=droppedTextures->num;i>=0;i--)
+ 			ScrollGridDis(px-lastPx,pz-lastPz,pHTextureGrid,&droppedTextures);
+ 			for (i=droppedTextures.num;i>=0;i--)
 			{
-				if (!Save_Data.fSoftware)	currscreen->DoFreeTexture(droppedTextures->hText[i]);
-				else						Three_Dee.pTMake->DoFreeTexture(droppedTextures->hText[i]);
+				if (!Save_Data.fSoftware)	currscreen->DoFreeTexture(droppedTextures.hText[i]);
+				else						Three_Dee.pTMake->DoFreeTexture(droppedTextures.hText[i]);
 			}
- 			delete droppedTextures;
  		}
  		lastPx=px;
  		lastPz=pz;
@@ -2367,7 +2366,7 @@ void LandScape::TriClipper(	SLong& vc,				//polygon vertex count
 	SLong	localPointsUsed;		//count of local vertices allocated
 	UByte	localClipFlags[32];		//local clip flag buffer (matches poly point defs)
 	DoPointStruc* newpolydef[32];	//new polygon definition
-	DoPointStruc localPoints[32];	//buffer of local vertices
+	static DoPointStruc localPoints[32];	//RERUN: caller's polydef[] ends up pointing here - stack lifetime dangled
 
 	localPointsUsed=0;
 
@@ -5852,8 +5851,8 @@ void LandScape::RenderTri(	UByte rotation,
 		SLong rightX=leftX;
 		SLong leftBaseX=pBot->x<<16;
 		SLong rightBaseX=pMid->x<<16;
-		SLong leftDX=(leftBaseX-leftX)/leftScanLines;
-		SLong rightDX=(rightBaseX-rightX)/rightScanLines;
+		SLong leftDX=leftScanLines ? (leftBaseX-leftX)/leftScanLines : 0;		//RERUN: degenerate triangle div0
+		SLong rightDX=rightScanLines ? (rightBaseX-rightX)/rightScanLines : 0;	//RERUN
 		SLong startY=pTop->z;
 		UByte* pScanLine=pScreen+sWidth*startY;
 
@@ -5894,8 +5893,8 @@ void LandScape::RenderTri(	UByte rotation,
 		SLong rightX=leftX;
 		SLong leftBaseX=pMid->x<<16;
 		SLong rightBaseX=pBot->x<<16;
-		SLong leftDX=(leftBaseX-leftX)/leftScanLines;
-		SLong rightDX=(rightBaseX-rightX)/rightScanLines;
+		SLong leftDX=leftScanLines ? (leftBaseX-leftX)/leftScanLines : 0;		//RERUN: degenerate triangle div0
+		SLong rightDX=rightScanLines ? (rightBaseX-rightX)/rightScanLines : 0;	//RERUN
 		SLong startY=pTop->z;
 		UByte* pScanLine=pScreen+sWidth*startY;
 

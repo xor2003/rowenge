@@ -426,14 +426,12 @@ void	LWMissionFolder::RefreshList()
 {
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00  	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(40);
 	//rlistbox->AddColumn(30);										  //RDH 02/06/99
 	//rlistbox->AddColumn(90);										  //RDH 02/06/99
 	//rlistbox->AddColumn(50);										  //RDH 02/06/99
 	//rlistbox->AddColumn(50);
-//DEADCODE RDH 08/05/00 	rlistbox->AddColumn(50);										  //RDH 02/06/99
 	//rlistbox->AddColumn(70);										  //RDH 02/06/99
 	//rlistbox->AddColumn(TARGETFIELDWIDTH);										  //RDH 02/06/99
 	//rlistbox->AddColumn(50);
@@ -443,7 +441,6 @@ void	LWMissionFolder::RefreshList()
 	rlistbox->AddString(RESSTRING(TYPE),2);
 	rlistbox->AddString(RESSTRING(TO),3);
 	rlistbox->AddString(RESSTRING(TOT),4);
-//DEADCODE RDH 08/05/00 	rlistbox->AddString(RESSTRING(ETA),5);
 	rlistbox->AddString(RESSTRING(STATUS),5);
 	rlistbox->AddString(RESSTRING(TARGET),6);
 	if (specialnotakeoffs)
@@ -479,40 +476,15 @@ void	LWMissionFolder::RefreshList()
 			int rafpack =0;
 			if (pk[0].instance)
 				rafpack = FindAssociatedRAFPackInfo(pk[0].instance, acorg, acleft);
-//DeadCode JIM 13Nov00 			else
 			finishedrafpack = FindAssociatedRAFPackInfo(UniqueID(UID_BIT14+(packlist[p].pack<<5)), finishedacorg, finishedacleft);
 			
 			if  (	(rafpack >= 0) || finishedrafpack>=0
-//DeadCode JIM 13Nov00 				&&	(Todays_Packages.pack[rafpack].packagestatus!=Profile::PS_SPARE)
 				)
 			{	   acorg+=finishedacorg;acleft+=finishedacleft;
-//DeadCode RDH 16Sep00 				int i=0;
-//DeadCode RDH 16Sep00 				acorg = 0;
-//DeadCode RDH 16Sep00 				acleft = 0;
-//DeadCode RDH 16Sep00 				while (i < pk.squadlist)
-//DeadCode RDH 16Sep00 				{
-//DeadCode RDH 16Sep00 					acorg = pk[i].numacoriginal;
-//DeadCode RDH 16Sep00 					acleft = pk[i].numacleft;
-//DeadCode RDH 16Sep00 					i++;
-//DeadCode RDH 16Sep00 				}
 				int losses = packlist[p].numofac - packlist[p].numofacleft;
 
-//DeadCode RDH 16Sep00 				rlistbox->AddString(CSprintf("%i", acleft),7);
 
 
-//DeadCode RDH 16Sep00 				i=0;
-//DeadCode RDH 16Sep00 				acorg = 0;
-//DeadCode RDH 16Sep00 				acleft = 0;
-//DeadCode RDH 16Sep00 				Profile& rafpk = Todays_Packages.pack[rafpack];
-//DeadCode RDH 16Sep00 
-//DeadCode RDH 16Sep00 				while (i < rafpk.squadlist)
-//DeadCode RDH 16Sep00 				{
-//DeadCode RDH 16Sep00 					acorg = rafpk[i].numacoriginal;
-//DeadCode RDH 16Sep00 					acleft = rafpk[i].numacleft;
-//DeadCode RDH 16Sep00 					i++;
-//DeadCode RDH 16Sep00 				}
-//DeadCode RDH 16Sep00 
-//DeadCode MS 26Sep00 				FindAssociatedRAFPackInfo(pk[0].instance, acorg, acleft);
 
 				int kills = acorg - acleft;
 				rlistbox->AddString(CSprintf("%i", acleft),7);
@@ -617,27 +589,6 @@ BOOL LWMissionFolder::OnInitDialog()
 	currpack = -1;
 
 	
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("H100",0);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("20",1);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("Strike",2);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("13:00",3);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("13:40",4);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("14:20",5);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("Inbound",6);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("Biggin Hill",7);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("30",8);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("3/2",9);
-//DEADCODE ROD 17/12/99 
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("H101",0);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("1",1);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("Reconn",2);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("13:00",3);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("13:40",4);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("14:20",5);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("Inbound",6);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("Woolston",7);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("4",8);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("3/2",9);
 	
 	TotalRefresh();
 
@@ -692,8 +643,6 @@ void LWMissionFolder::OnClickedRbuttonsquadron()
 {
 #ifndef	BOB_DEMO_VER
 
-//DEADCODE RDH 21/01/00 	MainToolBar().OpenACDossier(Node_Data.gruppe[packlist[currpack].gruppe - SQ_LW_START - 1].wadernum,
-//DEADCODE RDH 21/01/00 				Node_Data.gruppe[packlist[currpack].gruppe - SQ_LW_START - 1].gruppennum);	
 	Gruppen* gruppe = Node_Data[(SquadNum)packlist[currpack].gruppe];
  	MainToolBar().OpenACDossier(gruppe->wadernum,
 				Node_Data.gruppe[packlist[currpack].gruppe - SQ_LW_START - 1].gruppennum);	
@@ -734,7 +683,6 @@ void LWMissionFolder::OnSelectRlistboxctrl1(long row, long column)
 		}
 		RDialog::m_pView->SetHiLightInfo(packlist[currpack].pack, i,UID_Null);
 		Todays_Packages.InvalidateRoute(&Todays_Packages[Todays_Packages.hipack],true,true);
-//DeadCode JIM 8Nov00 		m_pView->m_mapdlg.Invalidate();
 		RefreshButtons();												//RDH 16Aug00
 	}
 
@@ -793,11 +741,6 @@ void LWMissionFolder::OnClickedRbuttonrespond()
 	{
 		Todays_Packages[packnum].AddNumerousEscorts(10,0,0,Profile::BR_WIDESTPOSSIBLE);
 			Todays_Packages[packnum].CalcRoutePositionsAndTime();
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].RecalcRoutePositions();
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].primarytargetETA = Todays_Packages[packnum].FindEarliestPrimaryTargetETA();//+(int)HR01;
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].SetPredictedPointFromETA(true);
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].RecalcRoutePositions();
-//DEADCODE RDH 10/03/00 			Todays_Packages[packnum].primarytargetETA = Todays_Packages[packnum].FindEarliestPrimaryTargetETA();//+(int)HR01;
 	}	
 
 //temp until we can set in migldg in code, see ££

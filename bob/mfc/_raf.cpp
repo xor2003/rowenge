@@ -73,8 +73,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "RAFRevEn.cpp"
 #include "RAFRevSt.cpp"
 #include "RAFRevTp.cpp"
-//DEADCODE RDH 18/04/00 #include "RAFRoutA.cpp"
-//DEADCODE RDH 10/04/00 #include "RAFRoutM.cpp"
 #include "RAFRoutT.cpp"
 #include "RAFTaskF.cpp"
 #include "RAFTaskS.cpp"

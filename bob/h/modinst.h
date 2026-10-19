@@ -71,7 +71,6 @@ struct	TimedDialSpec											//RJS 29Jun98
 	int		timeUp;
 	int		timeDown;
 
-//DeadCode RJS 30Jun98 	Bool	signedSrc;
 	Bool	signedDest;
 
 	UByte	nobitsDest;
@@ -148,63 +147,6 @@ public:
 	SWord C_FuelGuageSelector;
 
 	
-//DeadCode CSB 01/12/99		// Instruments
-//DeadCode CSB 01/12/99		FP ActualSpeed;			// miles per hour
-//DeadCode CSB 01/12/99		FP TrueAirSpeed;		// knotts
-//DeadCode CSB 01/12/99		FP IndicatedAirSpeed; 	// knotts
-//DeadCode CSB 01/12/99		FP MachNo;				// no units
-//DeadCode CSB 01/12/99		ULong Altitude;			// feet
-//DeadCode CSB 01/12/99	//	ULong RateOfClimb;		// feet per minute
-//DeadCode CSB 01/12/99		SLong RateOfClimb;		// feet per minute
-//DeadCode CSB 01/12/99		FP BankAngle;		// degrees
-//DeadCode CSB 01/12/99		FP PitchAngle;		// degrees
-//DeadCode CSB 01/12/99		FP HdgAngle;		// degrees
-//DeadCode CSB 01/12/99		FP LastHdgAngle;
-//DeadCode CSB 01/12/99		FP NormalAcc;			// gravities
-//DeadCode CSB 01/12/99		FP Rpm1;				// rpm
-//DeadCode CSB 01/12/99		FP Rpm2;				// rpm
-//DeadCode CSB 01/12/99		FP Slip;				// slip								//RJS 06Apr98
-//DeadCode CSB 01/12/99		SWord Turn;				// turn								//RJS 21Apr98
-//DeadCode CSB 01/12/99		FP	turn;				//turn in rads/cs
-//DeadCode CSB 01/12/99		FP pitchrate;			//in rads/cs
-//DeadCode CSB 01/12/99		FP Turn;				// turn								//RJS 21Apr98
-//DeadCode CSB 01/12/99		FP Turn2;				// turn								//RJS 21Apr98
-//DeadCode CSB 01/12/99		FP	time;				//time in csecs	debug only
-//DeadCode CSB 01/12/99		// Fiddled instruments....
-//DeadCode CSB 01/12/99	
-//DeadCode CSB 01/12/99		FP		TempFreeAir;										//RJS 03Apr98
-//DeadCode CSB 01/12/99		SLong	TempExhaust;							//RJS 11Feb98
-//DeadCode CSB 01/12/99		SLong	Charge;										//RJS 11Feb98
-//DeadCode CSB 01/12/99		SLong	GyroCompass;										//RJS 11Feb98
-//DeadCode CSB 01/12/99		SLong	HorizStab;										//RJS 11Feb98
-//DeadCode CSB 01/12/99		SLong	HydraulicPress;							//RJS 11Feb98
-//DeadCode CSB 01/12/99		SLong	CabPress;							//RJS 11Feb98
-//DeadCode CSB 01/12/99		SLong	FuelPress;							//RJS 11Feb98
-//DeadCode CSB 01/12/99		SLong	FuelContentInt;										//RJS 03Apr98
-//DeadCode CSB 01/12/99		SLong	FuelContentTot;										//RJS 14Apr99
-//DeadCode CSB 01/12/99		SLong	OxygenPress;										//RJS 01May98
-//DeadCode CSB 01/12/99		SWord	ManifoldPressure;							//RJS 02Nov98
-//DeadCode CSB 01/12/99		SWord	SuctionGuage;										//RJS 16Feb99
-//DeadCode CSB 01/12/99		SWord	CarburettorAirTemp;									//RJS 16Feb99
-//DeadCode CSB 01/12/99		SWord	CoolantTemp;										//RJS 16Feb99
-//DeadCode CSB 01/12/99		SWord	Power;												//RJS 31Mar99
-//DeadCode CSB 01/12/99		SWord	ExhaustTemp;				//RJS 01Apr99
-//DeadCode CSB 01/12/99		SWord	Voltage;											//RJS 14Apr99
-//DeadCode CSB 01/12/99		SWord	OilContent;											//RJS 26Nov99
-//DeadCode CSB 01/12/99		SWord	OilTemp;											//RJS 26Nov99
-//DeadCode CSB 01/12/99		SWord	RadiatorTemp;										//RJS 26Nov99
-//DeadCode CSB 01/12/99		SWord	Boost;												//RJS 26Nov99
-//DeadCode CSB 01/12/99	
-//DeadCode CSB 01/12/99	
-//DeadCode CSB 01/12/99		UWord	TimerCharge;								//RJS 11Feb98
-//DeadCode CSB 01/12/99		UWord	TimerGyro;									//RJS 11Feb98
-//DeadCode CSB 01/12/99		UWord	TimerHorizStab;									//RJS 11Feb98
-//DeadCode CSB 01/12/99		UWord	TimerExhaust;									//RJS 11Feb98
-//DeadCode CSB 01/12/99		UWord	TimerCabPress;									//RJS 11Feb98
-//DeadCode CSB 01/12/99		UWord	TimerHydraulicPress;									//RJS 11Feb98
-//DeadCode CSB 01/12/99		UWord	TimerFuelPress;									//RJS 11Feb98
-//DeadCode CSB 01/12/99		UWord	TimerOxygenPress;									//RJS 01May98
-//DeadCode CSB 01/12/99		UWord	TimerManifoldPress;									//RJS 01May98
 
 	UByteP	DialSrcList[MaxDialSrc];							//RJS 16Feb98
 	UWord	DialSrcCnt;											//RJS 16Feb98
@@ -311,54 +253,6 @@ public:
 		C_FuelGuageSelector = 0;
 
 	
-//DeadCode CSB 01/12/99			ActualSpeed = 0.0;
-//DeadCode CSB 01/12/99	 		TrueAirSpeed = 0;
-//DeadCode CSB 01/12/99	 		IndicatedAirSpeed = 0;
-//DeadCode CSB 01/12/99	 		MachNo = 0;
-//DeadCode CSB 01/12/99	 		Altitude = 0;
-//DeadCode CSB 01/12/99	 		RateOfClimb = 0;
-//DeadCode CSB 01/12/99	 		BankAngle = 0;
-//DeadCode CSB 01/12/99	 		PitchAngle = 0;
-//DeadCode CSB 01/12/99	 		HdgAngle = 0;
-//DeadCode CSB 01/12/99			LastHdgAngle = 0;
-//DeadCode CSB 01/12/99	 		NormalAcc = 0;
-//DeadCode CSB 01/12/99	 		Rpm1 = 0;
-//DeadCode CSB 01/12/99	 		Rpm2 = 0;
-//DeadCode CSB 01/12/99			Turn = 0;			//rdh
-//DeadCode CSB 01/12/99			turn = 0;
-//DeadCode CSB 01/12/99			Turn2 = 0;			//rdh
-//DeadCode CSB 01/12/99			time = 0;
-//DeadCode CSB 01/12/99	 		TempFreeAir = 0;	
-//DeadCode CSB 01/12/99	 		TempExhaust = 0;
-//DeadCode CSB 01/12/99	 		Charge = 0;
-//DeadCode CSB 01/12/99	 		GyroCompass = 0;
-//DeadCode CSB 01/12/99	 		HorizStab = 0;
-//DeadCode CSB 01/12/99	 		HydraulicPress = 0;
-//DeadCode CSB 01/12/99	 		CabPress = 0;
-//DeadCode CSB 01/12/99	 		FuelPress = 0;
-//DeadCode CSB 01/12/99			FuelContentInt = 0;										//RJS 16Feb99								
-//DeadCode CSB 01/12/99			FuelContentTot = 0;										//RJS 16Feb99
-//DeadCode CSB 01/12/99	//DeadCode CSB 14/04/99			FuelContentExt = 0;										//RJS 16Feb99
-//DeadCode CSB 01/12/99			OxygenPress = 0;										//RJS 16Feb99
-//DeadCode CSB 01/12/99			ManifoldPressure = 0;									//RJS 16Feb99
-//DeadCode CSB 01/12/99			SuctionGuage = 0;										//RJS 16Feb99
-//DeadCode CSB 01/12/99			CarburettorAirTemp = 0;									//RJS 16Feb99
-//DeadCode CSB 01/12/99			CoolantTemp = 0;										//RJS 16Feb99
-//DeadCode CSB 01/12/99	 
-//DeadCode CSB 01/12/99	 		TimerCharge = 0;
-//DeadCode CSB 01/12/99	 		TimerGyro = 0;
-//DeadCode CSB 01/12/99	 		TimerHorizStab = 0;
-//DeadCode CSB 01/12/99	 		TimerExhaust = 0;
-//DeadCode CSB 01/12/99	 		TimerCabPress = 0;
-//DeadCode CSB 01/12/99	 		TimerHydraulicPress = 0;
-//DeadCode CSB 01/12/99	 		TimerFuelPress = 0;
-//DeadCode CSB 01/12/99			TimerOxygenPress = 0;									//RJS 16Feb99
-//DeadCode CSB 01/12/99			TimerManifoldPress = 0;
-//DeadCode CSB 01/12/99	
-//DeadCode CSB 01/12/99			DialSrcCnt = 0;
-//DeadCode CSB 01/12/99			DialCnt = 0;
-//DeadCode CSB 01/12/99	
-//DeadCode CSB 01/12/99			TimedDialCnt = 0;
  	}	
 
 }

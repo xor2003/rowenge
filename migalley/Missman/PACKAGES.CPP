@@ -567,8 +567,8 @@ void	Profile::Wave::MakeWayPoints(bool wave0, int grnum, int duty,UniqueID targ)
 	GetKeyTargetWPs(wt,waf,wal,wpf,wpl,wr);
 	UniqueID targ2=UID_NULL;
 	UniqueID patrolbeginitem=UID_NULL;
-	Coords3D wp0;
-	Coords3D wp1;
+	Coords3D wp0 = {0,0,0};	//RERUN: some duties never set these - RecalcDeltasToMatch read garbage
+	Coords3D wp1 = {0,0,0};
 	SavedGlobrefs patrolzone=SGR_WPP_Target;
 	if (!wave0)
 		patrolzone=SGR_WPC_Target;
@@ -670,22 +670,27 @@ void	Profile::Wave::MakeWayPoints(bool wave0, int grnum, int duty,UniqueID targ)
 			{
 				UniqueID newwp=InsertWpBetween(waf,wal,SavedGlobrefs(group[grnum][0].globrefind),wpstartloopno,grnum);
 				info_waypoint* w=*Persons2::ConvertPtrUID(newwp);
-				wp1=w->World;
-				wp1.Y=FT_5000;
-				w->position.RecalcDeltasToMatch(wp1);
+				if (w)														//RERUN: InsertWpBetween may fail -> UID_Null
+				{	wp1=w->World;
+					wp1.Y=FT_5000;
+					w->position.RecalcDeltasToMatch(wp1);
+				}
 				GetKeyTargetWPs(wt,waf,wal,wpf,wpl,wr);
 				newwp=InsertWpBetween(waf,wal,SavedGlobrefs(group[grnum][0].globrefind+1),wpstoploopchkno,grnum);
 				w=*Persons2::ConvertPtrUID(newwp);
-				wp1=w->World;
-				wp1.Y=FT_5000;
-				w->position.RecalcDeltasToMatch(wp1);
+				if (w)
+				{	wp1=w->World;
+					wp1.Y=FT_5000;
+					w->position.RecalcDeltasToMatch(wp1);
+				}
 			}else
 			{
 				InsertWpBetween(waf,wal,patrolzone,wpstartloopno,grnum);
 				GetKeyTargetWPs(wt,waf,wal,wpf,wpl,wr);
 				UniqueID newwp=InsertWpBetween(wpf,wpl,patrolzone,wpstoploopchkno,grnum);
 				info_waypoint* w=*Persons2::ConvertPtrUID(newwp);
-				w->position.RecalcDeltasToMatch(wp1);
+				if (w)
+					w->position.RecalcDeltasToMatch(wp1);
 			}
 
 		}
@@ -695,7 +700,8 @@ void	Profile::Wave::MakeWayPoints(bool wave0, int grnum, int duty,UniqueID targ)
 		{
 			UniqueID newwp=InsertWpBetween(waf,wal,SGR_Pack_Target,wpbombno,grnum);
 			info_waypoint*	w=*Persons2::ConvertPtrUID(newwp);
-			w->range=METRES7000;
+			if (w)
+				w->range=METRES7000;
 			group[grnum][0].globrefind=0;
 		}
 		break;
@@ -703,12 +709,14 @@ void	Profile::Wave::MakeWayPoints(bool wave0, int grnum, int duty,UniqueID targ)
 		{
 			UniqueID newwp=InsertWpBetween(waf,wal,SGR_Pack_Target,wpstartloopno,grnum);
 			info_waypoint*	w=*Persons2::ConvertPtrUID(newwp);
-			w->position.RecalcDeltasToMatch(wp0);
+			if (w)
+				w->position.RecalcDeltasToMatch(wp0);
 
 			GetKeyTargetWPs(wt,waf,wal,wpf,wpl,wr);
 			newwp=InsertWpBetween(wpf,wpl,SGR_Pack_Target,wpstoploopchkno,grnum);
 			w=*Persons2::ConvertPtrUID(newwp);
-			w->position.RecalcDeltasToMatch(wp1);
+			if (w)
+				w->position.RecalcDeltasToMatch(wp1);
 			group[grnum][0].globrefind=0;
 		}
 		break;
@@ -1214,10 +1222,6 @@ int	PackageList::SquadACAvail(int sqnum)
 		else
 			return(0);
 	}
-//Old_Code DAW 12Nov98 	if (sqnum<SQ_B_NONFLYABLE)
-//Old_Code DAW 12Nov98 		return(MMC.squad[sqnum].ac_total_avail);
-//Old_Code DAW 12Nov98 	else
-//Old_Code DAW 12Nov98 		return 16;
 }
 int	PackageList::SquadACUsed(int sqnum)
 {
@@ -1416,7 +1420,7 @@ int Profile::ValidateTime(CString* buffer, int packnum, int wavenum)
 			*cnt++ = 0;
 			time = atoi(min) + 60 * atoi(hr);
 
-			int currtime;
+			int currtime = MORNINGPERIODSTART/60;
 			if (Miss_Man.currcampaignnum==Miss_Man.SO51_CAMPAIGN)
 			{
 				if (MMC.debrief.currperiod == 0)
@@ -1700,7 +1704,7 @@ void	SupplyTree::FillNatForUID(UniqueIDField& f)
 				||	(airfieldinfo[af].nationality==NAT_AMBER)		  //RDH 25/05/99
 		   )
 			f|=airfieldinfo[af].airfield;
-			if (airfieldinfo[af].attackstats.damagelevel>90)
+		if (airfieldinfo[af].attackstats.damagelevel>90)
 			{
 				ItemPtr p=*Persons2::ConvertPtrUID(airfieldinfo[af].airfield);
 				if (p)
@@ -2395,7 +2399,7 @@ bool Profile::CalcFuel(int wavenum, int group, UniqueID wpuid, int& reqfuel)
 
 	home=last;
 
-	int regroupfuel;
+	int regroupfuel = 0;
 
 	while (u)
 	{
@@ -2809,12 +2813,14 @@ void	Profile::ModifyPatrolRoute(int wavenum,int groupnum,int acnum)
 						wave[wavenum][groupnum][i].primary=wave[wavenum][groupnum][0].secondary;
  					UniqueID ft=wave[wavenum].InsertWpBetween(waf,wal,(SavedGlobrefs)t_gri,t_act,groupnum,i);
 					info_waypoint* wpft=*Persons2::ConvertPtrUID(ft);
-					wpft->position.RecalcDeltasToMatch(t_delta);
+					if (wpft)											//RERUN: uid lookup may fail
+						wpft->position.RecalcDeltasToMatch(t_delta);
 					if (p)
 					{
  						UniqueID ft=wave[wavenum].InsertWpBetween(wpf,wpl,(SavedGlobrefs)p_gri,p_act,groupnum,i);
 						info_waypoint* wpft=*Persons2::ConvertPtrUID(ft);
-						wpft->position.RecalcDeltasToMatch(p_delta);
+						if (wpft)
+							wpft->position.RecalcDeltasToMatch(p_delta);
 					}
 				}
 			}
@@ -2906,6 +2912,7 @@ void	Profile::Wave::SetPositionDescription(int grp,UniqueID wpid)
 {	//Ok... I need to get the flight and element info from the WP
 	bool	canhaveseperateelt=false;	//proper test based on duty required...
 	info_waypoint* wp=*Persons2::ConvertPtrUID(wpid);
+	if (!wp)	return;												//RERUN: uid lookup failed
 	int fl=wp->applyflight.Evaluate();
 	if (fl==ENABLE_COMPLEX_VAL)
 		fl=0;
@@ -2928,7 +2935,7 @@ void	Profile::Wave::SetPositionDescription(int grp,UniqueID wpid)
 			targdesc=NULL;
 	if (targdesc)
 	{
-		Coords3D delta;
+		Coords3D delta={0,0,0};								//RERUN: EvalW may not fill all fields
 		wp->position.EvalW(delta);
 		int direction=(Math_Lib.arctan(delta.X,delta.Y)+ANGLES_22Deg)/ANGLES_45Deg; //0..7,8=0
 		int range=Math_Lib.Distance2d(delta.X/1000,delta.Y/1000);

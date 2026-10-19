@@ -91,7 +91,6 @@ void Mig15_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 	ACM.DeltaPitchForMaxElevator = 0.25;//0.25	= 1.0472;
 
 	ACM.pitchmodifier = 0.2;//0.5;//1;
-//DeadCode CSB 08/03/99		ACM.pitchratemodifier = 0;//100000;
 	ACM.pitchintmodifier = 0;//1.5;
 	ACM.IntPitchForMaxElevator	= 0.1;//1000;
 

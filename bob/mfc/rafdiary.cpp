@@ -148,7 +148,6 @@ void	RAFDiary::RefreshData(int effect)
 		case 2:
 		{
 			FindGroup();
-//DeadCode JIM 13Oct00 			FillSquadronDetails();
 			Refresh();
 			break;
 		}
@@ -182,7 +181,6 @@ void	RAFDiary::FindGroup()
 			&&	(j < MAX_SQUAD)			
 		  )
 	{
-//DeadCode JIM 20Oct00 		PlaneTypeSelect	actype = Node_Data.squadron[i].AcType();
 		UniqueID uid = Node_Data.squadron[i].homeairfield;
 		TargetFighterField* af;
 		af = Node_Data[uid];
@@ -206,7 +204,6 @@ void	RAFDiary::FillList()
 			&&	(j < MAX_SQUAD)			
 		  )
 	{
-//DeadCode JIM 20Oct00 		PlaneTypeSelect	actype = Node_Data.squadron[i].AcType();
 		UniqueID uid = Node_Data.squadron[i].homeairfield;
 		TargetFighterField* af;
 		af = Node_Data[uid];
@@ -301,7 +298,6 @@ void RAFDiary::FillSquadronDetails(SquadNum sqnum,SquadronBase* indexer,Squadron
 		currentry = 0;
 		
 
-//DeadCode JIM 23Oct00  	while (i < RAFDiary::MAX_SQDETAILS)
  	{
  		sqdetails[i++] = NULL;
  	}

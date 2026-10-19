@@ -65,10 +65,6 @@ protected:
 	void	LWRefresh();
 	void	RAFRefresh();
 	CString EnemyReport(StatsPerType* acarray,int c0,int c1);
-//DeadCode JIM 23Oct00 	CString EnemyReport(int hurr, int spit, bool shownumbers);
-//DeadCode JIM 23Oct00 	CString EnemyReport(int* acarray, bool shownumbers);
-//DeadCode JIM 23Oct00 				int totalacseen[PT_HE59 - PT_GER_FLYABLE];
-//DeadCode JIM 23Oct00 				int totalackilled[PT_HE59 - PT_GER_FLYABLE];
 
 	// Generated message map functions
 	//{{AFX_MSG(RAFCombat)

@@ -291,7 +291,6 @@ void MapFiltersTarget::Refresh(bool redrawmap)
 				&&	(Save_Data.mapfilters[FILT_TOWN])
 				&&	(Save_Data.mapfilters[FILT_VILLAGES])
 				&&	(Save_Data.mapfilters[FILT_LIGHTHOUSES])
-//DeadCode RDH 9Sep00 				&&	(Save_Data.mapfilters[FILT_TUNNELS])
 			 )
 		b->SetPressed(true);
 	else
@@ -314,8 +313,6 @@ void MapFiltersTarget::Refresh(bool redrawmap)
 	b->SetPressed(Save_Data.mapfilters[FILT_LIGHTHOUSES]);
 
 
-//DeadCode RDH 2Aug00 	b = GETDLGITEM(IDC_RBUTTONTUNNELS);
-//DeadCode RDH 2Aug00 	b->SetPressed(Save_Data.mapfilters[FILT_TUNNELS]);
 
 	b = GETDLGITEM(IDC_OPERATIONALITEMS);
 	b->SetPressed(Save_Data.mapfilters[FILT_OPERATIONALITEMS]);
@@ -660,14 +657,12 @@ void MapFiltersTarget::OnClickedNavpoints()
 				&&	(Save_Data.mapfilters[FILT_TOWN])
 				&&	(Save_Data.mapfilters[FILT_VILLAGES])
 				&&	(Save_Data.mapfilters[FILT_LIGHTHOUSES])
-//DeadCode RDH 2Aug00 				&&	(Save_Data.mapfilters[FILT_TUNNELS])
 			 )
 	{
 		Save_Data.mapfilters%=FILT_CITY;
 		Save_Data.mapfilters%=FILT_TOWN;
  		Save_Data.mapfilters%=FILT_VILLAGES;
  		Save_Data.mapfilters%=FILT_LIGHTHOUSES;
-//DeadCode RDH 2Aug00  		Save_Data.mapfilters%=FILT_TUNNELS;
 
 
 	}else
@@ -676,7 +671,6 @@ void MapFiltersTarget::OnClickedNavpoints()
  		Save_Data.mapfilters|=FILT_TOWN;
  		Save_Data.mapfilters|=FILT_VILLAGES;
  		Save_Data.mapfilters|=FILT_LIGHTHOUSES;
-//DeadCode RDH 2Aug00  		Save_Data.mapfilters|=FILT_TUNNELS;
 
 	}
 	Refresh();

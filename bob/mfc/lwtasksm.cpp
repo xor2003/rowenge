@@ -140,10 +140,7 @@ void LWTaskSummary::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RSPINBUT_FIGHTERS, m_IDC_RSPINBUT_FIGHTERS);
 	DDX_Control(pDX, IDC_RSPINBUT_PERCENTFIGHTERS, m_IDC_RSPINBUT_PERCENTFIGHTERS);
 	DDX_Control(pDX, IDC_RSPINBUT_TARGETS, m_IDC_RSPINBUT_TARGETS);
-//DeadCode JIM 30Oct00 	DDX_Control(pDX, IDC_PC_ATTACHED, m_IDC_PC_ATTACHED);
-//DeadCode JIM 30Oct00 	DDX_Control(pDX, IDC_PC_DETACHED, m_IDC_PC_DETACHED);
 	DDX_Control(pDX, IDC_PC_FIGHTERS, m_IDC_PC_FIGHTERS);
-//DeadCode JIM 30Oct00 	DDX_Control(pDX, IDC_PC_RETURNING, m_IDC_PC_RETURNING);
 	DDX_Control(pDX, IDC_SPC_ATTACHED, m_IDC_SPC_ATTACHED);
 	DDX_Control(pDX, IDC_SPC_DETACHED, m_IDC_SPC_DETACHED);
 	DDX_Control(pDX, IDC_SPC_RETURNING, m_IDC_SPC_RETURNING);
@@ -171,23 +168,11 @@ void	LWTaskSummary::OnSelectTab()
 
 int LWTaskSummary::FindAcSpinEntry(int ac)
 {
-//DEADCODE RDH 14/01/00 	int entry= 0;
-//DEADCODE RDH 14/01/00 	while (	(entry < 18) && (AcSpin[entry] < ac))
-//DEADCODE RDH 14/01/00 		entry++;
-//DEADCODE RDH 14/01/00 	return (entry);
    return (0);
 }
 void LWTaskSummary::Refresh()
 {
-//DeadCode JIM 30Oct00 	MakeFighterSpinLists(false);
 	CRSpinBut* spinbut;
-//DEADCODE RDH 12/01/00 	spinbut=GETDLGITEM(IDC_RSPINBUT_TARGETS);
-//DEADCODE RDH 12/01/00 	spinbut->Clear()->MakeNumList(10,1,1)->SetIndex(Todays_Packages.taskdata.targetnum-1);
-//DEADCODE RDH 12/01/00  
-//DEADCODE RDH 12/01/00 	spinbut=GETDLGITEM(IDC_RSPINBUT_PERCENTFIGHTERS);
-//DEADCODE RDH 12/01/00 	int fighters = Todays_Packages.taskdata.acttached_no + Todays_Packages.taskdata.detached_no;
-//DEADCODE RDH 12/01/00 	int percent =  fighters/(fighters+Todays_Packages.taskdata.strike_no);
-//DEADCODE RDH 12/01/00 	spinbut->Clear()->MakeNumList(100,0,1)->SetIndex(percent);
 
 	CRStatic*   s;
 	s=GETDLGITEM(IDC_TARGETS);
@@ -195,54 +180,7 @@ void LWTaskSummary::Refresh()
 
 	int fighters = Todays_Packages.taskdata.totalfighter.acnum;
 	int fightersquads = Todays_Packages.taskdata.totalfighter.squadnum;
-//DEADCODE RDH 24/03/00 	bool squads = false;
-//DEADCODE RDH 24/03/00 		
-//DEADCODE RDH 24/03/00 	if (Todays_Packages.taskdata.returned.acnum == -1)
-//DEADCODE RDH 24/03/00 	{
-//DEADCODE RDH 24/03/00 		fightersquads +=Todays_Packages.taskdata.returned.squadnum;
-//DEADCODE RDH 24/03/00 		squads = true;
-//DEADCODE RDH 24/03/00 	}else
-//DEADCODE RDH 24/03/00 		fighters +=Todays_Packages.taskdata.returned.acnum;
-//DEADCODE RDH 24/03/00 
-//DEADCODE RDH 24/03/00 	if (Todays_Packages.taskdata.attached.acnum == -1)
-//DEADCODE RDH 24/03/00 	{
-//DEADCODE RDH 24/03/00 		fightersquads +=Todays_Packages.taskdata.attached.squadnum;
-//DEADCODE RDH 24/03/00 		squads = true;
-//DEADCODE RDH 24/03/00 	}else
-//DEADCODE RDH 24/03/00 		fighters +=Todays_Packages.taskdata.attached.acnum;
-//DEADCODE RDH 24/03/00 
-//DEADCODE RDH 24/03/00 	if (Todays_Packages.taskdata.detached.acnum == -1)
-//DEADCODE RDH 24/03/00 	{
-//DEADCODE RDH 24/03/00 		fightersquads +=Todays_Packages.taskdata.detached.squadnum;
-//DEADCODE RDH 24/03/00 		squads = true;
-//DEADCODE RDH 24/03/00 	}else
-//DEADCODE RDH 24/03/00 		fighters +=Todays_Packages.taskdata.detached.acnum;
-//DEADCODE RDH 24/03/00 
-//DEADCODE RDH 24/03/00 	if (squads)
-//DEADCODE RDH 24/03/00 	{
-//DEADCODE RDH 24/03/00 		fighters = -1;
-//DEADCODE RDH 24/03/00 		if (Todays_Packages.taskdata.returned.acnum > 0)
-//DEADCODE RDH 24/03/00 			fightersquads ++;
-//DEADCODE RDH 24/03/00 
-//DEADCODE RDH 24/03/00 		if (Todays_Packages.taskdata.attached.acnum > 0)
-//DEADCODE RDH 24/03/00 			fightersquads ++;
-//DEADCODE RDH 24/03/00 
-//DEADCODE RDH 24/03/00 		if (Todays_Packages.taskdata.detached.acnum > 0)
-//DEADCODE RDH 24/03/00 			fightersquads ++;
-//DEADCODE RDH 24/03/00 	}
 
-//DEADCODE RDH 04/04/00 	int strikeac = Todays_Packages.taskdata.strike.realacnum;
-//DEADCODE RDH 04/04/00 	int fighter_pc = fighters;
-//DEADCODE RDH 04/04/00 	if ((strikeac == -1) || (fighters == -1))
-//DEADCODE RDH 04/04/00 	{
-//DEADCODE RDH 04/04/00 		if (fightersquads <= 0)
-//DEADCODE RDH 04/04/00 			fightersquads = 1;
-//DEADCODE RDH 04/04/00 		if (strikesquads <= 0 )
-//DEADCODE RDH 04/04/00 			strikesquads = 1;
-//DEADCODE RDH 04/04/00 		strike_pc = strikesquads;
-//DEADCODE RDH 04/04/00 		fighter_pc = fightersquads; 
-//DEADCODE RDH 04/04/00 	}
-//DEADCODE RDH 04/04/00 
 		
 	int percent =  100* Todays_Packages.taskdata.totalfighter.realacnum
 						/(Todays_Packages.taskdata.totalfighter.realacnum+Todays_Packages.taskdata.strike.realacnum);
@@ -250,31 +188,6 @@ void LWTaskSummary::Refresh()
 	s=GETDLGITEM(IDC_PC_FIGHTERS);
 	s->SetString(CSprintf("%i",	percent));
 
-//DeadCode JIM 30Oct00 	if (fighters)
-//DeadCode JIM 30Oct00 	{
-//DeadCode JIM 30Oct00 		s=GETDLGITEM(IDC_PC_ATTACHED);
-//DeadCode JIM 30Oct00 		s->SetString(CSprintf("%i",	100 * Todays_Packages.taskdata.attached.realacnum
-//DeadCode JIM 30Oct00 					/Todays_Packages.taskdata.totalfighter.realacnum ));
-//DeadCode JIM 30Oct00 
-//DeadCode JIM 30Oct00 		s=GETDLGITEM(IDC_PC_DETACHED);
-//DeadCode JIM 30Oct00 		s->SetString(CSprintf("%i",	100 * Todays_Packages.taskdata.detached.realacnum
-//DeadCode JIM 30Oct00 					/Todays_Packages.taskdata.totalfighter.realacnum ));
-//DeadCode JIM 30Oct00 
-//DeadCode JIM 30Oct00 		s=GETDLGITEM(IDC_PC_RETURNING);
-//DeadCode JIM 30Oct00 		s->SetString(CSprintf("%i",	100 * Todays_Packages.taskdata.returned.realacnum
-//DeadCode JIM 30Oct00 					/Todays_Packages.taskdata.totalfighter.realacnum ));
-//DeadCode JIM 30Oct00 	}else
-//DeadCode JIM 30Oct00 	{
-//DeadCode JIM 30Oct00 		s=GETDLGITEM(IDC_PC_ATTACHED);
-//DeadCode JIM 30Oct00 		s->SetString(RESSTRING(NA));
-//DeadCode JIM 30Oct00 
-//DeadCode JIM 30Oct00 		s=GETDLGITEM(IDC_PC_DETACHED);
-//DeadCode JIM 30Oct00 		s->SetString(RESSTRING(NA));
-//DeadCode JIM 30Oct00 
-//DeadCode JIM 30Oct00 		s=GETDLGITEM(IDC_PC_RETURNING);
-//DeadCode JIM 30Oct00 		s->SetString(RESSTRING(NA));
-//DeadCode JIM 30Oct00 
-//DeadCode JIM 30Oct00 	}
 
   	spinbut=GETDLGITEM(IDC_RSPINBUT_BOMBERS);
 	spinbut->Clear();
@@ -283,8 +196,6 @@ void LWTaskSummary::Refresh()
 	//..strike.maxac should either be <12 or -1. -1 means that we are counting in squads
 	if (Todays_Packages.taskdata.strike.maxac != -1)
 		maxac = Todays_Packages.taskdata.strike.maxac;
-//DeadCode JIM 16Oct00 	if (maxac>12*3*3*5)
-//DeadCode JIM 16Oct00 		maxac=12*3*3*5;
 	int index = 0;
 	int entry = 0;
 	while (AcSpin[entry] <= maxac)
@@ -429,7 +340,6 @@ BEGIN_EVENTSINK_MAP(LWTaskSummary, CDialog)
 	ON_EVENT(LWTaskSummary, IDC_RCOMBOFIGHTERTYPE, 1 /* TextChanged */, OnTextChangedRcombofightertype, VTS_BSTR VTS_I2)
 	ON_EVENT(LWTaskSummary, IDC_RSPINBUT_BOMBERS, 1 /* TextChanged */, OnTextChangedRspinbutBombers, VTS_BSTR VTS_I2)
 	ON_EVENT(LWTaskSummary, IDC_RSPINBUT_FIGHTERS, 1 /* TextChanged */, OnTextChangedRspinbutFighters, VTS_BSTR VTS_I2)
-//DeadCode JIM 30Oct00 	ON_EVENT(LWTaskSummary, IDC_TICK_MAINTAIN_PC, 1 /* Clicked */, OnClickedTickMaintainPc, VTS_NONE)
 	ON_EVENT(LWTaskSummary, IDC_SPC_ATTACHED, 1 /* TextChanged */, OnTextChangedRspinbutSpcAttached, VTS_BSTR VTS_I2)
 	ON_EVENT(LWTaskSummary, IDC_SPC_DETACHED, 1 /* TextChanged */, OnTextChangedRspinbutSpcDetached, VTS_BSTR VTS_I2)
 	//}}AFX_EVENTSINK_MAP
@@ -502,7 +412,6 @@ void LWTaskSummary::OnTextChangedRcombofightertype(LPCTSTR Caption, short index)
 					pk.SetSubMethod((Profile::AttackMethod)a,reqsubmethod);	//RDH 02/04/00
 				}
 			}
-//DeadCode JIM 30Oct00 			pk.ReShareSecondaries();												//JIM 28Aug00
 			AttackMethodField	am2=pk.ScanAttackMethods();
 			pk.ReorderPackage(am2);
 			pk.CalcRoutePositionsAndTime(pk.primarytargetETA,false);
@@ -592,28 +501,6 @@ void LWTaskSummary::OnTextChangedRspinbutBombers(LPCTSTR caption, short Index)
 //	else
 //		iuse squadreq
 
-//DEADCODE RDH 02/04/00 		{
-//DEADCODE RDH 02/04/00 		Profile& pk = Todays_Packages.pack[Todays_Packages.hipack];
-//DEADCODE RDH 02/04/00 
-//DEADCODE RDH 02/04/00 		int j = 0, k = 0;
-//DEADCODE RDH 02/04/00 		while  (		(Node_Data.gruppe[j].squadron != SQ_ZERO)
-//DEADCODE RDH 02/04/00 					&&		(k != l_newunit)
-//DEADCODE RDH 02/04/00 				)
-//DEADCODE RDH 02/04/00 		{
-//DEADCODE RDH 02/04/00 			if SqIsAvail(j, acisfighter)
-//DEADCODE RDH 02/04/00 			{
-//DEADCODE RDH 02/04/00 				k++;
-//DEADCODE RDH 02/04/00 			}
-//DEADCODE RDH 02/04/00 			j++;
-//DEADCODE RDH 02/04/00 		}
-//DEADCODE RDH 02/04/00 		j = j + SQ_LW_START;
-//DEADCODE RDH 02/04/00 
-//DEADCODE RDH 02/04/00 		
-//DEADCODE RDH 02/04/00 		if ( oldunit < 0)
-//DEADCODE RDH 02/04/00 		{//add unit to package
-//DEADCODE RDH 02/04/00 			pk.AddSquadron(-1, (Profile::AttackMethod)attackmethod,pk.packagetarget[0].currentid,(SquadNum)j);
-//DEADCODE RDH 02/04/00 
-//DEADCODE RDH 02/04/00 
 	pk.ReShareSecondaries();												//JIM 28Aug00
 	AttackMethodField	am=pk.ScanAttackMethods();
 	pk.ReorderPackage(am);
@@ -690,7 +577,6 @@ void LWTaskSummary::OnTextChangedRspinbutFighters(LPCTSTR caption, short Index)
 		acreq = -1;
 		entry = 0;
 		while (	(index != Index)	)
-//DeadCode JIM 30Oct00 			(squadinfo[entry].numofsquads <= Todays_Packages.taskdata.attached.maxsquad)	&&	
 		{
 			index++;
 			if (index == Index)
@@ -700,10 +586,6 @@ void LWTaskSummary::OnTextChangedRspinbutFighters(LPCTSTR caption, short Index)
 	}
 
 	int orggrp, reqgrp, deltaac;
-//DeadCode JIM 30Oct00 	if (	(acreq >0))
-//DeadCode JIM 30Oct00 		reqgrp = 0;
-//DeadCode JIM 30Oct00 	else
-//DeadCode JIM 30Oct00 		reqgrp = squadreq/3;
 	Profile::AttackMethod	changemethod=Profile::AM_RETURNESCORT;
 	int currstaffeln;
 	int deltastaffeln=squadreq-totalfighterstaffeln;
@@ -815,78 +697,6 @@ void LWTaskSummary::OnTextChangedRspinbutFighters(LPCTSTR caption, short Index)
 	else
 		pk.ResetAcNumbers(changemethod, 0, 0, acreq);
 
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 	if (	(Todays_Packages.taskdata.totalfighter.acnum >=0)	||	(Todays_Packages.taskdata.totalfighter.squadnum <3))
-//DeadCode JIM 28Oct00 		orggrp = 0;
-//DeadCode JIM 28Oct00 	else
-//DeadCode JIM 28Oct00 		orggrp = Todays_Packages.taskdata.totalfighter.squadnum/3;
-//DeadCode JIM 28Oct00 	if (reqgrp < 1)
-//DeadCode JIM 28Oct00 	{
-//DeadCode JIM 28Oct00 		if (acreq >=0)
-//DeadCode JIM 28Oct00 			deltaac = acreq ;
-//DeadCode JIM 28Oct00 		else
-//DeadCode JIM 28Oct00 			deltaac = squadreq * 12 ;
-//DeadCode JIM 28Oct00 	}else
-//DeadCode JIM 28Oct00 		deltaac = -1;
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 	//find the lowest and highest non zero esort type
-//DeadCode JIM 28Oct00 	int i = 0;
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 	if (
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 	enum	{DETACHED, ATTACHED, RETURNED, MAXESCORT};
-//DeadCode JIM 28Oct00 	int fighter[3];
-//DeadCode JIM 28Oct00 	for (i=0; i < MAXESCORT; i++)
-//DeadCode JIM 28Oct00 		fighter[i] = 0;
-//DeadCode JIM 28Oct00 	i = 0;
-//DeadCode JIM 28Oct00 	while (i < pk.squadlist)
-//DeadCode JIM 28Oct00  	{
-//DeadCode JIM 28Oct00 		if	((pk[i].method&Profile::AM_GROUPMASK) == Profile::AM_DETACHED)
-//DeadCode JIM 28Oct00 			fighter[DETACHED]++;
-//DeadCode JIM 28Oct00 		if	((pk[i].method&Profile::AM_GROUPMASK) == Profile::AM_ATTACHED)
-//DeadCode JIM 28Oct00 			fighter[ATTACHED]++;
-//DeadCode JIM 28Oct00 		if	((pk[i].method&Profile::AM_GROUPMASK) == Profile::AM_RETURNESCORT)
-//DeadCode JIM 28Oct00 			fighter[RETURNED]++;
-//DeadCode JIM 28Oct00 		i++;
-//DeadCode JIM 28Oct00 	}
-//DeadCode JIM 28Oct00 	int lowestescortnumber = 255; 
-//DeadCode JIM 28Oct00 	int lowestescorttype = DETACHED;
-//DeadCode JIM 28Oct00 	int highestescortnumber = -1; 
-//DeadCode JIM 28Oct00 	int highestescorttype = DETACHED;
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 	for (i=0; i < MAXESCORT; i++)
-//DeadCode JIM 28Oct00 	{
-//DeadCode JIM 28Oct00 		if 	((fighter[i]!=0) &&	(fighter[i] < lowestescortnumber) )
-//DeadCode JIM 28Oct00 		{
-//DeadCode JIM 28Oct00 			 lowestescorttype = i;
-//DeadCode JIM 28Oct00 			 lowestescortnumber = fighter[i];
-//DeadCode JIM 28Oct00 		}
-//DeadCode JIM 28Oct00 		if 	(fighter[i] >= highestescortnumber)
-//DeadCode JIM 28Oct00 		{
-//DeadCode JIM 28Oct00 			 highestescorttype = i;
-//DeadCode JIM 28Oct00 			 highestescortnumber = fighter[i];
-//DeadCode JIM 28Oct00 		}
-//DeadCode JIM 28Oct00 	}
-//DeadCode JIM 28Oct00 	int am;
-//DeadCode JIM 28Oct00 	if (orggrp <= reqgrp)
-//DeadCode JIM 28Oct00 		am =  Profile::AM_ESCORTTYPES  +  (Profile::AM_FIELD_MIN *lowestescorttype); 
-//DeadCode JIM 28Oct00 	else
-//DeadCode JIM 28Oct00 		am =  Profile::AM_ESCORTTYPES  +  (Profile::AM_FIELD_MIN *highestescorttype); 
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 	if (orggrp < 1)
-//DeadCode JIM 28Oct00 	{
-//DeadCode JIM 28Oct00 		if (am != Profile::AM_DETACHED)
-//DeadCode JIM 28Oct00 			pk.DeleteNumerousSquadrons(Profile::AM_DETACHED);
-//DeadCode JIM 28Oct00 		if (am != Profile::AM_ATTACHED)
-//DeadCode JIM 28Oct00 			pk.DeleteNumerousSquadrons(Profile::AM_ATTACHED);
-//DeadCode JIM 28Oct00 		if (am != Profile::AM_RETURNESCORT)
-//DeadCode JIM 28Oct00 			pk.DeleteNumerousSquadrons(Profile::AM_RETURNESCORT);
-//DeadCode JIM 28Oct00 	}
-//DeadCode JIM 28Oct00 
-//DeadCode JIM 28Oct00 	pk.ResetAcNumbers((Profile::AttackMethod)am, orggrp, reqgrp, deltaac);
-//DeadCode JIM 28Oct00 	pk.ReShareSecondaries();												//JIM 28Aug00
 	AttackMethodField	am2=pk.ScanAttackMethods();
 	pk.ReorderPackage(am2);
 	pk.CalcRoutePositionsAndTime(pk.primarytargetETA,false);
@@ -1108,13 +918,6 @@ void LWTaskSummary::OnTextChangedRspinbutSpcDetached(LPCTSTR caption, short Inde
 	Todays_Packages.SetTaskData();
 	MakeFighterSpinLists(true);
 }
-//DeadCode JIM 30Oct00 void LWTaskSummary::OnClickedTickMaintainPc() 
-//DeadCode JIM 30Oct00 {
-//DeadCode JIM 30Oct00 	Todays_Packages.SetTaskData();
-//DeadCode JIM 30Oct00 	Refresh();
-//DeadCode JIM 30Oct00 	MakeFighterSpinLists(false);
-//DeadCode JIM 30Oct00 	
-//DeadCode JIM 30Oct00 }
 
 void LWTaskSummary::OnClose() 
 {

@@ -258,14 +258,7 @@ void	CDIS::RedrawList(Debrief::DisLog* dislog, int size)
 			{
 				if (intelltype == GENERAL)
 				{
-//DEADCODE RDH 09/03/99 					if (dislog[i].msgowner != NULL)
-//DEADCODE RDH 09/03/99 					{
-//DEADCODE RDH 09/03/99 						CString st = LoadResString(dislog[i].msgowner);
-//DEADCODE RDH 09/03/99 						rlistbox->AddString(LoadResString(dislog[i].msgowner),0);
-//DEADCODE RDH 09/03/99 					}else
-//DEADCODE RDH 09/03/99 					{
 						rlistbox->AddString("",0);
-//DEADCODE RDH 09/03/99 					}
 					rlistbox->AddString(RESTABLE(2,DISTITLE_0,dislog[i].msgtextid),1);
 					index++;
 					if (index == currhilight)

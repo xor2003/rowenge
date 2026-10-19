@@ -397,7 +397,6 @@ void ControlAccel::OnClickedReachcoast()
 }
 void ControlAccel::OnOK()
 {
-//DeadCode CSB 1Aug00 	if (MMC.curraccelrate > 1)
 		MMC.curraccelrate = MMC.accelrates[MMC.curracceltype];
 		CDialog::OnOK();
 }

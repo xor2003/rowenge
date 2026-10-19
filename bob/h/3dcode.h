@@ -69,7 +69,6 @@ class	ThreeDee
 	ViewPoint*	View_Point;
 	class	btree	*aircraft_tree;
 
-//DeadCode RJS 27Mar00 	CockpitBuf	buffetData;										//PD 29Oct98
 
 	ULong	viewer_x,
 			viewer_y,
@@ -88,24 +87,6 @@ class	ThreeDee
 
 	COORDS3D	lastSunPos;
 
-//DeadCode RJS 15Nov00 	struct SPosRec
-//DeadCode RJS 15Nov00 	{
-//DeadCode RJS 15Nov00 		enum {Max_Recs=32};
-//DeadCode RJS 15Nov00 		itemptr ip;
-//DeadCode RJS 15Nov00 		COORDS3D pos;
-//DeadCode RJS 15Nov00 	}
-//DeadCode RJS 15Nov00 //DeadCode RJS 15Nov00 	posRecTable[SPosRec::Max_Recs];
-//DeadCode RJS 15Nov00 	SLong cur_rec;
-//DeadCode RJS 15Nov00 	void ResetPosRec() {cur_rec=0;}
-//DeadCode RJS 15Nov00 	void StoreAcPos(itemptr ip)
-//DeadCode RJS 15Nov00 	{	
-//DeadCode RJS 15Nov00 		if (cur_rec<SPosRec::Max_Recs)
-//DeadCode RJS 15Nov00 		{
-//DeadCode RJS 15Nov00 			posRecTable[cur_rec].ip=ip;
-//DeadCode RJS 15Nov00 			posRecTable[cur_rec].pos=ip->World;
-//DeadCode RJS 15Nov00 			cur_rec++;
-//DeadCode RJS 15Nov00 		}
-//DeadCode RJS 15Nov00 	}
 
 	ANGLES	staticH,staticP,staticR;							//PD 05Sep97
 
@@ -164,7 +145,6 @@ class	ThreeDee
 
 	public:
 		bool drawDescText;
-//DeadCode JON 31Aug00 		D3DVALUE	clipNearZ;											//RJS 31Jul00
 		float		eye_x;													//RJS 23Aug00
 		float		eye_y;													//RJS 23Aug00
 		float		eye_z;													//RJS 23Aug00
@@ -182,7 +162,6 @@ class	ThreeDee
 		class	btree	*bt;
 		bool nomorereallygetdata;
 		NormalData* normalDataPtr;
-//deadcode		UByte*		pNormalLookup;
 		Bool		b3DRunning;									//PD 10Jun97
 		Bool		shapecheat;									//RJS 24Jul96
 		Bool		lightson;									//RJS 04Nov96
@@ -211,14 +190,6 @@ class	ThreeDee
 
 		FILE*	framefp;												//RJS 20Sep00
 
-//DeadCode RJS 15Nov00 		bool GetPosRec(itemptr ip,COORDS3D& pos)
-//DeadCode RJS 15Nov00 		{
-//DeadCode RJS 15Nov00         	int	i;	//the standard says... you can't access for statement locals outside 
-//DeadCode RJS 15Nov00 			for (i=cur_rec-1;i>=0 && posRecTable[i].ip!=ip;i--) {}
-//DeadCode RJS 15Nov00 			if (i==-1) return false;
-//DeadCode RJS 15Nov00 			pos=posRecTable[i].pos;
-//DeadCode RJS 15Nov00 			return true;
-//DeadCode RJS 15Nov00 		}
   		void render(CLib3D*,ViewPoint* vp,WorldStuff *);			//PD 22Apr96
 		void Init3D(CLib3D*,ViewPoint*);
 		void Done3D(void );
@@ -229,7 +200,6 @@ class	ThreeDee
 		void InitialiseCache();									//PD 05Aug98
 		void DeleteCache();										//PD 19Jan98
 
-//DeadCode RJS 27Mar00 		void SetCockpitBuffet(CockpitBuf*);
 
 		inline	SLong	ViewerX(){return SLong(viewer_x);}
 		inline	SLong	ViewerY(){return SLong(viewer_y);}
@@ -295,7 +265,6 @@ class	ThreeDee
 		};
 
 		SWord IntensFromRange(SLong& rng, SLong& start, SLong& end);//PD 09Jan96
-//DeadCode AMM 16Apr99 		static void PossMoveCycle();
 		void ResetPalette(Bool	forceday=FALSE);				//RJS 24Oct96
 		void ResetCompass();									//RJS 21Nov96
 		void do_object(itemptr);								//RJS 19Jun97
@@ -347,8 +316,6 @@ class	ThreeDee
   		void renderzoomedmap(ViewPoint* vp,WorldStuff *);//RJS 08Sep98
 		void renderAircraftRoute(void);									//JON 8Nov00
 		void renderWaypointTargets( const WayPointPtr waypt );			//JON 8Nov00
-//DeadCode RJS 27Apr00 		void do_objects_map(Bool);								//RJS 15Sep98
-//DeadCode RJS 27Apr00 		void do_map_object(ItemPtr,SLong);						//RJS 14Sep98
   		void renderreplay(ViewPoint* vp,WorldStuff *);	//AMM 20Oct98
 		void add_replay(rotitem& viewpoint);					//AMM 20Oct98
 		void SuperShapeCheat();									//RJS 09Nov98
@@ -389,14 +356,11 @@ inline	void	SetFrameTime();									//RJS 19Sep00
 		void ConstructNormalData();
 		void GetVisibleObjects(WorldStuff*); //PD 06/12/99
 		void AddVisibleShape(void *objRec,int index,int realscale);//RJS 04Feb00
-//DEADCODE RJS 4/28/00 		void AddVisibleGroup(void *objRec,int index);
 		void GetVisibleMapObjects(bool isZoomed=false);			//RJS 27Apr00
 		void AddMapToObjectRec(ItemPtr,ShapeNum,SLong);	//RJS 27Apr00
 
 		HRENDERTARGET hrtMirror;
 		MAPDESC mdMirror;
-//DeadCode JON 17Oct00 		void InitMirror();
-//DeadCode RJS 12Jul00 		void RenderMirror(SWord,COORDS3D&,SWord,SWord,SWord,Angles);
 };
 
 	extern	class	ThreeDee	Three_Dee;

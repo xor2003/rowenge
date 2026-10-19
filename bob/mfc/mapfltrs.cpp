@@ -119,10 +119,6 @@ int CMapFilters::filterbuttons[MAPFILTERSMAX+2]=
 	0
 };
 
-//DEADCODE RDH 06/01/00 static const MapFiltersField
-//DEADCODE RDH 06/01/00 	REDFILTERON(MAPFILTERSMAXBLUE,MAPFILTERSMAXRED),
-//DEADCODE RDH 06/01/00 	BLUEFILTERON(MAPFILTERSMIN,MAPFILTERSMAXBLUE);
-//DEADCODE RDH 06/01/00 
 
 CMapFilters::CMapFilters(CWnd* pParent /*=NULL*/)
 	: CRToolBar(pParent)
@@ -166,41 +162,7 @@ END_EVENTSINK_MAP()
 
 void CMapFilters::OnClickedFilter(int id) 
 {
-//DEADCODE DAW 23/11/99 	if (id==IDC_BORDER)	
-//DEADCODE DAW 23/11/99 		return;
 	// TODO: Add your control notification handler code here
-//DEADCODE RDH 06/01/00 		CRButton* but=(CRButton*)GetDlgItem(id);
-//DEADCODE RDH 06/01/00 		bool pressed=(but->GetPressed()==1);
-//DEADCODE RDH 06/01/00 	if (id==IDC_FILTER_BLUE_ALL)
-//DEADCODE RDH 06/01/00 	{
-//DEADCODE RDH 06/01/00 		if (pressed)
-//DEADCODE RDH 06/01/00 			Save_Data.mapfilters|=BLUEFILTERON;
-//DEADCODE RDH 06/01/00 		else
-//DEADCODE RDH 06/01/00 			Save_Data.mapfilters-=BLUEFILTERON;
-//DEADCODE RDH 06/01/00 		SetFiltersFromSaveGame();
-//DEADCODE RDH 06/01/00 	}
-//DEADCODE RDH 06/01/00 	else if (id==IDC_FILTER_RED_ALL)
-//DEADCODE RDH 06/01/00 	{
-//DEADCODE RDH 06/01/00 		if (pressed)
-//DEADCODE RDH 06/01/00 			Save_Data.mapfilters|=REDFILTERON;
-//DEADCODE RDH 06/01/00 		else
-//DEADCODE RDH 06/01/00 			Save_Data.mapfilters-=REDFILTERON;
-//DEADCODE RDH 06/01/00 		SetFiltersFromSaveGame();
-//DEADCODE RDH 06/01/00 	}
-//DEADCODE RDH 06/01/00 	else
-//DEADCODE RDH 06/01/00 											  //JIM 21/05/99
-//DEADCODE RDH 06/01/00 	{
-//DEADCODE RDH 06/01/00 		for (int i=0;filterbuttons[i];i++)
-//DEADCODE RDH 06/01/00 			breakif(filterbuttons[i]==id);
-//DEADCODE RDH 06/01/00 		assert(filterbuttons[i]);
-//DEADCODE RDH 06/01/00 
-//DEADCODE RDH 06/01/00 		if (pressed)
-//DEADCODE RDH 06/01/00 			Save_Data.mapfilters|=(MapFilters)i;
-//DEADCODE RDH 06/01/00 		else
-//DEADCODE RDH 06/01/00 			Save_Data.mapfilters%=(MapFilters)i;
-//DEADCODE RDH 06/01/00 	}
-//DEADCODE RDH 06/01/00 	m_pView->m_mapdlg.Invalidate();
-//DEADCODE RDH 06/01/00 	//delete but;
 }
 
 void	SetFiltersFromSaveGame()
@@ -211,12 +173,6 @@ void	SetFiltersFromSaveGame()
 }
 void	CMapFilters::SetFiltersFromSaveGame()
 {
-//DeadCode DAW 11Jul00 	for (int i=0;filterbuttons[i];i++)
-//DeadCode DAW 11Jul00 		if (filterbuttons[i]!=NOBUTTON)
-//DeadCode DAW 11Jul00 		{
-//DeadCode DAW 11Jul00 			CRButton* but=GETDLGITEM(filterbuttons[i]);
-//DeadCode DAW 11Jul00 			but->SetPressed(Save_Data.mapfilters[(MapFilters)i]);
-//DeadCode DAW 11Jul00 		}
 }
 
 void CMapFilters::OnInitMenu(CMenu* pMenu) 

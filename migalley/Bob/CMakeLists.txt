@@ -299,3 +299,7 @@ target_link_libraries(bob PRIVATE
     ${SDL2TTF_LIBRARIES}
     ${SDL2_MIXER_LIBRARIES}
 )
+# CoCreateInstance reaches RowanVideo_CreateGraph through a weak reference
+# (MFC_stub.cpp is shared with MiG, which has no player); weak refs do not
+# pull static-archive members, so force the symbol into the exe link.
+target_link_options(bob PRIVATE -Wl,--undefined=RowanVideo_CreateGraph)

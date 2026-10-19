@@ -148,7 +148,6 @@ void Clock::OnPaint()
 
 	LOGBRUSH brush={PS_SOLID,RGB(80,80,80),HS_CROSS};
 	CPen penf (PS_GEOMETRIC+PS_SOLID+PS_ENDCAP_ROUND,THICKNESS,&brush,0);
-//DEADCODE RDH 07/12/99 	CPen penb (PS_SOLID+PS_ENDCAP_ROUND,4,RGB(100,50,10));
 	CPen* oldpen=dc.SelectObject(&penf);
 
 	SLong time, hours_int;

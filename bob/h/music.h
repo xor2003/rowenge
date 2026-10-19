@@ -52,7 +52,6 @@ public:
 		delete this;
 	}
 
-//DeadCode AMM 22Nov99 	bool	IsMusicDeviceValid();
 	bool	AssignDefaultMusicDevice();
 	void	TestMusic();
 	bool 	ChangeMusicDevice(ULong);

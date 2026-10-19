@@ -42,7 +42,6 @@ struct	LiveList:AaaMainList
   	SleepList	sleeplistbackup;
 	CON		LiveList(WorldStuff* world);
 	void	Event();
-//DEADCODE CSB 06/01/00 	void	operator +=(ItemPtr i)	{sleeplist+=i;}
 	void	BackupSleepList();
 	int		ArchiveLiveList(UWord* archive,int archivesize,int skipsize=0);
 	void	RestoreSleepList();

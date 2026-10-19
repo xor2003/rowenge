@@ -57,11 +57,6 @@ typedef class AeroDevice *PAERODEVICE;
 
 #define FRAMESPERCALC 128		// This is the number of operations of the flight model per 
 								// calculation of atmosphere, fuel burn, etc.
-//DEADCODE AMM 24/11/99 #define EVERY512cs 0x00ff											  //DAW 02/07/99
-//DEADCODE AMM 24/11/99 #define EVERY256cs 0x007f
-//DEADCODE AMM 24/11/99 #define EVERY64cs  0x001f
-//DEADCODE AMM 24/11/99 #define EVERY16cs  0x0007
-//DEADCODE AMM 24/11/99 #define EVERY8cs   0x0003
 
 #define EVERY512cs 0x007f											  //DAW 02/07/99
 #define EVERY256cs 0x003f
@@ -208,7 +203,6 @@ public:
 	FCRD RotVel;												//Save
 
 	FCRD AirVel;	// rel to cg								//Save
-//DEADCODE CSB 23/12/99 	FCRD InstAirVel;											//Transient	
 	FP AirSpeed;												//Transient
 	FP DynamicPressure;											//Might Need for Slats/Airbrakes, Set by CalcAirVel
 
@@ -272,8 +266,6 @@ public:
 	SWord RightWheelBrake;									//Save
 	UWord BombingPhase;// player only
 
-//DEADCODE CSB 02/12/99 	FP SlatOutPressure;										//UnChanged
-//DEADCODE CSB 02/12/99 	FP SlatInPressure;										//UnChanged
  	SWord MaxElevatorTrim;	//CSB 27/09/99	
 	SWord MaxAileronTrim;	//CSB 27/09/99	
 	SWord MaxRudderTrim;	//CSB 27/09/99	
@@ -302,7 +294,6 @@ public:
 	bool			FuelCockTanks[4][4];// unchanged					//AMM 24Jul00
 	FUELCOCK_TYPE	FuelCockType;	//unchanged							//AMM 24Jul00
 // moved to AirStruc
-//DeadCode AMM 24Jul00 	SWord			FuelCockPos;//save									//AMM 24Jul00
 	// Functions
 
 	void ClearLists ();
@@ -326,7 +317,6 @@ public:
 	void ProcessEngines (AirStrucPtr const ControlledAC);
 	void RestartEngines (AirStrucPtr const ControlledAC);
 	void ProcessMainElements (AirStrucPtr const ControlledAC);
-//DeadCode CSB 05/11/98		void ProcessStabElements (AirStrucPtr const ControlledAC);
 	void ProcessDevices ();
 	void GearUp (AirStrucPtr const ControlledAC);
 	void GearDown (AirStrucPtr const ControlledAC);
@@ -337,8 +327,6 @@ public:
 
 	void ProcessCylinders (AirStrucPtr const ControlledAC);		//CSB 05/11/98
 
-//DeadCode CSB 26/02/99		void ProcessAeroCtrls ();
-//DeadCode CSB 26/02/99		void ProcessAeroCouples ();
 
 	void ProcessGears (AirStrucPtr const ControlledAC, FP forcex, FP forcey, FP forcez, FP momenty);	//CSB 11/01/99
 	void CheckGearPos (AirStrucPtr const ControlledAC);	//CSB 12/01/99
@@ -359,7 +347,6 @@ public:
 	void RotVelInt ();
 
 	void Ground (AirStrucPtr const ControlledAC);
-//DeadCode CSB 01/02/99		void GroundCalcs ();	// Simple Gear calcs
 
 	void CalcStickForceFeedback ();	//CSB
 	void ResetGearPos(bool);									//RJS 30Jun99
@@ -535,23 +522,6 @@ extern Model _Model;
 
 extern PMODEL ModelList;
 
-//DEADCODE  01/11/99 void F86E_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void MIG15_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F84E_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F80C_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F51D_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F9F2_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F8_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F82G_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void YAK9_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F4U5_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void SFURY_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void FFLY_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void A1_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 
-//DEADCODE  01/11/99 void B26_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void B29_Setup (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void T6_Setup (AirStrucPtr const, ULong);
 
 void SPITFIRE_Setup (AirStrucPtr const, ULong);		//CSB 22/09/99	
 void HURRICANE_Setup (AirStrucPtr const, ULong);	//CSB 22/09/99	
@@ -561,18 +531,6 @@ void JU87B_Setup (AirStrucPtr const, ULong);		//CSB 22/09/99
 	
 void DUMMY_Setup (AirStrucPtr const, ULong);		//CSB 29/10/99	
 	
-//DEADCODE  01/11/99 void F4U5_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void Mig15_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F8_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F80C_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F51D_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F82G_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F84E_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F86E_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void F9F2_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void FFLY_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void SFURY_SetupAI (AirStrucPtr const, ULong);
-//DEADCODE  01/11/99 void YAK9_SetupAI (AirStrucPtr const, ULong);
 
 void SPITFIRE_SetupAI (AirStrucPtr const, ULong);	//CSB 27/10/99	
 void HURRICANE_SetupAI (AirStrucPtr const, ULong);	//CSB 27/10/99	

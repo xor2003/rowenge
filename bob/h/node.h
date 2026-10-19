@@ -197,24 +197,12 @@ struct	SupplyNode
 		{	
 			FileNum		bfdummy;	//this field is garbage. Just to stop VC problems
 			SupplyFightFiles* fightfiles;
-//DEADCODE JIM 13/05/99 			FileNum		nodetree;
-//DEADCODE JIM 13/05/99 			int			startdis;
 			SupplyFightFiles* operator->();
 /////			Debrief::DisEntry	startdis;	//leg bone connected to the ancle bone!!!
 		};
 
 		FightFiles		redfrontBF;		//C //battlefield that determines the placement
 		FightFiles		bluefrontBF;	//battlefield that determines the placement
-//DeadCode DAW 28Oct98 		FileNum		redfrontBF;		//C //battlefield that determines the placement
-//DeadCode DAW 28Oct98 										//of items if reds are attacking from this 
-//DeadCode DAW 28Oct98 										//node:
-//DeadCode DAW 28Oct98 										//		tanks attacking line
-//DeadCode DAW 28Oct98 										//		artillery
-//DeadCode DAW 28Oct98 										//		roadblock
-//DeadCode DAW 28Oct98 										//		supply dumps
-//DeadCode DAW 28Oct98 										//		field HQ
-//DeadCode DAW 28Oct98 										//
-//DeadCode DAW 28Oct98 		FileNum		bluefrontBF;	//battlefield that determines the placement
 									//of items if blues are attacking from this
 									//node
 		SupplyRoute*	forward;	//C		//route down which the advance should progress
@@ -442,8 +430,6 @@ static SupplyNode	N0_0_Dangdong,
 					N3_21_Sangju,
 					N3_2_Chongju,
 					N3_8_Songnam,
-//DeadCode MS 02May99 					N3_64_Hongsong,
-//DeadCode MS 02May99 					N3_65_Hannae,
 					N3_51_Maesan,
 					N3_52_Kwangheywan,
 					N3_53_Chinchon,
@@ -452,10 +438,7 @@ static SupplyNode	N0_0_Dangdong,
 					N3_61_Tanyang,
 					N3_55_Uisong,
 					N3_XX_Taegu,									  //MS 22/04/99
-//DeadCode MS 02May99 					N3_66_Taechon,
-//DeadCode MS 02May99 					N3_45_Nonsan,
 					N3_63_Kunsan,
-//DeadCode MS 02May99 					N3_15_Kongju,
 					N3_4_Chungju,
 					N3_59_Koesan,
 					N3_26_Changhowon,
@@ -724,12 +707,7 @@ static SupplyRoute
 					R3_2_24Rail,
 					R3_2_1Rail,
 					R3_2_17Rail,
-//DeadCode MS 02May99 					R3_3_64Rail,
 					R3_64_65Rail,
-//DeadCode MS 02May99 					R3_65_66Rail,
-//DeadCode MS 02May99 					R3_66_63Rail,
-//DeadCode MS 02May99 					R3_63_45Rail,
-//DeadCode MS 02May99 					R3_45_1Rail,
 					R3_3_15Road,
 					R3_15_45Road,
 					R3_15_1Road,

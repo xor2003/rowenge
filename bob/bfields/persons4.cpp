@@ -76,7 +76,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
   //	#include	<stdio.h>
 
-//DEADCODE JIM 09/02/00 	#include	"text.h"
 	#include	"dosdefs.h"
 	#include	"myerror.h"
 //#define	TEXTREF_Included
@@ -99,8 +98,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //	#include	"bfcommon.h"
 	#include	"bfnumber.h"	//intensional double include
 
-//DeadCode JIM 28Mar96 extern	PlaneType&	camel;										//RDH 23Feb96
-//Old_Code PD 27Aug96  	MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);
 //	extern	ULong	GR_FriendlyScoutType00;
 //	extern	ULong	GR_GlobalSkillMin;
 //	extern	ULong	GR_GlobalSkillMax;
@@ -191,9 +188,6 @@ void	Persons4::make_airgrp(info_airgrp& I)
 			v3=NAT_RED;//defaultside;
 		if ((v1=J->uid.Evaluate())==ENABLE_COMPLEX_VAL)
 			if ((v2=J->band.Evaluate())==ENABLE_COMPLEX_VAL)
-//DEADCODE DAW 24/11/99 				if (v3==(int)NAT_RED)
-//DEADCODE DAW 24/11/99 					J->uniqueID.count=assignuid(RedAcBAND);
-//DEADCODE DAW 24/11/99 				else
 				J->uniqueID.count=assignuid(RealAcBAND);
 			else
 				J->uniqueID.count=assignuid((UniqueIDBand)v2);
@@ -215,13 +209,6 @@ void	Persons4::make_airgrp(info_airgrp& I)
 				info_waypointPtr w=ConvertPtrUID(J->wpref);
 				J->wpref=w->nextwp;
 			}
-//DeadCode MS 26Sep00 #ifndef NDEBUG
-//DeadCode MS 26Sep00 			{	//Homebase never filled in...
-//DeadCode MS 26Sep00  				info_waypointPtr w=ConvertPtrUID(J->wpref);
-//DeadCode MS 26Sep00 				if (w->applygroup!=ENABLE_COMPLEX_VAL)
-//DeadCode MS 26Sep00 					assert(	w->target.Evaluate()==J->homebase.Evaluate());
-//DeadCode MS 26Sep00 			}
-//DeadCode MS 26Sep00 #endif
 		//NOTE:
 			//Coming back from the 3d, the information represented here
 			//is not up to date.
@@ -363,8 +350,6 @@ void	Persons4::make_gndgrp(info_grndgrp& I)
 #ifndef	__BCPLUSPLUS__
 		if (gotGRoverride)
 		{
-//DeadCode JIM 22Oct00 			J->World.X=GR_ItemXOverride;
-//DeadCode JIM 22Oct00 			J->World.Z=GR_ItemZOverride;
 			for (int wpcount=GR_ItemWpOverride;wpcount;wpcount--)
 				if (info_waypointPtr(Persons2::ConvertPtrUID(J->wpref))->nextwp)
 					J->wpref=info_waypointPtr(Persons2::ConvertPtrUID(J->wpref))->nextwp;
@@ -434,16 +419,12 @@ void	Persons4::make_itemS(info_itemS& I,bool enabled)
 			else
 				J->uniqueID.count=UniqueID(v1);
 		J->bfieldindex=currbfindex;
-//DeadCode RDH 11Feb98 		J->uniqueID.sector=loadingmainworld;
 		J->uniqueID.changed=FALSE;
 //		J->uniqueID.deaded=FALSE;
 		J->position.EvalW(J->World);
 		J->Item::shape=ShapeNum(J->shape.Evaluate());
 		logUID(J);
 	}
-//DEADCODE JIM 16/11/99 	else
-//DEADCODE JIM 16/11/99 		if (bfdesc && justscanning==SCANNAMES)
-//DEADCODE JIM 16/11/99 ;//ME 			bfdesc->ST++;
 //  }
 //  else
 //  {
@@ -550,21 +531,6 @@ void	Persons4::make_string(string src,int len,TokenCode t)
 	if (justscanning==SCANNAMES)
 	{
  		char*	trg;//ME =bfdesc->title;
-//DEADCODE JIM 16/11/99 		if (t==T_comment)
-//DEADCODE JIM 16/11/99 ;//ME 			if ((UWord&)bfdesc->description[0])
-//DEADCODE JIM 16/11/99 ;//ME 			{
-//DEADCODE JIM 16/11/99 ;//ME 				trg=bfdesc->news;
-//DEADCODE JIM 16/11/99 ;//ME 				if (len>=DESCRIPT_LEN)
-//DEADCODE JIM 16/11/99 ;//ME 					len=DESCRIPT_LEN-1;
-//DEADCODE JIM 16/11/99 ;//ME
-//DEADCODE JIM 16/11/99 ;//ME 			}
-//DEADCODE JIM 16/11/99 ;//ME 			else
-//DEADCODE JIM 16/11/99 ;//ME 			{
-//DEADCODE JIM 16/11/99 ;//ME 				trg=bfdesc->description;
-//DEADCODE JIM 16/11/99 ;//ME 				if (len>=DESCRIPT_LEN)
-//DEADCODE JIM 16/11/99 ;//ME 					len=DESCRIPT_LEN-1;
-//DEADCODE JIM 16/11/99 ;//ME 			}
-//DEADCODE JIM 16/11/99 ;//ME 		else
 		if ((long)t==(long)T_family)
 		{
 ;//ME 			trg=bfdesc->family;
@@ -641,12 +607,6 @@ Bool	Persons4::make_agname(string src,int len,info_airgrp& A)
 	if (!justscanning)
 		if (len==4)
 		{
-//DEADCODE JIM 14/02/00 			int	v=(src[1]&15)*100+(src[2]&15)*10+(src[3]&15);
-//DEADCODE JIM 14/02/00 			if (src[0]=='E')
-//DEADCODE JIM 14/02/00 				A.squadron=-v;
-//DEADCODE JIM 14/02/00 			else
-//DEADCODE JIM 14/02/00 				A.squadron=v;
-//DEADCODE JIM 14/02/00 			return TRUE;
 		}
 	return FALSE;
 }
@@ -781,26 +741,6 @@ ITEM_STATUS	Persons2::ItemStatus(UniqueID u)
 // 	if (f)
 // 	{
 // 		livelength=0;
-//DeadCode JIM 20Jun97 		WayPointPtr w=f->waypoint;
-//DeadCode JIM 20Jun97
-//DeadCode JIM 20Jun97 		nextwp=w->uniqueID.count;
-//DeadCode JIM 20Jun97 		ItemBasePtr	i=w->target;
-//DeadCode JIM 20Jun97 		if (i)
-//DeadCode JIM 20Jun97 			nextwptarg=i->uniqueID.count;
-//DeadCode JIM 20Jun97 		else
-//DeadCode JIM 20Jun97 			nextwptarg=IllegalSepID;
-//DeadCode JIM 20Jun97 		while (f)
-//DeadCode JIM 20Jun97 		{
-//DeadCode JIM 20Jun97 			if (f->Status.deadtime==0)
-//DeadCode JIM 20Jun97 			  	livelength++;
-//DeadCode JIM 20Jun97 			f=f->follower;
-//DeadCode JIM 20Jun97 		}
-//DeadCode JIM 20Jun97 		if (i)
-//DeadCode JIM 20Jun97 			return (i->Status);
-//DeadCode JIM 20Jun97 		else
-//DeadCode JIM 20Jun97 			return (w->Status);
-//DeadCode JIM 20Jun97 	}
-//DeadCode JIM 20Jun97 	else
 //	{
 //		ITEM_STATUS	rv(FALSE);
 //		return rv;

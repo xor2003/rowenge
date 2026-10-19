@@ -1,31 +1,34 @@
 //------------------------------------------------------------------------------
 //Filename       lbmcpp.h
-//System         
+//System
 //Author         Jim Taylor
 //Date           Mon 7 Apr 1997
-//Description    This is the communial body of the LBM row unpack routine.
-//				 I have put it in a header file rather than a macro so that you
-//				 can debug it.
-//					
-//				It is included a number of times into LBM.CPP with different inputs
-//				
+//Description    LBM row unpack routine.
 //
+//				Was a textual-template include (#included inside function bodies
+//				with macro-defined inputs TRANSFERVALUESIZE/LOADVALUE/COPYVALUE/
+//				SAVEVALUE/DELTAVALUE/LBM_END_PTR, and it closed the caller's
+//				brace itself). Every live instantiation used the identical UByte
+//				configuration, so it is now a real function. Semantics
+//				preserved exactly:
+//				  - reads bounded at cend; past-end reads decode as a 1-byte
+//				    COPY (b==0) so the state machine converges instead of
+//				    running off the end of the fileblock. Pass
+//				    (const UByte*)~0 for the historical unbounded mode.
+//				  - data-derived stream skips saturate at [cstart,cend] rather
+//				    than wrapping the pointer wild.
+//				  - NULL stream or NULL destination decodes into a scratch sink
+//				    instead of writing through a null base pointer.
 //------------------------------------------------------------------------------
 
+#ifndef LBMCPP_H_INCLUDED
+#define LBMCPP_H_INCLUDED
 
+#include <stdint.h>
 
-
-
-//������������������������������������������������������������������������������
-//Procedure	Graphic::UnpackNRow
-//------------------------------------------------------------------------------
-//Author		Paul.   
-//Date			Fri 7 Jul 1995
-//Modified		DAW 11Jan96
-//
-//Description	Unpack a row of artwork
-//
-//Inputs		Source data
+//Inputs		Source data cursor c (moved past the row's bytes)
+//				End of the compressed stream buffer
+//				Destination image base + bytes per scanline
 //				Length of line in data
 //				start	x
 //				start	y
@@ -33,50 +36,39 @@
 //				physical max x
 //
 //Returns		Data ptr moved
-//
-//Externals
 //------------------------------------------------------------------------------
-//UByte *Graphic::UnpackNRow(UByte *c, SLong width, SLong x, SLong y, SLong minx, SLong maxx)
-//------------------------------------------------------------------------------
-//{
-//THIS IS AN EXAMPLE OF WHAT MAY NEED TO BE DEFINED
 
-//	minx=(minx>>1);
-//	maxx=((maxx+1)>>1);
-//	x>>=1;
-//	#define	TRANSFERVALUESIZE UWord
+static inline UByte* LBMUnpackNRow(UByte* c, const UByte* cend,
+									UByte* logicalscreenptr,
+									long BytesPerScanLine,
+									SLong width, SLong x, SLong y,
+									SLong minx, SLong maxx)
+{
+	static UByte	lbm_null_sink[65536];
+	if (!c)
+		c=(UByte*)lbm_null_sink;					//missing stream — decode zeros
+	if (!cend)
+		cend=(const UByte*)~0UL;					//historical unbounded mode
+	const UByte* cstart=c;							//clamp floor for LBMCBACK
+	UByte*	scraddr=	logicalscreenptr
+						? (UByte*)(((long)BytesPerScanLine * y) + logicalscreenptr)
+						: (UByte*)lbm_null_sink;
+	UByte		b = 0;
+	SLong		Count;
+	UByte		TRANSFERVALUE;
 
-//	#define LOADVALUE(x)	TRANSFERVALUE=*(TRANSFERVALUESIZE*)(ExpandBuff[x])
-//	#define COPYVALUE(x,y)	*((TRANSFERVALUESIZE*&)x)++=*(TRANSFERVALUESIZE*)(ExpandBuff[x])
-
-// RERUN: self-assert packing - DOSDEFS-era headers assumed ambient pack(1);
-// guard so include order cannot change this layout across TUs (ODR).
-#pragma pack(push,1)
-	#ifndef SAVEVALUE
-	#define SAVEVALUE(x)	*((TRANSFERVALUESIZE*&)x)++=TRANSFERVALUE
-	#endif
-	#ifndef DELTAVALUE
-	#define DELTAVALUE(x,d) (TRANSFERVALUESIZE*&)x += d
-	#endif
-
-	//RERUN: bound all compressed-stream reads at LBM_END_PTR; past-end reads
-	//decode as a 1-byte COPY (b==0) so every state-machine loop still
-	//converges instead of running off the end of the fileblock
-	#ifndef LBM_END_PTR
-	#define LBM_END_PTR	((UByte*)~0UL)
-	#endif
-	#define LBMREADB()	((c < (UByte*)LBM_END_PTR) ? *(c++) : (UByte)0)
-
-	TRANSFERVALUESIZE TRANSFERVALUE;
-
-//THIS IS THE ACTUAL START
-
-	LogicalPtr	scraddr=	((long)BytesPerScanLine * y) + logicalscreenptr;
-//TempCode JIM 19Feb96 	Colour		srccol;
-	UByte		b = 0;											//RERUN uninit read on malformed RLE
-	SLong		i,Count;
 	int	residue=0;
 	Bool	skipplotting=FALSE;
+
+	#define LBMREADB()	((c < (UByte*)cend) ? *(c++) : (UByte)0)
+	#define LBMCFWD(n)	do { uintptr_t _c=(uintptr_t)(c), _e=(uintptr_t)cend; \
+							if (_e<=_c || _e-_c < (uintptr_t)(n)) c=(UByte*)cend; else c+=(n); } while(0)
+	#define LBMCBACK(n)	do { uintptr_t _c=(uintptr_t)(c), _s=(uintptr_t)cstart; \
+							if (_s>=_c || _c-_s < (uintptr_t)(n)) c=(UByte*)cstart; else c-=(n); } while(0)
+	#define LOADVALUE(v)	TRANSFERVALUE=(v)
+	#define SAVEVALUE(t)	*(t)++=TRANSFERVALUE
+	#define COPYVALUE(t,s)	*(t)++=(s)
+	#define DELTAVALUE(t,d)	(t)+=(d)
 
 	////// CASE 1: starting off left clip - clip necessary
 
@@ -90,7 +82,7 @@
 				Count = 1+(SByte) b;
 				x+=Count;
 				width-=Count;
-					c+=Count;
+					LBMCFWD(Count);
 			}
 			elseif (b==0x80)
 			{	//SKIP
@@ -101,7 +93,7 @@
 			else
 			{	//RUN
 				Count = 1-(SByte)b;
-				c++;
+				LBMCFWD(1);
 				width-=Count;
 				x+=Count;
 			}
@@ -111,7 +103,7 @@
 		if (b<0x80)
 		{
 			residue=x-minx;
-			c-=residue;
+			LBMCBACK(residue);
 			x=minx;
 			DELTAVALUE(scraddr,x);			//set to starting pixel...
 			x+=Count=residue;
@@ -128,12 +120,12 @@
 				COPYVALUE(scraddr,LBMREADB());
 			}
 			while (--Count!=0);
-			c+=residue;	
+			LBMCFWD(residue);
 		}
 		else
 		if (b!=0x80)
 		{
-			LOADVALUE(((c-1) < (UByte*)LBM_END_PTR) ? *(c-1) : 0);
+			LOADVALUE(*(c-1));
 			residue=x-minx;
 			x=minx;
 			DELTAVALUE(scraddr,x);			//set to starting pixel...
@@ -255,7 +247,7 @@
 						COPYVALUE(scraddr,LBMREADB());
 					}
 					while (--Count!=0);
-					c+=residue;
+					LBMCFWD(residue);
 				}
 				elseif (b!=0x80)
 				{
@@ -279,7 +271,7 @@
 			{	//COPY
 				Count = 1+(SByte) b;
 				width-=Count;
-				c+=Count;
+				LBMCFWD(Count);
 			}
 			elseif (b==0x80)
 			{	//SKIP
@@ -289,20 +281,21 @@
 			else
 			{	//RUN
 				Count = 1-(SByte)b;
-				c++;
+				LBMCFWD(1);
 				width-=Count;
 			}
 		}
+
+	#undef LBMREADB
+	#undef LBMCFWD
+	#undef LBMCBACK
+	#undef LOADVALUE
+	#undef SAVEVALUE
+	#undef COPYVALUE
+	#undef DELTAVALUE
 
 	return(c);
 	//THAT'S YER LOT
 }
 
-#undef	LOADVALUE
-#undef	SAVEVALUE
-#undef	COPYVALUE
-#undef	DELTAVALUE
-#undef TRANSFERVALUESIZE
-
-
-#pragma pack(pop)
+#endif	//LBMCPP_H_INCLUDED

@@ -499,10 +499,6 @@ inline SWord AbsAngle(SWord ang)
 //Returns
 //
 //------------------------------------------------------------------------------
-//DEADCODE CSB 20/01/00 inline ANGLES AbsAngle(ANGLES ang)
-//DEADCODE CSB 20/01/00 {
-//DEADCODE CSB 20/01/00 	return(Angles(AbsAngle(SWord(ang))));
-//DEADCODE CSB 20/01/00 }
 
 
 #pragma pack(pop)

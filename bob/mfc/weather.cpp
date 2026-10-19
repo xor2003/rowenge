@@ -151,7 +151,6 @@ END_MESSAGE_MAP()
 BOOL CWeather::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
-//DeadCode JIM 20Oct00 	RDialog* parent=(RDialog*)GetParent();
 //	parent->SetMaxSize(CRect(0,0,350,430));
 //	parent->SetMinSize(CRect(0,0,150,150));
 	if (!Node_Data.GotBadWeatherPeriod())
@@ -208,12 +207,6 @@ BOOL CWeather::OnInitDialog()
 			else
 				s->SetString(RESSTRING(L_CLEAR));
 		}
-	//DEADCODE RDH 25/02/00 
-	//DEADCODE RDH 25/02/00 	s=GETDLGITEM(IDC_SPECIALNOTES);
-	//DEADCODE RDH 25/02/00 	if (MMC.Sky.MistInValley)
-	//DEADCODE RDH 25/02/00 		s->SetString(RESSTRING(MISTINVALLEYS));
-	//DEADCODE RDH 25/02/00 	else
-	//DEADCODE RDH 25/02/00   		s->SetString(RESSTRING(NONE_SPECIALS));
 
 
 
@@ -223,9 +216,6 @@ BOOL CWeather::OnInitDialog()
 			mag = 2;
 		s->SetString(RESLIST(LIGHT,mag));
 
-	//DEADCODE RDH 25/02/00 	s=GETDLGITEM(IDC_VISIBILITY);
-	//DEADCODE RDH 25/02/00 	int v = 0.5 + MMC.Sky.Visibility/(30.48*6080);
-	//DEADCODE RDH 25/02/00 	s->SetString(CSprintf("%i", v));
 
 		s=GETDLGITEM(IDC_TEMPERATURE);
 		int t = MMC.Sky.Temp0 - 272.65;
@@ -237,15 +227,6 @@ BOOL CWeather::OnInitDialog()
 
 
 
-	//DEADCODE RDH 25/02/00 	s=GETDLGITEM(IDC_CONTRAIL_BASE);
-	//DEADCODE RDH 25/02/00 	t = MMC.Sky.ContrailBandCentre - MMC.Sky.ContrailBandWidth/2;
-	//DEADCODE RDH 25/02/00 	t = t/30.48;
-	//DEADCODE RDH 25/02/00 	s->SetString(CSprintf("%i", t));
-	//DEADCODE RDH 25/02/00 
-	//DEADCODE RDH 25/02/00 	s=GETDLGITEM(IDC_CONTRAIL_TOP);
-	//DEADCODE RDH 25/02/00 	t = MMC.Sky.ContrailBandCentre + MMC.Sky.ContrailBandWidth/2;
-	//DEADCODE RDH 25/02/00 	t = t/30.48;
-	//DEADCODE RDH 25/02/00 	s->SetString(CSprintf("%i", t));
 
 		s=GETDLGITEM(IDC_WINDSPEED0);
 		t = MMC.Sky.wind0;

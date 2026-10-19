@@ -10,7 +10,6 @@
 #ifndef	imageMap_Included
 #define	imageMap_Included
 
-//DEADCODE MS 31/01/00 	#include	"3DDefs.h"										//PD 30Oct95
 	#include	"FileMan.h"										//PD 06Nov95
 
 	#include	"bitfield.h"									//PD 25Aug96
@@ -32,7 +31,6 @@ typedef ImageMap_Desc									//PD 01Aug96
 
 MINMAX		(ImageMapBit,0,512);								//DAW 27Oct98
 MAKEFIELD 	(ImageMapBit,ImageMapBitMIN,ImageMapBitMAX);		//DAW 27Oct98
-//DeadCode DAW 27Oct98 MAKEFIELD 	(ImageMapNumber,ImageMapNumberMIN,ImageMapNumberMAX);//PD 25Aug96
 
 
 class	 ImageMap
@@ -51,7 +49,6 @@ class	 ImageMap
 
 	friend	class	fileblock;
 
-//DeadCode DAW 27Oct98 	ImageMapDesc	*imagemaptable;
 
 	SLong			total_image_mem;							//PD 06Jun96
 	SLong			total_ac_mem;								//RJS 24Jun98
@@ -63,10 +60,8 @@ class	 ImageMap
 
 	SLong			failedcnt;									//RJS 13Jun99
 
-//DeadCode DAW 27Oct98 	ImageMapNumberField	imnf;									//PD 25Aug96
 
 	public:
-//DeadCode DAW 27Oct98 			SLong		*imagemaptable2;						//PD 10Mar97
 			Bool		DoingAC,DoingCock;						//RJS 24Jun98
 			bool		DoingPilotedAC;
 

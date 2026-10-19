@@ -134,7 +134,6 @@ END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CLockerRoom, CDialog)
     //{{AFX_EVENTSINK_MAP(CLockerRoom)
-//DEADCODE DAW 23/11/99 	ON_EVENT(CLockerRoom, IDC_VISITORS, 1 /* Clicked */, OnClickedVisitors, VTS_NONE)
 	ON_EVENT(CLockerRoom, IDC_RRADIO_GAMETYPE, 1 /* Selected */, OnSelectedRradioGametype, VTS_I4)
 	ON_EVENT(CLockerRoom, IDC_PILOTEDFLAG, 1 /* Clicked */, OnClickedPilotedflag, VTS_NONE)
 	ON_EVENT(CLockerRoom, IDC_NAME, 2 /* TextChanged */, OnTextChangedName, VTS_I4)
@@ -156,10 +155,6 @@ void CLockerRoom::RedrawSide()
 	pradio=GETDLGITEM(IDC_RRADIO_SELECTSIDE);
 
 	if (_DPlay.GameType == DPlay::DEATHMATCH)
-//DeadCode AMM 21Feb100 		||	(		(_DPlay.GameType == DPlay::COMMSCAMPAIGN)
-//DeadCode AMM 21Feb100 //DEADCODE AMM 10/06/99 				&&	(_DPlay.UIPlayerType == PLAYER_HOST)
-//DeadCode AMM 21Feb100 			)
-//DeadCode AMM 21Feb100 		)
 		pradio->ShowWindow(SW_HIDE);
 	else
 		pradio->ShowWindow(SW_SHOW);
@@ -208,7 +203,6 @@ BOOL CLockerRoom::OnInitDialog()
 		_DPlay.GameType=DPlay::DEATHMATCH;
 	}
 
-//DEADCODE RDH 25/11/99 	m_IDC_GAME_TITLECOMBO.SetCircularStyle(TRUE);
 
 	pradio=GETDLGITEM(IDC_RRADIO_GAMETYPE);
 
@@ -223,8 +217,6 @@ BOOL CLockerRoom::OnInitDialog()
 		pradio->AddButton(string);
 		string.LoadString(IDS_QUICKMISSIONCOMM);
 		pradio->AddButton(string);
-//DEADCODE RDH 09/05/00  		string.LoadString(IDS_CAMPAIGNCOMMS);
-//DEADCODE RDH 09/05/00  		pradio->AddButton(string);
 
 		pradio=GETDLGITEM(IDC_RRADIO_SELECTSIDE);
 		pradio->AddButton(RESSTRING(RED));
@@ -251,10 +243,6 @@ BOOL CLockerRoom::OnInitDialog()
 			pradio->AddButton(string);
 			break;
 
-//DeadCode AMM 21Feb100  		case DPlay::COMMSCAMPAIGN:
-//DeadCode AMM 21Feb100  			string.LoadString(IDS_CAMPAIGNCOMMS);
-//DeadCode AMM 21Feb100  			pradio->AddButton(string);
-//DeadCode AMM 21Feb100  			break;
 
 		default :
 			_DPlay.GameType=DPlay::DEATHMATCH;
@@ -314,26 +302,22 @@ BOOL CLockerRoom::OnInitDialog()
 
 	if (_DPlay.UIPlayerType==DPlay::PLAYER_HOST && !_DPlay.Lobbied)
 	{
-//DEADCODE AMM 26/11/99 		strcpy(_DPlay.SessionName,"MiG Alley");
-//DeadCode AMM 6Jul00 		strcpy(_DPlay.SessionName,"Blitz"); //AMM 26/11/99
 		strcpy(_DPlay.SessionName,"BoB");								//AMM 6Jul00
 	}
 
 	if (_DPlay.SessionName[0])
 	{
 		editbox=GETDLGITEM(IDC_GAME_TITLE);
-//DeadCode AMM 21Feb100 		editbox->SetWindowText(_DPlay.SessionName);
 		editbox->SetCaption("\b\t\n\v");
 		editbox->SetCaption(_DPlay.SessionName);
 	}
 
-	strcpy(_DPlay.PlayerName,Save_Data.CommsPlayerName);
+	strncpy(_DPlay.PlayerName,Save_Data.CommsPlayerName,PLAYERNAMELEN-1); _DPlay.PlayerName[PLAYERNAMELEN-1]=0;
 	if (_DPlay.PlayerName[0])
 	{
 		editbox=GETDLGITEM(IDC_NAME);
 //		editbox->SetFontNum(-8);
 //		editbox->SetEnabled(FALSE);
-//DeadCode AMM 21Feb100 		editbox->SetWindowText(_DPlay.PlayerName);
 		editbox->SetCaption("\b\t\n\v");
 		editbox->SetCaption(_DPlay.PlayerName);
 	}
@@ -408,11 +392,6 @@ void CLockerRoom::UpDateDPlay()
 		CSQuick1::quickdef.MakeTeamPlayMission(index);
 
 	}
-//DeadCode AMM 21Feb100  	else if (_DPlay.GameType == DPlay::COMMSCAMPAIGN)
-//DeadCode AMM 21Feb100 	{
-//DeadCode AMM 21Feb100 		strncpy(_DPlay.GameName,RESLIST(SCAMPAIGNSELECT1, index),59);
-//DeadCode AMM 21Feb100 		_DPlay.GameName[59]=NULL;
-//DeadCode AMM 21Feb100 	}
 //	else
 //		strcpy(_DPlay.GameName,"");
 

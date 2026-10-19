@@ -110,7 +110,6 @@ extern	void	CheckE3();
 	#define F_BATTLE
 #include	"files.g"
 #include	"mytime.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"persons2.h"
 #include	"transite.h"
 #include	"enumbits.m"
@@ -126,11 +125,9 @@ extern	void	CheckE3();
 #include "winmove.h"
 #include "missman2.h"
 #include "sagmove.h"
-//DEADCODE DAW 29/01/00 #include "package.h"
 #include "sky.h"
 #include "model.h"
 
-//DeadCode PD 6Nov97 #pragma dump_object_model AircraftAnimData;
 
 //MATHABLE(ANGLES);
 //extern	ULong	GR_NAT_FRIEND;
@@ -174,19 +171,9 @@ DES		AaaMainList::~AaaMainList()
 		tmp=tmp2;
 	}
 	while (tmp!=aaalist);
-//DeadCode JIM 06Oct96 	delete tmp;
 }
 
 
-//DEADCODE JIM 17/03/99 void	SleepList::AddItemEvents(EventRec* evlist)
-//DEADCODE JIM 17/03/99 {
-//DEADCODE JIM 17/03/99 	while (evlist)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		if (evlist->attitem && (evlist->attitem->Status.size==ITEMSIZE || evlist->attitem->Status.size==MOBILESIZE))
-//DEADCODE JIM 17/03/99 			operator+=(*evlist->attitem);
-//DEADCODE JIM 17/03/99 		evlist=evlist->eventlink;
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 }
 
 
 bool AaaMainList::operator	+=(ItemPtr i)
@@ -291,7 +278,6 @@ struct	AaaParams
 	ANGLESInst					turnpersec;							//JIM 05Dec96
 	SLong					minalt,altrange,flatrange;
 	SWord					reloadtime;
-//DEADCODE CSB 08/11/99 	UWord					muzzelvel;
 	ULong					muzzelvel; //CSB 08/11/99
 	SLong					lifetime;
 	ShapeNum				shapenum;
@@ -392,119 +378,6 @@ AaaParams	aaaguntypelist[]=
 		TRUE
 	},
 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_RED,	//red large bore flak
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_30Deg,ANGLES_60Deg,	ANGLES_30Deg,//MS 11Dec96
-//DEADCODE CSB 10/01/00 		METRES1000,FT_25000,				METRES5000,		100*10,
-//DEADCODE CSB 10/01/00 		5*1000,SPECIALLIFE,BFLAK,MOBILE_PUFFTRAVEL,			FIL_NULL,
-//DEADCODE CSB 10/01/00 		FALSE
-//DEADCODE CSB 10/01/00 		},		//life of -1 means use est life
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_RED,	//red large bore flak (short range)
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_30Deg,ANGLES_60Deg,	ANGLES_30Deg,//MS 11Dec96
-//DEADCODE CSB 10/01/00 		METRES1000,FT_12000,				METRES5000,		100*10,
-//DEADCODE CSB 10/01/00 		5*1000,SPECIALLIFE,WFLAK,MOBILE_PUFFTRAVEL,			FIL_NULL,
-//DEADCODE CSB 10/01/00 		FALSE
-//DEADCODE CSB 10/01/00 		},		//life of -1 means use est life
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_BLUE,	//blue large bore flak
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_30Deg,ANGLES_60Deg,	ANGLES_30Deg,//MS 11Dec96
-//DEADCODE CSB 10/01/00 		METRES1000,METRES3000,				METRES5000,		100*10,
-//DEADCODE CSB 10/01/00 		5*1000,SPECIALLIFE,BFLAK,MOBILE_PUFFTRAVEL,			FIL_NULL,
-//DEADCODE CSB 10/01/00 		FALSE
-//DEADCODE CSB 10/01/00 		},		//life of -1 means use est life
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_RED,	//red small bore flak 12mil
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_0Deg,ANGLES_80Deg,	ANGLES_170Deg,//JIM 05Dec96
-//DEADCODE CSB 10/01/00 		FT_100,FT_4000,				FT_5000,		50,
-//DEADCODE CSB 10/01/00 		6000,100*4,DSPARK,MOBILE_BULLET,					FIL_SFX_GUN_RIFLE_SHOT1,
-//DEADCODE CSB 10/01/00 //TempCode MS 30Mar99 		5*1000,100*4,DSPARK,MOBILE_BULLET,								FIL_SFX_GUN_RIFLE_SHOT1,
-//DEADCODE CSB 10/01/00 		FALSE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_RED,	//red small bore flak 37mil
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_0Deg,ANGLES_80Deg,	ANGLES_170Deg,//JIM 05Dec96
-//DEADCODE CSB 10/01/00 		FT_100,FT_4300,				FT_5000,		50,
-//DEADCODE CSB 10/01/00 		6000,100*4,FLMONN,MOBILE_BULLET,					FIL_SFX_MIG_CANNON_LOOP1,
-//DEADCODE CSB 10/01/00 //TempCode MS 30Mar99 		5*1000,100*4,DSPARK,MOBILE_BULLET,								FIL_SFX_GUN_RIFLE_SHOT1,
-//DEADCODE CSB 10/01/00 		FALSE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_BLUE,	//blue small bore flak
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_0Deg,ANGLES_60Deg,	ANGLES_170Deg,//JIM 05Dec96
-//DEADCODE CSB 10/01/00 		0,FT_12000,				METRES2000,		50,
-//DEADCODE CSB 10/01/00 		6000,100*2,DSPARK,MOBILE_BULLET,					FIL_SFX_GUN_RIFLE_SHOT1,
-//DEADCODE CSB 10/01/00 		FALSE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_BARAGE,NAT_RED,			//ground effect (non fatal)	//RJS 31Mar99
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_330Deg,ANGLES_120Deg,	ANGLES_10Deg,	//RJS 05Oct98
-//DEADCODE CSB 10/01/00 		-METRES100,METRES200,				METRES500,		500,				//Shoot every 5secs
-//DEADCODE CSB 10/01/00 		800,SPECIALLIFE,DSPARK,MOBILE_BULLET,									FIL_SFX_GUN_TANK2,//RJS 05Oct98
-//DEADCODE CSB 10/01/00 		FALSE																					//RJS 05Oct98
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_BARAGEGUN,NAT_RED,		//red ground gun (non fatal)																//RJS 09Dec98
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_300Deg,ANGLES_160Deg,	ANGLES_10Deg,
-//DEADCODE CSB 10/01/00 		-METRES500,METRES800,				160000,		500,
-//DEADCODE CSB 10/01/00 		800,SPECIALLIFE,DSPARK,MOBILE_BOMBDROP,								FIL_SFX_GUN_TANK2,
-//DEADCODE CSB 10/01/00 		FALSE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_BARAGEGUN,NAT_BLUE,		//blue ground gun (non fatal)																//RJS 09Dec98
-//DEADCODE CSB 10/01/00 		ANGLES_0Deg,ANGLES_FIDDLEMAX,		ANGLES_300Deg,ANGLES_160Deg,	ANGLES_10Deg,
-//DEADCODE CSB 10/01/00 		-METRES500,METRES800,				160000,		500,
-//DEADCODE CSB 10/01/00 		5*800,SPECIALLIFE,DSPARK,MOBILE_BOMBDROP,								FIL_SFX_GUN_TANK2,
-//DEADCODE CSB 10/01/00 		FALSE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 	{	AAA_ANTIAIRCRAFT,NAT_RED,	//rear gunners red
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		ANGLES_90Deg,ANGLES_180Deg,		ANGLES_350Deg,ANGLES_50Deg,			ANGLES_150Deg,//JIM 05Dec96
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		-METRES50,METRES300,				METRES300,		50,
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		5*1200,100*1,BULLET,MOBILE_BULLET,									FIL_SFX_GUN_TANK1,
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		TRUE
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		},
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 	{	AAA_ANTIAIRCRAFT,NAT_BLUE,	//rear gunners blue
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		ANGLES_90Deg,ANGLES_180Deg,		ANGLES_350Deg,ANGLES_50Deg,			ANGLES_150Deg,//JIM 05Dec96
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		-METRES50,METRES300,				METRES300,		50,
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		5*1200,100*1,BULLET,MOBILE_BULLET,									FIL_SFX_GUN_TANK1,
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		TRUE
-//DEADCODE CSB 10/01/00 //DeadCode RJS 08Apr99 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_BLUE,	//turret gunners top (forward)
-//DEADCODE CSB 10/01/00 		-ANGLES_90Deg,ANGLES_180Deg,		ANGLES_350Deg,ANGLES_50Deg,			ANGLES_150Deg,
-//DEADCODE CSB 10/01/00 		-METRES50,METRES300,				METRES300,		50,
-//DEADCODE CSB 10/01/00 		5*1200,100*1,BULLET,MOBILE_BULLET,									FIL_SFX_MACHINE_GUN_LOOP2,
-//DEADCODE CSB 10/01/00 		TRUE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_BLUE,	//turret gunners bottom (forward)
-//DEADCODE CSB 10/01/00 		-ANGLES_90Deg,ANGLES_180Deg,		ANGLES_300Deg,ANGLES_50Deg,			ANGLES_150Deg,
-//DEADCODE CSB 10/01/00 		-METRES50,METRES300,				METRES300,		50,
-//DEADCODE CSB 10/01/00 		5*1200,100*1,BULLET,MOBILE_BULLET,									FIL_SFX_MACHINE_GUN_LOOP2,
-//DEADCODE CSB 10/01/00 		TRUE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_BLUE,	//turret gunners top (rear)
-//DEADCODE CSB 10/01/00 		ANGLES_90Deg,ANGLES_180Deg,		ANGLES_350Deg,ANGLES_50Deg,			ANGLES_150Deg,
-//DEADCODE CSB 10/01/00 		-METRES50,METRES300,				METRES300,		50,
-//DEADCODE CSB 10/01/00 		5*1200,100*1,BULLET,MOBILE_BULLET,									FIL_SFX_MACHINE_GUN_LOOP2,
-//DEADCODE CSB 10/01/00 		TRUE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_BLUE,	//turret gunners bottom (rear)
-//DEADCODE CSB 10/01/00 		ANGLES_90Deg,ANGLES_180Deg,		ANGLES_300Deg,ANGLES_50Deg,			ANGLES_150Deg,
-//DEADCODE CSB 10/01/00 		-METRES50,METRES300,				METRES300,		50,
-//DEADCODE CSB 10/01/00 		5*1200,100*1,BULLET,MOBILE_BULLET,									FIL_SFX_MACHINE_GUN_LOOP2,
-//DEADCODE CSB 10/01/00 		TRUE
-//DEADCODE CSB 10/01/00 		},
-//DEADCODE CSB 10/01/00 
-//DEADCODE CSB 10/01/00 	{	AAA_ANTIAIRCRAFT,NAT_RED,	//turret gunners top (rear)
-//DEADCODE CSB 10/01/00 		ANGLES_90Deg,ANGLES_180Deg,		ANGLES_350Deg,ANGLES_50Deg,			ANGLES_150Deg,
-//DEADCODE CSB 10/01/00 		-METRES50,METRES300,				METRES300,		50,
-//DEADCODE CSB 10/01/00 		5*1200,100*1,BULLET,MOBILE_BULLET,									FIL_SFX_MACHINE_GUN_LOOP2,
-//DEADCODE CSB 10/01/00 		TRUE
-//DEADCODE CSB 10/01/00 		},
 };
 
 class	TrgListProc
@@ -539,8 +412,6 @@ void	TrgListProc::ReStart(AaaGunTypes t,Nationality n,AaaMainList::AaaSubList *s
 	case AAA_ANTIAIRCRAFT:
 	case AAA_ANTIAIRCRAFTNOTSAG:
 		base2=base=NULL;
-//DeadCode CSB 15Aug00 		aclist=ArtInt::ACArray;
-//DeadCode CSB 15Aug00 		index=-1;
 		last = mobileitem::ACList;
 		break;
 	case AAA_ANTITANK:
@@ -608,7 +479,6 @@ ItemPtr	TrgListProc::Next()
 			AirStrucPtr ac = AirStrucPtr(last);
 			if(		(!ac->Status.deadtime) && (ac->nationality != nat)
 				&&	((!ac->fly.numinsag) || (!ac->fly.expandedsag))		)
-//DeadCode CSB 22Aug00 				&&	(!ac->ai.attacker)	)
 				retval = last;
 
 			if(last->nextmobile)
@@ -638,9 +508,6 @@ ItemPtr	TrgListProc::Next()
 				last = last->nextmobile;
 			else
 			{
-//DeadCode CSB 3Nov00 				if(!ac->fly.numinsag)
-//DeadCode CSB 3Nov00 					last = mobileitem::SAGList;
-//DeadCode CSB 3Nov00 				else
 					return(NULL);
 			}
 			if(retval)
@@ -648,20 +515,6 @@ ItemPtr	TrgListProc::Next()
 		}
 		break;
 	}
-//DeadCode CSB 15Aug00 		{
-//DeadCode CSB 15Aug00 			do
-//DeadCode CSB 15Aug00 				index++;
-//DeadCode CSB 15Aug00 			while (		index<ArtInt::ACARRAYSIZE 
-//DeadCode CSB 15Aug00 					&& (	aclist[index]==NULL 
-//DeadCode CSB 15Aug00 						||	aclist[index]->nationality==nat
-//DeadCode CSB 15Aug00 					)	);
-//DeadCode CSB 15Aug00 			if (index<ArtInt::ACARRAYSIZE)
-//DeadCode CSB 15Aug00 				return aclist[index];
-//DeadCode CSB 15Aug00 			else
-//DeadCode CSB 15Aug00 				return NULL;
-//DeadCode CSB 15Aug00 
-//DeadCode CSB 15Aug00 		}
-//DeadCode CSB 15Aug00 		break;
 	case AAA_ANTITANK:
 	case AAA_BARAGE:
 	case AAA_BARAGEGUN:
@@ -707,9 +560,7 @@ void	SleepList::Event()
 			AaaParams* a = &aaaguntypelist[mgad->weaponlaunchers[0].LauncherType - LT_MOVEGUN];
 			guntype=a->guntype;
 			nat=a->nat;
-//DeadCode CSB 13Jul00 			range=a->flatrange+METRES2000;
 			range = a->flatrange + HALFVISIBLERANGE;
-//DEADCODE DAW 26/05/99 		}
 			TrgListProc	tlp(guntype,nat,aaalist,Live_List.aaalist);
 		//for all ac/gmobiles/aaasites - depending on type of gun
 			//if on enemy side - depending on type
@@ -738,27 +589,10 @@ void	SleepList::Event()
 								int				weapnum=0;
 								ULong			mvel;									//RJS 12Nov99
 								UWord			mdelay,mburst;							//RJS 12Nov99
-//DeadCode JIM 20Oct00 								bool	targetting=false;
 								WeapAnimData*	weapanim=SHAPE.GetWeaponLauncher(eye,0,weapoff.X,weapoff.Y,weapoff.Z,mvel,mdelay,mburst,LT_MOVEGUN);//RDH 31Jul98
 								if (weapanim)											//RJS 24Jun99
 									weapanim->LaunchTime=0;								//RJS 24Jun99
 
-	//DeadCode DAW 25Jun99 							weapanim->LaunchTime=0;
-//DEADCODE CSB 11/02/00 								if((d->lnchrtype == LT_BRIT_3IN) || (d->lnchrtype == LT_BRIT_3_7IN) || (d->lnchrtype == LT_BRIT_4_5IN))
-//DEADCODE CSB 11/02/00 									if (trg->Status.size==AIRSTRUCSIZE)
-//DEADCODE CSB 11/02/00 										if (!blockradio)
-//DEADCODE CSB 11/02/00 											if (AirStrucPtr(*trg)->IsUsingPilotedAcLog() && trg->World.Y>METRES5000)
-//DEADCODE CSB 11/02/00 											{
-//DEADCODE CSB 11/02/00 												TargetIndexes	trgindex;
-//DEADCODE CSB 11/02/00 												int msgalt=trg->World.Y;
-//DEADCODE CSB 11/02/00 												if (msgalt<eye->World.Y+a->minalt+a->altrange)
-//DEADCODE CSB 11/02/00 												{
-//DEADCODE CSB 11/02/00 													MESSAGE_STRUC	tmpmsg(OLDSCRIPT_FLAKREPORT, MSG_FLAKREPORT, NULL, eye, Persons2::PlayerGhostAC,trgindex.SetHeight(msgalt));//RJS 02Feb00
-//DEADCODE CSB 11/02/00 													_Miles.SequenceAudible(FIL_MUSIC_FLAK);
-//DEADCODE CSB 11/02/00 													_Radio.TriggerMsg(tmpmsg.SetVoice(VOICE_DENTIST));
-//DEADCODE CSB 11/02/00 													blockradio=aaalist;
-//DEADCODE CSB 11/02/00 												}
-//DEADCODE CSB 11/02/00 											}
 							}
 							return;/////
 						}
@@ -766,30 +600,17 @@ void	SleepList::Event()
 			}
 		}														//RJS 26May99
 //remove from live list if get here (nothing visible)
-//DeadCode JIM 15Nov96 	Live_List-=eye;	//should not be in livelist anyway!
 	}
 }
 
 inline void	WarnSmallBore(MobileItem*weapitem,AirStruc*trg)
 {
-//DEADCODE CSB 11/02/00 	AirStrucPtr resp=trg->fly.leadflight;
-//DEADCODE CSB 11/02/00 	if (!resp)
-//DEADCODE CSB 11/02/00 		resp=trg->FindBuddy();
-//DEADCODE CSB 11/02/00 	if (resp)
-//DEADCODE CSB 11/02/00 	{
-//DEADCODE CSB 11/02/00 		if (weapitem->SGT)
-//DEADCODE CSB 11/02/00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_FLAKFIRING, MSG_FLAKFIRING, resp, Persons2::ConvertPtrUID(weapitem->SGT), trg));//RJS 02Feb00
-//DEADCODE CSB 11/02/00 		else
-//DEADCODE CSB 11/02/00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_FLAKFIRING, MSG_FLAKFIRING, resp, weapitem, trg));//RJS 02Feb00
-//DEADCODE CSB 11/02/00 	}
-//DEADCODE CSB 11/02/00 
 }
 
 
 void	LiveList::Event()
 {
 
-//DeadCode JIM 06Jan97 	CheckE3();
 
 	if((Persons2::PlayerGhostAC->movecode == AUTO_TRAININGTAKEOFF) || (Persons2::PlayerGhostAC->movecode == AUTO_TRAININGLANDING))
 		return;
@@ -817,7 +638,6 @@ void	LiveList::Event()
 
 	if (aaalist[0][aaaind])
 	{
-//DeadCode JIM 06Jan97 	CheckE3();
 		ItemPtr		weapitem=aaalist[0][aaaind];
 		if (weapitem->World.Y==0)
 			weapitem->World.Y=Land_Scape.GetGroundLevel(weapitem);
@@ -827,7 +647,6 @@ void	LiveList::Event()
 		UWord			mdelay,mburst;						//RJS 12Nov99
 		bool	targetting=false;
 		WeapAnimData*	weapanim=SHAPE.GetWeaponLauncher(weapitem,weapnum,weapoff.X,weapoff.Y,weapoff.Z,mvel,mdelay,mburst,LT_MOVEGUN);//RDH 31Jul98
-//DeadCode JIM 06Jan97 	CheckE3();
 		if (weapanim)
 		{
 			if (!weapanim->target)
@@ -845,7 +664,6 @@ void	LiveList::Event()
 				}
 
 			AaaParams* 		aaaparams=&aaaguntypelist[weapanim->LauncherType-LT_MOVEGUN];
-//DEADCODE CSB 28/02/00 			TrgListProc		targlist(aaaparams->guntype,aaaparams->nat,sleeplist.aaalist,aaalist);	//assume all a/c use same detect routines
 			Bool nothingthere=TRUE;
 
 			if (	aaaparams->doinaccel 
@@ -895,18 +713,8 @@ void	LiveList::Event()
 						}
 						else
 						{	//Second Quick Throwout - Range
-//DEADCODE CSB 17/05/00 							SLong d1 = Wtarg.X - Wgun.X;		if(d1 < 0) d1 *= -1;
-//DEADCODE CSB 17/05/00 							SLong d2 = Wtarg.Y - Wgun.Y;		if(d2 < 0) d2 *= -1;
-//DEADCODE CSB 17/05/00 							SLong d3 = Wtarg.Z - Wgun.Z;		if(d3 < 0) d3 *= -1;
-//DEADCODE CSB 17/05/00 
-//DEADCODE CSB 17/05/00 							if(d2 > d1)	{SLong temp = d1;	d1 = d2;	d2 = temp;	}
-//DEADCODE CSB 17/05/00 							if(d3 > d1)	{SLong temp = d1;	d1 = d3;	d3 = temp;	}
-//DEADCODE CSB 17/05/00 
-//DEADCODE CSB 17/05/00 							Range = d1 + (d2 * d2 + d3 * d3) / (2 * d1);	//Max error [ 0% , + 16% ]
 							Range = weapitem->Distance3D(&Wgun, &Wtarg);
 
-//DEADCODE CSB 28/02/00 							if(		((weapitem->Status.size == AIRSTRUCSIZE) && (Range > METRES250))
-//DEADCODE CSB 28/02/00 								||	(Range > aaaparams->lifetime * aaaparams->muzzelvel / 10000)		)
 							FP maxrange = aaaparams->flatrange;
 							if(aaaparams->lifetime != SPECIALLIFE)
 								maxrange = FP(aaaparams->lifetime) * FP(aaaparams->muzzelvel) * 0.0001;
@@ -970,11 +778,6 @@ void	LiveList::Event()
 						FP aimdt = dt;
 						if(weapitem->Status.size == AIRSTRUCSIZE)
 						{
-//DEADCODE CSB 22/05/00 							AirStrucPtr weapac = AirStrucPtr(weapitem);
-//DEADCODE CSB 22/05/00 //DEADCODE CSB 22/05/00 							FP fskill = (weapac->ai.combatskill + Math_Lib.rnd(2 * (255 - weapac->ai.combatskill))) / 255.0;
-//DEADCODE CSB 22/05/00 							FP fskill = 5.0 - (4.0 / 256.0) * weapac->ai.combatskill;
-//DEADCODE CSB 22/05/00 							dt *= fskill;
-//DEADCODE CSB 22/05/00 							aimdt = dt;
 						}
 						else 
 							if((weapanim->LauncherType >= LT_BRIT_BOFORS) && (weapanim->LauncherType <= LT_BRIT_4_5IN))
@@ -1043,13 +846,9 @@ void	LiveList::Event()
 						if(		(UWord(HdgIntercept   - aaaparams->minhdg)   < UWord(ANGLES(aaaparams->hdgrange)))
 							&&	(UWord(PitchIntercept - aaaparams->minpitch) < UWord(ANGLES(aaaparams->pitchrange)))	)
 						{	//Target in the guns range of movement so aim and fire
-//DeadCode CSB 15Aug00 							ANGLES	tang;					//RJS 09Dec98
 							int	turnper;					//RJS 09Dec98
 								
 							turnper = ((ANGLES)aaaparams->turnpersec * eventtime) / 100;
-//DeadCode CSB 15Aug00 							tang = (Angles)turnper;			//RJS 09Dec98
-//DeadCode CSB 15Aug00 							if (tang>ANGLES_90Deg)			//RJS 09Dec98
-//DeadCode CSB 15Aug00 								turnper=ANGLES_90Deg;		//RJS 09Dec98
 
 							if(turnper > AbsAngle(HdgIntercept-(Angles)weapanim->hdg))
 								weapanim->hdg = HdgIntercept;
@@ -1065,7 +864,6 @@ void	LiveList::Event()
 							{
 								if (weapitem->Status.size == AIRSTRUCSIZE)//RJS 09Jul99
 								{
-//DeadCode DAW 27Oct00 									SWord error = Math_Lib.rnd(1024 - 3 * AirStrucPtr(weapitem)->ai.combatskill);
 									SWord error = ((255 - AirStrucPtr(weapitem)->ai.combatskill) * 2) / 1;
 									GlobHdgInt   += Angles((-1 + 2 * Math_Lib.rnd(2)) * error);
 									GlobPitchInt += Angles((-1 + 2 * Math_Lib.rnd(2)) * error);
@@ -1089,14 +887,9 @@ void	LiveList::Event()
 								_Miles.PlayOnce(aaaparams->sfx,weapitem);	//RJS 27Sep00
 								if (weapitem->Status.size == AIRSTRUCSIZE)//RJS 09Jul99
 								{
-//DeadCode CSB 30Jun00 									SWord error = 2048 - Math_Lib.rnd(4 * AirStrucPtr(weapitem)->ai.combatskill);
-//DeadCode CSB 30Jun00 									GlobHdgInt   += Angles((-1 + 2 * Math_Lib.rnd(2)) * error);
-//DeadCode CSB 30Jun00 									GlobPitchInt += Angles((-1 + 2 * Math_Lib.rnd(2)) * error);
 
 									//Launch a bullet every 10th of a second
 									Trans_Obj.ClearWeaponChain((mobileitem*)weapitem);
-//DEADCODE CSB 05/04/00 									SLong	nobullets = aaaparams->reloadtime / 10;
-//DEADCODE CSB 23/05/00 									SLong nobullets = 4;//(Timer_Code.FRAMETIME * SUBLISTSIZE) / aaaparams->reloadtime;
 									SLong nobullets = 2;				//CSB 20Jun00
 									if(AirStrucPtr(weapitem)->nationality == NAT_RAF)
 										nobullets *= 4;
@@ -1169,19 +962,14 @@ PrintString(gx-1, gy+1, "-+-");
 				}
 				else
 				{
-//DEADCODE CSB 28/02/00 				//	find target - starting where last launcher left off
-//DEADCODE CSB 28/02/00 **************					ItemPtr	trg=targlist.Next();
 					TrgListProc		targlist(aaaparams->guntype,aaaparams->nat,sleeplist.aaalist,aaalist);	//assume all a/c use same detect routines
 					ItemPtr trg = targlist.Next();
 					while (trg)
 					{
-//DEADCODE DAW 01/06/99 						if (!!(weapitem->World.Y<Land_Scape.CloudAlt())==!!(trg->World.Y<Land_Scape.CloudAlt()))
 						if(		(!trg->Status.deadtime)
 							&&	(	(weapitem->Status.size == AIRSTRUCSIZE)
 								||	(trg->Status.size != AIRSTRUCSIZE)
 								||	(!AirStrucPtr(trg)->ai.attacker)	)	)
-//DeadCode CSB 22Aug00 								||	(AirStrucPtr(trg)->movecode != AUTO_COMBAT)
-//DeadCode CSB 22Aug00 								||	(AirStrucPtr(trg)->ai.unfriendly == NULL)	)	)
 						//	look for anything within tracking range + rel hdg bias
 						{
 							if(trg == Persons2::PlayerSeenAC)
@@ -1193,7 +981,6 @@ PrintString(gx-1, gy+1, "-+-");
 								&&	(Math_Lib.AbsSign(trgpos->Z-weapitem->World.Z) < aaaparams->flatrange)
 								&&	(trgpos->Y > weapitem->World.Y + aaaparams->minalt)
 								&&	(trgpos->Y < weapitem->World.Y + aaaparams->minalt + aaaparams->altrange)
-//DeadCode CSB 14Aug00 								&&	(Math_Lib.rnd() < RND50PC)
 								&& !((aaaparams->shapenum == BFLAK) && (trg->Status.size == AIRSTRUCSIZE) && (Art_Int.CountFormationSize(AirStrucPtr(trg)) < 6))	)
 							{
 								weapitem->InterceptandRange(trgpos);
@@ -1231,8 +1018,6 @@ PrintString(gx-1, gy+1, "-+-");
 					trg=targlist.Next();
 				}
 
-//DEADCODE CSB 28/02/00 if(weapanim->LauncherType == LT_LUF_REARTOP)
-//DEADCODE CSB 28/02/00 	PrintVar(55, 3, "AMMO %.0f ", FP(weapanim->LoadedStores));
 
 				weapnum++;
 				weapanim=SHAPE.GetWeaponLauncher(weapitem,weapnum,weapoff.X,weapoff.Y,weapoff.Z,mvel,mdelay,mburst,LT_MOVEGUN);//RDH 31Jul98
@@ -1277,27 +1062,6 @@ PrintString(gx-1, gy+1, "-+-");
 
 void	TransObj::SeenFlak(TransientItemPtr transit)
 {
-//DEADCODE RDH 19/04/00 	ItemPtr	l=transit->Launcher;
-//DEADCODE RDH 19/04/00 	Nationality	nat=(Nationality)GR_NAT_FRIEND;
-//DEADCODE RDH 19/04/00 	DOLAUNCHER_PTR d=(DOLAUNCHER_PTR)SHAPE.GetLauncherPos(l->shape,0);
-//DEADCODE RDH 19/04/00 	if (d)
-//DEADCODE RDH 19/04/00 	{
-//DEADCODE RDH 19/04/00 		AaaParams* a=&aaaguntypelist
-//DEADCODE RDH 19/04/00 						[	d->lnchrtype-LT_MOVEGUN	];
-//DEADCODE RDH 19/04/00 		nat=a->nat;
-//DEADCODE RDH 19/04/00 		l->despos=transit->World;
-//DEADCODE RDH 19/04/00 		if (nat==GR_NAT_FRIEND)
-//DEADCODE RDH 19/04/00 		{
-//DEADCODE RDH 19/04/00 
-//DEADCODE RDH 19/04/00 //TEMP			if (nat!=NAT_RED)
-//DEADCODE RDH 19/04/00 //TEMP				Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_ALLIEDFLAKSIGHTED,l->despos);
-//DEADCODE RDH 19/04/00 //TEMP			else
-//DEADCODE RDH 19/04/00 //TEMP				Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_GERMANFLAKSIGHTED,l->despos);
-//DEADCODE RDH 19/04/00 			if (Manual_Pilot.ControlledAC2->movecode<AUTO_PRECOMBAT)
-//DEADCODE RDH 19/04/00 				_Miles.SequenceAudible(FIL_MUSIC_FLAK);
-//DEADCODE RDH 19/04/00 
-//DEADCODE RDH 19/04/00 		}
-//DEADCODE RDH 19/04/00 	}
 
 }
 

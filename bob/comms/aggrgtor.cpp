@@ -930,7 +930,7 @@ void	Aggregator::Log(const char *fmt, ...)
 	va_list	marker;
 
 	va_start(marker, fmt);
-	vsprintf(String, fmt, marker);
+	vsnprintf(String, sizeof(String), fmt, marker);
 
 	FILE* fp=fopen("aggspack.txt","at");
 	fprintf(fp,"%s",String);

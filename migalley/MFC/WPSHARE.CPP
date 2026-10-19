@@ -890,6 +890,7 @@ void	CWPShare::RefreshDetail(UniqueID u)
 	if (!wpdetail)
 		for (wpdetail=(RowanDialog*)parent->fchild;wpdetail;wpdetail=(RowanDialog*)wpdetail->sibling)
 			breakif(wpdetail->packnum!=-1 && wpdetail!=this);
+	if (!wpdetail)	return;
 	wpdetail->acnum=u;
 	wpdetail->RefreshData(0);
 }
@@ -898,6 +899,7 @@ void	CWPShare::RefreshButtons(int effect)
 	if (!wpbuttons)
 		for (wpbuttons=(RowanDialog*)parent->fchild;wpbuttons;wpbuttons=(RowanDialog*)wpbuttons->sibling)
 			breakif(wpbuttons->packnum==-1);
+	if (!wpbuttons)	return;
 	wpbuttons->RefreshData(effect);
 }
 void CWPShare::SetButtons(long row)

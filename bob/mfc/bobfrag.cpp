@@ -107,9 +107,6 @@ FragScreenBody::ButtonPos	FragScreenBody::buttonpos[FragScreenBody::FT_MAX][16]=
 		{{300,230},0,CP_::CP_LEADER},	{{150,240},0,CP_::CP_OTHER},{{450,240},0,CP_::CP_OTHER},	{{0,250},0,CP_::CP_OTHER},	{{600,250},0,CP_::CP_OTHER},
 		{{300,280},0,CP_::CP_OTHER},	{{150,290},0,CP_::CP_OTHER},{{450,290},0,CP_::CP_OTHER},	{{0,300},0,CP_::CP_OTHER},	{{600,300},0,CP_::CP_OTHER},
 		{{300,330},0,CP_::CP_SECOND},	{{150,340},0,CP_::CP_OTHER},{{450,340},0,CP_::CP_OTHER},	{{0,350},0,CP_::CP_OTHER},	{{600,350},0,CP_::CP_OTHER},
-//DEADCODE MS 16/03/00 		{{100,230},0,CP_::CP_LEADER},	{{26,260},0,CP_::CP_OTHER},{{174,260},0,CP_::CP_OTHER},		{{0,290},0,CP_::CP_OTHER},	{{248,290},0,CP_::CP_OTHER},
-//DEADCODE MS 16/03/00 		{{440,230},0,CP_::CP_OTHER},	{{366,260},0,CP_::CP_OTHER},{{514,260},0,CP_::CP_OTHER},	{{258,290},0,CP_::CP_OTHER},	{{588,290},0,CP_::CP_OTHER},
-//DEADCODE MS 16/03/00 		{{110,300},0,CP_::CP_SECOND},	{{26,330},0,CP_::CP_OTHER},{{174,330},0,CP_::CP_OTHER},		{{0,360},0,CP_::CP_OTHER},	{{248,360},0,CP_::CP_OTHER},
 
 	}
 	
@@ -193,7 +190,6 @@ BOOL BoBFrag::OnInitDialog()
 	CDialog::OnInitDialog();
 	
 
-//DeadCode JIM 22Oct00 	Node_Data.BuildTargetTable();
 
 
 	GetSideAndSetFrag();
@@ -203,7 +199,6 @@ BOOL BoBFrag::OnInitDialog()
 	else
 		FillSquadronsFromCamp();
 
-//DEADCODE RDH 23/03/00 	squadinfo.currfrag->currsquadoption = 0;							//CSB 01/03/00
 	//Node_Data[squadnum] returns ref to Squadron
 	//BritSquadron* mysq=Node_Data[squadnum];
 
@@ -221,8 +216,6 @@ BOOL BoBFrag::OnInitDialog()
 	rlistbox->AddString(RESSTRING(CALLSIGN),3);
 
 	CString string;
-//DEADCODE AMM 03/03/00 	Gruppen* mystfl=Node_Data[squadinfo.currfrag->squadoptions[0].squadnum];	//RDH 28/02/00
-//DEADCODE AMM 03/03/00 	int gruppennum = mystfl->gruppennum;
 	int staffel = 0;													//RDH 28/02/00
 	Gruppen* prevst = 0;
 	for(int i = 0; i < squadinfo.currfrag->maxsquadoption; i++)
@@ -241,7 +234,6 @@ BOOL BoBFrag::OnInitDialog()
 		else
 		{
 			Gruppen* mystfl=Node_Data[squadinfo.currfrag->squadoptions[i].squadnum];	
-//DEADCODE RDH 23/03/00 			int gruppennum = mystfl->gruppennum;
 			CString name = mystfl->ShortName() + "/";					//RDH 28/02/00
 			name = name + mystfl->SubName();
 			if (prevst == mystfl)
@@ -275,11 +267,7 @@ BOOL BoBFrag::OnInitDialog()
 		CRButton* but=GETDLGITEM(IDC_UNASSIGNFLAG);
 		but->ShowWindow(SW_HIDE);
 
-//DeadCode AMM 25Sep00 		CRStatic* s=GETDLGITEM(IDC_UNASSIGN);							//AMM 28Jul00
-//DeadCode AMM 25Sep00 		s->ShowWindow(SW_HIDE);											//AMM 28Jul00
 
-//DEADCODE AMM 25/02/00 		CRStatic* s=GETDLGITEM(IDC_UNASSIGN);
-//DEADCODE AMM 25/02/00 		s->ShowWindow(SW_HIDE);
 	}
 	else
 	{
@@ -291,7 +279,6 @@ BOOL BoBFrag::OnInitDialog()
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
-//DeadCode AMM 08Mar00 void BoBFrag::ResetRemotePlayerEntry(int plyr)
 void BoBFrag::ResetRemotePlayerEntry()
 {
 	int n;
@@ -344,12 +331,7 @@ void BoBFrag::ResetPlayerEntry(int plyrpos)
 	for (int i = 0; i < FragScreenBody::FE_MAX_PILOTS;i++)
 	{
 		squadinfo.currfrag->pilotentries[i].playerallowed      = true; 
-	
-		if (squadinfo.currfrag->pilotentries[i].playerinslot == true) //x0r Unitialized here
-		{
-//			squadinfo.currfrag->pilotentries[i].playerslotname = NULL;
-			squadinfo.currfrag->pilotentries[i].playerinslot = false;
-		}
+		squadinfo.currfrag->pilotentries[i].playerinslot = false;
 	}
 
 	int ppos2=plyrpos,prev;
@@ -363,16 +345,13 @@ void BoBFrag::ResetPlayerEntry(int plyrpos)
 
 		if (RFullPanelDial::incomms)
 		{
-//DeadCode CSB 11Sep100 			squadinfo.currfrag->pilotentries[plyrpos].playerslotname     = DPlay::H2H_Player[_DPlay.mySlot].name;
 			squadinfo.currfrag->pilotentries[ppos2].playerslotname     = DPlay::H2H_Player[_DPlay.mySlot].name;
 		}
 		else
 		{
-//DeadCode CSB 11Sep100 			squadinfo.currfrag->pilotentries[plyrpos].playerslotname     = MMC.PlayerName;
 			squadinfo.currfrag->pilotentries[ppos2].playerslotname     = MMC.PlayerName;
 		}
 
-//DeadCode CSB 11Sep100 		squadinfo.currfrag->pilotentries[plyrpos].playerinslot       = true;
 		squadinfo.currfrag->pilotentries[ppos2].playerinslot       = true;
 	}
 
@@ -405,9 +384,7 @@ void BoBFrag::SetPlayersPositionCamp(int plyrpos)
 	if (plyrpos>=0)
 	{
 		char index=Todays_Packages.hipack;
-//DeadCode JIM 20Oct00 		char sqindex=Todays_Packages.hisquad;
 
-//DeadCode AMM 24Feb00 		j=sqindex;
 
 		ULong numsquads=Todays_Packages[index].squadlist;
 
@@ -417,11 +394,9 @@ void BoBFrag::SetPlayersPositionCamp(int plyrpos)
 		{
 			if (Todays_Packages[index].squadlist[j].status>Profile::PS_ACTIVE_MIN && Todays_Packages[index].squadlist[j].status<Profile::PS_REFUELLING)	//JIM 17Aug00
 			{
-//DEADCODE AMM 25/02/00 				if (curr++==squadinfo.currfrag->currsquadoption)
 				if (curr++==pselectedsquadron)
 				{
 					MMC.playersquadron=Todays_Packages[index].squadlist[j].squadnum;
-//DeadCode JIM 20Sep00 					MMC.playeracnum=plyrpos; // each squadron has own line
 					break; // when loop is implemented
 				}
 			}
@@ -444,11 +419,6 @@ void BoBFrag::SetPlayersPositionCamp(int plyrpos)
 		}
 		MMC.playeracnum=plyrnum;
 	}
-//DEADCODE AMM 27/01/00 	else
-//DEADCODE AMM 27/01/00 	{
-//DEADCODE AMM 27/01/00 		MMC.playersquadron=6;
-//DEADCODE AMM 27/01/00 		MMC.playeracnum=0;
-//DEADCODE AMM 27/01/00 	}
 }
 
 void BoBFrag::SetPlayersPositionQM(int plyrpos)
@@ -459,7 +429,6 @@ void BoBFrag::SetPlayersPositionQM(int plyrpos)
 	int side=GetSideAndSetFrag(),i,j,curr=0;//,prev;
 	bool found=false;
 // set previous to an ac type that will never be selectable
-//DEADCODE AMM 08/03/00 	ULong prevsquad=PT_HE59;
 
 	int	prev[PT_HE59];
 
@@ -472,7 +441,6 @@ void BoBFrag::SetPlayersPositionQM(int plyrpos)
 	{
 		for (i=0;i<8;i++)
 		{
-//DEADCODE AMM 08/03/00 			prev=0; // reset number of previous ac in squadron
 
 			for (j=0;j<4;j++)
 			{
@@ -483,7 +451,6 @@ void BoBFrag::SetPlayersPositionQM(int plyrpos)
 					bool allowed=false;
 					int side=GetSide();
 
-//DeadCode AMM 08Aug00 					switch (CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype)
 					switch (CSQuick1::quickdef.line[side][i][j].actype)
 					{
 					case PT_SPIT_A:
@@ -504,10 +471,8 @@ void BoBFrag::SetPlayersPositionQM(int plyrpos)
 						}
 					}
 
-//DEADCODE AMM 02/03/00 					if (squadinfo.currfrag->squadoptions[i].playerallowed)
 					if (allowed)
 					{
-//DEADCODE AMM 25/02/00 						if (curr++==squadinfo.currfrag->currsquadoption)
 						if (curr++==pselectedsquadron)
 						{
 							MMC.playersquadron=CSQuick1::quickdef.line[side][i][j].actype;;
@@ -519,7 +484,6 @@ void BoBFrag::SetPlayersPositionQM(int plyrpos)
 
 						prev[CSQuick1::quickdef.line[side][i][j].actype]+=squadinfo.currfrag->squadoptions[i].totalac;
 
-//DEADCODE AMM 08/03/00 						prevsquad=MMC.playersquadron;
 					}
 				}
 			}
@@ -535,27 +499,8 @@ void BoBFrag::SetPlayersPositionQM(int plyrpos)
 	}
 	else
 	{
-//DeadCode AMM 27Jun00 		if (RFullPanelDial::incomms)
-//DeadCode AMM 27Jun00 		{
-//DeadCode AMM 27Jun00 			DPlay::H2H_Player[_DPlay.mySlot].squadron=-1;
-//DeadCode AMM 27Jun00 			DPlay::H2H_Player[_DPlay.mySlot].position=-1;
-//DeadCode AMM 27Jun00 		}
 	}
-//DEADCODE AMM 27/01/00 	else
-//DEADCODE AMM 27/01/00 	{
-//DEADCODE AMM 27/01/00 // player not allocated
-//DEADCODE AMM 27/01/00 
-//DEADCODE AMM 27/01/00 //		INT3;
-//DEADCODE AMM 27/01/00 
-//DEADCODE AMM 27/01/00 		MMC.playersquadron=-1;
-//DEADCODE AMM 27/01/00 		MMC.playeracnum=0;
-//DEADCODE AMM 27/01/00 	}
 
-//DEADCODE AMM 07/03/00 	if (RFullPanelDial::incomms)
-//DEADCODE AMM 07/03/00 	{
-//DEADCODE AMM 07/03/00 		DPlay::H2H_Player[_DPlay.mySlot].squadron=MMC.playersquadron;
-//DEADCODE AMM 07/03/00 		DPlay::H2H_Player[_DPlay.mySlot].position=MMC.playeracnum;
-//DEADCODE AMM 07/03/00 	}
 }
 
 void BoBFrag::SetPlayersPosition(int plyrpos)
@@ -596,22 +541,8 @@ void BoBFrag::PositionPilots()
 // find if any previous squadrons are same AC type and therefore have used up
 // callsigns, work out new offset
 
-//DeadCode JIM 20Oct00 	int thissquadnum=squadinfo.currfrag->squadoptions[squadinfo.currfrag->currsquadoption].squadnum;
 
 	flightnum=squadinfo.currfrag->squadoptions[squadinfo.currfrag->currsquadoption].startingcolour;
-//DeadCode JIM 20Sep00 	if (thissquadnum>SQ_LW_START
-//DeadCode JIM 20Sep00 		for (i=0;i<squadinfo.currfrag->currsquadoption;i++)
-//DeadCode JIM 20Sep00 		{
-//DeadCode JIM 20Sep00 			if (squadinfo.currfrag->squadoptions[i].squadnum==thissquadnum)
-//DeadCode JIM 20Sep00 			{
-//DeadCode JIM 20Sep00 				flightnum+=4;	//this is what I do in Persons3
-//DeadCode JIM 20Sep00 			}
-//DeadCode JIM 20Sep00 		}
-//DeadCode JIM 20Sep00 	else
-//DeadCode JIM 20Sep00 	{
-//DeadCode JIM 20Sep00 
-//DeadCode JIM 20Sep00 
-//DeadCode JIM 20Sep00 	}
 	i=0;
 
 	while (i < pilots)
@@ -635,24 +566,6 @@ void BoBFrag::PositionPilots()
 				b->SetCaption(squadinfo.currfrag->pilotentries[i].playerslotname);
 			else if (squadinfo.currfrag->pilotentries[i].remoteplayerinslot)// == true)
 			{
-//DeadCode AMM 09Mar00 				SLong sel_squad,sel_pos;
-//DeadCode AMM 09Mar00 
-//DeadCode AMM 09Mar00 				GetSquadronAndPos(sel_squad,sel_pos,i);
-//DeadCode AMM 09Mar00 
-//DeadCode AMM 09Mar00 				if (sel_squad!=-1 && sel_pos!=-1)
-//DeadCode AMM 09Mar00 				{
-//DeadCode AMM 09Mar00 					ULong n;
-//DeadCode AMM 09Mar00 
-//DeadCode AMM 09Mar00 					for (n=0;n<MAXPLAYERS;n++)
-//DeadCode AMM 09Mar00 					{
-//DeadCode AMM 09Mar00 						if (DPlay::H2H_Player[n].squadron==sel_squad
-//DeadCode AMM 09Mar00 						&& DPlay::H2H_Player[n].position==sel_pos)
-//DeadCode AMM 09Mar00 						{
-//DeadCode AMM 09Mar00 							b->SetCaption(DPlay::H2H_Player[n].name);
-//DeadCode AMM 09Mar00 							break;
-//DeadCode AMM 09Mar00 						}
-//DeadCode AMM 09Mar00 					}
-//DeadCode AMM 09Mar00 				}
 				ULong n;
 
 				for (n=0;n<MAXPLAYERS;n++)
@@ -697,18 +610,10 @@ void BoBFrag::PositionPilots()
 				b->SetCaption(squadinfo.currfrag->pilotentries[i].playerslotname);
 			else if (squadinfo.currfrag->pilotentries[i].remoteplayerinslot)
 			{
-//DEADCODE AMM 08/03/00 				SLong sel_squad,sel_pos;
-//DEADCODE AMM 08/03/00 
-//DEADCODE AMM 08/03/00 				GetSquadronAndPos(sel_squad,sel_pos,i);
-//DEADCODE AMM 08/03/00 
-//DEADCODE AMM 08/03/00 				if (sel_squad!=-1 && sel_pos!=-1)
-//DEADCODE AMM 08/03/00 				{
 					ULong n;
 
 					for (n=0;n<MAXPLAYERS;n++)
 					{
-//DEADCODE AMM 08/03/00 						if (DPlay::H2H_Player[n].squadron==sel_squad
-//DEADCODE AMM 08/03/00 						&& DPlay::H2H_Player[n].position==sel_pos)
 						if (DPlay::H2H_Player[n].squadron==squadinfo.currfrag->squadoptions[squadinfo.currfrag->currsquadoption].squadnum)
 						{
 // check for split squadron
@@ -729,7 +634,6 @@ void BoBFrag::PositionPilots()
 				b->SetCaption(LoadResString(mysq->replaceleadername));
 			else
 			{
-//DeadCode JIM 22Sep00 				b->SetCaption(LoadResString((IDS_PHRASE_CALLEE_SN01+(flightnum*5))+acinflight));
 				if (mysq->squadron<SQ_LW_START)
 					b->SetCaption(LoadResString((IDS_PHRASE_CALLEE_SN01+(flightnum*5))+acinflight));
 				else
@@ -826,22 +730,12 @@ void BoBFrag::FillSquadronsFromQM()
 
 	int side=GetSideAndSetFrag();
 
-//DeadCode AMM 25Jul00 	//temp
 	if (!RFullPanelDial::incomms)
 	{
-//DeadCode AMM 10Jul00 		strcpy(MMC.PlayerName,"Me");
 		strcpy(MMC.PlayerName,Save_Data.CommsPlayerName);					//AMM 10Jul00
 	}
 
 
-//DEADCODE AMM 02/03/00 	if (!RFullPanelDial::incomms)
-//DEADCODE AMM 02/03/00 	{
-//DEADCODE AMM 02/03/00 		ResetPlayerEntry(0);
-//DEADCODE AMM 02/03/00 	}
-//DEADCODE AMM 02/03/00 	else
-//DEADCODE AMM 02/03/00 	{
-//DEADCODE AMM 02/03/00 		ResetPlayerEntry(DPlay::H2H_Player[_DPlay.mySlot].position);
-//DEADCODE AMM 02/03/00 	}
 	ResetRemotePlayerEntry();
 
 	squadinfo.currfrag->maxsquadoption = 0;
@@ -866,13 +760,11 @@ void BoBFrag::FillSquadronsFromQM()
 				int num=3;
 				int side=GetSide();
 
-//DeadCode AMM 08Aug00 				if (!CSQuick1::quickdef.plside)
 				squadinfo.currfrag->squadoptions[numsquads].startingcolour=countflights[CSQuick1::quickdef.line[side][i][j].actype];
 				if (!side)
 				{
 					countflights[CSQuick1::quickdef.line[side][i][j].actype]+=numflights;
 					num=3;
-//DeadCode AMM 08Aug00 					switch (CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype)
 					switch (CSQuick1::quickdef.line[side][i][j].actype)
 					{
 					case PT_SPIT_A:
@@ -880,7 +772,6 @@ void BoBFrag::FillSquadronsFromQM()
 					case PT_HURR_A:
 					case PT_HURR_B:
 						squadinfo.currfrag->squadoptions[numsquads].playerallowed = true;
-//DeadCode AMM 08Aug00 						squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype;
 						squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[side][i][j].actype;
 						
 						break;
@@ -894,25 +785,21 @@ void BoBFrag::FillSquadronsFromQM()
 				}
 				else
 				{
-//DeadCode AMM 08Aug00 					switch (CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype)
 					countflights[CSQuick1::quickdef.line[side][i][j].actype]+=4;
 					switch (CSQuick1::quickdef.line[side][i][j].actype)
 					{
 					case PT_ME109:
 						num=4;
-//DeadCode AMM 08Aug00 						squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype;
 						squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[side][i][j].actype;
 						squadinfo.currfrag->squadoptions[numsquads].playerallowed = true;
 						break;
 					case PT_ME110:
 						num=4;
-//DeadCode AMM 08Aug00 						squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype;
 						squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[side][i][j].actype;
 						squadinfo.currfrag->squadoptions[numsquads].playerallowed = true;
 						break;
 					case PT_JU87:
 						num=3;
-//DeadCode AMM 08Aug00 						squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype;
 						squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[side][i][j].actype;
 						squadinfo.currfrag->squadoptions[numsquads].playerallowed = true;
 						break;
@@ -924,7 +811,6 @@ void BoBFrag::FillSquadronsFromQM()
 						num=5;
 						if (!_DPlay.PlayerCreated)
 						{
-//DeadCode AMM 08Aug00 							squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype;
 							squadinfo.currfrag->squadoptions[numsquads].squadnum = (SquadNum)CSQuick1::quickdef.line[side][i][j].actype;
 							squadinfo.currfrag->squadoptions[numsquads].playerallowed = true;
 						}
@@ -940,10 +826,7 @@ void BoBFrag::FillSquadronsFromQM()
 						break;
 					}
 				}
-//DeadCode AMM 08Aug00 				num=CSQuick1::ACPerFlight(PlaneTypeSelect(CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype));
 				num=CSQuick1::ACPerFlight(PlaneTypeSelect(CSQuick1::quickdef.line[side][i][j].actype));
-//DeadCode AMM 08Aug00 				if (CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].Duty()==QuickFields::QFD_BRIT_LONE||CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].Duty()==QuickFields::QFD_GERM_LONE)
-//DeadCode AMM 08Aug00 				if (CSQuick1::quickdef.line[side][i][j].Duty()==QuickFields::QFD_BRIT_LONE||CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].Duty()==QuickFields::QFD_GERM_LONE)
 				if (	CSQuick1::quickdef.line[side][i][j].Duty()==QuickFields::QFD_BRIT_LONE
 					||	CSQuick1::quickdef.line[side][i][j].Duty()==QuickFields::QFD_GERM_LONE
 					||	CSQuick1::quickdef.line[side][i][j].Duty()==QuickFields::QFD_FIXED_NUM_PLAYER
@@ -953,7 +836,6 @@ void BoBFrag::FillSquadronsFromQM()
 				{
 					squadinfo.currfrag->squadoptions[numsquads].acperflight = num;
 					squadinfo.currfrag->squadoptions[numsquads].totalac = numflights*num;
-//DeadCode AMM 08Aug00 					squadinfo.currfrag->squadoptions[numsquads].somesortofduty = CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].descID;	//RDH 23/03/00
 					squadinfo.currfrag->squadoptions[numsquads].somesortofduty = CSQuick1::quickdef.line[side][i][j].descID;	//RDH 23/03/00
 
 					squadinfo.currfrag->maxsquadoption++;
@@ -980,10 +862,7 @@ void BoBFrag::FillSquadronsFromCamp()
 {
 	int side=GetSideAndSetFrag(),j;
 
-//DeadCode AMM 27Sep00 	//temp
-//DeadCode AMM 27Sep00 	strcpy(MMC.PlayerName,"Me");
 	strcpy(MMC.PlayerName,Save_Data.CommsPlayerName);					//AMM 27Sep00
-//DeadCode JIM 12Oct00 	ResetPlayerEntry(0);
 	ResetRemotePlayerEntry();
 
 	squadinfo.currfrag->maxsquadoption = 0;
@@ -1010,14 +889,12 @@ void BoBFrag::FillSquadronsFromCamp()
 	for (j=0;j<numsquads;j++)
 // for each squadron - see SetPlayersPositionCamp also
 	{
-//DEADCODE JIM 09/02/00 		j=sqindex;
 
 // only allow player to take control of squadron if takeofftime>currtime
 		//Test poor: takeofftime is not best criteria... some flights take off just before takeoff time.								//JIM 2Oct00
 		//I have fixed this before. If there is a problem please tell me.
 		if (	Todays_Packages[index].squadlist[j].status>Profile::PS_ACTIVE_MIN 		//JIM 2Oct00
 			&&	Todays_Packages[index].squadlist[j].status<Profile::PS_REFUELLING	)	//JIM 2Oct00
-//DeadCode JIM 2Oct00 			takeofftime<=MMC.currtime)
 		{
 // numacoriginal + formation type gives numacper flight
 
@@ -1034,16 +911,6 @@ void BoBFrag::FillSquadronsFromCamp()
 				wingmanpos=Aircraft_Formations[tempform];
 			int totalac=numoriginal;
 			int perfl=wingmanpos->GetPerFl(totalac);
-//DeadCode JIM 7Jul00 			if (perfl>=10)
-//DeadCode JIM 7Jul00 			{
-//DeadCode JIM 7Jul00 				UWord fl2=perfl;
-//DeadCode JIM 7Jul00 				while (fl2>0)
-//DeadCode JIM 7Jul00 				{
-//DeadCode JIM 7Jul00 					perfl=fl2%10;										//RDH 23/03/00
-//DeadCode JIM 7Jul00 					breakif (totalac%perfl==0);
-//DeadCode JIM 7Jul00 					fl2/=10;
-//DeadCode JIM 7Jul00 				}
-//DeadCode JIM 7Jul00 			}
 			int mso=squadinfo.currfrag->maxsquadoption;
 			if (j==sqindex)
 				pselectedsquadron=
@@ -1098,7 +965,6 @@ void BoBFrag::OnClickedPilot0(int id)
 {
 	int butnum = id - IDC_PILOT_0;
 
-//DeadCode AMM 5Sep00 	pselectedsquadron=squadinfo.currfrag->squadoptions[squadinfo.currfrag->currsquadoption].squadnum;
 	pselectedsquadron=squadinfo.currfrag->currsquadoption;
 
 	if (RFullPanelDial::incomms)
@@ -1124,7 +990,6 @@ void BoBFrag::OnClickedPilot0(int id)
 	else
 	{
 		ResetPlayerEntry(butnum);
-//DEADCODE AMM 25/02/00 		SetPlayersPosition(butnum);
   		PositionPilots();
 	}
 
@@ -1208,7 +1073,6 @@ void	BoBFrag::GetSquadronAndPos(SLong& sel_squad, SLong& sel_pos, ULong plyrpos)
 {
 	int side=GetSideAndSetFrag(),i,j,curr=0;//,prev=0;
 	bool found=false;
-//DEADCODE AMM 08/03/00 	ULong prevsquad=PT_HE59;
 
 	int prev[PT_HE59];
 
@@ -1228,7 +1092,6 @@ void	BoBFrag::GetSquadronAndPos(SLong& sel_squad, SLong& sel_pos, ULong plyrpos)
 				bool allowed=false;
 				int side=GetSide();
 
-//DeadCode AMM 08Aug00 				switch (CSQuick1::quickdef.line[CSQuick1::quickdef.plside][i][j].actype)
 				switch (CSQuick1::quickdef.line[side][i][j].actype)
 				{
 				case PT_SPIT_A:
@@ -1376,11 +1239,6 @@ void BoBFrag::OnClickedReturntoplayer()
 	{
 		squadinfo.currfrag->currsquadoption = pselectedsquadron;
 
-//DeadCode AMM 11Sep00 		if (pselectedsquadron!=row-1)
-//DeadCode AMM 11Sep00 		{
-//DeadCode AMM 11Sep00 			ResetPlayerEntry(-1);
-//DeadCode AMM 11Sep00 		}
-//DeadCode AMM 11Sep00 		else
 		{
 			ResetPlayerEntry(squadinfo.acnuminsquad);
 		}

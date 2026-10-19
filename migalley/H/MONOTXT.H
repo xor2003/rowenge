@@ -122,7 +122,7 @@ class	MonoText
 		void PrintHexAt(SLong x,SLong y,SLong h,SLong digits)
 		{
 			SetCursor(x,y);
-			UByte lstring[9];
+			UByte lstring[9]={0};							//BinToHEX is a no-op in release
 			BinToHEX(h,lstring);
 			for (int i=0;i<8-digits;i++)
 				if (lstring[i]!='0')

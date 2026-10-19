@@ -89,11 +89,7 @@ RDialog*	AirfieldDossier::Make(int item, int gruppe)
 	enum{MAXSQUAD = 4};
 
 	UniqueID afuid = (UniqueID) item;
-//DEADCODE  11/02/00 	ItemPtr p=Persons2::ConvertPtrUID(afuid);
-//DEADCODE  11/02/00 	if (p->SGT)
-//DEADCODE  11/02/00 		afuid=p->SGT;
 
-//DEADCODE  09/02/00 	if (Todays_Packages[Todays_Packages.hipack].attackmethod >= Profile::AM_LWPACKS) 
 	if (item<Squadron::WN_LAST)	//RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)	//AM 10Oct00
 	{	//LW:	item is wadernum(0-3 or 1-4). Gruppe is gruppennum
 
@@ -124,14 +120,6 @@ RDialog*	AirfieldDossier::Make(int item, int gruppe)
 										)	)	);
 	}else
 	{	//RAF:	item is UID, Gruppe is either tab number or squad number
-//DeadCode JIM 23Oct00 		UniqueID	gr13;
-//DeadCode JIM 23Oct00 		int i =0;
-//DeadCode JIM 23Oct00 		while (Node_Data.sectorlist[i].uid != UID_NULL)
-//DeadCode JIM 23Oct00 		{
-//DeadCode JIM 23Oct00 			if (Node_Data.sectorlist[i].groupname == IDS_GROUP_13)
-//DeadCode JIM 23Oct00 				gr13 = Node_Data.sectorlist[i].uid;
-//DeadCode JIM 23Oct00 		i++;
-//DeadCode JIM 23Oct00 		}
 
 		if ((UniqueID)afuid == UID_AF_NEWCASTLE)
 		{
@@ -140,12 +128,6 @@ RDialog*	AirfieldDossier::Make(int item, int gruppe)
 			tabtitle[0] = sq->SubName()+ " "+RESSTRING(SQUADRON);
 			numopts = 1;
 			return
-//DEADCODE  14/02/00 				MakeTopDialog(::Place(POSN_MIN,POSN_MAX),
-//DEADCODE  14/02/00 						DialList(DialBox(FIL_NULL,new AirfieldDossier(afuid, gruppe),Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE)),
-//DEADCODE  14/02/00 							HTabBox(FIL_NULL,IdList(tabtitle[0],tabtitle[1],tabtitle[2],tabtitle[3],tabtitle[4],tabtitle[5]),Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX,EDGE::ALIGN_MAX), 
-//DEADCODE  14/02/00 								DialBox(FIL_D_SQUADDETAILS,new SquadronDetails((SquadNum)gruppe))
-//DEADCODE  14/02/00 
-//DEADCODE  14/02/00 											)	)	);
 				MakeTopDialog(::Place(POSN_MIN,POSN_MAX),
 						DialList(DialBox(FIL_NULL,new AirfieldDossier(afuid, gruppe),Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE)),
 								DialBox(FIL_D_SQUADDETAILS,new SquadronDetails((SquadNum)gruppe))
@@ -231,7 +213,6 @@ BOOL AirfieldDossier::OnInitDialog()
 	CRButton* title;
 	title = GETDLGITEM(IDJ_TITLE);
 
-//DEADCODE  14/02/00 	if (Todays_Packages[Todays_Packages.hipack].attackmethod >= Profile::AM_LWPACKS) 
  	if (uid<Squadron::WN_LAST)	//RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)	//AM 10Oct00
 	{
 		CString string;

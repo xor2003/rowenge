@@ -124,7 +124,6 @@ const	SLong		FlyBySteps = 0x00800;						//PD 18Jun96
 //and below the polygon cockpit when on inside view
 
 const UWord dpitchstrt = (UWord )ANGLES_70Deg;	//ANGLES_90Deg;	//PD 04Sep97
-//Old_Code PD 25Sep96 const UWord dpitchend  = (UWord )ANGLES_315Deg;
 const UWord dpitchend  = (UWord )((UWord)ANGLES_0Deg-1);
 
 const UWord dhdgstrt = (UWord )ANGLES_135Deg;

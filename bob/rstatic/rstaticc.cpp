@@ -361,8 +361,6 @@ void CRStaticCtrl::OnDraw(
 	}
 	m_FirstSweep = FALSE;
 	// slice the string into seperate lines if necessary...
-//DeadCode JIM 20Oct00 	int length=0;
-//DeadCode JIM 20Oct00 	int width=rc.Width();
 //	char c;
 //	for (int i=0;i<m_string.GetLength();i++)
 //	{

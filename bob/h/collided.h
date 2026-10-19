@@ -128,7 +128,6 @@ class	Collide
 
 //		Bool 	AcNearToGround(	AirStrucPtr,const vector&,const vector&,const vector&,const vector&);
 		Bool 	TouchedGround(	AirStrucPtr,ANGLES,ANGLES,Collide::Pos&,SLong,Bool isCrashed=FALSE);//RJS 15Apr98
-//Old_Code RDH 21Oct96 		SLong 	LowestSafeAlt(	AirStrucPtr,ANGLES,ANGLES);
 		void 	FindRelPitchAndRoll(AirStrucPtr ac,ANGLES&,ANGLES&,ANGLES&);
 
 

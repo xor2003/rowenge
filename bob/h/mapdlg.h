@@ -43,8 +43,6 @@ class CMapDlg : public CDialog
 // Construction
 public:
 	UINT	maptimer;
-//DeadCode JIM 9Nov00 	enum	{MAX_SAGINVALIDATES=256};
-//DeadCode JIM 8Nov00 	Coords3D	itemrefreshrequests[MAX_SAGINVALIDATES];
 	bool	InvalidateAnotherItem();
 	void InvalidateLine(CPoint point1,CPoint point2);
 	void InvalidateMovedLine(UniqueID thiswp,UniqueID nextwp,BOOL japanwp=FALSE);

@@ -9,7 +9,6 @@
 // guard so include order cannot change this layout across TUs (ODR).
 #pragma pack(push,1)
 
-//Old_Code PD 04Jun96 #include <string.h>  // (for size_t definition)
 #ifndef _SIZE_T_DEFINED_
 #define _SIZE_T_DEFINED_
  typedef unsigned size_t;

@@ -163,11 +163,6 @@ void Impact::HitGroupElement(ItemPtr	theItem, ItemPtr	theShooter, SLong index, S
 		damageloc = GetDamageLoc(newShape,adptr);
 		if (damageloc > -1)												//CSB 3Nov00
 		{
-//DEADCODE RJS 5/10/00 			UByte	oldamount = adptr[damageloc];
-//DEADCODE RJS 5/10/00 			SLong	newdamage = SLong(oldamount) + amount;
-//DEADCODE RJS 5/10/00
-//DEADCODE RJS 5/10/00 			if (newdamage > BS_DEAD)
-//DEADCODE RJS 5/10/00 				newdamage = BS_DEAD;
 
 			SHAPE.ForceWeaponDamage(theItem,theShooter,newShape,adptr,index,damageloc,damagetype,amount,&grppos);//RJS 10May00
 		}
@@ -226,11 +221,6 @@ bool Impact::HitGroup(ItemPtr	theItem, ItemPtr	theShooter, SLong amount, SLong d
 		damageloc = GetDamageLoc(newShape,adptr);
 		if (damageloc > -1)												//CSB 3Nov00
 		{
-//DEADCODE RJS 5/10/00 			UByte	oldamount = adptr[damageloc];
-//DEADCODE RJS 5/10/00 			SLong	newdamage = SLong(oldamount) + amount;
-//DEADCODE RJS 5/10/00
-//DEADCODE RJS 5/10/00 			if (newdamage > BS_DEAD)
-//DEADCODE RJS 5/10/00 				newdamage = BS_DEAD;
 
 			SHAPE.ForceWeaponDamage(theItem,theShooter,newShape,adptr,index,damageloc,damagetype,amount,&grppos);//RJS 10May00
 

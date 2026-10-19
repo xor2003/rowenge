@@ -80,7 +80,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	"myerror.h"										//PD 23Feb96
 	#include	"Mytime.h"										//PD 15Mar96
 	#include	"landscap.h"									//PD 15Mar96
-//DEADCODE JON 17/04/00 	#include	"textref.h"										//JIM 19Jul96
 	#include	"persons2.h"									//JIM 19Jul96
 	#include	"3dcode.h"										//DAW 30Jul96
 	#include	"savegame.h"									//PD 02Sep96
@@ -131,7 +130,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 Bool	bAllowInstantUpdate;									//PD 14Oct97
 bool fLastWasNormal,fLastWasAlternate;
 
-//DeadCode CSB 21Sep00 const SLong SAFECAMERAHEIGHT=400;	//10m
 const SLong SAFECAMERAHEIGHT = 175;
 
 const SLong MaxFlybyZoom	=50000;		//.5 km
@@ -147,12 +145,6 @@ const	ULong	QUIT3DNOTSET = 0xFFFFFFFF;								//RJS 27Sep00
 
 const	SLong	MAX_ZOOM_CONST = 500000;								//RJS 10Nov00
 
-//DeadCode RJS 5Jul00 #ifndef	NDEBUG
-//DeadCode RJS 5Jul00
-//DeadCode RJS 5Jul00 //#define __NODEATHVIEW__
-//DeadCode RJS 5Jul00 //	#define	_FIXZOOMRANGE_
-//DeadCode RJS 5Jul00
-//DeadCode RJS 5Jul00 #endif
 
 void ViewPoint::CheckPadlock(ItemBasePtr ip)
 {
@@ -286,7 +278,9 @@ DES	ViewPoint::~ViewPoint()
 }
 CON	ViewPoint::ViewPoint(CLib3D* lib3d,View3d* v)
 {
-	perspective_FoV = 1;										//RJS 21Mar00
+	memset(this,0,sizeof(ViewPoint));	//zero uninit members (no vptr in chain)
+	perspective_FoV = 1;											//RJS 21Mar00
+	reqhdg=reqpitch=reqroll=acthdg=actpitch=actroll=Angles(0);
 
 	_DPlay.hitResurrect = false;										//RJS 11Oct00
 
@@ -302,7 +296,6 @@ CON	ViewPoint::ViewPoint(CLib3D* lib3d,View3d* v)
 	OverLay.pvp=this;
 	itemTalkedAbout = NULL;										//RJS 09Jul99
 
-//DEADCODE PD 03/12/99 	currwin=win;
 	view3dwin=v;
 
 	//use this list when view mode select is 0
@@ -720,7 +713,6 @@ void ViewPoint::SetToMapItem(itemptr trg)
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 19Feb99 void ViewPoint::SetToPiloted(itemptr pilotedac)
 void ViewPoint::SetToPiloted(itemptr pilotedac,bool replayreset)//AMM 19Feb99
 {
 	if (this)
@@ -1014,7 +1006,6 @@ void ViewPoint::AllOutsideAnglesReset()
 
 	viewrangemin = ViewRangeMin;								//PD 27Mar96
 
-//DeadCode RJS 04Jun98 	viewrangemax = ViewRangeMax;								//PD 27Mar96
 	viewrangemax = 1920000;										//RJS 04Jun98
 
 	viewnum.viewcuttype = Gradual;								//PD 04Apr96
@@ -1070,7 +1061,7 @@ void ViewPoint::SelectView()
 	if (setDeath == DEATH_NULL)			//RJS 11Jun99
 		AnalogRead();
 
-		if (_DPlay.Implemented &&
+	if (_DPlay.Implemented &&
 			_DPlay.GameRunning &&
 			Save_Data.gamedifficulty[GC_MULTIPLAYERVIEWRESTRICTED])
 			multiplayerViewsRestricted=true;
@@ -1083,7 +1074,6 @@ void ViewPoint::SelectView()
 
 		SLong dx,dz;
 
-//DEADCODE PD 01/12/99 		bDoingHW3D = currwin->DoingHardware3D();				//PD 19Nov97
 
 //		if (bDoingHW3D)	modViewRangeMin = viewrangemin>>1;
 /*		else		*/	modViewRangeMin = viewrangemin;
@@ -1374,9 +1364,6 @@ void ViewPoint::SetViewFromNum(ViewFlags vno)
 			viewsetuprtn =  MYPREFIX ViewPoint::InitMap;								//RJS 08Sep98
 			break;												//RJS 08Sep98
 
-//DeadCode PD 16Feb99 		case VM_Prefs:											//PD 19Nov98
-//DeadCode PD 16Feb99 			viewsetuprtn=InitPrefs;								//PD 19Nov98
-//DeadCode PD 16Feb99 			break;												//PD 19Nov98
 
 		default:
 			_Error.EmitSysErr(__FILE__":Illegal ViewMode number");
@@ -1478,33 +1465,6 @@ void ViewPoint::SetViewRangeMinMax(SLong min, SLong max)
 //------------------------------------------------------------------------------
 void ViewPoint::SetToPaintShop()
 {
-//DEADCODE PD 01/12/99 	SWord	oldColorDepth;										//PD 07Jun97
-//DEADCODE PD 01/12/99 	oldColorDepth=Save_Data.colourdepth;
-//DEADCODE PD 01/12/99 	Save_Data.colourdepth=8;
-//DEADCODE PD 01/12/99 	ViewCutType	temp;											//PD 10Apr96
-//DEADCODE PD 01/12/99
-//DEADCODE PD 01/12/99 	AllOutsideAnglesReset();
-//DEADCODE PD 01/12/99
-//DEADCODE PD 01/12/99 	temp = viewnum.viewcuttype;									//PD 10Apr96
-//DEADCODE PD 01/12/99 	viewnum.viewcuttype = Instant;								//PD 10Apr96
-//DEADCODE PD 01/12/99
-//DEADCODE PD 01/12/99 	currentviewrec = paintshopviewrec;
-//DEADCODE PD 01/12/99 	viewdrawrtn =  MYPREFIX ViewPoint::DrawOutside;
-//DEADCODE PD 01/12/99 	bupviewdrawrtn = NULL;										//PD 28Jan97
-//DEADCODE PD 01/12/99 	drawpolypit = FALSE;
-//DEADCODE PD 01/12/99 	CopyPosition(trackeditem,this);
-//DEADCODE PD 01/12/99 	UpdateGlobalViewRec();										//PD 04Apr96
-//DEADCODE PD 01/12/99 	AddViewRec();
-//DEADCODE PD 01/12/99 	AddZoom();													//PD 10Apr96
-//DEADCODE PD 01/12/99 	UpdateGlobalHPR();											//PD 10Apr96
-//DEADCODE PD 01/12/99 	UIResetView();
-//DEADCODE PD 01/12/99
-//DEADCODE PD 01/12/99 	viewnum.viewcuttype=temp;									//PD 10Apr96
-//DEADCODE PD 01/12/99
-//DEADCODE PD 01/12/99 	bfrotaterate=												//PD 12Apr96
-//DEADCODE PD 01/12/99 		bfpitchrate=											//PD 12Apr96
-//DEADCODE PD 01/12/99 		bfrollrate=0;											//PD 12Apr96
-//DEADCODE PD 01/12/99 	Save_Data.colourdepth=oldColorDepth;						//PD 07Jun97
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1745,7 +1705,6 @@ void ViewPoint::SetToResurrectView()
 //------------------------------------------------------------------------------
 void ViewPoint::UISelectView()
 {
-//DEADCODE PD 01/12/99 	bDoingHW3D = FALSE;											//RDH 15Oct97
 
 	bAllowInstantUpdate=FALSE;									//PD 14Oct97
 
@@ -1970,31 +1929,6 @@ void ViewPoint::ControlViewSelect()
 			}
 		}
 	}
-//DeadCode JON 17Oct00 	if (viewkeysallowed && Key_Tests.KeyPress3d(VIEWMODETOG))
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 		if (Save_Data.gamedifficulty[GD_VIEWMODESELECT])	Save_Data.gamedifficulty %= GD_VIEWMODESELECT;
-//DeadCode JON 17Oct00 		else												Save_Data.gamedifficulty |= GD_VIEWMODESELECT;
-//DeadCode JON 17Oct00
-//DeadCode JON 17Oct00 		bViewModeToggled=TRUE;
-//DeadCode JON 17Oct00 	}
-//DeadCode JON 17Oct00
-//DeadCode JON 17Oct00 	if (viewkeysallowed && Key_Tests.KeyPress3d(BOXTARGET))
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 		if (Save_Data.detail_3d[DETAIL3D_PADLOCKCHEAT])	Save_Data.detail_3d %= DETAIL3D_PADLOCKCHEAT;
-//DeadCode JON 17Oct00 		else											Save_Data.detail_3d |= DETAIL3D_PADLOCKCHEAT;
-//DeadCode JON 17Oct00 	}
-//DeadCode JON 17Oct00
-//DeadCode JON 17Oct00 	if (viewkeysallowed && Key_Tests.KeyPress3d(KEY_TOGGLE_DESC_TEXT))	//JON 17Oct00
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 		if (Save_Data.gamedifficulty[GD_TEXTINFO])
-//DeadCode JON 17Oct00 		{
-//DeadCode JON 17Oct00 			Three_Dee.drawDescText = !Three_Dee.drawDescText;
-//DeadCode JON 17Oct00 		} else
-//DeadCode JON 17Oct00 		{
-//DeadCode JON 17Oct00 			if (Save_Data.detail_3d[DETAIL3D_PADLOCKCHEAT])	Save_Data.detail_3d %= DETAIL3D_PADLOCKCHEAT;
-//DeadCode JON 17Oct00 			else											Save_Data.detail_3d |= DETAIL3D_PADLOCKCHEAT;
-//DeadCode JON 17Oct00 		}
-//DeadCode JON 17Oct00 	}
 
 	if (!SHAPE.UsingRearGunner())										//RJS 20Oct00
 		viewmodeselect = Save_Data.gamedifficulty[GD_VIEWMODESELECT]?1:0;	//RJS 20Oct00
@@ -2029,7 +1963,6 @@ void ViewPoint::ControlViewSelect()
 		viewnum.viewmode==VM_FlyBy ||
 		viewnum.viewmode==VM_Chase ||
 		viewnum.viewmode==VM_InsideCheat	)
-//DeadCode RJS 28Aug00 		SHAPE.UsingRearGunner()				)							//RJS 28Jul00
 			bPadlockNotPossible=TRUE;
 
 	if (setDeath == DEATH_NULL && viewkeysallowed)
@@ -2086,7 +2019,6 @@ void ViewPoint::ControlViewSelect()
 
 		(this->*viewsetuprtn) ();
 		UpdateGlobalViewRec();									//PD 18Jun96
-//DEADCODE PD 02/12/99 		currwin->DoReleaseTextures();
 	}
 
 
@@ -2257,23 +2189,6 @@ void ViewPoint::ControlViewSelect()
 		currentviewrec->hdg = ANGLES_0Deg;
 		jhead = 0;
 
-//DeadCode RJS 25Sep00 		if (s_hdg > SWord(ANGLES_60Deg))
-//DeadCode RJS 25Sep00 		{
-//DeadCode RJS 25Sep00 			if (_Analogue.usingMouseToPan)
-//DeadCode RJS 25Sep00 				jhead = ANGLES_60Deg;
-//DeadCode RJS 25Sep00 			else
-//DeadCode RJS 25Sep00 				currentviewrec->hdg = ANGLES_60Deg;
-//DeadCode RJS 25Sep00 		}
-//DeadCode RJS 25Sep00 		else
-//DeadCode RJS 25Sep00 		{
-//DeadCode RJS 25Sep00 			if (s_hdg < SWord(-ANGLES_60Deg))
-//DeadCode RJS 25Sep00 			{
-//DeadCode RJS 25Sep00 				if (_Analogue.usingMouseToPan)
-//DeadCode RJS 25Sep00 					jhead = ANGLES_300Deg;
-//DeadCode RJS 25Sep00 				else
-//DeadCode RJS 25Sep00 					currentviewrec->hdg = ANGLES_300Deg;
-//DeadCode RJS 25Sep00 			}
-//DeadCode RJS 25Sep00 		}
 	}																	//RJS 30Aug00
 }
 
@@ -2294,20 +2209,6 @@ void ViewPoint::ControlViewDraw()
 	//waypoint view shuffle
 	if (Manual_Pilot.ControlledAC2)
 	{
-//DeadCode RJS 26Sep00 		WayPointPtr wpp=Manual_Pilot.ControlledAC2->waypoint;
-//DeadCode RJS 26Sep00 		if (wpp!=waypoint && wpp)
-//DeadCode RJS 26Sep00 		{
-//DeadCode RJS 26Sep00 			if (trackeditem && trackeditem==(itemptr)wpp->prev)
-//DeadCode RJS 26Sep00 			{
-//DeadCode RJS 26Sep00 				trackeditem=NULL;
-//DeadCode RJS 26Sep00 				waypoint=NULL;
-//DeadCode RJS 26Sep00 			}
-//DeadCode RJS 26Sep00 			if (trackeditem2 && trackeditem2==(itemptr)wpp->prev)
-//DeadCode RJS 26Sep00 			{
-//DeadCode RJS 26Sep00 				trackeditem2=NULL;
-//DeadCode RJS 26Sep00 				waypoint=NULL;
-//DeadCode RJS 26Sep00 			}
-//DeadCode RJS 26Sep00 		}
 		WayPointPtr wpp=Manual_Pilot.ControlledAC2->waypoint;
 		if (wpp!=currentwaypoint && wpp)
 		{
@@ -2649,7 +2550,6 @@ void ViewPoint::InitEnemy()
 //------------------------------------------------------------------------------
 void ViewPoint::PInitEnemy()
 {
-//DeadCode AMM 01Jun98 	if (_DPlay.Implemented)	{ PInitFriendly(); return; }															//ARM 06Dec96
 
 	viewnum.viewtarg = VT_Enemy;
 
@@ -2847,7 +2747,6 @@ void ViewPoint::PInitFriendly()
 //
 //Returns
 //
-//Version Notes:	DAW 23Oct96 - taken pauls version - lastver is deadcoded
 //
 //------------------------------------------------------------------------------
 void ViewPoint::InitGroundTarget()
@@ -2972,11 +2871,6 @@ void ViewPoint::RSetWP()	 //ctrl F4
 	{
 		currentwaypoint=NULL;
 		trackeditem2=this;
-//DeadCode JIM 27Jun00 		ResetWayPoint();
-//DeadCode JIM 27Jun00 		if(currentwaypoint==NULL)
-//DeadCode JIM 27Jun00 			trackeditem2=((AirStrucPtr)trackeditem)->ai.homebase;
-//DeadCode JIM 27Jun00 		else
-//DeadCode JIM 27Jun00 			trackeditem2=(itemptr )currentwaypoint;
 	}
 }
 
@@ -3229,11 +3123,6 @@ void ViewPoint::ToggleEnemy()
 //------------------------------------------------------------------------------
 void ViewPoint::ResetEnemy()
 {
-//DeadCode AMM 01Jun98 	if (_DPlay.Implemented)										//PD 17Dec96
-//DeadCode AMM 01Jun98 	{															//PD 17Dec96
-//DeadCode AMM 01Jun98 		ResetFriendly();										//PD 17Dec96
-//DeadCode AMM 01Jun98 		return;													//PD 17Dec96
-//DeadCode AMM 01Jun98 	}															//PD 17Dec96
 
 	Nationality	their_side = NAT_BLUE;									//RJS 20Oct00
 
@@ -3336,8 +3225,6 @@ void ViewPoint::ResetGroundTarget()
 	if (trackeditem->Status.size==AIRSTRUCSIZE)
 	{
 		SGtarget=AirStrucPtr(*trackeditem)->ai.unfriendly;
-//DEADCODE DAW 12/05/99 #pragma warnmsg("TEMP fix: needs unfriendly copied up to seen AC in winmove")
-//DEADCODE DAW 12/05/99 		SGtarget=Persons2::PlayerGhostAC->ai.unfriendly;
 
 		if (SGtarget)
 			if (SGtarget->Status.size==AIRSTRUCSIZE)
@@ -3361,44 +3248,7 @@ void ViewPoint::ResetGroundTarget()
 
 //I am going for the prescribed target, here...
 
-//DEADCODE DAW 11/05/99 	if (!SGtarget)
-//DEADCODE DAW 11/05/99 		enemytoofar=TRUE;
-//DEADCODE DAW 11/05/99 	else
 	{
-//DEADCODE DAW 11/05/99 		UniqueID SGT=ItemPtr(*SGtarget)->SGT;
-//DEADCODE DAW 11/05/99 		if (!SGT)
-//DEADCODE DAW 11/05/99 		{
-//DEADCODE DAW 11/05/99 			SGT=SGtarget->uniqueID.count;
-//DEADCODE DAW 11/05/99 		}
-//DEADCODE DAW 11/05/99 		else
-//DEADCODE DAW 11/05/99 		{
-//DEADCODE DAW 11/05/99 			SGtarget=MobileItem::currworld->ConvertPtrUID(SGT);
-//DEADCODE DAW 11/05/99 		}
-//DEADCODE DAW 11/05/99
-//DEADCODE DAW 11/05/99 		//this if makes the SGT item be chosen first...
-//DEADCODE DAW 11/05/99 		if (!SGtarget || ItemPtr(*SGtarget)->shape==EMPTY)
-//DEADCODE DAW 11/05/99 		{	//scan for nearest item
-//DEADCODE DAW 11/05/99 			Float skiprangeunder=-1.0;	//can't be returned by rangesquared
-//DEADCODE DAW 11/05/99 			Float skiprangeover=Float(METRES50KM)*Float(METRES50KM);
-//DEADCODE DAW 11/05/99 			SGtarget=NULL;
-//DEADCODE DAW 11/05/99 			for (int uid=0;uid<IllegalSepID;uid++)
-//DEADCODE DAW 11/05/99 			{
-//DEADCODE DAW 11/05/99 				ItemBasePtr b=MobileItem::currworld->ConvertPtrUID(UniqueID(uid));
-//DEADCODE DAW 11/05/99 				if (b && b->Status.size>=ITEMSIZE)
-//DEADCODE DAW 11/05/99 				{
-//DEADCODE DAW 11/05/99 					ItemPtr i=*b;
-//DEADCODE DAW 11/05/99 					if (i->SGT==SGT && i->shape!=EMPTY && !i->Status.deadtime)
-//DEADCODE DAW 11/05/99 					{
-//DEADCODE DAW 11/05/99 						Float range=trackeditem->Distance3DSquared( & i->World);
-//DEADCODE DAW 11/05/99 						if (range<skiprangeover && range>skiprangeunder)
-//DEADCODE DAW 11/05/99 						{
-//DEADCODE DAW 11/05/99 							SGtarget=i;
-//DEADCODE DAW 11/05/99 							skiprangeover=range;
-//DEADCODE DAW 11/05/99 						}
-//DEADCODE DAW 11/05/99 					}
-//DEADCODE DAW 11/05/99 				}
-//DEADCODE DAW 11/05/99 			}
-//DEADCODE DAW 11/05/99 		}
 		if (!SGtarget)
 			enemytoofar=TRUE;
 		else
@@ -3438,8 +3288,6 @@ void ViewPoint::NextGroundTarget()
 	if (trackeditem->Status.size==AIRSTRUCSIZE)
 	{
 		SGtarget=AirStrucPtr(*trackeditem)->ai.unfriendly;
-//DEADCODE DAW 12/05/99 #pragma warnmsg("TEMP fix: needs unfriendly copied up to seen AC in winmove")
-//DEADCODE DAW 12/05/99 		SGtarget=Persons2::PlayerGhostAC->ai.unfriendly;
 
 		if (SGtarget)
 			if (SGtarget->Status.size==AIRSTRUCSIZE)
@@ -3579,8 +3427,6 @@ void ViewPoint::PrevGroundTarget()
 	if (trackeditem->Status.size==AIRSTRUCSIZE)
 	{
 		SGtarget=AirStrucPtr(*trackeditem)->ai.unfriendly;
-//DEADCODE DAW 12/05/99 #pragma warnmsg("TEMP fix: needs unfriendly copied up to seen AC in winmove")
-//DEADCODE DAW 12/05/99 		SGtarget=Persons2::PlayerGhostAC->ai.unfriendly;
 
 		if (SGtarget)
 			if (SGtarget->Status.size==AIRSTRUCSIZE)
@@ -3716,231 +3562,8 @@ void ViewPoint::PrevGroundTarget()
 //Returns
 //
 //------------------------------------------------------------------------------
-//DEADCODE DAW 10/05/99 void ViewPoint::NextGroundTarget()
-//DEADCODE DAW 10/05/99 {
-//DEADCODE DAW 10/05/99 	SLong		matchrange = visiblerange;
-//DEADCODE DAW 10/05/99 	SLong		range;
-//DEADCODE DAW 10/05/99 	SLong		deltax,deltay,deltaz;
-//DEADCODE DAW 10/05/99 	SLong		gdx,gdy,gdz;
-//DEADCODE DAW 10/05/99 	itemptr		selected = NULL;
-//DEADCODE DAW 10/05/99 	ANGLES		dummy1,dummy2;
-//DEADCODE DAW 10/05/99 	ANGLES		matchhdg;
-//DEADCODE DAW 10/05/99 	SLong		crange = 0;
-//DEADCODE DAW 10/05/99 	Bool		livegroupelement;
 
-//DEADCODE DAW 10/05/99 	WayPointPtr	wpp;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	//Set crange to the distance to the currently viewed target
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	if (currentgndtargitem!=NULL)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		deltax = trackeditem->World.X - currentgndtargitem->World.X;
-//DEADCODE DAW 10/05/99 		deltay = trackeditem->World.Y - currentgndtargitem->World.Y;
-//DEADCODE DAW 10/05/99 		deltaz = trackeditem->World.Z - currentgndtargitem->World.Z;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE DAW 10/05/99 							crange,
-//DEADCODE DAW 10/05/99 							dummy1,dummy2);
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	//Get the first waypoint for the current view item (if available)
-//DEADCODE DAW 10/05/99 	switch(trackeditem->Status.size)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		//Item types that don't posses waypoint information
-//DEADCODE DAW 10/05/99 		default:
-//DEADCODE DAW 10/05/99 		case RotatedSize:
-//DEADCODE DAW 10/05/99 		case MovingSize:
-//DEADCODE DAW 10/05/99 		case HPSize:
-//DEADCODE DAW 10/05/99 		case HdgSize:
-//DEADCODE DAW 10/05/99 		case ItemSize:
-//DEADCODE DAW 10/05/99 			wpp = (WayPointPtr )NULL;
-//DEADCODE DAW 10/05/99 			break;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		case MobileSize:
-//DEADCODE DAW 10/05/99 		case TransientSize:
-//DEADCODE DAW 10/05/99 		case FormationSize:
-//DEADCODE DAW 10/05/99 		case ShipSize:
-//DEADCODE DAW 10/05/99 		case AirStrucSize:
-//DEADCODE DAW 10/05/99 			wpp = ((MobileItemPtr )trackeditem)->waypoint;
-//DEADCODE DAW 10/05/99 			break;
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	while (wpp)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		if (wpp->target!=NULL)
-//DEADCODE DAW 10/05/99 		{
-//DEADCODE DAW 10/05/99 			itemptr	ibp;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 			ibp = (itemptr)wpp->target;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 			if (ibp!=currentgndtargitem
-//DEADCODE DAW 10/05/99 				&&
-//DEADCODE DAW 10/05/99 				ibp->shape!=EMPTY)
-//DEADCODE DAW 10/05/99 			{
-//DEADCODE DAW 10/05/99 				livegroupelement=FALSE;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 				if (ibp->Status.size==FORMATIONSIZE)
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					while (ibp->Status.deadtime)
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						formationitem* tmpip=*ibp;
-//DEADCODE DAW 10/05/99 						tmpip=tmpip->follower;
-//DEADCODE DAW 10/05/99 						ibp=(itemptr)tmpip;
-//DEADCODE DAW 10/05/99 						if (ibp==NULL)							//PD 19Dec96
-//DEADCODE DAW 10/05/99 							break;								//PD 19Dec96
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99 					gdx=gdy=gdz=0;
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99 				else
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					livegroupelement=
-//DEADCODE DAW 10/05/99 						SHAPE.GetLiveElementPos(0,ibp,gdx,gdy,gdz);
-//DEADCODE DAW 10/05/99 					if (!livegroupelement)
-//DEADCODE DAW 10/05/99 						ibp=NULL;
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 				if (ibp)
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					deltax = gdx + trackeditem->World.X - ibp->World.X;
-//DEADCODE DAW 10/05/99 					deltay = gdy + trackeditem->World.Y - ibp->World.Y;
-//DEADCODE DAW 10/05/99 					deltaz = gdz + trackeditem->World.Z - ibp->World.Z;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 					Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE DAW 10/05/99 										range,
-//DEADCODE DAW 10/05/99 										dummy1,dummy2);
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 					if (range<matchrange)
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						matchrange = range;
-//DEADCODE DAW 10/05/99 						matchhdg = dummy1;
-//DEADCODE DAW 10/05/99 						crange = range;
-//DEADCODE DAW 10/05/99 						if (!livegroupelement)
-//DEADCODE DAW 10/05/99 							selected = (itemptr )ibp;
-//DEADCODE DAW 10/05/99 						else
-//DEADCODE DAW 10/05/99 						{
-//DEADCODE DAW 10/05/99 							if ((gdx | gdy | gdz)==0)
-//DEADCODE DAW 10/05/99 								selected=ibp;
-//DEADCODE DAW 10/05/99 							else
-//DEADCODE DAW 10/05/99 							{
-//DEADCODE DAW 10/05/99 							 	GroundTargItem.World=ibp->World;	//PD 14Dec96
-//DEADCODE DAW 10/05/99 								GroundTargItem.World.X += gdx;
-//DEADCODE DAW 10/05/99 								GroundTargItem.World.Y += gdy;
-//DEADCODE DAW 10/05/99 								GroundTargItem.World.Z += gdz;
-//DEADCODE DAW 10/05/99 								selected = &GroundTargItem;			//PD 14Dec96
-//DEADCODE DAW 10/05/99 							}
-//DEADCODE DAW 10/05/99 						}
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99 			}
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		wpp = wpp->next;
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	if (selected==NULL)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		//Get the first waypoint for the current view item (if available)
-//DEADCODE DAW 10/05/99 		switch(trackeditem->Status.size)
-//DEADCODE DAW 10/05/99 		{
-//DEADCODE DAW 10/05/99 			//Item types that don't posses waypoint information
-//DEADCODE DAW 10/05/99 			default:
-//DEADCODE DAW 10/05/99 			case RotatedSize:
-//DEADCODE DAW 10/05/99 			case MovingSize:
-//DEADCODE DAW 10/05/99 			case HPSize:
-//DEADCODE DAW 10/05/99 			case HdgSize:
-//DEADCODE DAW 10/05/99 			case ItemSize:
-//DEADCODE DAW 10/05/99 				wpp = (WayPointPtr )NULL;
-//DEADCODE DAW 10/05/99 				break;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 			case MobileSize:
-//DEADCODE DAW 10/05/99 			case TransientSize:
-//DEADCODE DAW 10/05/99 			case FormationSize:
-//DEADCODE DAW 10/05/99 			case ShipSize:
-//DEADCODE DAW 10/05/99 			case AirStrucSize:
-//DEADCODE DAW 10/05/99 				wpp = ((MobileItemPtr )trackeditem)->waypoint;
-//DEADCODE DAW 10/05/99 				break;
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		if (wpp) while (wpp->prev) {wpp=wpp->prev;}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		while (wpp)
-//DEADCODE DAW 10/05/99 		{
-//DEADCODE DAW 10/05/99 			if (wpp->target!=NULL)
-//DEADCODE DAW 10/05/99 			{
-//DEADCODE DAW 10/05/99 				itemptr	ibp;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 				ibp = (itemptr)wpp->target;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 				if (ibp!=currentgndtargitem
-//DEADCODE DAW 10/05/99 					&&
-//DEADCODE DAW 10/05/99 					ibp->shape!=EMPTY)
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					livegroupelement=FALSE;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 					if (ibp->Status.size==FORMATIONSIZE)
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						while (ibp->Status.deadtime)
-//DEADCODE DAW 10/05/99 						{
-//DEADCODE DAW 10/05/99 							formationitem* tmpip=*ibp;
-//DEADCODE DAW 10/05/99 							tmpip=tmpip->follower;
-//DEADCODE DAW 10/05/99 							ibp=(itemptr)tmpip;
-//DEADCODE DAW 10/05/99 							if (ibp==NULL)							//PD 19Dec96
-//DEADCODE DAW 10/05/99 								break;								//PD 19Dec96
-//DEADCODE DAW 10/05/99 						}
-//DEADCODE DAW 10/05/99 						gdx=gdy=gdz=0;
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99 					else
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						livegroupelement=
-//DEADCODE DAW 10/05/99 							SHAPE.GetLiveElementPos(0,ibp,gdx,gdy,gdz);
-//DEADCODE DAW 10/05/99 						if (!livegroupelement)
-//DEADCODE DAW 10/05/99 							ibp=NULL;
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 					if (ibp)
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						deltax = gdx + trackeditem->World.X - ibp->World.X;
-//DEADCODE DAW 10/05/99 						deltay = gdy + trackeditem->World.Y - ibp->World.Y;
-//DEADCODE DAW 10/05/99 						deltaz = gdz + trackeditem->World.Z - ibp->World.Z;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 						Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE DAW 10/05/99 											range,
-//DEADCODE DAW 10/05/99 											dummy1,dummy2);
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 						if (range<matchrange)
-//DEADCODE DAW 10/05/99 						{
-//DEADCODE DAW 10/05/99 							matchrange = range;
-//DEADCODE DAW 10/05/99 							matchhdg = dummy1;
-//DEADCODE DAW 10/05/99 							crange = range;
-//DEADCODE DAW 10/05/99 							if (!livegroupelement)
-//DEADCODE DAW 10/05/99 								selected = (itemptr )ibp;
-//DEADCODE DAW 10/05/99 							else
-//DEADCODE DAW 10/05/99 							{
-//DEADCODE DAW 10/05/99 								if ((gdx | gdy | gdz)==0)
-//DEADCODE DAW 10/05/99 									selected=ibp;
-//DEADCODE DAW 10/05/99 								else
-//DEADCODE DAW 10/05/99 								{
-//DEADCODE DAW 10/05/99 							 		GroundTargItem.World=ibp->World;//PD 14Dec96
-//DEADCODE DAW 10/05/99 									GroundTargItem.World.X += gdx;
-//DEADCODE DAW 10/05/99 									GroundTargItem.World.Y += gdy;
-//DEADCODE DAW 10/05/99 									GroundTargItem.World.Z += gdz;
-//DEADCODE DAW 10/05/99 									selected = &GroundTargItem;		//PD 14Dec96
-//DEADCODE DAW 10/05/99 								}
-//DEADCODE DAW 10/05/99 							}
-//DEADCODE DAW 10/05/99 						}
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99 			}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 			wpp = wpp->next;
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99 	}
 
-//DEADCODE DAW 10/05/99 	if (selected==NULL)
-//DEADCODE DAW 10/05/99 		ResetGroundTarget();
-//DEADCODE DAW 10/05/99 	else
-//DEADCODE DAW 10/05/99 		currentgndtargitem = selected;
-//DEADCODE DAW 10/05/99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		PrevGroundTarget
@@ -3954,232 +3577,6 @@ void ViewPoint::PrevGroundTarget()
 //Returns
 //
 //------------------------------------------------------------------------------
-//DEADCODE DAW 10/05/99 void ViewPoint::PrevGroundTarget()
-//DEADCODE DAW 10/05/99 {
-//DEADCODE DAW 10/05/99 	SLong		matchrange = 0;
-//DEADCODE DAW 10/05/99 	SLong		range;
-//DEADCODE DAW 10/05/99 	SLong		deltax,deltay,deltaz;
-//DEADCODE DAW 10/05/99 	SLong		gdx,gdy,gdz;
-//DEADCODE DAW 10/05/99 	itemptr		selected = NULL;
-//DEADCODE DAW 10/05/99 	ANGLES		dummy1,dummy2;
-//DEADCODE DAW 10/05/99 	ANGLES		matchhdg;
-//DEADCODE DAW 10/05/99 	SLong		crange = 0;
-//DEADCODE DAW 10/05/99 	Bool		livegroupelement;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	WayPointPtr	wpp;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	//Set crange to the distance to the currently viewed target
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	if (currentgndtargitem!=NULL)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		deltax = trackeditem->World.X - currentgndtargitem->World.X;
-//DEADCODE DAW 10/05/99 		deltay = trackeditem->World.Y - currentgndtargitem->World.Y;
-//DEADCODE DAW 10/05/99 		deltaz = trackeditem->World.Z - currentgndtargitem->World.Z;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE DAW 10/05/99 							crange,
-//DEADCODE DAW 10/05/99 							dummy1,dummy2);
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	//Get the first waypoint for the current view item (if available)
-//DEADCODE DAW 10/05/99 	switch(trackeditem->Status.size)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		//Item types that don't posses waypoint information
-//DEADCODE DAW 10/05/99 		default:
-//DEADCODE DAW 10/05/99 		case RotatedSize:
-//DEADCODE DAW 10/05/99 		case MovingSize:
-//DEADCODE DAW 10/05/99 		case HPSize:
-//DEADCODE DAW 10/05/99 		case HdgSize:
-//DEADCODE DAW 10/05/99 		case ItemSize:
-//DEADCODE DAW 10/05/99 			wpp = (WayPointPtr )NULL;
-//DEADCODE DAW 10/05/99 			break;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		case MobileSize:
-//DEADCODE DAW 10/05/99 		case TransientSize:
-//DEADCODE DAW 10/05/99 		case FormationSize:
-//DEADCODE DAW 10/05/99 		case ShipSize:
-//DEADCODE DAW 10/05/99 		case AirStrucSize:
-//DEADCODE DAW 10/05/99 			wpp = ((MobileItemPtr )trackeditem)->waypoint;
-//DEADCODE DAW 10/05/99 			break;
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	while (wpp)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		if (wpp->target!=NULL)
-//DEADCODE DAW 10/05/99 		{
-//DEADCODE DAW 10/05/99 			itemptr	ibp;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 			ibp = (itemptr)wpp->target;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 			if (ibp!=currentgndtargitem
-//DEADCODE DAW 10/05/99 				&&
-//DEADCODE DAW 10/05/99 				ibp->shape!=EMPTY)
-//DEADCODE DAW 10/05/99 			{
-//DEADCODE DAW 10/05/99 				livegroupelement=FALSE;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 				if (ibp->Status.size==FORMATIONSIZE)
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					while (ibp->Status.deadtime)
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						formationitem* tmpip=*ibp;
-//DEADCODE DAW 10/05/99 						tmpip=tmpip->follower;
-//DEADCODE DAW 10/05/99 						ibp=(itemptr)tmpip;
-//DEADCODE DAW 10/05/99 						if (ibp==NULL)							//PD 19Dec96
-//DEADCODE DAW 10/05/99 							break;								//PD 19Dec96
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99 					gdx=gdy=gdz=0;
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99 				else
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					livegroupelement=
-//DEADCODE DAW 10/05/99 						SHAPE.GetLiveElementPos(0,ibp,gdx,gdy,gdz);
-//DEADCODE DAW 10/05/99 					if (!livegroupelement)
-//DEADCODE DAW 10/05/99 						ibp=NULL;
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 				if (ibp)
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					deltax = gdx + trackeditem->World.X - ibp->World.X;
-//DEADCODE DAW 10/05/99 					deltay = gdy + trackeditem->World.Y - ibp->World.Y;
-//DEADCODE DAW 10/05/99 					deltaz = gdz + trackeditem->World.Z - ibp->World.Z;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 					Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE DAW 10/05/99 										range,
-//DEADCODE DAW 10/05/99 										dummy1,dummy2);
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 					if (range>matchrange)
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						matchrange = range;
-//DEADCODE DAW 10/05/99 						matchhdg = dummy1;
-//DEADCODE DAW 10/05/99 						crange = range;
-//DEADCODE DAW 10/05/99 						if (!livegroupelement)
-//DEADCODE DAW 10/05/99 							selected = (itemptr )ibp;
-//DEADCODE DAW 10/05/99 						else
-//DEADCODE DAW 10/05/99 						{
-//DEADCODE DAW 10/05/99 							if ((gdx | gdy | gdz)==0)
-//DEADCODE DAW 10/05/99 								selected=ibp;
-//DEADCODE DAW 10/05/99 							else
-//DEADCODE DAW 10/05/99 							{
-//DEADCODE DAW 10/05/99 							 	GroundTargItem.World=ibp->World;	//PD 14Dec96
-//DEADCODE DAW 10/05/99 								GroundTargItem.World.X += gdx;
-//DEADCODE DAW 10/05/99 								GroundTargItem.World.Y += gdy;
-//DEADCODE DAW 10/05/99 								GroundTargItem.World.Z += gdz;
-//DEADCODE DAW 10/05/99 								selected = &GroundTargItem;			//PD 14Dec96
-//DEADCODE DAW 10/05/99 							}
-//DEADCODE DAW 10/05/99 						}
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99 			}
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		wpp = wpp->next;
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	if (selected==NULL)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		//Get the first waypoint for the current view item (if available)
-//DEADCODE DAW 10/05/99 		switch(trackeditem->Status.size)
-//DEADCODE DAW 10/05/99 		{
-//DEADCODE DAW 10/05/99 			//Item types that don't posses waypoint information
-//DEADCODE DAW 10/05/99 			default:
-//DEADCODE DAW 10/05/99 			case RotatedSize:
-//DEADCODE DAW 10/05/99 			case MovingSize:
-//DEADCODE DAW 10/05/99 			case HPSize:
-//DEADCODE DAW 10/05/99 			case HdgSize:
-//DEADCODE DAW 10/05/99 			case ItemSize:
-//DEADCODE DAW 10/05/99 				wpp = (WayPointPtr )NULL;
-//DEADCODE DAW 10/05/99 				break;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 			case MobileSize:
-//DEADCODE DAW 10/05/99 			case TransientSize:
-//DEADCODE DAW 10/05/99 			case FormationSize:
-//DEADCODE DAW 10/05/99 			case ShipSize:
-//DEADCODE DAW 10/05/99 			case AirStrucSize:
-//DEADCODE DAW 10/05/99 				wpp = ((MobileItemPtr )trackeditem)->waypoint;
-//DEADCODE DAW 10/05/99 				break;
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		if (wpp) while (wpp->prev) {wpp=wpp->prev;}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 		while (wpp)
-//DEADCODE DAW 10/05/99 		{
-//DEADCODE DAW 10/05/99 			if (wpp->target!=NULL)
-//DEADCODE DAW 10/05/99 			{
-//DEADCODE DAW 10/05/99 				itemptr	ibp;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 				ibp = (itemptr)wpp->target;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 				if (ibp!=currentgndtargitem
-//DEADCODE DAW 10/05/99 					&&
-//DEADCODE DAW 10/05/99 					ibp->shape!=EMPTY)
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					livegroupelement=FALSE;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 					if (ibp->Status.size==FORMATIONSIZE)
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						while (ibp->Status.deadtime)
-//DEADCODE DAW 10/05/99 						{
-//DEADCODE DAW 10/05/99 							formationitem* tmpip=*ibp;
-//DEADCODE DAW 10/05/99 							tmpip=tmpip->follower;
-//DEADCODE DAW 10/05/99 							ibp=(itemptr)tmpip;
-//DEADCODE DAW 10/05/99 							if (ibp==NULL)							//PD 19Dec96
-//DEADCODE DAW 10/05/99 								break;								//PD 19Dec96
-//DEADCODE DAW 10/05/99 						}
-//DEADCODE DAW 10/05/99 						gdx=gdy=gdz=0;
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99 					else
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						livegroupelement=
-//DEADCODE DAW 10/05/99 							SHAPE.GetLiveElementPos(0,ibp,gdx,gdy,gdz);
-//DEADCODE DAW 10/05/99 						if (!livegroupelement)
-//DEADCODE DAW 10/05/99 							ibp=NULL;
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 					if (ibp)
-//DEADCODE DAW 10/05/99 					{
-//DEADCODE DAW 10/05/99 						deltax = gdx + trackeditem->World.X - ibp->World.X;
-//DEADCODE DAW 10/05/99 						deltay = gdy + trackeditem->World.Y - ibp->World.Y;
-//DEADCODE DAW 10/05/99 						deltaz = gdz + trackeditem->World.Z - ibp->World.Z;
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 						Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE DAW 10/05/99 											range,
-//DEADCODE DAW 10/05/99 											dummy1,dummy2);
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 						if (range>matchrange)
-//DEADCODE DAW 10/05/99 						{
-//DEADCODE DAW 10/05/99 							matchrange = range;
-//DEADCODE DAW 10/05/99 							matchhdg = dummy1;
-//DEADCODE DAW 10/05/99 							crange = range;
-//DEADCODE DAW 10/05/99 							if (!livegroupelement)
-//DEADCODE DAW 10/05/99 								selected = (itemptr )ibp;
-//DEADCODE DAW 10/05/99 							else
-//DEADCODE DAW 10/05/99 							{
-//DEADCODE DAW 10/05/99 								if ((gdx | gdy | gdz)==0)
-//DEADCODE DAW 10/05/99 									selected=ibp;
-//DEADCODE DAW 10/05/99 								else
-//DEADCODE DAW 10/05/99 								{
-//DEADCODE DAW 10/05/99 							 		GroundTargItem.World=ibp->World;//PD 14Dec96
-//DEADCODE DAW 10/05/99 									GroundTargItem.World.X += gdx;
-//DEADCODE DAW 10/05/99 									GroundTargItem.World.Y += gdy;
-//DEADCODE DAW 10/05/99 									GroundTargItem.World.Z += gdz;
-//DEADCODE DAW 10/05/99 									selected = &GroundTargItem;		//PD 14Dec96
-//DEADCODE DAW 10/05/99 								}
-//DEADCODE DAW 10/05/99 							}
-//DEADCODE DAW 10/05/99 						}
-//DEADCODE DAW 10/05/99 					}
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99 			}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 			wpp = wpp->next;
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99
-//DEADCODE DAW 10/05/99 	if (selected==NULL)
-//DEADCODE DAW 10/05/99 		ResetGroundTarget();
-//DEADCODE DAW 10/05/99 	else
-//DEADCODE DAW 10/05/99 		currentgndtargitem = selected;
-//DEADCODE DAW 10/05/99 }
-//DEADCODE DAW 10/05/99
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ResetWayPoint
 //Author		Paul.
@@ -4446,11 +3843,9 @@ void ViewPoint::DrawInPadlock()
 	//Angle limits
 	const ANGLES PITCH_UNDER_AC=ANGLES_330Deg;
 	const ANGLES PITCH_BELOW_RIM_CLIP=ANGLES_345Deg;
-//DeadCode CSB 09/07/99		const ANGLES PITCH_ZONE_PITCH=(Angles)(UWord(ANGLES_90Deg)-UWord(ANGLES_20Deg)-UWord(ANGLES_1Deg));
 	const ANGLES PITCH_ZONE_PITCH=(Angles)(UWord(ANGLES_90Deg)-UWord(ANGLES_25Deg));	//CSB 09/07/99
 	const ANGLES HEADING_ZONE_HDG_CLIP_LO=ANGLES_160Deg;
 	const ANGLES HEADING_ZONE_HDG_CLIP_HI=(Angles)(int(ANGLES_190Deg)+int(ANGLES_10Deg));
-//DeadCode RJS 20Oct00 	const SWord TRACKING_TIME=1*100;	//1 second switch
 
 	//View flags
 	const bool autopadlockenabled=Save_Data.gamedifficulty[GD_AUTOPADLOCKTOG]?true:false;
@@ -4579,25 +3974,7 @@ void ViewPoint::DrawInPadlock()
 		ANGLES	targethdg=intercepthdg;
 		ANGLES	targetpitch=interceptpitch;
 
-	//DEADCODE CSB 08/03/00 	deltaangle=targethdg-targetintercepthdg;
-	//DEADCODE CSB 08/03/00
-	//DEADCODE CSB 08/03/00 	if (deltaangle>=0)
-	//DEADCODE CSB 08/03/00 		deltaanglesign=1;
-	//DEADCODE CSB 08/03/00 	else
-	//DEADCODE CSB 08/03/00 	{
-	//DEADCODE CSB 08/03/00 		deltaanglesign=-1; deltaangle=-deltaangle;
-	//DEADCODE CSB 08/03/00 	}
 
-	//DEADCODE CSB 08/03/00 	SWord maxdelta = Three_Dee.Draw_Time() * rotate_rate;				//CSB 08/03/00
-	//DEADCODE CSB 08/03/00 //DEADCODE CSB 08/03/00 	ULong maxdelta = (deltaangle * Three_Dee.Draw_Time()) / smooth_time;	//CSB 08/03/00
-	//DEADCODE CSB 08/03/00 //DEADCODE CSB 08/03/00 	if(maxdelta > Three_Dee.Draw_Time() * rotate_rate)					//CSB 08/03/00
-	//DEADCODE CSB 08/03/00 //DEADCODE CSB 08/03/00 		maxdelta = Three_Dee.Draw_Time() * rotate_rate;					//CSB 08/03/00
-	//DEADCODE CSB 08/03/00 	if (deltaangle > maxdelta)											//CSB 08/03/00
-	//DEADCODE CSB 08/03/00 		deltaangle = maxdelta;											//CSB 08/03/00
-	//DEADCODE CSB 08/03/00 //DEADCODE CSB 08/03/00 	if (deltaangle>viewcodeframetime)
-	//DEADCODE CSB 08/03/00 //DEADCODE CSB 08/03/00 		deltaangle=2+((deltaangle*viewcodeframetime)/25);
-	//DEADCODE CSB 08/03/00
-	//DEADCODE CSB 08/03/00 	targethdg=(Angles)(targetintercepthdg+deltaanglesign*deltaangle);
 
 	/*	TESTCODE CSB 08/03/00 */
 	/*	TESTCODE CSB 08/03/00 */
@@ -4613,9 +3990,6 @@ void ViewPoint::DrawInPadlock()
 		}
 
 		ULong maxdelta = frameTimeMSecs * rotate_rate;					//RJS 19Sep00
-	//DEADCODE CSB 03/05/00 	FP factor = f_lockon + (1.0 - f_lockon) * FP(dhdg) / (FP(rotate_rate) * FP(smooth_time));
-	//DEADCODE CSB 03/05/00 	if(factor < 1.0)
-	//DEADCODE CSB 03/05/00 		maxdelta *= factor;
 
 		if(dhdg > ANGLES_90Deg)
 			maxdelta *= 2;
@@ -4640,14 +4014,9 @@ void ViewPoint::DrawInPadlock()
 		}
 
 		maxdelta = frameTimeMSecs * rotate_rate;						//RJS 19Sep00
-	//DEADCODE CSB 03/05/00 	factor = f_lockon + (1.0 - f_lockon) * FP(deltaangle) / (FP(rotate_rate) * FP(smooth_time));
-	//DEADCODE CSB 03/05/00 	if(factor < 1.0)
-	//DEADCODE CSB 03/05/00 		maxdelta *= factor;
 
 		if(deltaangle > maxdelta)
 			deltaangle = maxdelta;
-	//DEADCODE CSB 08/03/00 	if (deltaangle>viewcodeframetime)
-	//DEADCODE CSB 08/03/00 		deltaangle=2+((deltaangle*viewcodeframetime)/25);
 
 		targetpitch=(Angles)(targetinterceptpitch+deltaanglesign*deltaangle);
 
@@ -4657,8 +4026,6 @@ void ViewPoint::DrawInPadlock()
 		ANGLES trackeditemhdg, trackeditempitch, trackeditemroll;				//CSB 20Sep00
 		GetPolyPitAngles(trackeditemhdg, trackeditempitch, trackeditemroll);	//CSB 20Sep00
 																				//CSB 20Sep00
-//DeadCode CSB 21Oct00 		_matrix.TransformAngles(trackeditemhdg, trackeditempitch, trackeditemroll,	//CSB 20Sep00
-//DeadCode CSB 21Oct00 								intercepthdg,	interceptpitch,	  interceptroll);	//CSB 20Sep00
 
 		_matrix.TransformAngles(((MobileItemPtr )trackeditem)->hdg,
 								((MobileItemPtr )trackeditem)->pitch,
@@ -4669,7 +4036,6 @@ void ViewPoint::DrawInPadlock()
 
 		reqhdg=(ANGLES)-intercepthdg;
 		reqpitch=(ANGLES)-interceptpitch;
-//DeadCode CSB 21Oct00 		reqroll=(ANGLES)-interceptroll;
 		reqroll = (ANGLES)-trackeditemroll;
 
 		ViewCutType	oldviewcuttype=viewnum.viewcuttype;
@@ -4962,7 +4328,6 @@ void ViewPoint::DrawInPadlockB()
 
 			this->reqhdg = (ANGLES)-usehdg;
 			this->reqpitch = (ANGLES)-usepitch;
-//DeadCode CSB 26Oct00 			this->reqroll = (ANGLES)-useroll;
 			this->reqroll = (ANGLES)-trackeditemroll;
 
 			oldviewcuttype=viewnum.viewcuttype;
@@ -4995,7 +4360,6 @@ void ViewPoint::DrawInPadlockB()
 	else
 	{
 //dead		enemydirection=0;
-//DeadCode RJS 28Jul00 		trackeditem2=NULL;
 		viewnum.viewmode = VM_Inside;
 		InitInside();
 		DrawInside();
@@ -5640,15 +5004,6 @@ void ViewPoint::HandleZoom(ZmRtFlags flags)
 	//set zoom step based on the current zoom - larger steps
 	//when further away.
 
-//DeadCode CSB 7Aug00 	viewrangestep = (currentviewrec->range - modViewRangeMin);	//PD 30Apr97
-//DeadCode CSB 7Aug00
-//DeadCode CSB 7Aug00 	if (flags & ZR_BIG)											//JIM 10Aug96
-//DeadCode CSB 7Aug00 		viewrangestep<<=2;										//JIM 10Aug96
-//DeadCode CSB 7Aug00
-//DeadCode CSB 7Aug00 	if(viewrangestep <= 20)	viewrangestep = 20;
-//DeadCode CSB 7Aug00 //DEADCODE CSB 08/03/00 	else					viewrangestep = 2 + ((viewrangestep * viewcodeframetime)>>5);//JIM 10Aug96
-//DeadCode CSB 7Aug00 	else					viewrangestep = 2 + ((viewrangestep * Three_Dee.Draw_Time()) >> 8);	//CSB 08/03/00
-//DeadCode CSB 7Aug00 	if(viewrangestep <= 20) viewrangestep = 20;
 
 	viewrangestep = frameTimeMSecs * 8;									//RJS 19Sep00
 	if(flags & ZR_BIG)
@@ -5831,6 +5186,7 @@ void ViewPoint::HandleFixedView(QuickView quickviewflag)
 		case QV_NorthWest:	nextViewRec= &VRNorthWest;	break;
 		case QV_North:		nextViewRec= &VRNorth;		break;
 		case QV_Up:			nextViewRec= &VRUp;			break;
+		default:			return;						//RERUN: unmatched flag left nextViewRec garbage
 	}
 
 	if (fixedviewrec!=NULL && Save_Data.gamedifficulty[GD_UPTOGGLESTICKS]
@@ -6049,7 +5405,6 @@ void ViewPoint::HandleRotate(ZmRtFlags flags)
 #ifndef	__TINYROTATE__
 		if(flags & ZR_BIG)											//JIM 10Aug96
 		{
-	//DeadCode RDH 7Aug00 		viewanglestep=Angles((SWord)viewanglestep<<2);	//2);										//PD 07Dec96
 			viewanglestep = Angles(int(viewanglestep) * 2);												//CSB 7Aug00
 			KeySteps+=7;											//PD 07Dec96
 		}
@@ -6226,13 +5581,6 @@ void ViewPoint::CopyPositionHP(itemptr source,itemptr dest)
 			break;
 	}
 
-//DeadCode RJS 19Sep00 	if((source == trackeditem) && (trackeditem == Persons2::PlayerSeenAC))
-//DeadCode RJS 19Sep00 	{
-//DeadCode RJS 19Sep00 		FP fract = FP(Three_Dee.View_Dt()) / FP(10 * Timer_Code.FRAMETIME);
-//DeadCode RJS 19Sep00 		((ViewPoint*)dest)->reqhdg   += fract * SWord(SWord(((rotitem*)source)->hdg)   - SWord(Three_Dee.viewer_oldhdg));
-//DeadCode RJS 19Sep00 		((ViewPoint*)dest)->reqpitch += fract * SWord(SWord(((rotitem*)source)->pitch) - SWord(Three_Dee.viewer_oldpitch));
-//DeadCode RJS 19Sep00 		((ViewPoint*)dest)->reqroll  += fract * SWord(SWord(((rotitem*)source)->roll)  - SWord(Three_Dee.viewer_oldroll));
-//DeadCode RJS 19Sep00 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -6316,11 +5664,8 @@ void ViewPoint::CopyPositionHPVel(itemptr source,itemptr dest)
 			{
  			vhdg = Math_Lib.HighArcTan(sptr->vel_x,sptr->vel_z);
 
-//DEADCODE CSB 09/11/99 			vptch= Math_Lib.HighArcTan(sptr->vely,sptr->velhori);
 
 //DIRTY FIX !!! //CSB 09/11/99
-//DeadCode RJS 10Jul00 			FP velhori = FSqrt(sptr->vel_x * sptr->vel_x + sptr->vel_z * sptr->vel_z);	 //CSB 09/11/99
-//DeadCode RJS 10Jul00 			vptch= Math_Lib.HighArcTan(sptr->vel_y, velhori);							 //CSB 09/11/99
 
 			float	fvx = sptr->vel_x;
 			float	fvz = sptr->vel_z;
@@ -6393,7 +5738,6 @@ void ViewPoint::CopyPositionHPRVel(itemptr source,itemptr dest)
 			else
  				vhdg = Math_Lib.HighArcTan(sptr->vel_x,sptr->vel_z);
 
-//DEADCODE CSB 09/11/99 			if ((sptr->vely==0 && sptr->velhori==0) || bLowDown)
 			if ((sptr->vel_y==0 && sptr->vel_x==0 && sptr->vel_z==0) || bLowDown) //CSB 09/11/99
 				vptch = sptr->pitch;
 			else
@@ -6404,9 +5748,7 @@ void ViewPoint::CopyPositionHPRVel(itemptr source,itemptr dest)
 
 				fastMath.FloatToInt( &velhori,fastMath.FastSqrt(fvx*fvx+fvz*fvz));
 
-//DeadCode RJS 4Jul00 				FP velhori = FSqrt(sptr->vel_x * sptr->vel_x + sptr->vel_z * sptr->vel_z);	 //CSB 09/11/99
 				vptch= Math_Lib.HighArcTan(sptr->vel_y, velhori);							 //CSB 09/11/99
-//DEADCODE CSB 09/11/99 				vptch= Math_Lib.HighArcTan(sptr->vely,sptr->velhori);
 			}
 
  			vroll= sptr->roll;
@@ -7323,8 +6665,6 @@ void ViewPoint::AddCameraWobble()
 
 	if (Save_Data.viewwobble==0x00)	return;
 
-//DEADCODE CSB 08/03/00 	ANGLES	viewanglestep =										//PD 08Oct97
-//DEADCODE CSB 08/03/00 	(Angles)((ViewAngleStep * viewcodeframetime)/20);				//PD 08Oct97
 	ANGLES viewanglestep = Angles((ViewAngleStep * frameTimeMSecs) / 200);	//RJS 19Sep00
 
 	if (!viewanglestep)											//PD 05Apr96
@@ -7530,7 +6870,6 @@ void ViewPoint::GetDeltaAxis(SWord end_vel,SWord start_vel,SLong dist,SLong time
 
 	a /= t_squared;
 
-//DEADCODE CSB 08/03/00 	t = viewcodeframetime;
 	t = frameTimeMSecs / 10;											//RJS 19Sep00
 
 	t_squared = t * t;
@@ -7591,17 +6930,12 @@ itemptr ViewPoint::GetFirstItem(	MobileItemPtr 	entry,MobileItemPtr	SAGlist,
 								selected = (itemptr )entry;
 						}
 
-//DEADCODE JIM 10/02/00 	viewitemrange=selected?matchrange:0;
 //DEAD	viewitemhdg=selected?matchhdg:ANGLES_0Deg;					//PD 05Jul96
 
 	enemyvisible = TRUE;
 
 	if (selected!=NULL)
 	{
-//DEADCODE JIM 10/02/00 		if (Save_Data.gamedifficulty[GD_PADLOCKONLYWHENVIS])
-//DEADCODE JIM 10/02/00 		{
-//DEADCODE JIM 10/02/00 		 	enemyvisible=VisibleTest(selected,VF_CheckVisibleArea);
-//DEADCODE JIM 10/02/00 		}
 		viewitemrange=sqrt(maxrange);
 		crange=viewitemrange;
 		enemytoofar=FALSE;
@@ -7679,17 +7013,12 @@ itemptr ViewPoint::GetLastItem(	MobileItemPtr 	entry,MobileItemPtr	SAGlist,
 								selected = (itemptr )entry;
 						}
 
-//DEADCODE JIM 10/02/00 	viewitemrange=selected?matchrange:0;
 //DEAD	viewitemhdg=selected?matchhdg:ANGLES_0Deg;					//PD 05Jul96
 
 	enemyvisible = TRUE;
 
 	if (selected!=NULL)
 	{
-//DEADCODE JIM 10/02/00 		if (Save_Data.gamedifficulty[GD_PADLOCKONLYWHENVIS])
-//DEADCODE JIM 10/02/00 		{
-//DEADCODE JIM 10/02/00 		 	enemyvisible=VisibleTest(selected,VF_CheckVisibleArea);
-//DEADCODE JIM 10/02/00 		}
 		minrange=sqrt(minrange);
 		viewitemrange=minrange;
 		crange=minrange;
@@ -7758,31 +7087,6 @@ itemptr ViewPoint::GetNextItem(	MobileItemPtr 	list,MobileItemPtr	SAGlist,
 								maxrange = range;
 								selected = (itemptr )entry;
 						}
-//DEADCODE JIM 10/02/00 	while(list)
-//DEADCODE JIM 10/02/00 	{
-//DEADCODE JIM 10/02/00 		if(list!=(MobileItemPtr )trackeditem && list!=entry && !list->Status.deadtime)//PD 14Nov96
-//DEADCODE JIM 10/02/00 			//Not us OR last OR dead							//PD 14Nov96
-//DEADCODE JIM 10/02/00 		{
-//DEADCODE JIM 10/02/00 			if(((FormationItemPtr )list)->nationality==side)	//RDH 21Aug96
-//DEADCODE JIM 10/02/00 			{
-//DEADCODE JIM 10/02/00 				deltax = trackeditem->World.X - list->World.X;
-//DEADCODE JIM 10/02/00 				deltay = trackeditem->World.Y - list->World.Y;
-//DEADCODE JIM 10/02/00 				deltaz = trackeditem->World.Z - list->World.Z;
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 				Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE JIM 10/02/00 									range,
-//DEADCODE JIM 10/02/00 									dummy1,dummy2);				//PD 05Jul96
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 				if (range<matchrange && range>crange)
-//DEADCODE JIM 10/02/00 				{
-//DEADCODE JIM 10/02/00 					matchrange = range;
-//DEADCODE JIM 10/02/00 					matchhdg = dummy1;
-//DEADCODE JIM 10/02/00 					selected = (itemptr )list;
-//DEADCODE JIM 10/02/00 				}
-//DEADCODE JIM 10/02/00 			}
-//DEADCODE JIM 10/02/00 		}
-//DEADCODE JIM 10/02/00 		list = list->nextmobile;
-//DEADCODE JIM 10/02/00 	}
 
 	//Reset current range to 0 if none selected
 
@@ -7844,49 +7148,6 @@ itemptr ViewPoint::GetPrevItem(	MobileItemPtr 	list, MobileItemPtr	SAGlist,
 								minrange = range;
 								selected = (itemptr )entry;
 						}
-//DEADCODE JIM 10/02/00 	SLong	deltax,deltay,deltaz;
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 	SLong	range;
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 	ANGLES	dummy1,dummy2,matchhdg;
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 	SLong	matchrange = 0;
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 	deltax = trackeditem->World.X - entry->World.X;
-//DEADCODE JIM 10/02/00 	deltay = trackeditem->World.Y - entry->World.Y;
-//DEADCODE JIM 10/02/00 	deltaz = trackeditem->World.Z - entry->World.Z;
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 	Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE JIM 10/02/00 						crange,
-//DEADCODE JIM 10/02/00 						dummy1,dummy2);
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 	itemptr	selected = (itemptr )NULL;
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 	while(list)
-//DEADCODE JIM 10/02/00 	{
-//DEADCODE JIM 10/02/00 		if(list!=(MobileItemPtr )trackeditem && list!=entry && !list->Status.deadtime)//PD 14Nov96
-//DEADCODE JIM 10/02/00 			//Not us OR last OR dead
-//DEADCODE JIM 10/02/00 		{
-//DEADCODE JIM 10/02/00 			if(((FormationItemPtr )list)->nationality==side)
-//DEADCODE JIM 10/02/00 			{
-//DEADCODE JIM 10/02/00 				deltax = trackeditem->World.X - list->World.X;
-//DEADCODE JIM 10/02/00 				deltay = trackeditem->World.Y - list->World.Y;
-//DEADCODE JIM 10/02/00 				deltaz = trackeditem->World.Z - list->World.Z;
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 				Math_Lib.Intercept(	deltax,deltay,deltaz,
-//DEADCODE JIM 10/02/00 									range,
-//DEADCODE JIM 10/02/00 									dummy1,dummy2);
-//DEADCODE JIM 10/02/00
-//DEADCODE JIM 10/02/00 				if (range>matchrange && range<crange)
-//DEADCODE JIM 10/02/00 				{
-//DEADCODE JIM 10/02/00 					matchrange = range;
-//DEADCODE JIM 10/02/00 					matchhdg = dummy1;
-//DEADCODE JIM 10/02/00 					selected = (itemptr )list;
-//DEADCODE JIM 10/02/00 				}
-//DEADCODE JIM 10/02/00 			}
-//DEADCODE JIM 10/02/00 		}
-//DEADCODE JIM 10/02/00 		list = list->nextmobile;
-//DEADCODE JIM 10/02/00 	}
 
 	//Reset current range to 0 if none selected
 
@@ -7976,9 +7237,6 @@ itemptr ViewPoint::UIGetViewedItem()
 //------------------------------------------------------------------------------
 void ViewPoint::UpdateGlobalViewRec()
 {
-//DEADCODE CSB 08/03/00 	currentviewrec->hdg += (Angles )((bfrotaterate * viewcodeframetime)/10);//PD 04Apr96
-//DEADCODE CSB 08/03/00 	currentviewrec->pitch += (Angles )((bfpitchrate * viewcodeframetime)/10);//PD 04Apr96
-//DEADCODE CSB 08/03/00 	currentviewrec->roll += (Angles )((bfrollrate * viewcodeframetime)/10);//PD 04Apr96
 	currentviewrec->hdg   += Angles((bfrotaterate * frameTimeMSecs) / 100);	//RJS 19Sep00
 	currentviewrec->pitch += Angles((bfpitchrate  * frameTimeMSecs) / 100);	//RJS 19Sep00
 	currentviewrec->roll  += Angles((bfrollrate   * frameTimeMSecs) / 100);	//RJS 19Sep00
@@ -8349,14 +7607,10 @@ void ViewPoint::ControlDirectorView()
 				drawpolypit = FALSE;
 				viewnum.viewcuttype=Instant;
 				DrawTrack();
-//DEADCODE CSB 08/03/00 				directorcount -= viewcodeframetime;
-//DeadCode RJS 28Jul00 				directorcount -= Three_Dee.Draw_Time() * rotate_rate;				//CSB 08/03/00
 				directorcount -= DrawFrameTime();				//RJS 28Jul00
 				break;
 
 			default:			//Current director item to view
-//DEADCODE CSB 08/03/00 				directorcount -= viewcodeframetime;
-//DeadCode RJS 28Jul00 				directorcount -= Three_Dee.Draw_Time() * rotate_rate;				//CSB 08/03/00
 				directorcount -= DrawFrameTime();				//RJS 28Jul00
 				if (directorcount <= 0)
 				{
@@ -8530,65 +7784,6 @@ SLong ViewPoint::CockpitOrientation(Window* win,PVList* pvlp,SLong)
 //TempCode PD 13Mar98 	return (Angles)(UWord)x.f;
 //TempCode PD 13Mar98 }
 
-//DeadCode JON 23Oct00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JON 23Oct00 //Procedure		BuildPeripheralVisionList
-//DeadCode JON 23Oct00 //Author		Paul.
-//DeadCode JON 23Oct00 //Date			Tue 22 Jul 1997
-//DeadCode JON 23Oct00 //
-//DeadCode JON 23Oct00 //Description
-//DeadCode JON 23Oct00 //
-//DeadCode JON 23Oct00 //Inputs
-//DeadCode JON 23Oct00 //
-//DeadCode JON 23Oct00 //Returns
-//DeadCode JON 23Oct00 //
-//DeadCode JON 23Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 23Oct00 SLong ViewPoint::BuildPeripheralVisionList(PVList* pvlp,SLong maxEntries)
-//DeadCode JON 23Oct00 {
-//DeadCode JON 23Oct00 	SLong		howMany = 0;
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00  	if (!Manual_Pilot.ControlledAC2 || !Save_Data.gamedifficulty[GD_PERIPHERALVISION])
-//DeadCode JON 23Oct00 		return (howMany);//PD 21Aug97
-//DeadCode JON 23Oct00 	FPMATRIX tmat,*tmatp=&tmat;
-//DeadCode JON 23Oct00 	FormationItemPtr us=(FormationItemPtr)trackeditem;
-//DeadCode JON 23Oct00 	Nationality their_side=(Manual_Pilot.ControlledAC2->nationality==NAT_BLUE)?NAT_RED:NAT_BLUE;
-//DeadCode JON 23Oct00 	MobileItemPtr listp=ACList;
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 	_matrix.Generate(this->hdg,this->pitch,this->roll,tmatp);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 	while (listp!=NULL && howMany<maxEntries)
-//DeadCode JON 23Oct00 	{
-//DeadCode JON 23Oct00 		if (listp!=(MobileItemPtr)trackeditem &&
-//DeadCode JON 23Oct00 			!listp->Status.deadtime)
-//DeadCode JON 23Oct00 		{
-//DeadCode JON 23Oct00 			//Check position for this item
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 			IFShare dx,dy,dz;
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 			dx.i=listp->World.X-this->World.X;
-//DeadCode JON 23Oct00 			dy.i=listp->World.Y-this->World.Y;
-//DeadCode JON 23Oct00 			dz.i=listp->World.Z-this->World.Z;
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 			_matrix.transform(tmatp,dx,dy,dz);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 			if (dz.f>=Float(1))	// don't display a/c behind the viewer
-//DeadCode JON 23Oct00 			{
-//DeadCode JON 23Oct00 				SLong	irange;
-//DeadCode JON 23Oct00 				SWord	ihdg,ipitch;
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 				SLong	hi,pi;
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 				Math_Lib.Intercept(SLong(dx.f),SLong(dy.f),SLong(dz.f),irange,ihdg,ipitch);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 				UByte col=((FormationItemPtr)listp)->nationality==their_side?UByte(RED):UByte(197);
-//DeadCode JON 23Oct00 #pragma warnmsg("BuildPeripheralVisionList. This routine needs to scan SAGList as well.")
-//DeadCode JON 23Oct00 //TempCode PD 02Dec99 				if (irange<viewrangemax)
-//DeadCode JON 23Oct00 //TempCode PD 02Dec99 					currwin->DoPeripheralBlob(&dx.f,&dy.f,&dz.f,col,0);
-//DeadCode JON 23Oct00 			}
-//DeadCode JON 23Oct00 		}
-//DeadCode JON 23Oct00 		listp=listp->nextmobile;
-//DeadCode JON 23Oct00 	}
-//DeadCode JON 23Oct00 	return (0);
-//DeadCode JON 23Oct00 }
 
 void ViewPoint::GetThreatData(SWord& count,COORDS3D* pCoords,UByte* pColour,const SLong MAX_RANGE)
 {
@@ -8601,7 +7796,6 @@ void ViewPoint::GetThreatData(SWord& count,COORDS3D* pCoords,UByte* pColour,cons
 	}
 	FPMATRIX tmat,*tmatp= &tmat;
 
-//DeadCode RJS 20Oct00 	FormationItemPtr us=(FormationItemPtr)trackeditem;
 
 	Nationality their_side=(ac->nationality==NAT_BLUE)?NAT_RED:NAT_BLUE;
 
@@ -8811,23 +8005,6 @@ void ViewPoint::DrawMap()
 //------------------------------------------------------------------------------
 void ViewPoint::InitPrefs()
 {
-//DeadCode PD 20Nov98 	assert(false&&"Write me!");
-//DeadCode PD 16Feb99 	ViewCutType	temp=viewnum.viewcuttype;
-//DeadCode PD 16Feb99 	viewnum.viewcuttype=Instant;
-//DeadCode PD 16Feb99
-//DeadCode PD 16Feb99 	trackeditem = currentvehicle;
-//DeadCode PD 16Feb99 	currentviewrec = prefsrec;
-//DeadCode PD 16Feb99 	ResetZoomRotate((ZmRtFlags )NULL);
-//DeadCode PD 16Feb99 	UpdateGlobalViewRec();
-//DeadCode PD 16Feb99 	bupviewdrawrtn = NULL;										//PD 28Jan97
-//DeadCode PD 16Feb99 	viewdrawrtn = DrawPrefs;
-//DeadCode PD 16Feb99 	drawpolypit = FALSE;
-//DeadCode PD 16Feb99 	drawSpecialFlags -= (drawSpecialFlags & VIEW_SPECIAL_MAP);	//RJS 20Oct98
-//DeadCode PD 16Feb99 	drawmap = FALSE;
-//DeadCode PD 16Feb99 	OverLay.fPausedForPrefs=true;
-//DeadCode PD 16Feb99 	OverLay.InitPrefs3D();
-//DeadCode PD 16Feb99
-//DeadCode PD 16Feb99 	viewnum.viewcuttype=temp;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -8837,22 +8014,6 @@ void ViewPoint::InitPrefs()
 //------------------------------------------------------------------------------
 void ViewPoint::DrawPrefs()
 {
-//DeadCode PD 16Feb99 	ViewCutType	temp=viewnum.viewcuttype;
-//DeadCode PD 16Feb99 	viewnum.viewcuttype=Instant;
-//DeadCode PD 16Feb99
-//DeadCode PD 16Feb99  	CopyPositionHP(trackeditem,this);
-//DeadCode PD 16Feb99 	this->reqhdg = -this->reqhdg;
-//DeadCode PD 16Feb99 	this->reqpitch = -this->reqpitch;
-//DeadCode PD 16Feb99 	this->reqroll = -this->reqroll;
-//DeadCode PD 16Feb99 	currentviewrec->hdg+=(Angles )((SWord(ANGLES_2Deg)*viewcodeframetime)/10);
-//DeadCode PD 16Feb99 //	currentviewrec->hdg+=(Angles )((SWord(ANGLES_2Deg)*10)/10);
-//DeadCode PD 16Feb99 	UpdateGlobalViewRec();
-//DeadCode PD 16Feb99 	AddViewRec();
-//DeadCode PD 16Feb99 	UpdateGlobalHPR();
-//DeadCode PD 16Feb99 	AddZoom();
-//DeadCode PD 16Feb99 //	viewnum.viewcuttype = temp;
-//DeadCode PD 16Feb99
-//DeadCode PD 16Feb99 	viewnum.viewcuttype=temp;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -8869,7 +8030,6 @@ void ViewPoint::DrawPrefs()
 //------------------------------------------------------------------------------
 void ViewPoint::List8Toggle()
 {
-//DeadCode DAW 13Jul99 	if (viewnum.viewmode!=VM_Map && !Accel())
 	if (viewnum.viewmode!=VM_Map && !Accel() && !_DPlay.Implemented)//DAW 13Jul99
 	{
 		if (OverLay.pCurScr==NULL)
@@ -8892,13 +8052,6 @@ void ViewPoint::List8Toggle()
 //------------------------------------------------------------------------------
 void ViewPoint::List9Toggle()
 {
-//DeadCode AMM 10Jun99 	if (_DPlay.Implemented && _DPlay.accelselected!=_DPlay.ActivePlayers)
-//DeadCode AMM 10Jun99 	{
-//DeadCode AMM 10Jun99 		_DPlay.SendStartAccelSelectedMessage();
-//DeadCode AMM 10Jun99 	}
-//DeadCode AMM 10Jun99 	else if (viewnum.viewmode!=VM_Map && !Accel())
-//DeadCode AMM 10Jun99 	{
-//DeadCode DAW 13Jul99 	if (viewnum.viewmode!=VM_Map && !Accel())
 	if (viewnum.viewmode!=VM_Map && !Accel() && !_DPlay.Implemented)//DAW 13Jul99
 	{
 		if (OverLay.pCurScr==NULL)
@@ -8972,7 +8125,6 @@ void	ViewPoint::SetCheatItem(ItemPtr	itm)
 //------------------------------------------------------------------------------
 void ViewPoint::ReturnFromMap()
 {
-//DeadCode AMM 10Jun99 	_DPlay.SendAccelDeselectedMessage();
 
 	viewnum=premapviewnum;
 	viewdrawrtn=premapviewdrawrtn;
@@ -9054,22 +8206,12 @@ void ViewPoint::UnQuit3D()
 	quit3dtimer=QUIT3DNOTSET;
 	_DPlay.SimulateExitKey = FALSE;
 	_DPlay.hitResurrect = false;
-//DeadCode RJS 11Oct00 	OverLay.quit3d=0;
 }
 
 void ViewPoint::AnalogRead()
 {
 	int divfactor;
-//DeadCode RJS 20Oct00 	bool reverse=false;
 
-//DeadCode AMM 4Aug00 	if (  (SHAPE.UsingRearGunner() || Save_Data.flightdifficulty[FD_ENGINEMANAGMENT]))
-//DeadCode AMM 4Aug00 //		.&& Key_Tests.mshift	)
-//DeadCode AMM 4Aug00 	{
-//DeadCode AMM 4Aug00 		divfactor=(AM_HIGH-_Analogue.tune[AU_COCKPIT].mode)+1;
-//DeadCode AMM 4Aug00 		if (_Analogue.tune[AU_COCKPIT].reverse)
-//DeadCode AMM 4Aug00 			reverse=true;
-//DeadCode AMM 4Aug00 	}
-//DeadCode AMM 4Aug00 	else
 
 	_Analogue.usingMouseToPan=false;
 
@@ -9078,18 +8220,12 @@ void ViewPoint::AnalogRead()
 		if (!SHAPE.UsingRearGunner() || !InCockpit())
 		{
 	#ifdef NDEBUG
-	//DeadCode RDH 18Sep00 		{
-	//DeadCode RDH 18Sep00 	//DeadCode CSB 22Aug00 		divfactor=(AM_HIGH-_Analogue.tune[AU_VIEWH].mode)+1;
-	//DeadCode RDH 18Sep00 			if (_Analogue.tune[AU_VIEWP].aliased[AA_TT_REVERSE])
-	//DeadCode RDH 18Sep00 				reverse=true;
-	//DeadCode RDH 18Sep00 		}
 
 			analview[JOY_HEAD]=_Analogue.ReadPosition(AU_VIEWH);
 
 			if (!(analview[JOY_HEAD]==-0x8000))
 			{
 				_Analogue.usingMouseToPan=true;
-		//DeadCode CSB 22Aug00 		analview[JOY_HEAD]/=divfactor;
 				if (_Analogue.tune[AU_VIEWH].aliased[AA_TT_REVERSE])
 					analview[JOY_HEAD]=-analview[JOY_HEAD];
 				if (viewnum.viewtarg!=VT_Unlocked)
@@ -9099,7 +8235,6 @@ void ViewPoint::AnalogRead()
 			analview[JOY_PITCH]=_Analogue.ReadPosition(AU_VIEWP);
 			if (!(analview[JOY_PITCH]==-0x8000))
 			{
-		//DeadCode CSB 22Aug00 		analview[JOY_PITCH]/=divfactor;
 				if (!_Analogue.tune[AU_VIEWP].aliased[AA_TT_REVERSE])
 					analview[JOY_PITCH]=-analview[JOY_PITCH];
 				if (viewnum.viewtarg!=VT_Unlocked)
@@ -9114,23 +8249,11 @@ void ViewPoint::AnalogRead()
 		}
 		else
 		{
-	//DeadCode CSB 22Aug00 	if (!(analview[JOY_ZOOM]==-0x8000))
-	//DeadCode CSB 22Aug00 		analview[JOY_ZOOM]/=(AM_INTEGRATING-_Analogue.tune[AU_VIEWZ].mode)+1;
 
 	// see if we are in heavy bomber, if so get gunner inputs also
 
-	//DeadCode JIM 4Sep00 	if (Persons2::PlayerSeenAC&&Persons2::PlayerSeenAC->classtype->aerobaticfactor==AEROBATIC_LOW)
-	//DeadCode JIM 4Sep00 	{
 	// need to check that we are in gunner mode and using correct shifted device
 
-	//DeadCode  11Aug00 		if ((_Analogue.GunnerOnShiftedJoystick && Key_Tests.jshift)
-	//DeadCode  11Aug00 		||	(_Analogue.GunnerOnJoystick && !Key_Tests.jshift)
-	//DeadCode  11Aug00 		||	(_Analogue.GunnerOnShiftedMouse && Key_Tests.mshift)
-	//DeadCode  11Aug00 		||	(_Analogue.GunnerOnMouse && !Key_Tests.mshift))
-	//DeadCode JIM 31Aug00 		if ((_Analogue.AxisDeviceFlags & Analogue::GUN_ON_SH_JOYSTICK && Key_Tests.jshift)
-	//DeadCode JIM 31Aug00 		||	(_Analogue.AxisDeviceFlags & Analogue::GUN_ON_JOYSTICK && !Key_Tests.jshift)
-	//DeadCode JIM 31Aug00 		||	(_Analogue.AxisDeviceFlags & Analogue::GUN_ON_SH_MOUSE && Key_Tests.mshift)
-	//DeadCode JIM 31Aug00 		||	(_Analogue.AxisDeviceFlags & Analogue::GUN_ON_MOUSE && !Key_Tests.mshift))
 			{
 				analview[JOY_PITCH]=_Analogue.ReadPosition(AU_GUNP);
 				if (!(analview[JOY_PITCH]==-0x8000))
@@ -9149,8 +8272,6 @@ void ViewPoint::AnalogRead()
 						analview[JOY_HEAD]=-analview[JOY_HEAD];
 				}
 
-	//DeadCode CSB 11Sep00 			Mono_Text.PrintHexAt(60,0,analview[JOY_HEAD],8);
-	//DeadCode CSB 11Sep00 			Mono_Text.PrintHexAt(70,0,analview[JOY_PITCH],8);
 			}
 		}
 		{
@@ -9158,17 +8279,9 @@ void ViewPoint::AnalogRead()
 			analview[JOY_ZOOM]=_Analogue.ReadPosition(AU_VIEWZ);
 		}
 	}
-//DeadCode JIM 9Oct00 	else
-//DeadCode JIM 9Oct00 	{
-//DeadCode JIM 9Oct00 		analview[JOY_HEAD]=0x8000;
-//DeadCode JIM 9Oct00 		analview[JOY_PITCH]=0x8000;
-//DeadCode JIM 9Oct00  		analview[JOY_ROLL]=0x8000;
-//DeadCode JIM 9Oct00 		analview[JOY_ZOOM]=0x8000;
-//DeadCode JIM 9Oct00 	}
 	for (int i=JOY_ZOOM;i>=JOY_HEAD;i--)
 	{
 		if (analview[i]==-0x8000) analview[i]=0;
-//DEADCODE JIM 06/05/99 		else analview[i]<<=4;
 	}
 }
 
@@ -9454,7 +8567,6 @@ inline	void	ViewPoint::CalcSmoothAngle(const ANGLES	tempangle,ANGLES &  actualan
 		Float	maxout = (Float(maxdelta)*Float(tempangle_pos))/Float(rotate_rate * smooth_time);
 
 		maxdelta = fastMath.DoubleToULong(maxout);
-//DeadCode RJS 19Sep00 		maxdelta = (float(maxdelta) * float(tempangle_pos) / (rotate_rate * smooth_time);
 	}
 
 	if(tempangle_pos > ANGLES_90Deg)

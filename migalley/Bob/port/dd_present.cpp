@@ -44,11 +44,11 @@ WindowBackend* TopLevelBackend()
     return fallback;
 }
 
-// Present via the window surface (software blit), not the backend renderer:
-// MFC's SDL_RENDERER_ACCELERATED GL context is bound to the main thread, so
-// SDL_UpdateTexture from the 3D worker thread fails with "window has not
-// been made current".  GetWindowSurface/BlitScaled/UpdateWindowSurface are
-// pure software paths safe to call from the worker.
+// Present through the backend renderer.  We run on the main thread (queued
+// by QueuePresent, pumped by RowanDDPumpPresent), where the accelerated
+// renderer's GL context is bound — and we must use it: that renderer flags
+// the window SDL_WINDOW_OPENGL, which makes SDL_GetWindowSurface return
+// NULL and silently drops every frame (the stale-loading-screen bug).
 void PresentPrimary(IDirectDrawSurface7* primary)
 {
     if (!primary || !primary->desc.lpSurface) return;
@@ -65,7 +65,7 @@ void PresentPrimary(IDirectDrawSurface7* primary)
         }
     }
     WindowBackend* be = TopLevelBackend();
-    if (!be) return;
+    if (!be || !be->renderer) return;
 
     const int w = (int)primary->desc.dwWidth;
     const int h = (int)primary->desc.dwHeight;
@@ -76,18 +76,22 @@ void PresentPrimary(IDirectDrawSurface7* primary)
     else if (bpp == 16) fmt = SDL_PIXELFORMAT_RGB565;
     else                return;   // palettized primaries unsupported
 
-    // Wrap the DD frame and scale it onto the window surface.  Window
-    // surfaces are shared with MFC's paint path, which is suppressed
-    // while DD presents are active.
-    SDL_Surface* ws = SDL_GetWindowSurface(be->window);
-    if (!ws) return;
-    SDL_Surface* src = SDL_CreateRGBSurfaceWithFormatFrom(
-        primary->desc.lpSurface, w, h, (int)bpp,
-        (int)primary->desc.lPitch, fmt);
-    if (!src) return;
-    SDL_BlitScaled(src, nullptr, ws, nullptr);
-    SDL_FreeSurface(src);
-    SDL_UpdateWindowSurface(be->window);
+    // One streaming texture per renderer/size; RenderCopy scales the DD
+    // frame over the whole window (exclusive-fullscreen semantics).
+    static SDL_Renderer* texR = nullptr;
+    static SDL_Texture*  tex  = nullptr;
+    static int           texW = 0, texH = 0;
+    if (!tex || texR != be->renderer || texW != w || texH != h) {
+        if (tex) SDL_DestroyTexture(tex);
+        tex = SDL_CreateTexture(be->renderer, fmt,
+                                SDL_TEXTUREACCESS_STREAMING, w, h);
+        texR = be->renderer; texW = w; texH = h;
+        if (!tex) return;
+    }
+    SDL_UpdateTexture(tex, nullptr, primary->desc.lpSurface,
+                      (int)primary->desc.lPitch);
+    SDL_RenderCopy(be->renderer, tex, nullptr, nullptr);
+    SDL_RenderPresent(be->renderer);
 }
 
 } // namespace

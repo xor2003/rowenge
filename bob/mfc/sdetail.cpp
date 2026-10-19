@@ -121,11 +121,9 @@ void CSDetail::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX,IDC_CBO_AUTOFRAMERATE,m_IDC_CBO_AUTOFRAMERATE);
 	DDX_Control(pDX,IDC_CBO_LOWESTFRAMERATE,m_IDC_CBO_LOWESTFRAMERATE);
 	DDX_Control(pDX,IDC_CBO_DISPLAYDRIVERS,m_IDC_CBO_DISPLAYDRIVERS);
-//DEADCODE JIM 12/06/00 	DDX_Control(pDX,IDC_CBO_RESOLUTIONS,m_IDC_CBO_RESOLUTIONS);
 	DDX_Control(pDX,IDC_CBO_GAMMACORRECTION,m_IDC_CBO_GAMMACORRECTION);
 	DDX_Control(pDX,IDC_CBO_GROUNDSHADING,m_IDC_CBO_GROUNDSHADING);
 	DDX_Control(pDX,IDC_CBO_ITEMSHADING,m_IDC_CBO_ITEMSHADING);
-//DEADCODE RDH 15/02/99 	DDX_Control(pDX,IDC_CBO_SHOWIRONWORK,m_IDC_CBO_SHOWIRONWORK);
 	DDX_Control(pDX,IDC_CBO_REFLECTIONS,m_IDC_CBO_REFLECTIONS);
 	DDX_Control(pDX,IDC_RSTATICCTRL48,m_IDC_RSTATICCTRL48);
 	DDX_Control(pDX,IDC_CBO_WEATHER,m_IDC_CBO_WEATHER);
@@ -155,12 +153,6 @@ END_MESSAGE_MAP()
 
 int	ironlevels;
 
-//DeadCode JON 20Sep00 inline bool IsValidMode(SModeFlags* pmf,UWord w,UWord h)
-//DeadCode JON 20Sep00 {
-//DeadCode JON 20Sep00 	if (w*3!=h*4) return false;
-//DeadCode JON 20Sep00 	for (int x=0;x<SModeFlags::Max_Modes;x++) if (pmf->widths[x]==w) return true;
-//DeadCode JON 20Sep00 	return false;
-//DeadCode JON 20Sep00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		OnInitDialog
@@ -169,7 +161,6 @@ int	ironlevels;
 //------------------------------------------------------------------------------
 BOOL CSDetail::OnInitDialog()
 {
-//DEADCODE PD 03/12/99 	static char modeString[32];
 
 #define	SG2C_DISPLAY	setlevel
 #include "sg2combo.h"
@@ -178,8 +169,6 @@ BOOL CSDetail::OnInitDialog()
 
 	if (_DPlay.PlayerCreated)									//AMM 12Jul99
 	{															//AMM 12Jul99
-//DeadCode AMM 16Nov99 		_DPlay.UISendInPrefsMessage();							//AMM 12Jul99
-//DeadCode AMM 16Nov99 		DPlay::H2H_Player[_DPlay.mySlot].status=CPS_PREFS;		//AMM 12Jul99
 		_DPlay.SendStatusChange(DPlay::CPS_PREFS);
 	}															//AMM 12Jul99
 
@@ -231,64 +220,6 @@ BOOL CSDetail::OnInitDialog()
 	}
 	combo->SetIndex(selected);
 
-//DEADCODE PD 03/12/99 	//fill in display drivers field
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	int driverCount,modesCount,selectedDriver,driver_index;
-//DEADCODE PD 03/12/99 	char** driverNames;
-//DEADCODE PD 03/12/99 	SDrvrModes* driverModes;
-//DEADCODE PD 03/12/99 	GetDrivers(driverCount,driverNames);
-//DEADCODE PD 03/12/99 	GetModes(modesCount,driverModes);
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	CString pdd;
-//DEADCODE PD 03/12/99 	CRCombo* combo=GETDLGITEM(IDC_CBO_DISPLAYDRIVERS);
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	//the first entry must always be the 'Software Display Driver'
-//DEADCODE PD 03/12/99 	pdd.LoadString(IDS_SOFTWAREDRIVER);
-//DEADCODE PD 03/12/99 	combo->AddString(pdd);
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	//the second entry must always be 'Primary Display Driver' if it is 3D capeable
-//DEADCODE PD 03/12/99 	if (!Save_Data.fNoHardwareAtAll && Save_Data.sd.fFirstHardIsPrimary)
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		pdd.LoadString(IDS_PRIMARYDISPLAYDRIVER);
-//DEADCODE PD 03/12/99 		combo->AddString(pdd);
-//DEADCODE PD 03/12/99 	}
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	//driver count doesn't include primary!
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	for (SLong x=0;x<driverCount;x++) 
-//DEADCODE PD 03/12/99 		combo->AddString(driverNames[x]);
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	if (Save_Data.fSoftware)					selectedDriver=0;
-//DEADCODE PD 03/12/99 	else if (Save_Data.sd.fFirstHardIsPrimary)	selectedDriver=Save_Data.dddriver+2; //-1 to ... => 1 to ...+2
-//DEADCODE PD 03/12/99 	else 										selectedDriver=Save_Data.dddriver+1; // 0 to ... => 1 to ...+1
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	driver_index=Save_Data.dddriver;
-//DEADCODE PD 03/12/99 //	if (Save_Data.fNoHardwareAtAll)
-//DEADCODE PD 03/12/99 //b		driver_index++;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	combo->SetIndex(selectedDriver);
-//DEADCODE PD 03/12/99 	combo=GETDLGITEM(IDC_CBO_RESOLUTIONS);
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	SModeFlags* modeFlags;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	if (Save_Data.fSoftware)					modeFlags=&Save_Data.sd.soft_modes;
-//DEADCODE PD 03/12/99 	else if (Save_Data.sd.fFirstHardIsPrimary)	modeFlags=Save_Data.sd.hard_modes+selectedDriver-1;
-//DEADCODE PD 03/12/99 	else										modeFlags=Save_Data.sd.hard_modes+selectedDriver;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	SLong rez_index=0,add_index=0;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	for (x=0;x<modesCount;x++)
-//DEADCODE PD 03/12/99 		if (driverModes[x].driverNo-1==driver_index &&
-//DEADCODE PD 03/12/99 			driverModes[x].displayBPP==16 &&
-//DEADCODE PD 03/12/99 			IsValidMode(modeFlags,driverModes[x].displayWidth,driverModes[x].displayHeight))
-//DEADCODE PD 03/12/99 		{
-//DEADCODE PD 03/12/99 		 	if (Save_Data.screenresolution==add_index)	rez_index=add_index;
-//DEADCODE PD 03/12/99 			sprintf(modeString,"%d X %d\0",driverModes[x].displayWidth,driverModes[x].displayHeight);
-//DEADCODE PD 03/12/99 			combo->AddString(CString(modeString));
-//DEADCODE PD 03/12/99 			add_index++;
-//DEADCODE PD 03/12/99 		}
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	combo->SetIndex(rez_index);
 
 	OPTIONS
 	ThreeDeePref_Timer=SetTimer(DPlay::TIMER_PREFS3D,0,NULL);
@@ -305,16 +236,6 @@ BOOL CSDetail::OnInitDialog()
 		combo=GETDLGITEM(IDC_CBO_WEATHER);
 		combo->SetEnabled(true);
 	}
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_DISPLAYDRIVERS.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_RESOLUTIONS.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_GAMMACORRECTION.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_AUTOFRAMERATE.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_LOWESTFRAMERATE.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_GROUNDSHADING.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_ITEMSHADING.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_REFLECTIONS.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 	m_IDC_CBO_WEATHER.SetCircularStyle(TRUE);
-//DEADCODE RDH 25/11/99 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -376,67 +297,7 @@ void CSDetail::PreDestroyPanel()
 	selected=combo->GetIndex();
 	Save_Data.hMode=uiModes.mode[selected].hMode;
 
-//DEADCODE PD 03/12/99 	SDrvrModes* driverModes;
-//DEADCODE PD 03/12/99 	char** driverNames;
-//DEADCODE PD 03/12/99 	int curMode,selectedMode,selectedDriver;
-//DEADCODE PD 03/12/99 	int modesCount,driverCount;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	GetDrivers(driverCount,driverNames);
-//DEADCODE PD 03/12/99 	GetModes(modesCount,driverModes);
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	OPTIONS
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	CRCombo* combo=GETDLGITEM(IDC_CBO_DISPLAYDRIVERS);
-//DEADCODE PD 03/12/99 	selectedDriver=combo->GetIndex();
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	if (selectedDriver==0)	Save_Data.fSoftware=true;
-//DEADCODE PD 03/12/99 	else
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		Save_Data.fSoftware=false;
-//DEADCODE PD 03/12/99 		if (Save_Data.sd.fFirstHardIsPrimary)	selectedDriver--;
-//DEADCODE PD 03/12/99 	}
-//DEADCODE PD 03/12/99 	selectedDriver--;
-//DEADCODE PD 03/12/99 	Save_Data.dddriver=selectedDriver;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	combo=GETDLGITEM(IDC_CBO_RESOLUTIONS);
-//DEADCODE PD 03/12/99 	selectedMode=combo->GetIndex();
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	SModeFlags* modeFlags;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	if (Save_Data.fSoftware)	modeFlags=&Save_Data.sd.soft_modes;
-//DEADCODE PD 03/12/99 	else						modeFlags=Save_Data.sd.hard_modes+selectedDriver+1;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	Save_Data.screenresolution=selectedMode;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	curMode=0;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	for (SLong x=0;x<modesCount;x++)
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		if (driverModes[x].driverNo-1==selectedDriver &&
-//DEADCODE PD 03/12/99 			driverModes[x].displayBPP==16 &&
-//DEADCODE PD 03/12/99 			IsValidMode(modeFlags,driverModes[x].displayWidth,driverModes[x].displayHeight))
-//DEADCODE PD 03/12/99 		{
-//DEADCODE PD 03/12/99 			if (curMode==selectedMode)
-//DEADCODE PD 03/12/99 			{
-//DEADCODE PD 03/12/99 				Save_Data.displayW=driverModes[x].displayWidth;
-//DEADCODE PD 03/12/99 				Save_Data.displayH=driverModes[x].displayHeight;
-//DEADCODE PD 03/12/99 				break;
-//DEADCODE PD 03/12/99 			}
-//DEADCODE PD 03/12/99 			else curMode++;
-//DEADCODE PD 03/12/99 		}
-//DEADCODE PD 03/12/99 	}
 
-//DEADCODE PD 03/12/99 	if (Save_Data.fSoftware)
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		Save_Data.textureQuality=4;
-//DEADCODE PD 03/12/99 		Save_Data.filtering=0;
-//DEADCODE PD 03/12/99 		Save_Data.detail_3d%=DETAIL3D_INCONSEQUENTIALS;
-//DEADCODE PD 03/12/99 		Save_Data.detail_3d%=DETAIL3D_GROUNDSHADING;
-//DEADCODE PD 03/12/99 		Save_Data.cockpit3Ddetail%=COCK3D_SKYIMAGES;
-//DEADCODE PD 03/12/99 		Save_Data.gamedifficulty%=GD_GEFFECTS;
-//DEADCODE PD 03/12/99 		Save_Data.gamedifficulty%=GD_INJURYEFFECTS;
-//DEADCODE PD 03/12/99 		Save_Data.gamedifficulty%=GD_WHITEOUT;
-//DEADCODE PD 03/12/99 	}
 //	else
 //	{
 //		Save_Data.filtering=1;
@@ -500,80 +361,6 @@ void CSDetail::OnTextChangedCboDisplaydrivers(LPCTSTR text, short index)
 	}
 	combo->SetIndex(0);
 
-//DEADCODE PD 03/12/99 	static char modeString[32];
-//DEADCODE PD 03/12/99 	int selectedDriver,modesCount;
-//DEADCODE PD 03/12/99 	SDrvrModes* driverModes;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	GetModes(modesCount,driverModes);
-//DEADCODE PD 03/12/99 	CRCombo* combo=GETDLGITEM(IDC_CBO_DISPLAYDRIVERS);
-//DEADCODE PD 03/12/99 	selectedDriver=combo->GetIndex();
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	//if Save_Data.sd.fFirstHardIsPrimary then 
-//DEADCODE PD 03/12/99 	//	selectedDriver==0	for software				=>-1
-//DEADCODE PD 03/12/99 	//	selectedDriver==1	for primary hardware		=>-1
-//DEADCODE PD 03/12/99 	//	selectedDriver==2	for secondary hardware		=>0
-//DEADCODE PD 03/12/99 	//else
-//DEADCODE PD 03/12/99 	//	selectedDriver==0	for software				=>-1
-//DEADCODE PD 03/12/99 	//	selectedDriver==1	for secondary hardware		=>0
-//DEADCODE PD 03/12/99 	if (selectedDriver==0)	Save_Data.fSoftware=true;
-//DEADCODE PD 03/12/99 	else					Save_Data.fSoftware=false;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	if (Save_Data.sd.fFirstHardIsPrimary)	selectedDriver=selectedDriver==0?-1:selectedDriver-2;
-//DEADCODE PD 03/12/99 	else									selectedDriver--;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	SModeFlags* modeFlags;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	if (Save_Data.fSoftware)	modeFlags=&Save_Data.sd.soft_modes;
-//DEADCODE PD 03/12/99 	else						modeFlags=Save_Data.sd.hard_modes+selectedDriver+1;
-//DEADCODE PD 03/12/99 //dead	else						modeFlags=Save_Data.sd.hard_modes+selectedDriver+1;
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	//erase the current list of resolutions
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	combo=GETDLGITEM(IDC_CBO_RESOLUTIONS);
-//DEADCODE PD 03/12/99 	combo->Clear();
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	for (SLong x=0;x<modesCount;x++)
-//DEADCODE PD 03/12/99 		if (driverModes[x].driverNo-1==selectedDriver &&
-//DEADCODE PD 03/12/99 			driverModes[x].displayBPP==16 &&
-//DEADCODE PD 03/12/99 			IsValidMode(modeFlags,driverModes[x].displayWidth,driverModes[x].displayHeight))
-//DEADCODE PD 03/12/99 		{
-//DEADCODE PD 03/12/99 			sprintf(modeString,"%d X %d\0",
-//DEADCODE PD 03/12/99 					driverModes[x].displayWidth,
-//DEADCODE PD 03/12/99 					driverModes[x].displayHeight);
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 			combo->AddString(CString(modeString));
-//DEADCODE PD 03/12/99 		}
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	Save_Data.screenresolution=0;
-//DEADCODE PD 03/12/99 	combo->SetIndex(Save_Data.screenresolution);
-//DEADCODE PD 03/12/99 
-//DEADCODE PD 03/12/99 	if (Save_Data.fSoftware)
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		Save_Data.textureQuality=4;
-//DEADCODE PD 03/12/99 		Save_Data.filtering=0;
-//DEADCODE PD 03/12/99 		Save_Data.detail_3d%=DETAIL3D_INCONSEQUENTIALS;
-//DEADCODE PD 03/12/99 		Save_Data.detail_3d%=DETAIL3D_GROUNDSHADING;
-//DEADCODE PD 03/12/99 		Save_Data.cockpit3Ddetail%=COCK3D_SKYIMAGES;
-//DEADCODE PD 03/12/99 		combo=GETDLGITEM(IDC_CBO_GROUNDSHADING);
-//DEADCODE PD 03/12/99 		combo->Clear();
-//DEADCODE PD 03/12/99 		combo->AddString(LoadResString(IDS_L_OFF));
-//DEADCODE PD 03/12/99 		combo->SetIndex(0);
-//DEADCODE PD 03/12/99 		combo=GETDLGITEM(IDC_CBO_REFLECTIONS);
-//DEADCODE PD 03/12/99 		combo->Clear();
-//DEADCODE PD 03/12/99 		combo->AddString(LoadResString(IDS_L_OFF));
-//DEADCODE PD 03/12/99 		combo->SetIndex(0);
-//DEADCODE PD 03/12/99 	}
-//DEADCODE PD 03/12/99 	else
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		combo=GETDLGITEM(IDC_CBO_GROUNDSHADING);
-//DEADCODE PD 03/12/99 		combo->Clear();
-//DEADCODE PD 03/12/99 		combo->AddString(LoadResString(IDS_L_OFF));
-//DEADCODE PD 03/12/99 		combo->AddString(LoadResString(IDS_L_OFF+1));
-//DEADCODE PD 03/12/99 		combo=GETDLGITEM(IDC_CBO_REFLECTIONS);
-//DEADCODE PD 03/12/99 		combo->Clear();
-//DEADCODE PD 03/12/99 		combo->AddString(LoadResString(IDS_L_OFF));
-//DEADCODE PD 03/12/99 		combo->AddString(LoadResString(IDS_L_OFF+1));
-//DEADCODE PD 03/12/99 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

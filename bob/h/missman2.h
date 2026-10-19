@@ -15,15 +15,12 @@
 //this means that I dont want any common files							//RDH 18/05/00
 #define	f_common
 
-//DEADCODE MS 02/02/00 #include	"textref.h"
 #define		F_SOUNDS
 #define		F_COMMON
 #include	"Files.g"
 #include	"myangles.h"											//RDH 20Dec95
 #include	"savegame.h"
-//DEADCODE MS 02/02/00 #include	"flyinit.h"											//RDH 20Dec95
 #include	"worldinc.h"										//RDH 11Aug96
-//DEADCODE MS 02/02/00 #include	"debrief.h"
 //#ifdef	PACKAGE_INCLUDED
 #include	"sky.h"
 
@@ -124,7 +121,6 @@ substruct	(CampaignStatic,CampaignPtrs)
 	SWord			frontdeltastrength,
 					reservesavail;
 	SWord			currentplayerslot;
-//DeadCode RDH 25Mar97 	SWord			correctplayerslot;
 	char	PlayerName[PLAYERNAMELEN];
 	char	aircraftname[20];
 	UniqueID	InitialFront[3];
@@ -137,102 +133,25 @@ endstruct(CampaignStatic);
 //////////////////////////
 substruct	(CampaignBlueSquad,CampaignStatic)
 	Directives		directives;
-//DEADCODE JIM 28/01/00  	enum					{MAX_AC_NUM = 19};
-//DEADCODE DAW 24/11/99 struct	SquadronInfo
-//DEADCODE DAW 24/11/99 {
-//DEADCODE DAW 24/11/99 	PlaneTypeSelect	actype;										//RDH 07Apr96
-//DEADCODE DAW 24/11/99 	int				name;	//TextSnip0	 		name;
-//DEADCODE DAW 24/11/99 	SWord			airfieldindex;
-//DEADCODE DAW 24/11/99 	SWord			movetoairfieldindex;
-//DEADCODE DAW 24/11/99 	SWord			nextacnumber;
-//DEADCODE DAW 24/11/99 	SWord			ac_total_avail;
-//DEADCODE DAW 24/11/99 	SWord			rotatefreq;
-//DEADCODE DAW 24/11/99 	SLong			lastrotatedate;
-//DEADCODE DAW 24/11/99 	SWord			flt_used;		//not used!
-//DEADCODE DAW 24/11/99 	int				bingofuel;					//0.01kg
-//DEADCODE DAW 24/11/99 	AcTactics		elementtactics;
-//DEADCODE DAW 24/11/99 	AcTactics		flighttactics;
-//DEADCODE DAW 24/11/99 
-//DEADCODE DAW 24/11/99 //	SWord			flt_pilots_avail;
-//DEADCODE DAW 24/11/99 //	SWord			lastflightform,lastgrpform;
-//DEADCODE DAW 24/11/99 //	SWord			flightnum [MAX_FLIGHT_NUM];
-//DEADCODE DAW 24/11/99 //	SWord			formationnum [MAX_FLIGHT_NUM];
-//DEADCODE DAW 24/11/99 //	SWord			squadronform;
-//DEADCODE DAW 24/11/99 //	NextLeadAct		nextleadact [MAX_FLIGHT_NUM];
-//DEADCODE DAW 24/11/99 };
-//DEADCODE DAW 24/11/99 	SquadronInfo	squad[PILOTABLE_SQUADRONS];
 
 endstruct(CampaignBlueSquad);
 //////////////////////////
 substruct	(CampaignSquad,CampaignBlueSquad)
 
-//DEADCODE DAW 24/11/99 struct	MigSquadronInfo
-//DEADCODE DAW 24/11/99 {
-//DEADCODE DAW 24/11/99 	PlaneTypeSelect	actype;				//15 or 15bis 
-//DEADCODE DAW 24/11/99 	SWord			colourscheme;		//0..7			
-//DEADCODE DAW 24/11/99 	int				squadnameindex;		//name and desc index
-//DEADCODE DAW 24/11/99 	int				startdate;			//earliest date this squad can be used
-//DEADCODE DAW 24/11/99 	SWord			ac_total_avail;		//red squad size
-//DEADCODE DAW 24/11/99 	SWord			aclosses;			//total since squad launched
-//DEADCODE DAW 24/11/99 	SWord			aclosseslast;		//last 3d session
-//DEADCODE DAW 24/11/99 	SkillType		generalskill;		//ONE FIELD improve over time
-//DEADCODE DAW 24/11/99 	MoraleType		morale;				//squadron variable
-//DEADCODE DAW 24/11/99 	tAggressionLevel	agglevel;		//squad - improve slowly
-//DEADCODE DAW 24/11/99 	RedEvents		maxevent;			//improve very slowly - every 16 days?
-//DEADCODE DAW 24/11/99 
-//DEADCODE DAW 24/11/99 };
-//DEADCODE DAW 24/11/99 	MigSquadronInfo	migsquad[MAXMIGSQUADRONS];	//first 2 are active squadrons
-//DEADCODE DAW 24/11/99 	int	nextsquadtocopy;						//copy to 1 of first 2
 
 endstruct(CampaignSquad);
 //////////////////////////
 substruct	(CampaignPackages,CampaignSquad)
 //	Package package[MAX_PACKAGE_NUM];
 enum					{MAX_MISSIONPERCAMPAIGN = 8};
-//DEADCODE DAW 24/11/99 struct CampMissionDef
-//DEADCODE DAW 24/11/99 {
-//DEADCODE DAW 24/11/99 	SLong			msn_date;
-//DEADCODE DAW 24/11/99 	SLong			msn_time;
-//DEADCODE DAW 24/11/99 	UniqueID		target;
-//DEADCODE DAW 24/11/99 	UniqueID		captarget;
-//DEADCODE DAW 24/11/99 	FileNum			profile;
-//DEADCODE DAW 24/11/99 };
-//DEADCODE DAW 24/11/99 	int				winscore;
-//DEADCODE DAW 24/11/99 	Debrief::DisEntry		dis;
-//DEADCODE DAW 24/11/99 	CampMissionDef		missions[MAX_MISSIONPERCAMPAIGN];
 
 
 endstruct(CampaignPackages);
 //////////////////////////
 substruct	(CampaignPilots,CampaignPackages)
-//DEADCODE DAW 24/11/99 	PilotType	Active_Pilots[PILOTS_PER_CAMPAIGN];
 endstruct(CampaignPilots);
 //////////////////////////
 //DEADsubstruct	(CampaignFiles,CampaignPilotsOnly)
-//DEAD//DeadCode RDH 18Feb97 
-//DEAD//DeadCode RDH 18Feb97 	FileNum	introsheetart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	intropadart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	introiconart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	cr_iconart;
-//DEAD//DeadCode RDH 18Feb97  	FileNum	lc_iconart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	historyart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	personnelart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	junctionart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	squadart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	saveart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	savedialogue;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	quitart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	padart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	mainiconart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	flightart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	newstextart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	newsgraphicart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	flightgraphicart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	acsmallart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	acmedart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	aclargeart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	paintshopart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	introtextart;
 //DEAD
 //DEAD	TextSnip0	objecttext;
 //DEAD	TextSnip0	introtext;
@@ -243,14 +162,11 @@ endstruct(CampaignPilots);
 //////////////////////////
 //DEADsubstruct	(CampaignPilots,CampaignFiles)
 //DEAD	PilotType	Reserve_Pilots[PILOTS_IN_RESERVE];
-//DEAD//DeadCode RDH 27Mar97 	PilotType	aces[ACESLIST];
 //DEADendstruct(CampaignPilots);
 //DEAD//////////////////////////
 //DEADsubstruct	(CampaignTank,CampaignPilots)
 //DEAD	SLong		Tank_timer;
 //DEAD	SLong		Truck_timer;
-//DEAD//DeadCode RDH 24Feb97 	UniqueID	routesstartuids[MAXROUTES];
-//DEAD//DeadCode RDH 24Feb97 	UniqueID	routesenduids[MAXROUTES];
 //DEADendstruct(CampaignTank);
 //DEAD//////////////////////////
 //DEADsubstruct	(CampaignTankZero,CampaignTank)
@@ -285,12 +201,9 @@ struct	CampaignZPilots:CampaignPilots
 
 struct	CampaignZero:CampaignZPilots
 {
-//DeadCode RDH 02Oct96 	enum					{MAXWEATHERNUM = 4};
 //Dead	WpSetType		players_wpset;
 //Dead	SLong			TrainingCount;
 //Dead	SLong			TrainingRange;
-//DeadCode RDH 02Oct96 	SWord 			currweathernum;
-//DeadCode RDH 02Oct96 	SWord 			currwindnum;
 //Dead	SWord			currmission_no;
 //Dead	SWord			missionwpset;
 	PeriodReview	firstweek,prevweeks[6];
@@ -374,9 +287,6 @@ struct	CampaignZero:CampaignZPilots
 	SWord		undefendedcriticaltargetlosses;
 			
 
-//DEADCODE RDH 20/12/99 	UniqueID		pilotonaf;
-//DEADCODE RDH 20/12/99 	int				pilotonsquad;
-//DEADCODE RDH 20/12/99 	int				pilotonwader;
 
 //Dead	SWord			lastrecoveredpilot;
 //Dead	TextSnip0		lasttransferee;
@@ -384,19 +294,12 @@ struct	CampaignZero:CampaignZPilots
 //Dead	TextSnip0		specialeventtext;							//RDH 06Sep96
 //Dead	FileNum		playerbfield;
 //Dead	TextPerm	playernameref;
-//DeadCode JIM 17Aug00 	SpecialEventBitField	specialeventbits;
-//DeadCode JIM 17Aug00 	NewsEventField			newsevent;
-//DeadCode AMM 7Aug00 	Bool		indebrief;
-//DEADCODE DAW 29/01/00 	Debrief		debrief;
 	ATMOSPHERE		Sky;
-//DEADCODE DAW 29/01/00 	SG_DirControl	directives;
  	char	CommsPassword[11];
 	SWord	packageprevscores[10];
 
 	void	SetCurrMission (MissionType*);
 	bool	ChkEndCampaign();
-//DEADCODE DAW 29/01/00 	int		StoresDestroyedForNodeRoute(SupplyNode* node);
-//DEADCODE DAW 29/01/00 	void	BattleLossesForNode(SupplyNode* node, int& redlosses, int& bluelosses);
 
 
 	void	NextMission();
@@ -411,13 +314,8 @@ struct	CampaignZero:CampaignZPilots
 	void	RotateFlightsCheck();
 	void	ModifySkill(int groupnum, int daysonduty);
 
-//DEADCODE RDH 03/04/00 	void	EndDebrief();
 	void	CampaignInit();
 	void	InitIcons();
-//DEADCODE DAW 29/01/00 	void	AddDebriefData(Debrief::SquadKills& src, Debrief::SquadKills& dest);
-//DEADCODE DAW 29/01/00 	void	ZeroDebriefData(Debrief::SquadKills& dest);
-//DEADCODE DAW 29/01/00 	void	DisDayEntry(Debrief::TypeFlag type, int msgowner, int msgtextid);
-//DEADCODE DAW 29/01/00 	void	UpdateAllDis();
 	void	UpdatePlayerLog();										  //RDH 19/06/99
 	void	ZeroDisDay();
 	FileNum	FindSmacker(int index);
@@ -431,7 +329,6 @@ struct	CampaignZero:CampaignZPilots
 	static void	GlobalRefreshData();
 	TimeColours	TimeColour(int timetotest=0);	//
 
-//DEADCODE RDH 06/04/00 	bool	inentirewar;
 
 	//Set campaign up
 	CampaignZero& operator = (CampaignBase	*);
@@ -441,8 +338,6 @@ struct	CampaignZero:CampaignZPilots
 	CampaignZero& operator += (CampaignZero&	);
 
 
-//DEADCODE DAW 24/11/99 	static	 MigEvent	migevents[MIGEV_MAX];
-//DEADCODE DAW 24/11/99 	static	PilotType	Active_Pilots_Init[PILOTS_PER_CAMPAIGN];
 
 };
 
@@ -453,7 +348,6 @@ typedef	CampaignZero	Campaign;
 
 
 //------------------------------------------------------------------------------
-//DeadCode RDH 13Jun96 #include	"uid.g"												//RDH 21Dec95
 class	 MissMan
 {
 public:
@@ -463,19 +357,13 @@ public:
 		RADAR_CAMPAIGN,
 		ARFIELD_CAMPAIGN,
 		BLITZ_CAMPAIGN,
-//DEADCODE RDH 03/04/00 		SO51_CAMPAIGN,
-//DEADCODE RDH 19/03/99 		PEACETALKCAMPAIGN,
-//DEADCODE RDH 19/03/99 		RUNDEMOCAMPAIGN,
  		SCRAMBLECAMPAIGN,
-//DEADCODE RDH 19/03/99 		H2HCAMPAIGN,											//RDH 05Sep96
 		MINCAMPAIGNNUM = 0,
  		MAXCAMPAIGNNUM = 5,										//RDH 05Sep96
-//DEADCODE RDH 19/03/99 		MAXACTUALCAMPAIGNNUM = 3
 		} 	currcampaignnum;
 
 	static CampaignBase	*campaigntable[MAXCAMPAIGNNUM];
 	Campaign	camp;
-//DeadCode JIM 30Oct00 	Campaign	backup;
 
 };
 extern	MissMan Miss_Man;

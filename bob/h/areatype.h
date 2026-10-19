@@ -51,7 +51,6 @@ enum AreaType
 
 	RT_magic=1,
 	HEDGE_HEIGHT=1500, //15m
-//DeadCode JON 4Oct00 	CLIFF_HEIGHT=10000, //100m
 	AT_NULL=255, // a null value used for flagging...
 	RT_NULL=255,
 	FULLHTOFFSET=32, // offset for the full heights in RaiseLookUp
@@ -97,20 +96,6 @@ inline bool IsWidenedCrossing( UByte at, int pointcount ) // note any wide poly 
 				(1UL<<(RA_RIVMINRAILJUNCT)) |
 				(1UL<<(RA_RIVMAJRAILJUNCT));
 	return ( (at_shift&at_shift_mask) != 0 );
-//DeadCode JON 4Oct00 	at&=AT_MASK;
-//DeadCode JON 4Oct00 	return (	at == RA_CROSSING1 ||
-//DeadCode JON 4Oct00 				at == RA_CROSSING2 ||
-//DeadCode JON 4Oct00 				at == RA_ROADJUNCTION ||
-//DeadCode JON 4Oct00 				at == RA_RAILJUNCTION ||
-//DeadCode JON 4Oct00 				at == RA_MAJRAILROADJUNCT ||
-//DeadCode JON 4Oct00 				at == RA_MINRAILROADJUNCT ||
-//DeadCode JON 4Oct00 				at == RA_CROSSING3 ||
-//DeadCode JON 4Oct00 				at == RA_CROSSING4 ||
-//DeadCode JON 4Oct00 				at == RA_RIVAROADJUNCT ||
-//DeadCode JON 4Oct00 				at == RA_RIVBROADJUNCT ||
-//DeadCode JON 4Oct00 				at == RA_RIVMINRAILJUNCT ||
-//DeadCode JON 4Oct00 				at == RA_RIVMAJRAILJUNCT
-//DeadCode JON 4Oct00 				);
 }
 
 inline bool IsWideRotation( UByte at )
@@ -152,8 +137,6 @@ inline RaiseFlag PreCalcRaise( const long viewer_y, SLong &hedgeHeight )//, SLon
 	static RaiseFlag oldflg = FULLRAISE;
 	RaiseFlag flg;
 	if ( viewer_y>FT_10000)		flg = NORAISE;
-//DeadCode JON 4Oct00 	else if (viewer_y<FT_5000)	flg = FULLRAISE;
-//DeadCode JON 4Oct00 	else						flg = SCALEDRAISE;
 	else						flg = FULLRAISE;
 
 	if (flg != oldflg)// || flg == SCALEDRAISE)
@@ -165,7 +148,6 @@ inline RaiseFlag PreCalcRaise( const long viewer_y, SLong &hedgeHeight )//, SLon
 			case FULLRAISE:
 			{
 				hedgeHeight = HEDGE_HEIGHT;
-//DeadCode JON 4Oct00 				cliffHeight = CLIFF_HEIGHT;
 				for (int i = 0; i < FULLHTOFFSET; i++)
 				{
 					RaiseLookUp[i].rot0Alt = RaiseLookUp[i + FULLHTOFFSET].rot0Alt;
@@ -173,34 +155,8 @@ inline RaiseFlag PreCalcRaise( const long viewer_y, SLong &hedgeHeight )//, SLon
 					RaiseLookUp[i].rot2Alt = RaiseLookUp[i + FULLHTOFFSET].rot2Alt;
 					RaiseLookUp[i].rot3Alt = RaiseLookUp[i + FULLHTOFFSET].rot3Alt;
 				}
-//DeadCode JON 20Sep00 					RaiseLookUp[i]=RaiseLookUp[i+FULLHTOFFSET];
 			}
 			break;
-//DeadCode JON 4Oct00 			case SCALEDRAISE:
-//DeadCode JON 4Oct00 			{
-//DeadCode JON 4Oct00 				double raiseScale = double(viewer_y-FT_5000)/double(FT_10000-FT_5000);
-//DeadCode JON 4Oct00 				for ( int i=0; i<FULLHTOFFSET; i++ )
-//DeadCode JON 4Oct00 				{
-//DeadCode JON 4Oct00 					if ( RaiseLookUp[i+FULLHTOFFSET].sideImage == NULLIMAGE )
-//DeadCode JON 4Oct00 						continue;
-//DeadCode JON 4Oct00 //DeadCode JON 4Oct00 					RaiseLookUp[i]=RaiseLookUp[i+FULLHTOFFSET];
-//DeadCode JON 4Oct00 					memcpy( &RaiseLookUp[i],&RaiseLookUp[i+FULLHTOFFSET],sizeof( SLong )*4 );
-//DeadCode JON 4Oct00 					RaiseLookUp[i].rot0Alt-=SLong(double(RaiseLookUp[i].rot0Alt)*raiseScale);
-//DeadCode JON 4Oct00 					RaiseLookUp[i].rot1Alt-=SLong(double(RaiseLookUp[i].rot1Alt)*raiseScale);
-//DeadCode JON 4Oct00 					RaiseLookUp[i].rot2Alt-=SLong(double(RaiseLookUp[i].rot2Alt)*raiseScale);
-//DeadCode JON 4Oct00 					RaiseLookUp[i].rot3Alt-=SLong(double(RaiseLookUp[i].rot3Alt)*raiseScale);
-//DeadCode JON 4Oct00 					hedgeHeight=HEDGE_HEIGHT-SLong(double(HEDGE_HEIGHT)*raiseScale);
-//DeadCode JON 4Oct00
-//DeadCode JON 4Oct00
-//DeadCode JON 4Oct00 //DeadCode JON 4Oct00 					RaiseLookUp[i].rot0Alt-=RaiseLookUp[i].rot0Alt*(viewer_y-FT_5000)/(FT_10000-FT_5000);
-//DeadCode JON 4Oct00 //DeadCode JON 4Oct00 					RaiseLookUp[i].rot1Alt-=RaiseLookUp[i].rot1Alt*(viewer_y-FT_5000)/(FT_10000-FT_5000);
-//DeadCode JON 4Oct00 //DeadCode JON 4Oct00 					RaiseLookUp[i].rot2Alt-=RaiseLookUp[i].rot2Alt*(viewer_y-FT_5000)/(FT_10000-FT_5000);
-//DeadCode JON 4Oct00 //DeadCode JON 4Oct00 					RaiseLookUp[i].rot3Alt-=RaiseLookUp[i].rot3Alt*(viewer_y-FT_5000)/(FT_10000-FT_5000);
-//DeadCode JON 4Oct00 //DeadCode JON 4Oct00 					hedgeHeight=HEDGE_HEIGHT-(HEDGE_HEIGHT*(viewer_y-FT_5000)/(FT_10000-FT_5000));
-//DeadCode JON 4Oct00 //DeadCode JON 4Oct00 					cliffHeight=CLIFF_HEIGHT-(CLIFF_HEIGHT*(viewer_y-FT_5000)/(FT_10000-FT_5000));
-//DeadCode JON 4Oct00 				}
-//DeadCode JON 4Oct00 			}
-//DeadCode JON 4Oct00 			break;
 			case NORAISE:
 			{
 				hedgeHeight = 0.0;
@@ -371,8 +327,6 @@ struct raiseSide
 
 inline bool IsCliffBottom(UByte at)
 {
-//DeadCode JON 4Oct00 	at&=AT_MASK;
-//DeadCode JON 4Oct00 	return (/*at==AT_coastRock||*/at==AT_sea||at==AT_sand||at==AT_whiteChalk);
 	ULong at_shift = 1UL<<(at&AT_MASK);
 	const ULong at_shift_mask =
 				(1UL<<(AT_sea)) |
@@ -383,8 +337,6 @@ inline bool IsCliffBottom(UByte at)
 }
 inline bool IsRaised(UByte at)
 {
-//DeadCode JON 4Oct00 	at&=AT_MASK;
-//DeadCode JON 4Oct00 	return (at==AT_woods||at==AT_denseTown/*||at==AT_sparseTown*/||at==AT_denseCity||at==AT_sparseCity);
 	ULong at_shift = 1UL<<(at&AT_MASK);
 	const ULong at_shift_mask =
 				(1UL<<(AT_denseTown)) |
@@ -397,8 +349,6 @@ return ( (at_shift&at_shift_mask) != 0 );
 // is the area type hirez?
 inline bool IsHirez(UByte at)
 {
-//DeadCode JON 4Oct00 	at&=AT_MASK;
-//DeadCode JON 4Oct00 	return (at==AT_village||at==AT_denseTown||at==AT_sparseTown||at==AT_denseCity||at==AT_sparseCity);
 	ULong at_shift = 1UL<<(at&AT_MASK);
 	const ULong at_shift_mask =
 				(1UL<<(AT_village)) |
@@ -411,7 +361,6 @@ inline bool IsHirez(UByte at)
 }
 inline bool IsWater(UByte at)
 {
-//DeadCode JON 4Oct00 	return (at==AT_sea||at==AT_stream );
 	ULong at_shift = 1UL<<(at&AT_MASK);
 	const ULong at_shift_mask =
 				(1UL<<(AT_sea)) |
@@ -423,11 +372,6 @@ inline bool IsForest(UByte at) {at&=AT_MASK; return (at==AT_woods);}
 inline bool IsWooded(UByte at) {return false;}
 inline bool IsValidRoute(UByte at)
 {
-//DeadCode JON 4Oct00 	return (at==RT_ARoad		|| at==RT_BRoad			|| at==RT_MinorRoad ||
-//DeadCode JON 4Oct00 			at==RT_Footpath		|| at==RT_MajorRail		|| at==RT_MinorRail ||
-//DeadCode JON 4Oct00 			at==RT_MajorRiver	|| at==RT_MinorRiver	|| at==RT_Tributary ||
-//DeadCode JON 4Oct00 			at==RT_HedgerowThick|| at==RT_HedgerowThin	|| at==RT_Coast		||
-//DeadCode JON 4Oct00 			at==RT_AirField		|| at==RT_Cliff			|| at==RT_CliffRot);
 // optimised to:
 //	at&=AT_MASK;
 	ULong at_shift = 1UL<<(at&AT_MASK);

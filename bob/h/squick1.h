@@ -61,7 +61,6 @@ struct	QuickFields
 
 	QFD		Duty()	{return (QFD)(duty&QFD_MASK);}
 	UByte	DutyFlags()	{return duty;}
-//DeadCode AMM 10Aug00 	bool	AllowZero()	{return (duty&QFD_ALLOW_ZERO_FL)!=0;}
 	bool	AllowZero();										//AMM 10Aug00
 	int	ACPerFlight();
 	int	MaxFlights();
@@ -93,7 +92,6 @@ struct	QuickDef
 	void	FixOtherLines(int squad);
 	void	MakeDeathMatchMission(int index);
 	void	MakeTeamPlayMission(int index);
-//DeadCode AMM 23Oct00 	void	UpdateAcType();
 #ifndef	STANDALONE
 	static char** extrastrings;
 	static	void	trans(void* &dataarea,ULong& datasize);
@@ -102,11 +100,6 @@ struct	QuickDef
 	struct	QuickMissionArray
 	{
 		const QuickDef	operator[](int index)const;
-//DEADCODE RDH 24/03/00 		{
-//DEADCODE RDH 24/03/00 			fileblock* fb=new fileblock(FIL_QUICKMISSION_DATA);
-//DEADCODE RDH 24/03/00 			QuickDef* qd=(QuickDef*)fb->getdata();
-//DEADCODE RDH 24/03/00 			return	QuickMissionIndex(fb,qd[index]); 
-//DEADCODE RDH 24/03/00 		}
 	};
 
 };
@@ -123,7 +116,6 @@ public:
 #endif
 	static	int			currquickmiss;
 	static	int			currquickfamily;
-//DEADCODE JON 05/06/00 #pragma warnmsg("Here!")
 
 
 } ;
@@ -136,8 +128,6 @@ public:
 	int	targtype,targentry,plflst;
 	CSQuick1(CWnd* pParent = NULL);   // standard constructor
 	UINT missbrief_timer;
-//DEADCODE RDH 09/03/00 	UByte	misslistindex[40];
-//DEADCODE RDH 09/03/00 	UByte	misslistbackindex[40];
 	int	misslistindex[40];
 	int	misslistbackindex[40];
 	int	missionfamily[40];

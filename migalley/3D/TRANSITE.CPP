@@ -74,6 +74,7 @@ questions about this file may be asked at http://www.simhq.com/
 #define F_GRAFIX												//DAW 05Aug96
 #define F_BATTLE
 #include	"DOSDEFS.H"
+#include	"animlink.h"											//ptr side-channel for animdata fields
 #include	"WORLDINC.H"
 
 #include	"WORLD.H"
@@ -225,7 +226,6 @@ void TransObj::AddTransientItemToDeadList(TransientItemPtr transitem, bool novap
 			transitem->LaunchTime = newlife;
 		else
 		{
-	//DeadCode JIM 06Jan97	CheckE3();
 			transitem->AutoMoveInfo.movecode=MOBILE_NOPPILOT;						//RJS 09Dec98
 			transientcounter--;											//PD 24Jul96
 			TransientItemPtr temp;
@@ -241,7 +241,6 @@ void TransObj::AddTransientItemToDeadList(TransientItemPtr transitem, bool novap
 
 		//	OverLay.speed = transientcounter;
 
-	//DeadCode RJS 21Jan99	SHAPE.DetatchAllVapourStreams(transitem,400);	//RJS 04Sep98
 
 			if (TransToGoList==NULL)
 			{
@@ -273,12 +272,10 @@ void TransObj::AddTransientItemToDeadList(TransientItemPtr transitem, bool novap
 
 		//		temp->nexttogo = transitem;
 
-		//DeadCode JIM 07Oct96		transitem->nexttogo = NULL;
 			}
 
 			transitem->nexttogo = NULL;
 			_Miles.HaltItemSound((ItemBasePtr) transitem);
-		//DeadCode JIM 06Jan97	CheckE3();
 		}
 	}
 }
@@ -328,41 +325,6 @@ void TransObj::AddTransientItemToDeadList(TransientItemPtr transitem, bool novap
 //TempCode MGA 27Mar96	return (retval);
 //TempCode MGA 27Mar96 }
 
-//DeadCode JIM 07Oct96 //------------------------------------------------------------------------------
-//DeadCode JIM 07Oct96 //Procedure		FindInTransientList
-//DeadCode JIM 07Oct96 //Author		Martin Alderton
-//DeadCode JIM 07Oct96 //Date			Thu 29 Feb 1996
-//DeadCode JIM 07Oct96 //
-//DeadCode JIM 07Oct96 //Description	
-//DeadCode JIM 07Oct96 //
-//DeadCode JIM 07Oct96 //Inputs		
-//DeadCode JIM 07Oct96 //
-//DeadCode JIM 07Oct96 //Returns	
-//DeadCode JIM 07Oct96 //
-//DeadCode JIM 07Oct96 //------------------------------------------------------------------------------
-//DeadCode JIM 07Oct96 int TransObj::FindInTransientList(TransientItemPtr transit)
-//DeadCode JIM 07Oct96 {
-//DeadCode JIM 07Oct96	int retval=-1;
-//DeadCode JIM 07Oct96	int count=0;
-//DeadCode JIM 07Oct96
-//DeadCode JIM 07Oct96 //TempCode MGA 13Mar96	TransientItemPtr testlist = mobileitem::TransientList;
-//DeadCode JIM 07Oct96
-//DeadCode JIM 07Oct96	TransientItemPtr testlist;
-//DeadCode JIM 07Oct96 //TempCode MGA 27Mar96	testlist=TransientItem::gettranslist();
-//DeadCode JIM 07Oct96	testlist=TransientItem::TransientList;
-//DeadCode JIM 07Oct96
-//DeadCode JIM 07Oct96
-//DeadCode JIM 07Oct96	while (testlist!=NULL)
-//DeadCode JIM 07Oct96	{
-//DeadCode JIM 07Oct96		if (testlist->uniqueID.bitfieldUid.count==transit->uniqueID.bitfieldUid.count)
-//DeadCode JIM 07Oct96		{
-//DeadCode JIM 07Oct96			retval=count;
-//DeadCode JIM 07Oct96		}
-//DeadCode JIM 07Oct96		testlist=testlist->nexttrans;
-//DeadCode JIM 07Oct96		count++;
-//DeadCode JIM 07Oct96	}
-//DeadCode JIM 07Oct96	return(retval);
-//DeadCode JIM 07Oct96 }
 //------------------------------------------------------------------------------
 //Procedure		KillTheDeadList
 //Author		Martin Alderton
@@ -389,7 +351,6 @@ void TransObj::RemoveDeadListFromWorld()
 	TransientItemPtr remove = NULL;
 	TransientItemPtr lastitem = NULL;
 															
-//DeadCode RJS 11Nov98	SHAPE.KillVapourStreamDeadList();							//RJS 09Apr98
 
 
 	while (TempPtr)
@@ -439,26 +400,6 @@ void TransObj::KillOldest()
 {
 	SLong	trans2kill = transientcounter - MaxTransients;
 
-//DeadCode DAW 19May99 	while (trans2kill--)
-//DeadCode DAW 19May99 	{
-//DeadCode DAW 19May99 		TransientItemPtr tip,otp;
-//DeadCode DAW 19May99 		
-//DeadCode DAW 19May99 		tip = otp = TransientItem::TransientList;
-//DeadCode DAW 19May99 
-//DeadCode DAW 19May99 		tip = tip->nexttrans;
-//DeadCode DAW 19May99 
-//DeadCode DAW 19May99 		while (tip)
-//DeadCode DAW 19May99 		{
-//DeadCode DAW 19May99 			if (tip->LaunchTime<otp->LaunchTime)
-//DeadCode DAW 19May99 				otp = tip;
-//DeadCode DAW 19May99 
-//DeadCode DAW 19May99 			tip = tip->nexttrans;
-//DeadCode DAW 19May99 		}
-//DeadCode DAW 19May99 
-//DeadCode DAW 19May99 		otp->LaunchTime = 0x7FFFFFFF;
-//DeadCode DAW 19May99 
-//DeadCode DAW 19May99 		AddTransientItemToDeadList(otp);
-//DeadCode DAW 19May99 	}
 
 	while (trans2kill--)
 	{
@@ -728,7 +669,6 @@ void TransObj::MobileCrater(TransientItemPtr transit,WorldStuff&)//PD 26Apr96
 			transit->LaunchTime=0;
 
 		NoGravityAndFriction(transit,RetardedDrag);
-//DeadCode RJS 18Jun98		GAndFriction(transit,RetardedDrag,100);
 
 		SLong	groundheight = GetGroundLevel(transit);			//RJS 14Apr99
 		if (transit->World.Y <= groundheight)
@@ -988,35 +928,6 @@ void	TransObj::DropAllStores(mobileitem* ac,WorldStuff& world)
 	DumpFuel((AirStrucPtr)ac,world);
 	DumpWeapons((AirStrucPtr)ac,world);
 
-//DeadCode RJS 27May98	WeapAnimData*	weapon;										
-//DeadCode RJS 27May98	SLong			xpos, ypos, zpos;							
-//DeadCode RJS 27May98	UByte			index;										
-//DeadCode RJS 27May98	UWord			thisstore;
-//DeadCode RJS 27May98	int				retval;
-//DeadCode RJS 27May98	UWord			mvel;
-//DeadCode RJS 27May98
-//DeadCode RJS 27May98	for (index = 0; index < 4; index++)
-//DeadCode RJS 27May98	{
-//DeadCode RJS 27May98		weapon = SHAPE.GetWeaponLauncher(ac,index,xpos,ypos,zpos,mvel,LT_BOMB);
-//DeadCode RJS 27May98		if (weapon)
-//DeadCode RJS 27May98		{
-//DeadCode RJS 27May98			if (weapon->LoadedStores > 0)				
-//DeadCode RJS 27May98			{
-//DeadCode RJS 27May98				retval = weapon->LoadedStores;
-//DeadCode RJS 27May98				LaunchBombDrop((mobileitem*) ac,BOMB,xpos,ypos,zpos,world,TRUE);//RJS 11Jun97
-//DeadCode RJS 27May98				
-//DeadCode RJS 27May98				weapon->LoadedStores = 0;
-//DeadCode RJS 27May98
-//DeadCode RJS 27May98 //rdh 8/5/98: storesweight not used now
-//DeadCode RJS 27May98 //				((AirStruc*) *ac)->fly.storesweight -= retval * BOMBWEIGHT;
-//DeadCode RJS 27May98 //
-//DeadCode RJS 27May98 //				if (((AirStruc*) *ac)->fly.storesweight < 0)
-//DeadCode RJS 27May98 //					((AirStruc*) *ac)->fly.storesweight = 0;
-//DeadCode RJS 27May98				
-//DeadCode RJS 27May98				_Miles.SequenceAudible(FIL_MUSIC_BOMBS_DROPPED);
-//DeadCode RJS 27May98			}
-//DeadCode RJS 27May98		}
-//DeadCode RJS 27May98	}
 }
 
 //------------------------------------------------------------------------------
@@ -1049,12 +960,9 @@ TransientItem* TransObj::LaunchOneGunBullet(mobileitem* launcher,SLong MuzVel,Sh
 
 		SWord	vx,vy,vz,vhori;
 
-//DeadCode AMM 07Jul99 		if (!_Replay.Playback || (_Replay.Playback && launcher!=Persons2::PlayerSeenAC))//AMM 18Jun99
 		if ((!_Replay.Playback || (_Replay.Playback && launcher!=Persons2::PlayerSeenAC))//AMM 07Jul99
 			&& !(_DPlay.Implemented && launcher->uniqueID.bitfieldUid.commsmove && launcher!=Persons2::PlayerSeenAC))//AMM 07Jul99
 		{
-//DeadCode RJS 21Jun99 			if (_Replay.Playback)					//RJS 18Jun99
-//DeadCode RJS 21Jun99 				MuzVel += launcher->vel;	
 			((AirStrucPtr)launcher)->fly.pModel->CalcLauncherVel(MuzVel,vx,vy,vz);
 
 			newitem->velx = vx;
@@ -1075,19 +983,7 @@ TransientItem* TransObj::LaunchOneGunBullet(mobileitem* launcher,SLong MuzVel,Sh
 
 
 //Dead		if (launcher == Manual_Pilot.ControlledAC2)				//RJS 19May99
-//DeadCode AMM 18Jun99 			newitem->isArmed = 1;								//RJS 19May99
 
-//DeadCode RJS 15Mar99		Math_Lib.high_sin_cos((Angles)pitchang,sin_ang,cos_ang);//RJS 26May98
-//DeadCode RJS 15Mar99
-//DeadCode RJS 15Mar99		temp = (MuzVel * sin_ang)>>ANGLES_SHIFT; newitem->vely += (SWord )temp;		//RJS 11May98
-//DeadCode RJS 15Mar99
-//DeadCode RJS 15Mar99		temp = (MuzVel * cos_ang)>>ANGLES_SHIFT; newitem->velhori += (SWord )temp;	//RJS 11May98
-//DeadCode RJS 15Mar99
-//DeadCode RJS 15Mar99		Math_Lib.high_sin_cos((ANGLES )newitem->hdg,sin_ang,cos_ang);
-//DeadCode RJS 15Mar99
-//DeadCode RJS 15Mar99		temp = (newitem->velhori * sin_ang)>>ANGLES_SHIFT; newitem->velx = (SWord )temp;
-//DeadCode RJS 15Mar99
-//DeadCode RJS 15Mar99		temp = (newitem->velhori * cos_ang)>>ANGLES_SHIFT; newitem->velz = (SWord )temp;
 
 		 newitem->isArmed = 1;									//AMM 18Jun99
 		AddTransientItemToWorld(newitem,worldptr);
@@ -1132,18 +1028,6 @@ TransientItem* TransObj::LaunchManyGunBullets(	mobileitem* launcher,
 	Coords3D	xyz;
 	TransientItem*	newitem = NULL;
 
-//DeadCode CSB 10/03/99		velhori = launcher->velhori;
-//DeadCode CSB 10/03/99		vely = launcher->vely;
-//DeadCode CSB 10/03/99	
-//DeadCode CSB 10/03/99		Math_Lib.high_sin_cos((Angles)pitchang,sin_ang,cos_ang);
-//DeadCode CSB 10/03/99	
-//DeadCode CSB 10/03/99		temp = (MuzVel * sin_ang)>>ANGLES_SHIFT; vely += temp;
-//DeadCode CSB 10/03/99		temp = (MuzVel * cos_ang)>>ANGLES_SHIFT; velhori += temp;
-//DeadCode CSB 10/03/99	
-//DeadCode CSB 10/03/99		Math_Lib.high_sin_cos((ANGLES )launcher->hdg,sin_ang,cos_ang);
-//DeadCode CSB 10/03/99	
-//DeadCode CSB 10/03/99		velx = (velhori * sin_ang)>>ANGLES_SHIFT;
-//DeadCode CSB 10/03/99		velz = (velhori * cos_ang)>>ANGLES_SHIFT;
 
 	AirStrucPtr AC = (AirStrucPtr)launcher;	//CSB 11/06/99	
 	SWord bhdg, bpitch, bvel;						
@@ -1157,16 +1041,6 @@ TransientItem* TransObj::LaunchManyGunBullets(	mobileitem* launcher,
 	velx = (velhori * sin_ang)>>ANGLES_SHIFT;
 	velz = (velhori * cos_ang)>>ANGLES_SHIFT;	//CSB 11/06/99	
 	
-//DeadCode CSB 11/06/99		SLong vel = launcher->vel + MuzVel;
-//DeadCode CSB 11/06/99	
-//DeadCode CSB 11/06/99		Math_Lib.high_sin_cos((Angles)pitchang,sin_ang,cos_ang);
-//DeadCode CSB 11/06/99	
-//DeadCode CSB 11/06/99		velhori = vel * cos_ang / 32768;
-//DeadCode CSB 11/06/99		vely	= vel * sin_ang / 32768;
-//DeadCode CSB 11/06/99	
-//DeadCode CSB 11/06/99		Math_Lib.high_sin_cos((ANGLES )launcher->hdg,sin_ang,cos_ang);
-//DeadCode CSB 11/06/99		velx = velhori * sin_ang / 32768;
-//DeadCode CSB 11/06/99		velz = velhori * cos_ang / 32768;
 
 	xyz.X = xpos;
 	xyz.Y = ypos;
@@ -1243,42 +1117,6 @@ TransientItem* TransObj::LaunchManyGunBullets(	mobileitem* launcher,
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 24Jul98 TransientItem* TransObj::LaunchCommsBullet(AirStrucPtr Me, BULPACKET BulPacket)
-//DeadCode AMM 24Jul98 {
-//DeadCode AMM 24Jul98	mobileitem* launcher = (mobileitem*)Me;
-//DeadCode AMM 24Jul98	TransientItem* newitem;
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98	newitem=LaunchUnguidedMissile(launcher,GunfireShape,LIFETIME_BULLET,MOBILE_BULLET);
-//DeadCode AMM 24Jul98	
-//DeadCode AMM 24Jul98	if (newitem)
-//DeadCode AMM 24Jul98	{
-//DeadCode AMM 24Jul98		SWord	sin_ang,cos_ang;
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98		newitem->World.X=BulPacket.PosX;
-//DeadCode AMM 24Jul98		newitem->World.Y=BulPacket.PosY;
-//DeadCode AMM 24Jul98		newitem->World.Z=BulPacket.PosZ;
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98		newitem->velhori = BulPacket.HorzVel;
-//DeadCode AMM 24Jul98		newitem->hdg.a = (Angles)BulPacket.Head.a;
-//DeadCode AMM 24Jul98		newitem->velx = 0;
-//DeadCode AMM 24Jul98		newitem->vely = BulPacket.VertVel;
-//DeadCode AMM 24Jul98		newitem->velz = 0;
-//DeadCode AMM 24Jul98		newitem->MigStatus.LaunchFlags.deadtime = 1;						
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98		Math_Lib.high_sin_cos((ANGLES )newitem->hdg,sin_ang,cos_ang);
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98		newitem->velx = (SWord)((newitem->velhori * sin_ang)/ANGLES_FRACT);
-//DeadCode AMM 24Jul98		newitem->velz = (SWord)((newitem->velhori * cos_ang)/ANGLES_FRACT);
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98		newitem->LaunchTime = BulPacket.LaunchTime;
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98		WorldStuff* thisworld = newitem->GetCurrWorld();
-//DeadCode AMM 24Jul98		WorldStuff& worldptr = (WorldStuff&)(*thisworld);
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98		AddTransientItemToWorld(newitem,worldptr);
-//DeadCode AMM 24Jul98	}
-//DeadCode AMM 24Jul98	return newitem;												
-//DeadCode AMM 24Jul98 }
 
 //------------------------------------------------------------------------------
 //Procedure		LaunchTrackedBullet
@@ -1292,59 +1130,6 @@ TransientItem* TransObj::LaunchManyGunBullets(	mobileitem* launcher,
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode RJS 03Dec98 void	TransObj::LaunchTrackedBullet(mobileitem* launcher,WorldStuff& worldptr)
-//DeadCode RJS 03Dec98 {
-//DeadCode RDH 29Nov98	if (View_Object->PolyPitEnabled())
-//DeadCode RDH 29Nov98	{
-//DeadCode RDH 29Nov98		SLong			usexpos, useypos, usezpos;
-//DeadCode RDH 29Nov98		SLong			xpos, ypos, zpos;
-//DeadCode RDH 29Nov98		SLong			index, wpcnt;
-//DeadCode RDH 29Nov98		WeapAnimData*	weapon;
-//DeadCode RDH 29Nov98		UWord			mvel,mdelay,mburst;						//RDH 31Jul98
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98		usexpos = 0;
-//DeadCode RDH 29Nov98		useypos = 0;
-//DeadCode RDH 29Nov98		usezpos = 0;
-//DeadCode RDH 29Nov98		wpcnt = 0;
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98		index = 0;
-//DeadCode RDH 29Nov98		while (index < 3)
-//DeadCode RDH 29Nov98		{
-//DeadCode RDH 29Nov98			weapon = SHAPE.GetWeaponLauncher(launcher,index,xpos,ypos,zpos,mvel,mdelay,mburst,LT_BULLET);//RDH 31Jul98
-//DeadCode RDH 29Nov98			if (weapon)
-//DeadCode RDH 29Nov98			{
-//DeadCode RDH 29Nov98				usexpos += xpos;
-//DeadCode RDH 29Nov98				useypos += ypos;
-//DeadCode RDH 29Nov98				usezpos += zpos;
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98				wpcnt++;
-//DeadCode RDH 29Nov98			}
-//DeadCode RDH 29Nov98			index++;
-//DeadCode RDH 29Nov98		}
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98		if (wpcnt)
-//DeadCode RDH 29Nov98		{
-//DeadCode RDH 29Nov98			TransientItem* newitem;
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98			newitem=LaunchUnguidedMissile(launcher,EMPTY,LIFETIME_BULLET,MOBILE_TRACKBULLET);
-//DeadCode RDH 29Nov98			if (newitem)
-//DeadCode RDH 29Nov98			{
-//DeadCode RDH 29Nov98				SLong			temp;
-//DeadCode RDH 29Nov98				SWord			sin_ang,cos_ang;
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98				newitem->World.X = usexpos/wpcnt;					
-//DeadCode RDH 29Nov98				newitem->World.Y = useypos/wpcnt;					
-//DeadCode RDH 29Nov98				newitem->World.Z = usezpos/wpcnt;	
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98				Math_Lib.high_sin_cos((ANGLES )newitem->pitch,sin_ang,cos_ang);
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98				temp = (mvel * sin_ang)>>ANGLES_SHIFT; newitem->vely += (SWord )temp;
-//DeadCode RDH 29Nov98				temp = (mvel * cos_ang)>>ANGLES_SHIFT; newitem->velhori += (SWord )temp;
-//DeadCode RDH 29Nov98
-//DeadCode RDH 29Nov98				AddTransientItemToWorld(newitem,worldptr);
-//DeadCode RDH 29Nov98			}
-//DeadCode RDH 29Nov98		}
-//DeadCode RDH 29Nov98	}
 //}
 
 //------------------------------------------------------------------------------
@@ -1495,7 +1280,6 @@ void	TransObj::LaunchTroops(	item*		launcher,
 								WorldStuff& worldptr,
 								SByte		maxtroops	)
 {
-//DeadCode RJS 11Jun99 	if (Save_Data.desiredfps <= realFrameTime)					//RJS 11Jun99
 	{
 		if (maxtroops)
 		{
@@ -1517,7 +1301,6 @@ void	TransObj::LaunchTroops(	item*		launcher,
 				ShapeDescPtr	sdptr;
 				ShapeNum		newshp;
 				animptr			adptrtmp;
-	//DeadCode RJS 21Apr99			FireAnimData*	adptr2;										
 				Bool			isours = FALSE;
 				TroopAnimData*	adptr;
 				MinAnimData*	mad;
@@ -1595,48 +1378,6 @@ void	TransObj::LaunchTroops(	item*		launcher,
 				}
 
 				PointBlokes(launcher,troopshape,realpos,maxtroops,placelist,placecnt);
-//DeadCode RJS 01Jun99 				for (count = 0; count < maxtroops; count++)
-//DeadCode RJS 01Jun99 				{
-//DeadCode RJS 01Jun99 					newitem = SimplifiedSpriteLaunch(launcher,troopshape,LIFETIME_TROOP,MOBILE_TROOP);
-//DeadCode RJS 01Jun99 					if (newitem)
-//DeadCode RJS 01Jun99 					{
-//DeadCode RJS 01Jun99 						adptr = (TroopAnimData*) newitem->Anim;
-//DeadCode RJS 01Jun99 						if (!dim)
-//DeadCode RJS 01Jun99 						{
-//DeadCode RJS 01Jun99 							randindex = placecnt-Math_Lib.rnd(maxtroops);
-//DeadCode RJS 01Jun99 							if (randindex < 0)
-//DeadCode RJS 01Jun99 								randindex = placecnt;
-//DeadCode RJS 01Jun99 
-//DeadCode RJS 01Jun99 							adptr->xpos = placelist[randindex].X;								
-//DeadCode RJS 01Jun99 							adptr->ypos = placelist[randindex].Y;
-//DeadCode RJS 01Jun99 							adptr->zpos = placelist[randindex].Z;
-//DeadCode RJS 01Jun99 							adptr->oncourse = FALSE;
-//DeadCode RJS 01Jun99 
-//DeadCode RJS 01Jun99 							// Someone might panic!!!!!... headless chicken code
-//DeadCode RJS 01Jun99 							if (Math_Lib.rnd()>50000)
-//DeadCode RJS 01Jun99 								adptr->homing = FALSE;
-//DeadCode RJS 01Jun99 							else
-//DeadCode RJS 01Jun99 								adptr->homing = TRUE;
-//DeadCode RJS 01Jun99 						}
-//DeadCode RJS 01Jun99 						else
-//DeadCode RJS 01Jun99 						{
-//DeadCode RJS 01Jun99 							adptr->oncourse = FALSE;
-//DeadCode RJS 01Jun99 							adptr->homing = FALSE;
-//DeadCode RJS 01Jun99 						}
-//DeadCode RJS 01Jun99 	
-//DeadCode RJS 01Jun99 						// 5 metre spread around...
-//DeadCode RJS 01Jun99 						newitem->World.X = realpos.X + Math_Lib.rnd(1000) - 500;
-//DeadCode RJS 01Jun99 						newitem->World.Y = groundheight;								
-//DeadCode RJS 01Jun99 						newitem->World.Z = realpos.Z + Math_Lib.rnd(1000) - 500;
-//DeadCode RJS 01Jun99 
-//DeadCode RJS 01Jun99 						newitem->hdg = (Angles) Math_Lib.rnd();
-//DeadCode RJS 01Jun99 						newitem->vely = 0;
-//DeadCode RJS 01Jun99 						newitem->velhori = 100 + Math_Lib.rnd(20);
-//DeadCode RJS 01Jun99 						newitem->TransRandom = 50;
-//DeadCode RJS 01Jun99 
-//DeadCode RJS 01Jun99 						AddTransientItemToWorld(newitem, worldptr);
-//DeadCode RJS 01Jun99 					}
-//DeadCode RJS 01Jun99 				}
 			}
 		}
 	}
@@ -1728,10 +1469,7 @@ void	TransObj::LaunchParachute(mobileitem* launcher,WorldStuff& worldptr)
 				newitem->pitch = launcher->pitch;
 				newitem->roll = launcher->roll;
 
-//DeadCode CSB 13/06/99					if (((AirStrucPtr)launcher)->AcIsPlayer())		//RJS 13May99
 					newitem->hdg = Math_Lib.arctan(vx,vz);		//RJS 13May99
-//DeadCode CSB 13/06/99					else											//RJS 13May99
-//DeadCode CSB 13/06/99						newitem->hdg = launcher->hdg;				//RJS 13May99
 			}
 			else
 			{
@@ -1924,17 +1662,7 @@ void	TransObj::LaunchRicochet(mobileitem* launcher,WorldStuff& worldptr)
 	TransientItem*	newitem;
 	UWord			MaxVel = 300;
 	UWord			count;
-//DeadCode RJS 19Feb98	ExplodeAnimData* adptr;									//PD 10May96
 
-//DeadCode RJS 10Jul96	newitem = SimplifiedSpriteLaunch(launcher,SPURT1,10,MOBILE_RICOCHET);
-//DeadCode RJS 10Jul96	if (newitem)
-//DeadCode RJS 10Jul96	{
-//DeadCode RJS 10Jul96		newitem->hdg = ANGLES_0Deg - View_Point.hdg;
-//DeadCode RJS 10Jul96		adptr = (ExplodeAnimData* )newitem->Anim;
-//DeadCode RJS 10Jul96		adptr->frameno = Math_Lib.rnd(3);
-//DeadCode RJS 10Jul96
-//DeadCode RJS 10Jul96		AddTransientItemToWorld(newitem,worldptr);
-//DeadCode RJS 10Jul96	}
 
 	newitem = SimplifiedSpriteLaunch(launcher,DustShape,LIFETIME_MINIEX / 6,MOBILE_STATIONARY);//RJS 20Apr98
 	if (newitem)
@@ -2024,33 +1752,6 @@ void TransObj::LaunchExplosion(mobileitem* launcher,WorldStuff& worldptr,int	str
 	newitem	= RelativeSpriteLaunch(launcher,launcher->shape,HugeExplosionShape,100,MOBILE_BIGEXP);
 	if (newitem)
 	{
-//DeadCode RJS 26Nov98		sshp = SHAPESTUFF.GetShapePtr(launcher->shape);
-//DeadCode RJS 26Nov98		radius = (sshp->Size << 4) + 4;
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		dx = launcher->World.X - View_Point->World.X;
-//DeadCode RJS 26Nov98		dy = launcher->World.Y - View_Point->World.Y;
-//DeadCode RJS 26Nov98		dz = launcher->World.Z - View_Point->World.Z;
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		Math_Lib.Intercept(dx,dy,dz,distance,thehdg,pitch);
-//DeadCode RJS 26Nov98		Math_Lib.high_sin_cos((Angles)pitch,sin_ang,cos_ang);
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		dy = (sin_ang * radius) / ANGLES_FRACT;
-//DeadCode RJS 26Nov98		dh = (cos_ang * radius) / ANGLES_FRACT;
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		Math_Lib.high_sin_cos((Angles)thehdg,sin_ang,cos_ang);
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		dx = (sin_ang * dh) / ANGLES_FRACT;
-//DeadCode RJS 26Nov98		dz = (cos_ang * dh) / ANGLES_FRACT;
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		newitem->pitch = (Angles) 1;
-//DeadCode RJS 26Nov98		newitem->roll = (Angles) 1;
-//DeadCode RJS 26Nov98		newitem->hdg = (Angles) 1;
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		newitem->World.Z -= 1;
-//DeadCode RJS 26Nov98		newitem->World.X -= 1;
-//DeadCode RJS 26Nov98		newitem->World.Y -= 1;
-//DeadCode RJS 26Nov98		newitem->TransRandom = 10;
-//DeadCode RJS 26Nov98
 
 		AddTransientItemToWorld(newitem, worldptr);
 	}
@@ -2080,7 +1781,6 @@ void TransObj::LaunchSparkDebris(mobileitem* launcher, WorldStuff& worldptr)
 
 		for (count = 0; count < 8; count++)							//DAW 01Sep98
 		{
-	//DeadCode RJS 23Nov98		newitem = SimplifiedSpriteLaunch(launcher,SPARK,LIFETIME_DEBRISLNCHR,MOBILE_DEBRIS);//RDH 20Dec96
 			newitem = LaunchUnguidedMissile(launcher,SparkShape,200,MOBILE_GANDF);//RJS 28May99
 			if (newitem)
 			{
@@ -2170,13 +1870,7 @@ void TransObj::LaunchDeadACPart(AirStruc* launcher,BitFlags bitflag, WorldStuff 
 
 		AircraftAnimData*	adptr = (AircraftAnimData* )newitem->Anim;
 
-//DeadCode RJS 09Jun97		adptr->imagemaptail = adptr2->imagemaptail;
-//DeadCode RJS 09Jun97		adptr->imagemapbtmwing = adptr2->imagemapbtmwing;
-//DeadCode RJS 09Jun97		adptr->imagemapfuselage = adptr2->imagemapfuselage;
-//DeadCode RJS 09Jun97		adptr->imagemapother = adptr2->imagemapother;
-//DeadCode RJS 09Jun97		adptr->imagemaptopwing = adptr2->imagemaptopwing;
 		adptr->imagemapemblem = adptr2->imagemapemblem;
-//DeadCode RJS 27May97		adptr->vapourtrail = 0;
 
 		if (blowup)
 		{
@@ -2192,7 +1886,6 @@ void TransObj::LaunchDeadACPart(AirStruc* launcher,BitFlags bitflag, WorldStuff 
 		localdamflag = 0x0FFFF;		//All dead					//RJS 31Oct96
 		localdamflag &= ~(BS_DEAD<<bitflag);					//RJS 31Oct96
 
-//DeadCode RJS 09Jun97		adptr->dammageflags = localdamflag;	//(BS_DEAD<<bitflag) + (BS_DEAD<<BF_TheRest);//RJS 31Oct96
 
 		newitem->TransRandom = Math_Lib.rnd();
 
@@ -2229,20 +1922,6 @@ void TransObj::LaunchBitsOffPart(	ItemPtr	launcher,
 	animptr			adptrold;									//RJS 21Apr99
 	animptr			adptr;										//RJS 21Apr99
 
-//DeadCode RJS 05May99	if (noFlash == FALSE)
-//DeadCode RJS 05May99	{
-//DeadCode RJS 05May99		// A flash......colpos_impact should have been set up at this point...
-//DeadCode RJS 05May99		newitem = SimplifiedSpriteLaunch((mobileitem*)launcher,EXPLO,10,MOBILE_BIGEXP);//RJS 20Apr98
-//DeadCode RJS 05May99		if (newitem)
-//DeadCode RJS 05May99		{
-//DeadCode RJS 05May99			newitem->World = BoxCol::colpos_impact;
-//DeadCode RJS 05May99			if ((launcher->MigStatus.LaunchFlags.size >= MovingSize) && (launcher->MigStatus.LaunchFlags.size != TransientSize))//RJS 16Nov98
-//DeadCode RJS 05May99				newitem->Target = launcher;						//RJS 16Nov98
-//DeadCode RJS 05May99
-//DeadCode RJS 05May99			_Miles.PlaySample((FileNum) (FIL_SFX_EXPLOSION_OILDRUM1+Math_Lib.rnd(5)), newitem,32);
-//DeadCode RJS 05May99			AddTransientItemToWorld(newitem,worldptr);
-//DeadCode RJS 05May99		}
-//DeadCode RJS 05May99	}
 
 	sdptr = SHAPESTUFF.GetShapePtr(launcher->shape);
 	newitem = LaunchUnguidedMissile((mobileitem* )launcher,
@@ -2253,17 +1932,11 @@ void TransObj::LaunchBitsOffPart(	ItemPtr	launcher,
 		adptrold = launcher->Anim;								//RJS 21Apr99
 		adptr = newitem->Anim;									//RJS 21Apr99
 
-//DeadCode RJS 13Jul98		if (launcher->MigStatus.LaunchFlags.size == AirStrucSize)		// Inherit imagemaps
-//DeadCode RJS 13Jul98		{
-//DeadCode RJS 13Jul98			adptrold2 = (AircraftAnimData* )adptrold;
-//DeadCode RJS 13Jul98			adptr2 = (AircraftAnimData* )adptr;
-//DeadCode RJS 13Jul98		}
 
 
 
 		//Set 3D to only draw the dead part
 
-//DeadCode RJS 21Apr99		flagptr = (UByteP) newitem->Anim;
 		flagend = SHAPE.GetAnimDataSize(launcher->shape);
 		index = sdptr->DamageOffset;							//RJS 28Apr99
 
@@ -2281,17 +1954,6 @@ void TransObj::LaunchBitsOffPart(	ItemPtr	launcher,
 
 		if (blowup)
 		{
-//DeadCode DAW 03Sep98			SLong	vely = (((400 * Math_Lib.rnd())>>16) - 200);
-//DeadCode DAW 03Sep98			SLong	velhori = 300 - newitem->vely;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			blowup += 16;
-//DeadCode DAW 03Sep98			vely = (vely * blowup)>>6;
-//DeadCode DAW 03Sep98			velhori = (velhori * blowup)>>6;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			newitem->hdg = (Angles) Math_Lib.rnd();			
-//DeadCode DAW 03Sep98			newitem->vely = vely;		
-//DeadCode DAW 03Sep98			newitem->velhori = velhori;
-//DeadCode DAW 03Sep98
 			UWord	newhdg = Math_Lib.rnd();
 			UWord	newpitch = (Math_Lib.rnd()*ANGLES_60Deg) >> 16;
 			SWord	sin_ang, cos_ang;
@@ -2381,7 +2043,6 @@ void TransObj::LaunchGroundExplosion(mobileitem* launcher,WorldStuff& worldptr)
 {
 	TransientItem*	newitem;
 
-//DeadCode RJS 01Aug96	_Miles.PlaySample((FileNum) FIL_SFX_FIREBURN_LOOP, (rotitem) View_Point, (ItemBasePtr) launcher);
 
 	newitem = SimplifiedSpriteLaunch(	launcher,
 										LargeFireShape,
@@ -2394,7 +2055,6 @@ void TransObj::LaunchGroundExplosion(mobileitem* launcher,WorldStuff& worldptr)
 
 		groundlevel = GetGroundLevel(newitem);					//RJS 14Apr99
 
-//DeadCode RJS 02Oct96		if (newitem->World.Y<groundlevel)						//MS 07May96
 			newitem->World.Y=groundlevel;						//MS 07May96
 
 		newitem->TransRandom = SmokeLaunchDelay;
@@ -2417,41 +2077,6 @@ void TransObj::LaunchGroundExplosion(mobileitem* launcher,WorldStuff& worldptr)
 //------------------------------------------------------------------------------
 void TransObj::LaunchSmoulder(mobileitem* launcher,WorldStuff& worldptr,Bool	uselch)
 {
-//DeadCode RJS 26Nov98	TransientItem*	newitem;
-//DeadCode RJS 26Nov98	WeapAnimData*	weapon;										//RJS 09Dec96
-//DeadCode RJS 26Nov98	SLong			xpos, ypos, zpos;							//RJS 09Dec96
-//DeadCode RJS 26Nov98	UWord			mvel,mdelay,mburst;							//RDH 31Jul98
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98	if (uselch)													//RJS 09Dec96
-//DeadCode RJS 26Nov98		weapon = SHAPE.GetWeaponLauncher(launcher,0,xpos,ypos,zpos,mvel,mdelay,mburst,LT_VAPOUR);//RDH 31Jul98
-//DeadCode RJS 26Nov98	else
-//DeadCode RJS 26Nov98	{
-//DeadCode RJS 26Nov98		xpos = launcher->World.X;								//RJS 09Dec96
-//DeadCode RJS 26Nov98		ypos = launcher->World.Y;								//RJS 09Dec96
-//DeadCode RJS 26Nov98		zpos = launcher->World.Z;								//RJS 09Dec96
-//DeadCode RJS 26Nov98	}
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98	newitem = SimplifiedSpriteLaunch(	launcher,
-//DeadCode RJS 26Nov98										ShockwaveShape,
-//DeadCode RJS 26Nov98										LIFETIME_GROUNDEXP/2,MOBILE_GROUNDEXP);
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98	if (newitem)
-//DeadCode RJS 26Nov98	{
-//DeadCode RJS 26Nov98		SLong	groundlevel;								
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		groundlevel = Land_Scape.GetGroundLevel((itemptr )newitem);
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		if (newitem->World.Y<groundlevel)						
-//DeadCode RJS 26Nov98			newitem->World.Y=groundlevel;
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		newitem->World.X = xpos;								//RJS 09Dec96
-//DeadCode RJS 26Nov98		newitem->World.Y = ypos;								//RJS 09Dec96
-//DeadCode RJS 26Nov98		newitem->World.Z = zpos;								//RJS 09Dec96
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		newitem->TransRandom = SmokeLaunchDelay;
-//DeadCode RJS 26Nov98
-//DeadCode RJS 26Nov98		AddTransientItemToWorld(newitem, worldptr);
-//DeadCode RJS 26Nov98	}
 
 	TransientItem*	newitem;
 	newitem = SimplifiedSpriteLaunch(	launcher,
@@ -2562,7 +2187,6 @@ void	TransObj::LaunchBombDrop(mobileitem* launcher,ShapeNum	bombshape,SLong xpos
 {
 	TransientItem*	newitem;
 
-//DeadCode AMM 02Jul99 	_Replay.guncameradelay=BOMBDELAY;					//AMM 25Jan99
 
 	if (duff)													//RJS 03Dec96
 		newitem = LaunchUnguidedMissile((mobileitem* )launcher,bombshape,LIFETIME_BOMB,MOBILE_MUSHROOM);//RJS 17Nov98
@@ -2586,10 +2210,6 @@ void	TransObj::LaunchBombDrop(mobileitem* launcher,ShapeNum	bombshape,SLong xpos
 		if (!duff)												//RJS 10Jun99
 			newitem->isArmed = 1;								//RJS 19May99
 
-//DeadCode DAW 02Jul99 		if (Save_Data.gamedifficulty[GD_GUNCAMERAONTRIGGER] && !_DPlay.Implemented && !_Replay.Record)//AMM 25Jan99
-//DeadCode DAW 02Jul99 		{													//AMM 25Jan99
-//DeadCode DAW 02Jul99 			_Replay.StartRecordFlag=TRUE;					//AMM 25Jan99
-//DeadCode DAW 02Jul99 		}													//AMM 25Jan99
 
 //		newitem->pitch = ANGLES_0Deg;
 		newitem->TransRandom = LIFETIME_BOMB - 150;
@@ -2642,7 +2262,6 @@ UWord	TransObj::LaunchVapourStream(	UByteP		weapptr,
 		if (index < 0)
 		{
 			oldindex = -index;
-//DeadCode RDH 13Apr99			index = 0;
 		}
 
 		if (index == 0)
@@ -2718,7 +2337,6 @@ void	TransObj::LaunchBigExplosion(mobileitem* launcher,WorldStuff& worldptr,Shap
 		}
 	}
 
-//DeadCode DAW 27Nov98	LaunchSkinDebris(launcher,worldptr);
 	LaunchSparkDebris(launcher,worldptr);			
 }
 
@@ -2747,7 +2365,6 @@ void	TransObj::LaunchRealShockwave(mobileitem* launcher,UByte strength,WorldStuf
 			newitem->Launcher = ((TransientItem*)launcher)->Launcher;		//RJS 12Apr99
 
 		MissileAnimData*	adptr = (MissileAnimData*) newitem->Anim;
-//DeadCode DAW 23Jun99 		adptr->hitstrength = (3*strength)>>1;								//RJS 1/20/99//RJS 26Feb99
  		adptr->hitstrength = strength;								//RJS 23Jun99
 
 		newitem->isArmed = 1;												//RJS 10Jun99
@@ -2783,15 +2400,12 @@ void	TransObj::LaunchRicochetSmoke(mobileitem* launcher,ShapeNum	theShape,WorldS
 			newitem->velhori = launcher->velhori;
 		}
 		SLong	groundlevel;								
-//DeadCode RJS 19Feb98		ExplodeAnimData* adptr;
 
 //		groundlevel = GetGroundLevel(newitem);					//RJS 14Apr99
 //
 //		if (newitem->World.Y<groundlevel)						
 //			newitem->World.Y=groundlevel;
 
-//DeadCode RJS 19Feb98		adptr = (ExplodeAnimData* )newitem->Anim;
-//DeadCode RJS 19Feb98		adptr->frameno = Math_Lib.rnd(3);						//RJS 06Dec96
 		newitem->roll = (Angles) 0;								//RJS 03Dec96
 		newitem->pitch = (Angles) 1;							//RJS 06Dec96
 
@@ -2867,103 +2481,6 @@ void	TransObj::LaunchDustRing(mobileitem* launcher,WorldStuff& worldptr)
 //------------------------------------------------------------------------------
 void	TransObj::LaunchBirds(mobileitem* launcher,ShapeNum	birdshape,WorldStuff& worldptr)
 {
-//DeadCode RJS 21Apr99	TransientItem*	newitem;
-//DeadCode RJS 21Apr99	UByte			count;
-//DeadCode RJS 21Apr99	UByte			nobirds;
-//DeadCode RJS 21Apr99	ShapeDescPtr	sdptr;
-//DeadCode RJS 21Apr99	SLong			xpos, ypos, zpos;
-//DeadCode RJS 21Apr99	ShapeNum		newshp;
-//DeadCode RJS 21Apr99	FireAnimData*	adptr;
-//DeadCode RJS 21Apr99	UByteP			adptrtmp;
-//DeadCode RJS 21Apr99	int				treeheight;									//RJS 06Dec96
-//DeadCode RJS 21Apr99	Bool			foundone,flyaway;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99	sdptr = SHAPESTUFF.GetShapePtr(PCHUTE);						//AM 14Jan97
-//DeadCode RJS 21Apr99	treeheight = (3 * sdptr->sy) >> 2;							//RJS 06Dec96
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99	sdptr = SHAPESTUFF.GetShapePtr(launcher->shape);
-//DeadCode RJS 21Apr99	adptrtmp = (UByteP) launcher->Anim;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99	foundone = FALSE;
-//DeadCode RJS 21Apr99	flyaway = FALSE;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99	if (SHAPESTUFF.GetShapeScale(sdptr) == SHP_GRP)
-//DeadCode RJS 21Apr99	{
-//DeadCode RJS 21Apr99		UByteP		instr_ptr;
-//DeadCode RJS 21Apr99		instr_ptr = (UByteP )sdptr + sdptr->liveshpref;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99		while (SHAPE.GetGroupElement(instr_ptr,newshp,xpos,ypos,zpos))
-//DeadCode RJS 21Apr99		{
-//DeadCode RJS 21Apr99			sdptr = SHAPESTUFF.GetShapePtr(newshp);
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99			if (	(sdptr->AnimDataSize == FLAMEANIM)
-//DeadCode RJS 21Apr99				&&	(newshp != TroopLauncherShape)	)			//RJS 08Nov96
-//DeadCode RJS 21Apr99			{
-//DeadCode RJS 21Apr99				foundone = TRUE;
-//DeadCode RJS 21Apr99				break;
-//DeadCode RJS 21Apr99			}
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99			adptrtmp = (UByteP) ((ULong)adptrtmp + SHAPE.GetElementAnimOffset(newshp));
-//DeadCode RJS 21Apr99		}
-//DeadCode RJS 21Apr99	}
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99	if (foundone)
-//DeadCode RJS 21Apr99	{
-//DeadCode RJS 21Apr99		adptr = (FireAnimData*) adptrtmp;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99		if ((adptr->itemstate == ALIVE) && (adptr->frameno == 0))
-//DeadCode RJS 21Apr99			flyaway = TRUE;
-//DeadCode RJS 21Apr99	}
-//DeadCode RJS 21Apr99	else
-//DeadCode RJS 21Apr99	{
-//DeadCode RJS 21Apr99		MinAnimData*	mad = (MinAnimData*) launcher->Anim;	//RJS 07Feb97
-//DeadCode RJS 21Apr99																//RJS 07Feb97
-//DeadCode RJS 21Apr99		if (mad->itemstate == ALIVE)							//RJS 07Feb97
-//DeadCode RJS 21Apr99			flyaway = TRUE;										//RJS 07Feb97
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99		xpos = 0;
-//DeadCode RJS 21Apr99		ypos = 0;
-//DeadCode RJS 21Apr99		zpos = 0;
-//DeadCode RJS 21Apr99	}
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99	if (flyaway)
-//DeadCode RJS 21Apr99	{
-//DeadCode RJS 21Apr99		if (foundone)
-//DeadCode RJS 21Apr99			adptr->frameno = 1;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99		nobirds = 2 + Math_Lib.rnd(6);							//RJS 06Dec96
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99		for (count = 0; count < nobirds; count++)
-//DeadCode RJS 21Apr99		{
-//DeadCode RJS 21Apr99			newitem = SimplifiedSpriteLaunch(	launcher,		//RDH 20Dec96
-//DeadCode RJS 21Apr99												birdshape,
-//DeadCode RJS 21Apr99												LIFETIME_DEBRISLNCHR*4,MOBILE_BIRD);
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99			if (newitem)
-//DeadCode RJS 21Apr99			{
-//DeadCode RJS 21Apr99				SLong	groundlevel;								
-//DeadCode RJS 21Apr99 //DeadCode RJS 19Feb98				ExplodeAnimData* adptr;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99				groundlevel = GetGroundLevel(newitem);			//RJS 14Apr99
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99				newitem->World.X += xpos;
-//DeadCode RJS 21Apr99				newitem->World.Y += ypos + treeheight;			//RJS 06Dec96
-//DeadCode RJS 21Apr99				newitem->World.Z += zpos;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99				if (newitem->World.Y<groundlevel)						
-//DeadCode RJS 21Apr99					newitem->World.Y=groundlevel;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99				newitem->hdg = (Angles) Math_Lib.rnd();
-//DeadCode RJS 21Apr99				newitem->velhori = 100 + Math_Lib.rnd(50);
-//DeadCode RJS 21Apr99				newitem->vely = 50 + Math_Lib.rnd(50);
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99 //DeadCode RJS 19Feb98				adptr = (ExplodeAnimData* )newitem->Anim;
-//DeadCode RJS 21Apr99 //DeadCode RJS 19Feb98				adptr->frameno = 0;
-//DeadCode RJS 21Apr99
-//DeadCode RJS 21Apr99				AddTransientItemToWorld(newitem, worldptr);
-//DeadCode RJS 21Apr99			}
-//DeadCode RJS 21Apr99		}
-//DeadCode RJS 21Apr99	}
 }
 
 //------------------------------------------------------------------------------
@@ -3062,12 +2579,10 @@ void	TransObj::LaunchDustTrail(	mobileitem* launcher,
 
 	if (newitem)
 	{
-//DeadCode RJS 19Nov96		SLong	groundlevel = Land_Scape.GetGroundLevel((itemptr )newitem);//RJS 13Nov96
 
 		if (isplane)
 			direction += (Angles)(Math_Lib.rnd(ANGLES_90Deg) - ANGLES_45Deg);//RDH 08Nov96
 
-//DeadCode RJS 19Nov96		newitem->World.Y=groundlevel;
 		newitem->World.X += dx;									//RJS 13Nov96
 		newitem->World.Z += dz;									//RJS 13Nov96
 		newitem->hdg = direction;
@@ -3158,7 +2673,6 @@ void	TransObj::LaunchMushroomCloud(mobileitem* launcher,SLong impact,WorldStuff&
 											MOBILE_STATIONARY);		//RJS 06Oct98
 		if (newitem)
 		{
-//DeadCode RJS 28May99 			sdptr = SHAPESTUFF.GetShapePtr(BDUST);
 			newitem->DrawOffset += sdptr->Size << 2;
 
 			newitem->World.X += Math_Lib.rnd(sx2) - sx;
@@ -3386,8 +2900,6 @@ TransientItem* TransObj::LaunchRocket(mobileitem* launcher,ShapeNum	weapshape,SL
 	{
 		SWord	vx,vy,vz,vhori;									//RJS 10Jun99
 
-//DeadCode AMM 18Jun99 		if (launcher == Persons2::PlayerSeenAC)					//RJS 10Jun99
-//DeadCode DAW 28Jun99 		if (launcher == Persons2::PlayerSeenAC && !_Replay.Playback)//AMM 18Jun99
 		if (launcher == Persons2::PlayerSeenAC && !_Replay.Playback && !_Replay.Record)//AMM 28Jun99
 		{
 			((AirStrucPtr)launcher)->fly.pModel->CalcLauncherVel(1500,vx,vy,vz);
@@ -3491,7 +3003,6 @@ TransientItem* TransObj::LaunchFuelDrop(mobileitem* launcher,ShapeNum	weapshape,
 		{
 			SWord	vx,vy,vz;
 
-//DeadCode DAW 28Jun99 			if (!_Replay.Playback)
 			if (!_Replay.Playback && !_Replay.Record)			//AMM 28Jun99
 			{
 				((AirStrucPtr)launcher)->fly.pModel->CalcParachuteVel(vx,vy,vz,launcher->hdg,launcher->pitch,launcher->roll,launcher->vel/10,-10, launcher->World.Y);	//CSB 13/06/99	
@@ -3570,7 +3081,6 @@ void TransObj::LaunchGunPuff(mobileitem* launcher,SLong xpos, SLong ypos, SLong 
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 09Apr99 void TransObj::LaunchWeapon(AirStrucPtr	ac,
 SLong TransObj::LaunchWeapon(bool received,						//AMM 09Apr99
 							AirStrucPtr	ac,					//AMM 09Apr99
 							WeapAnimData*	weapon,
@@ -3592,7 +3102,6 @@ SLong TransObj::LaunchWeapon(bool received,						//AMM 09Apr99
 		weaponshape = (ShapeNum)sdptr->Type.shapenumber;
 	}
 
-//DeadCode RJS 27May98	failchance = weapon->SubDamage * Math_Lib.rnd();
 
 	if (unarmed)												//RJS 27May98
 	{
@@ -3664,15 +3173,14 @@ SLong TransObj::LaunchWeapon(bool received,						//AMM 09Apr99
 				}
 
 
-//DeadCode AMM 09Apr99				if (!_Replay.Playback)						//RJS 08Apr99
 				if (!received)									//AMM 09Apr99
 				{
 					MissileAnimData*	adptr = (MissileAnimData*) currbul->Anim;
-					adptr->lastmissile = (uintptr_t) ac->weap.currentbullet;
+					AnimLink::Store(adptr->lastmissile, ac->weap.currentbullet);
 					adptr->novirtualguns = ac->classtype->noGuns;	//RJS 29Mar99
 					if (adptr->lastmissile)
 					{
-						TransientItemPtr	tmpitm = (TransientItemPtr)adptr->lastmissile;
+						TransientItemPtr	tmpitm = (TransientItemPtr)AnimLink::Load(adptr->lastmissile);
 						if (tmpitm->isDeleted)// || tmpitm->MigStatus.LaunchFlags.deadtime)				//RJS 03Jun99
 							adptr->lastmissile = 0L;									//RJS 03Jun99
 						else															//RJS 03Jun99
@@ -3732,13 +3240,11 @@ void TransObj::LaunchTrailTail( mobileitem*	launcher,
 										MOBILE_GANDF);
 	if (newitem)
 	{
-//DeadCode RJS 19Feb98		ExplodeAnimData*	adptr = (ExplodeAnimData*) newitem->Anim;
 
 		newitem->World.X = xpos;
 		newitem->World.Y = ypos;
 		newitem->World.Z = zpos;
 
-//DeadCode RJS 19Feb98		adptr->frameno = 52;
 
 		AddTransientItemToWorld(newitem,world);
 	}
@@ -3758,66 +3264,6 @@ void TransObj::LaunchTrailTail( mobileitem*	launcher,
 //------------------------------------------------------------------------------
 void TransObj::LaunchClouds()
 {
-//DeadCode RJS 28May99 	if (	(View_Point->World.Y > Land_Scape.cloud_base)
-//DeadCode RJS 28May99 		&&	(CloudTotal < 20)
-//DeadCode RJS 28May99 		&&	!Three_Dee.IsPaused()	)							//RJS 27Feb98
-//DeadCode RJS 28May99 	{
-//DeadCode RJS 28May99 		if (CloudTimer > 0)
-//DeadCode RJS 28May99 			CloudTimer -= Timer_Code.FRAMETIME;
-//DeadCode RJS 28May99 		else
-//DeadCode RJS 28May99 		{
-//DeadCode RJS 28May99 			SWord	rndheading, rndpitch;
-//DeadCode RJS 28May99 			SLong	xpos, ypos, zpos;
-//DeadCode RJS 28May99 			SLong	wx, wy, wz, ccount, noclouds;
-//DeadCode RJS 28May99 			SWord	sin_ang,cos_ang,tan_ang;
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 			rndheading = Math_Lib.rnd(ANGLES_60Deg) - (SWord)ANGLES_30Deg;
-//DeadCode RJS 28May99 			rndpitch = Math_Lib.rnd(ANGLES_60Deg) - (SWord)ANGLES_30Deg;
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 			rndheading += (SWord)View_Point->hdg;
-//DeadCode RJS 28May99 			rndpitch += (SWord)View_Point->pitch;
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 			Math_Lib.high_sin_cos((Angles) -rndheading,sin_ang,cos_ang);
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 			// distance away is -65536
-//DeadCode RJS 28May99 			xpos = (sin_ang << 16) >> (ANGLES_SHIFT-2);
-//DeadCode RJS 28May99 			zpos = (cos_ang << 16) >> (ANGLES_SHIFT-2);
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 			Math_Lib.high_sin_cos((Angles) -rndpitch,sin_ang,cos_ang);
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 			ypos = (sin_ang << 16) >> (ANGLES_SHIFT-2);
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 			wx = xpos + View_Point->World.X;
-//DeadCode RJS 28May99 			wy = ypos + View_Point->World.Y;
-//DeadCode RJS 28May99 			wz = zpos + View_Point->World.Z;
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 			if (wy > (Land_Scape.cloud_base+2000))				//RJS 02Sep97
-//DeadCode RJS 28May99 			{
-//DeadCode RJS 28May99 				TransientItem*	newitem;
-//DeadCode RJS 28May99 				WorldStuff*	world = mobileitem::currworld;
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 				noclouds = Math_Lib.rnd() >> 13;
-//DeadCode RJS 28May99 				for (ccount=0; ccount < noclouds; ccount++)
-//DeadCode RJS 28May99 				{
-//DeadCode RJS 28May99 					newitem = SimplifiedSpriteLaunch(	Manual_Pilot.ControlledAC2,
-//DeadCode RJS 28May99 														CLOUD1,
-//DeadCode RJS 28May99 														2000,	//RJS 02Sep97
-//DeadCode RJS 28May99 														MOBILE_GANDF);
-//DeadCode RJS 28May99 					if (newitem)
-//DeadCode RJS 28May99 					{
-//DeadCode RJS 28May99 						CloudTimer = 300;
-//DeadCode RJS 28May99 						CloudTotal++;
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 						newitem->World.X = wx + ((Math_Lib.rnd() - 32768)>>1);
-//DeadCode RJS 28May99 						newitem->World.Y = wy + ((Math_Lib.rnd() - 32768)>>1);
-//DeadCode RJS 28May99 						newitem->World.Z = wz + ((Math_Lib.rnd() - 32768)>>1);
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 						AddTransientItemToWorld(newitem,*world);
-//DeadCode RJS 28May99 					}
-//DeadCode RJS 28May99 				}
-//DeadCode RJS 28May99 			}
-//DeadCode RJS 28May99 		}
-//DeadCode RJS 28May99 	}
 }
 
 //------------------------------------------------------------------------------
@@ -3859,7 +3305,7 @@ void	TransObj::LaunchCloneGun(	mobileitem* launcher,
 
 		adptr->weapindex = weapindex2;				//Swap indexes around,
 		adptr->weapindex2 = weapindex;				//... so as to alternate fire
-		adptr->originitm = (uintptr_t) launcher;
+		AnimLink::Store(adptr->originitm, launcher);
 		adptr->delay = bulletdelay;
 		adptr->shapename = bulletlnchr->shape;
 		adptr->lnchtype = lchtype;
@@ -4036,7 +3482,6 @@ void	TransObj::LaunchCanopyEject(mobileitem* launcher,WorldStuff& worldptr)
 				{
 					AircraftAnimData*	adptr2 = (AircraftAnimData*) newitem->Anim;
 					UByte				oldstate = adptr->CANOPY1;
-		//DeadCode RJS 21Apr99			UByteP				flagptr;
 					SLong				flagend;
 					int					index;							//RJS 21Apr99
 					ShapeDescPtr		sdptr = SHAPESTUFF.GetShapePtr(launcher->shape);
@@ -4044,7 +3489,6 @@ void	TransObj::LaunchCanopyEject(mobileitem* launcher,WorldStuff& worldptr)
 					adptr2->itemstate = DEAD;								
 
 					//Set 3D to only draw the dead part
-		//DeadCode RJS 21Apr99			flagptr = (UByteP) newitem->Anim;
 					flagend = SHAPE.GetAnimDataSize(launcher->shape);
 					index = sdptr->DamageOffset;
 
@@ -4205,7 +3649,9 @@ TransObj::SimplifiedSpriteLaunch(	Item* launcher,
 									AutoMoveCodeTypeSelect movecode)
 {
 	if (!launcher)
-		INT3;
+	{	INT3;
+		return	NULL;	//RERUN: INT3 is a release no-op — bail before deref
+	}
 
 	TransientItemPtr newitem = new TransientItem;
 
@@ -4233,7 +3679,6 @@ TransObj::SimplifiedSpriteLaunch(	Item* launcher,
 			newitem->velz =
 			newitem->velhori = 0;
 
-//DeadCode PD 08Oct96		newitem->collisiontime = 0;								//PD 10Sep96
 
 		newitem->shape = shape;
 
@@ -4245,7 +3690,7 @@ TransObj::SimplifiedSpriteLaunch(	Item* launcher,
 		newitem->AutoMoveInfo.movecode = movecode;
 		newitem->TransRandom = 0;
 		newitem->isOwned = 0;									//RJS 29Mar99
-		newitem->TimeOfLaunch = View_Object->TimeOfDay();		//RJS 19May99
+		newitem->TimeOfLaunch = (View_Object ? View_Object->TimeOfDay() : 0);		//RJS 19May99
 
 		(void )SHAPE.SetAnimData(newitem,0);					//RDH 23Sep96
 
@@ -4273,6 +3718,9 @@ TransObj::RelativeSpriteLaunch(	Item* launcher,
 								SLong lifetime,
 								AutoMoveCodeTypeSelect movecode)
 {
+	if (!launcher)
+		return	NULL;	//RERUN: missing launcher - nothing to launch from
+
 	TransientItemPtr newitem = new TransientItem;
 
 	if (newitem)
@@ -4313,7 +3761,7 @@ TransObj::RelativeSpriteLaunch(	Item* launcher,
 		newitem->AutoMoveInfo.movecode = movecode;
 		newitem->TransRandom = 0;
 		newitem->isOwned = 0;									//RJS 29Mar99
-		newitem->TimeOfLaunch = View_Object->TimeOfDay();		//RJS 19May99
+		newitem->TimeOfLaunch = (View_Object ? View_Object->TimeOfDay() : 0);		//RJS 19May99
 
 		(void )SHAPE.SetAnimData(newitem,0);
 
@@ -4386,7 +3834,6 @@ TransObj::LaunchUnguidedMissile(	mobileitem* launcher,
 			newitem->velhori = 0;
 		}
 
-//DeadCode PD 08Oct96		newitem->collisiontime = 0;								//PD 10Sep96
 
 		newitem->shape = shape;
 
@@ -4395,7 +3842,7 @@ TransObj::LaunchUnguidedMissile(	mobileitem* launcher,
 		newitem->AutoMoveInfo.movecode = movecode;
 		newitem->TransRandom = 0;
 		newitem->isOwned = 0;									//RJS 29Mar99
-		newitem->TimeOfLaunch = View_Object->TimeOfDay();		//RJS 19May99
+		newitem->TimeOfLaunch = (View_Object ? View_Object->TimeOfDay() : 0);		//RJS 19May99
 
 		if (inheritanimdata == FALSE)
 			SHAPE.SetAnimData(newitem,0);						//RJS 13Jul98
@@ -4462,7 +3909,6 @@ TransObj::LaunchUnguidedMissile(	item* launcher,
 		newitem->velhori = velh;
 		newitem->vel = vel;
 
-//DeadCode PD 08Oct96		newitem->collisiontime = 0;								//PD 10Sep96
 
 		newitem->shape = shape;
 
@@ -4471,7 +3917,7 @@ TransObj::LaunchUnguidedMissile(	item* launcher,
 		newitem->AutoMoveInfo.movecode = movecode;
 		newitem->TransRandom = 0;
 		newitem->isOwned = 0;									//RJS 29Mar99
-		newitem->TimeOfLaunch = View_Object->TimeOfDay();		//RJS 19May99
+		newitem->TimeOfLaunch = (View_Object ? View_Object->TimeOfDay() : 0);		//RJS 19May99
 
 		(void )SHAPE.SetAnimData(newitem);
 		if (movecode == MOBILE_PUFFTRAVEL)						//RJS 30Apr99
@@ -4535,7 +3981,6 @@ TransObj::LaunchGuidedMissile(	mobileitem* launcher,
 
 		newitem->velhori = launcher->velhori;
 
-//DeadCode PD 08Oct96		newitem->collisiontime = 0;								//PD 10Sep96
 
 		newitem->shape = shape;
 
@@ -4544,7 +3989,7 @@ TransObj::LaunchGuidedMissile(	mobileitem* launcher,
 		newitem->AutoMoveInfo.movecode = movecode;
 		newitem->TransRandom = 0;
 		newitem->isOwned = 0;									//RJS 29Mar99
-		newitem->TimeOfLaunch = View_Object->TimeOfDay();		//RJS 19May99
+		newitem->TimeOfLaunch = (View_Object ? View_Object->TimeOfDay() : 0);		//RJS 19May99
 
 		(void )SHAPE.SetAnimData(newitem,0);					//RDH 23Sep96
 
@@ -4619,7 +4064,7 @@ TransObj::LaunchSuperLauncher(	item*		launcher,
 		newitem->AutoMoveInfo.movecode = movecode;
 		newitem->TransRandom = 0;
 		newitem->isOwned = 0;								//RJS 29Mar99
-		newitem->TimeOfLaunch = View_Object->TimeOfDay();		//RJS 19May99
+		newitem->TimeOfLaunch = (View_Object ? View_Object->TimeOfDay() : 0);		//RJS 19May99
 
 		(void )SHAPE.SetAnimData(newitem);
 
@@ -4632,11 +4077,11 @@ TransObj::LaunchSuperLauncher(	item*		launcher,
 		{
 			MissileAnimData*	adptr = (MissileAnimData*) newitem->Anim;
 
-			adptr->lastmissile = (uintptr_t) ((AirStrucPtr)newitem->Launcher)->weap.currentbullet;
+			AnimLink::Store(adptr->lastmissile, ((AirStrucPtr)newitem->Launcher)->weap.currentbullet);
 			adptr->novirtualguns = ((AirStrucPtr)newitem->Launcher)->classtype->noGuns;//RJS 29Mar99
 			if (adptr->lastmissile)
 			{
-				TransientItemPtr	tmpitm = (TransientItemPtr)adptr->lastmissile;
+				TransientItemPtr	tmpitm = (TransientItemPtr)AnimLink::Load(adptr->lastmissile);
 				if (tmpitm->isDeleted)// || tmpitm->MigStatus.LaunchFlags.deadtime)				//RJS 03Jun99
 					adptr->lastmissile = 0L;									//RJS 03Jun99
 				else															//RJS 03Jun99
@@ -4689,253 +4134,6 @@ void	TransObj::GeneralItemDamage(mobileitem* launcher,
 									SByte	groupindex,
 									Bool	accollision)
 {
-//DeadCode RJS 20Nov98	DeathNum		deadtype;
-//DeadCode RJS 20Nov98	UWord			randdam;
-//DeadCode RJS 20Nov98	UByte			vulnerability;
-//DeadCode RJS 20Nov98	UByte			missilepower = 1;
-//DeadCode RJS 20Nov98	ULong			destruction;
-//DeadCode RJS 20Nov98	ShapeNum		shapehit;									//RJS 14Oct96
-//DeadCode RJS 20Nov98	MyGroundVector		hitvector;									//RJS 21Nov96
-//DeadCode RJS 20Nov98	ShapeDescPtr	sdptr;
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98	MinAnimData* mad =
-//DeadCode RJS 20Nov98				(MinAnimData* )launcher->Anim;	//RJS 01Aug96
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98	mad = (MinAnimData* ) SHAPE.GetGroupItemAnim(launcher,shapehit,groupindex,&hitvector);//RJS 21Nov96
-//DeadCode RJS 20Nov98	BalloonAnimData*	banim = (BalloonAnimData*) launcher->Anim;//RDH 17Dec96
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98	if (!accollision)
-//DeadCode RJS 20Nov98	{
-//DeadCode RJS 20Nov98		randdam = Math_Lib.rnd();								//RJS 16Oct96
-//DeadCode RJS 20Nov98		missilepower = SHAPESTUFF.GetShapeStrength(missile->shape);
-//DeadCode RJS 20Nov98		vulnerability = SHAPESTUFF.GetShapeStrength(shapehit);	//RJS 14Oct96
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98		if ( (mad->itemstate != ALIVE) || (vulnerability == 0) )//RJS 10Dec96
-//DeadCode RJS 20Nov98			destruction = 5000;
-//DeadCode RJS 20Nov98		else
-//DeadCode RJS 20Nov98		{
-//DeadCode RJS 20Nov98			destruction = vulnerability * randdam;				//RJS 16Oct96
-//DeadCode RJS 20Nov98			destruction >>= 14;									//RJS 10Dec96
-//DeadCode RJS 20Nov98		}
-//DeadCode RJS 20Nov98	}
-//DeadCode RJS 20Nov98	else
-//DeadCode RJS 20Nov98		destruction = 0;
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98	if (destruction < missilepower)								//RJS 16Oct96
-//DeadCode RJS 20Nov98	{
-//DeadCode RJS 20Nov98		if (groupindex > -1)
-//DeadCode RJS 20Nov98		{
-//DeadCode RJS 20Nov98			missile->World.X = hitvector.gx;						//RJS 21Nov96
-//DeadCode RJS 20Nov98			missile->World.Y = hitvector.gy;						//RJS 21Nov96
-//DeadCode RJS 20Nov98			missile->World.Z = hitvector.gz;						//RJS 21Nov96
-//DeadCode RJS 20Nov98		}
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98		sdptr = SHAPESTUFF.GetShapePtr(shapehit);
-//DeadCode RJS 20Nov98		deadtype = (DeathNum) sdptr->DeathType;
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97		switch (deadtype)
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97		{
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case DEFAULT:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchScatteredFire(missile,shapehit,worldptr);	//RJS 06Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case BIGEXPLOSION:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				_Miles.PlaySample((FileNum) (FIL_SFX_EXPLOSION_GROUND+Math_Lib.rnd(5)), (ItemBasePtr) launcher);//RJS 05Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchExplosion(missile,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case SMALLEXPLOSION:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchMiniExplosion(missile,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case GROUNDDEBRIS:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchGroundDebris(missile,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case SMALLDEBRIS:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case SMALLSPARK:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchSpark(missile,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case GROUNDRICOCHET:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchRicochet(missile,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case SMALLFIRE:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97 //DeadCode RJS 09Dec96				LaunchFire(launcher,worldptr);					//RJS 16Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchScatteredFire(missile,shapehit,worldptr);	//RJS 09Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				_Miles.PlaySample(FIL_SFX_WOOD_BREAK1, (ItemBasePtr) missile);//RJS 09Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case BIGFIRE:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchGroundExplosion(missile,worldptr);		//RJS 09Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case ATEAM:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchDelayedExplosion(launcher,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case BURSTBALLOON:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				banim->groundheight = Land_Scape.GetGroundLevel((itemptr)launcher);//RDH 17Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				_Miles.PlaySample(FIL_SFX_EXPLOSION_BALLOON, (ItemBasePtr) launcher);//RJS 22Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchBigExplosion(launcher,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchMovingSmoke(launcher,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97 //DeadCode RJS 02Dec96			case ZEPPELINDEATH:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97 //DeadCode RJS 02Dec96				_Miles.PlaySample(FIL_SFX_EXPLOSION_BALLOON, (ItemBasePtr) launcher);//RJS 22Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97 //DeadCode RJS 02Dec96				LaunchBigExplosion(launcher,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97 //DeadCode RJS 02Dec96				LaunchMovingSmoke(launcher,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97 //DeadCode RJS 02Dec96				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case CHATEAUDEATH:
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97 //DeadCode RJS 20Nov96				LaunchGroundExplosion(missile,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97 //DeadCode RJS 20Nov96				launcher->shape = CHTAU3;						//RJS 30Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case SMALLCOLLAPSE:									//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchDustRing(missile,worldptr);				//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchTroops(launcher,missile->World.X,missile->World.Y,missile->World.Z,worldptr,Math_Lib.rnd(3));//RJS 07Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case BIGCOLLAPSE:									//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				_Miles.PlaySample(FIL_SFX_DEBRIS_COLLAPSE, (ItemBasePtr) missile);//RJS 22Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchDustRing(missile,worldptr);				//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchMushroomCloud(missile,worldptr);			//RJS 07Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchTroops(launcher,missile->World.X,missile->World.Y,missile->World.Z,worldptr,Math_Lib.rnd(4));//RJS 07Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;											//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case AMMOBOXES:										//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchAmmoBoxes(missile,launcher,groupindex,worldptr);//RJS 07Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;											//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case FUELBARRELS:									//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchGroundExplosion(missile,worldptr);		//RJS 22Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchFuelBarrels(missile,worldptr);			//RJS 22Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;											//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case CHICKENS:										//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				_Miles.PlayOnce(FIL_SFX_HEN_SCUFFLE, (ItemBasePtr) missile);//RJS 22Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchBirds(missile,ChickenShape,worldptr);		//RJS 17Oct96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case TANKDEATH:										
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				if (missile->shape == BOMB)
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				{
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97					_Miles.PlaySample((FileNum) (FIL_SFX_EXPLOSION_DISTANT1+Math_Lib.rnd(2)), (ItemBasePtr) missile);//RJS 22Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97					LaunchSmoulder(missile,worldptr);
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97					_Miles.StopSample(FIL_SFX_TANK_LOOP1,launcher);//RJS 20Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				}
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;											
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case BRIDGEDEATH:									
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				_Miles.PlayOnce(FIL_SFX_DEBRIS_WATER, (ItemBasePtr) missile);//RJS 22Nov96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97			case TRAINDEATH:									//RJS 09Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				_Miles.PlaySample((FileNum) (FIL_SFX_EXPLOSION_DISTANT1+Math_Lib.rnd(2)), (ItemBasePtr) missile);//RJS 09Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				LaunchSmoulder(missile,worldptr,TRUE);			//RJS 09Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97				break;											//RJS 09Dec96
-//DeadCode RJS 20Nov98 //DeadCode RJS 27Feb97		}
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98		if (((TransientItem*)missile)->Launcher==Manual_Pilot.ControlledAC2)//PD 07Dec96
-//DeadCode RJS 20Nov98			if (View_Object)
-//DeadCode RJS 20Nov98				View_Object->PossDirectorAction(missile);
-//DeadCode RJS 20Nov98		mad->itemstate = DEAD;									//RJS 16Oct96
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98		if (	launcher->MigStatus.LaunchFlags.deadtime == FALSE				//JIM 05Dec96
-//DeadCode RJS 20Nov98			&&	(	groupindex == -1							//JIM 05Dec96
-//DeadCode RJS 20Nov98				||	SHAPE.GetGroupDeathToll(launcher)			//JIM 05Dec96
-//DeadCode RJS 20Nov98			)	)												//JIM 05Dec96
-//DeadCode RJS 20Nov98		{														//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DeadCode RDH 16Dec96			ShapeDescPtr	sdptr = SHAPESTUFF.GetShapePtr(shapehit);//JIM 05Dec96
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98			sdptr = SHAPESTUFF.GetShapePtr(launcher->shape);	//RJS 07Feb97
-//DeadCode RJS 20Nov98			launcher->MigStatus.LaunchFlags.deadtime = sdptr->DeadTime;		//JIM 05Dec96
-//DeadCode RJS 20Nov98			launcher->MigStatus.LaunchFlags.Deadscale = sdptr->DeadScale;		//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DeadCode JIM 22Apr97			launcher->uniqueID.deaded = TRUE;					//JIM 10Dec96
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98 //DEAD			if (	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.mainobjective
-//DeadCode RJS 20Nov98 //DEAD				||	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.subobjective
-//DeadCode RJS 20Nov98 //DEAD				||	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.wp1
-//DeadCode RJS 20Nov98 //DEAD				||	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.wp2
-//DeadCode RJS 20Nov98 //DEAD				||	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.wp3
-//DeadCode RJS 20Nov98 //DEAD				)
-//DeadCode RJS 20Nov98 //DEAD			{
-//DeadCode RJS 20Nov98 //DEAD//TEMP				if (Persons_2.TargLog==NULL)
-//DeadCode RJS 20Nov98 //DEAD//TEMP					Persons_2.TargLog=Persons_2.eventloglist=new EventLog(Persons_2.eventloglist);
-//DeadCode RJS 20Nov98 //DEAD
-//DeadCode RJS 20Nov98 //DEAD				int	count=+1;
-//DeadCode RJS 20Nov98 //DEAD				if (missile->MigStatus.LaunchFlags.size==TRANSIENTSIZE)
-//DeadCode RJS 20Nov98 //DEAD				{
-//DeadCode RJS 20Nov98 //DEAD					TransientItemPtr t=*missile;
-//DeadCode RJS 20Nov98 //DEAD					if (t->Launcher==NULL || t->Launcher->MigStatus.LaunchFlags.size<FORMATIONSIZE)
-//DeadCode RJS 20Nov98 //DEAD						count=+1;								//JIM 18Dec96
-//DeadCode RJS 20Nov98 //DEAD					else
-//DeadCode RJS 20Nov98 //DEAD					{
-//DeadCode RJS 20Nov98 //DEAD						FormationItemPtr f=*t->Launcher;
-//DeadCode RJS 20Nov98 //DEAD						if (f->AutoMoveInfo.nationality==GR_NAT_FRIEND)
-//DeadCode RJS 20Nov98 //DEAD						{
-//DeadCode RJS 20Nov98 //DEAD							count=+1;
-//DeadCode RJS 20Nov98 //DEAD						}
-//DeadCode RJS 20Nov98 //DEAD						else
-//DeadCode RJS 20Nov98 //DEAD							count=-1;
-//DeadCode RJS 20Nov98 //DEAD					}
-//DeadCode RJS 20Nov98 //DEAD				}
-//DeadCode RJS 20Nov98 //DEAD				if (count>0)
-//DeadCode RJS 20Nov98 //DEAD				{
-//DeadCode RJS 20Nov98 //DEAD//TEMP					Persons_2.AddMessage(UserMsg::GOHOME,TEXT_OBJECTIVEDESTROYED,launcher);
-//DeadCode RJS 20Nov98 //DEAD					MMC.specialeventbits |= FRIENDLYDESTROYEDTARGET;
-//DeadCode RJS 20Nov98 //DEAD				}
-//DeadCode RJS 20Nov98 //DEAD				else
-//DeadCode RJS 20Nov98 //DEAD					MMC.specialeventbits |= ENEMYDESTROYEDTARGET;
-//DeadCode RJS 20Nov98 //DEAD
-//DeadCode RJS 20Nov98 //DEAD//TEMP				Persons_2.UpdateLog(Persons_2.TargLog,count,EventLog::KILLEDSTATIC);
-//DeadCode RJS 20Nov98 //DEAD//TEMP				Persons_2.TargLog->name=_Text.ConvSnip0(launcher->uniqueID.bitfieldUid.count);
-//DeadCode RJS 20Nov98 //DEAD			}
-//DeadCode RJS 20Nov98 //DEAD			else
-//DeadCode RJS 20Nov98 //DeadCode JIM 10Dec96				if (launcher->uniqueID.deaded==FALSE)
-//DeadCode RJS 20Nov98 //DeadCode JIM 10Dec96				{
-//DeadCode RJS 20Nov98				if (launcher->MigStatus.LaunchFlags.size==FORMATIONSIZE)		//RDH 25Oct96
-//DeadCode RJS 20Nov98				{
-//DeadCode RJS 20Nov98 //DeadCode RDH 12Dec96					((FormationItem*)launcher)->BreakForm();	//RDH 25Oct96
-//DeadCode RJS 20Nov98 //DeadCode JIM 10Dec96					if (launcher->MigStatus.LaunchFlags.size>=FORMATIONSIZE)
-//DeadCode RJS 20Nov98 //DeadCode JIM 10Dec96					{
-//DeadCode RJS 20Nov98 //TEMP					if (Persons_2.TruckLog==NULL)
-//DeadCode RJS 20Nov98 //TEMP						Persons_2.TruckLog=Persons_2.eventloglist=new EventLog(Persons_2.eventloglist);
-//DeadCode RJS 20Nov98 //TEMP					if (((FormationItem*)launcher)->AutoMoveInfo.nationality==GR_NAT_FRIEND)//JIM 10Dec96
-//DeadCode RJS 20Nov98 //TEMP						Persons_2.UpdateLog(Persons_2.TruckLog,-1,EventLog::KILLEDTRUCK);//JIM 10Dec96
-//DeadCode RJS 20Nov98 //TEMP					else										//JIM 10Dec96
-//DeadCode RJS 20Nov98 //TEMP						Persons_2.UpdateLog(Persons_2.TruckLog,+1,EventLog::KILLEDTRUCK);//JIM 10Dec96
-//DeadCode RJS 20Nov98 //DeadCode JIM 10Dec96					}											//JIM 10Dec96
-//DeadCode RJS 20Nov98				}
-//DeadCode RJS 20Nov98			if (launcher->MigStatus.LaunchFlags.size==FORMATIONSIZE)
-//DeadCode RJS 20Nov98			{
-//DeadCode RJS 20Nov98				((FormationItem*)launcher)->BreakForm();		//RDH 12Dec96
-//DeadCode RJS 20Nov98			}
-//DeadCode RJS 20Nov98		}														//JIM 05Dec96
-//DeadCode RJS 20Nov98																//JIM 05Dec96
-//DeadCode RJS 20Nov98		if (deadtype == ANIM_AMMOBOXES)								//RJS 07Nov96
-//DeadCode RJS 20Nov98			mad->itemstate = DAMMAGED;							//RJS 04Dec96
-//DeadCode RJS 20Nov98 //TempCode JIM 30Nov96		if (deadtype == AMMOBOXES)								//RJS 07Nov96
-//DeadCode RJS 20Nov98 //TempCode JIM 30Nov96			mad->itemstate = ALIVE;								//RJS 07Nov96
-//DeadCode RJS 20Nov98	}
-//DeadCode RJS 20Nov98	else
-//DeadCode RJS 20Nov98	{
-//DeadCode RJS 20Nov98 //DeadCode RJS 07Feb97		deadtype = deathanims[shapehit - 1];					//RJS 14Oct96
-//DeadCode RJS 20Nov98		sdptr = SHAPESTUFF.GetShapePtr(shapehit);				//RJS 07Feb97
-//DeadCode RJS 20Nov98		deadtype = (DeathNum) sdptr->DeathType;							//RJS 07Feb97
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98
-//DeadCode RJS 20Nov98 //DEAD		if (	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.mainobjective//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DEAD			||	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.subobjective//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DEAD			||	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.wp1//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DEAD			||	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.wp2//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DEAD			||	launcher->uniqueID.bitfieldUid.count==Miss_Man.camp.players_wpset.wp3//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DEAD			)													//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DEAD		{														//JIM 05Dec96
-//DeadCode RJS 20Nov98 //DEAD//TEMP			if (Persons_2.TargLog==NULL)
-//DeadCode RJS 20Nov98 //DEAD//TEMP				Persons_2.TargLog=Persons_2.eventloglist=new EventLog(Persons_2.eventloglist);
-//DeadCode RJS 20Nov98 //DEAD//TEMP			Persons_2.UpdateLog(Persons_2.TargLog,1,EventLog::DAMAGEDSTATIC);
-//DeadCode RJS 20Nov98 //DEAD//TEMP			Persons_2.TargLog->name=_Text.ConvSnip0(launcher->uniqueID.bitfieldUid.count);
-//DeadCode RJS 20Nov98 //DEAD		}
-//DeadCode RJS 20Nov98 //DEAD		else
-//DeadCode RJS 20Nov98 //DEAD			if (launcher->MigStatus.LaunchFlags.size==FORMATIONSIZE)
-//DeadCode RJS 20Nov98 //DEAD			{
-//DeadCode RJS 20Nov98 //DEAD//TEMP				if (Persons_2.TruckLog==NULL)
-//DeadCode RJS 20Nov98 //DEAD//TEMP					Persons_2.TruckLog=Persons_2.eventloglist=new EventLog(Persons_2.eventloglist);
-//DeadCode RJS 20Nov98 //DEAD//TEMP				if (((FormationItem*)launcher)->AutoMoveInfo.nationality==GR_NAT_FRIEND)//JIM 10Dec96
-//DeadCode RJS 20Nov98 //DEAD//TEMP					Persons_2.UpdateLog(Persons_2.TruckLog,-1,EventLog::DAMAGEDTRUCK);//JIM 10Dec96
-//DeadCode RJS 20Nov98 //DEAD//TEMP				else											//JIM 10Dec96
-//DeadCode RJS 20Nov98 //DEAD//TEMP					Persons_2.UpdateLog(Persons_2.TruckLog,+1,EventLog::DAMAGEDTRUCK);//JIM 10Dec96
-//DeadCode RJS 20Nov98 //DEAD			}
-//DeadCode RJS 20Nov98 //DEAD
-//DeadCode RJS 20Nov98	}
-//DeadCode RJS 20Nov98	if (launcher->MigStatus.LaunchFlags.size==FORMATIONSIZE && missile->MigStatus.LaunchFlags.size==TRANSIENTSIZE)
-//DeadCode RJS 20Nov98		if (Manual_Pilot.ControlledAC2==((TransientItemPtr)missile)->Launcher)
-//DeadCode RJS 20Nov98			Art_Int.PlayerHitConvoy(*launcher);
 
 }
 
@@ -4979,7 +4177,6 @@ void TransObj::MobileBullet(TransientItemPtr transit,WorldStuff& world)
 			{
 				if (transit->World.Y<=groundheight)
 				{
-//DeadCode RJS 28Apr99					UByte	theArea = Three_Dee.GetLandType();		//MS 30Nov98
 
 					hitcoords = transit->World;						//RJS 10Nov98
 					hitcoords.Y = groundheight;						//RJS 10Nov98
@@ -4992,7 +4189,7 @@ void TransObj::MobileBullet(TransientItemPtr transit,WorldStuff& world)
 
 					if (adptr->lastmissile)
 					{
-						TransientItem*	olditm = (TransientItem*) adptr->lastmissile;
+						TransientItem*	olditm = (TransientItem*) AnimLink::Load(adptr->lastmissile);
 
 						olditm->isOwned = 0;
 						adptr->lastmissile = 0;
@@ -5015,8 +4212,6 @@ void TransObj::MobileBullet(TransientItemPtr transit,WorldStuff& world)
 					}
 				}
 			}
-//DeadCode DAW 04Jun99 			else
-//DeadCode DAW 04Jun99 			 	transit->LaunchTime=0;							//RJS 29Mar99
 		}
 
 		if (transit->LaunchTime>0)	
@@ -5030,7 +4225,7 @@ void TransObj::MobileBullet(TransientItemPtr transit,WorldStuff& world)
 			MissileAnimData*	adptr = (MissileAnimData*) transit->Anim;
 			if (adptr->lastmissile)
 			{
-				TransientItem*	olditm = (TransientItem*) adptr->lastmissile;
+				TransientItem*	olditm = (TransientItem*) AnimLink::Load(adptr->lastmissile);
 
 				olditm->isOwned = 0;
 				adptr->lastmissile = 0;
@@ -5225,7 +4420,6 @@ void	TransObj::MobileFuelDrop(TransientItemPtr transit,WorldStuff& world)
 
 		transit->pitch += angdelta;
 
-//DeadCode RJS 07Dec98		GAndFrictionFixedPitch(transit,OrdinaryDrag<<1);		//RJS 27Aug98
 		GAndFrictionFixedPitch(transit,0);						//RJS 07Dec98
 
 		//Test for collision with the ground, but not every move cycle
@@ -5237,7 +4431,6 @@ void	TransObj::MobileFuelDrop(TransientItemPtr transit,WorldStuff& world)
 
 			if (transit->World.Y <= groundheight)				//RJS 21Aug98
 			{
-//DeadCode RJS 28Apr99				UByte	theArea = Three_Dee.GetLandType();		//MS 30Nov98
 
 				Coords3D	hitpos = transit->World;			//RJS 10Nov98
 				hitpos.Y = groundheight + METRES01;				//RJS 10Nov98
@@ -5364,7 +4557,6 @@ void TransObj::MobileDeadACPart(TransientItemPtr transit,WorldStuff& worldptr)
 void TransObj::MobileSmokeTrail(TransientItemPtr transit,WorldStuff& world)
 {
 	SLong	timeleft=transit->LaunchTime;
-//Deadcode	MoveGunAnimData		*adptr2 = (MoveGunAnimData*) transit->Anim;
 	if (transit->Target->MigStatus.LaunchFlags.size == AirStrucSize)
 	{
 		AircraftAnimData	*adptr = (AircraftAnimData*) ((ItemPtr)transit->Target)->Anim;
@@ -5380,84 +4572,6 @@ void TransObj::MobileSmokeTrail(TransientItemPtr transit,WorldStuff& world)
 	else
 		AddTransientItemToDeadList(transit);
 
-//DeadCode RJS 24Jun97	if (timeleft && (transit->Target->shape != PDEATH) && (transit->Target->shape != WRECK))//RJS 06Nov96
-//DeadCode RJS 24Jun97	{
-//DeadCode RJS 24Jun97		SWord	frametime;
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		frametime = Timer_Code.FRAMETIME;						//DAW 31Jul96
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		if ((transit->LaunchTime-=frametime)<0)
-//DeadCode RJS 24Jun97			transit->LaunchTime=0;
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		//Follow the target
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		transit->World.X = transit->Target->World.X;
-//DeadCode RJS 24Jun97		transit->World.Y = transit->Target->World.Y;
-//DeadCode RJS 24Jun97		transit->World.Z = transit->Target->World.Z;
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		//Launch a piece of smoke if it's
-//DeadCode RJS 24Jun97		//the right time
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		SWord launchtime = (SWord )transit->TransRandom;
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		launchtime-=frametime;
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		if (launchtime<=0)
-//DeadCode RJS 24Jun97		{
-//DeadCode RJS 24Jun97			//Time to launch some smoke
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97			TransientItem*	newitem;
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97			newitem = LaunchUnguidedMissile(	transit,
-//DeadCode RJS 24Jun97												SmokinShape,
-//DeadCode RJS 24Jun97												LIFETIME_SMOKE,MOBILE_GANDF);//RJS 29Oct96
-//DeadCode RJS 24Jun97			if (newitem)
-//DeadCode RJS 24Jun97			{
-//DeadCode RJS 24Jun97				newitem->TransRandom = 0;
-//DeadCode RJS 24Jun97				newitem->World.X += (Math_Lib.rnd(40) - 20);
-//DeadCode RJS 24Jun97				newitem->World.Y += (Math_Lib.rnd(40) - 20);
-//DeadCode RJS 24Jun97				newitem->velhori = 0;							//RJS 29Oct96
-//DeadCode RJS 24Jun97				newitem->vely = 0;								//RJS 29Oct96
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97				AddTransientItemToWorld(newitem,world);
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97				ExplodeAnimData* adptr;									//PD 08May96
-//DeadCode RJS 24Jun97				adptr = (ExplodeAnimData* )newitem->Anim;			//RJS 31Jul96
-//DeadCode RJS 24Jun97				adptr->frameno = 0;									//RJS 05Jul96
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97				if (Math_Lib.rnd() <16*1024-TransientItem::transcount*10)
-//DeadCode RJS 24Jun97				{
-//DeadCode RJS 24Jun97					newitem = LaunchUnguidedMissile(transit,SPARK,
-//DeadCode RJS 24Jun97												LIFETIME_SMOKE,MOBILE_RICOCHET);
-//DeadCode RJS 24Jun97					
-//DeadCode RJS 24Jun97					if (newitem)
-//DeadCode RJS 24Jun97					{
-//DeadCode RJS 24Jun97						newitem->hdg += (ANGLES) (ANGLES_180Deg - Math_Lib.rnd(ANGLES_45Deg) + ANGLES_20Deg);
-//DeadCode RJS 24Jun97						newitem->velhori = 200 + Math_Lib.rnd(200);
-//DeadCode RJS 24Jun97						newitem->vely = Math_Lib.rnd(100) - 50;
-//DeadCode RJS 24Jun97						AddTransientItemToWorld(newitem,world);
-//DeadCode RJS 24Jun97					}
-//DeadCode RJS 24Jun97				}
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97			}
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97 //DeadCode RJS 08Jul96			launchtime = SmokeLaunchDelay;
-//DeadCode RJS 24Jun97 //DeadCode RJS 31Jul96			launchtime = 12;
-//DeadCode RJS 24Jun97			launchtime = (launchtime+3)&3;
-//DeadCode RJS 24Jun97			launchtime+=(TransientItem::transcount>>4);	//every 16=1cs	//48=3cs
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		}
-//DeadCode RJS 24Jun97		transit->TransRandom = (UWord )launchtime;
-//DeadCode RJS 24Jun97	}
-//DeadCode RJS 24Jun97	else
-//DeadCode RJS 24Jun97	{
-//DeadCode RJS 24Jun97		//Kill the launcher here
-//DeadCode RJS 24Jun97		
-//DeadCode RJS 24Jun97 //DeadCode RJS 12Aug96		KillLauncher(transit->Launcher,world);
-//DeadCode RJS 24Jun97
-//DeadCode RJS 24Jun97		AddTransientItemToDeadList(transit);
-//DeadCode RJS 24Jun97	}
 }
 
 //------------------------------------------------------------------------------
@@ -5558,29 +4672,15 @@ void TransObj::MobileGroundExp(TransientItemPtr transit,WorldStuff& world)
 //
 //				SWord	sin_ang,cos_ang;
 //
-////DeadCode RJS 07Feb97				Math_Lib.high_sin_cos((ANGLES )newitem->hdg,sin_ang,cos_ang);
 //
 //				randomfactor = Math_Lib.rnd();
 //
 //				newitem->velhori = ((randomfactor * SmokeVariableHorzVel)>>16);
 
-//DeadCode RJS 07Feb97				newitem->velx = (newitem->velhori * sin_ang)/ANGLES_FRACT;
-//DeadCode RJS 07Feb97
-//DeadCode RJS 07Feb97				newitem->velz = (newitem->velhori * cos_ang)/ANGLES_FRACT;
 //
 //				AddTransientItemToWorld(newitem,world);
 //			}
 
-//DeadCode RJS 11Jul97			//Drive the shape animation								//PD 08May96
-//DeadCode RJS 11Jul97
-//DeadCode RJS 11Jul97			ExplodeAnimData* adptr;									//PD 08May96
-//DeadCode RJS 11Jul97
-//DeadCode RJS 11Jul97			adptr = (ExplodeAnimData* )transit->Anim;				//PD 08May96
-//DeadCode RJS 11Jul97
-//DeadCode RJS 11Jul97			adptr->frameno++;										//PD 08May96
-//DeadCode RJS 11Jul97
-//DeadCode RJS 11Jul97			if (adptr->frameno>3)									//PD 08May96
-//DeadCode RJS 11Jul97				adptr->frameno = 0;									//PD 08May96
 //
 //			launchtime = SmokeLaunchDelay+((3*TransientItem::transcount)>>4);
 //		}
@@ -5608,77 +4708,6 @@ void TransObj::MobileMovingSmoke(TransientItemPtr transit,WorldStuff& world)
 {
 	SLong	timeleft = transit->LaunchTime;
 
-//DeadCode RJS 16Sep98	if (timeleft && (transit->Launcher->shape != EMPTY))		//RDH 17Dec96
-//DeadCode RJS 16Sep98	{
-//DeadCode RJS 16Sep98		_Miles.PlayLooped(FIL_SFX_FIREBURN_LOOP, (ItemBasePtr) transit);//RJS 22Nov96
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98		SWord	frametime;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98		frametime = Timer_Code.FRAMETIME;						//DAW 31Jul96
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98		if ((transit->LaunchTime-=frametime)<0)
-//DeadCode RJS 16Sep98			transit->LaunchTime=0;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98		//Launch a piece of smoke if it's
-//DeadCode RJS 16Sep98		//the right time
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98		SWord launchtime = (SWord )transit->TransRandom;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98		launchtime-=frametime;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98		if (launchtime<=0)
-//DeadCode RJS 16Sep98		{
-//DeadCode RJS 16Sep98			//Time to launch some smoke
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98			TransientItem*	newitem;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98			newitem = SimplifiedSpriteLaunch(	transit,
-//DeadCode RJS 16Sep98												BigSmokeShape,	//PD 09May96
-//DeadCode RJS 16Sep98												LIFETIME_SMOKE,MOBILE_GANDF);
-//DeadCode RJS 16Sep98			if (newitem)
-//DeadCode RJS 16Sep98			{
-//DeadCode RJS 16Sep98				UWord	randomfactor;
-//DeadCode RJS 16Sep98				SLong	vvel;
-//DeadCode RJS 16Sep98				newitem->TransRandom = 0;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98 //DeadCode RJS 19Feb98				ExplodeAnimData* adptr;									//PD 08May96
-//DeadCode RJS 16Sep98 //DeadCode RJS 19Feb98				adptr = (ExplodeAnimData* )newitem->Anim;			//RJS 31Jul96
-//DeadCode RJS 16Sep98 //DeadCode RJS 19Feb98				adptr->frameno = 0;	
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				newitem->World.X = transit->Launcher->World.X;
-//DeadCode RJS 16Sep98				newitem->World.Y = transit->Launcher->World.Y + 50;
-//DeadCode RJS 16Sep98				newitem->World.Z = transit->Launcher->World.Z;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				randomfactor = Math_Lib.rnd();
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				newitem->vely = SmokeBaseVel + ((randomfactor * SmokeVariableVertVel)>>16);//RJS 02Sep96
-//DeadCode RJS 16Sep98				newitem->pitch= ANGLES_90Deg;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				newitem->hdg = (Angles)(Math_Lib.rnd());
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				SWord	sin_ang,cos_ang;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				Math_Lib.high_sin_cos((ANGLES )newitem->hdg,sin_ang,cos_ang);
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				randomfactor = Math_Lib.rnd();
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				newitem->velhori = ((randomfactor * SmokeVariableHorzVel)>>16);
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				newitem->velx = (newitem->velhori * sin_ang)/ANGLES_FRACT;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				newitem->velz = (newitem->velhori * cos_ang)/ANGLES_FRACT;
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98				AddTransientItemToWorld(newitem,world);
-//DeadCode RJS 16Sep98			}
-//DeadCode RJS 16Sep98
-//DeadCode RJS 16Sep98			launchtime = SmokeLaunchDelay;
-//DeadCode RJS 16Sep98		}
-//DeadCode RJS 16Sep98		transit->TransRandom = (UWord )launchtime+(TransientItem::transcount>>4);
-//DeadCode RJS 16Sep98	}
-//DeadCode RJS 16Sep98	else
-//DeadCode RJS 16Sep98	{
-//DeadCode RJS 16Sep98		AddTransientItemToDeadList(transit);
-//DeadCode RJS 16Sep98	}
 
 	if (timeleft)
 	{
@@ -6170,13 +5199,6 @@ void	TransObj::MobileFire(TransientItemPtr transit, WorldStuff& world)
 
 			//Drive the shape animation								//PD 08May96
 
-//DeadCode RJS 19Feb98			ExplodeAnimData* adptr;									//PD 08May96
-//DeadCode RJS 19Feb98
-//DeadCode RJS 19Feb98			adptr = (ExplodeAnimData* )transit->Anim;				//PD 08May96
-//DeadCode RJS 19Feb98			adptr->frameno++;										//PD 08May96
-//DeadCode RJS 19Feb98
-//DeadCode RJS 19Feb98			if (adptr->frameno>7)									//PD 08May96
-//DeadCode RJS 19Feb98				adptr->frameno = 0;									//PD 08May96
 
 			launchtime = SmokeLaunchDelay+(TransientItem::transcount>>4);
 		}
@@ -6268,7 +5290,6 @@ void	TransObj::MobileTroop(TransientItemPtr transit, WorldStuff&)
 				_Miles.PlayOnce((FileNum)(FIL_SFX_VOCAL_ENEMY1 + voxrand),transit,48,FIL_SFX_VOCAL_ENEMY1,FIL_SFX_VOCAL_ENEMY4);
 			else
 				_Miles.PlayOnce((FileNum)(FIL_SFX_YELP1 + voxrand),transit,48,FIL_SFX_YELP1,FIL_SFX_YELP4);
-//DeadCode DAW 25Jun99 			_Miles.PlayOnce((FileNum)(FIL_SFX_VOCAL_ENEMY1 + voxrand),transit,48,FIL_SFX_VOCAL_ENEMY1,FIL_SFX_VOCAL_ENEMY4);
 		}
 
 		ApplyVelocities((mobileitem*) transit);
@@ -6304,7 +5325,6 @@ void TransObj::MobileParachute(TransientItemPtr transit, WorldStuff&	world)
 		if ((transit->LaunchTime-=Timer_Code.FRAMETIME)<0)
 			transit->LaunchTime=0;
 
-//DeadCode RJS 31May99 		if ((transit->shape == DUMY18) || (transit->shape == CHUTE2))
 		//must be the chute...
 		if (!transit->isOwned)									//DAW 31May99
 		{
@@ -6619,7 +5639,8 @@ void TransObj::MobileDelayedExplosion(TransientItemPtr transit, WorldStuff& worl
 				{
 					//Inherit old target as well as coords...
 					newitem->Target = transit->Target;			//RJS 24Jun99
-					newitem->World = transit->Target->World;
+					if (transit->Target)							//RERUN: target may be dead
+						newitem->World = transit->Target->World;
 					newitem->TransRandom = 3;		//Detonate!!
 
 					AddTransientItemToWorld(newitem,worldptr);
@@ -6637,7 +5658,9 @@ void TransObj::MobileDelayedExplosion(TransientItemPtr transit, WorldStuff& worl
 			break;
 			case 4:
 			{
-				AirStrucPtr	ac = (AirStrucPtr)*transit->Target;
+				AirStrucPtr	ac = transit->Target ? (AirStrucPtr)*transit->Target : NULL;	//RERUN: Target may die mid-flight (null deref at cast)
+				if (ac)									//RERUN: ac==NULL when Target dead
+				{
 				if (!_Replay.Playback)
 					ExplodeAC(ac,ac,worldptr);
 				else
@@ -6647,6 +5670,7 @@ void TransObj::MobileDelayedExplosion(TransientItemPtr transit, WorldStuff& worl
 				}
 
 				LaunchFire(ac,worldptr);
+				}
 
 				AddTransientItemToDeadList(transit);
 			}
@@ -6696,7 +5720,6 @@ void TransObj::MobileFlak(TransientItemPtr transit, WorldStuff& worldptr)
 	}
 	else
 	{
-//DEADCODE DAW 06/05/99		ShapeNum		theShape = ((TransientItem*)transit->Launcher)->shape;
 		TransientItem*	newitem;
 
 		newitem = SimplifiedSpriteLaunch(transit,transit->shape,250,MOBILE_STATIONARY);//RJS 06May99
@@ -6837,17 +5860,6 @@ void TransObj::MobileRicochetSmoke(TransientItemPtr transit, WorldStuff& worldpt
 		if ((transit->LaunchTime-=frametime)<0)
 			transit->LaunchTime=0;
 
-//DeadCode MS 30Nov98		if (transit->TransRandom == 0)							//RJS 20Apr98
-//DeadCode MS 30Nov98		{
-//DeadCode MS 30Nov98			//Test for collision with the ground
-//DeadCode MS 30Nov98			SLong	groundheight = Land_Scape.GetGroundLevel((itemptr)transit);
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98			if (transit->World.Y < groundheight)
-//DeadCode MS 30Nov98			{
-//DeadCode MS 30Nov98				transit->TransRandom = 1;
-//DeadCode MS 30Nov98				transit->World.Y = groundheight;
-//DeadCode MS 30Nov98			}
-//DeadCode MS 30Nov98		}
 
 		if (transit->velhori)									//RDH 30Mar99
 			GAndFriction(transit,0);							//RDH 30Mar99
@@ -7035,7 +6047,6 @@ void TransObj::MobileATeam(TransientItemPtr transit, WorldStuff& worldptr)
 				SLong	groundheight = GetGroundLevel(transit,theArea);//RJS 28Apr99
 				if (transit->World.Y <= groundheight)
 				{
-//DeadCode RJS 28Apr99					UByte	theArea = Three_Dee.GetLandType();		//RJS 27Nov98
 
 					Coords3D	hitcoords;
 
@@ -7116,83 +6127,8 @@ void TransObj::MobileATeam(TransientItemPtr transit, WorldStuff& worldptr)
 //------------------------------------------------------------------------------
 void	TransObj::MobileDustRing(TransientItemPtr transit, WorldStuff& world)
 {
-//DeadCode RJS 20Apr98	SLong			timeleft=transit->LaunchTime;
-//DeadCode RJS 20Apr98	UByte			count;
-//DeadCode RJS 20Apr98
-//DeadCode RJS 20Apr98	if (timeleft)
-//DeadCode RJS 20Apr98	{
-//DeadCode RJS 20Apr98		SWord	frametime;
-//DeadCode RJS 20Apr98		SLong	groundheight;
-//DeadCode RJS 20Apr98
-//DeadCode RJS 20Apr98		frametime = Timer_Code.FRAMETIME;						
-//DeadCode RJS 20Apr98
-//DeadCode RJS 20Apr98		if ((transit->LaunchTime-=frametime)<0)
-//DeadCode RJS 20Apr98			transit->LaunchTime=0;
-//DeadCode RJS 20Apr98	}
-//DeadCode RJS 20Apr98	else
-//DeadCode RJS 20Apr98		AddTransientItemToDeadList(transit);
 }
 
-//DeadCode JIM 28Nov96 //------------------------------------------------------------------------------
-//DeadCode JIM 28Nov96 //Procedure		MobileShockwave
-//DeadCode JIM 28Nov96 //Author		Robert Slater
-//DeadCode JIM 28Nov96 //Date			Wed 16 Oct 1996
-//DeadCode JIM 28Nov96 //
-//DeadCode JIM 28Nov96 //Description	Similar to bullet
-//DeadCode JIM 28Nov96 //
-//DeadCode JIM 28Nov96 //Inputs		
-//DeadCode JIM 28Nov96 //
-//DeadCode JIM 28Nov96 //Returns	
-//DeadCode JIM 28Nov96 //
-//DeadCode JIM 28Nov96 //------------------------------------------------------------------------------
-//DeadCode JIM 28Nov96 void	TransObj::MobileShockwave(TransientItemPtr transit, WorldStuff& world)
-//DeadCode JIM 28Nov96 {
-//DeadCode JIM 28Nov96	if ((transit->LaunchTime-=Timer_Code.FRAMETIME)<0)	
-//DeadCode JIM 28Nov96		transit->LaunchTime=0;
-//DeadCode JIM 28Nov96	else
-//DeadCode JIM 28Nov96	{
-//DeadCode JIM 28Nov96		if ((transit->LaunchTime & 0x03)==0)			
-//DeadCode JIM 28Nov96		{
-//DeadCode JIM 28Nov96			SLong	groundheight;
-//DeadCode JIM 28Nov96
-//DeadCode JIM 28Nov96			groundheight = Land_Scape.GetGroundLevel((itemptr)transit);
-//DeadCode JIM 28Nov96
-//DeadCode JIM 28Nov96			if (transit->World.Y<=groundheight)
-//DeadCode JIM 28Nov96				transit->World.Y = groundheight;
-//DeadCode JIM 28Nov96
-//DeadCode JIM 28Nov96			//Test for collision with other
-//DeadCode JIM 28Nov96			//items
-//DeadCode JIM 28Nov96
-//DeadCode JIM 28Nov96			itemptr	 hititem;
-//DeadCode JIM 28Nov96 //DeadCode RDH 26Nov96			vector	 hitvector;
-//DeadCode JIM 28Nov96 //DeadCode RDH 26Nov96			SByte	gindex;
-//DeadCode JIM 28Nov96			Coords3D	hitcoords;
-//DeadCode JIM 28Nov96			int	gindex;
-//DeadCode JIM 28Nov96
-//DeadCode JIM 28Nov96		if ((transit->LaunchTime & 0x03)==0)					//PD 08Oct96
-//DeadCode JIM 28Nov96			if (!transit->MigStatus.LaunchFlags.deadtime)
-//DeadCode JIM 28Nov96			{
-//DeadCode JIM 28Nov96				hititem=BoxCol::NineSectorCol(transit,hitcoords,gindex);
-//DeadCode JIM 28Nov96				if (hititem)	//_Collide.TransCollTest((MovingItemPtr )transit, hititem, hitvector, gindex))//RDH 26Nov96
-//DeadCode JIM 28Nov96				{
-//DeadCode JIM 28Nov96					transit->World=hitcoords;
-//DeadCode JIM 28Nov96 //DeadCode RDH 26Nov96					transit->World.X = hitvector.a;			
-//DeadCode JIM 28Nov96 //DeadCode RDH 26Nov96					transit->World.Y = hitvector.b;			
-//DeadCode JIM 28Nov96 //DeadCode RDH 26Nov96					transit->World.Z = hitvector.c;			
-//DeadCode JIM 28Nov96
-//DeadCode JIM 28Nov96					MissileHitSomething(hititem,transit,world,gindex);
-//DeadCode JIM 28Nov96					transit->velhori >>= 1;
-//DeadCode JIM 28Nov96				}
-//DeadCode JIM 28Nov96			}												
-//DeadCode JIM 28Nov96		}
-//DeadCode JIM 28Nov96
-//DeadCode JIM 28Nov96		if (transit->LaunchTime>0)	
-//DeadCode JIM 28Nov96			ApplyVelocities(transit);
-//DeadCode JIM 28Nov96	}
-//DeadCode JIM 28Nov96
-//DeadCode JIM 28Nov96	if (transit->LaunchTime<=0)
-//DeadCode JIM 28Nov96		AddTransientItemToDeadList(transit);
-//DeadCode JIM 28Nov96 }
 
 //------------------------------------------------------------------------------
 //Procedure		MobileBird
@@ -7213,7 +6149,6 @@ void	TransObj::MobileBird(TransientItemPtr transit, WorldStuff& world)
 
 	if (timeleft)
 	{
-//DeadCode RJS 19Feb98		ExplodeAnimData* adptr;								
 		SWord	frametime = Timer_Code.FRAMETIME;
 		SLong	groundheight = GetGroundLevel(transit);			//RJS 14Apr99
 		UByte	maxframe;
@@ -7221,8 +6156,6 @@ void	TransObj::MobileBird(TransientItemPtr transit, WorldStuff& world)
 		if ((transit->LaunchTime-=frametime)<0)
 			transit->LaunchTime=0;
 
-//DeadCode RJS 19Feb98		adptr = (ExplodeAnimData* )transit->Anim;
-//DeadCode RJS 19Feb98		adptr->frameno++;
 
 		GAndFriction(transit,OrdinaryDrag);
 
@@ -7247,8 +6180,6 @@ void	TransObj::MobileBird(TransientItemPtr transit, WorldStuff& world)
 				transit->World.Y = groundheight;
 		}
 
-//DeadCode RJS 19Feb98		if (adptr->frameno > maxframe)
-//DeadCode RJS 19Feb98			adptr->frameno = 0;
 	}
 	else
 		AddTransientItemToDeadList(transit);
@@ -7285,9 +6216,6 @@ void	TransObj::MobileAmmoBoxes(TransientItemPtr transit, WorldStuff& world)
 
 		// throw sparks...
 
-//DeadCode RJS 28May99 		triggerspark = Math_Lib.rnd();
-//DeadCode RJS 28May99 
-//DeadCode RJS 28May99 		if (triggerspark > 60000+(TransientItem::transcount<<4))
 		if (Save_Data.desiredfps <= realFrameTime)				//RJS 11Jun99
 		{
 			newitem = SimplifiedSpriteLaunch((mobileitem*)transit,SparkShape,300,MOBILE_DEBRIS);//RJS 28May99
@@ -7366,7 +6294,6 @@ void	TransObj::MobileBigExplosion(TransientItemPtr transit, WorldStuff& world)
 
 	if (timeleft)
 	{
-//DeadCode DAW 28Jun99 		_Miles.PlayLooped((FileNum) FIL_SFX_FIREBURN_LOOP, (ItemBasePtr) transit);//RJS 22Nov96
 
 		SWord	frametime = Timer_Code.FRAMETIME;						//RJS 16Nov98
 
@@ -7385,11 +6312,6 @@ void	TransObj::MobileBigExplosion(TransientItemPtr transit, WorldStuff& world)
 	}
 	else
 	{
-//DeadCode RJS 28Jun99 		if (pTarget)											//RJS 16Nov98
-//DeadCode RJS 28Jun99 		{														//RJS 16Nov98
-//DeadCode RJS 28Jun99 			if (pTarget->shape == PDEATH)						//RJS 16Nov98
-//DeadCode RJS 28Jun99 				LaunchFire((mobileitem*)pTarget,world);			//RJS 16Nov98
-//DeadCode RJS 28Jun99 		}														//RJS 16Nov98
 
 		AddTransientItemToDeadList(transit);
 	}
@@ -7476,110 +6398,6 @@ void	TransObj::MobileVapourTransient(TransientItemPtr	transit, WorldStuff&	world
 //------------------------------------------------------------------------------
 void	TransObj::MobileRocket(TransientItemPtr	transit, WorldStuff&	world)
 {
-//DeadCode MS 30Nov98	SLong	timeleft = transit->LaunchTime;
-//DeadCode MS 30Nov98	if (timeleft)
-//DeadCode MS 30Nov98	{
-//DeadCode MS 30Nov98		if ((transit->LaunchTime-=Timer_Code.FRAMETIME)<0)
-//DeadCode MS 30Nov98			transit->LaunchTime = 0;
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98		if ((transit->LaunchTime & 0x06)==0)					//RJS 09Nov98
-//DeadCode MS 30Nov98		{
-//DeadCode MS 30Nov98			itemptr		hititem;
-//DeadCode MS 30Nov98			Coords3D	hitcoords;
-//DeadCode MS 30Nov98			int			gindex;
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98			if (transit->MigStatus.LaunchFlags.deadtime == 0)					
-//DeadCode MS 30Nov98			{
-//DeadCode MS 30Nov98				hititem=BoxCol::NineSectorCol(transit,hitcoords,gindex);
-//DeadCode MS 30Nov98				if (hititem)
-//DeadCode MS 30Nov98				{
-//DeadCode MS 30Nov98					transit->LaunchTime=0;								
-//DeadCode MS 30Nov98					transit->TransRandom = 2;
-//DeadCode MS 30Nov98				}
-//DeadCode MS 30Nov98				else
-//DeadCode MS 30Nov98				{
-//DeadCode MS 30Nov98					SLong	groundheight = Land_Scape.GetGroundLevel(transit);
-//DeadCode MS 30Nov98					if (transit->World.Y<=groundheight)
-//DeadCode MS 30Nov98					{
-//DeadCode MS 30Nov98						UByte	theArea = Three_Dee.GetLandType();//MS 30Nov98
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98						transit->LaunchTime=0;								
-//DeadCode MS 30Nov98						transit->TransRandom = 2;
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98						hitcoords = transit->World;
-//DeadCode MS 30Nov98						hitcoords.Y = groundheight+METRES01;
-//DeadCode MS 30Nov98																			
-//DeadCode MS 30Nov98						DoImpactGround(transit,hitcoords,theArea);//MS 30Nov98
-//DeadCode MS 30Nov98					}
-//DeadCode MS 30Nov98				}
-//DeadCode MS 30Nov98			}
-//DeadCode MS 30Nov98		}														//RJS 09Nov98
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98		if (transit->LaunchTime)
-//DeadCode MS 30Nov98		{
-//DeadCode MS 30Nov98			switch (transit->TransRandom)
-//DeadCode MS 30Nov98			{
-//DeadCode MS 30Nov98				case 0:
-//DeadCode MS 30Nov98				case 2:
-//DeadCode MS 30Nov98					GAndFriction(transit,OrdinaryDrag);
-//DeadCode MS 30Nov98					break;
-//DeadCode MS 30Nov98				case 1:
-//DeadCode MS 30Nov98					SLong	velx, vely, velz, velhori;
-//DeadCode MS 30Nov98					SWord	sin_ang, cos_ang;
-//DeadCode MS 30Nov98					SLong	accel = 16;				// crap val
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98					Math_Lib.high_sin_cos((ANGLES )transit->pitch,sin_ang,cos_ang);
-//DeadCode MS 30Nov98					vely = (accel * sin_ang)>>15;
-//DeadCode MS 30Nov98					velhori = (accel * cos_ang)>>15;
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98					transit->vely += vely;
-//DeadCode MS 30Nov98					transit->velhori += velhori;
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98					Math_Lib.high_sin_cos((ANGLES )transit->hdg,sin_ang,cos_ang);
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98					velx = (transit->velhori * sin_ang)>>15;
-//DeadCode MS 30Nov98					velz = (transit->velhori * cos_ang)>>15;
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98					transit->velx = velx;
-//DeadCode MS 30Nov98					transit->velz = velz;
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98					GAndFriction(transit,OrdinaryDrag);
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98					break;
-//DeadCode MS 30Nov98			}
-//DeadCode MS 30Nov98		}
-//DeadCode MS 30Nov98	}
-//DeadCode MS 30Nov98	else
-//DeadCode MS 30Nov98	{
-//DeadCode MS 30Nov98		switch (transit->TransRandom)
-//DeadCode MS 30Nov98		{
-//DeadCode MS 30Nov98		case 0:
-//DeadCode MS 30Nov98		{
-//DeadCode MS 30Nov98			MoveGunAnimData	*adptr = (MoveGunAnimData*)transit->Anim;
-//DeadCode MS 30Nov98			WeapAnimData*	weapon = (WeapAnimData*) &adptr->weaponlaunchers[0];
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98			SHAPE.InitTrailFields((UByteP)weapon,0,5000,LT_FUEL);
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98			transit->LaunchTime = 500;
-//DeadCode MS 30Nov98			transit->TransRandom = 1;
-//DeadCode MS 30Nov98
-//DeadCode MS 30Nov98			_Miles.PlayOnce(FIL_SFX_MISSILE2, transit);
-//DeadCode MS 30Nov98			LaunchVapourStream((UByteP)weapon,transit->shape);
-//DeadCode MS 30Nov98			break;
-//DeadCode MS 30Nov98		}
-//DeadCode MS 30Nov98		case 1:
-//DeadCode MS 30Nov98		{
-//DeadCode MS 30Nov98			transit->LaunchTime = 3000;
-//DeadCode MS 30Nov98			transit->TransRandom = 2;
-//DeadCode MS 30Nov98			break;
-//DeadCode MS 30Nov98		}
-//DeadCode MS 30Nov98		default:
-//DeadCode MS 30Nov98		{
-//DeadCode MS 30Nov98			AddTransientItemToDeadList(transit);
-//DeadCode MS 30Nov98			break;
-//DeadCode MS 30Nov98		}
-//DeadCode MS 30Nov98		}
-//DeadCode MS 30Nov98	}
 
 	SLong	timeleft = transit->LaunchTime;
 	if (timeleft)
@@ -7599,7 +6417,6 @@ void	TransObj::MobileRocket(TransientItemPtr	transit, WorldStuff&	world)
 				if (hititem)
 				{
 					transit->LaunchTime=0;								
-//DeadCode RJS 26Feb99					transit->TransRandom = 2;
 				}
 				else
 				{
@@ -7607,10 +6424,8 @@ void	TransObj::MobileRocket(TransientItemPtr	transit, WorldStuff&	world)
 					SLong	groundheight = GetGroundLevel(transit,theArea);//RJS 28Apr99
 					if (transit->World.Y<=groundheight)
 					{
-//DeadCode RJS 28Apr99						UByte	theArea = Three_Dee.GetLandType();//MS 30Nov98
 
 						transit->LaunchTime=0;								
-//DeadCode RJS 26Feb99						transit->TransRandom = 2;
 
 						hitcoords = transit->World;
 						hitcoords.Y = groundheight+METRES01;
@@ -7667,7 +6482,7 @@ void	TransObj::MobileCloneGun(TransientItemPtr transit, WorldStuff& world)
 	else
 	{
 		CloneAnimData*		adptr = (CloneAnimData*) transit->Anim;
-		mobileitem			*theShooter = (mobileitem*)adptr->originitm;
+		mobileitem			*theShooter = (mobileitem*)AnimLink::Load(adptr->originitm);
 
 		SLong	clonesleft = transit->TransRandom;
 		if (clonesleft)
@@ -7678,7 +6493,7 @@ void	TransObj::MobileCloneGun(TransientItemPtr transit, WorldStuff& world)
 			SLong				index2 = adptr->weapindex2;
 			WeapAnimData*		weapanim;
 			UWord				mvel,mdelay,mburst;				//RDH 31Jul98
-//Dead			mobileitem			*theShooter = (mobileitem*)adptr->originitm;
+//Dead			mobileitem			*theShooter = (mobileitem*)AnimLink::Load(adptr->originitm);
 			SLong				velx,vely,velz,velh,vel;//rjs
 			ANGLES				hdg,pitch;
 			AutoMoveCodeTypeSelect	mcode;
@@ -7688,37 +6503,6 @@ void	TransObj::MobileCloneGun(TransientItemPtr transit, WorldStuff& world)
 			LnchrType			launchmask = (LnchrType)(adptr->lnchtype & LT_MASK);//RJS 09Jul99
 			
 			vel = transit->vel;
-//DeadCode CSB 26/03/99				if (theShooter->MigStatus.LaunchFlags.size>=MOBILESIZE)
-//DeadCode CSB 26/03/99				{
-//DeadCode CSB 26/03/99					SWord	sin_ang,cos_ang;
-//DeadCode CSB 26/03/99					SLong	totalvel = theShooter->vel + ;
-//DeadCode CSB 26/03/99	
-//DeadCode CSB 26/03/99					velh = theShooter->velhori;
-//DeadCode CSB 26/03/99					vely = theShooter->vely;
-//DeadCode CSB 26/03/99	
-//DeadCode CSB 26/03/99					muzPitch += (SWord) theShooter->pitch;			//RJS 21Jul98
-//DeadCode CSB 26/03/99	
-//DeadCode CSB 26/03/99					hdg = theShooter->hdg;
-//DeadCode CSB 26/03/99					pitch = (Angles) muzPitch;						//RJS 21Jul98
-//DeadCode CSB 26/03/99					Math_Lib.high_sin_cos(pitch,sin_ang,cos_ang);
-//DeadCode CSB 26/03/99	
-//DeadCode CSB 26/03/99					temp = (vel * sin_ang)>>ANGLES_SHIFT; vely += temp;
-//DeadCode CSB 26/03/99					temp = (vel * cos_ang)>>ANGLES_SHIFT; velh += temp;
-//DeadCode CSB 26/03/99	
-//DeadCode CSB 26/03/99					Math_Lib.high_sin_cos(hdg,sin_ang,cos_ang);
-//DeadCode CSB 26/03/99	
-//DeadCode CSB 26/03/99					velx = (velh * sin_ang)>>ANGLES_SHIFT;
-//DeadCode CSB 26/03/99					velz = (velh * cos_ang)>>ANGLES_SHIFT;
-//DeadCode CSB 26/03/99				}
-//DeadCode CSB 26/03/99				else
-//DeadCode CSB 26/03/99				{
-//DeadCode CSB 26/03/99					velh = transit->velhori;
-//DeadCode CSB 26/03/99					vely = transit->vely;
-//DeadCode CSB 26/03/99					velx = transit->velx;
-//DeadCode CSB 26/03/99					velz = transit->velz;
-//DeadCode CSB 26/03/99					hdg = transit->hdg;
-//DeadCode CSB 26/03/99					pitch = transit->pitch;
-//DeadCode CSB 26/03/99				}				
 
 			switch (launchmask)							//RJS 09Jul99
 			{
@@ -7914,8 +6698,6 @@ void TransObj::MobileDoDamage(TransientItemPtr transit,WorldStuff& world)
 				int		gindex;
 
 				hititem=BoxCol::NineSectorCol(transit,hitcoords,gindex);
-//DeadCode RJS 23Jun99 				if (hititem)
-//DeadCode RJS 23Jun99 					transit->LaunchTime=0;								
 			}
 		}
 	}
@@ -7966,7 +6748,6 @@ void TransObj::MobileThuggery(TransientItemPtr transit,WorldStuff& world)
 				scared = FALSE;
 
 				animptr	tmpanim = theVictim->Anim;	//RJS 05Jul99
-//DeadCode AMM 05Jul99 				animptr	tmpanim = transit->Launcher->Anim;
 				tmpanim += adptr->panimoff;
 
 				mad = (GrpMinAnimData*) tmpanim;
@@ -7984,7 +6765,6 @@ void TransObj::MobileThuggery(TransientItemPtr transit,WorldStuff& world)
 					scared = FALSE;
 				
 					animptr	tmpanim = theVictim->Anim;	 //RJS 05Jul99
-//DeadCode AMM 05Jul99 					animptr	tmpanim = transit->Launcher->Anim;
 					tmpanim += adptr->nanimoff;
 		
 					mad = (GrpMinAnimData*) tmpanim;
@@ -7996,7 +6776,6 @@ void TransObj::MobileThuggery(TransientItemPtr transit,WorldStuff& world)
 				itemptr		hititem;
 
 				hititem=BoxCol::SpecificCollision(transit,theVictim);//RJS 05Jul99	
-//DeadCode AMM 05Jul99 				hititem=BoxCol::SpecificCollision(transit,transit->Launcher);
 			}
 		}
 
@@ -8074,142 +6853,6 @@ void AirStruc::AutoSpiral2Ground(WorldStuff& world)
 {
 	SWord	frametime = Timer_Code.FRAMETIME;					//DAW 31Jul96
 	SLong	groundheight;										//DAW 03Sep98
-//DeadCode DAW 03Sep98	if (shape != CRATER)
-//DeadCode DAW 03Sep98	{
-//DeadCode DAW 03Sep98		SLong	groundheight;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98		Trans_Obj.GAndFriction((mobileitem* )this,OrdinaryDrag);
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98		groundheight = Land_Scape.GetGroundLevel((itemptr)this);
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98		if (World.Y<=groundheight)
-//DeadCode DAW 03Sep98		{
-//DeadCode DAW 03Sep98			World.Y = groundheight;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			velx =
-//DeadCode DAW 03Sep98				vely =
-//DeadCode DAW 03Sep98				velz =
-//DeadCode DAW 03Sep98				velhori = 0;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			if (shape == WRECK)
-//DeadCode DAW 03Sep98			{
-//DeadCode DAW 03Sep98				pitch = ANGLES_0Deg;							//RJS 21Nov96
-//DeadCode DAW 03Sep98				roll = ANGLES_0Deg;								//RJS 21Nov96
-//DeadCode DAW 03Sep98				shape = CRATER;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98				if (this == Manual_Pilot.ControlledAC2)
-//DeadCode DAW 03Sep98				{
-//DeadCode DAW 03Sep98					_Miles.StopEngine();
-//DeadCode DAW 03Sep98					Manual_Pilot.controlmode=Manual_Pilot.PILOTDEAD;
-//DeadCode DAW 03Sep98					GR_Quit3DNow=CRASHED_DEAD;
-//DeadCode DAW 03Sep98					Trans_Obj.View_Object->SetToDeathView();				//RDH 02Sep98
-//DeadCode DAW 03Sep98				}
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98 // in here when burning wreck hits ground, i.e. after collision	//AMM 20Feb97
-//DeadCode DAW 03Sep98 // or if plane has burst into flames after being shot			//AMM 20Feb97
-//DeadCode DAW 03Sep98 // score has already been set									//AMM 20Feb97
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98				if(_DPlay.Implemented)
-//DeadCode DAW 03Sep98				{
-//DeadCode DAW 03Sep98 // crash into ground after spiralling to ground
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98					_DPlay.item2place=ST_CRATER;
-//DeadCode DAW 03Sep98					_DPlay.SendKill(*this,GR_Quit3DNow,PIDC_FIRECRATER,NULL);//AMM 16Jun97
-//DeadCode DAW 03Sep98					_DPlay.ResurrectMe(*this,TRUE);
-//DeadCode DAW 03Sep98				}
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98				Trans_Obj.LaunchFire(*this,*currworld);
-//DeadCode DAW 03Sep98			}
-//DeadCode DAW 03Sep98			else
-//DeadCode DAW 03Sep98			{
-//DeadCode DAW 03Sep98				if (this == Manual_Pilot.ControlledAC2)			//RJS 12Sep97
-//DeadCode DAW 03Sep98				{												//RJS 12Sep97
-//DeadCode DAW 03Sep98					_Miles.StopEngine();						//RJS 12Sep97
-//DeadCode DAW 03Sep98					GR_Quit3DNow=CRASHED_DEAD;					//RJS 12Sep97
-//DeadCode DAW 03Sep98					
-//DeadCode DAW 03Sep98					Trans_Obj.View_Object->SetToDeathView();				//RDH 02Sep98
-//DeadCode DAW 03Sep98																//RJS 12Sep97
-//DeadCode DAW 03Sep98					if(_DPlay.Implemented)						//RJS 12Sep97
-//DeadCode DAW 03Sep98					{											//RJS 12Sep97
-//DeadCode DAW 03Sep98						_DPlay.item2place=ST_CRATER;			//RJS 12Sep97
-//DeadCode DAW 03Sep98						_DPlay.SendKill(*this,GR_Quit3DNow,PIDC_FIRECRATER,NULL);//RJS 12Sep97
-//DeadCode DAW 03Sep98						_DPlay.ResurrectMe(*this,TRUE);			//RJS 12Sep97
-//DeadCode DAW 03Sep98					}											//RJS 12Sep97
-//DeadCode DAW 03Sep98					else										//RJS 12Sep97
-//DeadCode DAW 03Sep98						Manual_Pilot.DeathSequenceOverride(*this,AUTO_CRASHROLL);//RDH 02Sep98
-//DeadCode DAW 03Sep98 //						Manual_Pilot.ControlledAC2->AutoMoveInfo.movecode = AUTO_CRASHROLL;//RJS 12Sep97
-//DeadCode DAW 03Sep98				}												//RJS 12Sep97
-//DeadCode DAW 03Sep98			}
-//DeadCode DAW 03Sep98		}
-//DeadCode DAW 03Sep98		else
-//DeadCode DAW 03Sep98		{
-//DeadCode DAW 03Sep98			AircraftAnimData*	adptr;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			adptr = (AircraftAnimData *)Anim;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			UWord	lcldamflag;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98 //DeadCode RJS 09Jun97			lcldamflag = adptr->dammageflags;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			//Check the state of the wings
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			SWord lrstate=0,tstate=0;			//try initialising variables - it stops bugs
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			// Calculate lift using new damage flags...........
-//DeadCode DAW 03Sep98			// In a bit.......
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97			lrstate = adptr->BOTLEFTWING + adptr->TOPLEFTWING;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97 //DeadCode RJS 21Feb97			lrstate = (lcldamflag >> BF_LBWing) & BS_DEAD;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97 //DeadCode RJS 21Feb97			lrstate += (lcldamflag >> BF_LTWing) & BS_DEAD;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97			tstate = lrstate;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97			lrstate -= adptr->BOTRIGHTWING;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97			lrstate -= adptr->TOPRIGHTWING;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97 //DeadCode RJS 21Feb97			lrstate -= (lcldamflag >> BF_RBWing) & BS_DEAD;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97 //DeadCode RJS 21Feb97			lrstate -= (lcldamflag >> BF_RTWing) & BS_DEAD;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97			tstate += adptr->BOTRIGHTWING;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97			tstate += adptr->TOPRIGHTWING;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97 //DeadCode RJS 21Feb97			tstate += (lcldamflag >> BF_RBWing) & BS_DEAD;
-//DeadCode DAW 03Sep98 //DeadCode RJS 13Mar97 //DeadCode RJS 21Feb97			tstate += (lcldamflag >> BF_RTWing) & BS_DEAD;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			//if lrstate>0 dammage to the left of the a/c is
-//DeadCode DAW 03Sep98			//more severe than the dammage to the right
-//DeadCode DAW 03Sep98			//this means more lift on the right and so
-//DeadCode DAW 03Sep98			//the aircraft spirals anti-clockwise
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			//also, -6 <= lrstate <= +6
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			//and, 0 <= tstate <= 12
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			//Use lrstate to modify roll
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			// Scale down from 512 to 6 first....
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			//NOT INITIALISED!!!
-//DeadCode DAW 03Sep98			lrstate /= 85;										//RJS 21Feb97
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			int	das;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			ANGLES	arse = DeathAngleStep;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			das = arse;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			ANGLES	rollanglestep = (Angles)((lrstate*das*frametime)/10);
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			roll += rollanglestep;
-//DeadCode DAW 03Sep98
-//DeadCode DAW 03Sep98			_Miles.PlayLooped((FileNum) FIL_SFX_FIREBURN_LOOP, (ItemBasePtr) *this);//RJS 22Nov96
-//DeadCode DAW 03Sep98		}
-//DeadCode DAW 03Sep98	}
 
 	Trans_Obj.GAndFriction((mobileitem* )this,OrdinaryDrag);
 
@@ -8524,7 +7167,6 @@ void TransObj::MissileHitSomething(	itemptr			hititem,
 					||	(lasthitter != Manual_Pilot.ControlledAC2)
 						)
 				{
-//DeadCode RJS 27Feb98					GeneralAircraftDammage((AirStruc* )hititem,world,FALSE,lasthitter);//ARM 02Dec96
 					if (lasthitter->MigStatus.LaunchFlags.size == AirStrucSize)
 					{
 						if (	(((AirStrucPtr)lasthitter)->IsUsingPilotedAcLog())//JIM 17Mar99
@@ -8578,14 +7220,6 @@ void TransObj::MissileHitSomething(	itemptr			hititem,
 						{
 							Persons_2.UpdateLog(((AirStrucPtr)lasthitter)->ai.eventlog,-1,EventLog::KILLED);//RDH 25Oct96
 
-//DeadCode RDH 17Feb97							inwingpos = ( ((AirStrucPtr)hititem)->formpos&InWingMAX) +
-//DeadCode RDH 17Feb97											((	((AirStrucPtr)hititem)->formpos&InFormMAX) * Miss_Man.camp.squad.pilotsperflight);
-//DeadCode RDH 17Feb97							if (MMC.Active_Pilots[inwingpos].kills >=5)
-//DeadCode RDH 17Feb97							{
-//DeadCode RDH 17Feb97								((AirStrucPtr)hititem)->ai.eventlog->fameloss = (TextSnip0)MMC.Active_Pilots[inwingpos].name;
-//DeadCode RDH 17Feb97
-//DeadCode RDH 17Feb97							}elseif (((AirStrucPtr)hititem)->ai.eventlog->fameloss == TEXT_NULL)
-//DeadCode RDH 17Feb97								((AirStrucPtr)hititem)->ai.eventlog->fameloss = (TextSnip0)MMC.Active_Pilots[inwingpos].name;
 						}									//RDH 03Oct96
 					}
 					else
@@ -8597,12 +7231,6 @@ void TransObj::MissileHitSomething(	itemptr			hititem,
 			}
 			break;
 
-//DeadCode RJS 27Feb98		//We've hit something else
-//DeadCode RJS 27Feb98		default:
-//DeadCode RJS 27Feb98			{
-//DeadCode RJS 27Feb98				GeneralItemDamage((mobileitem*)hititem,missile,world,groupindex);//RJS 02Oct96
-//DeadCode RJS 27Feb98			}
-//DeadCode RJS 27Feb98			break;
 	}
 	*/
 }
@@ -8636,106 +7264,6 @@ void TransObj::GeneralAircraftDammage(AirStruc* ac,
 	ULong		*dflagptr;
 	
 
-//DeadCode RJS 09Jun97	return;								// Disabled for new shapes!!!!!
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97	AircraftAnimData* adptr;
-//DeadCode RJS 09Jun97	
-//DeadCode RJS 09Jun97	adptr = (AircraftAnimData* )ac->Anim;
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97	if (blowup)
-//DeadCode RJS 09Jun97		totaldeathcount = 0;
-//DeadCode RJS 09Jun97	else
-//DeadCode RJS 09Jun97		totaldeathcount = BF_TheRest;							//RJS 31Oct96
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97	do
-//DeadCode RJS 09Jun97	{
-//DeadCode RJS 09Jun97		whichbit = (BitFlags) totaldeathcount;					//RJS 27Sep96
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97		dammagebit = Math_Lib.rnd();
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97		if (!blowup)
-//DeadCode RJS 09Jun97		{
-//DeadCode RJS 09Jun97			temp = dammagebit * (BF_Fuel+2);					//RJS 07Nov96
-//DeadCode RJS 09Jun97			temp >>= 16;										//RJS 21Oct96
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			dammagebit = temp & ~1;										//RJS 30Jul96
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			dflagptr = (ULong*) &(adptr->dammageflags);					//RJS 21Oct96
-//DeadCode RJS 09Jun97			damageflag = *dflagptr;										//RJS 21Oct96
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			state = (BitStates )((damageflag>>dammagebit) & BS_DEAD);
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			if ((BitFlags)dammagebit < BF_Pilot)				//RJS 18Oct96
-//DeadCode RJS 09Jun97			{
-//DeadCode RJS 09Jun97				noanim = FALSE;
-//DeadCode RJS 09Jun97 //DeadCode RJS 21Oct96				state = (BitStates )((adptr->dammageflags>>dammagebit) & BS_DEAD);
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97				if (	((BitFlags)dammagebit < BF_Tail)		//RJS 13Nov96
-//DeadCode RJS 09Jun97					&&	(Math_Lib.rnd() < 32767)		)
-//DeadCode RJS 09Jun97					return;
-//DeadCode RJS 09Jun97			}
-//DeadCode RJS 09Jun97			else
-//DeadCode RJS 09Jun97			{
-//DeadCode RJS 09Jun97				noanim = TRUE;
-//DeadCode RJS 09Jun97 //DeadCode RJS 21Oct96				state = (BitStates )((adptr->damageflags2>>dammagebit) & BS_DEAD);
-//DeadCode RJS 09Jun97			}
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			if (state == BS_DAMLV2)								//RJS 09Dec96
-//DeadCode RJS 09Jun97			{													//RJS 09Dec96
-//DeadCode RJS 09Jun97				if ((BitFlags)dammagebit == BF_Fuel)			//RJS 09Dec96
-//DeadCode RJS 09Jun97				{												//RJS 09Dec96
-//DeadCode RJS 09Jun97					if (Math_Lib.rnd() > 8000)					//RJS 09Dec96
-//DeadCode RJS 09Jun97						state = BS_DAMLV1;						//RJS 09Dec96
-//DeadCode RJS 09Jun97				}												//RJS 09Dec96
-//DeadCode RJS 09Jun97				else											//RJS 09Dec96
-//DeadCode RJS 09Jun97				{												//RJS 09Dec96
-//DeadCode RJS 09Jun97					if (Math_Lib.rnd() < 8000)					//RJS 09Dec96
-//DeadCode RJS 09Jun97						state = BS_DAMLV1;						//RJS 09Dec96
-//DeadCode RJS 09Jun97				}												//RJS 09Dec96
-//DeadCode RJS 09Jun97			}													//RJS 09Dec96
-//DeadCode RJS 09Jun97		}
-//DeadCode RJS 09Jun97		else
-//DeadCode RJS 09Jun97		{
-//DeadCode RJS 09Jun97			state = (BitStates )((adptr->dammageflags>>whichbit) & BS_DEAD);
-//DeadCode RJS 09Jun97			noanim = FALSE;
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			if (state != BS_DEAD)
-//DeadCode RJS 09Jun97				state = BS_DAMLV2;
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			totaldeathcount += 2;
-//DeadCode RJS 09Jun97			dammagebit = whichbit;								//RJS 27Sep96
-//DeadCode RJS 09Jun97		}
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97		// come in here
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97		if (state!=BS_DEAD)
-//DeadCode RJS 09Jun97		{
-//DeadCode RJS 09Jun97			state++;
-//DeadCode RJS 09Jun97			AcDamageEffects(ac,(BitFlags )dammagebit,state,worldptr);//RJS 08Aug96
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			if (hitter)
-//DeadCode RJS 09Jun97			{
-//DeadCode RJS 09Jun97				if (hitter == Manual_Pilot.ControlledAC2)
-//DeadCode RJS 09Jun97					SetAircraftDammage(ac,worldptr,(BitFlags )dammagebit,state,noanim,FALSE,blowup,TRUE);//ARM 02Dec96
-//DeadCode RJS 09Jun97				else
-//DeadCode RJS 09Jun97					SetAircraftDammage(ac,worldptr,(BitFlags )dammagebit,state,noanim,FALSE,blowup,FALSE);//ARM 02Dec96
-//DeadCode RJS 09Jun97			}
-//DeadCode RJS 09Jun97			else
-//DeadCode RJS 09Jun97				SetAircraftDammage(ac,worldptr,(BitFlags )dammagebit,state,noanim,FALSE,blowup,FALSE);//ARM 02Dec96
-//DeadCode RJS 09Jun97
-//DeadCode RJS 09Jun97			if ( (state == BS_DEAD)	&& ((BitFlags )dammagebit != BF_Gear) )//RJS 06Oct96
-//DeadCode RJS 09Jun97			{
-//DeadCode RJS 09Jun97				if (ac == Manual_Pilot.ControlledAC2)
-//DeadCode RJS 09Jun97					_Miles.SequenceAudible(FIL_MUSIC_SPIRALLING);
-//DeadCode RJS 09Jun97				else
-//DeadCode RJS 09Jun97				{
-//DeadCode RJS 09Jun97					_Miles.SequenceAudible(FIL_MUSIC_ADVANTAGE);	//RJS 25Sep96
-//DeadCode RJS 09Jun97					_Miles.SequenceAudible(SPOT_PLAYER_MAKES_KILL);
-//DeadCode RJS 09Jun97				}
-//DeadCode RJS 09Jun97			}
-//DeadCode RJS 09Jun97		}
-//DeadCode RJS 09Jun97	}while (totaldeathcount < BF_TheRest);
 }
 
 //------------------------------------------------------------------------------
@@ -8775,7 +7303,6 @@ void TransObj::DirectAircraftDamage(AirStruc* ac,WorldStuff& worldptr, BitStates
 			ShapeDescPtr	sdptr = SHAPESTUFF.GetShapePtr(ac->shape);
 			ac->MigStatus.LaunchFlags.deadtime = sdptr->DeadTime;
 			ac->MigStatus.LaunchFlags.deadscale = sdptr->DeadScale;
-//DeadCode JIM 22Apr97			ac->uniqueID.deaded = TRUE;
 			ac->BreakForm();
 //			if (ac == Manual_Pilot.ControlledAC2)
 //				_Miles.SequenceAudible(FIL_MUSIC_SPIRALLING);
@@ -8896,109 +7423,6 @@ void TransObj::SetAircraftDammage(	AirStruc*	ac,
 	ULong			*dflagptr;
 	UByteP			damageptr;									//RJS 18Feb97
 
-//DeadCode RJS 13Mar97	adptr = (AircraftAnimData* )ac->Anim;
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97	if (	!adptr										
-//DeadCode RJS 13Mar97		||	(whichbit == BF_TheRest)	)					
-//DeadCode RJS 13Mar97		return;
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97	dflagptr = (ULong*) &(adptr->dammageflags);					//RJS 21Oct96
-//DeadCode RJS 13Mar97	damageflag = *dflagptr;										//RJS 21Oct96
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97	oldstate = (BitStates )((damageflag>>whichbit) & BS_DEAD);	//RJS 21Oct96
-//DeadCode RJS 13Mar97	
-//DeadCode RJS 13Mar97	if (oldstate == whatstate)
-//DeadCode RJS 13Mar97		return;													//RJS 21Oct96
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97	//Send damage offset from start of animation data....
-//DeadCode RJS 13Mar97	if (sendpacket)							
-//DeadCode RJS 13Mar97		_DPlay.NewDamage (ac, oldstate, whichbit);
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97	damageflag &= ~(BS_DEAD<<whichbit);							//RJS 21Oct96
-//DeadCode RJS 13Mar97	damageflag |= whatstate<<whichbit;							//RJS 21Oct96
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97	*dflagptr = damageflag;					//RJS 21Oct96
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97	if (noanim)													//RJS 30Jul96
-//DeadCode RJS 13Mar97	{
-//DeadCode RJS 13Mar97		if (whatstate==BS_DEAD)
-//DeadCode RJS 13Mar97		{
-//DeadCode RJS 13Mar97			if (ac != Manual_Pilot.ControlledAC2)				//RJS 20Nov96
-//DeadCode RJS 13Mar97			{
-//DeadCode RJS 13Mar97				//I know this *may* have effects elsewhere.. but it fixes rear gunners//JIM 15Nov96
-//DeadCode RJS 13Mar97				adptr->itemstate = DAMMAGED;					//RJS 22Nov96
-//DeadCode RJS 13Mar97			}
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			if (ac->uniqueID.deaded == FALSE)					//JIM 23Oct96
-//DeadCode RJS 13Mar97			{
-//DeadCode RJS 13Mar97				ac->MigStatus.LaunchFlags.deadtime = sdptr->DeadTime;
-//DeadCode RJS 13Mar97				ac->MigStatus.LaunchFlags.Deadscale = sdptr->DeadScale;
-//DeadCode RJS 13Mar97				ac->uniqueID.deaded = TRUE;
-//DeadCode RJS 13Mar97				ac->BreakForm();
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97				// Record kill for Comms
-//DeadCode RJS 13Mar97				_DPlay.StoreKill (ac, NULL, TRUE);
-//DeadCode RJS 13Mar97			}
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			if (!nomovecode)									//RJS 21Oct96
-//DeadCode RJS 13Mar97					ac->AutoMoveInfo.movecode = AUTO_DEATHSEQUENCE;				//PD 12Sep96
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97		}
-//DeadCode RJS 13Mar97	}
-//DeadCode RJS 13Mar97	else
-//DeadCode RJS 13Mar97	{
-//DeadCode RJS 13Mar97		//If the new state is BS_DEAD then we need to launch a dead a/c part to match the
-//DeadCode RJS 13Mar97		//missing section
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97		if (whatstate==BS_DEAD)
-//DeadCode RJS 13Mar97		{
-//DeadCode RJS 13Mar97			//Kill the item...
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			if (ac != Manual_Pilot.ControlledAC2)				//RJS 20Nov96
-//DeadCode RJS 13Mar97			{
-//DeadCode RJS 13Mar97				//I know this *may* have effects elsewhere.. but it fixes rear gunners//JIM 15Nov96
-//DeadCode RJS 13Mar97				adptr->itemstate = DAMMAGED;					//RJS 22Nov96
-//DeadCode RJS 13Mar97			}
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			if (	(ac->uniqueID.deaded == FALSE)				//RJS 13Feb97
-//DeadCode RJS 13Mar97				&&	(damageptr != &adptr->GEAR)		)			//RJS 13Feb97
-//DeadCode RJS 13Mar97			{
-//DeadCode RJS 13Mar97				ac->MigStatus.LaunchFlags.deadtime = sdptr->DeadTime;
-//DeadCode RJS 13Mar97				ac->MigStatus.LaunchFlags.Deadscale = sdptr->DeadScale;
-//DeadCode RJS 13Mar97				ac->uniqueID.deaded = TRUE;
-//DeadCode RJS 13Mar97				ac->BreakForm();
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97				// Record kill for Comms
-//DeadCode RJS 13Mar97				_DPlay.StoreKill (ac, NULL, TRUE);
-//DeadCode RJS 13Mar97			}
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			//...and launch the dead bit
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			LaunchDeadACPart(ac,whichbit,worldptr,blowup);
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			if (whichbit < BF_Nose)					
-//DeadCode RJS 13Mar97				_Miles.PlayOnce(FIL_SFX_WOOD_BREAK2, (ItemBasePtr) ac);//RJS 22Nov96
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			if (	(whichbit == BF_LBWing)
-//DeadCode RJS 13Mar97				||	(whichbit == BF_RBWing)	)
-//DeadCode RJS 13Mar97			{
-//DeadCode RJS 13Mar97				switch (whichbit)									//RJS 08Aug96
-//DeadCode RJS 13Mar97				{
-//DeadCode RJS 13Mar97					case BF_LBWing:
-//DeadCode RJS 13Mar97						whichbit = BF_LTWing;
-//DeadCode RJS 13Mar97					break;
-//DeadCode RJS 13Mar97					case BF_RBWing:
-//DeadCode RJS 13Mar97						whichbit = BF_RTWing;
-//DeadCode RJS 13Mar97					break;
-//DeadCode RJS 13Mar97				}
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97				SetAircraftDammage(ac,worldptr,whichbit,BS_DEAD,noanim,nomovecode,blowup);//RJS 31Oct96
-//DeadCode RJS 13Mar97			}
-//DeadCode RJS 13Mar97
-//DeadCode RJS 13Mar97			if ((!nomovecode) && (whichbit != BF_Gear))			//RJS 21Oct96
-//DeadCode RJS 13Mar97				ac->AutoMoveInfo.movecode = AUTO_DEATHSEQUENCE;				//PD 12Sep96
-//DeadCode RJS 13Mar97		}
-//DeadCode RJS 13Mar97	}
 
 }
 
@@ -9020,132 +7444,6 @@ void TransObj::SetAircraftDammage(	AirStruc*	ac,
 //------------------------------------------------------------------------------
 void	TransObj::AcDamageEffects(AirStruc*	ac, BitFlags	whichbit, BitStates	whatstate,WorldStuff&	worldptr)
 {
-//DeadCode RDH 02Sep98	AirStruc*	acptr = Manual_Pilot.ControlledAC2;				//RJS 13Nov96
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98 //we have decided to do this at the end of the mission
-//DeadCode RDH 02Sep98 //DeadCode RDH 09Sep96	SWord	moraledec = MORALE_STAGE / 8;
-//DeadCode RDH 02Sep98 //DeadCode RDH 09Sep96
-//DeadCode RDH 02Sep98 //DeadCode RDH 09Sep96	if (ac->ai.morale > moraledec)
-//DeadCode RDH 02Sep98 //DeadCode RDH 09Sep96		ac->ai.morale -= moraledec;
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98	switch (whichbit)
-//DeadCode RDH 02Sep98	{
-//DeadCode RDH 02Sep98		case BF_LBWing:
-//DeadCode RDH 02Sep98		case BF_LTWing:
-//DeadCode RDH 02Sep98		case BF_RBWing:
-//DeadCode RDH 02Sep98		case BF_RTWing:
-//DeadCode RDH 02Sep98		case BF_Tail:
-//DeadCode RDH 02Sep98		case BF_Gear:
-//DeadCode RDH 02Sep98			if (whatstate == BS_DAMLV2)
-//DeadCode RDH 02Sep98			{
-//DeadCode RDH 02Sep98				_Miles.PlayOnce(FIL_SFX_WOOD_BREAK1, (ItemBasePtr) ac);//RJS 22Nov96
-//DeadCode RDH 02Sep98				break;
-//DeadCode RDH 02Sep98			}
-//DeadCode RDH 02Sep98		case BF_Nose:
-//DeadCode RDH 02Sep98		case BF_TheRest:										//RJS 31Oct96
-//DeadCode RDH 02Sep98			_Miles.PlaySample((FileNum) (FIL_SFX_RICOCHET_CANVAS1 + Math_Lib.rnd(6)), (ItemBasePtr) ac);//RJS 22Nov96
-//DeadCode RDH 02Sep98		break;
-//DeadCode RDH 02Sep98		case BF_Pilot:
-//DeadCode RDH 02Sep98		{
-//DeadCode RDH 02Sep98			AircraftAnimData	*adptr = (AircraftAnimData*) ac->Anim;//RDH 16Dec96
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98			if (whatstate == BS_DAMLV2)
-//DeadCode RDH 02Sep98				if (ac->ai.morale > MORALE_POOR)
-//DeadCode RDH 02Sep98					ac->ai.morale = MORALE_POOR;
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98			if (whatstate == BS_DEAD)
-//DeadCode RDH 02Sep98			{
-//DeadCode RDH 02Sep98				if (ac == Manual_Pilot.ControlledAC2)
-//DeadCode RDH 02Sep98				{
-//DeadCode RDH 02Sep98					_Miles.PlayOnce(FIL_SFX_DYING_BREATH2, (ItemBasePtr) ac);//RJS 27Nov96
-//DeadCode RDH 02Sep98					Manual_Pilot.controlmode=ManualPilot::PILOTDEAD;
-//DeadCode RDH 02Sep98 //DeadCode ARM 08Dec96 // ZXCV					if (!_DPlay.Implemented)
-//DeadCode RDH 02Sep98						GR_Quit3DNow=CRASHED_DEAD;					//RJS 13Nov96
-//DeadCode RDH 02Sep98					if (acptr)
-//DeadCode RDH 02Sep98						acptr->fly.redeffect = 1;				//RJS 14Nov96
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98					adptr->itemstate = DEAD;					//RDH 16Dec96
-//DeadCode RDH 02Sep98				}
-//DeadCode RDH 02Sep98				else
-//DeadCode RDH 02Sep98					_Miles.PlayOnce(FIL_SFX_DYING_BREATH2, (ItemBasePtr) ac,96);//RJS 27Nov96
-//DeadCode RDH 02Sep98			}
-//DeadCode RDH 02Sep98			else
-//DeadCode RDH 02Sep98			{
-//DeadCode RDH 02Sep98				if (ac == Manual_Pilot.ControlledAC2)
-//DeadCode RDH 02Sep98					_Miles.PlayOnce((FileNum) (FIL_SFX_YELP1 + Math_Lib.rnd(3)), (ItemBasePtr) ac);//RJS 22Nov96
-//DeadCode RDH 02Sep98				else
-//DeadCode RDH 02Sep98					_Miles.PlayOnce((FileNum) (FIL_SFX_YELP1 + Math_Lib.rnd(3)), (ItemBasePtr) ac,96);//RJS 27Nov96
-//DeadCode RDH 02Sep98			}
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98		}
-//DeadCode RDH 02Sep98		break;
-//DeadCode RDH 02Sep98		case BF_Fuel:
-//DeadCode RDH 02Sep98		{
-//DeadCode RDH 02Sep98			_Miles.PlaySample((FileNum) (FIL_SFX_RICOCHET_CANVAS1 + Math_Lib.rnd(6)), (ItemBasePtr) ac);//RJS 22Nov96
-//DeadCode RDH 02Sep98			switch (whatstate)
-//DeadCode RDH 02Sep98			{
-//DeadCode RDH 02Sep98				case BS_DAMLV1:									//RJS 27Nov96
-//DeadCode RDH 02Sep98				{
-//DeadCode RDH 02Sep98					AircraftAnimData*	adptr = (AircraftAnimData*) ac->Anim;
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98 //DeadCode RJS 21May97					if (adptr->vapourtrail == 0)
-//DeadCode RDH 02Sep98 //DeadCode RJS 23May97						LaunchVapourStream((mobileitem*)ac,worldptr);//RJS 13Nov96
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98					break;
-//DeadCode RDH 02Sep98				}
-//DeadCode RDH 02Sep98				case BS_DEAD:
-//DeadCode RDH 02Sep98				{
-//DeadCode RDH 02Sep98					if (ac == Manual_Pilot.ControlledAC2)		//RJS 27May97
-//DeadCode RDH 02Sep98						if (View_Object)
-//DeadCode RDH 02Sep98							View_Object->SetToDeathView(DZ_Slow);		//RJS 27May97
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98					_Miles.PlaySample((FileNum) (FIL_SFX_EXPLOSION_OILDRUM1+Math_Lib.rnd(6)), (ItemBasePtr) ac);//RJS 22Nov96
-//DeadCode RDH 02Sep98					KillLauncher((itemptr)ac,worldptr);//RJS 21Oct96
-//DeadCode RDH 02Sep98				}
-//DeadCode RDH 02Sep98				break;
-//DeadCode RDH 02Sep98			}
-//DeadCode RDH 02Sep98		}
-//DeadCode RDH 02Sep98		break;
-//DeadCode RDH 02Sep98		case BF_Engine:
-//DeadCode RDH 02Sep98		{
-//DeadCode RDH 02Sep98			FormationItemPtr flauncher = *ac;					//RJS 02Oct96
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98			_Miles.PlaySample((FileNum) (FIL_SFX_RICOCHET_METAL_TWANG + Math_Lib.rnd(4)), (ItemBasePtr) ac);//RJS 02Dec96
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98			switch (whatstate)
-//DeadCode RDH 02Sep98			{
-//DeadCode RDH 02Sep98				case BS_DAMLV2:
-//DeadCode RDH 02Sep98				{
-//DeadCode RDH 02Sep98					if (ac == Manual_Pilot.ControlledAC2)
-//DeadCode RDH 02Sep98						_Miles.KillEngine(flauncher->classtype,2);//RJS 03Dec96
-//DeadCode RDH 02Sep98				}
-//DeadCode RDH 02Sep98				break;
-//DeadCode RDH 02Sep98				case BS_DEAD:
-//DeadCode RDH 02Sep98				{
-//DeadCode RDH 02Sep98					AircraftAnimData*	adptr = (AircraftAnimData*) ac->Anim;
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98					if (ac == Manual_Pilot.ControlledAC2)
-//DeadCode RDH 02Sep98						_Miles.KillEngine(flauncher->classtype,0);//RJS 21Oct96
-//DeadCode RDH 02Sep98
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97					if (adptr->vapourtrail)
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97					{
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97						if (ac == Manual_Pilot.ControlledAC2)	//RJS 14Nov96
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97							View_Point.SetToDeathView(DZ_Slow);		//RJS 14Nov96
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97						_Miles.PlaySample((FileNum) (FIL_SFX_EXPLOSION_OILDRUM1+Math_Lib.rnd(6)), (ItemBasePtr) ac);//RJS 22Nov96
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97						KillLauncher((itemptr)ac,worldptr);
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97					}
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97					else
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97					{
-//DeadCode RDH 02Sep98						_Miles.PlaySample((FileNum) (FIL_SFX_EXPLOSION_DISTANT1+Math_Lib.rnd(2)), (ItemBasePtr) ac);//RJS 22Nov96
-//DeadCode RDH 02Sep98						LaunchSmokeTrail((mobileitem*)ac,worldptr);
-//DeadCode RDH 02Sep98 //DeadCode RJS 27May97					}
-//DeadCode RDH 02Sep98				}
-//DeadCode RDH 02Sep98				break;
-//DeadCode RDH 02Sep98			}
-//DeadCode RDH 02Sep98		}
-//DeadCode RDH 02Sep98		break;
-//DeadCode RDH 02Sep98	}
 }
 
 //------------------------------------------------------------------------------
@@ -9167,18 +7465,14 @@ void TransObj::KillLauncher(itemptr launcher,ItemPtr killer,WorldStuff& world,SB
 	{
 		AirStrucPtr	ac = (AirStrucPtr) launcher;
 
-//DeadCode AMM 31Mar99		if (!(_DPlay.Implemented || _Replay.Record))
 		if (!_DPlay.Implemented)								//AMM 31Mar99
 			SHAPE.DetatchAllVapourStreams(ac);
 
 		if (Manual_Pilot.DeathSequenceOverride(ac,AUTO_SPIRAL2GROUND)==TRUE)
 		{
-//DeadCode AMM 31Mar99			if (!(_DPlay.Implemented || _Replay.Record))
 			if (!_DPlay.Implemented)							//AMM 31Mar99
 				ExplodeAC(ac,killer,world);						//JIM 11Mar99
 
-//DeadCode AMM 24Mar99			else												//AMM 04Mar99
-//DeadCode AMM 04Mar99			if (airtoair)										//AMM 08Jan99
 			if (_DPlay.Implemented || _Replay.Record)
 			{
 			// Send ac_collision packet....
@@ -9653,16 +7947,7 @@ void TransObj::ControlKeybWeap(AirStrucPtr ac,WorldStuff& world)
 		if (adptr->itemstate != ALIVE)
 			return;
 
-//DeadCode RJS 03Dec98		if (fakeshootdelay <= 0)
-//DeadCode RJS 03Dec98		{
-//DeadCode RJS 03Dec98			// Launch fake bullet for gunsight code....
-//DeadCode RJS 03Dec98
-//DeadCode RJS 03Dec98			fakeshootdelay = 25;
-			SHAPE.CalcRadarRange(ac);
-//DeadCode MS 30Nov98			LaunchTrackedBullet(ac,world);
-//DeadCode RJS 03Dec98		}
-//DeadCode RJS 03Dec98		else
-//DeadCode RJS 03Dec98			fakeshootdelay -= frametime;
+		SHAPE.CalcRadarRange(ac);
 
 		if (Key_Tests.KeyPress3d(WINGSPANUP) || Key_Tests.KeyHeld3d(WINGSPANUP))
 			SHAPE.WingSpanUp();
@@ -9684,19 +7969,7 @@ void TransObj::ControlKeybWeap(AirStrucPtr ac,WorldStuff& world)
 		}*/
 
 
-//DeadCode RJS 23Mar99		if (Key_Tests.KeyPress3d(CANOPYEJECT))					//RJS 20Apr98
-//DeadCode RJS 23Mar99			LaunchCanopyEject(ac,world);						//RJS 19Feb98
 
-//DeadCode RJS 05May99		if (Key_Tests.KeyPress3d(EJECTPILOT))					//RJS 19Feb98
-//DeadCode RJS 05May99		{
-//DeadCode RJS 05May99			if (_DPlay.Implemented || _Replay.Record)			//AMM 21Apr99
-//DeadCode RJS 05May99			{													//AMM 21Apr99
-//DeadCode RJS 05May99				_DPlay.NewSpecial(PIDC_EJECT,0,0,0);			//AMM 21Apr99
-//DeadCode RJS 05May99			}													//AMM 21Apr99
-//DeadCode RJS 05May99			else												//AMM 21Apr99
-//DeadCode RJS 05May99				LaunchCanopyEject(ac,world);						//RJS 19Feb98
-//DeadCode RJS 05May99 //DeadCode RJS 23Mar99			LaunchParachute(ac,world);							//RJS 19Feb98
-//DeadCode RJS 05May99		}
 
 		if (Key_Tests.KeyPress3d(LASTWEAPON))					
 			WeaponSearch(ac,Go_Backward);
@@ -9735,7 +8008,6 @@ void TransObj::ControlKeybWeap(AirStrucPtr ac,WorldStuff& world)
 		}
 
 		if (	Key_Tests.KeyPress3d(RELOADWEAPON))		//RJS 11May99
-//DEADCODE RDH 11/05/99			&&	Save_Data.gamedifficulty[GD_RELOADARMS]	)		//RJS 25Jan99
 			ReloadWeapons(ac);
 
 		if (Key_Tests.KeyPress3d(VOICETOGGLE))					//RJS 30Jun99
@@ -9781,9 +8053,6 @@ void TransObj::ControlKeybWeap(AirStrucPtr ac,WorldStuff& world)
 		}
 		else
 		{
-//DeadCode RJS 23Jul98			if (	(	Key_Tests.KeyHeld3d(SHOOT)				//RJS 10Jun97
-//DeadCode RJS 23Jul98					 && ((LT_BULLET & LT_MASK)==currentweapon))	//RJS 10Jun97
-//DeadCode RJS 23Jul98				||	autobulletcount								)//RJS 10Jun97
 			if (Key_Tests.KeyHeld3d(SHOOT))						//RJS 23Jul98
 			{
 				// cannot drop multiple bombs, causes cock-up
@@ -9854,9 +8123,7 @@ void TransObj::ControlKeybWeap(AirStrucPtr ac,WorldStuff& world)
 				{
 					if (!_Replay.guncameradelay--)
 					{
-//DeadCode AMM 02Jul99 						_Replay.clearreplaybuffers=true;
 // done in stop record
-//DeadCode AMM 08Jul99 						_Replay.ClearReplayBuffers();			//AMM 02Jul99
 						_Replay.StopRecord();
 					}
 				}
@@ -9938,14 +8205,9 @@ void TransObj::PilotedACHit()
 	if (	Save_Data.gamedifficulty[GD_COLLISIONS]				//RJS 25Jan99
 		&&	!(Manual_Pilot.ControlledAC2->MigStatus.LaunchFlags.deadtime)
 		&&	(!View_Point ||!((ViewPoint*)View_Point)->Accel())
-//DEADCODE DAW 28/03/99		&&	!Timer_Code.accel
 //#pragma warnmsg("Paul: test for accel")
 		)
 	{
-//DeadCode RJS 20May99 		itemptr	 hititem;
-//DeadCode RJS 20May99 		Coords3D	hitcoords;
-//DeadCode RJS 20May99 		int	gindex;
-//DeadCode RJS 20May99 		WorldStuff&	world = *Manual_Pilot.ControlledAC2->currworld;
 
 		BoxCol::NineSectorColThisPiloted(Manual_Pilot.ControlledAC2);//RJS 20May99
 	}
@@ -9968,46 +8230,6 @@ void TransObj::PilotedACHit()
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 28Apr99 void TransObj::CommsACHit (AirStrucPtr hititem1, itemptr hititem2)
-//DeadCode AMM 28Apr99 {
-//DeadCode AMM 28Apr99
-//DeadCode AMM 28Apr99	WorldStuff&	world = *hititem1->currworld;
-//DeadCode AMM 28Apr99
-//DeadCode AMM 28Apr99	if (	(hititem1 == Manual_Pilot.ControlledAC2)
-//DeadCode AMM 28Apr99		||	(hititem2 == Manual_Pilot.ControlledAC2)	)
-//DeadCode AMM 28Apr99		View_Object->SetToDeathView();							//RDH 02Sep98
-//DeadCode AMM 28Apr99
-//DeadCode AMM 28Apr99	if (	(hititem1->shape != WRECK)
-//DeadCode AMM 28Apr99		&&	(hititem1->shape != CRATER)
-//DeadCode AMM 28Apr99		&&	(hititem1->shape != PDEATH)	)
-//DeadCode AMM 28Apr99		 KillLauncher((itemptr)hititem1,hititem1,world);		//JIM 11Mar99
-//DeadCode AMM 28Apr99
-//DeadCode AMM 28Apr99	if (	(hititem2->shape != WRECK)
-//DeadCode AMM 28Apr99		&&	(hititem2->shape != CRATER)
-//DeadCode AMM 28Apr99		&&	(hititem2->shape != PDEATH)	)
-//DeadCode AMM 28Apr99		 KillLauncher((itemptr)hititem2,hititem2,world);		//JIM 11Mar99
-//DeadCode AMM 28Apr99
-//DeadCode AMM 28Apr99
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98 #ifdef LOGENTRY
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98						_DPlay.LogEntry ("CommsACHit");
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98 #endif
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98	WorldStuff&	world = *Me->currworld;
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98	MinAnimData* mad =
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98		(MinAnimData* )Me->Anim;//RJS 05Sep96
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98	if (mad->itemstate != DEAD)
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98		 KillLauncher((itemptr)Me,world);//RJS 05Sep96
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98	mad = (MinAnimData* )hititem->Anim;
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98	if (mad->itemstate != DEAD)
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98		KillLauncher((itemptr)hititem,world);
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98	gindex = gindex;
-//DeadCode AMM 28Apr99 //DeadCode AMM 01Jun98
-//DeadCode AMM 28Apr99 }
 
 //------------------------------------------------------------------------------
 //Procedure		ExecuteAnimation
@@ -10064,9 +8286,6 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 	SLong		grounddist;
 	Bool		noDirt = FALSE;
 
-//DeadCode RJS 11Jun99 //DeadCode RJS 11Jun99 	if (WithinVisibleRange(hitCoords,SHAPESTUFF.GetShapePtr(shapehit)->MaxDrawRange))//RJS 30Apr99
-//DeadCode RJS 11Jun99 //if (WithinVisibleRange(hitCoords,400000))					//RJS 11Jun99
-//DeadCode RJS 11Jun99 	{
 		hitpositm->World = hitCoords;								//RJS 02Dec98
 
 		switch ((int)animnum)												//JIM 29/03/99
@@ -10208,7 +8427,6 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 					if (grounddist < 300)		// 3 metres
 					{
 						LaunchDirtyBuildingFingers(hitpositm,Math_Lib.rnd(),worldptr);// lets have some dirt//MS 30Nov98
-		//DeadCode MS 10Dec98				LaunchDirtLarge(hitpositm,worldptr);
 
 						hitpositm->World.Y = glevel;
 						LaunchShockwave(hitpositm,worldptr);
@@ -10269,10 +8487,8 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 				if ((weapon->LauncherType==LT_FUEL) || (weapon->LauncherType==LT_INTFUEL))
 					weapon->pitch = -1;
 
-	//DeadCode RJS 25Mar99			SHAPE.InitTrailFields(weapptr,0,32000,LT_FUEL);		//RJS 02Apr98
 				SHAPE.LogFuelDamage(itm,weapptr,itm);				//RJS 21Jan99
 				LaunchVapourStream(weapptr,shapehit);				//RJS 17Sep97
-//RERUN deadcode				shititem = itm;
 			}
 			break;
 			case ANIM_WEAPONDAMAGE:									
@@ -10312,18 +8528,10 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 			{
 				if (WithinVisibleRange(hitCoords,100000))		//RJS 11Jun99
 				{
-//DeadCode RJS 01Jul99 					if (Math_Lib.rnd()>40000)
-//DeadCode RJS 01Jul99 					{
-//DeadCode RJS 01Jul99 						ShapeDescPtr		sdptr = SHAPESTUFF.GetShapePtr(shapehit);
-//DeadCode RJS 01Jul99 						ULong				size = sdptr->Size << 4;
-//DeadCode RJS 01Jul99 						UWord				maxtroops = size / 163;
-//DeadCode RJS 01Jul99 
-//DeadCode RJS 01Jul99 						if (maxtroops > randval)	//RJS 10Dec98
 						UWord	maxtroops = randval;			//RJS 01Jul99
 
 						_Miles.PlayOnce((FileNum) (FIL_SFX_YELP1 + Math_Lib.rnd(5)),hitpositm);
 						LaunchDebris(hitpositm,BlokeFlyingShape,0,maxtroops,worldptr,TRUE);
-//DeadCode RJS 01Jul99 					}
 				}
 				break;
 			}
@@ -10331,11 +8539,6 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 			{
 				if (WithinVisibleRange(hitCoords,200000))		//RJS 11Jun99
 				{
-//DeadCode RJS 01Jul99 					ShapeDescPtr		sdptr = SHAPESTUFF.GetShapePtr(shapehit);
-//DeadCode RJS 01Jul99 					ULong				size = sdptr->Size << 4;
-//DeadCode RJS 01Jul99 					UWord				maxtroops = size / 128;
-//DeadCode RJS 01Jul99 
-//DeadCode RJS 01Jul99 					if (maxtroops > randval)	//RJS 10Dec98
 					UWord	maxtroops = randval;				//RJS 01Jul99
 
 					hitpositm->World = oldcoords;
@@ -10348,11 +8551,6 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 			{
 				if (WithinVisibleRange(hitCoords,200000))		//RJS 11Jun99
 				{
-//DeadCode RJS 01Jul99 					ShapeDescPtr		sdptr = SHAPESTUFF.GetShapePtr(shapehit);
-//DeadCode RJS 01Jul99 					ULong				size = sdptr->Size << 4;
-//DeadCode RJS 01Jul99 					UWord				maxtroops = size / 128;
-//DeadCode RJS 01Jul99 
-//DeadCode RJS 01Jul99 					if (maxtroops > randval)	//RJS 10Dec98
 					UWord	maxtroops = randval;				//RJS 01Jul99
 
 					hitpositm->World = oldcoords;
@@ -10458,7 +8656,6 @@ void	TransObj::ExecuteAnimation(	ItemPtr		itm,
 		}
 
 		hitpositm->World = oldcoords;
-//DeadCode RJS 11Jun99 	}
 }
 
 //------------------------------------------------------------------------------
@@ -10577,9 +8774,6 @@ void	TransObj::LaunchDirtLarge(mobileitem* launcher,WorldStuff& worldptr)
 											100,MOBILE_STATIONARY);	//MS 10Dec98
 		if (newitem)												//MS 10Dec98
 		{															//MS 10Dec98
-	//DeadCode RJS 21Apr99		SLong	glevel = GetGroundLevel(launcher) + METRES01;	//RJS 14Apr99
-	//DeadCode RJS 21Apr99																//MS 10Dec98
-	//DeadCode RJS 21Apr99		newitem->World.Y = glevel;								//MS 10Dec98
 			newitem->World.Y += METRES01;							//RJS 21Apr99
 			newitem->hdg = hdg;										//MS 10Dec98
 			newitem->pitch = pitch;									//MS 10Dec98
@@ -10733,7 +8927,6 @@ void	TransObj::DoImpactGround(ItemPtr	launcher, Coords3D	impactpos,UByte	areatyp
 			case AT_sea:
 			case AT_river:
 			case AT_washShore:
-//DeadCode RJS 06Jul99 				_Miles.PlayOnce(FIL_SFX_RICOCHET_WATER,launcher);
 				LaunchSplashSmall((mobileitem*)launcher,*world);
 				break;
 			case AT_hardRock:									//RJS 06Jul99
@@ -10827,20 +9020,9 @@ void	TransObj::DoImpactGround(ItemPtr	launcher, Coords3D	impactpos,UByte	areatyp
 
 			_Miles.PlaySample((FileNum) (FIL_SFX_EXPLOSION_TANK+Math_Lib.rnd(3)), launcher);//RJS 10Nov98
 
-//DeadCode AM 01Dec98			if (HitStrength > 24)
-//DeadCode AM 01Dec98			{
-//DeadCode AM 01Dec98				LaunchDirtyFingers((mobileitem*)launcher,*world);
-//DeadCode AM 01Dec98				LaunchDirtLarge((mobileitem*)launcher,*world);
-//DeadCode AM 01Dec98			}
-//DeadCode AM 01Dec98			else
-//DeadCode AM 01Dec98			{
-//DeadCode AM 01Dec98				if (HitStrength > 16)
-//DeadCode AM 01Dec98					LaunchDirtyFingers((mobileitem*)launcher,*world);
-//DeadCode AM 01Dec98				else
 			LaunchDirtMedium((mobileitem*)launcher,*world);
 //Dead			if (((TransientItem*)launcher)->Launcher == Manual_Pilot.ControlledAC2)
 				LaunchCrater((mobileitem*)launcher,*world);
-//DeadCode AM 01Dec98			}
 		}
 		break;
 		}
@@ -11001,14 +9183,6 @@ void	TransObj::LandedEffect(AirStrucPtr	ac, SLong	landed,Bool send,Bool musthit)
 			case _Collide.PROP_TOUCH:
 			case _Collide.NOSE_TOUCH:
 			{
-//DeadCode MS 10Dec98				TransientItem*	newitem;
-//DeadCode MS 10Dec98				newitem = SimplifiedSpriteLaunch(ac,DUMY13,400,MOBILE_GANDF);
-//DeadCode MS 10Dec98				if (newitem)												
-//DeadCode MS 10Dec98				{									
-//DeadCode MS 10Dec98					newitem->vely = 150;						
-//DeadCode MS 10Dec98					newitem->TransRandom = 1;				
-//DeadCode MS 10Dec98					AddTransientItemToWorld(newitem,*world);	
-//DeadCode MS 10Dec98				}						
 				
 				KillLauncher(ac,ac,*world);
 				if (View_Object && (ac==Manual_Pilot.ControlledAC2))
@@ -11050,19 +9224,9 @@ void	TransObj::LandedEffect(AirStrucPtr	ac, SLong	landed,Bool send,Bool musthit)
 		else
 		{
 			// Are any wheels damaged?
-//DeadCode DAW 28Jun99 			if (adptr->LEFTWHEEL ||	adptr->RIGHTWHEEL || adptr->FRONTWHEEL || adptr->BACKWHEEL)
-//DeadCode DAW 28Jun99 				landed = _Collide.LANDED_BELLY;
 
 			if (landed == _Collide.LANDED_OK)
 			{
-//DeadCode RJS 11Jun99 				// Perhaps throw up a bit of dirt...
-//DeadCode RJS 11Jun99 
-//DeadCode RJS 11Jun99 				adptr->hasdust = FALSE;
-//DeadCode RJS 11Jun99 				if (!adptr->justlanded)
-//DeadCode RJS 11Jun99 				{
-//DeadCode RJS 11Jun99 					adptr->justlanded = TRUE;
-//DeadCode RJS 11Jun99 					_Miles.PlayOnce(FIL_SFX_TYRE_SCREECH1,ac);
-//DeadCode RJS 11Jun99 				}
 			}
 			else
 			{
@@ -11082,19 +9246,10 @@ void	TransObj::LandedEffect(AirStrucPtr	ac, SLong	landed,Bool send,Bool musthit)
 
 					SHAPE.DetatchAllVapourStreams(ac);			//RJS 04Dec98
 
-//DeadCode MS 10Dec98					TransientItem*	newitem;
-//DeadCode MS 10Dec98					newitem = SimplifiedSpriteLaunch(ac,DUMY13,400,MOBILE_GANDF);
-//DeadCode MS 10Dec98					if (newitem)												
-//DeadCode MS 10Dec98					{									
-//DeadCode MS 10Dec98						newitem->vely = 150;						
-//DeadCode MS 10Dec98						newitem->TransRandom = 1;				
-//DeadCode MS 10Dec98						AddTransientItemToWorld(newitem,*world);	
-//DeadCode MS 10Dec98					}						
 
 					Manual_Pilot.DeathSequenceOverride(ac,AUTO_NOPPILOT);
 
 					ExplodeAC(ac,ac,*world);					//JIM 11Mar99
-//DeadCode RJS 30Mar99					ac->shape = PDEATH;
 
 					if (View_Object && (ac==Manual_Pilot.ControlledAC2))
 						View_Object->SetToDeathView(DEATH_NORMAL);
@@ -11106,22 +9261,6 @@ void	TransObj::LandedEffect(AirStrucPtr	ac, SLong	landed,Bool send,Bool musthit)
 					LaunchFire(ac,*world);						//RJS 28Jun99
 				}
 				break;
-//DeadCode RJS 04Dec98				case _Collide.RIGHT_WING_TOUCH:
-//DeadCode RJS 04Dec98					Manual_Pilot.DeathSequenceOverride(ac,AUTO_CRASHROLL);
-//DeadCode RJS 04Dec98					adptr->hasdust = TRUE;
-//DeadCode RJS 04Dec98					LaunchDustTrail2(ac,*world); // Maybe sparks, if on hard ground...
-//DeadCode RJS 04Dec98					SHAPE.ForceDamage(ac,&adptr->RIGHTWINGIN,BS_DEAD);
-//DeadCode RJS 04Dec98					if (View_Object && (ac==Manual_Pilot.ControlledAC2))
-//DeadCode RJS 04Dec98						View_Object->SetToDeathView(DEATH_SKID);
-//DeadCode RJS 04Dec98				break;
-//DeadCode RJS 04Dec98				case _Collide.LEFT_WING_TOUCH:
-//DeadCode RJS 04Dec98					Manual_Pilot.DeathSequenceOverride(ac,AUTO_CRASHROLL);
-//DeadCode RJS 04Dec98					adptr->hasdust = TRUE;
-//DeadCode RJS 04Dec98					LaunchDustTrail2(ac,*world); // Maybe sparks, if on hard ground...
-//DeadCode RJS 04Dec98					SHAPE.ForceDamage(ac,&adptr->LEFTWINGIN,BS_DEAD);
-//DeadCode RJS 04Dec98					if (View_Object && (ac==Manual_Pilot.ControlledAC2))
-//DeadCode RJS 04Dec98						View_Object->SetToDeathView(DEATH_SKID);
-//DeadCode RJS 04Dec98				break;
 				default:
 				{
 					if (ac->vel < MPH100)						//RJS 11Dec98
@@ -11541,14 +9680,6 @@ void	TransObj::DummyLandedEffect(AirStrucPtr	ac, SLong	landed,UByte atype)
 			case _Collide.PROP_TOUCH:
 			case _Collide.NOSE_TOUCH:
 			{
-//DeadCode MS 10Dec98				TransientItem*	newitem;
-//DeadCode MS 10Dec98				newitem = SimplifiedSpriteLaunch(ac,DUMY13,400,MOBILE_GANDF);
-//DeadCode MS 10Dec98				if (newitem)												
-//DeadCode MS 10Dec98				{									
-//DeadCode MS 10Dec98					newitem->vely = 150;						
-//DeadCode MS 10Dec98					newitem->TransRandom = 1;				
-//DeadCode MS 10Dec98					AddTransientItemToWorld(newitem,*world);	
-//DeadCode MS 10Dec98				}						
 			
 				KillLauncher(ac,ac,*world);						//JIM 11Mar99
 			}
@@ -11571,8 +9702,6 @@ void	TransObj::DummyLandedEffect(AirStrucPtr	ac, SLong	landed,UByte atype)
 		else
 		{
 			// Are any wheels damaged?
-//DeadCode DAW 28Jun99 			if (adptr->LEFTWHEEL ||	adptr->RIGHTWHEEL || adptr->FRONTWHEEL || adptr->BACKWHEEL)
-//DeadCode DAW 28Jun99 				landed = _Collide.LANDED_BELLY;
 
 			if (landed == _Collide.LANDED_OK)
 			{
@@ -11587,7 +9716,6 @@ void	TransObj::DummyLandedEffect(AirStrucPtr	ac, SLong	landed,UByte atype)
 			}
 			else
 			{
-//DeadCode RJS 20Apr99				LaunchDirtMedium(ac,*world);
 				LaunchMushroomCloud(ac,10,*world);				//RJS 20Apr99
 
 				switch (landed)
@@ -11606,18 +9734,6 @@ void	TransObj::DummyLandedEffect(AirStrucPtr	ac, SLong	landed,UByte atype)
 					LaunchFire(ac,*world);						//RJS 28Jun99
 				}
 				break;
-//DeadCode RJS 20Apr99				case _Collide.RIGHT_WING_TOUCH:
-//DeadCode RJS 20Apr99					Manual_Pilot.DeathSequenceOverride(ac,AUTO_CRASHROLL);
-//DeadCode RJS 20Apr99					adptr->hasdust = TRUE;
-//DeadCode RJS 20Apr99					LaunchDustTrail2(ac,*world); // Maybe sparks, if on hard ground...
-//DeadCode RJS 20Apr99					SHAPE.ForceDamage(ac,ac,&adptr->RIGHTWINGIN,BS_DEAD);//JIM 11Mar99
-//DeadCode RJS 20Apr99				break;
-//DeadCode RJS 20Apr99				case _Collide.LEFT_WING_TOUCH:
-//DeadCode RJS 20Apr99					Manual_Pilot.DeathSequenceOverride(ac,AUTO_CRASHROLL);
-//DeadCode RJS 20Apr99					adptr->hasdust = TRUE;
-//DeadCode RJS 20Apr99					LaunchDustTrail2(ac,*world); // Maybe sparks, if on hard ground...
-//DeadCode RJS 20Apr99					SHAPE.ForceDamage(ac,ac,&adptr->LEFTWINGIN,BS_DEAD);//JIM 11Mar99
-//DeadCode RJS 20Apr99				break;
 				default:
 				{
 					if (ac->vel < MPH100)						//RJS 11Dec98
@@ -11665,10 +9781,7 @@ void	TransObj::DummyLandedEffect(AirStrucPtr	ac, SLong	landed,UByte atype)
 			}
 			else
 			{
-//DeadCode RJS 20Apr99				LaunchDirtMedium(ac,*world);
 				KillLauncher(ac,ac,*world);						//JIM 11Mar99
-//DeadCode RJS 21Apr99				SHAPE.ResetAnimData_NewShape(ac,PDEATH);		//RJS 30Mar99
-//DeadCode RDH 30Mar99				ac->shape = PDEATH;
 				LaunchFire(ac,*world);
 			}
 
@@ -11697,12 +9810,9 @@ void	TransObj::DummyLandedEffect(AirStrucPtr	ac, SLong	landed,UByte atype)
 				}
 				else
 				{
-//DeadCode RJS 20Apr99					LaunchDirtMedium(ac,*world);
 					KillLauncher(ac,ac,*world);					//JIM 11Mar99
 					if (View_Object && (ac==Manual_Pilot.ControlledAC2))//RDH 02Sep98
 						View_Object->SetToDeathView();				//RDH 02Sep98
-//DeadCode RJS 21Apr99					SHAPE.ResetAnimData_NewShape(ac,PDEATH);		//RJS 30Mar99
-//DeadCode RDH 30Mar99					ac->shape = PDEATH;
 					LaunchFire(ac,*world);
 				}
 
@@ -12012,7 +10122,6 @@ void	TransObj::LaunchFlash(mobileitem*	launcher, UByte	damsize, WorldStuff&	worl
 {
 	TransientItem*		newitem;
 	
-//DeadCode MS 30Nov98	newitem = SimplifiedSpriteLaunch((mobileitem*)launcher,EXPLO,3,MOBILE_STATIONARY);
 	newitem = SimplifiedSpriteLaunch((mobileitem*)launcher,FLASH,30,MOBILE_STATIONARY);
 	if (newitem)
 	{
@@ -12169,7 +10278,6 @@ void	TransObj::LaunchTossedShape(mobileitem*	launcher, SByte	groupindex,Coords3D
 						if (launcher->MigStatus.LaunchFlags.size == FORMATIONSIZE)//RJS 23Jun99
 						{
  							if (	!launcher->MigStatus.LaunchFlags.deadtime )
-//DEADCODE JIM 09/09/99 								&&	(launcher->AutoMoveInfo.movecode != AUTO_NOPPILOT)	)//RJS 01Jul99
  								FormationItemPtr(*launcher)->BreakForm(); //JIM 09/09/99
 						}
 
@@ -12277,7 +10385,6 @@ void	TransObj::MobileCollapse(TransientItemPtr transit, WorldStuff& world)
 			SLong	groundheight = GetGroundLevel(transit,theArea);//RJS 28Apr99
 			if (transit->World.Y <= groundheight)
 			{
-//DeadCode RJS 28Apr99				UByte	theArea = Three_Dee.GetLandType();		//RJS 27Nov98
 
 				Coords3D	hitcoords;
 
@@ -12665,11 +10772,8 @@ void TransObj::KillLauncherComms(AirStrucPtr	ac)
 
 	SHAPE.DetatchAllVapourStreams(ac);
 
-//DeadCode AMM 24Mar99	if (ac==Persons2::PlayerSeenAC)
-//DeadCode AMM 24Mar99	{
 	if (!_Replay.Record)
 	{
-//DeadCode AMM 15Apr99		if (Manual_Pilot.DeathSequenceOverride(ac,AUTO_SPIRAL2GROUND,true))
 		{
 			// what is the killer??
 			ExplodeAC(ac,ac,*world,FALSE);						//JIM 11Mar99
@@ -12680,11 +10784,6 @@ void TransObj::KillLauncherComms(AirStrucPtr	ac)
 		ExplodeAC(ac,ac,*world,FALSE);						
 	}
 
-//DeadCode AMM 24Mar99	}
-//DeadCode AMM 24Mar99	else
-//DeadCode AMM 24Mar99	{
-//DeadCode AMM 24Mar99		ExplodeAC(ac,*world,FALSE);
-//DeadCode AMM 24Mar99	}
 }
 
 //------------------------------------------------------------------------------
@@ -12846,7 +10945,7 @@ void	TransObj::AddTransientItemToTrailList(TransientItemPtr	newitem)
 	if (StaticTrailList[StaticTrailIndex].item==NULL)			//RJS 13May99
 	{
 		StaticTrailList[StaticTrailIndex].item = newitem;		//RJS 13May99
-		StaticTrailList[StaticTrailIndex].time = View_Object->TimeOfDay();//RJS 13May99
+		StaticTrailList[StaticTrailIndex].time = (View_Object ? View_Object->TimeOfDay() : 0);//RJS 13May99
 		StaticTrailCnt++;
 	}
 }
@@ -12897,22 +10996,6 @@ void	TransObj::CleanUpTrailList()
 	SLong	index;
 	for (index=0; index < MaxTrails; index++)					//RJS 06Apr99
 	{
-//DeadCode DAW 21Jun99 		if (StaticTrailList[index].item)						//RJS 13Jun99
-//DeadCode DAW 21Jun99 		{
-//DeadCode DAW 21Jun99 			Coords3DList*	apoint;
-//DeadCode DAW 21Jun99 #ifndef	NDEBUG
-//DeadCode DAW 21Jun99 #ifdef	MEMTRACE
-//DeadCode DAW 21Jun99 	UWord cw=GETFPCW();
-//DeadCode DAW 21Jun99 	::AfxTrace("TRANSKILL:\n");
-//DeadCode DAW 21Jun99 	SETFPCW(cw);
-//DeadCode DAW 21Jun99 #endif
-//DeadCode DAW 21Jun99 #endif
-//DeadCode DAW 21Jun99 			adptr = (SmokeTrailAnimData*) StaticTrailList[index].item->Anim;
-//DeadCode DAW 21Jun99 			apoint = (Coords3DList*) adptr->thelist;
-//DeadCode DAW 21Jun99 			apoint->Wipe();
-//DeadCode DAW 21Jun99 
-//DeadCode DAW 21Jun99 			adptr->thelist = NULL;
-//DeadCode DAW 21Jun99 		}
 
 		StaticTrailList[index].item = NULL;						//RJS 13May99
 		StaticTrailList[index].time = 0xFFFFFFFF;				//RJS 13May99
@@ -12935,12 +11018,6 @@ void	TransObj::CleanUpTrailList()
 //------------------------------------------------------------------------------
 void	TransObj::ScanTrailListAndSave()
 {
-//DeadCode DAW 06Apr99	SLong	index;
-//DeadCode DAW 06Apr99	for (index=0; index < MaxTransients; index++)
-//DeadCode DAW 06Apr99	{
-//DeadCode DAW 06Apr99
-//DeadCode DAW 06Apr99
-//DeadCode DAW 06Apr99	}
 }
 
 //------------------------------------------------------------------------------
@@ -12979,7 +11056,7 @@ void	TransObj::LaunchReplayTrail(Coords3D&			cpos,
 		adptr->weaponlaunchers[0].pitch = -1;
 		adptr->weaponlaunchers[0].LauncherType = LT_VAPOUR;	//RJS 13Apr99
 		adptr->nopoints = smkptr->nopoints;
-		adptr->thelist = (uintptr_t) thelist;
+		AnimLink::Store(adptr->thelist, thelist);
 		adptr->lifetime = smkptr->lifetime;
 		adptr->SmkDescIndex = smkptr->smkindex;
 		adptr->currTime = smkptr->currTime;						//RJS 16Jun99
@@ -13033,7 +11110,6 @@ void	TransObj::LaunchNapalmImpacted(mobileitem* launcher,WorldStuff& worldptr)
 										MOBILE_BURNIT);		
 	if (newitem)											
 	{
-//DeadCode RJS 21Apr99		newitem->World.Y = GetGroundLevel(newitem);				//RJS 14Apr99
 
 		Three_Dee.pMigLand->GetShadowAngles(newitem->World,newitem->hdg,newitem->pitch,newitem->roll);
 
@@ -13193,36 +11269,14 @@ static int lastheight=0;
 SLong	TransObj::GetGroundLevel(ItemBase*	itm)
 {
 	SLong	height = 0;	//HIGHESTGROUND;
-//DeadCode DAW 01Jul99 	int newsect=0;
-//DeadCode DAW 01Jul99 	//landscape block size = 512*256 cm= 128Kcm= 1.3km
-//DeadCode DAW 01Jul99 	int sectx=itm->World.X>>17;
-//DeadCode DAW 01Jul99 	int sectz=itm->World.Z&0xfffe0000;
-//DeadCode DAW 01Jul99 	newsect=sectx+sectz;
-//DeadCode DAW 01Jul99 	if (newsect==lastsector && lastheight<itm->World.Y + METRES500)
-//DeadCode DAW 01Jul99 	{
-//DeadCode DAW 01Jul99 //		return lastheight;
-//DeadCode DAW 01Jul99 	}
 	if (itm->World.Y < HIGHESTGROUND)
 		height = Land_Scape.GetGroundLevel(itm->World);
-//DEADCODE DAW 05/05/99	else
-//DEADCODE DAW 05/05/99		height=HIGHESTGROUND;
-//DeadCode DAW 01Jul99 	lastsector=newsect;
-//DeadCode DAW 01Jul99 	lastheight=height;
 	return (height);
 }
 
 SLong	TransObj::GetGroundLevel(ItemBase*	itm,UByte&	theArea)
 {
 	SLong	height = 0;	//HIGHESTGROUND;
-//DeadCode DAW 01Jul99 	int newsect=0;
-//DeadCode DAW 01Jul99 	//landscape block size = 512*256 cm= 128Kcm= 1.3km
-//DeadCode DAW 01Jul99 	int sectx=itm->World.X>>17;
-//DeadCode DAW 01Jul99 	int sectz=itm->World.Z&0xfffe0000;
-//DeadCode DAW 01Jul99 	newsect=sectx+sectz;
-//DeadCode DAW 01Jul99 	if (newsect==lastsector && lastheight<itm->World.Y + METRES500)
-//DeadCode DAW 01Jul99 	{
-//DeadCode DAW 01Jul99 //		return lastheight;
-//DeadCode DAW 01Jul99 	}
 	if (itm->World.Y < HIGHESTGROUND)
 	{
 		height = Land_Scape.GetGroundLevel(itm->World,&theArea);//DAW 04May99
@@ -13231,8 +11285,6 @@ SLong	TransObj::GetGroundLevel(ItemBase*	itm,UByte&	theArea)
 	else
 		theArea = DEFAULT_AREATYPE;	//RERUN: uninit read by callers when above HIGHESTGROUND
 
-//DeadCode DAW 01Jul99 	lastsector=newsect;
-//DeadCode DAW 01Jul99 	lastheight=height;
 	return (height);
 }
 
@@ -13650,17 +11702,11 @@ void	TransObj::PointBlokes(ItemPtr	launcher, ShapeNum troopshape, Coords3D&	real
 				adptr->xpos = placelist[randindex].X;								
 				adptr->ypos = placelist[randindex].Y;
 				adptr->zpos = placelist[randindex].Z;
-//DeadCode RJS 11Jun99 					adptr->oncourse = FALSE;
 
 				// Someone might panic!!!!!... headless chicken code
 				if (Math_Lib.rnd()<60000)							//RJS 10Jun99
 					adptr->homing = TRUE;							//RJS 10Jun99
 			}
-//DeadCode RJS 11Jun99 				else
-//DeadCode RJS 11Jun99 				{
-//DeadCode RJS 11Jun99 					adptr->oncourse = FALSE;
-//DeadCode RJS 11Jun99 					adptr->homing = FALSE;
-//DeadCode RJS 11Jun99 				}
 	
 			// 5 metre spread around...
 			newitem->World.X = realpos.X + Math_Lib.rnd(1000) - 500;

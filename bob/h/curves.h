@@ -110,7 +110,6 @@ void LoadCurvesF80C ();
 void LoadCurvesF51D ();
 void LoadCurvesF9F2 ();
 
-//DeadCode CSB 27/10/98	void LoadCurvesATMOS ();
 void LoadCurvesF94A ();
 void LoadCurvesF8 ();
 void LoadCurvesF82G ();

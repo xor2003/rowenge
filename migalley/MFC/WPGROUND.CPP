@@ -193,6 +193,7 @@ void	CWPGround::RefreshDetail(UniqueID u)
 	if (!wpdetail)
 		for (wpdetail=(RowanDialog*)parent->fchild;wpdetail;wpdetail=(RowanDialog*)wpdetail->sibling)
 			breakif(wpdetail->packnum!=-1 && wpdetail!=this);
+	if (!wpdetail)	return;
 	wpdetail->acnum=u;
 	wpdetail->RefreshData(0);
 }
@@ -201,9 +202,9 @@ void	CWPGround::DescribeTargetRoute()
 {
 	if (!Todays_Packages[packnum][wavenum].firstwp || !Todays_Packages[packnum][wavenum][groupnum].uid)
 		return;
-	int	minelt,maxelt;
-	int	minfl,maxfl;
-	int maxrows;
+	int	minelt=-1,maxelt=-1;
+	int	minfl=-1,maxfl=-1;
+	int maxrows=MAXLISTSIZE;
 	switch (groupingmode)
 	{
 		case 0:
@@ -316,116 +317,6 @@ void	CWPGround::DescribeTargetRoute()
 //want a target disperse line after
 //want a landing time after
 
-//DeadCode RDH 01Nov98 	if (!Todays_Packages[packnum][wavenum].firstwp || !Todays_Packages[packnum][wavenum][groupnum].uid)
-//DeadCode RDH 01Nov98 		return;
-//DeadCode RDH 01Nov98 	int	minelt,maxelt;
-//DeadCode RDH 01Nov98 	int	minfl,maxfl;
-//DeadCode RDH 01Nov98 
-//DeadCode RDH 01Nov98 	switch (groupingmode)
-//DeadCode RDH 01Nov98 	{
-//DeadCode RDH 01Nov98 		case 0:
-//DeadCode RDH 01Nov98 				minelt=maxelt=-1;
-//DeadCode RDH 01Nov98 				minfl=maxfl=-1;
-//DeadCode RDH 01Nov98 		break;
-//DeadCode RDH 01Nov98 		case 1:
-//DeadCode RDH 01Nov98 				minelt=maxelt=-1;
-//DeadCode RDH 01Nov98 				minfl=0,maxfl=3;
-//DeadCode RDH 01Nov98 		break;
-//DeadCode RDH 01Nov98 		case 2:
-//DeadCode RDH 01Nov98 				minelt=0,maxelt=1;
-//DeadCode RDH 01Nov98 				minfl=0,maxfl=3;
-//DeadCode RDH 01Nov98 		break;
-//DeadCode RDH 01Nov98 	}
-//DeadCode RDH 01Nov98 
-//DeadCode RDH 01Nov98 	CRListBox* rlistbox=GetDlgItem(IDC_WAYPOINTLIST);
-//DeadCode RDH 01Nov98 	rlistbox->Clear();
-//DeadCode RDH 01Nov98 	int	currrow=0;
-//DeadCode RDH 01Nov98 	rlistbox->AddColumn(120);
-//DeadCode RDH 01Nov98 	rlistbox->AddColumn(20);
-//DeadCode RDH 01Nov98	rlistbox->AddColumn(thincol);
-//DeadCode RDH 01Nov98	rlistbox->AddColumn(thincol);
-//DeadCode RDH 01Nov98	rlistbox->AddColumn(thincol);
-//DeadCode RDH 01Nov98	rlistbox->AddColumn(thincol);
-//DeadCode RDH 01Nov98	rlistbox->AddColumn(thincol);
-//DeadCode RDH 01Nov98	rlistbox->AddColumn(thincol);
-//DeadCode RDH 01Nov98 
-//DeadCode RDH 01Nov98 	rlistbox->AddString(RESSTRING(WAYPOINT),0);
-//DeadCode RDH 01Nov98 	rlistbox->AddString(RESSTRING(POSITION),1);
-//DeadCode RDH 01Nov98 	rlistbox->AddString(RESSTRING(ALTITUDE),2);
-//DeadCode RDH 01Nov98 	rlistbox->AddString(RESSTRING(VELOCITY),3);
-//DeadCode RDH 01Nov98 	rlistbox->AddString(RESSTRING(ETA),4);
-//DeadCode RDH 01Nov98 	rlistbox->AddString(RESSTRING(ETA),5);
-//DeadCode RDH 01Nov98 	rlistbox->AddString(RESSTRING(FUELUSED),6);
-//DeadCode RDH 01Nov98 	tabletype[currrow++]=HEADER;
-//DeadCode RDH 01Nov98 
-//DeadCode RDH 01Nov98 
-//DeadCode RDH 01Nov98 	for (int fl=minfl;fl<=maxfl;fl++)
-//DeadCode RDH 01Nov98 		for (int elt=minelt;elt<=maxelt;elt++)
-//DeadCode RDH 01Nov98 		{
-//DeadCode RDH 01Nov98 			char buffer[30];
-//DeadCode RDH 01Nov98 			{
-//DeadCode RDH 01Nov98 				if (fl!=-1)
-//DeadCode RDH 01Nov98 					if (elt!=-1)
-//DeadCode RDH 01Nov98 						sprintf(buffer,RESSTRING(FL_PC_EL_PC),fl,elt);
-//DeadCode RDH 01Nov98 					else
-//DeadCode RDH 01Nov98 						sprintf(buffer,RESSTRING(FL_PC),fl);
-//DeadCode RDH 01Nov98 				else
-//DeadCode RDH 01Nov98 					sprintf(buffer,RESSTRING(ALLFLIGHTS));
-//DeadCode RDH 01Nov98 				rlistbox->AddString(buffer,0);
-//DeadCode RDH 01Nov98 				rlistbox->AddString("",1);
-//DeadCode RDH 01Nov98				rlistbox->AddString("",2);
-//DeadCode RDH 01Nov98				rlistbox->AddString("",3);
-//DeadCode RDH 01Nov98				rlistbox->AddString("",4);
-//DeadCode RDH 01Nov98 				rlistbox->AddString("",5);
-//DeadCode RDH 01Nov98 				rlistbox->AddString("",6);
-//DeadCode RDH 01Nov98 				tabletype[currrow]=TITLE;
-//DeadCode RDH 01Nov98 				tablewp[currrow]=UniqueID(((fl&7)*4)+(elt&3));
-//DeadCode RDH 01Nov98 				currrow++;
-//DeadCode RDH 01Nov98 
-//DeadCode RDH 01Nov98 			}
-//DeadCode RDH 01Nov98 //want a target arrival time line before
-//DeadCode RDH 01Nov98 			Describeonewp(rlistbox,keys[BEFORE],MAINROUTE,currrow++,' ');
-//DeadCode RDH 01Nov98 			UniqueID u;
-//DeadCode RDH 01Nov98 			int wpnum=0;
-//DeadCode RDH 01Nov98 			char wpletter='A';
-//DeadCode RDH 01Nov98 			u=Profile::Wave::FindWpBetween(keys[BEFORE],keys[ATTACK1],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			while (u && u!=keys[ATTACK1])
-//DeadCode RDH 01Nov98 			{
-//DeadCode RDH 01Nov98 				Describeonewp(rlistbox,u,BEFORE,currrow++,wpletter++);
-//DeadCode RDH 01Nov98 				u=Profile::Wave::FindWpAfter(u,keys[ATTACK1],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			}
-//DeadCode RDH 01Nov98 			u=Profile::Wave::FindWpBetween(keys[ATTACK1],keys[BETWEEN],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			while (u)
-//DeadCode RDH 01Nov98 			{
-//DeadCode RDH 01Nov98 				Describeonewp(rlistbox,u,ATTACK1,currrow++,wpletter++);
-//DeadCode RDH 01Nov98 				u=Profile::Wave::FindWpAfter(u,keys[BETWEEN],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			}
-//DeadCode RDH 01Nov98 			u=Profile::Wave::FindWpAfter(keys[BETWEEN],keys[ATTACK2],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			while (u && u!=keys[ATTACK2])
-//DeadCode RDH 01Nov98 			{
-//DeadCode RDH 01Nov98 				Describeonewp(rlistbox,u,BETWEEN,currrow++,wpletter++);
-//DeadCode RDH 01Nov98 				u=Profile::Wave::FindWpAfter(u,keys[ATTACK2],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			}
-//DeadCode RDH 01Nov98 			u=Profile::Wave::FindWpBetween(keys[ATTACK2],keys[AFTER],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			if (u!=keys[ATTACK1])
-//DeadCode RDH 01Nov98 			while (u)
-//DeadCode RDH 01Nov98 			{
-//DeadCode RDH 01Nov98 				Describeonewp(rlistbox,u,ATTACK2,currrow++,wpletter++);
-//DeadCode RDH 01Nov98 				u=Profile::Wave::FindWpAfter(u,keys[AFTER],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			}
-//DeadCode RDH 01Nov98 			u=Profile::Wave::FindWpAfter(keys[AFTER],keys[POSTRV],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			while (u && u!=keys[POSTRV])
-//DeadCode RDH 01Nov98 			{
-//DeadCode RDH 01Nov98 				Describeonewp(rlistbox,u,AFTER,currrow++,wpletter++);
-//DeadCode RDH 01Nov98 				u=Profile::Wave::FindWpAfter(u,keys[POSTRV],groupnum,fl,elt);
-//DeadCode RDH 01Nov98 			}
-//DeadCode RDH 01Nov98 //want a target regroup line after
-//DeadCode RDH 01Nov98 		}
-//DeadCode RDH 01Nov98 		Describeonewp(rlistbox,keys[POSTRV],POSTRV,currrow++,' ');
-//DeadCode RDH 01Nov98 
-//DeadCode RDH 01Nov98 //want a target disperse line after
-//DeadCode RDH 01Nov98 //want a landing time after
-//DeadCode RDH 01Nov98 
 }
 
 void	CWPGround::Describeonewp(CRListBox* listbox,UniqueID u,TableType t,int addrow,char currletter)
@@ -462,13 +353,14 @@ void	CWPGround::Describeonewp(CRListBox* listbox,UniqueID u,TableType t,int addr
 		listbox->AddString(buffer,0);
 	}
 	else
+	{
 		if (u==keys[BEFORE])
 			listbox->AddString(RESSTRING(MAIN_WP_TARGET),0);
-		else
-		if (u==keys[POSTRV])
+		else if (u==keys[POSTRV])
 			listbox->AddString(RESSTRING(MAIN_WP_REGROUP),0);
 		else
 			listbox->AddString(RESSTRING(MAIN_WP_DISPERSE),0);
+	}
 				
 
 
@@ -486,13 +378,6 @@ void	CWPGround::Describeonewp(CRListBox* listbox,UniqueID u,TableType t,int addr
 				int alt = (w->World.Y*10)/Save_Data.alt.mediummm;
 				alt = 100*((alt + 50)/100);
 				listbox->AddString(CSprintf("%i%s",alt,LoadResString(Save_Data.alt.mediumabbr)),1);
-//DeadCode RDH 01Nov98 	if (w->vel!=0 && w->vel!=ENABLE_COMPLEX_VAL)
-//DeadCode RDH 01Nov98 	{
-//DeadCode RDH 01Nov98 		sprintf(buffer,"%i",w->vel/5);
-//DeadCode RDH 01Nov98 		listbox->AddString(buffer,3);
-//DeadCode RDH 01Nov98 	}
-//DeadCode RDH 01Nov98 	else
-//DeadCode RDH 01Nov98 		listbox->AddString(RESSTRING(CRUISE),3);
 				break;
 			}
 			case L_ETAREL:
@@ -603,6 +488,7 @@ void	CWPGround::RefreshButtons(int effect)
 	if (!wpbuttons)
 		for (wpbuttons=(RowanDialog*)parent->fchild;wpbuttons;wpbuttons=(RowanDialog*)wpbuttons->sibling)
 			breakif(wpbuttons->packnum==-1);
+	if (!wpbuttons)	return;
 	wpbuttons->RefreshData(effect);
 }
 void CWPGround::SetButtons(long row)

@@ -8,7 +8,6 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -112,25 +111,13 @@ static unsigned short dpn_udp_port() {
     const char* e = getenv("ROWAN_DPLAY_PORT");
     return (unsigned short)(e ? atoi(e) : 54710);
 }
-static unsigned short dpn_tcp_port() { return (unsigned short)(dpn_udp_port() + 1); }
+/* session traffic now runs over ENet (reliable ordered UDP) on udp+1;
+   kept the old TCP port number so ROWAN_DPLAY_PORT stays compatible */
+static unsigned short dpn_enet_port() { return (unsigned short)(dpn_udp_port() + 1); }
 
-static bool sock_send_all(int fd, const void* buf, size_t len) {
-    const char* p = (const char*)buf;
-    while (len) {
-        ssize_t n = send(fd, p, len, MSG_NOSIGNAL);
-        if (n <= 0) return false;
-        p += n; len -= (size_t)n;
-    }
-    return true;
-}
-static bool sock_recv_all(int fd, void* buf, size_t len) {
-    char* p = (char*)buf;
-    while (len) {
-        ssize_t n = recv(fd, p, len, 0);
-        if (n <= 0) return false;
-        p += n; len -= (size_t)n;
-    }
-    return true;
+static void enetInitOnce() {
+    static std::once_flag once;
+    std::call_once(once, []{ enet_initialize(); });
 }
 
 /* ================================================================== */
@@ -161,30 +148,29 @@ ULONG CDPlayNet::Release() {
 /* ---------------- teardown ---------------- */
 void CDPlayNet::teardown() {
     shutting = true;
-    /* shutdown() wakes blocking recv() on connected sockets; the accept and
-       UDP responder loops poll `shutting` via select timeouts. */
+    /* ask the service thread to flush outQ, run the ENet disconnect
+       handshake on every live peer, then exit — then destroy the host. */
     {
-        std::lock_guard<std::mutex> lk(mtx);
-        if (hostConn && hostConn->fd >= 0) shutdown(hostConn->fd, SHUT_RDWR);
-        for (auto& c : conns) if (c->fd >= 0) shutdown(c->fd, SHUT_RDWR);
+        std::lock_guard<std::mutex> lk(outMtx);
+        draining = true;
     }
-    if (acceptThr.joinable()) acceptThr.join();
+    if (serviceThr.joinable()) serviceThr.join();
+    if (eHost) { enet_host_destroy(eHost); eHost = nullptr; }
     if (udpThr.joinable()) udpThr.join();
-    std::vector<std::shared_ptr<Conn> > cs;
     {
         std::lock_guard<std::mutex> lk(mtx);
-        cs.swap(conns);
-        if (hostConn) { cs.push_back(hostConn); hostConn.reset(); }
+        conns.clear();
+        hostConn.reset();
     }
-    for (auto& c : cs) {
-        if (c->thr.joinable()) c->thr.join();
-        if (c->fd >= 0) { close(c->fd); c->fd = -1; }
-    }
-    if (listenFd >= 0) { close(listenFd); listenFd = -1; }
     if (udpSrvFd >= 0) { close(udpSrvFd); udpSrvFd = -1; }
     if (udpQFd >= 0) { close(udpQFd); udpQFd = -1; }
     inSession = false;
     isHost = false;
+    /* leave the object reusable for a later Open */
+    draining = false;
+    shutting = false;
+    connectDone = false;
+    connectFailed = false;
 }
 
 /* ---------------- queue ---------------- */
@@ -228,27 +214,29 @@ void CDPlayNet::pushSysDestroy(DPXID id, uint32_t ptype) {
 }
 
 /* ---------------- wire helpers ---------------- */
-HRESULT CDPlayNet::sendMsgToWire(Conn* c, DPXID from, DPXID to, const void* data, size_t len) {
-    if (!c || c->fd < 0 || c->dead) return DPX_ERR_GENERIC;
-    WHdr h; memset(&h, 0, sizeof(h));
-    h.magic = W_MAGIC; h.type = W_MSG; h.from = from; h.to = to;
-    h.len = (uint32_t)len;
-    std::lock_guard<std::mutex> lk(c->sendMtx);
-    if (!sock_send_all(c->fd, &h, sizeof(h)) ||
-        (len && !sock_send_all(c->fd, data, len))) {
-        c->dead = true;
-        return DPX_ERR_GENERIC;
-    }
-    return DPX_OK;
+/* Frame one WHdr message into a single reliable ENet packet and queue it
+   for the service thread. Channel 0 is reliable+ordered — same ordering
+   guarantee the TCP stream provided. */
+void CDPlayNet::queuePacket(ENetPeer* peer, uint32_t type, DPXID from, DPXID to,
+                            uint32_t aux, const void* data, size_t len) {
+    if (!peer) return;
+    OutPkt p;
+    p.peer = peer;
+    p.buf.resize(sizeof(WHdr) + len);
+    WHdr* h = (WHdr*)p.buf.data();
+    memset(h, 0, sizeof(*h));
+    h->magic = W_MAGIC; h->type = type; h->from = from; h->to = to;
+    h->aux = aux; h->len = (uint32_t)len;
+    if (len) memcpy(p.buf.data() + sizeof(WHdr), data, len);
+    std::lock_guard<std::mutex> lk(outMtx);
+    outQ.push_back(std::move(p));
 }
 
-static bool wsend_simple(int fd, uint32_t type, DPXID from, DPXID to,
-                         uint32_t aux, const void* data, size_t len) {
-    WHdr h; memset(&h, 0, sizeof(h));
-    h.magic = W_MAGIC; h.type = type; h.from = from; h.to = to;
-    h.aux = aux; h.len = (uint32_t)len;
-    if (!sock_send_all(fd, &h, sizeof(h))) return false;
-    return !len || sock_send_all(fd, data, len);
+HRESULT CDPlayNet::sendMsgToWire(Conn* c, DPXID from, DPXID to, const void* data, size_t len) {
+    if (!c || !c->peer || c->peer->state != ENET_PEER_STATE_CONNECTED)
+        return DPX_ERR_GENERIC;
+    queuePacket(c->peer, W_MSG, from, to, 0, data, len);
+    return DPX_OK;
 }
 
 /* routing of app messages when WE are the host */
@@ -300,45 +288,16 @@ HRESULT CDPlayNet::routeFromLocal(DPXID from, DPXID to, const void* data, size_t
     if (isHost) {
         return hostRoute(nullptr, from, to, (const uint8_t*)data, len);
     }
-    if (hostConn && hostConn->fd >= 0 && !hostConn->dead)
+    if (hostConn && hostConn->peer &&
+        hostConn->peer->state == ENET_PEER_STATE_CONNECTED)
         return sendMsgToWire(hostConn.get(), from, to, data, len);
-    /* no connection — loop back locally so single-host test builds still flow */
-    std::lock_guard<std::mutex> lk(mtx);
+    /* no connection — loop back locally so single-host test builds still
+       flow. mtx is already held by the caller (SendEx). */
     enqueue(from, to, data, len);
     return DPX_OK;
 }
 
 /* ---------------- host side ---------------- */
-void CDPlayNet::acceptLoop() {
-    while (!shutting) {
-        fd_set rf; FD_ZERO(&rf); FD_SET(listenFd, &rf);
-        timeval tv{0, 200000};
-        if (select(listenFd + 1, &rf, nullptr, nullptr, &tv) <= 0) continue;
-        sockaddr_in sa; socklen_t sl = sizeof(sa);
-        int fd = accept(listenFd, (sockaddr*)&sa, &sl);
-        if (fd < 0) { if (shutting) break; continue; }
-        int one = 1;
-        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
-        auto c = std::make_shared<Conn>();
-        c->fd = fd; c->addr = sa;
-        {
-            std::lock_guard<std::mutex> lk(mtx);
-            /* reap finished conns (their recv threads ended; a conn can
-               never erase/join its own thread from inside the loop) */
-            for (auto it = conns.begin(); it != conns.end();) {
-                Conn* o = it->get();
-                if (o->dead && o->fd < 0) {
-                    if (o->thr.joinable()) o->thr.join();
-                    it = conns.erase(it);
-                } else ++it;
-            }
-            conns.push_back(c);
-        }
-        DPNLOG("accepted client %s\n", inet_ntoa(sa.sin_addr));
-        c->thr = std::thread(&CDPlayNet::connRecvLoop, this, c);
-    }
-}
-
 void CDPlayNet::hostDestroyRemotePlayers(Conn* c) {
     /* remove all of conn's players/groups, broadcast DESTROY sysmsgs */
     DPNLOG("conn teardown: %zu remote players\n", c->players.size());
@@ -353,90 +312,75 @@ void CDPlayNet::hostDestroyRemotePlayers(Conn* c) {
         m.dpId = p; m.name.dwSize = sizeof(RDPNAME);
         for (auto& o : conns)
             if (o.get() != c)
-                wsend_simple(o->fd, W_SYSMSG, 0, 0, 0, &m, sizeof(m));
+                queuePacket(o->peer, W_SYSMSG, 0, 0, 0, &m, sizeof(m));
     }
     c->players.clear();
 }
 
-void CDPlayNet::connRecvLoop(std::shared_ptr<Conn> c) {
-    for (;;) {
-        WHdr h;
-        if (!sock_recv_all(c->fd, &h, sizeof(h)) || h.magic != W_MAGIC) break;
-        std::vector<uint8_t> pl(h.len);
-        if (h.len && !sock_recv_all(c->fd, pl.data(), h.len)) break;
-        std::unique_lock<std::mutex> lk(mtx);
-        switch (h.type) {
-        case W_HELLO:
-            DPNLOG("client hello\n");
-            break;
-        case W_MSG:
-            hostRoute(c.get(), h.from, h.to, pl.data(), pl.size());
-            break;
-        case W_CPREQ: {
-            DPXID id = nextId++;
-            c->players.insert(id);
-            if (h.to == 1) {        /* player */
-                pushSysCreate(id, DPXPLAYERTYPE_PLAYER);
-                sessionDesc.dwCurrentPlayers++;
-            } else {
-                localGroups.insert(id);
-                pushSysCreate(id, DPXPLAYERTYPE_GROUP);
-            }
-            lk.unlock();
-            wsend_simple(c->fd, W_CPACK, 0, id, h.aux, nullptr, 0);
-            /* tell other clients about the new player/group */
-            RMsgCreateP m; memset(&m, 0, sizeof(m));
-            m.dwType = DPXSYS_CREATEPLAYERORGROUP;
-            m.dwPlayerType = h.to; m.dpId = id;
-            m.dwCurrentPlayers = sessionDesc.dwCurrentPlayers;
-            m.name.dwSize = sizeof(RDPNAME);
-            std::vector<Conn*> others;
-            {
-                std::lock_guard<std::mutex> lk2(mtx);
-                for (auto& o : conns) if (o.get() != c.get()) others.push_back(o.get());
-            }
-            for (Conn* o : others)
-                wsend_simple(o->fd, W_SYSMSG, 0, 0, 0, &m, sizeof(m));
-            break;
+/* client->host message dispatch (one ENet packet = one WHdr message) */
+void CDPlayNet::hostOnPacket(Conn* c, const uint8_t* p, size_t n) {
+    if (n < sizeof(WHdr)) return;
+    WHdr h; memcpy(&h, p, sizeof(h));
+    if (h.magic != W_MAGIC || sizeof(WHdr) + h.len > n) return;
+    const uint8_t* pl = p + sizeof(WHdr);
+    std::unique_lock<std::mutex> lk(mtx);
+    switch (h.type) {
+    case W_HELLO:
+        DPNLOG("client hello\n");
+        break;
+    case W_MSG:
+        hostRoute(c, h.from, h.to, pl, h.len);
+        break;
+    case W_CPREQ: {
+        DPXID id = nextId++;
+        c->players.insert(id);
+        if (h.to == 1) {        /* player */
+            pushSysCreate(id, DPXPLAYERTYPE_PLAYER);
+            sessionDesc.dwCurrentPlayers++;
+        } else {
+            localGroups.insert(id);
+            pushSysCreate(id, DPXPLAYERTYPE_GROUP);
         }
-        case W_ADDG:
-            groups[h.to].insert(h.from);
-            DPNLOG("wire addplayer g=%u p=%u members=%zu\n", h.to, h.from, groups[h.to].size());
-            break;
-        case W_DELG:
-            groups[h.to].erase(h.from);
-            DPNLOG("wire delplayer g=%u p=%u\n", h.to, h.from);
-            break;
-        case W_DESTROY: {
-            DPXID p = h.from;
-            c->players.erase(p);
-            for (auto& g : groups) g.second.erase(p);
-            pushSysDestroy(p, DPXPLAYERTYPE_PLAYER);
-            RMsgDestroyP m; memset(&m, 0, sizeof(m));
-            m.dwType = DPXSYS_DESTROYPLAYERORGROUP;
-            m.dwPlayerType = DPXPLAYERTYPE_PLAYER;
-            m.dpId = p; m.name.dwSize = sizeof(RDPNAME);
-            for (auto& o : conns)
-                if (o.get() != c.get())
-                    wsend_simple(o->fd, W_SYSMSG, 0, 0, 0, &m, sizeof(m));
-            break;
-        }
-        case W_BYE:
-            hostDestroyRemotePlayers(c.get());
-            shutdown(c->fd, SHUT_RDWR);
-            break;
-        default: break;
-        }
+        queuePacket(c->peer, W_CPACK, 0, id, h.aux, nullptr, 0);
+        /* tell other clients about the new player/group */
+        RMsgCreateP m; memset(&m, 0, sizeof(m));
+        m.dwType = DPXSYS_CREATEPLAYERORGROUP;
+        m.dwPlayerType = h.to; m.dpId = id;
+        m.dwCurrentPlayers = sessionDesc.dwCurrentPlayers;
+        m.name.dwSize = sizeof(RDPNAME);
+        for (auto& o : conns)
+            if (o.get() != c)
+                queuePacket(o->peer, W_SYSMSG, 0, 0, 0, &m, sizeof(m));
+        break;
     }
-    /* connection dropped — mark dead; removal happens in acceptLoop/teardown
-       (this Conn owns the very thread running this loop) */
-    {
-        std::lock_guard<std::mutex> lk(mtx);
-        hostDestroyRemotePlayers(c.get());
-        if (c->fd >= 0) { close(c->fd); c->fd = -1; }
-        c->dead = true;
+    case W_ADDG:
+        groups[h.to].insert(h.from);
+        DPNLOG("wire addplayer g=%u p=%u members=%zu\n", h.to, h.from, groups[h.to].size());
+        break;
+    case W_DELG:
+        groups[h.to].erase(h.from);
+        DPNLOG("wire delplayer g=%u p=%u\n", h.to, h.from);
+        break;
+    case W_DESTROY: {
+        DPXID pid = h.from;
+        c->players.erase(pid);
+        for (auto& g : groups) g.second.erase(pid);
+        pushSysDestroy(pid, DPXPLAYERTYPE_PLAYER);
+        RMsgDestroyP m; memset(&m, 0, sizeof(m));
+        m.dwType = DPXSYS_DESTROYPLAYERORGROUP;
+        m.dwPlayerType = DPXPLAYERTYPE_PLAYER;
+        m.dpId = pid; m.name.dwSize = sizeof(RDPNAME);
+        for (auto& o : conns)
+            if (o.get() != c)
+                queuePacket(o->peer, W_SYSMSG, 0, 0, 0, &m, sizeof(m));
+        break;
     }
-    DPNLOG("client disconnected\n");
+    case W_BYE:
+        hostDestroyRemotePlayers(c);
+        enet_peer_disconnect(c->peer, 0);     /* service thread — safe */
+        break;
+    default: break;
+    }
 }
 
 /* UDP discovery responder (host) */
@@ -469,61 +413,181 @@ void CDPlayNet::udpResponderLoop() {
 }
 
 /* ---------------- client side ---------------- */
-void CDPlayNet::clientRecvLoop(int fd) {
-    for (;;) {
-        WHdr h;
-        if (!sock_recv_all(fd, &h, sizeof(h)) || h.magic != W_MAGIC) break;
-        std::vector<uint8_t> pl(h.len);
-        if (h.len && !sock_recv_all(fd, pl.data(), h.len)) break;
-        std::unique_lock<std::mutex> lk(mtx);
-        switch (h.type) {
-        case W_MSG:
-            DPNLOG("recv from=%u to=%u len=%u pid=%08x\n",
-                   h.from, h.to, h.len, h.len >= 4 ? *(const uint32_t*)pl.data() : 0);
-            enqueue(h.from, h.to, pl.data(), pl.size());
-            break;
-        case W_SYSMSG:
-            enqueueSysMsg(pl.data(), pl.size());
-            break;
-        case W_CPACK:
-            pendingIds[h.aux] = {h.to, true};
-            lk.unlock();
-            idCv.notify_all();
-            break;
-        case W_SESSLOST: {
-            RMsgGeneric m; m.dwType = DPXSYS_SESSIONLOST;
-            enqueueSysMsg(&m, sizeof(m));
-            break;
-        }
-        default: break;
-        }
+/* host->client message dispatch */
+void CDPlayNet::clientOnPacket(const uint8_t* p, size_t n) {
+    if (n < sizeof(WHdr)) return;
+    WHdr h; memcpy(&h, p, sizeof(h));
+    if (h.magic != W_MAGIC || sizeof(WHdr) + h.len > n) return;
+    const uint8_t* pl = p + sizeof(WHdr);
+    std::unique_lock<std::mutex> lk(mtx);
+    switch (h.type) {
+    case W_MSG:
+        DPNLOG("recv from=%u to=%u len=%u pid=%08x\n",
+               h.from, h.to, h.len, h.len >= 4 ? *(const uint32_t*)pl : 0);
+        enqueue(h.from, h.to, pl, h.len);
+        break;
+    case W_SYSMSG:
+        enqueueSysMsg(pl, h.len);
+        break;
+    case W_CPACK:
+        pendingIds[h.aux] = {h.to, true};
+        lk.unlock();
+        idCv.notify_all();
+        break;
+    case W_SESSLOST: {
+        RMsgGeneric m; m.dwType = DPXSYS_SESSIONLOST;
+        enqueueSysMsg(&m, sizeof(m));
+        break;
     }
-    /* host socket died -> session lost */
-    {
-        std::lock_guard<std::mutex> lk(mtx);
-        if (inSession && !shutting) {
-            RMsgGeneric m; m.dwType = DPXSYS_SESSIONLOST;
-            enqueueSysMsg(&m, sizeof(m));
-        }
-        inSession = false;
+    default: break;
     }
-    DPNLOG("host connection lost\n");
+}
+
+/* ---------------- ENet service thread ----------------
+   Owns eHost entirely: drains outQ (the only path outbound packets take),
+   then services host events. Senders never touch enet directly. */
+void CDPlayNet::enetServiceLoop() {
+    bool done = false;
+    while (!done) {
+        /* drain outbound queue — enet_peer_send only on this thread.
+           The empty check and the draining check share one critical
+           section so a packet pushed just before `draining` was set
+           is still sent (Close's W_BYE/W_SESSLOST rely on it). */
+        for (;;) {
+            OutPkt p;
+            bool has = false;
+            {
+                std::lock_guard<std::mutex> lk(outMtx);
+                if (!outQ.empty()) {
+                    p = std::move(outQ.front());
+                    outQ.pop_front();
+                    has = true;
+                } else if (draining) {
+                    done = true;
+                }
+            }
+            if (!has) break;
+            if (!p.peer) continue;
+            ENetPacket* pk = enet_packet_create(p.buf.data(), p.buf.size(),
+                                                ENET_PACKET_FLAG_RELIABLE);
+            if (pk) enet_peer_send(p.peer, 0, pk);
+        }
+        if (done) break;
+        ENetEvent ev;
+        /* 5 ms cap on outbound latency; enet_host_service also flushes
+           queued sends each iteration */
+        if (enet_host_service(eHost, &ev, 5) > 0)
+            handleEnetEvent(ev);
+    }
+    gracefulDisconnect();
+}
+
+/* teardown path on the service thread: disconnect every live peer and pump
+   until the handshake completes (bounded — a dead peer must not hang exit) */
+void CDPlayNet::gracefulDisconnect() {
+    if (!eHost) return;
+    for (size_t i = 0; i < eHost->peerCount; ++i) {
+        ENetPeer* p = &eHost->peers[i];
+        if (p->state == ENET_PEER_STATE_CONNECTED)
+            enet_peer_disconnect(p, 0);
+    }
+    const auto deadline = std::chrono::steady_clock::now()
+                          + std::chrono::milliseconds(400);
+    ENetEvent ev;
+    while (std::chrono::steady_clock::now() < deadline) {
+        size_t live = 0;
+        for (size_t i = 0; i < eHost->peerCount; ++i) {
+            ENetPeerState s = eHost->peers[i].state;
+            if (s != ENET_PEER_STATE_DISCONNECTED &&
+                s != ENET_PEER_STATE_ZOMBIE)
+                ++live;
+        }
+        if (!live) break;
+        enet_host_service(eHost, &ev, 20);   /* events dropped — tearing down */
+    }
+    enet_host_flush(eHost);
+}
+
+void CDPlayNet::handleEnetEvent(const ENetEvent& ev) {
+    switch (ev.type) {
+    case ENET_EVENT_TYPE_CONNECT:
+        if (isHost) {
+            auto c = std::make_shared<Conn>();
+            c->peer = ev.peer;
+            c->addr.sin_addr.s_addr = ev.peer->address.host;  /* net order */
+            c->addr.sin_port = htons(ev.peer->address.port);  /* host order */
+            c->addr.sin_family = AF_INET;
+            ev.peer->data = c.get();
+            {
+                std::lock_guard<std::mutex> lk(mtx);
+                conns.push_back(c);
+            }
+            DPNLOG("client connected (enet)\n");
+        } else {
+            {
+                std::lock_guard<std::mutex> lk(mtx);
+                auto c = std::make_shared<Conn>();
+                c->peer = ev.peer;
+                ev.peer->data = c.get();
+                hostConn = c;
+                connectDone = true;
+            }
+            connCv.notify_all();
+            DPNLOG("connected to host (enet)\n");
+        }
+        break;
+    case ENET_EVENT_TYPE_RECEIVE:
+        if (isHost)
+            hostOnPacket((Conn*)ev.peer->data, ev.packet->data,
+                         ev.packet->dataLength);
+        else
+            clientOnPacket(ev.packet->data, ev.packet->dataLength);
+        enet_packet_destroy(ev.packet);
+        break;
+    case ENET_EVENT_TYPE_DISCONNECT:
+        if (isHost) {
+            Conn* c = (Conn*)ev.peer->data;
+            ev.peer->data = nullptr;
+            if (c) {
+                std::lock_guard<std::mutex> lk(mtx);
+                hostDestroyRemotePlayers(c);
+                for (auto it = conns.begin(); it != conns.end(); ++it)
+                    if (it->get() == c) { conns.erase(it); break; }
+            }
+            DPNLOG("client disconnected\n");
+        } else {
+            bool early;
+            {
+                std::lock_guard<std::mutex> lk(mtx);
+                early = !connectDone;
+                if (early) connectFailed = true;
+                if (!early && inSession && !shutting) {
+                    RMsgGeneric m; m.dwType = DPXSYS_SESSIONLOST;
+                    enqueueSysMsg(&m, sizeof(m));
+                }
+                if (!early) inSession = false;
+                if (hostConn) hostConn.reset();
+            }
+            if (early) connCv.notify_all();
+            DPNLOG("host connection lost\n");
+        }
+        break;
+    default: break;
+    }
 }
 
 HRESULT CDPlayNet::requestId(DPXID* out, uint32_t kind) {
     uint32_t tag;
+    ENetPeer* peer;
     {
         std::lock_guard<std::mutex> lk(mtx);
         tag = reqTagSeq++;
+        if (!hostConn || !hostConn->peer ||
+            hostConn->peer->state != ENET_PEER_STATE_CONNECTED)
+            return DPX_NOCONNECTION;
+        peer = hostConn->peer;
     }
-    int fd;
-    {
-        std::lock_guard<std::mutex> lk(mtx);
-        if (!hostConn || hostConn->fd < 0) return DPX_NOCONNECTION;
-        fd = hostConn->fd;
-    }
-    if (!wsend_simple(fd, W_CPREQ, 0, kind, tag, nullptr, 0))
-        return DPX_ERR_GENERIC;
+    queuePacket(peer, W_CPREQ, 0, kind, tag, nullptr, 0);
     std::unique_lock<std::mutex> lk(mtx);
     bool ok = idCv.wait_for(lk, std::chrono::seconds(10),
                             [&]{ return pendingIds.count(tag) && pendingIds[tag].second; });
@@ -645,25 +709,22 @@ HRESULT CDPlayNet::EnumSessions(LPVOID descp, uint32_t, LPVOID cbv,
 HRESULT CDPlayNet::Open(LPVOID descp, uint32_t flags) {
     RDPSD2* d = (RDPSD2*)descp;
     if (!d) return DPX_ERR_INVALIDPARAM;
-    std::lock_guard<std::mutex> lk(mtx);
+    std::unique_lock<std::mutex> lk(mtx);
     if (inSession) return DPX_ERR_GENERIC;
 
+    enetInitOnce();
+
     if (flags & DPX_OPEN_CREATE) {
-        /* TCP listen */
-        listenFd = socket(AF_INET, SOCK_STREAM, 0);
-        if (listenFd < 0) return DPX_CANTCREATESESSION;
-        int one = 1;
-        setsockopt(listenFd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-        sockaddr_in sa{}; sa.sin_family = AF_INET;
-        sa.sin_port = htons(dpn_tcp_port());
-        sa.sin_addr.s_addr = INADDR_ANY;
-        if (bind(listenFd, (sockaddr*)&sa, sizeof(sa)) || listen(listenFd, 8)) {
-            close(listenFd); listenFd = -1;
-            return DPX_CANTCREATESESSION;
-        }
-        /* UDP discovery responder */
+        /* ENet server host — reliable ordered UDP session channel */
+        ENetAddress ea;
+        ea.host = ENET_HOST_ANY;
+        ea.port = dpn_enet_port();
+        eHost = enet_host_create(&ea, 32 /*peers*/, 1 /*channel*/, 0, 0);
+        if (!eHost) return DPX_CANTCREATESESSION;
+        /* UDP discovery responder (ENet has no broadcast discovery) */
         udpSrvFd = socket(AF_INET, SOCK_DGRAM, 0);
         if (udpSrvFd >= 0) {
+            int one = 1;
             setsockopt(udpSrvFd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
             sockaddr_in ua{}; ua.sin_family = AF_INET;
             ua.sin_port = htons(dpn_udp_port());
@@ -684,11 +745,11 @@ HRESULT CDPlayNet::Open(LPVOID descp, uint32_t flags) {
         sessionDesc.dwCurrentPlayers = 0;
         isHost = true;
         inSession = true;
-        acceptThr = std::thread(&CDPlayNet::acceptLoop, this);
+        serviceThr = std::thread(&CDPlayNet::enetServiceLoop, this);
         if (udpSrvFd >= 0)
             udpThr = std::thread(&CDPlayNet::udpResponderLoop, this);
-        DPNLOG("hosting '%s' tcp=%u udp=%u\n", sessionName.c_str(),
-               dpn_tcp_port(), dpn_udp_port());
+        DPNLOG("hosting '%s' enet=%u udp=%u\n", sessionName.c_str(),
+               dpn_enet_port(), dpn_udp_port());
         return DPX_OK;
     }
 
@@ -706,25 +767,40 @@ HRESULT CDPlayNet::Open(LPVOID descp, uint32_t flags) {
             DPNLOG("join failed: unknown session guid\n");
             return DPX_NOCONNECTION;
         }
-        int fd = socket(AF_INET, SOCK_STREAM, 0);
-        if (fd < 0) return DPX_NOCONNECTION;
-        sa.sin_port = htons(dpn_tcp_port());
-        if (connect(fd, (sockaddr*)&sa, sizeof(sa))) {
-            close(fd);
-            DPNLOG("join failed: connect %s:%u\n", inet_ntoa(sa.sin_addr), dpn_tcp_port());
+        eHost = enet_host_create(nullptr /*client*/, 1, 1, 0, 0);
+        if (!eHost) return DPX_NOCONNECTION;
+        ENetAddress ea;
+        ea.host = sa.sin_addr.s_addr;   /* enet stores host in NET order —
+                                           copies it into sin_addr verbatim */
+        ea.port = dpn_enet_port();      /* port IS host order in ENet */
+        ENetPeer* peer = enet_host_connect(eHost, &ea, 1, 0);
+        if (!peer) {
+            enet_host_destroy(eHost); eHost = nullptr;
             return DPX_NOCONNECTION;
         }
-        int one = 1;
-        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+        connectDone = false; connectFailed = false;
+        isHost = false;
+        serviceThr = std::thread(&CDPlayNet::enetServiceLoop, this);
+        /* wait for the CONNECT event — timed wait, and NOT holding mtx
+           while blocked (the service thread needs it to set hostConn) */
+        bool ok = connCv.wait_for(lk, std::chrono::seconds(5),
+                                  [&]{ return connectDone || connectFailed; });
+        if (!ok || connectFailed || !hostConn) {
+            DPNLOG("join failed: no connect from %s:%u\n",
+                   inet_ntoa(sa.sin_addr), dpn_enet_port());
+            lk.unlock();
+            { std::lock_guard<std::mutex> ol(outMtx); draining = true; }
+            serviceThr.join();
+            enet_host_destroy(eHost); eHost = nullptr;
+            draining = false;             /* allow a later Open retry */
+            lk.lock();
+            return DPX_NOCONNECTION;
+        }
         sessionDesc = *d;
         sessionName = d->name.a ? d->name.a : "";
-        wsend_simple(fd, W_HELLO, 0, 0, 0, &d->guidApplication, sizeof(GUID));
-        auto c = std::make_shared<Conn>();
-        c->fd = fd; c->addr = sa;
-        hostConn = c;
-        isHost = false;
         inSession = true;
-        c->thr = std::thread(&CDPlayNet::clientRecvLoop, this, fd);
+        queuePacket(hostConn->peer, W_HELLO, 0, 0, 0,
+                    &d->guidApplication, sizeof(GUID));
         DPNLOG("joined session at %s\n", inet_ntoa(sa.sin_addr));
         return DPX_OK;
     }
@@ -748,12 +824,13 @@ HRESULT CDPlayNet::CreatePlayer(DPXID* out, LPVOID, HANDLE hEvent,
         m.dpId = id;
         m.dwCurrentPlayers = sessionDesc.dwCurrentPlayers;
         m.name.dwSize = sizeof(RDPNAME);
-        std::vector<int> fds;
+        std::vector<ENetPeer*> peers;
         {
             std::lock_guard<std::mutex> lk2(mtx);
-            for (auto& c : conns) fds.push_back(c->fd);
+            for (auto& c : conns) peers.push_back(c->peer);
         }
-        for (int f : fds) wsend_simple(f, W_SYSMSG, 0, 0, 0, &m, sizeof(m));
+        for (ENetPeer* p : peers)
+            queuePacket(p, W_SYSMSG, 0, 0, 0, &m, sizeof(m));
         lk.lock();
     } else {
         lk.unlock();
@@ -801,11 +878,8 @@ HRESULT CDPlayNet::AddPlayerToGroup(DPXID group, DPXID player) {
     std::unique_lock<std::mutex> lk(mtx);
     groups[group].insert(player);
     DPNLOG("addplayer g=%u p=%u members=%zu\n", group, player, groups[group].size());
-    if (!isHost && hostConn && hostConn->fd >= 0) {
-        int fd = hostConn->fd;
-        lk.unlock();
-        wsend_simple(fd, W_ADDG, player, group, 0, nullptr, 0);
-    }
+    if (!isHost && hostConn && hostConn->peer)
+        queuePacket(hostConn->peer, W_ADDG, player, group, 0, nullptr, 0);
     return DPX_OK;
 }
 
@@ -814,21 +888,16 @@ HRESULT CDPlayNet::DeletePlayerFromGroup(DPXID group, DPXID player) {
     auto it = groups.find(group);
     if (it != groups.end()) it->second.erase(player);
     DPNLOG("delplayer g=%u p=%u\n", group, player);
-    if (!isHost && hostConn && hostConn->fd >= 0) {
-        int fd = hostConn->fd;
-        lk.unlock();
-        wsend_simple(fd, W_DELG, player, group, 0, nullptr, 0);
-    }
+    if (!isHost && hostConn && hostConn->peer)
+        queuePacket(hostConn->peer, W_DELG, player, group, 0, nullptr, 0);
     return DPX_OK;
 }
 HRESULT CDPlayNet::DestroyPlayer(DPXID id) {
     std::unique_lock<std::mutex> lk(mtx);
     localPlayers.erase(id);
     for (auto& g : groups) g.second.erase(id);
-    if (!isHost && hostConn && hostConn->fd >= 0) {
-        int fd = hostConn->fd;
-        lk.unlock();
-        wsend_simple(fd, W_DESTROY, id, 0, 0, nullptr, 0);
+    if (!isHost && hostConn && hostConn->peer) {
+        queuePacket(hostConn->peer, W_DESTROY, id, 0, 0, nullptr, 0);
         return DPX_OK;
     }
     pushSysDestroy(id, DPXPLAYERTYPE_PLAYER);
@@ -899,14 +968,15 @@ HRESULT CDPlayNet::Close() {
     }
     if (wasHost) {
         /* notify clients before tearing down */
-        std::vector<int> fds;
+        std::vector<ENetPeer*> peers;
         {
             std::lock_guard<std::mutex> lk(mtx);
-            for (auto& c : conns) fds.push_back(c->fd);
+            for (auto& c : conns) peers.push_back(c->peer);
         }
-        for (int f : fds) wsend_simple(f, W_SESSLOST, 0, 0, 0, nullptr, 0);
-    } else if (hc && hc->fd >= 0) {
-        wsend_simple(hc->fd, W_BYE, 0, 0, 0, nullptr, 0);
+        for (ENetPeer* p : peers)
+            queuePacket(p, W_SESSLOST, 0, 0, 0, nullptr, 0);
+    } else if (hc && hc->peer) {
+        queuePacket(hc->peer, W_BYE, 0, 0, 0, nullptr, 0);
     }
     teardown();
     return DPX_OK;

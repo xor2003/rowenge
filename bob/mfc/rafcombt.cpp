@@ -221,11 +221,6 @@ void RAFCombat::RAFRefresh()
 				s->SetString(name);
 				StatsPerType	counts[6]={PT_SPIT_A};
 
-//DeadCode JIM 23Oct00 				for (int cnt=0; cnt < (PT_HE59 - PT_GER_FLYABLE); cnt++)
-//DeadCode JIM 23Oct00 				{
-//DeadCode JIM 23Oct00 					totalacseen [cnt] = 0;
-//DeadCode JIM 23Oct00 					totalackilled [cnt] = 0;
-//DeadCode JIM 23Oct00 				}
 				int totaltotalacseen = 0;
 
 				Diary::RaidGroup*	lwraidgroup = Squad_Diary.GetFirstRaidGroup(raidpack);
@@ -323,32 +318,6 @@ void RAFCombat::RAFRefresh()
 					acloss = acloss + RESSTRING(AIRCRAFT);
 			   	s->SetString(acloss);
 
-//DeadCode RDH 22Aug00 				bool acdamage = false;
-//DeadCode RDH 22Aug00 				int maxdam = 0, maxdamtype;
-//DeadCode RDH 22Aug00 				int elementsdestroyed = 0;
-//DeadCode RDH 22Aug00 				for(int i = 0; i < DIARY_MAXDAMAGE; i++)
-//DeadCode RDH 22Aug00 					if (pptr->specificdamage[i] >50)
-//DeadCode RDH 22Aug00 					{
-//DeadCode RDH 22Aug00 						acdamage = true;
-//DeadCode RDH 22Aug00 						if (pptr->specificdamage[i] > maxdam)
-//DeadCode RDH 22Aug00 						{
-//DeadCode RDH 22Aug00 							maxdam = pptr->specificdamage[i];
-//DeadCode RDH 22Aug00 							maxdamtype = i;
-//DeadCode RDH 22Aug00 						}
-//DeadCode RDH 22Aug00 						if (pptr->specificdamage[i] > 250)
-//DeadCode RDH 22Aug00 							elementsdestroyed++;
-//DeadCode RDH 22Aug00 					}
-//DeadCode RDH 22Aug00 				if (elementsdestroyed > 1)
-//DeadCode RDH 22Aug00 					s->SetString(RESSTRING(WRITEOFF));
-//DeadCode RDH 22Aug00 				else if 	(acdamage)
-//DeadCode RDH 22Aug00 				{
-//DeadCode RDH 22Aug00 					if (maxdam < 200)
-//DeadCode RDH 22Aug00 						s->SetString(RESLIST(DIARYDAM_LEFTWING, pptr->specificdamage[maxdamtype]));
-//DeadCode RDH 22Aug00 					else
-//DeadCode RDH 22Aug00 						s->SetString(RESLIST(DIARYDEST_LEFTWING, pptr->specificdamage[maxdamtype]));
-//DeadCode RDH 22Aug00 				}else
-//DeadCode RDH 22Aug00 					s->SetString(RESSTRING(NOAIRCRAFT));
-//DeadCode RDH 22Aug00 
 
 				CREdit* editbox;
 				editbox=GETDLGITEM(IDC_NAME);
@@ -472,18 +441,6 @@ void RAFCombat::LWRefresh()
 					intercept = 	Squad_Diary.GetFirstIntercept(raidgroup);	//RJS 18Oct00
 					if (intercept)
 					{
-//DeadCode RJS 18Oct00 						s = GETDLGITEM(IDC_RSTATICTIMEATTK);
-//DeadCode RJS 18Oct00 						int t=intercept->intercepttime/60;
-//DeadCode RJS 18Oct00 						s->SetString(CSprintf("%02i:%02i",t/60,t%60));
-//DeadCode RJS 18Oct00  
-//DeadCode RJS 18Oct00 						s = GETDLGITEM(IDC_RSTATICPLACEATTK);
-//DeadCode RJS 18Oct00 						s->SetString("Over Dover");
-//DeadCode RJS 18Oct00 
-//DeadCode RJS 18Oct00 						s = GETDLGITEM(IDC_RSTATICHTENEMY);
-//DeadCode RJS 18Oct00 						int alt = (intercept->interceptheight*10)/Save_Data.alt.mediummm;
-//DeadCode RJS 18Oct00 						alt = 100*((alt + 50)/100);
-//DeadCode RJS 18Oct00 						CString altstring = CSprintf("%i%s",alt,LoadResString(Save_Data.alt.mediumabbr));
-//DeadCode RJS 18Oct00 						s->SetString(altstring);
 						s = GETDLGITEM(IDC_RSTATICTIMEATTK);			//RJS 18Oct00
 						int t=intercept->intercepttime/60;
 						if (t)
@@ -540,31 +497,6 @@ void RAFCombat::LWRefresh()
 						acloss = acloss + RESSTRING(AIRCRAFT);
 				   	s->SetString(acloss);
 
-//DeadCode RDH 22Aug00 					bool acdamage = false;
-//DeadCode RDH 22Aug00 					int maxdam = 0, maxdamtype;
-//DeadCode RDH 22Aug00 					int elementsdestroyed = 0;
-//DeadCode RDH 22Aug00 					for(int i = 0; i < DIARY_MAXDAMAGE; i++)
-//DeadCode RDH 22Aug00 						if (pptr->specificdamage[i] >50)
-//DeadCode RDH 22Aug00 						{
-//DeadCode RDH 22Aug00 							acdamage = true;
-//DeadCode RDH 22Aug00 							if (pptr->specificdamage[i] > maxdam)
-//DeadCode RDH 22Aug00 							{
-//DeadCode RDH 22Aug00 								maxdam = pptr->specificdamage[i];
-//DeadCode RDH 22Aug00 								maxdamtype = i;
-//DeadCode RDH 22Aug00 							}
-//DeadCode RDH 22Aug00 							if (pptr->specificdamage[i] > 250)
-//DeadCode RDH 22Aug00 								elementsdestroyed++;
-//DeadCode RDH 22Aug00 						}
-//DeadCode RDH 22Aug00 					if (elementsdestroyed > 1)
-//DeadCode RDH 22Aug00 						s->SetString(RESSTRING(WRITEOFF));
-//DeadCode RDH 22Aug00 					else if 	(acdamage)
-//DeadCode RDH 22Aug00 					{
-//DeadCode RDH 22Aug00 						if (maxdam < 200)
-//DeadCode RDH 22Aug00 							s->SetString(RESLIST(DIARYDAM_LEFTWING, pptr->specificdamage[maxdamtype]));
-//DeadCode RDH 22Aug00 						else
-//DeadCode RDH 22Aug00 							s->SetString(RESLIST(DIARYDEST_LEFTWING, pptr->specificdamage[maxdamtype]));
-//DeadCode RDH 22Aug00 					}else
-//DeadCode RDH 22Aug00 						s->SetString(RESSTRING(NOAIRCRAFT));
 
 					CREdit* editbox;
 					editbox=GETDLGITEM(IDC_NAME);
@@ -587,27 +519,6 @@ void RAFCombat::LWRefresh()
 	}
 
 }
-//DeadCode JIM 23Oct00 CString RAFCombat::EnemyReport(int hurr, int spit, bool shownumbers)
-//DeadCode JIM 23Oct00 {
-//DeadCode JIM 23Oct00 	CString type= "";
-//DeadCode JIM 23Oct00 	if (hurr)
-//DeadCode JIM 23Oct00 	{
-//DeadCode JIM 23Oct00 		if (shownumbers)
-//DeadCode JIM 23Oct00 			type = CSprintf("%i ", hurr);
-//DeadCode JIM 23Oct00 		type = type + RESSTRING(HURRICANES);
-//DeadCode JIM 23Oct00 	}
-//DeadCode JIM 23Oct00 	if (spit)
-//DeadCode JIM 23Oct00 	{
-//DeadCode JIM 23Oct00 		if (type != "")
-//DeadCode JIM 23Oct00 			type = type + " and ";
-//DeadCode JIM 23Oct00 		if (shownumbers)
-//DeadCode JIM 23Oct00 			type = type + CSprintf("%i ", spit);
-//DeadCode JIM 23Oct00 		type= type + RESSTRING(SPITFIRES);
-//DeadCode JIM 23Oct00 	}
-//DeadCode JIM 23Oct00 	if (type == "")
-//DeadCode JIM 23Oct00 		type = RESSTRING(NOAIRCRAFT);
-//DeadCode JIM 23Oct00 	return (type);
-//DeadCode JIM 23Oct00 }
 CString RAFCombat::EnemyReport(StatsPerType* acarray,int c0,int c1)
 {
 	CString type= "";
@@ -654,44 +565,6 @@ BOOL RAFCombat::OnInitDialog()
 		LWRefresh();
 	else
 		RAFRefresh();
-//DEADCODE RDH 24/02/00 	CDialog::OnInitDialog();
-//DEADCODE RDH 24/02/00 	CRStatic*   s;
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICCRDATE);
-//DEADCODE RDH 24/02/00 	s->SetString("10th July 1940");
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICFLIGHTSQUAD);
-//DEADCODE RDH 24/02/00 	s->SetString("Flight A 56 Sqdn.");
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	int ac = 16;
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICENEMYAC);
-//DEADCODE RDH 24/02/00 	s->SetString(CSprintf("%i", ac));
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICTYPEENEMYAC);
-//DEADCODE RDH 24/02/00 	s->SetString(RESSTRING(JU88));
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICTIMEATTK);
-//DEADCODE RDH 24/02/00 	s->SetString("17:00 hours");
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICPLACEATTK);
-//DEADCODE RDH 24/02/00 	s->SetString("Over Dover");
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICHTENEMY);
-//DEADCODE RDH 24/02/00 	s->SetString("10,000ft");
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICENEMYCONC);
-//DEADCODE RDH 24/02/00 	s->SetString("3 Me109s");
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICENEMYINCONC);
-//DEADCODE RDH 24/02/00 	s->SetString("1 Me109s");
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICOURAC);
-//DEADCODE RDH 24/02/00 	s->SetString("Tail shredded");
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICOURPERS);
-//DEADCODE RDH 24/02/00 	s->SetString("NIL.");
-//DEADCODE RDH 24/02/00 
-//DEADCODE RDH 24/02/00 	s = GETDLGITEM(IDC_RSTATICGUNCAM);
-//DEADCODE RDH 24/02/00 	s->SetString("film00");
 	
 	debrief_timer=SetTimer(DPlay::TIMER_READYROOM,0,NULL); // set sheet up first before starting timer
 	_DPlay.SendStatusChange(DPlay::CPS_DEBRIEF);

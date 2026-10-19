@@ -77,7 +77,6 @@ x0r
 #include "shapes.cpp"
 #include "shpbld.cpp"
 #include "transite.cpp"
-//DeadCode JIM 2Oct00 #include "viewsel.cpp"
 #include "world.cpp" 
 #include "anmradio.cpp"
 //#include "overlay.cpp"

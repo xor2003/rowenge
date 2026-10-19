@@ -88,7 +88,7 @@ void COleFont::SetName(LPCTSTR propVal)
 
 CY COleFont::GetSize()
 {
-	CY result;
+	CY result = {};
 	GetProperty(0x2, VT_CY, (void*)&result);
 	return result;
 }
@@ -100,7 +100,7 @@ void COleFont::SetSize(const CY& propVal)
 
 BOOL COleFont::GetBold()
 {
-	BOOL result;
+	BOOL result = 0;
 	GetProperty(0x3, VT_BOOL, (void*)&result);
 	return result;
 }
@@ -112,7 +112,7 @@ void COleFont::SetBold(BOOL propVal)
 
 BOOL COleFont::GetItalic()
 {
-	BOOL result;
+	BOOL result = 0;
 	GetProperty(0x4, VT_BOOL, &result);
 	return result;
 }
@@ -124,7 +124,7 @@ void COleFont::SetItalic(BOOL propVal)
 
 BOOL COleFont::GetUnderline()
 {
-	BOOL result;
+	BOOL result = 0;
 	GetProperty(0x5, VT_BOOL, &result);
 	return result;
 }
@@ -136,7 +136,7 @@ void COleFont::SetUnderline(BOOL propVal)
 
 BOOL COleFont::GetStrikethrough()
 {
-	BOOL result;
+	BOOL result = 0;
 	GetProperty(0x6, VT_BOOL, &result);
 	return result;
 }
@@ -148,7 +148,7 @@ void COleFont::SetStrikethrough(BOOL propVal)
 
 short COleFont::GetWeight()
 {
-	short result;
+	short result = 0;
 	GetProperty(0x7, VT_I2, &result);
 	return result;
 }
@@ -160,7 +160,7 @@ void COleFont::SetWeight(short propVal)
 
 short COleFont::GetCharset()
 {
-	short result;
+	short result = 0;
 	GetProperty(0x8, VT_I2, &result);
 	return result;
 }

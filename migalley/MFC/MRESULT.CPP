@@ -258,7 +258,6 @@ void	Campaign::SetOldPackScore(int packnum)
 		{
 		case SupplyTree::S2U_MAIN:
 			currlevel=node->attackstats.damagelevel;
-//DEADCODE RDH 06/05/99 			node->attackstats.daylasthit = 
 		break;
 		case SupplyTree::S2U_AF0:
 		case SupplyTree::S2U_AF1:
@@ -266,14 +265,12 @@ void	Campaign::SetOldPackScore(int packnum)
 		{
 			AirFieldInfo* af = SupplyTree::FindAirfieldForItem(Todays_Packages.pack[packnum].packagetarget);
 			currlevel=af->attackstats.damagelevel;
-//DEADCODE RDH 06/05/99 			af->attackstats.daylasthit = ;
 			break;
 		}
 		case SupplyTree::S2U_ROUTE0:
 		case SupplyTree::S2U_ROUTE1:
 		case SupplyTree::S2U_ROUTE2:
 			currlevel=node->route[rel-SupplyTree::S2U_ROUTE0]->attackstats.damagelevel;
-//DEADCODE RDH 06/05/99 			node->route[rel-SupplyTree::S2U_ROUTE0]->attackstats.daylasthit
 		break;
 		}
 		MMC.packageprevscores[packnum]=currlevel;
@@ -288,8 +285,6 @@ void	Campaign::SetOldPackScore(int packnum)
 			if (s2->redsupplyUID==Todays_Packages.pack[packnum].packagetarget)
 			{
 				MMC.packageprevscores[packnum]=s2->SetSupplySizeGR(); //JIM 21/05/99
-//DEADCODE JIM 21/05/99 					s2->storeslaunched;
-//DEADCODE RDH 06/05/99 				s2->attackstats.daylasthit = ;
 			}
 	}
 	break;
@@ -331,7 +326,6 @@ void	CMResult::FillProfileRow(CRListBox* rlistbox,int i)
 	else
 		rlistbox->AddString(RESSTRING(L_FAILURE),2);
 		
-//DeadCode RDH 30Mar99 	rlistbox->AddString(RESSTRING(OPT_YES),3);
 	if (Todays_Packages.pack[i].redo)
 		rlistbox->AddString(RESSTRING(OPT_YES),3);
 	else

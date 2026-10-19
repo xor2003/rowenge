@@ -231,7 +231,6 @@ void CMainFrame::OnBye()
 		{
  			_DPlay.ExitDirectPlay();
 		}
-//DEADCODE AMM 17/05/99 		m_oldindebrief=FALSE;
 		RDialog::m_pView->LaunchFullPane(&RFullPanelDial::title);	
 	}
 #endif
@@ -258,7 +257,6 @@ void CMainFrame::OnGoBig()
 #if !defined(NOT_TOPMOST)
 				SetWindowPos(&wndTopMost,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
 #endif
-//DeadCode DAW 17Jun99 		ModifyStyleEx(0,WS_EX_TOPMOST);
 
 	ShowWindow(SW_SHOWMAXIMIZED);
 //	m_wndSystemBox.GetDlgItem(ID_GONORMAL)->ShowWindow(SW_SHOW);
@@ -269,7 +267,6 @@ void CMainFrame::OnGoNormal()
 {
 //TEMPCODE DAW 08/05/99 	if (IsZoomed())
     ModifyStyle(0,WS_THICKFRAME); // Come back border!
-//DeadCode DAW 17Jun99 	ModifyStyleEx(WS_EX_TOPMOST,0);
 	ShowWindow(SW_SHOWNORMAL);
 #if !defined(NOT_TOPMOST)
 				SetWindowPos(&wndBottom,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
@@ -319,7 +316,6 @@ void CMainFrame::Initialise()
 		HideToolbars();
 		_DPlay.LaunchedByLobbyCheck();
 #ifdef 	MIG_DEMO_VER
-//DeadCode DAW 02Nov99 		if (!File_Man.ExistNumberedFile(FIL_SMACK_GAMEINTRO))
 		if (!File_Man.ExistNumberedFile(FIL_SMACK_GAMEINTRO) && !_DPlay.PossibleLobby)
 		{
 			Save_Data.InitPreferences((int)Master_3d.winst);
@@ -456,7 +452,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	int total;
 	int priority;
 	CRToolBar* pToolbar;
-	CRToolBar* pPriorityToolbar;
+	CRToolBar* pPriorityToolbar=NULL;
 	BOOL foundend;
 	POSITION position;
 	CRect rect;
@@ -477,6 +473,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	row=0;
 	total=0;
 	priority=0;
+	pPriorityToolbar=NULL;
 	foundend=FALSE;
 	for (y=0;y<count;y++)
 	{
@@ -497,7 +494,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 		// found a row now draw it
 		if (foundend || y==count-1)
 		{
-			pPriorityToolbar->m_currentlength+=totalwidth-total;
+			if (pPriorityToolbar) pPriorityToolbar->m_currentlength+=totalwidth-total;
 			position=m_top.FindIndex(start);
 			total=0;
 			for (x=start;x<=y;x++)
@@ -519,6 +516,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 				total=0;
 				foundend=FALSE;
 				priority=0;
+				pPriorityToolbar=NULL;
 			}
 		}
 	}
@@ -535,6 +533,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	row=0;
 	total=0;
 	priority=0;
+	pPriorityToolbar=NULL;
 	foundend=FALSE;
 	for (y=0;y<count;y++)
 	{
@@ -555,7 +554,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 		// found a row now draw it
 		if (foundend || y==count-1)
 		{
-			pPriorityToolbar->m_currentlength+=totalwidth-total;
+			if (pPriorityToolbar) pPriorityToolbar->m_currentlength+=totalwidth-total;
 			position=m_bottom.FindIndex(start);
 			total=0;
 			for (x=start;x<=y;x++)
@@ -576,6 +575,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 				total=0;
 				foundend=FALSE;
 				priority=0;
+				pPriorityToolbar=NULL;
 			}
 		}
 	}
@@ -588,6 +588,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	row=0;
 	total=0;
 	priority=0;
+	pPriorityToolbar=NULL;
 	foundend=FALSE;
 	for (y=0;y<count;y++)
 	{
@@ -608,7 +609,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 		// found a row now draw it
 		if (foundend || y==count-1)
 		{
-			pPriorityToolbar->m_currentlength+=totalheight-total;
+			if (pPriorityToolbar) pPriorityToolbar->m_currentlength+=totalheight-total;
 			position=m_left.FindIndex(start);
 			total=0;
 			for (x=start;x<=y;x++)
@@ -629,6 +630,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 				total=0;
 				foundend=FALSE;
 				priority=0;
+				pPriorityToolbar=NULL;
 			}
 		}
 	}
@@ -640,6 +642,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	row=0;
 	total=0;
 	priority=0;
+	pPriorityToolbar=NULL;
 	foundend=FALSE;
 	for (y=0;y<count;y++)
 	{
@@ -660,7 +663,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 		// found a row now draw it
 		if (foundend || y==count-1)
 		{
-			pPriorityToolbar->m_currentlength+=totalheight-total;
+			if (pPriorityToolbar) pPriorityToolbar->m_currentlength+=totalheight-total;
 			position=m_right.FindIndex(start);
 			total=0;
 			for (x=start;x<=y;x++)
@@ -681,6 +684,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 				total=0;
 				foundend=FALSE;
 				priority=0;
+				pPriorityToolbar=NULL;
 			}
 		}
 	}
@@ -695,20 +699,10 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 //	Invalidate();
 }
 
-//DEADCODE DAW 07/05/99 void CMainFrame::OnNcPaint() 
-//DEADCODE DAW 07/05/99 {
-//DEADCODE DAW 07/05/99 //	CDC* pDC=GetWindowDC();
-//DEADCODE DAW 07/05/99 //	CRect windrect;
-//DEADCODE DAW 07/05/99 //	GetWindowRect(windrect);
-//DEADCODE DAW 07/05/99 //	pDC->FillSolidRect(0,0,windrect.Width(),windrect.Height(),RGB(0,0,0));
-//DEADCODE DAW 07/05/99 	// Do not call CFrameWnd::OnNcPaint() for painting messages
-//DEADCODE DAW 07/05/99 }
 
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
 {
 	// TODO: Add your specialized code here and/or call the base class
-//DEADCODE DAW 07/06/99 	CRect rect;														  //DAW 07/06/99
-//DEADCODE DAW 07/06/99 	AfxGetMainWnd()->GetWindowRect(rect);							  //DAW 07/06/99
 	return CFrameWnd::WindowProc(message, wParam, lParam);
 }
 
@@ -781,12 +775,6 @@ LRESULT CMainFrame::OnCommandHelp(WPARAM w, LPARAM lParam)
 //------------------------------------------------------------------------------
 void CMainFrame::OnMove(int x, int y) 
 {
-//DEADCODE DAW 07/05/99 	CRect oldpos;
-//DEADCODE DAW 07/05/99 	GetWindowRect(oldpos);
-//DEADCODE DAW 07/05/99 	CFrameWnd::OnMove(x, y);
-//DEADCODE DAW 07/05/99 	x-=oldpos.left;
-//DEADCODE DAW 07/05/99 	y-=oldpos.top;
-//DEADCODE DAW 07/05/99 	RePositionLayout(x,y);
 //	RecalcLayout();
 	// TODO: Add your message handler code here
 	
@@ -846,10 +834,6 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 
 void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized) 
 {
-//DeadCode DAW 22Jun99 		TRACE2("Activate %i ==> %08x\n",nState,::GetWindowThreadProcessId(pWndOther->m_hWnd, NULL) );
-//DeadCode DAW 22Jun99 	else
-//DeadCode DAW 22Jun99 	{
-//DeadCode DAW 22Jun99 		TRACE1("Activate %i xxx\n",nState);
 		//If in the 3D && state==0 then discard DD here
 #ifdef NDEBUG
  	if (!pWndOther)
@@ -865,7 +849,6 @@ void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 			}
 		}
 #endif
-//DeadCode DAW 22Jun99 	}
 
 	CFrameWnd::OnActivate(nState, pWndOther, bMinimized);
 	
@@ -881,7 +864,6 @@ static BOOL CALLBACK EnumThreadWndProc(  HWND hwnd,  LPARAM lParam)
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD hTask)
 {
 	CFrameWnd::OnActivateApp(bActive, hTask);
-//DeadCode DAW 22Jun99 	TRACE2("Activate Ap %i ==>%08x\n",bActive,hTask);
 	
 	// TODO: Add your message handler code here
 	//BOOL SetWindowPos( const CWnd* pWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags );
@@ -899,13 +881,6 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD hTask)
 		{  
 			HWND upperwnd=HWND_BOTTOM;  
 			::SetWindowPos(m_hWnd,upperwnd,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
-//DEADCODE DAW 16/06/99 			if (hTask)
-//DEADCODE DAW 16/06/99 				EnumThreadWindows((int)hTask,EnumThreadWndProc,(int)&upperwnd);
-//DEADCODE DAW 16/06/99  			if (upperwnd!=HWND_BOTTOM)
-//DEADCODE DAW 16/06/99 			{
-//DEADCODE DAW 16/06/99 				::SetWindowPos(m_hWnd,HWND_TOP,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
-//DEADCODE DAW 16/06/99 				::SetWindowPos(upperwnd,HWND_TOP,0,0,0,0,SWP_NOACTIVATE+SWP_NOMOVE+SWP_NOSIZE);
-//DEADCODE DAW 16/06/99 			}
 		}
 		else
 		{

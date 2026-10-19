@@ -475,7 +475,6 @@ struct	DPMIregs
 	DPMIseg	s;
 };
 
-//DeadCode JIM 13Dec95 MATHABLE(DPMIregs::Flags);
 
 #ifdef __WATCOMC__
 extern	Bool	ASM_DOSvia31(	UWord	intnum,			//Interrupt number. add 256 for flags

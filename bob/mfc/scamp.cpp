@@ -118,12 +118,6 @@ BOOL CSCampaign::OnInitDialog()
 	CString string;
 
 	rlistbox=GETDLGITEM(IDC_RLIST_CAMPAIGNS);
-//DeadCode JIM 27Sep00 	rlistbox->Clear();
-//DeadCode JIM 27Sep00 	rlistbox->AddColumn(100);
-//DeadCode JIM 27Sep00 	rlistbox->AddColumn(100);
-//DeadCode JIM 27Sep00 	rlistbox->AddColumn(100);
-//DeadCode JIM 27Sep00 	rlistbox->AddColumn(100);
-//DEADCODE RDH 26/10/99    	rlistbox->AddColumn(100);
 
 	string.LoadString(IDS_L_SCAMPAIGNSELECT1);
 	rlistbox->AddString(string,0);
@@ -134,14 +128,6 @@ BOOL CSCampaign::OnInitDialog()
 	string.LoadString(IDS_SCAMPAIGNSELECT4);
 	rlistbox->AddString(string,3);
 
-//DEADCODE RDH 26/10/99    	string.LoadString(IDS_L_SCAMPAIGNDATE1);
-//DEADCODE RDH 26/10/99 	rlistbox->AddString(string,1);
-//DEADCODE RDH 26/10/99 	string.LoadString(IDS_SCAMPAIGNDATE2A);
-//DEADCODE RDH 26/10/99 	rlistbox->AddString(string,1);
-//DEADCODE RDH 26/10/99 	string.LoadString(IDS_SCAMPAIGNDATE3A);
-//DEADCODE RDH 26/10/99 	rlistbox->AddString(string,1);
-//DEADCODE RDH 26/10/99 	string.LoadString(IDS_SCAMPAIGNDATE4A);
-//DEADCODE RDH 26/10/99 	rlistbox->AddString(string,1);
 
 	rlistbox->SetHilightRow(0);
 	rlistbox->SetHilightCol(0);

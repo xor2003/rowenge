@@ -136,24 +136,6 @@ AirStrucPtr	ArtInt::CollideAgainstList[COLLIDEAGAINSTLISTSIZE];
 //Description:
 //
 //////////////////////////////////////////////////////////////////////
-//DeadCode AMM 20Oct100 int		ArtInt::GetGroundSpotter(ItemPtr trg)
-//DeadCode AMM 20Oct100 {
-//DeadCode AMM 20Oct100 	if ( !trg || trg->World.X < 0 || trg->World.X > 8*8*8*256*512 || trg->World.Z < 0 || trg->World.Z > 8*8*8*256*512)
-//DeadCode AMM 20Oct100 		return 0; // the target is null!
-//DeadCode AMM 20Oct100
-//DeadCode AMM 20Oct100 	// get the grid data
-//DeadCode AMM 20Oct100 //DEADCODE CSB 25/05/00 	fileblock fb( FIL_RADARGRID, Grid_Base::makeGridAt );
-//DeadCode AMM 20Oct100 	Grid_Base* radarGrid = (Grid_Base*) Grid_Base::gridfiles[Grid_Base::GF_RADAR].getdata();
-//DeadCode AMM 20Oct100
-//DeadCode AMM 20Oct100 	int v = radarGrid->getWorld( trg->World.X, trg->World.Z );
-//DeadCode AMM 20Oct100 	if (v==0)
-//DeadCode AMM 20Oct100 		return IllegalBAND;
-//DeadCode AMM 20Oct100 	else
-//DeadCode AMM 20Oct100 		if ( v<32 ) // low level radar
-//DeadCode AMM 20Oct100 			return v + CLRadarBAND - 1;
-//DeadCode AMM 20Oct100 		else
-//DeadCode AMM 20Oct100 			return ((v>>4)+CHRadarBAND+2);
-//DeadCode AMM 20Oct100 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GroundVisible
@@ -175,7 +157,6 @@ int		ArtInt::GroundVisible(Coords3D& trg, int* failedspotter)
 	if ( !&trg || trg.X < 0 || trg.X > 8*8*8*256*512 || trg.Z < 0 || trg.Z > 8*8*8*256*512)
 		return 0; // the target is null!
 	// get the grid data
-//DEADCODE CSB 25/05/00 	fileblock fb( FIL_RADARGRID, Grid_Base::makeGridAt );
 	Grid_Base* radarGrid = (Grid_Base*) Grid_Base::gridfiles[Grid_Base::GF_RADAR].getdata();
 
 	int v = radarGrid->getWorld( trg.X, trg.Z );
@@ -189,7 +170,6 @@ int		ArtInt::GroundVisible(Coords3D& trg, int* failedspotter)
 //		if (MMC.Sky.Layer[0].AltBase < trg->World.Y ) // target is above clouds -NOTE: IGNORING CLOUD HOLES NOW
 		if ( trg.Y > FT_5000 )
 		{//above clouds
-//DEADCODE CSB 25/05/00 			fileblock fb( FIL_4COLGRID, Grid_Base::makeGridAt );
 			Grid_Long* colD = (Grid_Long*) Grid_Base::gridfiles[Grid_Base::GF_CLOUDLAYER0].getdata();
 			prob = colD->getWorld( trg.X, trg.Z );
 		}
@@ -353,10 +333,6 @@ UniqueID	ArtInt::GetSecondarySpotter(Coords3D& target,UniqueID primary)
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 20Oct100 void	ArtInt::SpottedFromGround( AirStruc* trg )
-//DeadCode AMM 20Oct100 {
-//DeadCode AMM 20Oct100 	/* empty at the moment */
-//DeadCode AMM 20Oct100 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -484,7 +460,6 @@ bool	ArtInt::Visible(AirStrucPtr eye,AirStrucPtr trg)
 	Coords3D* eyepos=_DPlay.GetGoodACPosition(eye);
 	Coords3D* trgpos=_DPlay.GetGoodACPosition(trg);
 	//loads of quick throwouts for target
-//DeadCode JIM 22Apr97 	if (trg->uniqueID.deaded)									//JIM 17Oct96
 	if (trg->Status.deadtime)
 		return(false);											//JIM 17Oct96
 	if (trg->leader && trg->information)
@@ -509,7 +484,6 @@ bool	ArtInt::Visible(AirStrucPtr eye,AirStrucPtr trg)
 
 	if (	delta<visiblerange && delta>-visiblerange
 		&&	delta2<visiblerange && delta2>-visiblerange
-//DEADCODE JIM 29/03/99 		||	(!!(eye->World.Y<Land_Scape.CloudAlt())!=!!(trg->World.Y<Land_Scape.CloudAlt()))
 		)
 	{
 		Item::InterceptandRange(eyepos,trgpos);
@@ -522,8 +496,6 @@ bool	ArtInt::Visible(AirStrucPtr eye,AirStrucPtr trg)
 	return(false);
 }
 
-//DeadCode JIM 06Nov96 #define	SUNPITCH 	ANGLES_30Deg
-//DeadCode JIM 06Nov96 #define	SUNHDG	ANGLES_135Deg
 
 
 bool	ArtInt::Seen(AirStrucPtr eye,AirStrucPtr trg)
@@ -706,7 +678,6 @@ bool	ArtInt::Seen(AirStrucPtr eye,AirStrucPtr trg)
 void	ArtInt::VisibleCheck()
 {
 	VisibleAcCheck();
-//DeadCode AMM 20Oct100 	VisibleContrailsCheck();
 	VisibleAAACheck();
 
 	if(!(ACArrayInd & 0x7f) && (MemberListInd == 0))			//RJS 13Sep00
@@ -760,7 +731,6 @@ void	ArtInt::VisibleCheck()
 		&&	((!_DPlay.Implemented) || (_DPlay.Implemented && _DPlay.GameType==DPlay::COMMSQUICKMISSION))
 		&&	((Persons2::PlayerGhostAC->movecode != AUTO_TRAININGTAKEOFF) && (Persons2::PlayerGhostAC->movecode != AUTO_TRAININGLANDING))	)
 	{
-//DeadCode CSB 19Oct00 		PrintVar(0, 24, "%.0f ", FP(player->World.X - player->World.Z));
 		if(player->World.X - player->World.Z > METRES100KM)
 		{
 			Grid_Base* cornerAlt = (Grid_Base*)Grid_Base::gridfiles[Grid_Base::GF_CORNERALT].getdata();
@@ -809,7 +779,6 @@ void	ArtInt::VisibleCheck()
 			PrintString(0, y, "                                   ");
 		y = 0;
 		for(int i = 0; i < ACARRAYSIZE; i++)
-//DeadCode CSB 28Jul00 			if((ACArray[i]) && (ACArray[i]->waypoint == Persons2::PlayerSeenAC->waypoint))
 			if(		((ACArray[i]) && (ACArray[i]->movecode != AUTOSAG_WAITTAKEOFF))
 				&&	(	((!ACArray[i]->fly.leadflight) || (ACArray[i]->waypoint != ACArray[i]->fly.leadflight->waypoint))
 					||	((ACArray[i]->movecode != AUTO_FOLLOWWP) && (ACArray[i]->movecode != AUTOSAG_TRACKEXPFOLLOW))
@@ -898,26 +867,18 @@ void	ArtInt::VisibleCheck()
 					case GROUND_HALTTRUCK:			PrintString(12, y, "GROUND_HALTTRUCK ");		break;
 					case AUTO_LAST:					PrintString(12, y, "AUTO_LAST ");				break;
 					case AUTOSAG_FIRST:				PrintString(12, y, "AUTOSAG_FIRST ");			break;
-//DeadCode CSB 10Aug00 					case AUTOSAG_WAITTAKEOFF:		PrintString(12, y, "AUTOSAG_WAITTAKEOFF ");		break;
-//DEADCODE CSB 22/03/00 					case AUTOSAG_TAKEOFF:			PrintString(12, y, "AUTOSAG_TAKEOFF ");			break;
-//DEADCODE CSB 22/03/00 					case AUTOSAG_FOLLOWWP:			PrintString(12, y, "AUTOSAG_FOLLOWWP ");		break;
 					case AUTOSAG_FOLLOWWPHOME:		PrintString(12, y, "AUTOSAG_FOLLOWWPHOME ");	break;
-//DEADCODE CSB 22/03/00 					case AUTOSAG_LANDING:			PrintString(12, y, "AUTOSAG_LANDING ");			break;
 					case AUTOSAG_REFUELLING:		PrintString(12, y, "AUTOSAG_REFUELLING ");		break;
-//DEADCODE CSB 22/03/00 					case AUTOSAG_PRECOMBAT:			PrintString(12, y, "AUTOSAG_PRECOMBAT ");		break;
 					case AUTOSAG_COMBAT:			PrintString(12, y, "AUTOSAG_COMBAT ");			break;
 					case AUTOSAG_COMBATCIRCLES:		PrintString(12, y, "AUTOSAG_COMBATCIRCLES ");	break;
 					case AUTOSAG_POSTCOMBAT:		PrintString(12, y, "AUTOSAG_POSTCOMBAT ");		break;
 					case AUTOSAG_BOMBAPPROACH:		PrintString(12, y, "AUTOSAG_BOMBAPPROACH ");	break;
-//DEADCODE CSB 22/03/00 					case AUTOSAG_BOMB:				PrintString(12, y, "AUTOSAG_BOMB ");			break;
 					case AUTOSAG_TRACKEXPFOLLOW:	PrintString(12, y, "AUTOSAG_TRACKEXPFOLLOW ");	break;
 					case AUTOSAG_TRACKEXPCOMBAT:	PrintString(12, y, "AUTOSAG_TRACKEXPCOMBAT ");	break;
 					case AUTOSAG_DESTROYED:			PrintString(12, y, "AUTOSAG_DESTROYED ");		break;
 					case AUTOSAG_DEATHGLIDE:		PrintString(12, y, "AUTOSAG_DEATHGLIDE ");		break;
 					case AUTOSAG_LAST:				PrintString(12, y, "AUTOSAG_LAST ");			break;
-//DEADCODE CSB 22/03/00 					case AUTO_COMBAT:				PrintString(12, y, "AUTO_COMBAT ");				break;
 				}
-//DeadCode CSB 28Jul00 				PrintVar(26, y, " %.0f ", FP(leadac->ai.ManStep));
 				PrintVar(26, y, " %.0f ", FP(leadac->waypoint->wpname));
 
 				int fuel = 0;
@@ -926,53 +887,14 @@ void	ArtInt::VisibleCheck()
 
 				PrintVar(28, y, " %.0f ", FP(FP(fuel) / (10.0 * FP(leadac->classtype->maxintfuel))));
 
-//DEADCODE CSB 06/06/00 				PrintVar(30, y, "%.1f ", FP(0.00001 * Persons2::PlayerGhostAC->Distance3D(&leadac->World)));
 
-//DeadCode CSB 19Jul00 				PrintVar(30, y, "%.0f ", FP(leadac->ai.combatskill));
-//DeadCode CSB 19Jul00 				PrintVar(35, y, "%.0f ", FP(leadac->ai.morale));
-//DeadCode CSB 22Aug00 				PrintVar(30, y, "%.0f   ", FP(leadac->World.Y / 30));
-//DeadCode CSB 22Aug00 				PrintVar(36, y, "%.0f   ", FP(leadac->Distance3D(&leadac->waypoint->World) / 100000.0));
-//DeadCode CSB 22Aug00 				PrintVar(40, y, "%.0f   ", FP(leadac->vel_ * 0.0001));
 
-//DeadCode CSB 5Jul00 				if((leadac->fly.numinsag) && (!leadac->fly.expandedsag))
-//DeadCode CSB 5Jul00 				{
-//DeadCode CSB 5Jul00 					SimpleAircraftAnimData*	saganim = (SimpleAircraftAnimData*)(leadac->Anim);
-//DeadCode CSB 5Jul00 					SLong damage = saganim->LEFTWINGOUT  + saganim->LEFTWINGIN
-//DeadCode CSB 5Jul00 								 + saganim->RIGHTWINGOUT + saganim->RIGHTWINGIN
-//DeadCode CSB 5Jul00 								 + saganim->ENGINELEFT	 + saganim->ENGINERIGHT
-//DeadCode CSB 5Jul00 								 + saganim->OTHER;
-//DeadCode CSB 5Jul00 					damage = (10000 * ((255 * 7) - damage)) / (255 * 7);
-//DeadCode CSB 5Jul00 					PrintVar(45, y, "%.2f ", FP(FP(damage) * 0.01));
-//DeadCode CSB 5Jul00 				}
 
-//DeadCode CSB 22Aug00 				if((leadac->waypoint) && (leadac->waypoint->ETA))
-//DeadCode CSB 22Aug00 				{
-//DeadCode CSB 22Aug00 					leadac->InterceptandRange(&leadac->World, &leadac->waypoint->World);
-//DeadCode CSB 22Aug00 					if(leadac->waypoint->ETA != leadac->timeofday)
-//DeadCode CSB 22Aug00 						PrintVar(45, y, "%.0f ", FP(leadac->Range / (leadac->waypoint->ETA - leadac->timeofday)));
-//DeadCode CSB 22Aug00 				}
 
 				y++;
 			}
 
 
-//DEADCODE CSB 06/06/00 		FP range2 = 1e14;	//100 km
-//DEADCODE CSB 06/06/00 		SWord a = -1;
-//DEADCODE CSB 06/06/00 		AirStrucPtr p = Persons2::PlayerGhostAC;
-//DEADCODE CSB 06/06/00 		for(i = 0; i < ACARRAYSIZE; i++)
-//DEADCODE CSB 06/06/00 			if((ACArray[i]) && (ACArray[i]->nationality != p->nationality))
-//DEADCODE CSB 06/06/00 				if(p->Distance3DSquared(&ACArray[i]->World) < range2)
-//DEADCODE CSB 06/06/00 				{
-//DEADCODE CSB 06/06/00 					a = i;
-//DEADCODE CSB 06/06/00 					range2 = p->Distance3DSquared(&ACArray[i]->World);
-//DEADCODE CSB 06/06/00 				}
-//DEADCODE CSB 06/06/00 		if(a > -1)
-//DEADCODE CSB 06/06/00 		{
-//DEADCODE CSB 06/06/00 			p->InterceptandRange(ACArray[a]);
-//DEADCODE CSB 06/06/00 			PrintVar(25, 22, "Headg %.0f ", FP(UWord(p->HdgIntercept) / 182));
-//DEADCODE CSB 06/06/00 			PrintVar(25, 23, "Pitch %.0f ", FP(p->PitchIntercept / 182));
-//DEADCODE CSB 06/06/00 			PrintVar(25, 24, "Range %.0f ", FP(p->Range / 100));
-//DEADCODE CSB 06/06/00 		}
 	}
 
  	COORDS3D AcPos;
@@ -1010,7 +932,6 @@ void	ArtInt::VisibleCheck()
 					if(foll == Persons2::PlayerGhostAC)
 						foll = Persons2::PlayerSeenAC;
 
-//DeadCode CSB 23Jun00 					PrintVar(0 + dx, y, "%.0f ", FP(foll->formpos));
 					if(foll->movecode == AUTO_COMBAT)
 						PrintString(0 + dx, y, "COM ");
 					else if(foll->movecode == AUTO_PRECOMBAT)
@@ -1075,9 +996,7 @@ void	ArtInt::VisibleCheck()
 						case MANOEUVRE_UNBALANCEDFLIGHT:	PrintString(4 + dx, y, "UNBALANCEDFLIGHT ");	break;
 						case MANOEUVRE_LOWALT:				PrintString(4 + dx, y, "LOWALT ");				break;
 						case MANOEUVRE_TURNTOHDGANDPITCH:	PrintString(4 + dx, y, "TURNTOHDGANDPITCH ");	break;
-//DeadCode CSB 7Sep00 						case MANOEUVRE_HIGHYOYO:			PrintString(4 + dx, y, "HIGHYOYO ");			break;
 						case MANOEUVRE_ZOOM:				PrintString(4 + dx, y, "ZOOM ");				break;
-//DeadCode CSB 7Sep00 						case MANOEUVRE_LOWYOYO:				PrintString(4 + dx, y, "LOWYOYO ");				break;
 						case MANOEUVRE_INTERCEPTHIGH:		PrintString(4 + dx, y, "INTERCEPTHIGH ");		break;
 						case MANOEUVRE_INTERCEPTLOW:		PrintString(4 + dx, y, "INTERCEPTLOW ");		break;
 						case MANOEUVRE_GAINSPEED:			PrintString(4 + dx, y, "GAINSPEED ");			break;
@@ -1145,8 +1064,6 @@ void	ArtInt::VisibleCheck()
 #ifdef PRINT_ROUTE
 	if(!(Persons2::PlayerSeenAC->fly.pModel->FrameCount & 0x0f))
 	{
-//DeadCode CSB 27Jul00 		PrintVar(60, 0, "%.0f ", FP(Persons3::SagExpansionCounter::totalexpanded));
-//DeadCode CSB 27Jul00 		PrintVar(64, 0, "%.0f ", FP(Persons3::SagExpansionCounter::highdemandrange * 0.01));
 
 		AirStrucPtr plyr = Persons2::PlayerSeenAC;
 
@@ -1192,8 +1109,6 @@ void	ArtInt::VisibleCheck()
 				}
 			}
 		}
-//DeadCode CSB 27Jul00 	PrintVar(70, 6, "%.0f ", FP(SWord(plyr->pitch)));
-//DeadCode CSB 27Jul00 	PrintVar(70, 7, "%.0f ", FP(SWord(plyr->classtype->bestclimbpitch.a) * (1.0 - FP(plyr->World.Y) / FP(plyr->classtype->abs_ceiling))));
 		int count = 0;
 		for(AirStrucPtr ac = AirStrucPtr(plyr->ACList); ac; ac = AirStrucPtr(ac->nextmobile))
 			if(ac->movecode == AUTO_NOPPILOT)
@@ -1554,8 +1469,6 @@ void ArtInt::MakeCollisionLists()
 				break;
 		}
 
-//DeadCode CSB 11Sep00 PrintVar(40, 20, "Checker %.0f ", FP(CheckListInd));
-//DeadCode CSB 11Sep00 PrintVar(40, 21, "Against %.0f ", FP(AgainstListInd));
 }
 
 
@@ -1601,25 +1514,7 @@ void ArtInt::CollisionAvoidance(AirStrucPtr ac1, AirStrucPtr ac2)
 	if(timetocollide > 128)
 		return;
 
-//DEADCODE CSB 04/02/00 	if(timetocollide < 64)
-//DEADCODE CSB 04/02/00 	{
-//DEADCODE CSB 04/02/00 		ac1->ai.simpleacm = TRUE;
-//DEADCODE CSB 04/02/00 		if(ac1->ai.unfriendly == ac2)
-//DEADCODE CSB 04/02/00 		{
-//DEADCODE CSB 04/02/00 			ac1->ai.manoeuvre = MANOEUVRE_COLLIDE;
-//DEADCODE CSB 04/02/00 			ac1->ai.ManStep = 0;
-//DEADCODE CSB 04/02/00 		}
-//DEADCODE CSB 04/02/00 		else
-//DEADCODE CSB 04/02/00 			SetEngage(ac1, ac2, MANOEUVRE_COLLIDE, ANGLES_0Deg, ANGLES_0Deg, false);
-//DEADCODE CSB 04/02/00 	}
-//DEADCODE CSB 04/02/00 	else
 	{
-//DeadCode CSB 21Jun00 		ac2->InterceptandRange(ac1);
-//DeadCode CSB 21Jun00 		ac1->ai.desiredhdg   = ac2->HdgIntercept;
-//DeadCode CSB 21Jun00 		if(SWord(ac2->PitchIntercept) > SWord(ANGLES_350Deg))
-//DeadCode CSB 21Jun00 			ac1->ai.desiredpitch = ANGLES_90Deg;
-//DeadCode CSB 21Jun00 		else
-//DeadCode CSB 21Jun00 			ac1->ai.desiredpitch = ANGLES_270Deg;
 
 		ac1->InterceptandRange(ac2);
 
@@ -1644,7 +1539,6 @@ void ArtInt::CollisionAvoidance(AirStrucPtr ac1, AirStrucPtr ac2)
 		if(ac2->classtype->aerobaticfactor == AEROBATIC_LOW)
 		{
 			ac1->SetManoeuvreTime(400);
-//DeadCode CSB 26Oct00 			if(ac1->ai.unfriendly == ItemPtr(ac2))
 			if(ac1->nationality != ac2->nationality)
 				ac1->ai.firsttactic = TACTIC_NULL;
 		}
@@ -1663,108 +1557,11 @@ void	ArtInt::ExpandMigs(AirStrucPtr placeholder)
 // dont need to send a message for replay because expandmigs uses ghost AC position
 // to expand Migs. In time accel for replay the Migs could get expanded but upon
 // resuming record the block header will record all their positions.
-//DeadCode AMM 13Apr99 	placeholder->Status.Drawn=TRUE;
-//DEADCODE AMM 24/01/00 	if (_DPlay.Implemented)										//AMM 12Apr99
-//DEADCODE AMM 24/01/00 		_DPlay.SendExpandMigsMessage(placeholder->uniqueID.count);//AMM 12Apr99
-//DEADCODE AMM 24/01/00 	else														//AMM 12Apr99
 		placeholder->Status.Drawn=TRUE;							//AMM 12Apr99
 }
 
 void	ArtInt::ReallyExpandMigs(AirStrucPtr placeholder)
 {	//GUARANTEED 256/50=5 SECOND DELAY BETWEEN THESE 2 ROUTINES!!!
-//DEADCODE JIM 09/12/99 //	basic setup info in placeholder
-//DEADCODE JIM 09/12/99 //		currac->fly.callname=formac;
-//DEADCODE JIM 09/12/99 //		currac->fly.callnum=wingac;
-//DEADCODE JIM 09/12/99 //		currac->Status.deadscale=I.type.Evaluate(0)-SQ_R_MOREMIGSQUADS;
-//DEADCODE JIM 09/12/99 //	copy from placeholder:
-//DEADCODE JIM 09/12/99 //		formation
-//DEADCODE JIM 09/12/99 //		homebase - can be airfield
-//DEADCODE JIM 09/12/99 //		waypoints
-//DEADCODE JIM 09/12/99 //		position
-//DEADCODE JIM 09/12/99 //
-//DEADCODE JIM 09/12/99 	int squad=placeholder->Status.deadscale;
-//DEADCODE JIM 09/12/99 	AirStrucPtr	mainleader=NULL,flightleader=NULL,prevac=NULL;
-//DEADCODE JIM 09/12/99 	bool geardown = false;	//(placeholder->movecode==AUTO_TAKEOFF);
-//DEADCODE JIM 09/12/99 	AircraftAnimData* adptr = (AircraftAnimData *)placeholder->Anim;	//CSB 31/5/99
-//DEADCODE JIM 09/12/99 	if(adptr->acleglowerl == 0)
-//DEADCODE JIM 09/12/99 		geardown = true;						//CSB 31/5/99
-//DEADCODE JIM 09/12/99 	for (int ac=placeholder->fly.callname,wingsize=placeholder->fly.callnum,flnum=0;ac>0;flnum++)
-//DEADCODE JIM 09/12/99 		for (int wac=0;wac<wingsize;wac++,ac--)
-//DEADCODE JIM 09/12/99 		{
-//DEADCODE JIM 09/12/99 			AirStrucPtr	newac=Persons3::migsq[squad];
-//DEADCODE JIM 09/12/99 			if (newac)
-//DEADCODE JIM 09/12/99 			{
-//DEADCODE JIM 09/12/99 				Persons3::migsq[squad]=newac->fly.nextflight;
-//DEADCODE JIM 09/12/99 				if (!mainleader)
-//DEADCODE JIM 09/12/99 				{
-//DEADCODE JIM 09/12/99 					prevac=mainleader=flightleader=newac;
-//DEADCODE JIM 09/12/99 					newac->fly.leadflight=placeholder->fly.leadflight;
-//DEADCODE JIM 09/12/99 					newac->fly.nextflight=NULL;
-//DEADCODE JIM 09/12/99 					newac->leader=
-//DEADCODE JIM 09/12/99 						newac->follower=NULL;
-//DEADCODE JIM 09/12/99 				}
-//DEADCODE JIM 09/12/99 				else
-//DEADCODE JIM 09/12/99 				if (wac)
-//DEADCODE JIM 09/12/99 				{
-//DEADCODE JIM 09/12/99 					prevac->follower=newac;
-//DEADCODE JIM 09/12/99 					newac->leader=flightleader;
-//DEADCODE JIM 09/12/99 					newac->follower=NULL;
-//DEADCODE JIM 09/12/99 					newac->fly.leadflight=mainleader;
-//DEADCODE JIM 09/12/99 					newac->fly.nextflight=NULL;
-//DEADCODE JIM 09/12/99 					prevac=newac;
-//DEADCODE JIM 09/12/99 				}
-//DEADCODE JIM 09/12/99 				else
-//DEADCODE JIM 09/12/99 				{
-//DEADCODE JIM 09/12/99 					newac->leader=NULL;
-//DEADCODE JIM 09/12/99 					newac->follower=NULL;
-//DEADCODE JIM 09/12/99 					flightleader->fly.nextflight=newac;
-//DEADCODE JIM 09/12/99 					newac->fly.leadflight=mainleader;
-//DEADCODE JIM 09/12/99 					newac->fly.nextflight=NULL;
-//DEADCODE JIM 09/12/99 					flightleader=
-//DEADCODE JIM 09/12/99 						prevac=newac;
-//DEADCODE JIM 09/12/99 				}
-//DEADCODE JIM 09/12/99 				newac->currworld->RemoveFromWorld(newac);
-//DEADCODE JIM 09/12/99 				newac->fly.originalformpos=
-//DEADCODE JIM 09/12/99 					newac->formpos=(FormationIndexMIN+(InForm)flnum)+(InWing)wac;//DAW 26May99
-//DEADCODE JIM 09/12/99 				newac->formation=(FORMATIONDESC)placeholder->formation;
-//DEADCODE JIM 09/12/99 				if (newac->formpos==FormationIndexMIN)
-//DEADCODE JIM 09/12/99 					newac->World=placeholder->World;
-//DEADCODE JIM 09/12/99 				else
-//DEADCODE JIM 09/12/99 					if (placeholder->movecode==AUTO_TAKEOFF)
-//DEADCODE JIM 09/12/99 					{
-//DEADCODE JIM 09/12/99 						newac->World=placeholder->World;
-//DEADCODE JIM 09/12/99 						newac->World.X+=METRES15*(newac->formpos&InWingMAX);
-//DEADCODE JIM 09/12/99 						newac->World.Z+=METRES15*(newac->formpos&InFormMAX);
-//DEADCODE JIM 09/12/99 					}
-//DEADCODE JIM 09/12/99 					else
-//DEADCODE JIM 09/12/99 						newac->World=*newac->PositionWRTLeader();
-//DEADCODE JIM 09/12/99 				newac->currworld->AddToWorld(newac);
-//DEADCODE JIM 09/12/99
-//DEADCODE JIM 09/12/99 				newac->hdg=placeholder->hdg;
-//DEADCODE JIM 09/12/99 				newac->pitch=placeholder->pitch;
-//DEADCODE JIM 09/12/99 				newac->fly.cpitch=placeholder->fly.cpitch;
-//DEADCODE JIM 09/12/99 				newac->roll=placeholder->roll;
-//DEADCODE JIM 09/12/99 				newac->vel_=placeholder->vel_;
-//DEADCODE JIM 09/12/99 				newac->slowdownleader=FALSE;
-//DEADCODE JIM 09/12/99 				newac->overview_movecode=placeholder->overview_movecode;
-//DEADCODE JIM 09/12/99 				if (geardown)
-//DEADCODE JIM 09/12/99 					newac->fly.pModel->GearDown(newac);
-//DEADCODE JIM 09/12/99 				newac->information=geardown?IF_ALLBAD:IF_ALLGOOD;
-//DEADCODE JIM 09/12/99 				newac->ai.manoeuvre=(MANOEUVRE)placeholder->ai.manoeuvre;
-//DEADCODE JIM 09/12/99 				newac->manoeuvretime=placeholder->manoeuvretime;
-//DEADCODE JIM 09/12/99 				newac->ai.ManStep=(int)placeholder->ai.ManStep;
-//DEADCODE JIM 09/12/99 				newac->ai.homebase=placeholder->ai.homebase;
-//DEADCODE JIM 09/12/99 				newac->ai.eventlog=placeholder->ai.eventlog;
-//DEADCODE JIM 09/12/99 				newac->waypoint=placeholder->waypoint;
-//DEADCODE JIM 09/12/99
-//DEADCODE JIM 09/12/99 //TEMPCODE RDH 26/05/99 				newac->
-//DEADCODE JIM 09/12/99 			}
-//DEADCODE JIM 09/12/99 		}
-//DEADCODE JIM 09/12/99 //make placeholder disappear
-//DEADCODE JIM 09/12/99 	placeholder->Status.deadtime=1;
-//DEADCODE JIM 09/12/99 	placeholder->World.Y=0;
-//DEADCODE JIM 09/12/99 	placeholder->vel_=0;
-//DEADCODE JIM 09/12/99 	placeholder->movecode=AUTO_NOPPILOT;
 }
 
 
@@ -1818,7 +1615,6 @@ void	ArtInt::VisibleAcCheck()
 				eye->ai.beenseen = TRUE;								//CSB 07/03/00
 			else														//CSB 07/03/00
 				eye->ai.beenseen = FALSE;								//CSB 07/03/00
-//DEADCODE CSB 14/02/00 			SpottedFromGround( eye );
 	}
 	else
 	{							//Frames 2,3,4,5 of 5
@@ -1852,9 +1648,6 @@ void	ArtInt::VisibleAcCheck()
 							&&	(eye->vel_ > 3 * eye->classtype->minvel / 2)
 							&&	((!eye->fly.pModel) || (eye->World.Y > eye->fly.pModel->GroundHeight + FT_100))	)
 						{
-//DeadCode CSB 23Aug00 							if((eye->ai.unfriendly == NULL) && (LeadersGroupInCombat(eye)))
-//DeadCode CSB 23Aug00 								AttackSpareInLeadersGroup(eye);
-//DeadCode CSB 23Aug00 							else
 							if(		((eye != Persons2::PlayerGhostAC) && (eye != Persons2::PlayerSeenAC))
 								||	((eye->classtype->visible == ME110) || (eye->classtype->visible == JU87))	)
 							{
@@ -1868,9 +1661,6 @@ void	ArtInt::VisibleAcCheck()
 
 												if((eye != Persons2::PlayerGhostAC) && (eye != Persons2::PlayerSeenAC))
 												{
-//DeadCode CSB 7Sep00 													if(eye->movecode == AUTO_PRECOMBAT)
-//DeadCode CSB 7Sep00 														SpottedNewUnfriendly(eye, trg);
-//DeadCode CSB 7Sep00 													else
 														SpottedUnfriendly(eye, trg);
 												}
 												else
@@ -1892,86 +1682,8 @@ void	ArtInt::VisibleAcCheck()
 		}
 	}
 
-//DEADCODE CSB 02/03/00 PrintVar(0, 10, "Checker %.0f  ", FP(ACArrayInd));
-//DEADCODE CSB 02/03/00 if(ACArray[ACArrayInd])
-//DEADCODE CSB 02/03/00 {
-//DEADCODE CSB 02/03/00 	if(ACArray[ACArrayInd]->nationality == NAT_RAF)		PrintString(15, 10, "RAF");
-//DEADCODE CSB 02/03/00 	else												PrintString(15, 10, "LUF");
-//DEADCODE CSB 02/03/00 }
-//DEADCODE CSB 02/03/00 else PrintString(15, 10, "---");
-//DEADCODE CSB 02/03/00 for(SWord n = 0; n < 4; n++)
-//DEADCODE CSB 02/03/00 	if(MemberList[n])
-//DEADCODE CSB 02/03/00 	{
-//DEADCODE CSB 02/03/00 		if(MemberList[n]->nationality == NAT_RAF)		PrintString(20, 10 + n, "RAF");
-//DEADCODE CSB 02/03/00 		else											PrintString(20, 10 + n, "LUF");
-//DEADCODE CSB 02/03/00 	}
-//DEADCODE CSB 02/03/00 	else PrintString(20, 10 + n, "---");
 }
 
-//DEADCODE CSB 01/02/00 	ACArrayInd++;
-//DEADCODE CSB 01/02/00 	if (ACArrayInd>=ACARRAYSIZE)
-//DEADCODE CSB 01/02/00 	{
-//DEADCODE CSB 01/02/00 		ACArrayInd-=ACARRAYSIZE;
-//DEADCODE CSB 01/02/00 		if (gunstimer)
-//DEADCODE CSB 01/02/00 			if (--gunstimer)
-//DEADCODE CSB 01/02/00 				OverLay.DecisionMessage(PreCombatMsg,8,Persons2::PlayerGhostAC,NULL,Persons2::PlayerGhostAC,FALSE);	//RJS 09Jun99
-//DEADCODE CSB 01/02/00
-//DEADCODE CSB 01/02/00 	}
-//DEADCODE CSB 01/02/00 	if (eye && !eye->Status.deadtime)							//JIM 17Oct96
-//DEADCODE CSB 01/02/00 	 	if ((eye->formpos == 0) || !eye->information)			//group leader or not in formation //RDH 23/02/99
-//DEADCODE CSB 01/02/00 		if (eye->movecode!=AUTO_NOPPILOT)	//spare aircraft
-//DEADCODE CSB 01/02/00 			if (!eye->AircraftDamaged())
-//DEADCODE CSB 01/02/00 				if (eye->movecode!=AUTO_COMBAT || eye->ai.unfriendly==NULL)
-//DEADCODE CSB 01/02/00 				{	//we exist and we are not busy
-//DEADCODE CSB 01/02/00 					int	indstart=Math_Lib.rnd(100);
-//DEADCODE CSB 01/02/00 					int indloop=indstart;
-//DEADCODE CSB 01/02/00
-//DEADCODE CSB 01/02/00 					if (	(eye->ai.unfriendly==NULL) && (LeadersGroupInCombat(eye)))									  //RDH 13/06/99
-//DEADCODE CSB 01/02/00 					{//if eye has leader and leader has unfriendly and leader is in combat
-//DEADCODE CSB 01/02/00 						if (AttackSpareInLeadersGroup(eye))
-//DEADCODE CSB 01/02/00 							return;
-//DEADCODE CSB 01/02/00 					}
-//DEADCODE CSB 01/02/00 					do
-//DEADCODE CSB 01/02/00 					{
-//DEADCODE CSB 01/02/00 						AirStruc* trg=ACArray[indloop];
-//DEADCODE CSB 01/02/00 			//##also quick throw out based on whether msg already sent
-//DEADCODE CSB 01/02/00 						if (	trg
-//DEADCODE CSB 01/02/00 							&&	trg != eye
-//DEADCODE CSB 01/02/00 							&&	trg->movecode != AUTO_NOPPILOT
-//DEADCODE CSB 01/02/00 							&&	trg->movecode != AUTO_TAKEOFF
-//DEADCODE CSB 01/02/00 							&&	((trg->formpos == 0) || (!trg->information))		//only see group leaders or a/c not information //RDH 10/05/99
-//DEADCODE CSB 01/02/00 							&&	Seen(eye,trg)
-//DEADCODE CSB 01/02/00 							)
-//DEADCODE CSB 01/02/00 						{
-//DEADCODE CSB 01/02/00 							//ok.. we can see the other guy
-//DEADCODE CSB 01/02/00 							//can't tell who he is yet..
-//DEADCODE CSB 01/02/00 							if((trg->nationality != eye->nationality) && (eye->ai.unfriendly != trg))
-//DEADCODE CSB 01/02/00 							{
-//DEADCODE CSB 01/02/00 								spotcount++;
-//DEADCODE CSB 01/02/00 								if (Save_Data.gamedifficulty[GD_TACTICALRANGE])
-//DEADCODE CSB 01/02/00 									OverLay.CancelAccel();
-//DEADCODE CSB 01/02/00 							}
-//DEADCODE CSB 01/02/00
-//DEADCODE CSB 01/02/00 							if(eye->nationality == trg->nationality)
-//DEADCODE CSB 01/02/00 								breakif(DoesFriendNeedHelp(eye, trg))
-//DEADCODE CSB 01/02/00 							else
-//DEADCODE CSB 01/02/00 								if((trg->nationality == NAT_GREEN) || (trg->nationality == NAT_AMBER))
-//DEADCODE CSB 01/02/00 									breakif(SpottedNeutral(eye, trg))
-//DEADCODE CSB 01/02/00 								else
-//DEADCODE CSB 01/02/00 									if(eye->movecode == AUTO_PRECOMBAT)
-//DEADCODE CSB 01/02/00 										SpottedNewUnfriendly(eye, trg);
-//DEADCODE CSB 01/02/00 									else
-//DEADCODE CSB 01/02/00 										breakif(SpottedUnfriendly(eye, trg))
-//DEADCODE CSB 01/02/00
-//DEADCODE CSB 01/02/00 						}
-//DEADCODE CSB 01/02/00
-//DEADCODE CSB 01/02/00 						if (indloop==0)
-//DEADCODE CSB 01/02/00 							indloop=ACARRAYSIZE;
-//DEADCODE CSB 01/02/00 						indloop--;
-//DEADCODE CSB 01/02/00 					}
-//DEADCODE CSB 01/02/00 					while (indloop!=indstart);
-//DEADCODE CSB 01/02/00 				}
-//DEADCODE CSB 01/02/00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2003,8 +1715,6 @@ void ArtInt::MakeMemberList(AirStrucPtr ac)
 
 	if(LeadAc->fly.numinsag)					//UnExpanded SAG
 	{
-//DeadCode CSB 1Nov00 		if((LeadAc->ai.unfriendly) && (LeadAc->ai.unfriendly->Status.size == AIRSTRUCSIZE))
-//DeadCode CSB 1Nov00 			AddToMemberList(AirStrucPtr(LeadAc->ai.unfriendly), 0);
 		if(LeadAc->ai.attacker)
 			AddToMemberList(LeadAc, LeadAc->ai.attacker, 0);
 	}
@@ -2012,8 +1722,6 @@ void ArtInt::MakeMemberList(AirStrucPtr ac)
 		for(AirStrucPtr lac = LeadAc; lac; lac = lac->fly.nextflight)
 			for(AirStrucPtr fac = lac; fac; fac = fac->Follower())
 			{
-//DeadCode CSB 1Nov00 				if((fac->ai.unfriendly) && (fac->ai.unfriendly->Status.size == AIRSTRUCSIZE))
-//DeadCode CSB 1Nov00 					AddToMemberList(AirStrucPtr(fac->ai.unfriendly)->GetLeadAc(), 0);
 				if(fac->ai.attacker)
 					AddToMemberList(LeadAc, fac->ai.attacker->GetLeadAc(), 0);
 			}
@@ -2108,24 +1816,6 @@ void ArtInt::AddToMemberList(AirStrucPtr eye, AirStrucPtr ac, float dist2)
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 20Oct100 bool ArtInt::LeadersGroupInCombat(AirStruc* eye)
-//DeadCode AMM 20Oct100 {
-//DeadCode AMM 20Oct100 	if(eye->classtype->aerobaticfactor != AEROBATIC_HIGH)
-//DeadCode AMM 20Oct100 		return(false);
-//DeadCode AMM 20Oct100 	AirStrucPtr ldr = eye->FindFormpos0();
-//DeadCode AMM 20Oct100 	//rdh 25/6/99: don't process for player when he is leader
-//DeadCode AMM 20Oct100 	if((ldr->AcIsPlayer()) && (!Save_Data.gamedifficulty[GD_AUTOVECTORING]))
-//DeadCode AMM 20Oct100 		return(false);
-//DeadCode AMM 20Oct100 	else
-//DeadCode AMM 20Oct100 		for(;ldr; ldr = ldr->fly.nextflight)
-//DeadCode AMM 20Oct100 			for(AirStrucPtr ac = ldr; ac; ac = ac->Follower())
-//DeadCode AMM 20Oct100 				if(		(ac->ai.unfriendly)
-//DeadCode AMM 20Oct100 					&&	(ac->ai.unfriendly->Status.size==AIRSTRUCSIZE)
-//DeadCode AMM 20Oct100 					&&	(((AirStruc*)ac->ai.unfriendly)->nationality != ac->nationality))
-//DeadCode AMM 20Oct100 					return(true);
-//DeadCode AMM 20Oct100
-//DeadCode AMM 20Oct100 	return(false);
-//DeadCode AMM 20Oct100 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2160,9 +1850,6 @@ bool ArtInt::AttackSpareInLeadersGroup(AirStruc* eye)
 	if((unf->fly.numinsag) && (unf->fly.expandedsag))
 		unf = unf->fly.expandedsag;
 
-//DeadCode CSB 19Jun00 	if(unf->classtype->aerobaticfactor == AEROBATIC_LOW)
-//DeadCode CSB 19Jun00 		unf = FindTailie(unf);
-//DeadCode CSB 19Jun00 	else
 	{
 		//unfldr is a GroupLeader
 		AirStrucPtr unfldr = unf->FindFormpos0();
@@ -2217,53 +1904,6 @@ bool ArtInt::AttackSpareInLeadersGroup(AirStruc* eye)
 	return(true);
 }
 
-//DEADCODE CSB 20/01/00 		AirStruc*	unf = unfldr;
-//DEADCODE CSB 20/01/00 		AirStruc*	unf2;
-//DEADCODE CSB 20/01/00 		AirStruc*	trg = NULL;
-//DEADCODE CSB 20/01/00 		AirStruc*	anytrg = NULL;
-//DEADCODE CSB 20/01/00 		int range = MILES50;
-//DEADCODE CSB 20/01/00 		int anyrange = MILES50;
-//DEADCODE CSB 20/01/00 		while (unf)
-//DEADCODE CSB 20/01/00 		{
-//DEADCODE CSB 20/01/00 			unf2 = unf;
-//DEADCODE CSB 20/01/00 			while (unf2)
-//DEADCODE CSB 20/01/00 			{
-//DEADCODE CSB 20/01/00 				eye->InterceptandRange(&unf2->World);
-//DEADCODE CSB 20/01/00 				if (unf2->ai.attacker==NULL)
-//DEADCODE CSB 20/01/00 				{
-//DEADCODE CSB 20/01/00 					if (unf2->Range<range)
-//DEADCODE CSB 20/01/00 					{
-//DEADCODE CSB 20/01/00 						trg = unf2;
-//DEADCODE CSB 20/01/00 						range = unf2->Range;
-//DEADCODE CSB 20/01/00 					}
-//DEADCODE CSB 20/01/00 				}else
-//DEADCODE CSB 20/01/00 				{
-//DEADCODE CSB 20/01/00 					if (unf2->Range<anyrange)
-//DEADCODE CSB 20/01/00 					{
-//DEADCODE CSB 20/01/00 						anytrg = unf2;
-//DEADCODE CSB 20/01/00 						anyrange = unf2->Range;
-//DEADCODE CSB 20/01/00 					}
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 				}
-//DEADCODE CSB 20/01/00 				unf2=(AirStruc*)unf2->follower;
-//DEADCODE CSB 20/01/00 			}
-//DEADCODE CSB 20/01/00 			unf = unf->fly.nextflight;
-//DEADCODE CSB 20/01/00 		}
-//DEADCODE CSB 20/01/00 		if (trg)
-//DEADCODE CSB 20/01/00 		{
-//DEADCODE CSB 20/01/00 			SetEngage(eye,trg,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, FALSE);	//CSB 07/07/99
-//DEADCODE CSB 20/01/00 			return(true);
-//DEADCODE CSB 20/01/00 		}else
-//DEADCODE CSB 20/01/00 		{//everybody is engaged
-//DEADCODE CSB 20/01/00 			if (anytrg)
-//DEADCODE CSB 20/01/00 			{
-//DEADCODE CSB 20/01/00 				SetEngage(eye,anytrg,MANOEUVRE_SELECT,ANGLES_0Deg,ANGLES_0Deg, FALSE);	//CSB 07/07/99
-//DEADCODE CSB 20/01/00 				return(true);
-//DEADCODE CSB 20/01/00 			}
-//DEADCODE CSB 20/01/00 		}
-//DEADCODE CSB 20/01/00 	}
-//DEADCODE CSB 20/01/00 	return(false);
-//DEADCODE CSB 20/01/00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2288,49 +1928,6 @@ int		ArtInt::GuessFormationSize(AirStrucPtr caller, AirStrucPtr trg)
 	return(CountFormationSize(trg));
 }
 
-//DEADCODE CSB 21/01/00 //DEADCODE RDH 23/06/99 	if (!trg->leader || trg->information)
-//DEADCODE CSB 21/01/00 //DEADCODE RDH 23/06/99 	{
-//DEADCODE CSB 21/01/00 		if (trg->leader)
-//DEADCODE CSB 21/01/00 			trg=(AirStrucPtr)*trg->leader;
-//DEADCODE CSB 21/01/00 		if (		(!trg->fly.leadflight)
-//DEADCODE CSB 21/01/00 				||	(trg->information)
-//DEADCODE CSB 21/01/00 				||	(AircraftAreClose(caller, trg->fly.leadflight)) //trg and its leader is close so assume rest is a well //RDH 12/06/99
-//DEADCODE CSB 21/01/00 			)
-//DEADCODE CSB 21/01/00 		{	//count all a/c in formation
-//DEADCODE CSB 21/01/00 			if (trg->fly.leadflight)
-//DEADCODE CSB 21/01/00 				trg=trg->fly.leadflight;
-//DEADCODE CSB 21/01/00 			int	acc=0;
-//DEADCODE CSB 21/01/00 			do
-//DEADCODE CSB 21/01/00 			{
-//DEADCODE CSB 21/01/00 				AirStrucPtr	tf=trg;
-//DEADCODE CSB 21/01/00 				do
-//DEADCODE CSB 21/01/00 				{
-//DEADCODE CSB 21/01/00 					acc++;
-//DEADCODE CSB 21/01/00 					tf=(AirStrucPtr)*tf->follower;
-//DEADCODE CSB 21/01/00 				}
-//DEADCODE CSB 21/01/00 				while (tf && tf->information);
-//DEADCODE CSB 21/01/00 				trg=trg->fly.nextflight;
-//DEADCODE CSB 21/01/00 			}
-//DEADCODE CSB 21/01/00 //DEADCODE RDH 12/06/99 			while (trg && trg->information);
-//DEADCODE CSB 21/01/00 			while (trg);		//we want all ac
-//DEADCODE CSB 21/01/00 			return acc;
-//DEADCODE CSB 21/01/00 		}
-//DEADCODE CSB 21/01/00 		else
-//DEADCODE CSB 21/01/00 		{	//count all a/c in flight
-//DEADCODE CSB 21/01/00 			int	acc=0;
-//DEADCODE CSB 21/01/00 			AirStrucPtr	tf=trg;
-//DEADCODE CSB 21/01/00 			do
-//DEADCODE CSB 21/01/00 			{
-//DEADCODE CSB 21/01/00 				acc++;
-//DEADCODE CSB 21/01/00 				tf=(AirStrucPtr)*tf->follower;
-//DEADCODE CSB 21/01/00 			}
-//DEADCODE CSB 21/01/00 			while (tf && tf->information);
-//DEADCODE CSB 21/01/00 			return acc;
-//DEADCODE CSB 21/01/00 		}
-//DEADCODE CSB 21/01/00 //DEADCODE RDH 23/06/99 	}
-//DEADCODE CSB 21/01/00 //DEADCODE RDH 23/06/99 	else	//on our own
-//DEADCODE CSB 21/01/00 //DEADCODE RDH 23/06/99 		return (spotcount);
-//DEADCODE CSB 21/01/00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2373,66 +1970,8 @@ int ArtInt::CountFormationSize(AirStrucPtr trg)
 
 	return(num);
 
-//DeadCode CSB 11Oct00 	trg = trg->FindFormpos0();
-//DeadCode CSB 11Oct00 	if(trg->classtype->aerobaticfactor != AEROBATIC_LOW)	//If this is an escorter find escortee
-//DeadCode CSB 11Oct00 		if(trg->fly.leadflight)
-//DeadCode CSB 11Oct00 			trg = trg->fly.leadflight;
-//DeadCode CSB 11Oct00
-//DeadCode CSB 11Oct00 	int num = CountSquadronSize(trg);						//Count number in lead squadron
-//DeadCode CSB 11Oct00
-//DeadCode CSB 11Oct00 	for(int i = 0; i < ACARRAYSIZE; i++)
-//DeadCode CSB 11Oct00 		if(ACArray[i])
-//DeadCode CSB 11Oct00 		{
-//DeadCode CSB 11Oct00 			AirStrucPtr as = ACArray[i]->GetLeadAc();
-//DeadCode CSB 11Oct00
-//DeadCode CSB 11Oct00 			if(		(as->classtype->aerobaticfactor == AEROBATIC_HIGH)
-//DeadCode CSB 11Oct00 				&&	((as->fly.leadflight == trg) || ((trg->fly.expandedsag) && (as->fly.leadflight == trg->fly.expandedsag)))
-//DeadCode CSB 11Oct00 				&&	(as->Distance3DSquared(&trg->World) < FP(HALFVISIBLERANGE) * FP(HALFVISIBLERANGE)) )
-//DeadCode CSB 11Oct00 				num += CountSquadronSize(as);			//Add number in escorting squadrons
-//DeadCode CSB 11Oct00 		}
-//DeadCode CSB 11Oct00
-//DeadCode CSB 11Oct00 	return(num);
 }
 
-//DEADCODE CSB 20/01/00 	if(!trg->leader || trg->information)
-//DEADCODE CSB 20/01/00 	{
-//DEADCODE CSB 20/01/00 		if (trg->leader)
-//DEADCODE CSB 20/01/00 			trg=(AirStrucPtr)*trg->leader;
-//DEADCODE CSB 20/01/00 		if (!trg->fly.leadflight || trg->information)
-//DEADCODE CSB 20/01/00 		{	//count all a/c in formation
-//DEADCODE CSB 20/01/00 			if (trg->fly.leadflight)
-//DEADCODE CSB 20/01/00 				trg=trg->fly.leadflight;
-//DEADCODE CSB 20/01/00 			int	acc=0;
-//DEADCODE CSB 20/01/00 			do
-//DEADCODE CSB 20/01/00 			{
-//DEADCODE CSB 20/01/00 				AirStrucPtr	tf=trg;
-//DEADCODE CSB 20/01/00 				do
-//DEADCODE CSB 20/01/00 				{
-//DEADCODE CSB 20/01/00 					acc++;
-//DEADCODE CSB 20/01/00 					tf=(AirStrucPtr)*tf->follower;
-//DEADCODE CSB 20/01/00 				}
-//DEADCODE CSB 20/01/00 				while (tf && tf->information);
-//DEADCODE CSB 20/01/00 				trg=trg->fly.nextflight;
-//DEADCODE CSB 20/01/00 			}
-//DEADCODE CSB 20/01/00 			while (trg && trg->information);
-//DEADCODE CSB 20/01/00 			return acc;
-//DEADCODE CSB 20/01/00 		}
-//DEADCODE CSB 20/01/00 		else
-//DEADCODE CSB 20/01/00 		{	//count all a/c in flight
-//DEADCODE CSB 20/01/00 			int	acc=0;
-//DEADCODE CSB 20/01/00 			AirStrucPtr	tf=trg;
-//DEADCODE CSB 20/01/00 			do
-//DEADCODE CSB 20/01/00 			{
-//DEADCODE CSB 20/01/00 				acc++;
-//DEADCODE CSB 20/01/00 				tf=(AirStrucPtr)*tf->follower;
-//DEADCODE CSB 20/01/00 			}
-//DEADCODE CSB 20/01/00 			while (tf && tf->information);
-//DEADCODE CSB 20/01/00 			return acc;
-//DEADCODE CSB 20/01/00 		}
-//DEADCODE CSB 20/01/00 	}
-//DEADCODE CSB 20/01/00 	else	//on our own
-//DEADCODE CSB 20/01/00 		return (1);
-//DEADCODE CSB 20/01/00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2458,7 +1997,6 @@ int ArtInt::CountSquadronSize(AirStrucPtr trg)
 	else
 		for(AirStrucPtr ldr = trg->GetLeadAc(); ldr; ldr = ldr->fly.nextflight)
 			for(AirStrucPtr ac = ldr; ac; ac = ac->Follower())
-//DeadCode CSB 24Aug00 				if(!ac->Status.deadtime)
 					num++;
 
 	return(num);
@@ -2520,7 +2058,6 @@ void	ArtInt::AllEngage(AirStrucPtr leadac)
 		{
 			if(f->movecode == m)
 			if((!f->AircraftDamaged()) && (f->classtype->aerobaticfactor != AEROBATIC_LOW))								//JIM 29Aug96
-//DEADCODE CSB 24/01/00 				Art_Int.SetEngage(f, *f->ai.unfriendly, MANOEUVRE_SELECT, ANGLES_0Deg, ANGLES_0Deg, FALSE);
 				Art_Int.AttackSpareInLeadersGroup(f);
 			f=*f->follower;
 		}
@@ -2569,14 +2106,6 @@ void ArtInt::BreakOff(AirStrucPtr ac)
 	ac->manoeuvretime = 0;
 
 	ac->SetUnfriendly();												//CSB 1Aug00
-//DeadCode CSB 1Aug00 	if((ac->ai.unfriendly) && (ac->ai.unfriendly->Status.size == AIRSTRUCSIZE))
-//DeadCode CSB 1Aug00 	{//there is one call where the break off is happening because the
-//DeadCode CSB 1Aug00 		//pilot has been damaged and is of low morale. He might not be in combat
-//DeadCode CSB 1Aug00 		AirStrucPtr unf = *ac->ai.unfriendly;
-//DeadCode CSB 1Aug00 		ac->ai.unfriendly = NULL;
-//DeadCode CSB 1Aug00 		if((unf) && (unf->ai.attacker == ac))
-//DeadCode CSB 1Aug00 			unf->ai.attacker = NULL;
-//DeadCode CSB 1Aug00 	}
 }
 
 
@@ -2680,7 +2209,6 @@ bool ArtInt::PersonalThreat(AirStrucPtr trg, AirStrucPtr agg, bool process)
 	if(trg->classtype->aerobaticfactor == AEROBATIC_LOW)	//Heavy bomber
 	{
 		trg = trg->FindFormpos0();
-//DeadCode CSB 18Oct00 		AirStrucPtr escortleader = trg->FindAirEscortLeader();
 		AirStrucPtr escortleader = FindEscort(trg);
 		if(escortleader)
 			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_AMUNDERATTACK, MSG_PERSONALTHREAT, trg, trg, escortleader));//RJS 02Feb00
@@ -2691,8 +2219,6 @@ bool ArtInt::PersonalThreat(AirStrucPtr trg, AirStrucPtr agg, bool process)
 		&&	(agg->ai.attacker) && (agg->Distance3DSquared(&agg->ai.attacker->World) < FP(WEAPONSRANGE) * FP(WEAPONSRANGE))	)
 		return(false);
 
-//DeadCode CSB 26Oct00 	if(trg->ShouldGoHome())
-//DeadCode CSB 26Oct00 		return(false);
 
 	PersonalThreatMsg(trg, agg);
 
@@ -2723,96 +2249,6 @@ bool ArtInt::PersonalThreat(AirStrucPtr trg, AirStrucPtr agg, bool process)
 	return(true);
 }
 
-//DEADCODE CSB 20/01/00 	if(trg->nationality == agg->nationality)		  //MS 11/05/99
-//DEADCODE CSB 20/01/00 		return(false);
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	if((!trg) || (!agg) || (trg->Status.size != AIRSTRUCSIZE) || (agg->Status.size != AIRSTRUCSIZE))
-//DEADCODE CSB 20/01/00 		return(false);
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	if(trg->Status.deadtime)
-//DEADCODE CSB 20/01/00 		return(false);
-//DEADCODE CSB 20/01/00 	//It is a valid pairing - now some quick throwouts:
-//DEADCODE CSB 20/01/00 	//If aircraft already committed
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	//if trg is bomber
-//DEADCODE CSB 20/01/00 	if(trg->classtype->aerobaticfactor==AEROBATIC_LOW)		  //RDH 03/03/99
-//DEADCODE CSB 20/01/00 	{
-//DEADCODE CSB 20/01/00 		if (trg->formpos)
-//DEADCODE CSB 20/01/00 			trg = trg->fly.leadflight;
-//DEADCODE CSB 20/01/00 		AirStruc*  escortleader = trg->FindAirEscortLeader();
-//DEADCODE CSB 20/01/00 		if(escortleader)
-//DEADCODE CSB 20/01/00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_AMUNDERATTACK, MSG_PERSONALTHREAT, trg, trg, escortleader));//RJS 02Feb00
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 		return(false);
-//DEADCODE CSB 20/01/00 	}
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	//if trg is in combat and has a trg in standard contact, 1 in 16 chance of reacting
-//DEADCODE CSB 20/01/00 	//and range is short
-//DEADCODE CSB 20/01/00 	int range = 0;
-//DEADCODE CSB 20/01/00 	if (		(trg->ai.unfriendly)
-//DEADCODE CSB 20/01/00 			&&	(trg->ai.unfriendly->Status.size==AIRSTRUCSIZE)
-//DEADCODE CSB 20/01/00 	   )
-//DEADCODE CSB 20/01/00 		range=trg->Distance3D(&(trg->ai.unfriendly)->World);
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	if(		(trg->movecode == AUTO_COMBAT)
-//DEADCODE CSB 20/01/00 		&&	(range < INSIDEWEAPONSRANGE)
-//DEADCODE CSB 20/01/00 		&&	(trg->ai.unfriendly)
-//DEADCODE CSB 20/01/00 		&&	(trg->ai.unfriendly->Status.size == AIRSTRUCSIZE)
-//DEADCODE CSB 20/01/00 		&&	(trg->ai.Unfriendly()->ai.attacker == trg)
-//DEADCODE CSB 20/01/00 		&&	(Math_Lib.rnd(16))
-//DEADCODE CSB 20/01/00 		)
-//DEADCODE CSB 20/01/00 		return(false);
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	//if trg is player come out of accel
-//DEADCODE CSB 20/01/00 	if(trg == Manual_Pilot.ControlledAC2)
-//DEADCODE CSB 20/01/00 		OverLay.CancelAccel();
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	if(agg == Manual_Pilot.ControlledAC2)
-//DEADCODE CSB 20/01/00 		agg = Persons2::PlayerGhostAC;
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	//if agg is computer controlled and if trg is not agg unfriendly don't react
-//DEADCODE CSB 20/01/00 	if((agg != Persons2::PlayerGhostAC)	&& (agg->ai.unfriendly != trg))
-//DEADCODE CSB 20/01/00 		return(false);
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	PersonalThreatMsg(trg, agg);								  //RDH 15/06/99
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 	MANOEUVRE manoeuvre = MANOEUVRE_SELECT;
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 	MANOEUVRE goodmanoeuvre = MANOEUVRE_SELECT;
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 	if(trg->ai.combatskill >= SKILL_VETERAN)
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 		 goodmanoeuvre = MANOEUVRE_SPLITS;
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 	if 	(trg->ai.combatskill >= SKILL_REGULAR)
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 	{
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 		RndVal	rndnum = Math_Lib.rnd();
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 		if	(rndnum < RND25PC)
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 			manoeuvre = MANOEUVRE_SCISSORS;
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 		else if	(rndnum < RND50PC)
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 			manoeuvre = MANOEUVRE_BREAKTURN;
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 		else
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 			manoeuvre = goodmanoeuvre;						  //RDH 15/06/99 //RDH 20/06/99
-//DEADCODE CSB 20/01/00 //DEADCODE CSB 19/01/00 	}
-//DEADCODE CSB 20/01/00 	MANOEUVRE manoeuvre = ChooseEvasiveManoeuvre(trg, agg);
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	if (		(trg->ai.unfriendly)
-//DEADCODE CSB 20/01/00 			&&	(trg->ai.unfriendly->Status.size==AIRSTRUCSIZE)
-//DEADCODE CSB 20/01/00 		)
-//DEADCODE CSB 20/01/00 	{//target already has an unfriendly ac
-//DEADCODE CSB 20/01/00 		if (trg->ai.unfriendly !=agg)
-//DEADCODE CSB 20/01/00 			SetEngage(trg,agg,manoeuvre,ANGLES_0Deg,ANGLES_0Deg, FALSE);	//agg is different
-//DEADCODE CSB 20/01/00 		else
-//DEADCODE CSB 20/01/00 		{//change manoeuvre in response
-//DEADCODE CSB 20/01/00 			trg->ai.manoeuvre  = manoeuvre;
-//DEADCODE CSB 20/01/00 			trg->ai.ManStep   = 0;
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 		}
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	}else
-//DEADCODE CSB 20/01/00 	{//
-//DEADCODE CSB 20/01/00 		SetEngage(trg,agg,manoeuvre,ANGLES_0Deg,ANGLES_0Deg, FALSE);
-//DEADCODE CSB 20/01/00 	}															  //RDH 15/06/99
-//DEADCODE CSB 20/01/00
-//DEADCODE CSB 20/01/00 	return(true);
-//DEADCODE CSB 20/01/00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2918,8 +2354,6 @@ MANOEUVRE ArtInt::ChooseEvasiveManoeuvre(AirStrucPtr trg, AirStrucPtr agg)
 				case 1:	if(agg->World.Y > trg->World.Y)		return(MANOEUVRE_ZOOM);
 						else								return(MANOEUVRE_STEEPDIVE);
 				case 2:	return(MANOEUVRE_HIGBARRELROLL);
-//DeadCode CSB 5Nov00 				case 2:	return(MANOEUVRE_ZOOM);
-//DeadCode CSB 21Oct00 				case 3:	return(MANOEUVRE_STALLTURN);
 			}
 		else if(choosebad)
 			switch(Math_Lib.rnd(5))
@@ -2967,62 +2401,14 @@ MANOEUVRE ArtInt::ChooseEvasiveManoeuvre(AirStrucPtr trg, AirStrucPtr agg)
 		INT3;
 	}
 
-//DeadCode CSB 6Sep00 //Low combat skill
-//DeadCode CSB 6Sep00 	if(Math_Lib.rnd(SKILL_POOR) > trg->ai.combatskill)
-//DeadCode CSB 6Sep00 		switch(Math_Lib.rnd(3))
-//DeadCode CSB 6Sep00 		{
-//DeadCode CSB 6Sep00 			case 0:		return(MANOEUVRE_BAILOUT);
-//DeadCode CSB 6Sep00 			case 1:		return(MANOEUVRE_PANICTURN);
-//DeadCode CSB 6Sep00 			case 2:		return(MANOEUVRE_MILDSCISSORS);
-//DeadCode CSB 6Sep00 		}
-//DeadCode CSB 6Sep00
-//DeadCode CSB 6Sep00 //High combat skill
-//DeadCode CSB 6Sep00 	if(Math_Lib.rnd(SKILL_MAX) < trg->ai.combatskill)
-//DeadCode CSB 6Sep00 		switch(Math_Lib.rnd(4))
-//DeadCode CSB 6Sep00 		{
-//DeadCode CSB 6Sep00 			case 0:		return(MANOEUVRE_JINK);
-//DeadCode CSB 6Sep00 			case 1:		return(MANOEUVRE_HIGBARRELROLL);
-//DeadCode CSB 6Sep00 			case 2:		return(MANOEUVRE_REVERSETURN);
-//DeadCode CSB 6Sep00 		}
-//DeadCode CSB 6Sep00
-//DeadCode CSB 6Sep00 	else	//Average manoeuvres
-//DeadCode CSB 6Sep00 		switch(Math_Lib.rnd(8))
-//DeadCode CSB 6Sep00 		{
-//DeadCode CSB 6Sep00 			case 0:		return(MANOEUVRE_SCISSORS);
-//DeadCode CSB 6Sep00 			case 1:		return(MANOEUVRE_BREAKTURN);
-//DeadCode CSB 6Sep00 			case 2:		return(MANOEUVRE_BREAKHIGH);
-//DeadCode CSB 6Sep00 			case 3:		return(MANOEUVRE_BREAKLOW);
-//DeadCode CSB 6Sep00 			case 4:		return(MANOEUVRE_BREAK90);
-//DeadCode CSB 6Sep00 		}
-//DeadCode CSB 6Sep00
-//DeadCode CSB 6Sep00 	if(trg->nationality == NAT_RAF)	//Spit - Hurri
-//DeadCode CSB 6Sep00 	{
-//DeadCode CSB 6Sep00 //DeadCode CSB 8Aug00 		if(trg->World.Y < 250000)
-//DeadCode CSB 6Sep00 		if(Math_Lib.rnd(2))
-//DeadCode CSB 6Sep00 			return(MANOEUVRE_CLIMBTURN);
-//DeadCode CSB 6Sep00 		else
-//DeadCode CSB 6Sep00 			return(MANOEUVRE_SPLITS);
-//DeadCode CSB 6Sep00 	}
-//DeadCode CSB 6Sep00 	else
-//DeadCode CSB 6Sep00 	{
-//DeadCode CSB 6Sep00 //DeadCode CSB 8Aug00 		if(trg->World.Y < 250000)
-//DeadCode CSB 6Sep00 		if(Math_Lib.rnd(2))
-//DeadCode CSB 6Sep00 			return(MANOEUVRE_ZOOM);
-//DeadCode CSB 6Sep00 		else
-//DeadCode CSB 6Sep00 			return(MANOEUVRE_STEEPDIVE);
-//DeadCode CSB 6Sep00 	}
 }
 
 
 void	FormationItem::BreakForm()
 {
 
-//DeadCode AMM 01Jun98 	if (_DPlay.Implemented)										//ARM 06Dec96
-//DeadCode AMM 01Jun98 		return;
 
-//DeadCode DAW 29Jun99 	movecode=AUTO_NOPPILOT;										//JIM 15Oct96
 	FormationItemPtr	replacement=NULL;
-//DeadCode JIM 15Oct96 	if (follower)
 	replacement=follower;
 	bool	gottrain=false;//(Persons2::getbandfromUID(uniqueID.count)==RedTrainBAND);//DAW 22Jun99
 	FormationItemPtr	user=NULL;
@@ -3062,7 +2448,6 @@ void	FormationItem::BreakForm()
 		}
 	}
 	movecode=AUTO_NOPPILOT;										//JIM 15Oct96
-//DeadCode DAW 29Jun99 	leader=NULL;
 }
 
 
@@ -3112,7 +2497,6 @@ void	AirStruc::BreakForm()
 			replacement->leader = NULL;
 		if(replacement->fly.leadflight == this)
 			replacement->fly.leadflight = NULL;
-//DeadCode CSB 14Sep00 		if((!this->formpos) || (replacement->position()))		  //JIM 09/07/99	//CSB 12/07/99
 		if((!formpos) || (((formpos & 0xf0) == 0) && ((replacement->formpos & 0xf0) != 0)))
 			replacement->formpos = formpos;							  //JIM 09/07/99
 		if((replacement->fly.nextflight == NULL) && (fly.nextflight!=replacement))
@@ -3171,8 +2555,6 @@ void	AirStruc::BreakForm()
 	}
 	if(ai.attacker)
 	{
-//DeadCode CSB 4Aug00 		if(ai.attacker->ai.unfriendly != this)
-//DeadCode CSB 4Aug00 			INT3;
 		ai.attacker->ai.unfriendly = NULL;
 		ai.attacker = NULL;
 	}
@@ -3225,7 +2607,6 @@ void	AirStruc::BreakForm()
 						if(replacement == NULL)								//MS 7Jul00
 						{
 							fly.expandedsag = NULL;
-//DeadCode RJS 26Sep00 							leadac->DestroySag();
 							leadac->SAGDeathSequenceOverride(AUTOSAG_DESTROYED);	//RJS 26Sep00
 						}
 
@@ -3241,29 +2622,6 @@ void	AirStruc::BreakForm()
 	DoAllSAGChecks();													//CSB 1Aug00
 
 //THIS DOES NOT WORK AS ONLY GROUP LEADERS ARE BEING CHECKED			//CSB 10/03/00
-//DEADCODE CSB 10/03/00 	AcArrayItterator	user;
-//DEADCODE CSB 10/03/00 	while (user.Next())
-//DEADCODE CSB 10/03/00 		if (user)
-//DEADCODE CSB 10/03/00 		{
-//DEADCODE CSB 10/03/00 			if (user->leader==this || user->fly.leadflight==this)
-//DEADCODE CSB 10/03/00 			{
-//DEADCODE CSB 10/03/00 				if (user->leader==this)
-//DEADCODE CSB 10/03/00 					user->leader=replacement;
-//DEADCODE CSB 10/03/00 				if (user->fly.leadflight==this)
-//DEADCODE CSB 10/03/00 					user->fly.leadflight=replacement;
-//DEADCODE CSB 10/03/00 				user->information=IF_OUT_POS;
-//DEADCODE CSB 10/03/00 			}
-//DEADCODE CSB 10/03/00
-//DEADCODE CSB 10/03/00 			if (user->follower==this)
-//DEADCODE CSB 10/03/00 				user->follower=replacement;
-//DEADCODE CSB 10/03/00 			if (user->fly.nextflight==this)
-//DEADCODE CSB 10/03/00 				user->fly.nextflight=replacement;
-//DEADCODE CSB 10/03/00
-//DEADCODE CSB 10/03/00 			if (user->ai.unfriendly==this)
-//DEADCODE CSB 10/03/00 				user->ai.unfriendly=NULL;
-//DEADCODE CSB 10/03/00 			if (user->ai.attacker==this)
-//DEADCODE CSB 10/03/00 				user->ai.attacker=NULL;
-//DEADCODE CSB 10/03/00 		}
 }
 
 
@@ -3503,61 +2861,6 @@ void AirStruc::DumpAndRun()
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode DAW 27Jun99 void	ArtInt::PlayerHitConvoy(FormationItemPtr f1)
-//DeadCode DAW 27Jun99 {
-//DeadCode DAW 27Jun99 	FormationItemPtr f=f1->leader;
-//DeadCode DAW 27Jun99 	if (f==NULL)
-//DeadCode DAW 27Jun99 		f=f1;
-//DeadCode DAW 27Jun99 	AirStrucPtr p=Manual_Pilot.ControlledAC2;
-//DeadCode DAW 27Jun99 	if (p->leader==NULL && p->follower!=NULL && p->movecode!=AUTO_STRAFFE)
-//DeadCode DAW 27Jun99 		if (p->waypoint && p->waypoint->target!=f)
-//DeadCode DAW 27Jun99 		{	//all of players flight will attack convoy...
-//DeadCode DAW 27Jun99 			//insert an extra waypoint to that effect
-//DeadCode DAW 27Jun99 			WayPointPtr w=new WayPoint;
-//DeadCode DAW 27Jun99 			WayPointPtr o=p->waypoint;
-//DeadCode DAW 27Jun99 			if (p->waypoint->prev==NULL)
-//DeadCode DAW 27Jun99 			{	//no prev, but I have stuff pointing there!
-//DeadCode DAW 27Jun99 				*w=*p->waypoint;
-//DeadCode DAW 27Jun99 				w->uniqueID.count=UID_Null;
-//DeadCode DAW 27Jun99 				w->next=p->waypoint->next;
-//DeadCode DAW 27Jun99 				p->waypoint->next=w;
-//DeadCode DAW 27Jun99 				w->prev=p->waypoint;
-//DeadCode DAW 27Jun99 				if (w->next)
-//DeadCode DAW 27Jun99 					w->next->prev=w;
-//DeadCode DAW 27Jun99 				w=w->prev;
-//DeadCode DAW 27Jun99 			}
-//DeadCode DAW 27Jun99 			else
-//DeadCode DAW 27Jun99 			{
-//DeadCode DAW 27Jun99 				w->next=p->waypoint;
-//DeadCode DAW 27Jun99 				w->prev=p->waypoint->prev;
-//DeadCode DAW 27Jun99 				p->waypoint->prev=w;
-//DeadCode DAW 27Jun99 				w->prev->next=w;
-//DeadCode DAW 27Jun99 				w->uniqueID.count=UID_Null;
-//DeadCode DAW 27Jun99 			}
-//DeadCode DAW 27Jun99
-//DeadCode DAW 27Jun99 //DeadCode AMM 10Jun98 			w->uniqueID.deaded=TRUE;							//RJS 27Feb98
-//DeadCode DAW 27Jun99 //DeadCode AMM 30Nov98 			w->uniqueID.commsmove=TRUE;							//AMM 10Jun98
-//DeadCode DAW 27Jun99 			w->Status.deaded=TRUE;								//AMM 30Nov98
-//DeadCode DAW 27Jun99 			p->movecode=AUTO_STRAFFE;
-//DeadCode DAW 27Jun99 			w->World.X=0;
-//DeadCode DAW 27Jun99 			w->World.Y=METRES4000;
-//DeadCode DAW 27Jun99 			w->World.Z=0;
-//DeadCode DAW 27Jun99 			w->range=METRES3000-METRES500;
-//DeadCode DAW 27Jun99 			w->vel=0;
-//DeadCode DAW 27Jun99 			w->eta=0;
-//DeadCode DAW 27Jun99 			w->action=wpdivebombstraffeno;
-//DeadCode DAW 27Jun99 			w->target=f;
-//DeadCode DAW 27Jun99 			while (p)
-//DeadCode DAW 27Jun99 			{
-//DeadCode DAW 27Jun99 				if (p->waypoint==o)
-//DeadCode DAW 27Jun99 					p->waypoint=w;
-//DeadCode DAW 27Jun99 				p=*p->follower;
-//DeadCode DAW 27Jun99 			}
-//DeadCode DAW 27Jun99 		}
-//DeadCode DAW 27Jun99 		else
-//DeadCode DAW 27Jun99 			if (p->waypoint && f->follower && f->Status.deadtime)
-//DeadCode DAW 27Jun99 			   p->waypoint->target=f->follower;
-//DeadCode DAW 27Jun99 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ProcessWPEvents
@@ -3571,21 +2874,6 @@ void AirStruc::DumpAndRun()
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 20Oct100 void	ArtInt::ProcessWPEvents()
-//DeadCode AMM 20Oct100 {
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 	Blue ac will have events on their waypoints to launch the MiGs
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 	Decide here which MiGs to launch
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 	if (there hasn't been a launch against group trg is in)
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 	if (trg == FB)
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 	{
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 		if (trg is escorted)
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 			LaunchMiGs(trg,SPLITFORCE);
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 		else
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 			LaunchMiGs(trg,ATTACKBOMBERSONLY);
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 	}else if (trg is not escorting)
-//DeadCode AMM 20Oct100 //TempCode RDH 27Mar98 		LaunchMiGs(trg, ATTACKWEAKNESSES);
-//DeadCode AMM 20Oct100 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		LaunchMiGs
 //Author		R. Hyde
@@ -3598,9 +2886,6 @@ void AirStruc::DumpAndRun()
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 20Oct100 void	ArtInt::LaunchMiGs(AirStruc* trg,tAggressionLevel al)
-//DeadCode AMM 20Oct100 {
-//DeadCode AMM 20Oct100 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		VisibleContrailsCheck
@@ -3614,113 +2899,10 @@ void AirStruc::DumpAndRun()
 //Returns
 //
 //------------------------------------------------------------------------------
-//DeadCode AMM 20Oct100 void	ArtInt::VisibleContrailsCheck()
-//DeadCode AMM 20Oct100 {
-//DeadCode AMM 20Oct100 }
 
 
 void	ArtInt::VisibleAAACheck()
 {
-//DEADCODE DAW 22/03/00 	AirStruc* eye=ACArray[ACArrayInd];
-//DEADCODE DAW 22/03/00 	if (eye && !eye->Status.deadtime && eye->waypoint)												//viewer alive
-//DEADCODE DAW 22/03/00 		if (eye->waypoint->wpname==WPNAME_Target || eye->waypoint->wpname==0)									//in patrol area
-//DEADCODE DAW 22/03/00 			if ((eye->duty&ACTIONCODE)!=DA_CAP)
-//DEADCODE DAW 22/03/00 				if (eye->movecode!=AUTO_BOMB)
-//DEADCODE DAW 22/03/00 					if (!eye->formpos || eye->uniqueID.count==eye->waypoint->skipunder)
-//DEADCODE DAW 22/03/00 					{
-//DEADCODE DAW 22/03/00 						ItemPtr	seltrg=NULL;
-//DEADCODE DAW 22/03/00 						if ((eye->duty&DUTYMASK)==DC_WW)
-//DEADCODE DAW 22/03/00 						{
-//DEADCODE DAW 22/03/00 							AaaMainList::AaaSubList* list=Three_Dee.livelist->aaalist;
-//DEADCODE DAW 22/03/00 							AaaMainList::AaaSubList* lstart=list;
-//DEADCODE DAW 22/03/00 							do{
-//DEADCODE DAW 22/03/00 								for (int i=0;i<AaaMainList::SUBLISTSIZE;i++)
-//DEADCODE DAW 22/03/00 								{
-//DEADCODE DAW 22/03/00 									ItemPtr trg=list->aaaitem[i];
-//DEADCODE DAW 22/03/00 									if (trg && trg->Status.size==ITEMSIZE && !trg->Status.deadtime)
-//DEADCODE DAW 22/03/00 									{
-//DEADCODE DAW 22/03/00 										Coords3D		weapoff;
-//DEADCODE DAW 22/03/00 										int				weapnum=0;
-//DEADCODE DAW 22/03/00 										ULong			mvel;
-//DEADCODE DAW 22/03/00 										UWord			mdelay,mburst;						//RDH 31Jul98
-//DEADCODE DAW 22/03/00
-//DEADCODE DAW 22/03/00 										WeapAnimData*	weapanim=SHAPE.GetWeaponLauncher(trg,weapnum,weapoff.X,weapoff.Y,weapoff.Z,mvel,mdelay,mburst,LT_MOVEGUN);//RDH 31Jul98
-//DEADCODE DAW 22/03/00 										if (weapanim)
-//DEADCODE DAW 22/03/00 										{
-//DEADCODE DAW 22/03/00 											AaaParams*	aaaparams=&aaaguntypelist[weapanim->LauncherType-LT_MOVEGUN];
-//DEADCODE DAW 22/03/00 											if (aaaparams->guntype==AAA_ANTIAIRCRAFT && aaaparams->nat!=eye->nationality)
-//DEADCODE DAW 22/03/00 											{
-//DEADCODE DAW 22/03/00 												int range=eye->Distance3D(&trg->World);
-//DEADCODE DAW 22/03/00 												if (range<METRES15KM)
-//DEADCODE DAW 22/03/00 													if (range<(METRES2000 + eye->ai.combatskill*(METRES350/SKILL_SUBSTAGE)) || Math_Lib.rnd((SKILL_SUBSTAGE*22)-eye->ai.combatskill)<SKILL_SUBSTAGE)
-//DEADCODE DAW 22/03/00 													{	//spotted a site!
-//DEADCODE DAW 22/03/00 														seltrg=trg;
-//DEADCODE DAW 22/03/00 														break;
-//DEADCODE DAW 22/03/00 													}
-//DEADCODE DAW 22/03/00 											}
-//DEADCODE DAW 22/03/00 										}
-//DEADCODE DAW 22/03/00 									}
-//DEADCODE DAW 22/03/00 								}
-//DEADCODE DAW 22/03/00 								list=list->next;
-//DEADCODE DAW 22/03/00 							}while (list!=lstart);
-//DEADCODE DAW 22/03/00 						}
-//DEADCODE DAW 22/03/00 						else
-//DEADCODE DAW 22/03/00 						if ((eye->duty&DUTYMASK)==DC_AR)
-//DEADCODE DAW 22/03/00 						{
-//DEADCODE DAW 22/03/00 							for (FormationItemPtr truck=*MobileItem::MobileList;truck;truck=*truck->nextmobile)
-//DEADCODE DAW 22/03/00 							{
-//DEADCODE DAW 22/03/00 								if (!truck->leader && truck->nationality!=eye->nationality && !truck->Status.deadtime)
-//DEADCODE DAW 22/03/00 								{
-//DEADCODE DAW 22/03/00 									int range=eye->Distance3D(&truck->World);
-//DEADCODE DAW 22/03/00 									if (range<METRES15KM)
-//DEADCODE DAW 22/03/00 									{
-//DEADCODE DAW 22/03/00 										UniqueIDBand b=Persons2::getbandfromUID(truck->uniqueID.count);
-//DEADCODE DAW 22/03/00 //TEMPCODE RJS 16/11/99 										if (b==RedTrainBAND || b==RedTruckBAND)
-//DEADCODE DAW 22/03/00 //TEMPCODE RJS 16/11/99 											if (range< (METRES2000 + eye->ai.combatskill*METRES350) || !Math_Lib.rnd(20-eye->ai.combatskill))
-//DEADCODE DAW 22/03/00 //TEMPCODE RJS 16/11/99 											{	//spotted a site!
-//DEADCODE DAW 22/03/00 //TEMPCODE RJS 16/11/99 												seltrg=truck;
-//DEADCODE DAW 22/03/00 //TEMPCODE RJS 16/11/99 												break;
-//DEADCODE DAW 22/03/00 //TEMPCODE RJS 16/11/99 											}
-//DEADCODE DAW 22/03/00 									}
-//DEADCODE DAW 22/03/00 								}
-//DEADCODE DAW 22/03/00 							}
-//DEADCODE DAW 22/03/00 						}
-//DEADCODE DAW 22/03/00 						if (seltrg)	//ok... got a selected target! Now what?
-//DEADCODE DAW 22/03/00 						{
-//DEADCODE DAW 22/03/00 							AirStrucPtr sender,recipient;
-//DEADCODE DAW 22/03/00 							recipient=eye->PlayerInGroup();
-//DEADCODE DAW 22/03/00 //DEADCODE RDH 15/06/99 							if (!recipient)
-//DEADCODE DAW 22/03/00 //DEADCODE RDH 15/06/99 							{
-//DEADCODE DAW 22/03/00 //DEADCODE RDH 15/06/99 								sender=recipient=eye;
-//DEADCODE DAW 22/03/00 //DEADCODE RDH 15/06/99 							}
-//DEADCODE DAW 22/03/00 //DEADCODE RDH 15/06/99 							else
-//DEADCODE DAW 22/03/00 							if (!recipient)
-//DEADCODE DAW 22/03/00 								recipient=eye;
-//DEADCODE DAW 22/03/00 							if (recipient==eye)
-//DEADCODE DAW 22/03/00 							{
-//DEADCODE DAW 22/03/00 								sender=recipient->FindBuddy();
-//DEADCODE DAW 22/03/00 								if (!sender)
-//DEADCODE DAW 22/03/00 									sender=recipient;
-//DEADCODE DAW 22/03/00 							}
-//DEADCODE DAW 22/03/00 							else
-//DEADCODE DAW 22/03/00 							{
-//DEADCODE DAW 22/03/00 								sender=eye;
-//DEADCODE DAW 22/03/00 							}
-//DEADCODE DAW 22/03/00 							if (seltrg->Status.size==ITEMSIZE)
-//DEADCODE DAW 22/03/00 								_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_WWALLOCUS,MSG_MORETARGETS,sender,seltrg,recipient));//RJS 02Feb00
-//DEADCODE DAW 22/03/00 							else
-//DEADCODE DAW 22/03/00 								_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_SEETARGET,MSG_MORETARGETS,sender,seltrg,recipient));
-//DEADCODE DAW 22/03/00 							for (AirStrucPtr fl=eye;fl;fl=fl->fly.nextflight)
-//DEADCODE DAW 22/03/00 								for (AirStrucPtr w=fl;w;w=w->Follower())
-//DEADCODE DAW 22/03/00 									if (w->uniqueID.count>=eye->waypoint->skipunder && w->uniqueID.count<=eye->waypoint->skipover)
-//DEADCODE DAW 22/03/00 									{
-//DEADCODE DAW 22/03/00 										w->movecode=AUTO_BOMB;
-//DEADCODE DAW 22/03/00 										w->ai.ManStep=0;
-//DEADCODE DAW 22/03/00 										w->manoeuvretime=0;
-//DEADCODE DAW 22/03/00 										w->ai.unfriendly=seltrg;
-//DEADCODE DAW 22/03/00 									}
-//DEADCODE DAW 22/03/00 						}
-//DEADCODE DAW 22/03/00 					}
 }
 
 
@@ -3800,23 +2982,6 @@ if(		((msg.caller) && (msg.caller->Status.deadtime))
 bool	DecisionAI::UserMsgDecision(AirStrucPtr callee,ItemBasePtr trg,			  //JIM 22/01/99
 		AirStrucPtr caller,ArtInt* artint,MESSAGE_STRUC* PriorityMessage)
 {
-//DEADCODE CSB 04/05/00 	if (caller->ai.radiosilent)
-//DEADCODE CSB 04/05/00 	{
-//DEADCODE CSB 04/05/00 		AirStrucPtr respondent=caller->fly.leadflight;
-//DEADCODE CSB 04/05/00 		if (!respondent)
-//DEADCODE CSB 04/05/00 			respondent=caller->FindBuddy();
-//DEADCODE CSB 04/05/00 		if (Math_Lib.rnd(8)==0)
-//DEADCODE CSB 04/05/00 			caller->ai.radiosilent=FALSE;							  //JIM 11/06/99
-//DEADCODE CSB 04/05/00 		if (respondent)
-//DEADCODE CSB 04/05/00 		{
-//DEADCODE CSB 04/05/00 			if (Math_Lib.rnd(8)==0)
-//DEADCODE CSB 04/05/00 				respondent->ai.radiosilent=FALSE;					  //JIM 11/06/99
-//DEADCODE CSB 04/05/00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_SILENCE, MSG_SILENCE, respondent, NULL, caller));//RJS 02Feb100
-//DEADCODE CSB 04/05/00
-//DEADCODE CSB 04/05/00 		}
-//DEADCODE CSB 04/05/00
-//DEADCODE CSB 04/05/00
-//DEADCODE CSB 04/05/00 	}
 	return AutoMsgDecision(callee,trg,caller,artint,PriorityMessage);
 }
 
@@ -3824,7 +2989,6 @@ bool	DecisionAI::UserMsgDecision(AirStrucPtr callee,ItemBasePtr trg,			  //JIM 2
 PhraseTables DecisionAI::GetDefaultPhrase(AirStrucPtr callee,ItemBasePtr trg)
 {
 		#pragma warnmsg ("RadioChat:code commented out")
-//DEADCODE CSB 28/02/00 /*
 	Art_Int.blocking=DoNothing;
 	OptionRef* msgopts=GetMsgOptions();
 	assert(msgopts);
@@ -3858,7 +3022,6 @@ PhraseTables DecisionAI::GetDefaultPhrase(AirStrucPtr callee,ItemBasePtr trg)
 		return	PHRASE_NULL;	//no user phrase to continue...
 	}
 
-//DEADCODE CSB 28/02/00   */
 	return PHRASE_NULL;
 
 }
@@ -3951,20 +3114,6 @@ AirStrucPtr AirStruc::PlayerInGroup()
 	return(NULL);																	//CSB 07/03/00
 }
 
-//DEADCODE CSB 07/03/00 	AirStrucPtr	leadac=this;
-//DEADCODE CSB 07/03/00 	if (leader)
-//DEADCODE CSB 07/03/00 		leadac=Leader();
-//DEADCODE CSB 07/03/00 	if (leadac->formpos)			//RDH 24/05/99 edit on Craig's machine as well
-//DEADCODE CSB 07/03/00 		leadac=leadac->fly.leadflight;
-//DEADCODE CSB 07/03/00 	AirStrucPtr rv;
-//DEADCODE CSB 07/03/00 	for(;leadac;leadac=leadac->fly.nextflight)
-//DEADCODE CSB 07/03/00 	{
-//DEADCODE CSB 07/03/00 		rv=leadac->InPlayersElement();
-//DEADCODE CSB 07/03/00 		if (rv)
-//DEADCODE CSB 07/03/00 			return rv;
-//DEADCODE CSB 07/03/00 	}
-//DEADCODE CSB 07/03/00 	return	NULL;
-//DEADCODE CSB 07/03/00 }
 
 
 AirStrucPtr		AirStruc::FindAirEscortLeader()
@@ -3972,17 +3121,6 @@ AirStrucPtr		AirStruc::FindAirEscortLeader()
 	INT3;																//CSB 18Oct00
 	return(NULL);														//CSB 20Oct00
 
-//DeadCode CSB 18Oct00 	AcArrayItterator search;
-//DeadCode CSB 18Oct00 	while (search.Next())
-//DeadCode CSB 18Oct00 		if (search)
-//DeadCode CSB 18Oct00 		{
-//DeadCode CSB 18Oct00 			if (!search->formpos)
-//DeadCode CSB 18Oct00 				if (search->fly.leadflight==this)
-//DeadCode CSB 18Oct00 					if (!search->Status.deadtime)
-//DeadCode CSB 18Oct00 						if (search->duty>=PACK_AM_ESCORT)//==DUTYESCORT)	//DAW 22/03/00
-//DeadCode CSB 18Oct00 							return search;
-//DeadCode CSB 18Oct00 		}
-//DeadCode CSB 18Oct00 	return search;
 }
 
 
@@ -4136,41 +3274,6 @@ AirStrucPtr		AirStruc::FindAcInGroup()
 }
 
 
-//DEADCODE RDH 05/07/99 AirStrucPtr		AirStruc::FindBandit(int& count)
-//DEADCODE RDH 05/07/99 {//find bandit in visible range
-//DEADCODE RDH 05/07/99 	AcArrayItterator bogey;
-//DEADCODE RDH 05/07/99 	AirStruc*	bandit = NULL;
-//DEADCODE RDH 05/07/99 	SLong range =  VISIBLERANGE;
-//DEADCODE RDH 05/07/99 	count = 0;
-//DEADCODE RDH 05/07/99 	while (bogey.Next())
-//DEADCODE RDH 05/07/99 		if (bogey)
-//DEADCODE RDH 05/07/99 		{
-//DEADCODE RDH 05/07/99 			if (bogey->nationality != nationality)
-//DEADCODE RDH 05/07/99 			{
-//DEADCODE RDH 05/07/99 				if (	(!bogey->leader)
-//DEADCODE RDH 05/07/99 					||	(!bogey->information)
-//DEADCODE RDH 05/07/99 					)
-//DEADCODE RDH 05/07/99 				{
-//DEADCODE RDH 05/07/99 					if  (		(!bogey->leader)
-//DEADCODE RDH 05/07/99 							&&	(bogey->movecode != AUTO_NOPPILOT)
-//DEADCODE RDH 05/07/99 						)
-//DEADCODE RDH 05/07/99 						//count all leaders that active
-//DEADCODE RDH 05/07/99 						count++;
-//DEADCODE RDH 05/07/99 					Art_Int.InterceptRangeFromTo(this, bogey);
-//DEADCODE RDH 05/07/99 					if (		(Range < VISIBLERANGE)
-//DEADCODE RDH 05/07/99 							&&	(Range < range)
-//DEADCODE RDH 05/07/99 							&&	(!Status.deadtime)
-//DEADCODE RDH 05/07/99 						)
-//DEADCODE RDH 05/07/99 					{
-//DEADCODE RDH 05/07/99 						range = Range;
-//DEADCODE RDH 05/07/99 						bandit = bogey;
-//DEADCODE RDH 05/07/99 					}
-//DEADCODE RDH 05/07/99 				}
-//DEADCODE RDH 05/07/99 			}
-//DEADCODE RDH 05/07/99 		}
-//DEADCODE RDH 05/07/99 	Range = range;		//range of bandit
-//DEADCODE RDH 05/07/99 	return (bandit);
-//DEADCODE RDH 05/07/99 }
 
 
 AirStrucPtr AirStruc::FindBandit(int& count)
@@ -4202,110 +3305,18 @@ AirStrucPtr AirStruc::FindBandit(int& count)
 		return(Art_Int.ACArray[nearesti]->GetLeadAc());
 	}
 
-//DeadCode CSB 18Oct00 	//find bandit in visible range, return count of leader. THis may be 0 even if bandit found
-//DeadCode CSB 18Oct00 	AcArrayItterator bogey;
-//DeadCode CSB 18Oct00 	AirStruc*	bandit = NULL;
-//DeadCode CSB 18Oct00 	SLong range =  VISIBLERANGE;
-//DeadCode CSB 18Oct00 	count = 0;
-//DeadCode CSB 18Oct00 	while (bogey.Next())
-//DeadCode CSB 18Oct00 		if (bogey)
-//DeadCode CSB 18Oct00 		{
-//DeadCode CSB 18Oct00 			if  (		(		(!bogey->leader)
-//DeadCode CSB 18Oct00 							||	(!bogey->information)
-//DeadCode CSB 18Oct00 						)
-//DeadCode CSB 18Oct00 						&&	(bogey->movecode != AUTO_NOPPILOT)
-//DeadCode CSB 18Oct00 						&&	(bogey->nationality != nationality)
-//DeadCode CSB 18Oct00 						&&	(!Status.deadtime)
-//DeadCode CSB 18Oct00 				)
-//DeadCode CSB 18Oct00 			{
-//DeadCode CSB 18Oct00 				Art_Int.InterceptRangeFromTo(this, bogey);
-//DeadCode CSB 18Oct00 				if 	(Range < VISIBLERANGE)
-//DeadCode CSB 18Oct00 				{
-//DeadCode CSB 18Oct00 					if 	(!bogey->leader)
-//DeadCode CSB 18Oct00 						//count all leaders that active
-//DeadCode CSB 18Oct00 						count++;
-//DeadCode CSB 18Oct00 					if (Range < range)
-//DeadCode CSB 18Oct00 					{
-//DeadCode CSB 18Oct00 						range = Range;
-//DeadCode CSB 18Oct00 						bandit = bogey;
-//DeadCode CSB 18Oct00 					}
-//DeadCode CSB 18Oct00 				}
-//DeadCode CSB 18Oct00 			}
-//DeadCode CSB 18Oct00 		}
-//DeadCode CSB 18Oct00 	Range = range;		//range of bandit
-//DeadCode CSB 18Oct00 	return (bandit);
 }
 
 
 
 
 
-//DEADCODE RDH 05/07/99 AirStrucPtr		AirStruc::FindAnyBandit(SLong& range)
-//DEADCODE RDH 05/07/99 {
-//DEADCODE RDH 05/07/99 	AcArrayItterator bogey;
-//DEADCODE RDH 05/07/99 	AirStruc*	bandit = NULL;
-//DEADCODE RDH 05/07/99 	range =  MILES2000;
-//DEADCODE RDH 05/07/99
-//DEADCODE RDH 05/07/99 	while (bogey.Next())
-//DEADCODE RDH 05/07/99 		if (bogey)
-//DEADCODE RDH 05/07/99 		{
-//DEADCODE RDH 05/07/99 			if (bogey->nationality != nationality)
-//DEADCODE RDH 05/07/99 			{
-//DEADCODE RDH 05/07/99 				if (	(!bogey->leader)
-//DEADCODE RDH 05/07/99 					||	(!bogey->information)
-//DEADCODE RDH 05/07/99 					)
-//DEADCODE RDH 05/07/99 				{
-//DEADCODE RDH 05/07/99
-//DEADCODE RDH 05/07/99 					Art_Int.InterceptRangeFromTo(this, bogey);
-//DEADCODE RDH 05/07/99 					if (		(Range < MILES2000)
-//DEADCODE RDH 05/07/99 							&&	(Range < range)
-//DEADCODE RDH 05/07/99 							&&	(!Status.deadtime)
-//DEADCODE RDH 05/07/99 						)
-//DEADCODE RDH 05/07/99 					{
-//DEADCODE RDH 05/07/99 						range = Range;
-//DEADCODE RDH 05/07/99 						bandit = bogey;
-//DEADCODE RDH 05/07/99 					}
-//DEADCODE RDH 05/07/99 				}
-//DEADCODE RDH 05/07/99 			}
-//DEADCODE RDH 05/07/99 		}
-//DEADCODE RDH 05/07/99 	return (bandit);
-//DEADCODE RDH 05/07/99 }
 
 
 AirStrucPtr		AirStruc::FindAnyBandit(SLong& range, int& count)
 {
 	INT3;																//CSB 18Oct00
 	return(NULL);
-//DeadCode CSB 18Oct00 	AcArrayItterator bogey;
-//DeadCode CSB 18Oct00 	AirStruc*	bandit = NULL;
-//DeadCode CSB 18Oct00 	range =  MILES2000;
-//DeadCode CSB 18Oct00
-//DeadCode CSB 18Oct00 	while (bogey.Next())
-//DeadCode CSB 18Oct00 	if (bogey)
-//DeadCode CSB 18Oct00 		{
-//DeadCode CSB 18Oct00 			if  (		(		(!bogey->leader)
-//DeadCode CSB 18Oct00 							||	(!bogey->information)
-//DeadCode CSB 18Oct00 						)
-//DeadCode CSB 18Oct00 						&&	(bogey->movecode != AUTO_NOPPILOT)
-//DeadCode CSB 18Oct00 						&&	(bogey->nationality != nationality)
-//DeadCode CSB 18Oct00 						&&	(!Status.deadtime)
-//DeadCode CSB 18Oct00 				)
-//DeadCode CSB 18Oct00 			{
-//DeadCode CSB 18Oct00 				Art_Int.InterceptRangeFromTo(this, bogey);
-//DeadCode CSB 18Oct00 				if 	(Range < MILES2000)
-//DeadCode CSB 18Oct00 				{
-//DeadCode CSB 18Oct00 					if 	(!bogey->leader)
-//DeadCode CSB 18Oct00 						//count all leaders that active
-//DeadCode CSB 18Oct00 						count++;
-//DeadCode CSB 18Oct00 					if (Range < range)
-//DeadCode CSB 18Oct00 					{
-//DeadCode CSB 18Oct00 						range = Range;
-//DeadCode CSB 18Oct00 						bandit = bogey;
-//DeadCode CSB 18Oct00 					}
-//DeadCode CSB 18Oct00 				}
-//DeadCode CSB 18Oct00 			}
-//DeadCode CSB 18Oct00 		}
-//DeadCode CSB 18Oct00 	return (bandit);
 
 	return NULL;
 }
@@ -4325,28 +3336,6 @@ AirStrucPtr AirStruc::FindBanditOnTail()
 
 	return(NULL);
 
-//DeadCode CSB 18Oct00 	AcArrayItterator bogey;
-//DeadCode CSB 18Oct00 	AirStruc*	bandit = NULL;
-//DeadCode CSB 18Oct00
-//DeadCode CSB 18Oct00 	while (bogey.Next())
-//DeadCode CSB 18Oct00 		if (bogey)
-//DeadCode CSB 18Oct00 		{
-//DeadCode CSB 18Oct00 			if (bogey->nationality != nationality)
-//DeadCode CSB 18Oct00 			{
-//DeadCode CSB 18Oct00 				if(bogey->movecode == AUTO_COMBAT)
-//DeadCode CSB 18Oct00 				{
-//DeadCode CSB 18Oct00 					Art_Int.InterceptRangeFromTo(this, bogey);
-//DeadCode CSB 18Oct00 					if (		(Range < ENGAGERANGE)
-//DeadCode CSB 18Oct00 							&&	(Art_Int.TargetOnCallerTail(this, bogey, ANGLES_30Deg))
-//DeadCode CSB 18Oct00 						)
-//DeadCode CSB 18Oct00 					{
-//DeadCode CSB 18Oct00
-//DeadCode CSB 18Oct00 						bandit = bogey;
-//DeadCode CSB 18Oct00 					}
-//DeadCode CSB 18Oct00 				}
-//DeadCode CSB 18Oct00 			}
-//DeadCode CSB 18Oct00 		}
-//DeadCode CSB 18Oct00 	return (bandit);
 }
 
 
@@ -4463,11 +3452,6 @@ AirStrucPtr ArtInt::SplitUnit(AirStrucPtr ac, UnitSize& unitsize)
 			unitsize = UNIT_LUF_GRUPPEN;
 			ac2ic = FindEscort(ac);
 		}
-//DEADCODE CSB 16/02/00 		else
-//DEADCODE CSB 16/02/00 		{
-//DEADCODE CSB 16/02/00 			unitsize = UNIT_LUF_GESCHWADER;
-//DEADCODE CSB 16/02/00 			ac2ic = nextgruppen;
-//DEADCODE CSB 16/02/00 		}
 	}
 	else
 		unitsize = UNIT_VOID;
@@ -4553,20 +3537,6 @@ bool ArtInt::CanAttackType(AirStrucPtr ac, AirStrucPtr trg)
 {
 	return(true);
 
-//DEADCODE CSB 21/03/00 	if(ac->attack either)
-//DEADCODE CSB 21/03/00 		return(true);
-//DEADCODE CSB 21/03/00 	else if(ac->attack bombers)
-//DEADCODE CSB 21/03/00 		if(trg->classtype->aerobaticfactor < AEROBATIC_HIGH)
-//DEADCODE CSB 21/03/00 			return(true);
-//DEADCODE CSB 21/03/00 		else
-//DEADCODE CSB 21/03/00 			return(false);
-//DEADCODE CSB 21/03/00 	else if(ac->attack fighters)
-//DEADCODE CSB 21/03/00 		if(trg->classtype->aerobaticfactor == AEROBATIC_HIGH)
-//DEADCODE CSB 21/03/00 			return(true);
-//DEADCODE CSB 21/03/00 		else
-//DEADCODE CSB 21/03/00 			return(false);
-//DEADCODE CSB 21/03/00 	else
-//DEADCODE CSB 21/03/00 		return(false);
 }
 
 
@@ -4659,14 +3629,6 @@ Bool AirStruc::ShouldGoHome()
 	}
 
 	{
-//DeadCode CSB 29Aug00 		FP fuelcontents = 0;
-//DeadCode CSB 29Aug00 		for(int i = 0; i < 4; i++)
-//DeadCode CSB 29Aug00 			fuelcontents += fly.fuel_content[i];
-//DeadCode CSB 29Aug00 		if((classtype->visible == ME109) && (Save_Data.flightdifficulty[FD_109FUEL]))
-//DeadCode CSB 29Aug00 			fuelcontents /= 1.5;
-//DeadCode CSB 29Aug00
-//DeadCode CSB 29Aug00 		if(fuelcontents < 0.4 * classtype->maxintfuel)
-//DeadCode CSB 29Aug00 			return(TRUE);
 		if(FuelShort(10 * 60 * 100))
 			return(TRUE);
 	}

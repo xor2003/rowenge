@@ -123,7 +123,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //Deaded	#include	"mouse.h"
 	#include	"collided.h"									//PD 08Oct96
 
-//DEADCODE JIM 07/02/00 	#include	"package.h"									//RJS 23Oct96
 	#include	"missman2.h"									//RJS 23Oct96
 	#include	"Persons2.h"									//PD 10Dec96
 
@@ -145,7 +144,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"cstring.h"
 #include	"grid.h"													//JON 6Jul00
 
-//DEADCODE JIM 07/02/00 	#include	"sqddiary.h"									//RJS 27Jan99
 
 	class	ThreeDee	Three_Dee;
 
@@ -375,7 +373,6 @@ class	Bollox2
 public:
 	Bollox2(const char*	theName)
 	{
-//DeadCode RJS 15Aug00 		static	int	theWindow = AllocConsole();
 	}
 
 	~Bollox2()
@@ -419,7 +416,6 @@ CON	ThreeDee::ThreeDee()
 	pTMake=NULL;
 
 	normalDataPtr=NULL;
-//deadcode	pNormalLookup=NULL;
 
 	View_Point=NULL;
 	nomorereallygetdata=false;
@@ -456,7 +452,6 @@ CON	ThreeDee::ThreeDee()
   	sunItemP->shape=SUN;												//RJS 30May00
  	sunItemP->Anim = sunanimptr;										//RJS 30May00
 
-//DeadCode JON 31Aug00 	clipNearZ = DEFAULT_NEARZ;											//RJS 31Jul00
 
 }
 
@@ -475,12 +470,9 @@ CON	ThreeDee::ThreeDee()
 DES	ThreeDee::~ThreeDee()
 {
 	delete []NewPalettePtr;
-//DeadCode RJS 21Apr99 	delete []sunanimptr;
 	if (normalDataPtr!=NULL) delete[]normalDataPtr,normalDataPtr=NULL;
-//deadcode	if (pNormalLookup!=NULL) delete[]pNormalLookup,pNormalLookup=NULL;
 
 	delete sunItemP;													//RJS 30May00
-//DeadCode RJS 30May00 	sunanimptr.Delete();										//RJS 21Apr99
 
 #ifndef	NDEBUG													//RJS 23Mar00
 	CheatAnimSave = ANIM_NULL;
@@ -557,7 +549,7 @@ void ThreeDee::Init3D(CLib3D *lib3d,ViewPoint*	vp)
 		pMigLand=new CMigLand;
 		pTMake=new TMake;
 	}
-	PaletteBlender(View_Point->TimeOfDay());
+	PaletteBlender(View_Point ? View_Point->TimeOfDay() : 0);	//RERUN: View_Point may be NULL during early init
 	pMigLand->BigInit(View_Point);
 
 	pTMake->Init(vp->World.X,vp->World.Z,lib3d);
@@ -611,8 +603,6 @@ void ThreeDee::Init3D(CLib3D *lib3d,ViewPoint*	vp)
 
 	if (normalDataPtr==NULL)
 		normalDataPtr=new NormalData[256];
-//deadcode	if (pNormalLookup==NULL)
-//deadcode		pNormalLookup=new UByte[256];
 	lastSunPos.X=lastSunPos.Y=lastSunPos.Z=0;
 
 	ConstructNormalData();
@@ -622,7 +612,6 @@ void ThreeDee::Init3D(CLib3D *lib3d,ViewPoint*	vp)
 	mapdistz = sdptr->sx << 6; // cos map is 4cm
 	mapoffx = mapoffy = 0;
 
-//DEADCODE RJS 3/21/00 	SHAPE.SetDistScale();//RJS 02Nov98
 
 	OverLay.LoaderScreen((2<<8)+128+96+16);
 
@@ -649,13 +638,10 @@ void ThreeDee::Init3D(CLib3D *lib3d,ViewPoint*	vp)
 
 	OverLay.LoaderScreen((2<<8)+255);
 
-//DeadCode JON 17Oct00 	InitMirror();
 
-//DeadCode RJS 28Feb00	SHAPE.SwitchToPilot(true);									//RJS 10Dec99
 
 	Land_Scape.smokePlaneOn = false;							//RJS 15Feb00
 
-//DeadCode RJS 24Mar00 //???	Squad_Diary.CreatePlayer(Todays_Packages);					//RJS 27Jan00
 
 	vp->move_time_ms = timeGetTime();									//CSB 02/03/00
 	view_dt = 0;														//CSB 02/03/00
@@ -678,7 +664,6 @@ void ThreeDee::Init3D(CLib3D *lib3d,ViewPoint*	vp)
 	vp->SetDrawFrameTime(tmpdrawtime);							//RJS 05Apr00
 
 // Force near horizon if Z-Buffer depth is crap
-//DEADCODE RJS 5/8/00 	ULong	theZBufferDepth;
 	g_lpLib3d->GetZDepth(theZBufferDepth);
 
 	if (theZBufferDepth < 24)									//RJS 03May00
@@ -691,7 +676,6 @@ void ThreeDee::Init3D(CLib3D *lib3d,ViewPoint*	vp)
 
 	SHAPE.FixUpCollision = FALSE;										//AMM 4Jul00
 
-//DeadCode JON 31Aug00 	clipNearZ = DEFAULT_NEARZ;											//RJS 31Jul00
 
 	includeClippedObjects = true;										//RJS 23Aug00
 	hasBeenMirror = false;												//RJS 30Aug00
@@ -723,7 +707,6 @@ void ThreeDee::Init3D(CLib3D *lib3d,ViewPoint*	vp)
 //------------------------------------------------------------------------------
 void ThreeDee::Done3D()
 {
-//DeadCode CSB 11Sep00 	Mono_Text.PrintAt(40,20,(UByte*)"Done 3D");
 #ifndef	NDEBUG													//RJS 23Mar00
 //Quick restore...												//RJS 23Mar00
 	if (shapecheat)												//RJS 23Mar00
@@ -731,7 +714,6 @@ void ThreeDee::Done3D()
 #endif															//RJS 23Mar00
 //TempCode PD 23Nov98 	Save_Data.gameSettings=gameSettings;
 	b3DRunning=FALSE;											//PD 10Jun97
-//DeadCode RJS 20Oct00 	GREY3DTYPE	gtdt = NOGREY3D;								//PD 29Sep96
 //DEAD	POLYGON.SetGrey3DType(gtdt);								//PD 29Sep96
 	if (pMigLand!=NULL)	delete pMigLand,pMigLand=NULL;		//PD 18Jan98
 	if (pTMake!=NULL)
@@ -743,17 +725,13 @@ void ThreeDee::Done3D()
 
 	DeleteFor2D();												//RJS 08Sep00
 
-//DeadCode RJS 8Sep00 	delete(bt);
 
 //TempCode PD 04Feb99 	delete aircraft_tree;										//PD 28Oct98
 	aircraft_tree=NULL;											//PD 28Oct98
-//DeadCode RJS 8Sep00 	bt=NULL;													//JIM 06Oct96
 	Land_Scape.Exit();											//PD 18Oct96
 
 	if (normalDataPtr!=NULL) delete[]normalDataPtr,normalDataPtr=NULL;
-//deadcode	if (pNormalLookup!=NULL) delete[]pNormalLookup,pNormalLookup=NULL;
 
-//DeadCode RJS 8Sep00 	OverLay.ReleaseInfoTexts();
 
 	SHAPE.DeleteAllSmokeTrails();								//RJS 18Feb99
 }
@@ -908,14 +886,9 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 	DWORD _pt3=timeGetTime();									//PD 19Feb96
 
 
-//DEADCODE JON 4/6/00 	if (Land_Scape.UpdateTexturesWRTViewPos()==false &&
-//DEADCODE JON 4/6/00 		Land_Scape.UpdateTexturesWRTViewPos()==false &&
-//DEADCODE JON 4/6/00 		Land_Scape.UpdateTexturesWRTViewPos()==false)
-//DEADCODE JON 4/6/00 		assert(false&&"Unrecoverable landscape error");
 
 //TEMPCODE	RenderMirror(View_Point->World,0,0,1,ANGLES_45Deg);
 	Bool	drawpolypit = View_Point->PolyPitEnabled();					//RJS 10Mar00
-//DeadCode RJS 20Oct00 	bool	inCockpit = View_Point->InCockpit();
 
 //Dead	Bool	drawpolypit = View_Point->PolyPitEnabled();
 
@@ -1022,7 +995,6 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 		if (Key_Tests.KeyPress3d(DROPBOMB))
 		{
 			adptr = (MinAnimData*) Manual_Pilot.ControlledAC2->Anim;
-//DeadCode RJS 02Feb100 			adptr->itemstate++;
 			if (adptr->itemstate == DEAD)						//RJS 02Feb100
 			{
 				if (adptr->repair)
@@ -1149,7 +1121,6 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
  	init_scene(world, vp);
 
-//DEADCODE JON 4/14/00 	pTMake->BuildShadowList(world,vp);							//PD 22Oct98
  	pTMake->FrameInit(world,Three_Dee.SunLightVector);
 
  	// set up the landcape local variables
@@ -1176,14 +1147,6 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
 	_Miles.SetUpListener(View_Point->trackeditem,viewer_x,viewer_y,viewer_z,eye_x,eye_y,eye_z,View_Point->hdg,View_Point->pitch);	//RJS 15Sep00
 
-//DeadCode JON 7Nov00 	if (SLong(viewer_y) < mistHeight)									//RJS 30May00
-//DeadCode JON 7Nov00 	{
-//DeadCode JON 7Nov00 		g_lpLib3d->SetFogValues( .8f, 0.8f );
-//DeadCode JON 7Nov00 		g_lpLib3d->SetFogColour(0x00AAAAAA);
-//DeadCode JON 7Nov00 	}
-//DeadCode JON 7Nov00 	else
-//DeadCode JON 7Nov00 		g_lpLib3d->SetFogColour(fogCol);
-//DeadCode JON 29Aug00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,clipNearZ,Land_Scape.view_dist);	//RJS 31Jul00
 
 	ANGLES h,p,r;
 	if(drawpolypit)
@@ -1248,15 +1211,12 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 	Smoke_Trails.SetViewPoint(vp);								//RJS 11Feb00
 
 	SHAPE.ResetRadar(Manual_Pilot.ControlledAC2,viewer_x,viewer_y,viewer_z);//RJS 09Nov98
-	PaletteBlender(View_Point->TimeOfDay());				//RJS 26May00
-//DEADCODE JON 4/13/00 	pTMake->BuildShadowList(world,vp);							//PD 22Oct98
+	PaletteBlender(View_Point ? View_Point->TimeOfDay() : 0);	//RERUN: View_Point may be NULL during early init				//RJS 26May00
 //TEMPCODE JIM 07/06/00 	if (ProbeTime  a0(0,"make tree"))
 	if (Manual_Pilot.ControlledAC2)
 	{
 		//if player is MiG15 then change shape to complex MiG
 		ShapeNum manualPilotShape=Manual_Pilot.ControlledAC2->shape;
-//DeadCode RJS 15Dec99		if (manualPilotShape==CMIG15) Manual_Pilot.ControlledAC2->shape=MIG15;
-//DEADCODE PD 07/12/99 		do_objects();
 
 //3.	Put items into binary tree
 		GetVisibleObjects(world);
@@ -1271,22 +1231,15 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
 	View_Point->BlockTick(FALSE);								//RJS 04Feb00
 
-//DEADCODE JIM 09/12/99 	SHAPE.SetRadar();											//RJS 06Nov98
 
 //	5.	Render landscape
 //TEMPCODE JIM 07/06/00 	if (ProbeTime  a12(12,"Landscape"))
 	DWORD _pt4=timeGetTime();
 	Land_Scape.RenderLandscape(	g_lpLib3d );
 	DWORD _pt5=timeGetTime();
-//DEADCODE JON 4/6/00 								,View_Point,
-//DEADCODE JON 4/6/00 								fpviewer_matrix,
-//DEADCODE JON 4/6/00 								viewer_x,viewer_y,viewer_z,
-//DEADCODE JON 4/6/00 								vp->hdg);
-//DeadCode RJS 04Feb00 	View_Point->BlockTick(FALSE);
 
 	Land_Scape.gunnerDead = false;										//RJS 24Oct00
 
-//DeadCode JON 5Oct00 	OverLay.SetupCheatBox();
 
 	// Do not call possmove cycle before do_objects();			//ARM 26Jul96
 	SHAPE.InitCloudFade();									//RJS 15Jul98
@@ -1303,7 +1256,6 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
 	SHAPE.SetCloudFade();										//RJS 15Jul98
 
-//DEADCODE PD 01/12/99 	Land_Scape.TidyUp();
 
 	OverLay.doInteractiveCockpit = false;
 	bool	ZBufferFudge = false;							//RJS 08May00
@@ -1323,7 +1275,6 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 		add_cockpit(*vp,UNMASKED,h,p,r);					//JIM 10Aug96
 	}															//PD 20Feb96
 #endif
-//DEADCODE JON 4/19/00 	g_lpLib3d->End3DScene(); // this does nothing so why call it???
 
 #ifndef _NO_SHAPES_
 //	8.	Info panel stuff...
@@ -1335,7 +1286,6 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 #ifdef	_PROCDEBUG_
 ::AfxTrace("r2\n");
 #endif
-//DeadCode RJS 1Sep00 	Add_PeripheralVision();
 #endif
 //	9.	Stop movecode again....
 #ifdef	_PROCDEBUG_
@@ -1358,16 +1308,9 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 				Save_Data.gamedifficulty|=GD_DISPLAYMESSAGES;
 		}
 
-//DEADCODE AMM 10/12/99 		if (Key_Tests.KeyPress3d(ASCII_h))
-//DEADCODE AMM 10/12/99 			INT3;
-//DEADCODE AMM 10/12/99
-//DEADCODE AMM 10/12/99 		if (Key_Tests.KeyPress3d(ASCII_H))
-//DEADCODE AMM 10/12/99 			INT3;
 //#pragma message(__HERE__"Test code for comms message dialog")
 
 		if(		(Persons2::PlayerSeenAC->classtype->aerobaticfactor != AEROBATIC_LOW)	)	//CSB 21Jun00
-//DeadCode CSB 18Sep00 			&&	(	((Persons2::PlayerSeenAC->movecode != AUTO_TRAININGTAKEOFF) && (Persons2::PlayerSeenAC->movecode != AUTO_TRAININGLANDING))
-//DeadCode CSB 18Sep00 				||	(Art_Int.CountFormationSize(Persons2::PlayerSeenAC) > 1)	)	)
 		{
 			if(Key_Tests.KeyPress3d(RADIOCOMMS))
 	//			OverLay.SetToCommsChatScr();
@@ -1394,7 +1337,6 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 		}
 	}
 
-//DEADCODE JON 4/6/00 	g_lpLib3d->End3DScene();
 
 // Radio message and mouse process...
 	OverLay.ProcessUIScreen();
@@ -1414,7 +1356,6 @@ void ThreeDee::render3d(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 	if (ZBufferFudge)											//RJS 08May00
 		Land_Scape.SetFogBand();								//RJS 08May00
 
-//deadcode JON 19/06/01		Land_Scape.ProcessStompMap();								//RJS 30Nov99
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -1447,7 +1388,6 @@ void ThreeDee::init_scene(WorldStuff *worldptr, ViewPoint* viewpoint)//PD 22Apr9
  	viewer_y = viewpoint->World.Y;
  	viewer_z = viewpoint->World.Z;
 
-//DEADCODE RJS 3/31/00 	generate_matrix(*viewpoint);									//PD 20Dec95
 
 	bt->Clear3DArea();
 //TempCode PD 04Feb99 	aircraft_tree->Clear3DArea();								//PD 28Oct98
@@ -1457,7 +1397,6 @@ void ThreeDee::init_scene(WorldStuff *worldptr, ViewPoint* viewpoint)//PD 22Apr9
 	COORDS3D posn;
 	GetSunPos(posn);
 
-//DEADCODE JON 4/19/00 	Land_Scape.SetLVector(posn);
 
  	SunLightVector.ni.i = worldptr->sunpos.X;
  	SunLightVector.nj.i = worldptr->sunpos.Y;
@@ -1487,11 +1426,8 @@ void ThreeDee::add_cockpit(rotitem& viewpoint,PitTypes pittype,ANGLES h,ANGLES p
 	ClassPtr clstyp=Manual_Pilot.ControlledAC2->classtype;
 	Coords3D	eyepos;
 
-//DeadCode RJS 28Feb00	if (View_Point->viewnum.viewmode!=VM_InPadlock)	shape=clstyp->cockpit1;
-//DeadCode RJS 28Feb00	else 											shape=clstyp->cockpit2;
 	shape = SHAPE.GetCockpitShape(eyepos);								//RJS 28Feb00
 
-//DeadCode RJS 23Oct00 	Obj3D obj3d,*obj3dptr=&obj3d;
 	Obj3D obj3d;													//RJS 23Oct00
 
 	D3DVECTOR	eyeoff;
@@ -1508,7 +1444,6 @@ void ThreeDee::add_cockpit(rotitem& viewpoint,PitTypes pittype,ANGLES h,ANGLES p
 	tempitem.pitch=p;
 	tempitem.roll=r;
 	animptr	adptr=Manual_Pilot.ControlledAC2->Anim;
-//DeadCode RJS 20Oct00 	PolyPitAnimData* ppitanim=(PolyPitAnimData*)adptr;
 	resetpit=FALSE;
 
 	g_lpLib3d->PushMatrix(MATRIX_OBJECT);
@@ -1516,19 +1451,14 @@ void ThreeDee::add_cockpit(rotitem& viewpoint,PitTypes pittype,ANGLES h,ANGLES p
 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
 	if (theZBufferDepth < 24)
 	{
-//DeadCode JON 22Aug00 		g_lpLib3d->SetFogValues( 2.f, 2.f );
 		g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,COCKPIT_NEARZ,3000,true);
 		g_lpLib3d->EnableFogging( false );
 	}
 	else
 	{
 		g_lpLib3d->SetNearClipPlane( COCKPIT_NEARZ );
-//DeadCode JON 29Aug00 		g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,10,Land_Scape.view_dist,true);
 	}
-//DeadCode JON 22Aug00 	g_lpLib3d->SetFogColour(fogCol);
 
-//DeadCode RJS 07Feb00	obj3d.lptr=NULL;
-//DeadCode RJS 07Feb00	obj3d.rptr=NULL;
 	obj3d.realbz.f = 0;									//RJS 31Mar00
 	obj3d.ItemPtr=Manual_Pilot.ControlledAC2;
 	obj3d.AnimPtr=adptr;
@@ -1542,7 +1472,6 @@ void ThreeDee::add_cockpit(rotitem& viewpoint,PitTypes pittype,ANGLES h,ANGLES p
 	obj3d.AngH=((hdgitem *)tempitemptr)->hdg;
 	obj3d.objtype=MOBILE_OBJECT;
 	SHAPE.animate_shape(&obj3d,tempitemptr->World);
-//DeadCode RJS 20Oct00 	ShapeDescPtr sdptr=SHAPESTUFF.GetShapePtr(shape);
 
 	g_lpLib3d->Scale(MATRIX_OBJECT,cockScale);							//RJS 30May00
 	g_lpLib3d->Translate(MATRIX_OBJECT,eyeoff);
@@ -1656,16 +1585,11 @@ void ThreeDee::Add_Sun(rotitem* vp,WorldStuff *worldptr)
 	//Land_Scape.ScaleInsideHorizon(sunpos);
 
 // move to init scene
-//DEADCODE JON 4/14/00  	SunLightVector.ni.i = worldptr->sunpos.X;	//sunpos.X;
-//DEADCODE JON 4/14/00  	SunLightVector.nj.i = worldptr->sunpos.Y;	//sunpos.Y;
-//DEADCODE JON 4/14/00  	SunLightVector.nk.i = worldptr->sunpos.Z;	//sunpos.Z;
 
  	//This assumes the sun goes directly overhead
 
  	SHAPE.SunInVision = FALSE;								//PD 27Nov96
 
-//DeadCode RJS 30May00  	itemptr	sunitemp = new item;
-//DeadCode RJS 30May00   	sunitemp->shape=SUN;							//RJS 29Sep97
   	sunItemP->World = sunpos;											//RJS 30May00
 
  	//PD 27Nov96 - fix to stop sun not being drawn 'cos
@@ -1772,12 +1696,6 @@ void ThreeDee::Add_Shadow(AirStrucPtr	ac, bool dopiloted)
 						shadpos.X = acworld.X + vdx;
 						shadpos.Z = acworld.Z + vdz;
 
-//DeadCode RJS 20Sep00 						shadpos.X = acworld.X + scale * FP(-mobileitem::currworld->sunpos.X);
-//DeadCode RJS 20Sep00 						shadpos.Y = ac->fly.pModel->GroundHeight;
-//DeadCode RJS 20Sep00 						shadpos.Z = acworld.Z + scale * FP(- mobileitem::currworld->sunpos.Z);
-//DeadCode RJS 20Sep00
-//DeadCode RJS 20Sep00 						if(		(shadpos.X - acworld.X > -100000) && (shadpos.X - acworld.X < 100000)
-//DeadCode RJS 20Sep00 							&&	(shadpos.Z - acworld.Z > -100000) && (shadpos.Z - acworld.Z < 100000)	)
 						if ((xoffset*xoffset+zoffset*zoffset)<(150000.*150000.))
 						{
 							shaditem->shape = ac->classtype->shadowshpno;
@@ -1797,106 +1715,6 @@ void ThreeDee::Add_Shadow(AirStrucPtr	ac, bool dopiloted)
 						}
 					}
 
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99  					shaditem->shape = ac->classtype->shadowshpno;
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					shaditem->World = ac->World;
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 //#pragma warnmsg("Paul: timerFudgeFactor is garbage!")
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 ////TEMPCODE JIM 08/04/99 				shaditem->World.X += (View_Point->timerFudgeFactor * ac->velx)/100;//PD 19Sep97
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 ////TEMPCODE JIM 08/04/99 				shaditem->World.Z += (View_Point->timerFudgeFactor * ac->velz)/100;//PD 19Sep97
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 ////TEMPCODE JIM 08/04/99
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					newhdg = ac->hdg;
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					pMigLand->GetShadowAngles(shaditem->World,newhdg,newpitch,newroll);
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					shaditem->hdg = newhdg;
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					shaditem->pitch = newpitch;
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					shaditem->roll = newroll;
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					shaditem->Anim = ac->Anim;
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					do_object_shad(shaditem,ac);
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					shaditem->Anim = NULL;
-//DeadCode CSB 1Sep00 //DeadCode DAW 30Jun99 					delete (shaditem);
-//DeadCode CSB 1Sep00 					Coords3D	shadpos=View_Point->World;
-//DeadCode CSB 1Sep00 					Coords3D	acworld = ac->World;					//CSB 02/03/00
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 					SLong	vdx,vdy,vdz;
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 					fastMath.FloatToInt(&vdx,float(Float(ac->vel_x)*fView_dt_frac));//RJS 31Mar00
-//DeadCode CSB 1Sep00 					fastMath.FloatToInt(&vdy,float(Float(ac->vel_y)*fView_dt_frac));//RJS 31Mar00
-//DeadCode CSB 1Sep00 					fastMath.FloatToInt(&vdz,float(Float(ac->vel_z)*fView_dt_frac));//RJS 31Mar00
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 					acworld.X += vdx;
-//DeadCode CSB 1Sep00 					acworld.Y += vdy;
-//DeadCode CSB 1Sep00 					acworld.Z += vdz;
-//DeadCode CSB 1Sep00 //DEADCODE RJS 3/31/00 					acworld.X += SLong(ac->vel_x * view_dt) / 1e5;		//CSB 02/03/00
-//DeadCode CSB 1Sep00 //DEADCODE RJS 3/31/00 					acworld.Y += SLong(ac->vel_y * view_dt) / 1e5;		//CSB 02/03/00
-//DeadCode CSB 1Sep00 //DEADCODE RJS 3/31/00 					acworld.Z += SLong(ac->vel_z * view_dt) / 1e5;		//CSB 02/03/00
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 					shadpos.X += mobileitem::currworld->sunpos.X;
-//DeadCode CSB 1Sep00  					shadpos.Y += mobileitem::currworld->sunpos.Y;
-//DeadCode CSB 1Sep00  					shadpos.Z += mobileitem::currworld->sunpos.Z;
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 					if (shadpos.Y > acworld.Y)							//RJS 9Aug00
-//DeadCode CSB 1Sep00 					{
-//DeadCode CSB 1Sep00  						shaditem->shape = ac->classtype->shadowshpno;
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 						SLong	glevel;
-//DeadCode CSB 1Sep00 						if (ac->fly.pModel->GroundHeight)	//crap fix
-//DeadCode CSB 1Sep00 							glevel = ac->fly.pModel->GroundHeight;
-//DeadCode CSB 1Sep00 						else
-//DeadCode CSB 1Sep00 							glevel = acworld.Y - 200;		//crap fix		//CSB 02/03/00
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 						SLong	ixpos,izpos;
-//DeadCode CSB 1Sep00 						Float	xpos, zpos;
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 						SLong	heightsun = shadpos.Y - glevel;
-//DeadCode CSB 1Sep00 						if (heightsun > 5000)
-//DeadCode CSB 1Sep00 						{
-//DeadCode CSB 1Sep00 							SLong	heightac = ac->World.Y - glevel;
-//DeadCode CSB 1Sep00 //DeadCode RJS 22Aug00 							SLong	ixpos,izpos;
-//DeadCode CSB 1Sep00 //DeadCode RJS 22Aug00 							Float	xpos, zpos;
-//DeadCode CSB 1Sep00 							Float	heightscale = Float(heightac);
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							heightscale *= 0.2;
-//DeadCode CSB 1Sep00 							heightscale /= Float(heightsun);
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							ixpos = acworld.X - shadpos.X;					//CSB 02/03/00
-//DeadCode CSB 1Sep00 							izpos = acworld.Z - shadpos.Z;					//CSB 02/03/00
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							xpos = Float(ixpos);
-//DeadCode CSB 1Sep00 							zpos = Float(izpos);
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							xpos *= heightscale;
-//DeadCode CSB 1Sep00 							zpos *= heightscale;
-//DeadCode CSB 1Sep00 						}
-//DeadCode CSB 1Sep00 						else
-//DeadCode CSB 1Sep00 							xpos = zpos = 0;
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 //DeadCode RJS 9Aug00 							ixpos = SLong(xpos);
-//DeadCode CSB 1Sep00 //DeadCode RJS 9Aug00 							izpos = SLong(zpos);
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 						if (	((xpos < 100000.) && (xpos > -100000.))
-//DeadCode CSB 1Sep00 							&&	((zpos < 100000.) && (zpos > -100000.))	)
-//DeadCode CSB 1Sep00 						{
-//DeadCode CSB 1Sep00 							ixpos = SLong(xpos);					//RJS 9Aug00
-//DeadCode CSB 1Sep00 							izpos = SLong(zpos);					//RJS 9Aug00
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							shaditem->World.X = acworld.X + ixpos;		//CSB 02/03/00
-//DeadCode CSB 1Sep00 							shaditem->World.Z = acworld.Z + izpos;		//CSB 02/03/00
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							newhdg = ac->hdg;
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							pMigLand->GetShadowAngles(shaditem->World,newhdg,newpitch,newroll);
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							shaditem->World.Y += 16;
-//DeadCode CSB 1Sep00 							shaditem->hdg = newhdg;
-//DeadCode CSB 1Sep00 							shaditem->pitch = newpitch;
-//DeadCode CSB 1Sep00 							shaditem->roll = newroll;
-//DeadCode CSB 1Sep00 							shaditem->Anim = ac->Anim;
-//DeadCode CSB 1Sep00
-//DeadCode CSB 1Sep00 							do_object_shad(shaditem,ac);
-//DeadCode CSB 1Sep00 						}
-//DeadCode CSB 1Sep00 					}
 
 					shaditem->Anim = ANIM_NULL;
 					//delete (shaditem);
@@ -1940,7 +1758,6 @@ void	ThreeDee::AddLensObject(DoPointStruc	*dopointP, ShapeNum	shpno, int	frameno
 		adptr = (FlareAnimData*) lensflareanim;
 		adptr->colstep = frameno;
 		adptr->depth = fader;											//RJS 23Jun00
-//DeadCode JON 23Jun00 		adptr->depth = 64 + ((fader*191)/255);							//RJS 20Jun00
 
 		tempitemptr->Anim = ANIM_NULL;								//RJS 07Dec99
 
@@ -2020,7 +1837,6 @@ SLong ThreeDee::AddVapourObject(ShapeNum	shape,
 //------------------------------------------------------------------------------
 void ThreeDee::render_scene()
 {
-//DeadCode RJS 07Feb00	bt->draw_object(g_lpLib3d,View_Point);							//PD 20Dec95
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2045,9 +1861,6 @@ void ThreeDee::exit_3D()
 	delete fpviewer_matrix;
 	delete fpinverse_matrix;
 
-//DeadCode RJS 19Sep00 	SLong	rfps = View_Point->RealDrawFrameTime();		//RJS 05Apr00
-//DeadCode RJS 19Sep00 	if (rfps)											//RJS 28May99
-//DeadCode RJS 19Sep00 		Trans_Obj.realFrameTime = 100 / rfps;			//RJS 28May99
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2177,42 +1990,6 @@ SWord ThreeDee::IntensFromRange(SLong& range,
 
 inline SLong D3Distance(SLong a,SLong b,SLong c)
 {
-//DEADCODE RJS 5/8/00 	SLong	max,med,min,temp;
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	max = a<0?-a:a; med = b<0?-b:b; min = c<0?-c:c;
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	if (max < med )
-//DEADCODE RJS 5/8/00 	{
-//DEADCODE RJS 5/8/00 		temp = max; max = med; med = temp;
-//DEADCODE RJS 5/8/00 	}
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	if (max < min)
-//DEADCODE RJS 5/8/00 	{
-//DEADCODE RJS 5/8/00 		temp = max; max = min; min = max;
-//DEADCODE RJS 5/8/00 	}
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	if (med < min)
-//DEADCODE RJS 5/8/00 	{
-//DEADCODE RJS 5/8/00 		temp = med; med = min; min = temp;
-//DEADCODE RJS 5/8/00 	}
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	// Now max > med > min
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	temp = med >> 2;	//	1/4 med
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	med = temp;
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	temp >>= 2;			//	1/16 med
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	med += temp;
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	temp >>= 1;			//	1/32 med
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	med += temp;
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	min	>>= 2;			//	1/4 min
-//DEADCODE RJS 5/8/00
-//DEADCODE RJS 5/8/00 	return max + med + min;
 	float	dx = float(a);
 	float	dy = float(b);
 	float	dz = float(c);
@@ -2245,156 +2022,6 @@ inline SLong D3Distance(SLong a,SLong b,SLong c)
 //------------------------------------------------------------------------------
 void ThreeDee::do_objects()
 {
-//Old_Code RJS 04Feb00 	Land_Scape.ResetItemLog(); /* for software landscape sorting */
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	ShapeDescPtr	sdp;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	int		i,j;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	item 	tempitem,
-//Old_Code RJS 04Feb00 			*tempitemptr,
-//Old_Code RJS 04Feb00 			*previtmptr;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	UWord	sector_x,
-//Old_Code RJS 04Feb00 			sector_y,
-//Old_Code RJS 04Feb00 			current_sector_x,
-//Old_Code RJS 04Feb00 			current_sector_y,
-//Old_Code RJS 04Feb00 			this_sector;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	Bool	dopilotedshad = FALSE;
-//Old_Code RJS 04Feb00 	Bool	isPiloted = FALSE;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	if (!View_Point->PolyPitEnabled() && (View_Point->viewnum.viewmode!=VM_InsideCheat && View_Point->viewnum.viewmode!=VM_Inside))
-//Old_Code RJS 04Feb00 		dopilotedshad = TRUE;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	tempitem.World.X = viewer_x;
-//Old_Code RJS 04Feb00 	tempitem.World.Y = viewer_y;
-//Old_Code RJS 04Feb00 	tempitem.World.Z = viewer_z;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	tempitemptr = &tempitem;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	current_world->getsectornos(tempitemptr,sector_x,sector_y);
-//Old_Code RJS 04Feb00 	ResetPosRec();
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	//Draw a 3x3 grid of sectors around the viewer
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	int	sectorcount = 12;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	// Ensure smoke trail points are all sampled once if paused....
-//Old_Code RJS 04Feb00 	if (!IsPaused())														//RJS 16Apr98
-//Old_Code RJS 04Feb00 		SHAPE.SamplePntTime = TRUE;											//RJS 16Apr98
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	previtmptr=NULL;
-//Old_Code RJS 04Feb00 	for(current_sector_x = sector_x-1;sectorcount;current_sector_x++)
-//Old_Code RJS 04Feb00 	{
-//Old_Code RJS 04Feb00 		//sc test&dec occurs 4 times per yloop of 3 times
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 		for(current_sector_y = sector_y-1;--sectorcount&3;current_sector_y++)
-//Old_Code RJS 04Feb00 		{
-//Old_Code RJS 04Feb00 			bool itemLogged=false;	/* for software landscape sort */
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 			this_sector =
-//Old_Code RJS 04Feb00 				current_world->makeindex(current_sector_x,current_sector_y);
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 			tempitemptr =
-//Old_Code RJS 04Feb00 				current_world->getfirstitem(this_sector);
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 			while (tempitemptr)
-//Old_Code RJS 04Feb00 			{
-//Old_Code RJS 04Feb00 				Bool  itemdisabled=FALSE;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 				if (current_world->SameSector(tempitemptr,*View_Point) &&
-//Old_Code RJS 04Feb00 					!itemdisabled)
-//Old_Code RJS 04Feb00 				{
-//Old_Code RJS 04Feb00 					sdp = SHAPESTUFF.GetShapePtr(tempitemptr->shape);
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 					SLong rangemax = sdp->MaxDrawRange;		//RJS 22Jan99
-//Old_Code RJS 04Feb00 					SLong rng=D3Distance(	tempitemptr->World.X-View_Point->World.X,
-//Old_Code RJS 04Feb00 											tempitemptr->World.Y-View_Point->World.Y,
-//Old_Code RJS 04Feb00 											tempitemptr->World.Z-View_Point->World.Z);
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 					if (tempitemptr->Status.size==AirStrucSize)	//RJS 04Jun98
-//Old_Code RJS 04Feb00 					{
-//Old_Code RJS 04Feb00 						StoreAcPos(tempitemptr);
-//Old_Code RJS 04Feb00 						rangemax = RANGE_AIRCRAFT_FLASH;		//RJS 04Jun98
-//Old_Code RJS 04Feb00 						isPiloted = TRUE;									//RJS 08Sep98
-//Old_Code RJS 04Feb00 						if (rng < RANGE_SHADOW)					//RJS 13Jul98
-//Old_Code RJS 04Feb00 							Add_Shadow(objectRec,(AirStrucPtr)tempitemptr,dopilotedshad);//RJS 13Jul98
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 						if (	(tempitemptr != Persons2::PlayerGhostAC)	//RJS 07Sep98
-//Old_Code RJS 04Feb00 							&&	(tempitemptr != Persons2::PlayerSeenAC)	)	//RJS 07Sep98
-//Old_Code RJS 04Feb00 						{
-//Old_Code RJS 04Feb00 							isPiloted = FALSE;								//RJS 08Sep98
-//Old_Code RJS 04Feb00 							if (rng < RANGE_FLYBYFAST)
-//Old_Code RJS 04Feb00 								DoFlyBySound((AirStrucPtr)tempitemptr,rng);
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 							if (radarOn && View_Point->PolyPitEnabled())//RJS 09Nov98
-//Old_Code RJS 04Feb00 								SHAPE.GetRadarItem(tempitemptr,rng);//RJS 09Nov98
-//Old_Code RJS 04Feb00 						}										//RJS 07Sep98
-//Old_Code RJS 04Feb00 					}
-//Old_Code RJS 04Feb00 					else										//RJS 04Jun98
-//Old_Code RJS 04Feb00 					{
-//Old_Code RJS 04Feb00 						if (	groundlockOn									//RJS 10Jun99
-//Old_Code RJS 04Feb00 							&&	(tempitemptr->Status.size != TRANSIENTSIZE)		//RJS 10Jun99
-//Old_Code RJS 04Feb00 							&&	View_Point->PolyPitEnabled()	)				//RJS 10Jun99
-//Old_Code RJS 04Feb00 							SHAPE.GetRadarItem(tempitemptr,rng);//RJS 04Jun99
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 						isPiloted = FALSE;
-//Old_Code RJS 04Feb00 					}
-//Old_Code RJS 04Feb00 																//RJS 04Jun98
-//Old_Code RJS 04Feb00 					if (rng<=rangemax)							//RJS 04Jun98
-//Old_Code RJS 04Feb00 					{
-//Old_Code RJS 04Feb00 						SLong	oldfaderange=Land_Scape.fade_band_end;//PD 19Dec96
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 						if (rangemax==RANGE_AIRCRAFT_FLASH)		//RJS 04Jun98
-//Old_Code RJS 04Feb00 							Land_Scape.fade_band_end=0x7FFFFFFF;//RJS 04Jun98
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 						/* for software landscape sorting */
-//Old_Code RJS 04Feb00 						if (!itemLogged)
-//Old_Code RJS 04Feb00 							itemLogged=Land_Scape.LogItem(viewer_x,viewer_z,tempitemptr->World);
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 						switch(SHAPESTUFF.GetShapeScale(sdp))
-//Old_Code RJS 04Feb00 						{
-//Old_Code RJS 04Feb00 							case SHP_GRP:
-//Old_Code RJS 04Feb00  								do_object_grp(tempitemptr);
-//Old_Code RJS 04Feb00 								break;
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 							case SHP_1CM:
-//Old_Code RJS 04Feb00 							case SHP_4CM:
-//Old_Code RJS 04Feb00 							case SHP_16CM:
-//Old_Code RJS 04Feb00 								if (dopilotedshad)//RJS 02Sep98
-//Old_Code RJS 04Feb00 								{
-//Old_Code RJS 04Feb00 #ifndef NDEBUG
-//Old_Code RJS 04Feb00 // dont delete these lines!!!! I use them often for testing
-//Old_Code RJS 04Feb00 									if (_DPlay.SpookyGhostMode)
-//Old_Code RJS 04Feb00 									{
-//Old_Code RJS 04Feb00 										if (tempitemptr==Persons2::PlayerSeenAC)
-//Old_Code RJS 04Feb00 										{
-//Old_Code RJS 04Feb00 											do_object(Persons2::PlayerGhostAC);
-//Old_Code RJS 04Feb00 										}
-//Old_Code RJS 04Feb00 									}
-//Old_Code RJS 04Feb00 #endif
-//Old_Code RJS 04Feb00 										do_object(tempitemptr);
-//Old_Code RJS 04Feb00 								}
-//Old_Code RJS 04Feb00 								else if (isPiloted == FALSE)
-//Old_Code RJS 04Feb00 									do_object(tempitemptr);
-//Old_Code RJS 04Feb00 								break;
-//Old_Code RJS 04Feb00 						}
-//Old_Code RJS 04Feb00 						Land_Scape.fade_band_end=oldfaderange;	//PD 19Dec96
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 					}
-//Old_Code RJS 04Feb00 				}
-//Old_Code RJS 04Feb00 				previtmptr = tempitemptr;		//RJS 27Apr99
-//Old_Code RJS 04Feb00 			 	tempitemptr = tempitemptr->Next;
-//Old_Code RJS 04Feb00 			}
-//Old_Code RJS 04Feb00 		}
-//Old_Code RJS 04Feb00 	}
-//Old_Code RJS 04Feb00
-//Old_Code RJS 04Feb00 	// Lock smoke trail point sampling....
-//Old_Code RJS 04Feb00 	if (IsPaused())															//RJS 16Apr98
-//Old_Code RJS 04Feb00 		SHAPE.SamplePntTime = FALSE;										//RJS 16Apr98
-//Old_Code RJS 04Feb00 	else
-//Old_Code RJS 04Feb00 		SHAPE.SamplePntTime = TRUE;								//RJS 23Nov98
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2472,19 +2099,12 @@ void ThreeDee::do_ui_objects()
 
 		for (int i=0; i < objectRec->numItems; i++)						//RJS 25Sep00
 		{
-//DeadCode RJS 25Sep00 			sdp = SHAPESTUFF.GetShapePtr(objectRec->obj3d[i].Shape);
-//DeadCode RJS 25Sep00 			tempitemptr=objectRec->obj3d[i].ItemPtr;
 			if (0L==objectRec->itemFlag[i])
 			{
 				somethingvisible = true;
 				SetObjectAngles(&objectRec->obj3d[i]);
 
-//DeadCode RJS 25Sep00 				if (tempitemptr)
-//DeadCode RJS 25Sep00 				{
-//DeadCode RJS 25Sep00 					tempitemptr->Status.Drawn = TRUE;
-//DeadCode RJS 25Sep00
 //TempCode RJS 12Jun00 					SHAPE.animate_shape(&objectRec->obj3d[i],tempitemptr->World);
-//DeadCode RJS 25Sep00 				}
 			}
 		}
 
@@ -2508,81 +2128,6 @@ void ThreeDee::do_ui_objects()
 //------------------------------------------------------------------------------
 void ThreeDee::do_object(itemptr tempitemptr)
 {
-//DeadCode RJS 07Feb00 	if (tempitemptr->Anim==NULL)								//RJS 21Apr99
-//DeadCode RJS 07Feb00 		SHAPE.SetAnimData(tempitemptr,0);						//RDH 23Sep96
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 	//New test to see if we want to draw or not...
-//DeadCode RJS 07Feb00 	MinAnimData*	mad = (MinAnimData*)tempitemptr->Anim;
-//DeadCode RJS 07Feb00 	if (!mad->IsInvisible)										//RJS 17Nov98
-//DeadCode RJS 07Feb00 	{
-//DeadCode RJS 07Feb00 		Obj3DPtr	obj3dptr;										//PD 13Mar96
-//DeadCode RJS 07Feb00 		IFShare		wx,wy,wz;
-//DeadCode RJS 07Feb00 		btree*		which_tree;
-//DeadCode RJS 07Feb00 		bool		beenfixed = false;
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 			which_tree=bt;
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 		IFShare			bzoffset;
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 		ShapeDescPtr	sdptr;
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 		if(tempitemptr->World.Y==0)
-//DeadCode RJS 07Feb00 		{
-//DeadCode RJS 07Feb00 			tempitemptr->World.Y = _Collide.AccurateGroundAltitude(tempitemptr->World);//PD 08Oct96
-//DeadCode RJS 07Feb00 			beenfixed = true;
-//DeadCode RJS 07Feb00 		}
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 		wx.i = tempitemptr->World.X - viewer_x;
-//DeadCode RJS 07Feb00 		wy.i = tempitemptr->World.Y - viewer_y;
-//DeadCode RJS 07Feb00 		wz.i = tempitemptr->World.Z - viewer_z;
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 		_matrix.transform(fpviewer_matrix,wx,wy,wz);
-//DeadCode RJS 07Feb00 		if (tempitemptr->Status.size == TRANSIENTSIZE)			//RJS 27Nov98
-//DeadCode RJS 07Feb00 		{
-//DeadCode RJS 07Feb00 			UWord	offset = ((TransientItem*)tempitemptr)->DrawOffset;
-//DeadCode RJS 07Feb00 			if (offset)
-//DeadCode RJS 07Feb00 			{
-//DeadCode RJS 07Feb00 				// scale the 3d coords so the object is drawn closer...
-//DeadCode RJS 07Feb00 				Float	newz = wz.f - Float(offset);
-//DeadCode RJS 07Feb00 				Float	dscale = newz / wz.f;
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 				wx.f *= dscale;
-//DeadCode RJS 07Feb00 				wy.f *= dscale;
-//DeadCode RJS 07Feb00 				wz.f = newz;
-//DeadCode RJS 07Feb00 			}
-//DeadCode RJS 07Feb00 		}
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 		sdptr = SHAPESTUFF.GetShapePtr(tempitemptr->shape);		//RJS 29May97
-//DeadCode RJS 07Feb00 		int	shpsize = sdptr->Size<<4;								//RJS 20Aug98
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 		if(RoughCone(wx,wy,wz,shpsize))								//RJS 15Dec99
-//DeadCode RJS 07Feb00 		{															//RJS 09Jul98
-//DeadCode RJS 07Feb00  			if (!sdptr->Type.DrawPriority)							//RJS 09Jul98
-//DeadCode RJS 07Feb00 				bzoffset.f = (Float)shpsize;						//RJS 09Jul98
-//DeadCode RJS 07Feb00  			else													//RJS 09Jul98
-//DeadCode RJS 07Feb00  				bzoffset.f = 12325.0;								//RJS 09Jul98
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 			obj3dptr = (Obj3DPtr )which_tree->Get3DArea(STATIC_OBJECT);
-//DeadCode RJS 07Feb00 			SetObj3D(obj3dptr,tempitemptr,wx,wy,wz,bzoffset);
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 			obj3dptr->AnimPtr = tempitemptr->Anim;				//DAW 23Apr99
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 			which_tree->insert_object(obj3dptr);							//RJS 17Sep97
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 			SHAPE.animate_shape(obj3dptr,tempitemptr->World);	//RJS 01Dec99
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 			tempitemptr->Status.Drawn = TRUE;//RJS 05Oct98
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 	#ifndef NDEBUG
-//DeadCode RJS 07Feb00 			if (supercheatitem && (beenfixed==true))
-//DeadCode RJS 07Feb00 				tempitemptr->World.Y = 0;
-//DeadCode RJS 07Feb00 	#endif
-//DeadCode RJS 07Feb00 		}															//RJS 10Nov98
-//DeadCode RJS 07Feb00 		else
-//DeadCode RJS 07Feb00 			SHAPE.dummy_animate_shape(tempitemptr,(UByteP)sdptr);//RJS 06Apr99
-//DeadCode RJS 07Feb00
-//DeadCode RJS 07Feb00 //DeadCode RJS 04Feb00		SHAPE.sfx_shape(tempitemptr,wx,wy,wz);						//RJS 20Apr98
-//DeadCode RJS 07Feb00 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2665,42 +2210,6 @@ void ThreeDee::do_object_shad(rotitem* tempitemptr, itemptr	owner)
 //------------------------------------------------------------------------------
 SLong ThreeDee::do_object_vapour(rotitem* tempitemptr, UByteP&	thisobj, UWord failedyet)
 {
-//DeadCode RJS 04Feb00 	Obj3DPtr	obj3dptr;
-//DeadCode RJS 04Feb00 	IFShare		wx,wy,wz;
-//DeadCode RJS 04Feb00 	IFShare		bzoffset;
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 	bzoffset.f = 96*4;											//RJS 17Sep97
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 //DeadCode RJS 21Apr99 	UByteP	adptr=(UByteP )tempitemptr->Anim;
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 	wx.i = tempitemptr->World.X - viewer_x;
-//DeadCode RJS 04Feb00 	wy.i = tempitemptr->World.Y - viewer_y;
-//DeadCode RJS 04Feb00 	wz.i = tempitemptr->World.Z - viewer_z;
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 	_matrix.transform(fpviewer_matrix,wx,wy,wz);
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 	if(RoughCone(wx,wy,wz,0) || !failedyet)					//RJS 20Aug98
-//DeadCode RJS 04Feb00 	{
-//DeadCode RJS 04Feb00 		obj3dptr = (Obj3DPtr )bt->Get3DArea(SMOKE_OBJECT);		//DAW 18Aug99
-//DeadCode RJS 04Feb00 		if (obj3dptr)
-//DeadCode RJS 04Feb00 		{
-//DeadCode RJS 04Feb00 			SetObj3D(obj3dptr,tempitemptr,wx,wy,wz,bzoffset);
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 			obj3dptr->ItemPtr = NULL;								//RJS 11Nov98
-//DeadCode RJS 04Feb00 			obj3dptr->objtype = SMOKE_OBJECT;
-//DeadCode RJS 04Feb00 			obj3dptr->AnimPtr = tempitemptr->Anim;								//RJS 21Apr99
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 			bt->insert_object(obj3dptr);
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 			tempitemptr->Status.Drawn = TRUE;//RJS 05Oct98
-//DeadCode RJS 04Feb00 		}
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 		thisobj = (UByteP) obj3dptr;
-//DeadCode RJS 04Feb00 	}
-//DeadCode RJS 04Feb00 	else
-//DeadCode RJS 04Feb00 		thisobj = NULL;
-//DeadCode RJS 04Feb00
-//DeadCode RJS 04Feb00 	return(wz.f);
 
 	D3DVECTOR 		pos;
 	ULong 			clipcode;
@@ -2914,100 +2423,6 @@ void ThreeDee::ResetCompass()
 	resetpit = TRUE;
 }
 
-//DEADCODE JIM 07/02/00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DEADCODE JIM 07/02/00 //Procedure		CalcLightsOn
-//DEADCODE JIM 07/02/00 //Author		Robert Slater
-//DEADCODE JIM 07/02/00 //Date			Mon 16 Dec 1996
-//DEADCODE JIM 07/02/00 //
-//DEADCODE JIM 07/02/00 //Description
-//DEADCODE JIM 07/02/00 //
-//DEADCODE JIM 07/02/00 //Inputs
-//DEADCODE JIM 07/02/00 //
-//DEADCODE JIM 07/02/00 //Returns
-//DEADCODE JIM 07/02/00 //
-//DEADCODE JIM 07/02/00 //------------------------------------------------------------------------------
-//DEADCODE JIM 07/02/00 void ThreeDee::CalcLightsOn(SLong	time)
-//DEADCODE JIM 07/02/00 {
-//DEADCODE JIM 07/02/00 	SLong			timedif,palpos;
-//DEADCODE JIM 07/02/00 	Bool			timetochange;
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 	time /= 100;							// To seconds
-//DEADCODE JIM 07/02/00 	lightson = TRUE;
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 	timedif = time - Miss_Man.camp.dawntime;
-//DEADCODE JIM 07/02/00 	if ((timedif >= -1800) && (timedif <= 1800))
-//DEADCODE JIM 07/02/00 	{
-//DEADCODE JIM 07/02/00 		palpos = 0;
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 		if (timedif < 0)
-//DEADCODE JIM 07/02/00 		{
-//DEADCODE JIM 07/02/00 			whichpal = PAL_NIGHT;								//RJS 02Sep97
-//DEADCODE JIM 07/02/00 			palpos = 16;
-//DEADCODE JIM 07/02/00 		}
-//DEADCODE JIM 07/02/00 		else
-//DEADCODE JIM 07/02/00 			whichpal = PAL_DAWN;								//RJS 02Sep97
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 		palpos += ((timedif<<4) / 1800);
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 		if (palpos != whereinpal)
-//DEADCODE JIM 07/02/00 		{
-//DEADCODE JIM 07/02/00 			whereinpal = palpos;
-//DEADCODE JIM 07/02/00 			timetochange = TRUE;
-//DEADCODE JIM 07/02/00 			if ((whereinpal > 8) && (whichpal == PAL_DAWN))		//RJS 02Sep97
-//DEADCODE JIM 07/02/00 				lightson = FALSE;
-//DEADCODE JIM 07/02/00 		}
-//DEADCODE JIM 07/02/00 	}
-//DEADCODE JIM 07/02/00 	else
-//DEADCODE JIM 07/02/00 	{
-//DEADCODE JIM 07/02/00 		lightson = FALSE;
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 		timedif = time - Miss_Man.camp.dusktime;
-//DEADCODE JIM 07/02/00 		if ((timedif >= -1800) && (timedif <= 1800))
-//DEADCODE JIM 07/02/00 		{
-//DEADCODE JIM 07/02/00 			palpos = 0;
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 			if (timedif < 0)
-//DEADCODE JIM 07/02/00 			{
-//DEADCODE JIM 07/02/00 				whichpal = PAL_DAY;								//RJS 02Sep97
-//DEADCODE JIM 07/02/00 				palpos = 16;
-//DEADCODE JIM 07/02/00 			}
-//DEADCODE JIM 07/02/00 			else
-//DEADCODE JIM 07/02/00 				whichpal = PAL_DUSK;							//RJS 02Sep97
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 			palpos += ((timedif<<4) / 1800);
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 			if (palpos != whereinpal)
-//DEADCODE JIM 07/02/00 			{
-//DEADCODE JIM 07/02/00 				whereinpal = palpos;
-//DEADCODE JIM 07/02/00 				if ((whereinpal > 7) && (whichpal == PAL_DUSK))	//RJS 02Sep97
-//DEADCODE JIM 07/02/00 					lightson = TRUE;
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 				timetochange = TRUE;
-//DEADCODE JIM 07/02/00 			}
-//DEADCODE JIM 07/02/00 		}
-//DEADCODE JIM 07/02/00 	}
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 	if (!timetochange)
-//DEADCODE JIM 07/02/00 	{
-//DEADCODE JIM 07/02/00 		SLong	daytimelow,daytimehigh;
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 		daytimelow = Miss_Man.camp.dawntime + 1800;
-//DEADCODE JIM 07/02/00 		daytimehigh = Miss_Man.camp.dusktime - 1800;
-//DEADCODE JIM 07/02/00 		whereinpal = 0;
-//DEADCODE JIM 07/02/00 		timetochange = TRUE;
-//DEADCODE JIM 07/02/00
-//DEADCODE JIM 07/02/00 		if ((time > daytimelow) && (time < daytimehigh))
-//DEADCODE JIM 07/02/00 		{
-//DEADCODE JIM 07/02/00 			whichpal = PAL_DAY;									//RJS 02Sep97
-//DEADCODE JIM 07/02/00 			lightson = FALSE;
-//DEADCODE JIM 07/02/00 		}
-//DEADCODE JIM 07/02/00 		else
-//DEADCODE JIM 07/02/00 		{
-//DEADCODE JIM 07/02/00 			whichpal = PAL_NIGHT;								//RJS 02Sep97
-//DEADCODE JIM 07/02/00 			lightson = TRUE;
-//DEADCODE JIM 07/02/00 		}
-//DEADCODE JIM 07/02/00 	}
-//DEADCODE JIM 07/02/00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		InitialiseCache
@@ -3177,70 +2592,6 @@ inline void ThreeDee::GetSunPos(COORDS3D& pos)
 	current_world->MakeSunPos(View_Point);
 	pos=current_world->sunpos;
 
-//DEADCODE JON 4/19/00 	//re-make the landscape normal lookup table if the sun position
-//DEADCODE JON 4/19/00 	//has changed
-//DEADCODE JON 4/19/00 	if (lastSunPos.X!=pos.X||lastSunPos.Y!=pos.Y||lastSunPos.Z!=pos.Z)
-//DEADCODE JON 4/19/00 	{
-//DEADCODE JON 4/19/00 		lastSunPos.X=pos.X;
-//DEADCODE JON 4/19/00 		lastSunPos.Y=pos.Y;
-//DEADCODE JON 4/19/00 		lastSunPos.Z=pos.Z;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 		double 	li=double(pos.X),
-//DEADCODE JON 4/19/00 				lj=double(pos.Y>>1),
-//DEADCODE JON 4/19/00 				lk=double(pos.Z),
-//DEADCODE JON 4/19/00 				mag=li*li+lj*lj+lk*lk;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 		_asm {	fld mag;
-//DEADCODE JON 4/19/00 				fsqrt;
-//DEADCODE JON 4/19/00 				fstp mag;
-//DEADCODE JON 4/19/00 			}
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 		li/=mag;
-//DEADCODE JON 4/19/00 		lj/=mag;
-//DEADCODE JON 4/19/00 		lk/=mag;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 		NormalData* pNormal=normalDataPtr;
-//DEADCODE JON 4/19/00 //deadcode		UByte*		pnlu=pNormalLookup;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 		//add scaling so that level ground always gets
-//DEADCODE JON 4/19/00 		//full intensity regardless of the sun position
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 /*		const double darkest_value=.3;	//min=0, max=1
-//DEADCODE JON 4/19/00 		const double level_i=pNormal->i*li+pNormal->j*lj+pNormal->k*lk;
-//DEADCODE JON 4/19/00 		const double min_i=0.;
-//DEADCODE JON 4/19/00 		const double add_factor=255*darkest_value;
-//DEADCODE JON 4/19/00 		const double mul_factor=255-add_factor;
-//DEADCODE JON 4/19/00 		const SLong low_clip=SLong(add_factor);
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 		for (SLong i=0;i<256;i++)
-//DEADCODE JON 4/19/00 		{
-//DEADCODE JON 4/19/00 			//take dot product of sun light vector and landscape vector
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			NormalData& n=*pNormal;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			double dot=li*n.i+lj*n.j+lk*n.k;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			if (dot<min_i)			dot=min_i;
-//DEADCODE JON 4/19/00 			else if (dot>level_i)	dot=level_i;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			//dot is in the range min_i<=dot<=level_i
-//DEADCODE JON 4/19/00 			//convert to the range add_factor<=dot<=255
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			dot-=min_i;
-//DEADCODE JON 4/19/00 			dot/=(level_i-min_i);
-//DEADCODE JON 4/19/00 			dot=add_factor+mul_factor*dot;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			SLong dotVal=SLong(dot);
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			if (dotVal>255)				dotVal=255;
-//DEADCODE JON 4/19/00 			else if (dotVal<low_clip)	dotVal=low_clip;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			*pnlu++=UByte(dotVal);
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 			pNormal++;
-//DEADCODE JON 4/19/00 		}
-//DEADCODE JON 4/19/00 	*/
-//DEADCODE JON 4/19/00 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3276,34 +2627,14 @@ void	ThreeDee::DoFlyBySound(AirStrucPtr	ac,SLong	distance)
 {
 	if (!IsPaused())
 	{
-//DeadCode RJS 10May99 		SLong	ann,bnn,cnn;
-//DeadCode RJS 10May99 		SLong	dvx,dvy,dvz;
-//DeadCode RJS 10May99 		SLong	magVelAC;//RJS 06Oct98
-//DeadCode RJS 10May99
-//DeadCode RJS 10May99 		ann = ac->velx;
-//DeadCode RJS 10May99 		bnn = ac->vely;
-//DeadCode RJS 10May99 		cnn = ac->velz;
-//DeadCode RJS 10May99 		magVelAC = (ann*ann) + (bnn*bnn) + (cnn*cnn);
 		if (ac->vel_ && !ac->Status.deadtime)		//Other AC must not be at standstill
 		{
 			SLong	dvx,dvy,dvz;
 			SLong	eyevx, eyevy, eyevz, eyevel;
-//DeadCode RJS 11Oct00 //DeadCode RJS 11Oct00 			bool	isyou = false;		//are we in flyby view?
-//DeadCode RJS 11Oct00
-//DeadCode RJS 11Oct00 			if (isyou)
-//DeadCode RJS 11Oct00 			{
-//DeadCode RJS 11Oct00 				eyevx = 0;
-//DeadCode RJS 11Oct00 				eyevy = 0;
-//DeadCode RJS 11Oct00 				eyevz = 0;
-//DeadCode RJS 11Oct00 				eyevel = 0;
-//DeadCode RJS 11Oct00 			}
-//DeadCode RJS 11Oct00 			else
-//DeadCode RJS 11Oct00 			{
 				eyevx = Manual_Pilot.ControlledAC2->vel_x/1000;
 				eyevy = Manual_Pilot.ControlledAC2->vel_y/1000;
 				eyevz = Manual_Pilot.ControlledAC2->vel_z/1000;
 				eyevel = Manual_Pilot.ControlledAC2->vel_/1000;
-//DeadCode RJS 11Oct00 			}
 
 			if (ac->Anim != NULL)
 			{
@@ -3350,9 +2681,8 @@ void	ThreeDee::DoFlyBySound(AirStrucPtr	ac,SLong	distance)
 						{
 							if (ac->nationality != Manual_Pilot.ControlledAC2->nationality)
 							{
-//DeadCode RJS 20Oct00 								AirStrucPtr	buddy = Manual_Pilot.ControlledAC2->FindBuddy();
 
-								{}//DEADCODE RDH 07/12/99 								_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_HEADON,MSG_BOGEYCALL,buddy,ac,Manual_Pilot.ControlledAC2));
+								{}
 							}
 						}
 					}
@@ -3405,92 +2735,6 @@ void	ThreeDee::DoFlyBySound(AirStrucPtr	ac,SLong	distance)
 //------------------------------------------------------------------------------
 void ThreeDee::add_map(rotitem& viewpoint,Bool	isZoomed)
 {
-//DeadCode RJS 19Apr00 	item	tempitem,
-//DeadCode RJS 19Apr00 			*tempitemptr;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	ShapeNum shape;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	SLong	zoffset,yoffset;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	zoffset = yoffset = 0;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	tempitemptr = &tempitem;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	Obj3DPtr	obj3dptr;
-//DeadCode RJS 19Apr00 	IFShare		wx,wy,wz;
-//DeadCode RJS 19Apr00 	IFShare		bzoffset;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	ShapeDescPtr	sdptr;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	tempitem.World.X = viewpoint.World.X;
-//DeadCode RJS 19Apr00 	tempitem.World.Y = viewpoint.World.Y;
-//DeadCode RJS 19Apr00 	tempitem.World.Z = viewpoint.World.Z;
-//DeadCode RJS 19Apr00 	tempitemptr->Anim = Manual_Pilot.ControlledAC2->Anim;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  	if (isZoomed == FALSE)
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99   	{
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		sdptr = SHAPESTUFF.GetShapePtr(MAPZ);
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		SLong	properdistz = (sdptr->sx << 4)*4;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		SLong	minzoom = properdistz >> 2;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		tempitem.shape = MAP;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		if (Key_Tests.KeyPress3d(ZOOMIN) || Key_Tests.KeyHeld3d(ZOOMIN))
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		{
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  			if (mapdistz < properdistz)
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  			{
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  				mapdistz = properdistz;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  				mapoffx = mapoffy = 0;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  			}
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		}
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		if (Key_Tests.KeyPress3d(ZOOMOUT) || Key_Tests.KeyHeld3d(ZOOMOUT))
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		{
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  			if (mapdistz > (minzoom+16))
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  				mapdistz -= 16;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		}
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		SLong	zoomoffset = (properdistz - mapdistz)>>1;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		SLong	yoffset;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		SLong	distgap = properdistz - minzoom;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		wx.f = mapoffx + zoomoffset;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		wy.f = mapoffy;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		wz.f = mapdistz;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		obj3dptr = (Obj3DPtr )bt->Get3DArea(STATIC_OBJECT);
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		bzoffset.f=0;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		tempitemptr->Anim = Manual_Pilot.ControlledAC2->Anim;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		SetObj3D(obj3dptr,tempitemptr,wx,wy,wz,bzoffset);
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		obj3dptr->objtype = STATIC_OBJECT;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		obj3dptr->AnimPtr= (UByteP) Manual_Pilot.ControlledAC2->Anim;
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  		bt->insert_object2(obj3dptr);
-//DeadCode RJS 19Apr00 //TempCode PD 07Apr99  	}
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	sdptr = SHAPESTUFF.GetShapePtr(MAPZ);
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	tempitem.shape = MAPZ;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	wx.f = 0;
-//DeadCode RJS 19Apr00 	wy.f = 0;
-//DeadCode RJS 19Apr00 	wz.f = 20<<4;	//(sdptr->sx << 4);
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	obj3dptr = (Obj3DPtr )bt->Get3DArea(STATIC_OBJECT);
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	bzoffset.f=0;
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	SetObj3D(obj3dptr,tempitemptr,wx,wy,wz,bzoffset);
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	obj3dptr->objtype = STATIC_OBJECT;
-//DeadCode RJS 19Apr00 	obj3dptr->AnimPtr= Manual_Pilot.ControlledAC2->Anim;								//RJS 21Apr99
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	bt->insert_object2(obj3dptr);
-//DeadCode RJS 19Apr00
-//DeadCode RJS 19Apr00 	tempitem.Anim=ANIM_NULL;
 
 #ifndef	_NO_MAP_ART_
 	btree::ObjectRec *objectRec;
@@ -3535,12 +2779,7 @@ void ThreeDee::render(CLib3D *lib3d, ViewPoint* vp,WorldStuff *world)//PD 22Apr9
 
 	mirrorSeen = false;													//JON 11Aug00
 
-//DeadCode JON 31Aug00 	if (View_Point && View_Point->PolyPitEnabled())
-//DeadCode JON 31Aug00 		clipNearZ = COCKPIT_NEARZ;
-//DeadCode JON 31Aug00 	else
-//DeadCode JON 31Aug00 		clipNearZ = DEFAULT_NEARZ;
 
-//DeadCode AMM 14Apr99 	SHAPE.safeTrail = FALSE;
 	if (vp->drawSpecialFlags)
 	{
 		_Interactive.Clear();								//RJS 29Nov99
@@ -3555,7 +2794,6 @@ void ThreeDee::render(CLib3D *lib3d, ViewPoint* vp,WorldStuff *world)//PD 22Apr9
 	}
 	else
 #pragma warnmsg("**** RENDER TIME MONOTEXT REMOVED **** //CSB")
-//DeadCode CSB 29Jun00 		if (ProbeTime a48(48,"Render"))
 			render3d(vp,world);
 
 	exit_3D();
@@ -3616,7 +2854,6 @@ void ThreeDee::rendermap(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
 // In this view we are 64*blockwidth high...
 // (far map = 256*256 imagemap, where 1 pixel == .25 block)
-//DeadCode JON 8Nov00 	const int worldY = 64*LandScape::_blockWidth;
 	const int horizDistToCorner = 64*LandScape::_blockWidth;
 	static int fudge = 10;
 	const int worldY = horizDistToCorner-(fudge*LandScape::_blockWidth);
@@ -3626,10 +2863,7 @@ void ThreeDee::rendermap(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
 	PaletteBlender((MissManDawnTime() + 2000)*100);						//daytime?
 
-//DeadCode RJS 19Apr00 	View_Point->BlockTick(FALSE);
 
-//DEADCODE RJS 4/25/00 	g_lpLib3d->PushMatrix( MATRIX_OBJECT );
-//DEADCODE RJS 4/25/00 	g_lpLib3d->PushMatrix( MATRIX_VIEWER );
 
 	int x = viewer_x>>Grid_Base::WORLDSPACEMOD;
 	int z = viewer_z>>Grid_Base::WORLDSPACEMOD;
@@ -3649,8 +2883,6 @@ void ThreeDee::rendermap(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 	g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
 
-//DeadCode JON 22Aug00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,1,Land_Scape.view_dist);
-//DeadCode JON 22Aug00 	g_lpLib3d->SetFogColour(0x0090B8E8);
 
 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->hdg);
 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_PITCH,(Angles)-(int)View_Point->pitch);
@@ -3727,129 +2959,18 @@ void ThreeDee::rendermap(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
 	g_lpLib3d->EndFan();
 
-//DeadCode JON 8Nov00 	g_lpLib3d->LoadIdentity( MATRIX_OBJECT );
-//DeadCode JON 8Nov00 	D3DVECTOR viewMods;
-//DeadCode JON 8Nov00 	viewMods.x=(D3DVALUE)-viewer_x;
-//DeadCode JON 8Nov00 	viewMods.y=(D3DVALUE)0.0f;
-//DeadCode JON 8Nov00 	viewMods.z=(D3DVALUE)-viewer_z;
-//DeadCode JON 8Nov00 	g_lpLib3d->Translate( MATRIX_OBJECT, viewMods );
-//DeadCode JON 8Nov00 	g_lpLib3d->Scale( MATRIX_OBJECT, 1.f/20.f );
 	g_lpLib3d->Scale( MATRIX_OBJECT, 0.9f );
 
 	renderAircraftRoute();												//JON 8Nov00
 
-//DeadCode JON 8Nov00 	cornerVert->setPosition(
-//DeadCode JON 8Nov00 		MAP_SCALE( -(horizDistToCorner+LandScape::_blockWidth)+xOff ),
-//DeadCode JON 8Nov00 		MAP_SCALE( -worldY ),
-//DeadCode JON 8Nov00 		MAP_SCALE( horizDistToCorner+zOff )
-//DeadCode JON 8Nov00 	);
-//DeadCode JON 8Nov00 	cornerVert->setIMapCoords( 0, 256 );
-//DeadCode JON 8Nov00 	cornerVert++;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	cornerVert->setPosition(
-//DeadCode JON 8Nov00 		MAP_SCALE( horizDistToCorner+xOff ),
-//DeadCode JON 8Nov00 		MAP_SCALE( -worldY ),
-//DeadCode JON 8Nov00 		MAP_SCALE( horizDistToCorner+zOff )
-//DeadCode JON 8Nov00 	);
-//DeadCode JON 8Nov00 	cornerVert->setIMapCoords( 256, 256 );
-//DeadCode JON 8Nov00 	cornerVert++;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	cornerVert->setPosition(
-//DeadCode JON 8Nov00 		MAP_SCALE( horizDistToCorner+xOff ),
-//DeadCode JON 8Nov00 		MAP_SCALE( -worldY ),
-//DeadCode JON 8Nov00 		MAP_SCALE( -(horizDistToCorner+LandScape::_blockWidth)+zOff )
-//DeadCode JON 8Nov00 	);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	cornerVert->setIMapCoords( 256, 0 );
-//DeadCode JON 8Nov00 	cornerVert++;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	cornerVert->setPosition(
-//DeadCode JON 8Nov00 		MAP_SCALE( -(horizDistToCorner+LandScape::_blockWidth)+xOff ),
-//DeadCode JON 8Nov00 		MAP_SCALE( -worldY ),
-//DeadCode JON 8Nov00 		MAP_SCALE( -(horizDistToCorner+LandScape::_blockWidth)+zOff )
-//DeadCode JON 8Nov00 	);
-//DeadCode JON 8Nov00 	cornerVert->setIMapCoords( 0, 0 );
 
 #undef MAP_SCALE
 
-//DeadCode JON 2Oct00 	// now draw the stuff onto the background
-//DeadCode JON 2Oct00 	COORDS3D viewCone[8];
-//DeadCode JON 2Oct00 	g_lpLib3d->BackProjectViewCone(viewCone);
-//DeadCode JON 2Oct00
-//DeadCode JON 2Oct00 	Lib3DPoint *cornerVert = g_lpLib3d->BeginFan(HMATERIAL(Land_Scape.horizonImg),4 );
-//DeadCode JON 2Oct00
-//DeadCode JON 2Oct00 	cornerVert->setPosition(
-//DeadCode JON 2Oct00 		viewCone[4].X,
-//DeadCode JON 2Oct00 		viewCone[4].Y+100,
-//DeadCode JON 2Oct00 		viewCone[4].Z
-//DeadCode JON 2Oct00 	);
-//DeadCode JON 2Oct00 	cornerVert->setIMapCoords( 0, 256 );
-//DeadCode JON 2Oct00 	cornerVert++;
-//DeadCode JON 2Oct00
-//DeadCode JON 2Oct00 	cornerVert->setPosition(
-//DeadCode JON 2Oct00 		viewCone[5].X,
-//DeadCode JON 2Oct00 		viewCone[5].Y+100,
-//DeadCode JON 2Oct00 		viewCone[5].Z
-//DeadCode JON 2Oct00 	);
-//DeadCode JON 2Oct00 	cornerVert->setIMapCoords( 256, 256 );
-//DeadCode JON 2Oct00 	cornerVert++;
-//DeadCode JON 2Oct00
-//DeadCode JON 2Oct00 	cornerVert->setPosition(
-//DeadCode JON 2Oct00 		viewCone[6].X,
-//DeadCode JON 2Oct00 		viewCone[6].Y+100,
-//DeadCode JON 2Oct00 		viewCone[6].Z
-//DeadCode JON 2Oct00 	);
-//DeadCode JON 2Oct00
-//DeadCode JON 2Oct00 	cornerVert->setIMapCoords( 256, 0 );
-//DeadCode JON 2Oct00 	cornerVert++;
-//DeadCode JON 2Oct00
-//DeadCode JON 2Oct00 	cornerVert->setPosition(
-//DeadCode JON 2Oct00 		viewCone[7].X,
-//DeadCode JON 2Oct00 		viewCone[7].Y+100,
-//DeadCode JON 2Oct00 		viewCone[7].Z
-//DeadCode JON 2Oct00 	);
-//DeadCode JON 2Oct00 	cornerVert->setIMapCoords( 0, 0 );
-//DeadCode JON 2Oct00
-//DeadCode JON 2Oct00 	g_lpLib3d->EndFan();
 
-//DEADCODE JON 6/2/00 	R3DVERTEX *cornerVert;
-//DEADCODE JON 6/2/00 	g_lpLib3d->BeginFan(HMATERIAL(Land_Scape.horizonImg),4,cornerVert);
-//DEADCODE JON 6/2/00
-//DEADCODE JON 6/2/00 	cornerVert->bodyx.f = viewCone[4].X;
-//DEADCODE JON 6/2/00 	cornerVert->bodyy.f = viewCone[4].Y+100;
-//DEADCODE JON 6/2/00 	cornerVert->bodyz.f = viewCone[4].Z;
-//DEADCODE JON 6/2/00 	cornerVert->ix = 0;
-//DEADCODE JON 6/2/00 	cornerVert->iy = 256;
-//DEADCODE JON 6/2/00 	cornerVert++;
-//DEADCODE JON 6/2/00
-//DEADCODE JON 6/2/00 	cornerVert->bodyx.f = viewCone[5].X;
-//DEADCODE JON 6/2/00 	cornerVert->bodyy.f = viewCone[5].Y+100;
-//DEADCODE JON 6/2/00 	cornerVert->bodyz.f = viewCone[5].Z;
-//DEADCODE JON 6/2/00 	cornerVert->ix = 256;
-//DEADCODE JON 6/2/00 	cornerVert->iy = 256;
-//DEADCODE JON 6/2/00 	cornerVert++;
-//DEADCODE JON 6/2/00
-//DEADCODE JON 6/2/00 	cornerVert->bodyx.f = viewCone[6].X;
-//DEADCODE JON 6/2/00 	cornerVert->bodyy.f = viewCone[6].Y+100;
-//DEADCODE JON 6/2/00 	cornerVert->bodyz.f = viewCone[6].Z;
-//DEADCODE JON 6/2/00 	cornerVert->ix = 256;
-//DEADCODE JON 6/2/00 	cornerVert->iy = 0;
-//DEADCODE JON 6/2/00 	cornerVert++;
-//DEADCODE JON 6/2/00
-//DEADCODE JON 6/2/00 	cornerVert->bodyx.f = viewCone[7].X;
-//DEADCODE JON 6/2/00 	cornerVert->bodyy.f = viewCone[7].Y+100;
-//DEADCODE JON 6/2/00 	cornerVert->bodyz.f = viewCone[7].Z;
-//DEADCODE JON 6/2/00 	cornerVert->ix = 0;
-//DEADCODE JON 6/2/00 	cornerVert->iy = 0;
-//DEADCODE JON 6/2/00
-//DEADCODE JON 6/2/00 	g_lpLib3d->EndFan();
 
 	DrawVisibleObjects();
 
-//DEADCODE RJS 4/25/00 	g_lpLib3d->PopMatrix( MATRIX_OBJECT );
-//DEADCODE RJS 4/25/00 	g_lpLib3d->PopMatrix( MATRIX_VIEWER );
 
-//DeadCode RJS 19Apr00 	add_map(*vp);
 
 	bt->Clear3DArea();
 
@@ -3906,7 +3027,6 @@ void ThreeDee::renderzoomedmap(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
 	add_map(*vp);
 
-//DEADCODE RJS 4/27/00 	View_Point->BlockTick(FALSE);
 
 	Land_Scape.SetUpVisibleCones(	g_lpLib3d,
 									View_Point,
@@ -3933,12 +3053,6 @@ void ThreeDee::renderzoomedmap(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 	View_Point->BlockTick(FALSE);
 
 	Land_Scape.RenderLandscape(	g_lpLib3d );
-//DEADCODE JON 4/6/00 								View_Point,
-//DEADCODE JON 4/6/00 								fpviewer_matrix,
-//DEADCODE JON 4/6/00 								viewer_x,viewer_y,viewer_z,
-//DEADCODE JON 4/6/00 								vp->hdg);
-//DEADCODE RJS 4/27/00  	do_objects_map(TRUE);
-//DEADCODE RJS 4/25/00 	add_map(*vp,TRUE);
 
 	g_lpLib3d->Scale( MATRIX_OBJECT, 0.3f );
 	renderAircraftRoute();
@@ -3954,169 +3068,7 @@ void ThreeDee::renderzoomedmap(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 	Save_Data.fieldOfView = oldfov;//RJS 09Nov98
 }
 
-//DeadCode RJS 27Apr00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode RJS 27Apr00 //Procedure		do_objects_map
-//DeadCode RJS 27Apr00 //Author		Robert Slater
-//DeadCode RJS 27Apr00 //Date			Tue 20 Oct 1998
-//DeadCode RJS 27Apr00 //
-//DeadCode RJS 27Apr00 //Description
-//DeadCode RJS 27Apr00 //
-//DeadCode RJS 27Apr00 //Inputs
-//DeadCode RJS 27Apr00 //
-//DeadCode RJS 27Apr00 //Returns
-//DeadCode RJS 27Apr00 //
-//DeadCode RJS 27Apr00 //------------------------------------------------------------------------------
-//DeadCode RJS 27Apr00 void ThreeDee::do_objects_map(Bool	zoomed)
-//DeadCode RJS 27Apr00 {
-//DeadCode RJS 27Apr00 	ShapeDescPtr	sdptr;
-//DeadCode RJS 27Apr00 	int		i,j;
-//DeadCode RJS 27Apr00 	item 	tempitem,
-//DeadCode RJS 27Apr00 			*tempitemptr;
-//DeadCode RJS 27Apr00 	UWord	sector_x,
-//DeadCode RJS 27Apr00 			sector_y,
-//DeadCode RJS 27Apr00 			current_sector_x,
-//DeadCode RJS 27Apr00 			current_sector_y,
-//DeadCode RJS 27Apr00 			min_sector_x,
-//DeadCode RJS 27Apr00 			max_sector_x,
-//DeadCode RJS 27Apr00 			min_sector_y,
-//DeadCode RJS 27Apr00 			max_sector_y,
-//DeadCode RJS 27Apr00 			this_sector;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 	sdptr = SHAPESTUFF.GetShapePtr(MAPZ);
-//DeadCode RJS 27Apr00 	SLong	properdistz = (sdptr->sx << 4)*4;
-//DeadCode RJS 27Apr00 	SLong	zoomoffset = (properdistz - mapdistz)>>1;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 	if (zoomed==TRUE)
-//DeadCode RJS 27Apr00 	{
-//DeadCode RJS 27Apr00 		tempitemptr = &tempitem;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		tempitemptr->World.X = Manual_Pilot.ControlledAC2->World.X;
-//DeadCode RJS 27Apr00 		tempitemptr->World.Y = Manual_Pilot.ControlledAC2->World.Y;
-//DeadCode RJS 27Apr00 		tempitemptr->World.Z = Manual_Pilot.ControlledAC2->World.Z;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		current_world->getsectornos(tempitemptr,sector_x,sector_y);
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		max_sector_x = sector_x + 1;
-//DeadCode RJS 27Apr00 		max_sector_y = sector_y + 1;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		min_sector_x = sector_x - 1;
-//DeadCode RJS 27Apr00 		min_sector_y = sector_y - 1;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		if (min_sector_x > 32)		// cos unsigned arithmetic (-1 = 65536)
-//DeadCode RJS 27Apr00 			min_sector_x = 0;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		if (min_sector_y > 32)		// cos unsigned arithmetic (-1 = 65536)
-//DeadCode RJS 27Apr00 			min_sector_y = 0;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		if (max_sector_x > 32)
-//DeadCode RJS 27Apr00 			max_sector_x = 32;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		if (max_sector_y > 32)
-//DeadCode RJS 27Apr00 			max_sector_y = 32;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		zoomoffset = 0;//(FT_25000 - FT_20000)>>1;
-//DeadCode RJS 27Apr00 		mapoffx = mapoffy = 0;
-//DeadCode RJS 27Apr00 		mapdistz = 0;//FT_20000;		// This is how high we want the items on the Landscape map
-//DeadCode RJS 27Apr00 	}
-//DeadCode RJS 27Apr00 	else
-//DeadCode RJS 27Apr00 	{
-//DeadCode RJS 27Apr00 		min_sector_x = min_sector_y = 0;
-//DeadCode RJS 27Apr00 		max_sector_x = max_sector_y = 32;
-//DeadCode RJS 27Apr00 	}
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 	for(current_sector_x = min_sector_x;current_sector_x < max_sector_x; current_sector_x++)
-//DeadCode RJS 27Apr00 	{
-//DeadCode RJS 27Apr00 		for(current_sector_y = min_sector_y; current_sector_y < max_sector_y;current_sector_y++)
-//DeadCode RJS 27Apr00 		{
-//DeadCode RJS 27Apr00 			this_sector = current_world->makeindex(current_sector_x,current_sector_y);
-//DeadCode RJS 27Apr00 			tempitemptr = current_world->getfirstitem(this_sector);
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 			while (tempitemptr)
-//DeadCode RJS 27Apr00 			{
-//DeadCode RJS 27Apr00 				if (	(tempitemptr->Status.size==AirStrucSize)
-//DeadCode RJS 27Apr00 					/*&&	(tempitemptr != Persons2::PlayerGhostAC)*/	)
-//DeadCode RJS 27Apr00 				{
-//DeadCode RJS 27Apr00 					switch(SHAPESTUFF.GetShapeScale(sdptr))
-//DeadCode RJS 27Apr00 					{
-//DeadCode RJS 27Apr00 						case SHP_1CM:
-//DeadCode RJS 27Apr00 						case SHP_4CM:
-//DeadCode RJS 27Apr00 						case SHP_16CM:
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 							do_map_object(tempitemptr,zoomoffset);
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 							break;
-//DeadCode RJS 27Apr00 					}
-//DeadCode RJS 27Apr00 				}
-//DeadCode RJS 27Apr00 			 	tempitemptr = tempitemptr->Next;
-//DeadCode RJS 27Apr00 			}
-//DeadCode RJS 27Apr00 		}
-//DeadCode RJS 27Apr00 	}
-//DeadCode RJS 27Apr00 }
 
-//DeadCode RJS 27Apr00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode RJS 27Apr00 //Procedure		do_map_object
-//DeadCode RJS 27Apr00 //Author		Robert Slater
-//DeadCode RJS 27Apr00 //Date			Tue 20 Oct 1998
-//DeadCode RJS 27Apr00 //
-//DeadCode RJS 27Apr00 //Description
-//DeadCode RJS 27Apr00 //
-//DeadCode RJS 27Apr00 //Inputs
-//DeadCode RJS 27Apr00 //
-//DeadCode RJS 27Apr00 //Returns
-//DeadCode RJS 27Apr00 //
-//DeadCode RJS 27Apr00 //------------------------------------------------------------------------------
-//DeadCode RJS 27Apr00 void	ThreeDee::do_map_object(ItemPtr	tempitemptr,SLong	zoomoffset)
-//DeadCode RJS 27Apr00 {
-//DeadCode RJS 27Apr00 	Obj3DPtr		obj3dptr;
-//DeadCode RJS 27Apr00 	IFShare			wx,wy,wz;
-//DeadCode RJS 27Apr00 	animptr			adptr=tempitemptr->Anim;	 //RJS 4/16/99	//RJS 21Apr99
-//DeadCode RJS 27Apr00 	IFShare			bzoffset;
-//DeadCode RJS 27Apr00 	ShapeDescPtr	sdptr;
-//DeadCode RJS 27Apr00 	MinAnimData*	mad = (MinAnimData*)adptr;
-//DeadCode RJS 27Apr00 	SLong			xmax,ymax;
-//DeadCode RJS 27Apr00 	SLong			xmap,ymap;
-//DeadCode RJS 27Apr00 	SLong			ix,iy;
-//DeadCode RJS 27Apr00 	SLong			gridsize = 1 << 21;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 	// Total world is 1 - 8 by 1 - 8
-//DeadCode RJS 27Apr00 	// World covered is 2 - 6 by 2 - 8
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 	// Each block is 1 << 21 cm square
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 	xmap = tempitemptr->World.X - (gridsize*11);// cos real map doesn't start til after 11 blocks (8 + 3)
-//DeadCode RJS 27Apr00 	ymap = tempitemptr->World.Z;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 	xmax = gridsize * 37;      // Five big blocks of 8 little blocks
-//DeadCode RJS 27Apr00 	ymax = gridsize * 64;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 	if ((xmap < xmax) && (ymap < ymax))
-//DeadCode RJS 27Apr00 	{
-//DeadCode RJS 27Apr00 		xmax /= 312;
-//DeadCode RJS 27Apr00 		ymax /= 624;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		ix = (xmap << 2)/xmax;			//Width of map object is 312 cm x 4cm scale
-//DeadCode RJS 27Apr00 		iy = (ymap << 2)/ymax;			//Height of map object is double the width
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		ix += mapoffx;
-//DeadCode RJS 27Apr00 		iy += mapoffy;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		ix += zoomoffset;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		wx.f = (-312 * 4) + ix;				//cos map is 4cm scale
-//DeadCode RJS 27Apr00 		wy.f = (-290 * 4) + iy;
-//DeadCode RJS 27Apr00 		wz.f = mapdistz - 4;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		bzoffset.f = 1.0;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		obj3dptr = (Obj3DPtr )bt->Get3DArea(STATIC_OBJECT);
-//DeadCode RJS 27Apr00 		SetObj3D(obj3dptr,tempitemptr,wx,wy,wz,bzoffset);
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		obj3dptr->Shape = MAPRED;
-//DeadCode RJS 27Apr00 		obj3dptr->AnimPtr = adptr;
-//DeadCode RJS 27Apr00
-//DeadCode RJS 27Apr00 		bt->insert_object(obj3dptr);
-//DeadCode RJS 27Apr00 	}
-//DeadCode RJS 27Apr00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		do_smoke_object
@@ -4193,51 +3145,19 @@ void ThreeDee::renderreplay(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 	{
 		_Replay.UpdateLandscape=false;
 		Land_Scape.PossibleTeleport();
-//DeadCode JON 9Oct00 		Land_Scape.RefreshLandscape();
 	}
 
-//DEADCODE JON 4/6/00 	if (Land_Scape.UpdateTexturesWRTViewPos()==false &&
-//DEADCODE JON 4/6/00 		Land_Scape.UpdateTexturesWRTViewPos()==false &&
-//DEADCODE JON 4/6/00 		Land_Scape.UpdateTexturesWRTViewPos()==false)
-//DEADCODE JON 4/6/00 		assert(false&&"Unrecoverable landscape error");
 
-//DEADCODE JON 4/6/00 	g_lpLib3d->BeginScene(RENDERTARGET_PRIMARY);
 
-//DEADCODE JON 4/6/00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,50,Land_Scape.view_dist);
-//DEADCODE JON 4/6/00 	g_lpLib3d->SetFogColour(fogCol);
 
 	OverLay.SetViewpoint(View_Point);
 	OverLay.SetScreen(g_lpLib3d);
 
 	init_scene(world, vp);
 
-//DEADCODE JON 4/14/00 	pTMake->BuildShadowList(world,vp);							//RJS 17Feb99
 	pTMake->FrameInit(world,Three_Dee.SunLightVector);
 
 	ShapeNum manualPilotShape=Manual_Pilot.ControlledAC2->shape;
-//DeadCode RJS 15Dec99	if (manualPilotShape==CMIG15) Manual_Pilot.ControlledAC2->shape=MIG15;
-//DEADCODE PD 15Feb2000	do_objects();
-//DeadCode RJS 31Jul00 	Land_Scape.SetUpVisibleCones(	g_lpLib3d,
-//DeadCode RJS 31Jul00 									View_Point,
-//DeadCode RJS 31Jul00 									viewer_x,viewer_y,viewer_z,
-//DeadCode RJS 31Jul00 									vp->hdg);
-//DeadCode RJS 31Jul00
-//DeadCode RJS 31Jul00 	g_lpLib3d->BeginScene(RENDERTARGET_PRIMARY);
-//DeadCode RJS 31Jul00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,clipNearZ,Land_Scape.view_dist);	//RJS 31Jul00
-//DeadCode RJS 31Jul00 	g_lpLib3d->SetFogColour(fogCol);
-//DeadCode RJS 31Jul00
-//DeadCode RJS 31Jul00 		g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
-//DeadCode RJS 31Jul00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->hdg);
-//DeadCode RJS 31Jul00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_PITCH,(Angles)-(int)View_Point->pitch);
-//DeadCode RJS 31Jul00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_ROLL,(Angles)-(int)View_Point->roll);
-//DeadCode RJS 31Jul00
-//DeadCode RJS 31Jul00 	Smoke_Trails.SetViewPoint(vp);
-//DeadCode RJS 31Jul00 	PaletteBlender(View_Point->TimeOfDay());
-//DeadCode RJS 31Jul00
-//DeadCode RJS 31Jul00 	GetVisibleObjects(world);
-//DeadCode RJS 31Jul00 	Manual_Pilot.ControlledAC2->shape=manualPilotShape;
-//DeadCode RJS 31Jul00
-//DeadCode RJS 31Jul00 	View_Point->BlockTick(FALSE);
 
 	Land_Scape.SetUpVisibleCones(	g_lpLib3d,
 									View_Point,
@@ -4246,7 +3166,6 @@ void ThreeDee::renderreplay(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 
 	g_lpLib3d->BeginScene(RENDERTARGET_PRIMARY);
 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,NON_COCKPIT_NEARZ,Land_Scape.view_dist);
-//DeadCode JON 7Nov00 	g_lpLib3d->SetFogColour(fogCol);
 
 	g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->hdg);
@@ -4263,24 +3182,18 @@ void ThreeDee::renderreplay(ViewPoint* vp,WorldStuff *world)//PD 22Apr96
 	_Miles.SetUpListener(View_Point->trackeditem,viewer_x,viewer_y,viewer_z,eye_x,eye_y,eye_z,View_Point->hdg,View_Point->pitch);	//RJS 15Sep00
 
 	Smoke_Trails.SetViewPoint(vp);										//RJS 31Jul00
-	PaletteBlender(View_Point->TimeOfDay()); 							//RJS 31Jul00
+	PaletteBlender(View_Point ? View_Point->TimeOfDay() : 0);	//RERUN: View_Point may be NULL during early init 							//RJS 31Jul00
 																		//RJS 31Jul00
 	GetVisibleObjects(world);											//RJS 31Jul00
 	Manual_Pilot.ControlledAC2->shape=manualPilotShape;					//RJS 31Jul00
 
 	View_Point->BlockTick(FALSE);										//RJS 31Jul00
 
-	PaletteBlender(View_Point->TimeOfDay());
+	PaletteBlender(View_Point ? View_Point->TimeOfDay() : 0);	//RERUN: View_Point may be NULL during early init
 	Land_Scape.RenderLandscape(	g_lpLib3d );
-//DEADCODE JON 4/6/00 								View_Point,
-//DEADCODE JON 4/6/00 								fpviewer_matrix,
-//DEADCODE JON 4/6/00 								viewer_x,viewer_y,viewer_z,
-//DEADCODE JON 4/6/00 								vp->hdg);
 
 	// Shove everything into binary tree and render...
 //dEAD,cos gonna use interface stuff instead...	add_replay(*vp);
-//DEADCODE RJS 4/20/00 	Add_Sun(*vp,world);
-//DEADCODE RJS 5/8/00 	Land_Scape.CloudLayer(View_Point);
 	SHAPE.InitCloudFade();
 	DrawVisibleObjects();											//RJS 23Feb00
 	SHAPE.SetCloudFade();
@@ -4345,19 +3258,6 @@ void ThreeDee::add_replay(rotitem& viewpoint)
 	}
 }
 
-//DeadCode RJS 27Mar00 void SetBuffetData(CockpitBuf* newBuffetData)
-//DeadCode RJS 27Mar00 {
-//DeadCode RJS 27Mar00 	Three_Dee.SetCockpitBuffet(newBuffetData);
-//DeadCode RJS 27Mar00 }
-//DeadCode RJS 27Mar00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode RJS 27Mar00 //Procedure		SetCockpitBuffet
-//DeadCode RJS 27Mar00 //Author		Paul.
-//DeadCode RJS 27Mar00 //Date			Thu 29 Oct 1998
-//DeadCode RJS 27Mar00 //------------------------------------------------------------------------------
-//DeadCode RJS 27Mar00 void ThreeDee::SetCockpitBuffet(CockpitBuf* newBuffetData)
-//DeadCode RJS 27Mar00 {
-//DeadCode RJS 27Mar00  	buffetData=*newBuffetData;
-//DeadCode RJS 27Mar00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		SuperShapeCheat
@@ -4470,11 +3370,9 @@ void ThreeDee::do_object_dummy(itemptr tempitemptr,SLong objtype, itemptr fiddle
 	if (tempitemptr->Anim==NULL)
 		SHAPE.SetAnimData(tempitemptr,0);
 
-//DEADCODE RJS 5/8/00 	MinAnimData*	mad = (MinAnimData*)tempitemptr->Anim;			//RJS 08Feb00
 //tempcode	if (!mad->IsInvisible)
 	{
 		D3DVECTOR 		pos;
-//DEADCODE RJS 5/8/00 		ULong 			clipcode;
 		SLong			dx,dy,dz;
 		SLong			range;
 
@@ -4491,11 +3389,7 @@ void ThreeDee::do_object_dummy(itemptr tempitemptr,SLong objtype, itemptr fiddle
 
 		Obj3DPtr	obj3dptr = Obj3DPtr(StuffIntoVisibleList(tempitemptr,D3Distance(dx,dy,dz),pos,objtype));
 
-//DeadCode RJS 26May00 		obj3dptr->objtype = (ObjectType)objtype;
 		obj3dptr->ItemPtr = fiddle;
-//DeadCode RJS 26May00 		if (	(objtype == MOBILE_OBJECT)
-//DeadCode RJS 26May00 			&&	(obj3dptr->copySize >= HDGSIZE)	)
-//DeadCode RJS 26May00 			obj3dptr->AngH = HdgItemPtr(tempitemptr)->hdg;
 	}
 #endif
 
@@ -4645,7 +3539,6 @@ void	ThreeDee::StuffInBinaryTree(ItemPtr	tempitemptr)
 
 	Obj3DPtr	obj3dptr = (Obj3DPtr)StuffIntoVisibleList(tempitemptr,D3Distance(dx,dy,dz),pos,objType);
 
-//DeadCode RJS 26May00 	obj3dptr->objtype = (ObjectType)MOBILE_OBJECT;
 
 	SHAPE.sfx_shape(tempitemptr,pos,obj3dptr->realbz.f);
 
@@ -4666,8 +3559,6 @@ void	ThreeDee::StuffInBinaryTree(ItemPtr	tempitemptr)
 //------------------------------------------------------------------------------
 void ThreeDee::GetVisibleObjects(WorldStuff *worldptr)
 {
-//DeadCode RJS 07Feb00 	g_lpLib3d->PushMatrix(MATRIX_OBJECT);
-//DeadCode RJS 07Feb00 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
 	btree::ObjectRec *objectRec;
 	ObjectType	objtype;
 
@@ -4887,7 +3778,6 @@ void ThreeDee::GetVisibleObjects(WorldStuff *worldptr)
 
 		StuffInBinaryTree(dummyitem);
 
-//DeadCode RJS 26May00 		objectRec->obj3d[objectRec->numItems-1].ItemPtr = Persons2::PlayerSeenAC;
 
 		dummyitem.Anim = ANIM_NULL;
 	}
@@ -4927,7 +3817,6 @@ void ThreeDee::GetVisibleObjects(WorldStuff *worldptr)
 
 					SHAPE.animate_shape(&objectRec->obj3d[i],tempitemptr->World);	//RJS 26May00
 
-//DeadCode JON 17Oct00 					if (	Save_Data.gamedifficulty[GD_TEXTINFO]		//RJS 12Jul00
 					if (drawDescText									//JON 17Oct00
 						&&	(objectRec->obj3d[i].copySize == AIRSTRUCSIZE)	)	//RJS 23Aug00
 						OverLay.PrintID(tempitemptr);
@@ -5022,7 +3911,6 @@ void	ThreeDee::DrawVisibleObjects()
 				{
 				case SHP_GRP:
 					_Error.EmitSysErr(__FILE__":  Should not be group here!!");//RJS 15Feb00
-//DeadCode RJS 15Feb00 					AddVisibleGroup((void*)objectRec,i);
  					break;
 				case SHP_1CM:
 					AddVisibleShape((void*)objectRec,i,1);		//RJS 04Feb00
@@ -5099,8 +3987,6 @@ void ThreeDee::AddVisibleShape(void *pvoid,int index, int realscale)
 //just draw
 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
 
-//DeadCode RJS 23Oct00 	if (realscale > 1)
-//DeadCode RJS 23Oct00 		g_lpLib3d->Scale(MATRIX_OBJECT,D3DVALUE(realscale));
 
 	if (thisobj->objtype != SMOKE_OBJECT)
 	{
@@ -5196,204 +4082,7 @@ void ThreeDee::AddVisibleShape(void *pvoid,int index, int realscale)
 	SHAPE.process_shape(g_lpLib3d,View_Point,thisobj,NULL,FALSE,NULL);
 }
 
-//DEADCODE RJS 4/28/00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DEADCODE RJS 4/28/00 //Procedure		AddVisibleGroup
-//DEADCODE RJS 4/28/00 //Author		Paul.
-//DEADCODE RJS 4/28/00 //Date			Thu 3 Feb 2000
-//DEADCODE RJS 4/28/00 //
-//DEADCODE RJS 4/28/00 //------------------------------------------------------------------------------
-//DEADCODE RJS 4/28/00 void ThreeDee::AddVisibleGroup(void *pvoid,int index)
-//DEADCODE RJS 4/28/00 {
-//DeadCode RJS 15Feb00 	btree::ObjectRec *objRec=(btree::ObjectRec*)pvoid;
-//DeadCode RJS 15Feb00 	item *tempitemptr;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	UByte*		groupjump;										//RJS 18Oct96
-//DeadCode RJS 15Feb00 	SWord		instruction;									//RJS 18Oct96
-//DeadCode RJS 15Feb00 	DOGROUP_PTR 	tempgrp;									//RJS 18Oct96
-//DeadCode RJS 15Feb00 	DRAWBETWEEN_PTR	dobetptr;									//RJS 18Oct96
-//DeadCode RJS 15Feb00 	SWord		heading;										//RJS 14Aug97
-//DeadCode RJS 15Feb00 	SByte		ydelta;											//RJS 20Nov97
-//DeadCode RJS 15Feb00 	UByteP		adptrold;
-//DeadCode RJS 15Feb00 	COORDS3D	tmpworld;
-//DeadCode RJS 15Feb00 	SLong		heightfix;
-//DeadCode RJS 15Feb00 	MinAnimData*	mad;										//RJS 16Nov98
-//DeadCode RJS 15Feb00 	SWord		realPitch,realRoll,realHdg;						//RJS 23Nov99
-//DeadCode RJS 15Feb00 	SLong		dx,dz;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	tempitemptr=objRec->obj3d->ItemPtr;							//RJS 08Feb00
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	if (tempitemptr->Anim==NULL)								//RJS 21Apr99
-//DeadCode RJS 15Feb00 		SHAPE.SetAnimData(tempitemptr,0);						//RDH 23Sep96
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	animptr	adptr=tempitemptr->Anim;							//RJS 21Apr99
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	ShapeNum oldshape;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	ShapeDescPtr	header_ptr =
-//DeadCode RJS 15Feb00 		SHAPESTUFF.GetShapePtr(oldshape = tempitemptr->shape);
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	UByte *instr_ptr = (UByte *)header_ptr + header_ptr->liveshpref;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	R3DVALUE a;
-//DeadCode RJS 15Feb00 	a=objRec->pos[index].x*objRec->pos[index].x+
-//DeadCode RJS 15Feb00 		objRec->pos[index].y*objRec->pos[index].y+
-//DeadCode RJS 15Feb00 		objRec->pos[index].z*objRec->pos[index].z;
-//DeadCode RJS 15Feb00 	a=fastMath.FastSqrt(a);
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	SLong	grouprange = (SLong)a;
-//DeadCode RJS 15Feb00 	Bool	notinrange;											//RJS 04Dec96
-//DeadCode RJS 15Feb00 	SLong	shpsize;											//RJS 09Jul98
-//DeadCode RJS 15Feb00 	Bool	isFiddled;
-//DeadCode RJS 15Feb00 	bool	noHeightFix = false;								//RJS 23Nov99
-//DeadCode RJS 15Feb00 	SWord	rotateitem;											//RJS 23Nov99
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	groupjump = NULL;											//RJS 05Dec96
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	if (	(tempitemptr->Status.size == AIRSTRUCSIZE)
-//DeadCode RJS 15Feb00 		||	(tempitemptr->Status.size == TRANSIENTSIZE)	)
-//DeadCode RJS 15Feb00 	{
-//DeadCode RJS 15Feb00 		mobileitem*	hdgitem = (mobileitem*) tempitemptr;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		realHdg = hdgitem->hdg;
-//DeadCode RJS 15Feb00 		realPitch = hdgitem->pitch;
-//DeadCode RJS 15Feb00 		realRoll = hdgitem->roll;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		noHeightFix = true;
-//DeadCode RJS 15Feb00 	}
-//DeadCode RJS 15Feb00 	else
-//DeadCode RJS 15Feb00 	{
-//DeadCode RJS 15Feb00 		realPitch = 0;
-//DeadCode RJS 15Feb00 		realRoll = 0;
-//DeadCode RJS 15Feb00 		realHdg = 0;
-//DeadCode RJS 15Feb00 	}
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 	forever	//while(TRUE)
-//DeadCode RJS 15Feb00 	{
-//DeadCode RJS 15Feb00 		Obj3D thisObj;
-//DeadCode RJS 15Feb00 //DeadCode RJS 08Feb00		thisObj.lptr=NULL;
-//DeadCode RJS 15Feb00 //DeadCode RJS 08Feb00		thisObj.rptr=NULL;
-//DeadCode RJS 15Feb00 		thisObj.ItemPtr=tempitemptr;
-//DeadCode RJS 15Feb00 		thisObj.IsTransient=0;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		instruction = *instr_ptr;
-//DeadCode RJS 15Feb00 		instr_ptr++;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		if (instruction!=dogroupno)
-//DeadCode RJS 15Feb00 			break;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		tempgrp = (DOGROUP_PTR)instr_ptr;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		ShapeNum newshape = (ShapeNum )tempgrp->shapenum;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		heading = tempgrp->angle;								//RJS 14Aug97
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		tempitemptr->shape = newshape;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		thisObj.Shape=tempitemptr->shape;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		thisObj.Body.X.f=objRec->pos[index].x+tempgrp->xoffset;
-//DeadCode RJS 15Feb00 		thisObj.Body.Y.f=objRec->pos[index].y+tempgrp->yoffset;
-//DeadCode RJS 15Feb00 		thisObj.Body.Z.f=objRec->pos[index].z+tempgrp->zoffset;
-//DeadCode RJS 15Feb00 		thisObj.AngH=
-//DeadCode RJS 15Feb00 		thisObj.AngC=
-//DeadCode RJS 15Feb00 		thisObj.AngR=ANGLES_0Deg;
-//DeadCode RJS 15Feb00 		thisObj.objtype=STATIC_OBJECT;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		SHAPE.SetGrpTokenVisibility((UByteP)tempgrp,tempitemptr->Anim,adptr);//RJS 21Apr99
-//DeadCode RJS 15Feb00 		mad = (MinAnimData*) adptr;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		if (!noHeightFix)										//RJS 23Nov99
-//DeadCode RJS 15Feb00 		{
-//DeadCode RJS 15Feb00 			//Eliminate cocked-up deltas
-//DeadCode RJS 15Feb00 			ydelta = SHAPE.GetElementYDelta(newshape,adptr,tmpworld,tempitemptr->World.Y);//RJS 09Jun99
-//DeadCode RJS 15Feb00 			rotateitem = heading;
-//DeadCode RJS 15Feb00 		}
-//DeadCode RJS 15Feb00 		else
-//DeadCode RJS 15Feb00 		{
-//DeadCode RJS 15Feb00 			heading += realHdg;
-//DeadCode RJS 15Feb00 			ydelta = 0;
-//DeadCode RJS 15Feb00 			adptr += SHAPE.GetElementAnimOffset(newshape);
-//DeadCode RJS 15Feb00 			rotateitem = 1;
-//DeadCode RJS 15Feb00 		}
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 		if (	(grouprange >= tempgrp->range_min)				//MS 27May98
-//DeadCode RJS 15Feb00 			&&	(grouprange < tempgrp->range_max)	)			//MS 27May98
-//DeadCode RJS 15Feb00 		{
-//DeadCode RJS 15Feb00 			// Delta calc moved to 3dcom.cpp					//DAW 01Dec98
-//DeadCode RJS 15Feb00 			heightfix = ydelta<<4;								//DAW 01Dec98
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 			if (!mad->IsInvisible)								//RJS 21Apr99
-//DeadCode RJS 15Feb00 			{
-//DeadCode RJS 15Feb00 				thisObj.Body.Y.f+=heightfix;
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 				ShapeDescPtr sdptr = SHAPESTUFF.GetShapePtr(newshape);			//RJS 17Nov98
-//DeadCode RJS 15Feb00 				shpsize = sdptr->Size << 4;							//RJS 17Nov98
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 				#pragma message(__HERE__"Fix wire problem")
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 				if (rotateitem)									//RJS 23Nov99
-//DeadCode RJS 15Feb00 				{												//RJS 20Nov97
-//DeadCode RJS 15Feb00 					thisObj.AngH = (Angles) heading;			//RJS 20Nov97
-//DeadCode RJS 15Feb00 					thisObj.AngC = (Angles) realPitch;		//RJS 23Nov99
-//DeadCode RJS 15Feb00 					thisObj.AngR = (Angles) realRoll;			//RJS 23Nov99
-//DeadCode RJS 15Feb00 					thisObj.objtype = MOBILE_OBJECT;			//RJS 14Aug97
-//DeadCode RJS 15Feb00 				}												//RJS 14Aug97
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 				//Make sure animdata inherits sizefield too	//RJS 21Apr99
-//DeadCode RJS 15Feb00 				thisObj.AnimPtr = tempitemptr->Anim;		//RJS 21Apr99
-//DeadCode RJS 15Feb00 				thisObj.AnimPtr = (UByteP)mad;				//RJS 20Nov97
-//DeadCode RJS 15Feb00 				SHAPE.animate_shape(&thisObj,tmpworld);		//RJS 01Dec99
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 				g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
-//DeadCode RJS 15Feb00 				switch (SHAPESTUFF.GetShapeScale(sdptr))
-//DeadCode RJS 15Feb00 				{
-//DeadCode RJS 15Feb00 				case SHP_4CM:
-//DeadCode RJS 15Feb00 					g_lpLib3d->Scale(MATRIX_OBJECT,D3DVALUE(4));
-//DeadCode RJS 15Feb00 					break;
-//DeadCode RJS 15Feb00 				case SHP_16CM:
-//DeadCode RJS 15Feb00 					g_lpLib3d->Scale(MATRIX_OBJECT,D3DVALUE(16));
-//DeadCode RJS 15Feb00 					break;
-//DeadCode RJS 15Feb00 				default:
-//DeadCode RJS 15Feb00 					break;
-//DeadCode RJS 15Feb00 				}
-//DeadCode RJS 15Feb00 				g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_ROLL,(Angles)-(int)thisObj.AngR);
-//DeadCode RJS 15Feb00 				g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_PITCH,(Angles)-(int)thisObj.AngC);
-//DeadCode RJS 15Feb00 				g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_HEADING,(Angles)(int)thisObj.AngH);
-//DeadCode RJS 15Feb00 				D3DVECTOR t;
-//DeadCode RJS 15Feb00 				t.dvX=thisObj.Body.X.f;
-//DeadCode RJS 15Feb00 				t.dvY=thisObj.Body.Y.f;
-//DeadCode RJS 15Feb00 				t.dvZ=thisObj.Body.Z.f;
-//DeadCode RJS 15Feb00 				g_lpLib3d->Translate(MATRIX_OBJECT,t);
-//DeadCode RJS 15Feb00
-//DeadCode RJS 15Feb00 				SHAPE.process_shape(g_lpLib3d,View_Point,&thisObj,NULL,FALSE,NULL);
-//DeadCode RJS 15Feb00 				tempitemptr->Status.Drawn = TRUE;//RJS 05Oct98
-//DeadCode RJS 15Feb00 			}
-//DeadCode RJS 15Feb00 		}
-//DeadCode RJS 15Feb00 		instr_ptr += sizeof(DOGROUP);							//RJS 22Aug97
-//DeadCode RJS 15Feb00 	}
-//DeadCode RJS 15Feb00 	tempitemptr->shape = oldshape;
-//DEADCODE RJS 4/28/00 }
 
-//DeadCode JON 17Oct00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JON 17Oct00 //Procedure		InitMirror
-//DeadCode JON 17Oct00 //Author		Paul.
-//DeadCode JON 17Oct00 //Date			Tue 7 Dec 1999
-//DeadCode JON 17Oct00 //
-//DeadCode JON 17Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 17Oct00 void ThreeDee::InitMirror()
-//DeadCode JON 17Oct00 {
-//DeadCode JON 17Oct00 	mdMirror.w=256;
-//DeadCode JON 17Oct00 	mdMirror.h=256;
-//DeadCode JON 17Oct00 	mdMirror.alpha=0L;
-//DeadCode JON 17Oct00 	mdMirror.body=0L;
-//DeadCode JON 17Oct00 	mdMirror.isMasked=0;
-//DeadCode JON 17Oct00 	mdMirror.hTextureMap=0L;
-//DeadCode JON 17Oct00 	mdMirror.palette=0L;
-//DeadCode JON 17Oct00 	mdMirror.paletteindex=0;
-//DeadCode JON 17Oct00 //tempcode	g_lpLib3d->CreateTexture(&mdMirror,TC_RENDERTARGET);
-//DeadCode JON 17Oct00 //DeadCode JON 17Sep00 	hrtMirror=HRENDERTARGET(&mdMirror);
-//DeadCode JON 17Oct00 #pragma warnmsg ( "what does this do - is it used???" )
-//DeadCode JON 17Oct00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		UseMirror
@@ -5415,173 +4104,6 @@ void ThreeDee::UseMirror(SWord	material, COORDS3D& pos,SWord dx,SWord dy,SWord d
 
 //	static UByte doit=0xFF;
 //	if ((doit^=0xFF)==0) return;
-//DeadCode RJS 12Jul00 	const SLong MIRROR_RANGE=100000;
-//DeadCode RJS 12Jul00 	D3DMATRIX mat;
-//DeadCode RJS 12Jul00 	D3DVECTOR view,upvec,rightvec;
-//DeadCode RJS 12Jul00 	D3DVALUE mag;
-//DeadCode RJS 12Jul00 	ImageMapDescPtr	imap = Image_Map.GetImageMapPtr(ImageMapNumber(material));
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 	g_lpLib3d->BeginScene(RENDERTARGET_MIRROR);
-//DeadCode RJS 12Jul00 	//set new projection matrix
-//DeadCode RJS 12Jul00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,100,135184);
-//DeadCode RJS 12Jul00 	g_lpLib3d->SetFogColour(fogCol);
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 	//set new view matrix
-//DeadCode RJS 12Jul00 	//create matrix using view orientation vector v (dx,dy,dz)
-//DeadCode RJS 12Jul00 	view.dvX=dx;
-//DeadCode RJS 12Jul00 	view.dvY=dy;
-//DeadCode RJS 12Jul00 	view.dvZ=dz;
-//DeadCode RJS 12Jul00 	//normalise the view vector
-//DeadCode RJS 12Jul00 	mag=view.dvX*view.dvX+view.dvY*view.dvY+view.dvZ*view.dvZ;
-//DeadCode RJS 12Jul00 	mag=fastMath.FastInvSqrt(mag);
-//DeadCode RJS 12Jul00 	view.dvX*=mag;
-//DeadCode RJS 12Jul00 	view.dvY*=mag;
-//DeadCode RJS 12Jul00 	view.dvZ*=mag;
-//DeadCode RJS 12Jul00 	//dot product of up vector (0,1,0) with view vector
-//DeadCode RJS 12Jul00 	upvec.dvX=0-view.dvY*view.dvX;
-//DeadCode RJS 12Jul00 	upvec.dvY=1-view.dvY*view.dvY;
-//DeadCode RJS 12Jul00 	upvec.dvZ=0-view.dvY*view.dvZ;
-//DeadCode RJS 12Jul00 	mag=upvec.dvX*upvec.dvX+upvec.dvY*upvec.dvY+upvec.dvZ*upvec.dvZ;
-//DeadCode RJS 12Jul00 	mag=fastMath.FastInvSqrt(mag);
-//DeadCode RJS 12Jul00 	upvec.dvX*=mag;
-//DeadCode RJS 12Jul00 	upvec.dvY*=mag;
-//DeadCode RJS 12Jul00 	upvec.dvZ*=mag;
-//DeadCode RJS 12Jul00 	rightvec.dvX=upvec.dvY*view.dvZ-upvec.dvZ*view.dvY;
-//DeadCode RJS 12Jul00 	rightvec.dvY=upvec.dvX*view.dvZ-upvec.dvZ*view.dvX;
-//DeadCode RJS 12Jul00 	rightvec.dvZ=upvec.dvX*view.dvY-upvec.dvY*view.dvX;
-//DeadCode RJS 12Jul00 	mat._11=rightvec.dvX;
-//DeadCode RJS 12Jul00 	mat._12=upvec.dvX;
-//DeadCode RJS 12Jul00 	mat._13=view.dvX;
-//DeadCode RJS 12Jul00 	mat._21=rightvec.dvY;
-//DeadCode RJS 12Jul00 	mat._22=upvec.dvY;
-//DeadCode RJS 12Jul00 	mat._23=view.dvY;
-//DeadCode RJS 12Jul00 	mat._31=rightvec.dvZ;
-//DeadCode RJS 12Jul00 	mat._32=upvec.dvZ;
-//DeadCode RJS 12Jul00 	mat._33=view.dvZ;
-//DeadCode RJS 12Jul00 	mat._14=mat._24=mat._34=mat._41=mat._42=mat._43=0;
-//DeadCode RJS 12Jul00 	mat._44=1;
-//DeadCode RJS 12Jul00 	g_lpLib3d->SetMatrix(MATRIX_VIEWER,mat);
-//DeadCode RJS 12Jul00 	//add in the aircrafts orientation
-//DeadCode RJS 12Jul00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_ROLL,(Angles)-(int)View_Point->roll);
-//DeadCode RJS 12Jul00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_PITCH,(Angles)(int)View_Point->pitch);
-//DeadCode RJS 12Jul00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->hdg);
-//DeadCode RJS 12Jul00 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
-//DeadCode RJS 12Jul00 	//step through sector list looking for objects to render on the mirror
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 	UWord sector_x, sector_y, current_sector_x, current_sector_y, this_sector;
-//DeadCode RJS 12Jul00 	item tempitem,*tempitemptr=&tempitem;
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 	btree::ObjectRec *objectRec;
-//DeadCode RJS 12Jul00 	objectRec=&bt->objectRec;
-//DeadCode RJS 12Jul00 	objectRec->numItems=0;
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 	ShapeDescPtr sdptr;
-//DeadCode RJS 12Jul00 	int	sectorcount=12;
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 	tempitem.World=pos;
-//DeadCode RJS 12Jul00 	current_world->getsectornos(tempitemptr,sector_x,sector_y);
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 	for(current_sector_x=sector_x-1;sectorcount;current_sector_x++)
-//DeadCode RJS 12Jul00 	{
-//DeadCode RJS 12Jul00 		//sc test&dec occurs 4 times per yloop of 3 times
-//DeadCode RJS 12Jul00 		for(current_sector_y=sector_y-1;--sectorcount&3;current_sector_y++)
-//DeadCode RJS 12Jul00 		{
-//DeadCode RJS 12Jul00 			this_sector=current_world->makeindex(current_sector_x,current_sector_y);
-//DeadCode RJS 12Jul00 			tempitemptr=current_world->getfirstitem(this_sector);
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 			while (tempitemptr)
-//DeadCode RJS 12Jul00 			{
-//DeadCode RJS 12Jul00 				if (current_world->SameSector(tempitemptr,*View_Point))
-//DeadCode RJS 12Jul00 				{
-//DeadCode RJS 12Jul00 					if (tempitemptr->Status.size==AirStrucSize &&
-//DeadCode RJS 12Jul00 						tempitemptr!=Persons2::PlayerGhostAC &&
-//DeadCode RJS 12Jul00 						tempitemptr!=Persons2::PlayerSeenAC)
-//DeadCode RJS 12Jul00 					{
-//DeadCode RJS 12Jul00 						SLong dx,dy,dz;
-//DeadCode RJS 12Jul00 						dx=tempitemptr->World.X-pos.X;
-//DeadCode RJS 12Jul00 						dy=tempitemptr->World.Y-pos.Y;
-//DeadCode RJS 12Jul00 						dz=tempitemptr->World.Z-pos.Z;
-//DeadCode RJS 12Jul00 						SLong rng=D3Distance(dx,dy,dz);
-//DeadCode RJS 12Jul00 						if (rng<=MIRROR_RANGE)
-//DeadCode RJS 12Jul00 						{
-//DeadCode RJS 12Jul00 							SLong index=objectRec->numItems++;
-//DeadCode RJS 12Jul00 							sdptr=SHAPESTUFF.GetShapePtr(tempitemptr->shape);
-//DeadCode RJS 12Jul00 							objectRec->pos[index].x=dx;
-//DeadCode RJS 12Jul00 							objectRec->pos[index].y=dy;
-//DeadCode RJS 12Jul00 							objectRec->pos[index].z=dz;
-//DeadCode RJS 12Jul00 							objectRec->rad[index]=sdptr->Size<<4;
-//DeadCode RJS 12Jul00 							objectRec->obj3d[index].ItemPtr=tempitemptr;//RJS 07Feb00
-//DeadCode RJS 12Jul00 							objectRec->range[index]=rng;
-//DeadCode RJS 12Jul00 						}
-//DeadCode RJS 12Jul00 					}
-//DeadCode RJS 12Jul00 				}
-//DeadCode RJS 12Jul00 			 	tempitemptr=tempitemptr->Next;
-//DeadCode RJS 12Jul00 			}
-//DeadCode RJS 12Jul00 		}
-//DeadCode RJS 12Jul00 	}
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 	if (objectRec->numItems>0)
-//DeadCode RJS 12Jul00 	{
-//DeadCode RJS 12Jul00 		g_lpLib3d->VisibleCheck(objectRec->pos,objectRec->rad,objectRec->numItems,objectRec->itemFlag);
-//DeadCode RJS 12Jul00
-//DeadCode RJS 12Jul00 		for (int i=int(objectRec->numItems)-1;i>=0;i--)
-//DeadCode RJS 12Jul00 		{
-//DeadCode RJS 12Jul00 			if (0==objectRec->itemFlag[i])
-//DeadCode RJS 12Jul00 			{
-//DeadCode RJS 12Jul00 				Obj3D thisObj;
-//DeadCode RJS 12Jul00 				tempitemptr=objectRec->obj3d[i].ItemPtr;		//RJS 07Feb00
-//DeadCode RJS 12Jul00 				sdptr=SHAPESTUFF.GetShapePtr(tempitemptr->shape);
-//DeadCode RJS 12Jul00 //DeadCode RJS 07Feb00				thisObj.lptr=NULL;
-//DeadCode RJS 12Jul00 //DeadCode RJS 07Feb00				thisObj.rptr=NULL;
-//DeadCode RJS 12Jul00 				thisObj.ItemPtr=tempitemptr;
-//DeadCode RJS 12Jul00 				thisObj.Shape=tempitemptr->shape;
-//DeadCode RJS 12Jul00 				thisObj.Body.X.f=objectRec->pos[i].x;
-//DeadCode RJS 12Jul00 				thisObj.Body.Y.f=objectRec->pos[i].y;
-//DeadCode RJS 12Jul00 				thisObj.Body.Z.f=objectRec->pos[i].z;
-//DeadCode RJS 12Jul00 				thisObj.AngH=ANGLES_0Deg;
-//DeadCode RJS 12Jul00 				thisObj.AngC=ANGLES_0Deg;
-//DeadCode RJS 12Jul00 				thisObj.AngR=ANGLES_0Deg;
-//DeadCode RJS 12Jul00 //DeadCode RJS 26May00 				thisObj.IsTransient=0;
-//DeadCode RJS 12Jul00 				thisObj.AnimPtr=tempitemptr->Anim;
-//DeadCode RJS 12Jul00 				switch (tempitemptr->Status.size)
-//DeadCode RJS 12Jul00 				{
-//DeadCode RJS 12Jul00 				default:
-//DeadCode RJS 12Jul00 				case ItemSize:
-//DeadCode RJS 12Jul00 					thisObj.objtype=STATIC_OBJECT;
-//DeadCode RJS 12Jul00 					break;
-//DeadCode RJS 12Jul00 				case TransientSize:
-//DeadCode RJS 12Jul00 //DeadCode RJS 26May00 					thisObj.IsTransient=1;
-//DeadCode RJS 12Jul00 				case RotatedSize:
-//DeadCode RJS 12Jul00 				case MovingSize:
-//DeadCode RJS 12Jul00 				case MobileSize:
-//DeadCode RJS 12Jul00 				case FormationSize:
-//DeadCode RJS 12Jul00 				case ShipSize:
-//DeadCode RJS 12Jul00 				case AirStrucSize:
-//DeadCode RJS 12Jul00 					thisObj.AngR=((rotitem *)tempitemptr)->roll;
-//DeadCode RJS 12Jul00 				case HPSize:
-//DeadCode RJS 12Jul00 					thisObj.AngC=((hpitem *)tempitemptr)->pitch;
-//DeadCode RJS 12Jul00 				case HdgSize:
-//DeadCode RJS 12Jul00 					thisObj.AngH=((hdgitem *)tempitemptr)->hdg;
-//DeadCode RJS 12Jul00 					thisObj.objtype=MOBILE_OBJECT;
-//DeadCode RJS 12Jul00 					break;
-//DeadCode RJS 12Jul00 				}
-//DeadCode RJS 12Jul00 				SHAPE.animate_shape(&thisObj,tempitemptr->World);
-//DeadCode RJS 12Jul00 				//just draw
-//DeadCode RJS 12Jul00 				g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
-//DeadCode RJS 12Jul00 				g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_ROLL,(Angles)-(int)thisObj.AngR);
-//DeadCode RJS 12Jul00 				g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_PITCH,(Angles)(int)thisObj.AngC);
-//DeadCode RJS 12Jul00 				g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_HEADING,(Angles)(int)thisObj.AngH);
-//DeadCode RJS 12Jul00 				D3DVECTOR t;
-//DeadCode RJS 12Jul00 				t.dvX=thisObj.Body.X.f;
-//DeadCode RJS 12Jul00 				t.dvY=thisObj.Body.Y.f;
-//DeadCode RJS 12Jul00 				t.dvZ=thisObj.Body.Z.f;
-//DeadCode RJS 12Jul00 				g_lpLib3d->Translate(MATRIX_OBJECT,t);
-//DeadCode RJS 12Jul00 				SHAPE.process_shape(g_lpLib3d,View_Point,&thisObj,NULL,FALSE,NULL);
-//DeadCode RJS 12Jul00 				tempitemptr->Status.Drawn=TRUE;
-//DeadCode RJS 12Jul00 			}
-//DeadCode RJS 12Jul00 		}
-//DeadCode RJS 12Jul00 	}
-//DeadCode RJS 12Jul00 	g_lpLib3d->EndScene();
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -5622,18 +4144,6 @@ void ThreeDee::AddToObjectRec(void* objRec,ItemPtr	tempitemptr, SLong size, SLon
 
 		if (ConeCheck(objectRec->pos[objectRec->numItems],rng,size))	//RJS 23Aug00
 		{
-//DeadCode RJS 25Sep00 			if(copySize > ITEMSIZE)										//RJS 26May00
-//DeadCode RJS 25Sep00 			{
-//DeadCode RJS 25Sep00 				objtype = MOBILE_OBJECT;									//RJS 26May00
-//DeadCode RJS 25Sep00 				if(copySize >= MOBILESIZE)
-//DeadCode RJS 25Sep00 				{
-//DeadCode RJS 25Sep00 					MobileItemPtr mobitem = MobileItemPtr(tempitemptr);			//CSB 01/03/00
-//DeadCode RJS 25Sep00
-//DeadCode RJS 25Sep00 					objectRec->pos[objectRec->numItems].x += Float(mobitem->vel_x + wind_x)*fView_dt_frac;
-//DeadCode RJS 25Sep00 					objectRec->pos[objectRec->numItems].y += Float(mobitem->vel_y + wind_y)*fView_dt_frac;
-//DeadCode RJS 25Sep00 					objectRec->pos[objectRec->numItems].z += Float(mobitem->vel_z + wind_z)*fView_dt_frac;
-//DeadCode RJS 25Sep00 				}
-//DeadCode RJS 25Sep00 			}
 
 			objectRec->rad[objectRec->numItems]   = size;
 			objectRec->range[objectRec->numItems] = rng;
@@ -5795,8 +4305,6 @@ void ThreeDee::AddNewVapourObject(	ShapeNum	shape,
 		SLong			range;
 		Obj3DPtr		obj3dptr;
 		D3DVECTOR		pos;
-//DeadCode RJS 20Oct00 		ULong			clipcode=0;
-//DeadCode RJS 20Oct00 		Coords3DList*	apoint = (Coords3DList*)apoint1;
 	  	SLong			vdx=0;											//RJS 12Sep00
 		SLong			vdy=0;											//RJS 12Sep00
 		SLong			vdz=0;											//RJS 12Sep00
@@ -5825,9 +4333,7 @@ void ThreeDee::AddNewVapourObject(	ShapeNum	shape,
 //	g_lpLib3d->VisibleCheck(&pos,1,&clipcode);
 //	g_lpLib3d->PopMatrix(MATRIX_OBJECT);
 
-//DeadCode RJS 10Aug00 		thisobj3d = NULL;
 //	if (clipcode==0)
-//DeadCode RJS 9Aug00 	{
 		btree::ObjectRec*	objectRec = &bt->objectRec;
 
 		objectRec->pos[objectRec->numItems]=pos;
@@ -5887,7 +4393,6 @@ void ThreeDee::ExpandGroup(void *pvoid,ItemPtr tempitemptr, SLong grouprange)
 	SByte			ydelta;
 	UByteP			adptrold;
 	COORDS3D		tmpworld;
-//DEADCODE RJS 4/7/00 	Coords3D		relworld;
 	SLong			heightfix;
 	MinAnimData*	mad;
 	SWord			realPitch,realRoll,realHdg;
@@ -5916,7 +4421,6 @@ void ThreeDee::ExpandGroup(void *pvoid,ItemPtr tempitemptr, SLong grouprange)
 	Bool	notinrange;
 	SLong	shpsize;
 	Bool	isFiddled;
-//DeadCode RJS 26May00 	bool	noHeightFix = false;
 	SWord	rotateitem;
 	R3DVALUE	rng;
 	UByte		copySize = tempitemptr->Status.size;					//RJS 26May00
@@ -5931,14 +4435,10 @@ void ThreeDee::ExpandGroup(void *pvoid,ItemPtr tempitemptr, SLong grouprange)
 		realPitch = hdgitem->pitch;
 		realRoll = hdgitem->roll;
 
-//DeadCode RJS 25Sep00 		velCorrectX = float(hdgitem->vel_x + wind_x)*float(fView_dt_frac);		//RJS 7Jun00
-//DeadCode RJS 25Sep00 		velCorrectY = float(hdgitem->vel_y + wind_y)*float(fView_dt_frac);		//RJS 7Jun00
-//DeadCode RJS 25Sep00 		velCorrectZ = float(hdgitem->vel_z + wind_z)*float(fView_dt_frac);		//RJS 7Jun00
 		fastMath.FloatToInt(&velCorrectX,velCorrect_x);
 		fastMath.FloatToInt(&velCorrectY,velCorrect_y);
 		fastMath.FloatToInt(&velCorrectZ,velCorrect_z);
 
-//DeadCode RJS 26May00 		noHeightFix = true;
 	}
 	else
 	{
@@ -6068,15 +4568,11 @@ void ThreeDee::ExpandGroup(void *pvoid,ItemPtr tempitemptr, SLong grouprange)
 						smpoptr->objtype = STATIC_OBJECT;
 					}
 
-//DeadCode RJS 2Jun00  				smpoptr->copySize=copySize;								//RJS 26May00
  					smpoptr->copySize=0;								//RJS 26May00
 					smpoptr->AnimPtr=tempitemptr->Anim;
 					smpoptr->AnimPtr=(UByteP)mad;
 					smpoptr->realbz.f = Float(rng);
 
-//DeadCode RJS 23Aug00 					SHAPE.animate_shape(smpoptr,tmpworld);
-//DeadCode RJS 23Aug00
-//DeadCode RJS 23Aug00 					smpoptr->ItemPtr = NULL;
 
 					tempitemptr->Status.Drawn = TRUE;
 
@@ -6135,10 +4631,8 @@ void	ThreeDee::StuffInBinaryTree(ItemPtr	tempitemptr, Obj3DPtr	theobj3dptr)
 	else
 		objType = STATIC_OBJECT;
 
-//DeadCode RJS 23Oct00 	Obj3DPtr	obj3dptr = (Obj3DPtr)StuffIntoVisibleList(tempitemptr,range,pos,objType);
 	StuffIntoVisibleList(tempitemptr,range,pos,objType);				//RJS 23Oct00
 
-//DeadCode RJS 26May00 	obj3dptr->objtype = (ObjectType)MOBILE_OBJECT;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -6166,10 +4660,6 @@ void ThreeDee::GetVisibleMapObjects(bool	isZoomed)
 	MobileItemPtr tempitemptr;											//JIM 31Jul00
 	ShapeDesc *sdp;
 
-//DeadCode RJS 25Aug00 	if (mobileitem::GetSAGList())
-//DeadCode RJS 25Aug00 		tempitemptr = mobileitem::GetSAGList();
-//DeadCode RJS 25Aug00 	else
-//DeadCode RJS 25Aug00 		tempitemptr = mobileitem::GetACList();
 
 	float	rangecheck=METRES20KM*METRES20KM;
 	if (!isZoomed && Save_Data.gamedifficulty[GD_VISIBLEMIGSCHEAT])
@@ -6181,7 +4671,6 @@ void ThreeDee::GetVisibleMapObjects(bool	isZoomed)
 	{
 		if (!tempitemptr->Status.deadtime)						//RJS 14Jul00
 		{
-//DeadCode CSB 27Jul00 			if (!isZoomed || current_world->SameSector(tempitemptr,*View_Point))
 				if (Math_Lib.DistanceSquared(View_Point->World.X-tempitemptr->World.X,View_Point->World.Z-tempitemptr->World.Z)<rangecheck)
 				{
 					sdp=SHAPESTUFF.GetShapePtr(tempitemptr->shape);
@@ -6364,8 +4853,6 @@ void	ThreeDee::RenderMirror()
 	return;
 #endif
 
-//DeadCode RJS 30Aug00 	static bool hasBeenMirror = false;
-//DeadCode RJS 12Jul00 const	Angles	mirrorFoV = ANGLES_45Deg;
 
 	if ( !Save_Data.cockpit3Ddetail[COCK3D_SKYIMAGES] || !mirrorSeen )
 	{
@@ -6375,7 +4862,6 @@ void	ThreeDee::RenderMirror()
 			g_lpLib3d->BeginScene(RENDERTARGET_MIRROR);
 			g_lpLib3d->Wipe( fogCol );
 			g_lpLib3d->EndScene();
-//DeadCode JON 17Sep00 			g_lpLib3d->UploadMirror();
 			g_lpLib3d->UploadTexture();
 
 			hasBeenMirror = false;										//RJS 23Aug00
@@ -6389,49 +4875,6 @@ void	ThreeDee::RenderMirror()
 	hasBeenMirror = true;
 	includeClippedObjects = true;										//RJS 23Aug00
 
-//DeadCode JON 1Nov00 // Clever stuff...
-//DeadCode JON 1Nov00 	R3DMATRIX 	mat;
-//DeadCode JON 1Nov00 	D3DVECTOR 	view,upvec,rightvec;
-//DeadCode JON 1Nov00 	D3DVALUE 	mag;
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 //set new view matrix
-//DeadCode JON 1Nov00 //create matrix using view orientation vector v (dx,dy,dz)
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 	view.dvX=mirrorOri.X;
-//DeadCode JON 1Nov00 	view.dvY=mirrorOri.Y;
-//DeadCode JON 1Nov00 	view.dvZ=mirrorOri.Z;
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 //normalise the view vector
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 	mag=view.dvX*view.dvX+view.dvY*view.dvY+view.dvZ*view.dvZ;
-//DeadCode JON 1Nov00 	mag=fastMath.FastInvSqrt(mag);
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 	view.dvX*=mag;
-//DeadCode JON 1Nov00 	view.dvY*=mag;
-//DeadCode JON 1Nov00 	view.dvZ*=mag;
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 //dot product of up vector (0,1,0) with view vector
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 	upvec.dvX=0-view.dvY*view.dvX;
-//DeadCode JON 1Nov00 	upvec.dvY=1-view.dvY*view.dvY;
-//DeadCode JON 1Nov00 	upvec.dvZ=0-view.dvY*view.dvZ;
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 	mag=upvec.dvX*upvec.dvX+upvec.dvY*upvec.dvY+upvec.dvZ*upvec.dvZ;
-//DeadCode JON 1Nov00 	mag=fastMath.FastInvSqrt(mag);
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 	upvec.dvX*=mag;
-//DeadCode JON 1Nov00 	upvec.dvY*=mag;
-//DeadCode JON 1Nov00 	upvec.dvZ*=mag;
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 	rightvec.dvX=upvec.dvY*view.dvZ-upvec.dvZ*view.dvY;
-//DeadCode JON 1Nov00 	rightvec.dvY=upvec.dvX*view.dvZ-upvec.dvZ*view.dvX;
-//DeadCode JON 1Nov00 	rightvec.dvZ=upvec.dvX*view.dvY-upvec.dvY*view.dvX;
-//DeadCode JON 1Nov00
-//DeadCode JON 1Nov00 	mat._11=rightvec.dvX;	mat._12=upvec.dvX;	mat._13=view.dvX;
-//DeadCode JON 1Nov00 	mat._21=rightvec.dvY;	mat._22=upvec.dvY;	mat._23=view.dvY;
-//DeadCode JON 1Nov00 	mat._31=rightvec.dvZ;	mat._32=upvec.dvZ;	mat._33=view.dvZ;
-//DeadCode JON 1Nov00 	mat._14=mat._24=mat._34=mat._41=mat._42=mat._43=0;
-//DeadCode JON 1Nov00 	mat._44=1;
 
 	g_lpLib3d->SetMirrorTexture( HMATERIAL( Image_Map.GetImageMapPtr(ImageMapNumber(mirrorMaterial)) ) );
 //set up the mirror matrices
@@ -6441,9 +4884,6 @@ void	ThreeDee::RenderMirror()
  	g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
 
 	// this does stuff from the current view point...
-//DeadCode JON 1Nov00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->hdg);
-//DeadCode JON 1Nov00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_PITCH,(Angles)-(int)View_Point->pitch);
-//DeadCode JON 1Nov00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_ROLL,(Angles)-(int)View_Point->roll);
 
 
 
@@ -6485,7 +4925,6 @@ void	ThreeDee::RenderMirror()
 //render the mirror scene
 	g_lpLib3d->EndScene();
 
-//DeadCode JON 17Sep00 	g_lpLib3d->UploadMirror();
 	g_lpLib3d->UploadTexture();
 }
 
@@ -6550,7 +4989,6 @@ void ThreeDee::GetMirrorObjects()
 			if (0L==objectRec->itemFlag[i])
 			{
 // Push the range out to draw simple shapes...
-//DeadCode JON 1Nov00 				objectRec->obj3d[i].realbz.f += 4000;
 
 				somethingvisible = true;
 				if (tempitemptr)
@@ -6623,7 +5061,6 @@ inline	void	ThreeDee::SetFrameTime()
 //TEMPCODE JIM 06/06/00 		ftl=0;
 //TEMPCODE JIM 06/06/00 #endif
 
-//DeadCode RJS 20Sep00 	if(draw_time > 256)	draw_time = 256;					//256 ms
 	last_time = time_now;
 	if(!IsPaused())
 	{
@@ -6645,14 +5082,6 @@ inline	void	ThreeDee::SetFrameTime()
 			MissManCampSky().GetWind(View_Point->trackeditem->World.Y, wind_x, wind_y, wind_z);
 	}
 
-//DEADCODE CSB 08/03/00 PrintVar(65, 21, "tn %.0f ", FP(time_now));
-//DEADCODE CSB 08/03/00 PrintVar(65, 23, "dt %.0f  ", FP(view_dt));
-//DEADCODE CSB 08/03/00 static ULong longest_dt = 0;
-//DEADCODE CSB 08/03/00 if(view_dt > longest_dt)
-//DEADCODE CSB 08/03/00 {
-//DEADCODE CSB 08/03/00 longest_dt = view_dt;
-//DEADCODE CSB 08/03/00 PrintVar(60, 24, "%.0f", FP(longest_dt));
-//DEADCODE CSB 08/03/00 }
 
 	if (_DPlay.Implemented || View_Point->Accel())									//RJS 26Sep00
 	{
@@ -6685,7 +5114,6 @@ void ThreeDee::ExpandPhotoGroup(void *pvoid,ItemPtr tempitemptr, SLong grouprang
 	SByte			ydelta;
 	UByteP			adptrold;
 	COORDS3D		tmpworld;
-//DEADCODE RJS 4/7/00 	Coords3D		relworld;
 	SLong			heightfix;
 	MinAnimData*	mad;
 	SWord			realPitch,realRoll,realHdg;
@@ -6714,7 +5142,6 @@ void ThreeDee::ExpandPhotoGroup(void *pvoid,ItemPtr tempitemptr, SLong grouprang
 	Bool	notinrange;
 	SLong	shpsize;
 	Bool	isFiddled;
-//DeadCode RJS 26May00 	bool	noHeightFix = false;
 	SWord	rotateitem;
 	R3DVALUE	rng;
 	UByte		copySize = tempitemptr->Status.size;					//RJS 26May00
@@ -6729,14 +5156,10 @@ void ThreeDee::ExpandPhotoGroup(void *pvoid,ItemPtr tempitemptr, SLong grouprang
 		realPitch = hdgitem->pitch;
 		realRoll = hdgitem->roll;
 
-//DeadCode RJS 25Sep00 		velCorrectX = float(hdgitem->vel_x + wind_x)*float(fView_dt_frac);		//RJS 7Jun00
-//DeadCode RJS 25Sep00 		velCorrectY = float(hdgitem->vel_y + wind_y)*float(fView_dt_frac);		//RJS 7Jun00
-//DeadCode RJS 25Sep00 		velCorrectZ = float(hdgitem->vel_z + wind_z)*float(fView_dt_frac);		//RJS 7Jun00
 		fastMath.FloatToInt(&velCorrectX,velCorrect_x);
 		fastMath.FloatToInt(&velCorrectY,velCorrect_y);
 		fastMath.FloatToInt(&velCorrectZ,velCorrect_z);
 
-//DeadCode RJS 26May00 		noHeightFix = true;
 	}
 	else
 	{

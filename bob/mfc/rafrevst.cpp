@@ -136,7 +136,6 @@ BOOL RAFReviewStrength::OnInitDialog()
 	
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(120);	   //MIKE
 	//rlistbox->AddColumn(80);										  //RDH 02/06/99
@@ -172,35 +171,7 @@ BOOL RAFReviewStrength::OnInitDialog()
 		rlistbox->AddString(CSprintf("%i",Node_Data.RAFstrengthinfo[i].actotal),1+i);
 	}
 
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("4",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("3",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",1);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",1);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("4",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("3",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",2);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",2);
-//DEADCODE  17/02/00 
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("10",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("4",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("3",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("80",3);
-//DEADCODE  17/02/00 	rlistbox->AddString("120",3);
 
-//DEADCODE RDH 12/06/00 	 	CRStatic*   s;
-//DEADCODE RDH 12/06/00    	
-//DEADCODE RDH 12/06/00 	s=GETDLGITEM(IDC_RSTATIC_COMMENT);
-//DEADCODE RDH 12/06/00 	s->SetString("The number of Category A squadrons is very low. Any further dilution will mean that the RAF is no longer a credible fighting force");
 
 
 

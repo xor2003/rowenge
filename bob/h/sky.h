@@ -44,7 +44,6 @@ typedef class Cloud CLOUD, *PCLOUD;
 //enum	{CLEAR, RAIN, SNOW}:
 
 //#define DEFAULT_CONTRAIL_LEVEL FEET2CM(41000)	// put this in sky class
-//DeadCode RJS 09Dec99 #define MAXIMUM_CONTRAIL_DURATION 90000
 #define MAXIMUM_CONTRAIL_DURATION 1000	//10 secs...
 class AtmosphereData
 {
@@ -88,23 +87,12 @@ public:
 
 	// *************************************
 
-//DeadCode CSB 27/10/98		// New Stuff
-//DeadCode CSB 27/10/98	//Craig will change the code soon so that these will become redundant
-//DeadCode CSB 27/10/98		PCURVE pMinTemp;
-//DeadCode CSB 27/10/98		PCURVE pMaxTemp;
-//DeadCode CSB 27/10/98		PCURVE pMinPressure;
-//DeadCode CSB 27/10/98		PCURVE pMaxPressure;
-//DeadCode CSB 27/10/98
-//DeadCode CSB 27/10/98		FP TempFrac;
-//DeadCode CSB 27/10/98		FP PressureFrac;
 
 	// *************************************
 
 	// conditions
 //	FP Temp0;	// Temperature at sea level			   	(288)
-//DeadCode CSB 17/11/98		FP Temp1;	// Temperature at 36,089 feet and above	(217)
 //	FP Pres0;	// Pressure at sea level 				(101300)
-//DeadCode CSB 17/11/98		FP Pres1;
 	FP a;
 
 	// wind
@@ -120,8 +108,6 @@ public:
 
 //	Atmosphere ();
 
-//DeadCode CSB 27/10/98		void SetConditions (FP, FP, FP);
-//DeadCode CSB 27/10/98		void SetConditions (FP, FP);
 //	void Atmosphere::SetContrails (FP contraillevel);
 	void SetMissionConditions ();
 	void SetMissionTemp (SWord month);

@@ -198,12 +198,16 @@ typedef struct _DPSESSIONDESC2 {
         LPSTR  lpszPasswordA;     /* ANSI */
     };
 
-    DWORD   dwReserved1;
-    DWORD   dwReserved2;
-    DWORD   dwUser1;
-    DWORD   dwUser2;
-    DWORD   dwUser3;
-    DWORD   dwUser4;
+    /* RERUN: pointer-width reserved fields so the layout is identical to
+       RDPSD2 in dplay_net.h — CDPlayNet memcpy's sizeof(RDPSD2) (112B) in
+       Open/SetSessionDesc/GetSessionDesc, and a DWORD tail (88B here)
+       would over-read/overflow the caller's buffer. */
+    DWORD_PTR dwReserved1;
+    DWORD_PTR dwReserved2;
+    DWORD_PTR dwUser1;
+    DWORD_PTR dwUser2;
+    DWORD_PTR dwUser3;
+    DWORD_PTR dwUser4;
 } DPSESSIONDESC2, *LPDPSESSIONDESC2;
 typedef const DPSESSIONDESC2* LPCDPSESSIONDESC2;
 
@@ -234,8 +238,15 @@ typedef BOOL (WINAPI *LPDPENUMCONNECTIONSCALLBACK)(
     LPVOID lpContext
 );
 
+typedef void DPSECURITYDESC, *LPCDPSECURITYDESC;
+typedef void DPCREDENTIALS,  *LPCDPCREDENTIALS;
+typedef void DPCHAT,         *LPDPCHAT;
+
 typedef unsigned int DPID;   // DWORD-width player id
 typedef DPID* LPDPID;
+
+typedef BOOL (WINAPI *LPDPENUMPLAYERSCALLBACK2)(
+    DPID, DPID, DWORD, LPCDPNAME, DWORD, LPVOID);
 
 HRESULT GetConnectionSettings(
     DWORD   dwAppID,
@@ -252,79 +263,74 @@ HRESULT SetConnectionSettings(
 
 
 /* ------------------------------------------------------------------
-   Minimal but complete IDirectPlay4 stub
+   IDirectPlay4 virtual interface — vtable slots MUST match the real
+   DPLAY.H order (IUnknown + IDirectPlay2 + IDirectPlay3 + IDirectPlay4,
+   alphabetical within each interface) because the concrete object is
+   CDPlayNet (migalley/MFC/dplay_net.h), built to that layout.
+   Previously this was a struct of non-virtual inline stubs, so every
+   lpDP4->X() call was statically bound and returned DPERR_UNSUPPORTED —
+   multiplayer was dead code. RERUN 2026-10.
    ------------------------------------------------------------------ */
+struct _DPLCONNECTION;
+typedef _DPLCONNECTION* LPDPLCONNECTION;
 struct IDirectPlay4 {
-    // IUnknown
-    HRESULT QueryInterface(REFIID, void**) { return DPERR_UNSUPPORTED; }
-    ULONG   AddRef() { return 1; }
-    ULONG   Release() { return 1; }
-
-    // Connection/session management
-    HRESULT InitializeConnection(LPVOID, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT Open(LPCDPSESSIONDESC2, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT Close() { return DPERR_UNSUPPORTED; }
-
-    // Enumeration
-    HRESULT EnumSessions(LPCDPSESSIONDESC2, DWORD,
-                         LPDPENUMSESSIONSCALLBACK2, LPVOID, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT EnumConnections(LPCGUID, LPDPENUMCONNECTIONSCALLBACK, LPVOID, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT EnumPlayers(LPGUID, LPVOID, LPVOID, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT EnumGroups(LPGUID, LPVOID, LPVOID, DWORD) { return DPERR_UNSUPPORTED; }
-
-    // Player management
-    HRESULT CreatePlayer(LPDPID lpidPlayer,
-                         LPDPNAME lpName,
-                         HANDLE hEvent,
-                         LPVOID lpData,
-                         DWORD dwDataSize,
-                         DWORD dwFlags) {
-        if (lpidPlayer) *lpidPlayer = 1; // dummy ID
-        return DPERR_UNSUPPORTED;
-    }
-    HRESULT DestroyPlayer(DPID) { return DPERR_UNSUPPORTED; }
-    HRESULT GetPlayerName(DPID, LPVOID, LPDWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT GetPlayerCaps(DPID, LPDPCAPS, DWORD) { return DPERR_UNSUPPORTED; }
-
-    // Group management
-    HRESULT CreateGroup(LPDPID lpidGroup,
-                        LPDPNAME lpName,
-                        LPVOID lpData,
-                        DWORD dwDataSize,
-                        DWORD dwFlags) {
-        if (lpidGroup) *lpidGroup = 2; // dummy group ID
-        return DPERR_UNSUPPORTED;
-    }
-    HRESULT DestroyGroup(DPID) { return DPERR_UNSUPPORTED; }
-    HRESULT AddPlayerToGroup(DPID, DPID) { return DPERR_UNSUPPORTED; }
-    HRESULT RemovePlayerFromGroup(DPID, DPID) { return DPERR_UNSUPPORTED; }
-    // Legacy alias
-    HRESULT DeletePlayerFromGroup(DPID dpIdGroup, DPID dpIdPlayer) {
-        return RemovePlayerFromGroup(dpIdGroup, dpIdPlayer);
-    }
-    HRESULT GetGroupName(DPID, LPVOID, LPDWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT GetGroupData(DPID, LPVOID, LPDWORD, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT SetGroupData(DPID, LPVOID, DWORD, DWORD) { return DPERR_UNSUPPORTED; }
-
-    // Messaging
-    HRESULT Send(DPID, DPID, DWORD, LPVOID, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT Receive(LPDPID, LPDPID, DWORD, LPVOID, LPDWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT SendEx(DPID, DPID, DWORD,
-                   LPVOID, DWORD,
-                   DWORD, DWORD,
-                   LPVOID, LPDWORD) { return DPERR_UNSUPPORTED; }
-
-    // Session info
-    HRESULT GetSessionDesc(LPVOID, LPDWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT SetSessionDesc(LPCDPSESSIONDESC2, DWORD) { return DPERR_UNSUPPORTED; }
-
-    // Capabilities
-    HRESULT GetCaps(LPDPCAPS, DWORD) { return DPERR_UNSUPPORTED; }
-
-    // Misc
-    HRESULT CancelMessage(DWORD, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT CancelPriority(DWORD, DWORD) { return DPERR_UNSUPPORTED; }
-    HRESULT GetMessageQueue(DPID, DPID, DWORD, LPDWORD, LPDWORD) { return DPERR_UNSUPPORTED; }
+    /* IUnknown */
+    virtual HRESULT QueryInterface(REFIID, LPVOID*) = 0;
+    virtual ULONG   AddRef() = 0;
+    virtual ULONG   Release() = 0;
+    /* IDirectPlay2 (real DPLAY.H declaration order) */
+    virtual HRESULT AddPlayerToGroup(DPID, DPID) = 0;
+    virtual HRESULT Close() = 0;
+    virtual HRESULT CreateGroup(LPDPID, LPDPNAME, LPVOID, DWORD, DWORD) = 0;
+    virtual HRESULT CreatePlayer(LPDPID, LPDPNAME, HANDLE, LPVOID, DWORD, DWORD) = 0;
+    virtual HRESULT DeletePlayerFromGroup(DPID, DPID) = 0;
+    virtual HRESULT DestroyGroup(DPID) = 0;
+    virtual HRESULT DestroyPlayer(DPID) = 0;
+    virtual HRESULT EnumGroupPlayers(DPID, LPGUID, LPDPENUMPLAYERSCALLBACK2, LPVOID, DWORD) = 0;
+    virtual HRESULT EnumGroups(LPGUID, LPDPENUMPLAYERSCALLBACK2, LPVOID, DWORD) = 0;
+    virtual HRESULT EnumPlayers(LPGUID, LPDPENUMPLAYERSCALLBACK2, LPVOID, DWORD) = 0;
+    virtual HRESULT EnumSessions(LPDPSESSIONDESC2, DWORD, LPDPENUMSESSIONSCALLBACK2, LPVOID, DWORD) = 0;
+    virtual HRESULT GetCaps(LPDPCAPS, DWORD) = 0;
+    virtual HRESULT GetGroupData(DPID, LPVOID, LPDWORD, DWORD) = 0;
+    virtual HRESULT GetGroupName(DPID, LPVOID, LPDWORD) = 0;
+    virtual HRESULT GetMessageCount(DPID, LPDWORD) = 0;
+    virtual HRESULT GetPlayerAddress(DPID, LPVOID, LPDWORD) = 0;
+    virtual HRESULT GetPlayerCaps(DPID, LPDPCAPS, DWORD) = 0;
+    virtual HRESULT GetPlayerData(DPID, LPVOID, LPDWORD, DWORD) = 0;
+    virtual HRESULT GetPlayerName(DPID, LPVOID, LPDWORD) = 0;
+    virtual HRESULT GetSessionDesc(LPVOID, LPDWORD) = 0;
+    virtual HRESULT Initialize(LPGUID) = 0;
+    virtual HRESULT Open(LPDPSESSIONDESC2, DWORD) = 0;
+    virtual HRESULT Receive(LPDPID, LPDPID, DWORD, LPVOID, LPDWORD) = 0;
+    virtual HRESULT Send(DPID, DPID, DWORD, LPVOID, DWORD) = 0;
+    virtual HRESULT SetGroupData(DPID, LPVOID, DWORD, DWORD) = 0;
+    virtual HRESULT SetGroupName(DPID, LPDPNAME, DWORD) = 0;
+    virtual HRESULT SetPlayerData(DPID, LPVOID, DWORD, DWORD) = 0;
+    virtual HRESULT SetPlayerName(DPID, LPDPNAME, DWORD) = 0;
+    virtual HRESULT SetSessionDesc(LPCDPSESSIONDESC2, DWORD) = 0;
+    /* IDirectPlay3 */
+    virtual HRESULT AddGroupToGroup(DPID, DPID) = 0;
+    virtual HRESULT CreateGroupInGroup(DPID, LPDPID, LPDPNAME, LPVOID, DWORD, DWORD) = 0;
+    virtual HRESULT DeleteGroupFromGroup(DPID, DPID) = 0;
+    virtual HRESULT EnumConnections(LPCGUID, LPDPENUMCONNECTIONSCALLBACK, LPVOID, DWORD) = 0;
+    virtual HRESULT EnumGroupsInGroup(DPID, LPGUID, LPDPENUMPLAYERSCALLBACK2, LPVOID, DWORD) = 0;
+    virtual HRESULT GetGroupConnectionSettings(DWORD, DPID, LPVOID, LPDWORD) = 0;
+    virtual HRESULT InitializeConnection(LPVOID, DWORD) = 0;
+    virtual HRESULT SecureOpen(LPCDPSESSIONDESC2, DWORD, LPCDPSECURITYDESC, LPCDPCREDENTIALS) = 0;
+    virtual HRESULT SendChatMessage(DPID, DPID, DWORD, LPDPCHAT) = 0;
+    virtual HRESULT SetGroupConnectionSettings(DWORD, DPID, LPDPLCONNECTION) = 0;
+    virtual HRESULT StartSession(DWORD, DPID) = 0;
+    virtual HRESULT GetGroupFlags(DPID, LPDWORD) = 0;
+    virtual HRESULT GetGroupParent(DPID, LPDPID) = 0;
+    virtual HRESULT GetPlayerAccount(DPID, DWORD, LPVOID, LPDWORD) = 0;
+    virtual HRESULT GetPlayerFlags(DPID, LPDWORD) = 0;
+    /* IDirectPlay4 */
+    virtual HRESULT GetGroupOwner(DPID, LPDPID) = 0;
+    virtual HRESULT SetGroupOwner(DPID, DPID) = 0;
+    virtual HRESULT SendEx(DPID, DPID, DWORD, LPVOID, DWORD, DWORD, DWORD, LPVOID, DWORD_PTR*) = 0;
+    virtual HRESULT GetMessageQueue(DPID, DPID, DWORD, LPDWORD, LPDWORD) = 0;
+    virtual HRESULT CancelMessage(DWORD, DWORD) = 0;
+    virtual HRESULT CancelPriority(DWORD, DWORD, DWORD) = 0;
 };
 
 //typedef IDirectPlay4* LPDIRECTPLAY4A;

@@ -77,8 +77,6 @@ questions about this file may be asked at http://www.simhq.com/
 #include <vector>
 #include <string>
 #include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 #include	"DOSDEFS.H"
 #include	"DISPLAY.H"
@@ -89,20 +87,22 @@ questions about this file may be asked at http://www.simhq.com/
 #include	"MILES.H"
 #include	"WINMOVE.H"
 #include    "MFC_stub.h"
+#include    "smacker.h"	// vendored libsmacker (engine/smacker)
 
-// Globals for ffmpeg playback
-static FILE* ffmpeg_pipe = nullptr;
-static FILE* ffmpeg_audio_pipe = nullptr;
+// libsmacker playback state
+static smk smk_video = nullptr;
+static int smk_audio_track = -1;         // enabled track, -1 = none
 static SDL_AudioDeviceID audio_dev = 0;
 static Smack* smk_info = nullptr;
-static std::vector<unsigned char> frame_buffer;
+static std::vector<unsigned char> frame_buffer;	// RGB24, palette-expanded
 static int frame_width = 0;
-static int frame_height = 0;
+static int frame_height = 0;             // decoded rows
+static int frame_draw_height = 0;        // rows after SMK y-scale
 static int frame_size = 0;
 static Uint32 last_frame_time = 0;
 
 SmackBuf* sbuf = nullptr;
-Smack* smk=nullptr;
+Smack* smk_play=nullptr;
 int			Xoff=0;
 int			Yoff=0;
 static int Woff=0;
@@ -110,7 +110,7 @@ static int Hoff=0;
 int			wait=0;
 
 /*
-	UWord	DoSmack(int h)
+	UWord	DoSmack(intptr_t h)
 	Returns Number of frames left [0 if finished]
 	Inputs	MigWindow Handle
 
@@ -119,11 +119,11 @@ int			wait=0;
 extern	int	introsmk;
 
 // Any-key video interrupt: arms the one-shot skip flag that DoSmack()
-// consumes on its next call. Gated on smk so a keypress with no video
+// consumes on its next call. Gated on smk_play so a keypress with no video
 // playing can't leave a stale skip armed for the next OpenSmack().
 void	InterruptSmack()
 {
-	if (smk)
+	if (smk_play)
 		introsmk = 1;
 }
 
@@ -133,14 +133,11 @@ extern DPlay _DPlay;
 
 void	CloseSmack()
 {
-	if (ffmpeg_pipe) {
-		pclose(ffmpeg_pipe);
-		ffmpeg_pipe = nullptr;
+	if (smk_video) {
+		smk_close(smk_video);
+		smk_video = nullptr;
 	}
-	if (ffmpeg_audio_pipe) {
-		pclose(ffmpeg_audio_pipe);
-		ffmpeg_audio_pipe = nullptr;
-	}
+	smk_audio_track = -1;
 	if (audio_dev) {
 		SDL_CloseAudioDevice(audio_dev);
 		audio_dev = 0;
@@ -149,13 +146,13 @@ void	CloseSmack()
 		delete smk_info;
 		smk_info = nullptr;
 	}
-	smk = nullptr;
+	smk_play = nullptr;
 	sbuf = nullptr;
 	frame_buffer.clear();
 	//std::cout << "CloseSmack called" << std::endl;
 }
 
-Smack* OpenSmack(FileNum filenumber,int win, int x, int y,int w, int h)
+Smack* OpenSmack(FileNum filenumber,intptr_t win, int x, int y,int w, int h)
 {
 	char	filepath[256];
 
@@ -171,97 +168,85 @@ Smack* OpenSmack(FileNum filenumber,int win, int x, int y,int w, int h)
 
 	FILEMAN.namenumberedfile(filenumber, filepath);
 
-	// Use ffprobe to get video info
-	char command[512];
-	snprintf(command, sizeof(command), "ffprobe -v error -select_streams v:0 -show_entries stream=width,height,nb_frames,avg_frame_rate -of default=noprint_wrappers=1:nokey=1 \"%s\"", filepath);
-
-	FILE* ffprobe_pipe = popen(command, "r");
-	if (!ffprobe_pipe) {
-		std::cerr << "Failed to run ffprobe on " << filepath << std::endl;
+	smk_video = smk_open_file(filepath, SMK_MODE_DISK);
+	if (!smk_video) {
+		std::cerr << "OpenSmack: libsmacker failed on " << filepath << std::endl;
 		return nullptr;
 	}
 
-	int width = 0, height = 0, frames = 0;
-	int fr_num = 0, fr_den = 1;
-	char frames_str[32], fr_str[32];
+	unsigned long fcount = 0;
+	double usf = 0;
+	smk_info_all(smk_video, nullptr, &fcount, &usf);
 
-	if (fscanf(ffprobe_pipe, "%d", &width) != 1) { width = 0; }
-	if (fscanf(ffprobe_pipe, "%d", &height) != 1) { height = 0; }
-	if (fscanf(ffprobe_pipe, "%s", frames_str) == 1) {
-		if (strcmp(frames_str, "N/A") != 0) {
-			sscanf(frames_str, "%d", &frames);
-		}
-	}
-	if (fscanf(ffprobe_pipe, "%s", fr_str) == 1) {
-		sscanf(fr_str, "%d/%d", &fr_num, &fr_den);
-	}
-	pclose(ffprobe_pipe);
-
-	if (width == 0 || height == 0) {
-		std::cerr << "Failed to get video dimensions from ffprobe for " << filepath << std::endl;
+	unsigned long width = 0, height = 0;
+	unsigned char ymode = SMK_FLAG_Y_NONE;
+	smk_info_video(smk_video, &width, &height, &ymode);
+	if (!width || !height) {
+		std::cerr << "OpenSmack: no video track in " << filepath << std::endl;
+		smk_close(smk_video);
+		smk_video = nullptr;
 		return nullptr;
 	}
 
-	// Store info in a new Smack struct
 	smk_info = new Smack;
 	memset(smk_info, 0, sizeof(Smack));
 	smk_info->Width = width;
 	smk_info->Height = height;
-	smk_info->Frames = frames;
-	if (fr_num > 0 && fr_den > 0) {
-		smk_info->MSPerFrame = (1000 * fr_den) / fr_num;
-	} else {
-		smk_info->MSPerFrame = 1000 / 15; // Default to 15 fps
-	}
+	smk_info->Frames = fcount;
+	smk_info->MSPerFrame = usf > 0 ? (unsigned long)(usf / 1000.0) : 1000 / 15;
+	if (!smk_info->MSPerFrame) smk_info->MSPerFrame = 1;
 	smk_info->FrameNum = 0;
 
-	// Prepare ffmpeg command to decode to raw RGB
-	snprintf(command, sizeof(command), "ffmpeg -loglevel quiet -i \"%s\" -f image2pipe -vcodec rawvideo -pix_fmt rgb24 -", filepath);
+	smk_enable_video(smk_video, 1);
 
-	ffmpeg_pipe = popen(command, "r");
-	if (!ffmpeg_pipe) {
-		std::cerr << "Failed to run ffmpeg for " << filepath << std::endl;
-		delete smk_info;
-		smk_info = nullptr;
+	// Enable the first audio track and open SDL audio at its native spec —
+	// libsmacker returns one decoded chunk per frame, so queueing the
+	// chunk as each frame is presented keeps A/V in sync.
+	unsigned char trackmask = 0, schans[7] = {}, sdepth[7] = {};
+	unsigned long srate[7] = {};
+	smk_info_audio(smk_video, &trackmask, schans, sdepth, srate);
+	for (int t = 0; t < 7; ++t) {
+		if (!(trackmask & (1 << t))) continue;
+		smk_enable_audio(smk_video, t, 1);
+		SDL_AudioSpec want, have;
+		SDL_zero(want);
+		want.freq = srate[t];
+		want.format = sdepth[t] == 16 ? AUDIO_S16SYS : AUDIO_U8;
+		want.channels = schans[t];
+		want.samples = 4096;
+		audio_dev = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+		if (audio_dev) {
+			SDL_PauseAudioDevice(audio_dev, 0);
+			smk_audio_track = t;
+		}
+		break;
+	}
+
+	// Set up frame buffer (palette indices -> RGB24 at blit time)
+	frame_width = (int)width;
+	frame_height = (int)height;
+	frame_draw_height = frame_height *
+		(ymode == SMK_FLAG_Y_DOUBLE ? 2 : 1);   // interlaced SMKs draw 2x rows
+	frame_size = frame_width * frame_height * 3;
+	frame_buffer.resize(frame_size);
+
+	smk_play = smk_info;
+	if (smk_first(smk_video) == SMK_ERROR) {   // decodes frame 0 + audio
+		CloseSmack();
 		return nullptr;
 	}
 
-	// Open audio device
-	SDL_AudioSpec want, have;
-	SDL_zero(want);
-	want.freq = 44100;
-	want.format = AUDIO_S16LSB;
-	want.channels = 2;
-	want.samples = 4096;
-	audio_dev = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
-	if (audio_dev) {
-		SDL_PauseAudioDevice(audio_dev, 0);
-		snprintf(command, sizeof(command), "ffmpeg -i \"%s\" -f s16le -ac 2 -ar 44100 -vn -loglevel quiet -", filepath);
-		ffmpeg_audio_pipe = popen(command, "r");
-		if (ffmpeg_audio_pipe) {
-			int fd = fileno(ffmpeg_audio_pipe);
-			int flags = fcntl(fd, F_GETFL, 0);
-			fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-		}
-	}
+	std::cout << "OpenSmack: " << filepath << " (" << width << "x" << height
+	          << " @ " << (1000.0f/smk_info->MSPerFrame) << "fps)" << std::endl;
 
-	// Set up frame buffer
-	frame_width = width;
-	frame_height = height;
-	frame_size = width * height * 3;
-	frame_buffer.resize(frame_size);
-
-	smk = smk_info;
-
-	std::cout << "OpenSmack: " << filepath << " (" << width << "x" << height << " @ " << (1000.0f/smk_info->MSPerFrame) << "fps)" << std::endl;
-
-	return smk;
+	return smk_play;
 }
 
-UWord	DoSmack(int h)
+UWord	DoSmack(intptr_t h)
 {
 	if (introsmk != 0) {
 		introsmk = 0;
+		fprintf(stderr, "[winsmack] bail: introsmk skip\n");
 		return 0;
 	}
 
@@ -270,19 +255,20 @@ UWord	DoSmack(int h)
 		return 1;
 #endif
 
-	if (!ffmpeg_pipe || !smk) {
+	if (!smk_video || !smk_play) {
+		fprintf(stderr, "[winsmack] bail: no video/play state\n");
 		return 0;
 	}
 
-	// Handle audio
-	if (ffmpeg_audio_pipe && audio_dev) {
+	// Queue the current frame's decoded audio chunk (one chunk per frame,
+	// so this stays in step with the video pacing below).
+	if (audio_dev && smk_audio_track >= 0) {
 		Uint32 queued = SDL_GetQueuedAudioSize(audio_dev);
 		if (queued < 88200) { // Keep ~0.5s buffered
-			unsigned char audio_buf[8192];
-			ssize_t bytes = read(fileno(ffmpeg_audio_pipe), audio_buf, sizeof(audio_buf));
-			if (bytes > 0) {
-				SDL_QueueAudio(audio_dev, audio_buf, bytes);
-			}
+			unsigned long abytes = smk_get_audio_size(smk_video, smk_audio_track);
+			const unsigned char* abuf = smk_get_audio(smk_video, smk_audio_track);
+			if (abuf && abytes)
+				SDL_QueueAudio(audio_dev, abuf, abytes);
 		}
 	}
 
@@ -290,25 +276,33 @@ UWord	DoSmack(int h)
 	if (last_frame_time == 0) {
 		last_frame_time = current_time;
 	}
-	
-	if (current_time < last_frame_time + smk->MSPerFrame) {
-		if (smk->Frames > 0) return smk->Frames - smk->FrameNum;
+
+	if (current_time < last_frame_time + smk_play->MSPerFrame) {
+		if (smk_play->Frames > 0) return smk_play->Frames - smk_play->FrameNum;
 		return 1;
 	}
 	last_frame_time = current_time;
 
-	size_t bytes_read = fread(frame_buffer.data(), 1, frame_size, ffmpeg_pipe);
-
-	if (bytes_read < frame_size) {
-		CloseSmack();
-		return 0;
+	// Palette-expand the current frame into RGB24 for the blit below.
+	{
+		const unsigned char* vpx = smk_get_video(smk_video);
+		const unsigned char* pal = smk_get_palette(smk_video);
+		if (!vpx || !pal) { fprintf(stderr, "[winsmack] bail: null frame/palette\n"); CloseSmack(); return 0; }
+		unsigned char* out = frame_buffer.data();
+		for (int i = 0, n = frame_width * frame_height; i < n; ++i) {
+			const unsigned char* c = pal + 3 * vpx[i];
+			out[3*i]   = c[0];
+			out[3*i+1] = c[1];
+			out[3*i+2] = c[2];
+		}
 	}
 
-	smk->FrameNum++;
+	smk_play->FrameNum++;
 
 	HWND hWnd = (HWND)h;
 	CWnd* pWnd = CWnd::FromHandle(hWnd);
 	if (!pWnd) {
+		fprintf(stderr, "[winsmack] bail: FromHandle null\n");
 		CloseSmack();
 		return 0;
 	}
@@ -316,7 +310,7 @@ UWord	DoSmack(int h)
 	CDC* pDC = pWnd->GetDC();
 	if (!pDC || !pDC->m_renderer) {
 		if (pDC) pWnd->ReleaseDC(pDC);
-		if (smk->Frames > 0) return smk->Frames - smk->FrameNum;
+		if (smk_play->Frames > 0) return smk_play->Frames - smk_play->FrameNum;
 		return 1;
 	}
 	SDL_Renderer* renderer = pDC->m_renderer;
@@ -335,24 +329,25 @@ UWord	DoSmack(int h)
 			if (winW <= 0 || winH <= 0)
 				SDL_GetRendererOutputSize(renderer, &winW, &winH);
 
-			// To play at original size, use frame_width and frame_height.
+			// To play at original size, use frame_width and frame_draw_height
+			// (decode height times the SMK y-scale factor).
 			// Use Xoff/Yoff for position (or center if -1).
 			int dstX = Xoff;
 			int dstY = Yoff;
 			int dstW = frame_width;
-			int dstH = frame_height;
+			int dstH = frame_draw_height;
 
 			if (Woff == -1)
 			{
 				dstW = winW;
-				dstH = (frame_height * winW) / frame_width;
+				dstH = (frame_draw_height * winW) / frame_width;
 				dstX = 0;
 				dstY = (winH - dstH) / 2;
 			}
 			else
 			{
 				if (dstX == -1) dstX = (winW - frame_width) / 2;
-				if (dstY == -1) dstY = (winH - frame_height) / 2;
+				if (dstY == -1) dstY = (winH - frame_draw_height) / 2;
 			}
 
 			SDL_Rect dstRect = { dstX, dstY, dstW, dstH };
@@ -369,11 +364,14 @@ UWord	DoSmack(int h)
 	
 	pWnd->ReleaseDC(pDC);
 
-	if (smk->Frames > 0 && smk->FrameNum >= smk->Frames) {
+	if (smk_play->Frames > 0 && smk_play->FrameNum >= smk_play->Frames) {
+		fprintf(stderr, "[winsmack] bail: frames done %u/%u\n",
+		        (unsigned)smk_play->FrameNum, (unsigned)smk_play->Frames);
 		CloseSmack();
 		return 0;
 	}
+	smk_next(smk_video);          // decode the next frame for next call
 
-	if (smk->Frames > 0) return smk->Frames - smk->FrameNum;
+	if (smk_play->Frames > 0) return smk_play->Frames - smk_play->FrameNum;
 	return 1;
 }

@@ -183,8 +183,6 @@ BEGIN_EVENTSINK_MAP(ChooseSquad, CDialog)
 	ON_EVENT(ChooseSquad, IDC_RLISTBOXCTRL1, 1 /* Select */, OnSelectRlistboxctrl1, VTS_I4 VTS_I4)
 	ON_EVENT(ChooseSquad, IDC_DELETE, 1 /* Clicked */, OnClickedDelete, VTS_NONE)
 	ON_EVENT(ChooseSquad, IDC_FLIGHTS, 1 /* TextChanged */, OnTextChangedFlights, VTS_BSTR)
-//DEADCODE DAW 29/03/99 	ON_EVENT(ChooseSquad, IDJ_TITLE, 3 /* OK */, OnOKTitle, VTS_NONE)
-//DEADCODE DAW 29/03/99 	ON_EVENT(ChooseSquad, IDJ_TITLE, 2 /* Cancel */, OnCancelTitle, VTS_NONE)
 	ON_EVENT(ChooseSquad, IDC_RSPINBUTCTRL1, 1 /* TextChanged */, OnTextChangedRspinbutctrl1, VTS_BSTR)
 	//}}AFX_EVENTSINK_MAP
 END_EVENTSINK_MAP()
@@ -208,9 +206,7 @@ void ChooseSquad::OnSelectRlistboxctrl1(long row, long column)
 			&&	(i >= 0)
 		)
 	{
-//DEADCODE RDH 17/06/99 		if (row)
 		{
-//DEADCODE RDH 17/06/99 			row--;
 
 			int numavail=Todays_Packages.SquadACAvail(i)
 						-Todays_Packages.SquadACUsed(i);
@@ -287,8 +283,6 @@ BOOL ChooseSquad::OnInitDialog()
 		rlistbox->AddString(GetTargName(SupplyTree::airfieldinfo[MMC.squad[i].airfieldindex].airfield),2);
 		rlistbox->AddString(CSprintf("%i",FlightAvail(i)),3);
 	}
-//DEADCODE RDH 27/05/99 	if (Miss_Man.currcampaignnum==MissMan::SO51_CAMPAIGN)					  //JIM 01/04/99
-//DEADCODE RDH 27/05/99 	{																  //JIM 01/04/99
 		if (MMC.directives.B29avail)
 			i = SQ_B29;
 		else
@@ -304,7 +298,6 @@ BOOL ChooseSquad::OnInitDialog()
 			currrow = PILOTABLE_SQUADRONS+1;
 		else
 			currrow = Todays_Packages[packnum][wavenum][groupnum].squadron+1;
-//DEADCODE RDH 27/05/99 	}																  //JIM 01/04/99
 	rlistbox->SetHilightRow(currrow);
 	FillCombo();
 	
@@ -322,7 +315,6 @@ void ChooseSquad::OnOK()
 				Todays_Packages[packnum].ClearGroup(wavenum,groupnum);
 //			else
 //				Todays_Packages[packnum][wavenum][groupnum].SetFlights(ag->inform/4);
-//DeadCode DAW 12Nov98 				Todays_Packages[packnum][wavenum][groupnum].numflights = ag->inform/4;
 	}
 	Todays_Packages[packnum].RecalcRoutePositions();
 	RefreshParent();
@@ -333,7 +325,6 @@ void ChooseSquad::OnOK()
 
 void ChooseSquad::OnCancel() 
 {
-//DeadCode DAW 12Nov98 	Todays_Packages[packnum][wavenum][groupnum].squadron = initialsquad;
 	Todays_Packages[packnum][wavenum][groupnum].SetSquad(initialsquad);
 	info_airgrp* ag=*Persons2::ConvertPtrUID(Todays_Packages[packnum][wavenum][groupnum].uid);
 	if (ag!=NULL)

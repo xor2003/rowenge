@@ -287,8 +287,6 @@ KeyMap3d*
 		breakif(!i || mapreq->bitflag==0);
 	}
 	((KeyMap3d*) reftable3d.flat)->active=TRUE;
-//DeadCode JIM 2Nov00 	ModeIs3D=TRUE;
-//DeadCode JIM 2Nov00 	MouseMode=PANNING;
 
 }
 void keytests::Reg3dConv(FileNum f)
@@ -441,15 +439,6 @@ void	keytests::InsertUIKey(UIKeyNoMouse& keyfake)
 //Returns		false=0/true
 //
 //------------------------------------------------------------------------------
-//DeadCode ARM 04Jun96 extern	Bool	BITRESET(void*,ULong);
-//DeadCode ARM 04Jun96 #pragma	aux		BITRESET		=		\
-//DeadCode ARM 04Jun96 		"btr	ds:[esi],ecx"	\
-//DeadCode ARM 04Jun96 		"sbb	al,al"		\
-//DeadCode ARM 04Jun96 		"neg	al"			\
-//DeadCode ARM 04Jun96 		parm	[esi] [ecx]	\
-//DeadCode ARM 04Jun96 		value	[al]			\
-
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BTS
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -463,15 +452,6 @@ void	keytests::InsertUIKey(UIKeyNoMouse& keyfake)
 //Returns		false=0/true
 //
 //------------------------------------------------------------------------------
-//DeadCode ARM 04Jun96 extern	Bool	BITSET(void*,ULong);
-//DeadCode ARM 04Jun96 #pragma	aux		BITSET		=		\
-//DeadCode ARM 04Jun96 		"bts	ds:[esi],ecx"	\
-//DeadCode ARM 04Jun96 		"sbb	al,al"		\
-//DeadCode ARM 04Jun96 		"neg	al"			\
-//DeadCode ARM 04Jun96 		parm	[esi] [ecx]	\
-//DeadCode ARM 04Jun96 		value	[al]			\
-
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BTS
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -484,15 +464,6 @@ void	keytests::InsertUIKey(UIKeyNoMouse& keyfake)
 //Returns		false=0/true
 //
 //------------------------------------------------------------------------------
-//DeadCode ARM 04Jun96 extern	Bool	BITTEST(void*,ULong);
-//DeadCode ARM 04Jun96 #pragma	aux		BITTEST		=		\
-//DeadCode ARM 04Jun96 		"bt		ds:[esi],ecx"	\
-//DeadCode ARM 04Jun96 		"sbb	al,al"		\
-//DeadCode ARM 04Jun96 		"neg	al"			\
-//DeadCode ARM 04Jun96 		parm	[esi] [ecx]	\
-//DeadCode ARM 04Jun96 		value	[al]			\
-
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		BTC
 //Author		Jim Taylor
 //Date			Fri 3 Nov 1995
@@ -506,14 +477,6 @@ void	keytests::InsertUIKey(UIKeyNoMouse& keyfake)
 //Returns		false=0/true - old value
 //
 //------------------------------------------------------------------------------
-//DeadCode ARM 04Jun96 extern	Bool	BITCOMP(void*,ULong);
-//DeadCode ARM 04Jun96 #pragma	aux		BITCOMP		=		\
-//DeadCode ARM 04Jun96 		"btc	ds:[esi],ecx"	\
-//DeadCode ARM 04Jun96 		"sbb	al,al"		\
-//DeadCode ARM 04Jun96 		"neg	al"			\
-//DeadCode ARM 04Jun96 		parm	[esi] [ecx]	\
-//DeadCode ARM 04Jun96 		value	[al]			\
-//DeadCode ARM 04Jun96 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		KeyHeld3d
 //Author		Jim Taylor
@@ -593,10 +556,3 @@ void	keytests::SetMouseShiftMode(DeviceMode mode)
 		mshift=false;
 }
 
-//DeadCode JIM 31Aug00 void	keytests::SetJoystickShiftMode(DeviceMode mode)
-//DeadCode JIM 31Aug00 {
-//DeadCode JIM 31Aug00 	if (mode==SHIFTED)
-//DeadCode JIM 31Aug00 		jshift=true;
-//DeadCode JIM 31Aug00 	else
-//DeadCode JIM 31Aug00 		jshift=false;
-//DeadCode JIM 31Aug00 }

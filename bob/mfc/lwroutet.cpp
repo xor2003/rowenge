@@ -92,11 +92,6 @@ RDialog*	LWRouteTop::Make()
 			MakeTopDialog(::Place(POSN_CENTRE,POSN_MIN),
 					DialList(DialBox(FIL_NULL,new LWRouteTop(),Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE)),
 						HTabBox(FIL_NULL,IdList(tabtitle[0],tabtitle[1],tabtitle[2],tabtitle[3],tabtitle[4]),Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX,EDGE::ALIGN_MAX), 
-//DEADCODE  23/02/00 							DialBox(FIL_D_ROUTE,new LWRouteAirfield()),
-//DEADCODE  23/02/00 							DialBox(FIL_D_ROUTE,new LWRouteMain()),
-//DEADCODE  23/02/00 							DialBox(FIL_D_ROUTE,new LWRouteAirfield()),
-//DEADCODE  23/02/00 							DialBox(FIL_D_ROUTE,new LWRouteAirfield()),
-//DEADCODE  23/02/00 							DialBox(FIL_D_ROUTE,new LWRouteAirfield())
 							DialBox(FIL_D_ROUTE,new LWRouteMain(0)),
 							DialBox(FIL_D_ROUTE,new LWRouteMain(1)),
 							DialBox(FIL_D_ROUTE,new LWRouteMain(2)),
@@ -105,10 +100,6 @@ RDialog*	LWRouteTop::Make()
 
 										)	)	);
 
-//DEADCODE RDH 18/11/99 	return
-//DEADCODE RDH 18/11/99 		MakeTopDialog(::Place(POSN_CENTRE,POSN_CENTRE),
-//DEADCODE RDH 18/11/99 			DialBox(FIL_D_INTERCEPTOFFERED,new LWRouteTop())
-//DEADCODE RDH 18/11/99 			);
 }
 
 LWRouteTop::LWRouteTop(CWnd* pParent /*=NULL*/)

@@ -60,8 +60,6 @@ struct DrawDataHdr
 {
 	UWord	noOfPolys;
 	UWord	noOfLines;
-//DeadCode JON 24Oct00 	UWord	noOfTrees;
-//DeadCode JON 24Oct00 	UWord	treeOffset;
 	UWord	noOfSheep;
 	UWord	sheepOffset;
 	UWord	lineOffset;
@@ -92,9 +90,7 @@ struct AltPointsHdr
 	ULong	checksum;
 	int	Checksum()
 	{
-//DeadCode JIM 15Aug00 Rewrote this checksum to get a more 'interesting' number
 #define SH	<<
-//DeadCode MS 15Aug00 define the fillowing for a less unique number the way it used to be
 //#define	SH +0*
 		return (	(vertexCount SH 4)+
 					(topEdgePoints SH 10)+
@@ -141,7 +137,6 @@ struct DataRecord{
 	ULong dataLen;
 	ULong x,z;
 	void setInvalid() { pData=&invalidHdr;/*dataLen = 0xFFFFFFFF;*/ }
-//DeadCode JON 9Oct00 	bool isValid() { return (dataLen != 0xFFFFFFFF); }
 };
 
 #ifdef	IN_MIGLAND_CPP
@@ -286,15 +281,12 @@ template<class Object> Object* CBlockAllocator<Object>::Alloc()
 //------------------------------------------------------------------------------
 template<class Object> void CBlockAllocator<Object>::Free(Object* pObj)
 {
-	#ifndef NOASSERTS
-	assert(pObj>=pObjList&&" I didn't allocate this (lo)");
-	assert(pObj<pObjList+sizeObjList&&" I didn't allocate this (hi)");
-	#endif
+	if (pObj<pObjList || pObj>=pObjList+sizeObjList)				//RERUN: foreign block after allocator swap
+		return;
 	ULong index=ULong(pObj-pObjList);
 	if (index<lastStart) lastStart=index;
-	#ifndef NOASSERTS
-	assert(BITTEST(pRecord,index)&&" Already Freed");
-	#endif
+	if (!BITTEST(pRecord,index))										//RERUN: already freed
+		return;
 	BITRESET(pRecord,index);
 }
 
@@ -392,7 +384,6 @@ class CRectangularCache
 	void BuildEastRequests();
 	void BuildSouthRequests();
 	void BuildWestRequests();
-//DeadCode JON 9Oct00 	void BigRebuild();
 	void StillGoingNorth();
 	void StillGoingEast();
 	void StillGoingSouth();
@@ -1177,7 +1168,6 @@ public:
 	UByte* getdata(CMigFile& migFile,CDecompressData& migDecomp,ULong x,ULong z)
 	{
 		UByte* rv=migFile.GetData(x,z);
-//DeadCode JON 14Sep00 		assert(rv);
 		return rv;
 	}
 };

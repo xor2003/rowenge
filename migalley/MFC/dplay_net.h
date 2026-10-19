@@ -7,6 +7,8 @@
 
 #include "WIN32_COMPAT.H"
 
+#include <enet/enet.h>
+
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
@@ -117,12 +119,15 @@ private:
         std::vector<uint8_t> data;
     };
     struct Conn {
-        int fd = -1;
-        std::mutex sendMtx;
+        ENetPeer* peer = nullptr;
         std::set<DPXID> players;      /* remote player ids owned by conn */
-        std::thread thr;
         sockaddr_in addr{};
-        std::atomic<bool> dead{false};
+    };
+    /* outbound packet queued for the ENet service thread — all enet_* calls
+       must run on that thread (ENet hosts are not thread-safe). */
+    struct OutPkt {
+        ENetPeer* peer;
+        std::vector<uint8_t> buf;
     };
 
     /* state */
@@ -143,17 +148,26 @@ private:
     RDPSD2 sessionDesc{};             /* real-layout copy */
     std::string sessionName;
 
+    /* ENet transport — server host when isHost, client host otherwise.
+       One service thread owns the host: it drains outQ and services events. */
+    ENetHost* eHost = nullptr;
+    std::thread serviceThr;
+    std::deque<OutPkt> outQ;
+    std::mutex outMtx;
+    bool draining = false;          /* teardown: drain then disconnect */
+
     /* host-side */
-    int listenFd = -1;
-    std::thread acceptThr;
     std::vector<std::shared_ptr<Conn> > conns;
-    int udpSrvFd = -1;                /* discovery responder */
+    int udpSrvFd = -1;              /* discovery responder */
     std::thread udpThr;
 
     /* client-side */
     std::shared_ptr<Conn> hostConn;
     std::map<uint32_t, std::pair<DPXID,bool> > pendingIds;  /* reqTag -> {id,done} */
     std::condition_variable idCv;
+    std::condition_variable connCv;
+    bool connectDone = false;       /* CONNECT event arrived */
+    bool connectFailed = false;     /* connect timed out/refused */
     uint32_t reqTagSeq = 1;
 
     /* discovery (querier) — non-blocking async enum: each EnumSessions call
@@ -172,14 +186,18 @@ private:
     /* internals — all called with mtx held unless noted */
     void enqueue(DPXID from, DPXID to, const void* data, size_t len);
     void enqueueSysMsg(const void* blob, size_t len);
+    void queuePacket(ENetPeer* peer, uint32_t type, DPXID from, DPXID to,
+                     uint32_t aux, const void* data, size_t len);
     HRESULT sendMsgToWire(Conn* c, DPXID from, DPXID to, const void* data, size_t len);
     HRESULT routeFromLocal(DPXID from, DPXID to, const void* data, size_t len);
     HRESULT hostRoute(Conn* src, DPXID from, DPXID to, const uint8_t* data, size_t len);
     void hostDestroyRemotePlayers(Conn* c);
-    void acceptLoop();
-    void connRecvLoop(std::shared_ptr<Conn> c);
+    void enetServiceLoop();
+    void handleEnetEvent(const ENetEvent& ev);
+    void hostOnPacket(Conn* c, const uint8_t* p, size_t n);
+    void clientOnPacket(const uint8_t* p, size_t n);
+    void gracefulDisconnect();
     void udpResponderLoop();
-    void clientRecvLoop(int fd);
     HRESULT requestId(DPXID* out, uint32_t kind);
     void pushSysCreate(DPXID id, uint32_t ptype);
     void pushSysDestroy(DPXID id, uint32_t ptype);

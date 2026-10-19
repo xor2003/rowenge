@@ -283,12 +283,10 @@ CRScrlBarCtrl::~CRScrlBarCtrl()
 void CRScrlBarCtrl::OnDraw(
 			CDC* pdc, const CRect& rcBounds, const CRect& rcInvalid)
 {
-//DeadCode JIM 14Aug00 	TRACE0("Scroll bar draw\n");
 	CWnd* parent;
 	if (m_bDrawing || !m_hWnd) return;
 	m_bDrawing=TRUE;
 
-//DeadCode JIM 01Aug100 	QueryPerformanceCounter(&drawtime);
   
 
 	// all the graphics come from the file system and if this is not
@@ -811,10 +809,6 @@ long CRScrlBarCtrl::GetParentPointer()
 
 void CRScrlBarCtrl::SetParentPointer(long nNewValue) 
 {
-//DeadCode JIM 01Aug100 	if (nNewValue)
-//DeadCode JIM 01Aug100 		QueryPerformanceCounter(&spptime);
-//DeadCode JIM 01Aug100 	else
-//DeadCode JIM 01Aug100 		TRACE0("SB SPP ZERO!!!!\n");
 
 	m_parenthWnd=(HWND)nNewValue;
 	SetModifiedFlag();
@@ -840,7 +834,6 @@ void CRScrlBarCtrl::DoFireScroll()
 		::SendMessage(m_parenthWnd,WM_ACTIVEXSCROLL,m_iScrollPos,m_bHorzAlign);
 	else
 		FireScroll(m_iScrollPos);
-//DeadCode DAW 18Jul00 		m_parent->SendMessage(WM_ACTIVEXSCROLL,m_iScrollPos,m_bHorzAlign);
 	RedrawWindow();
 }
 

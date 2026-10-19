@@ -38,7 +38,6 @@ class	ACMAirStruc:public	AirStruc
 	void TwoSeaterDefence();										//RDH 19Nov96
 
 //ACM member functions
-//DEADCODE RDH 21/02/99 	void	MoveToHdg (ANGLES);
 	void	MoveToHdg (ANGLES desiredhdg, ANGLES desiredpitch);		  //RDH 21/02/99
  
 	void	MoveToHdgOnThisRoll (ANGLES,ANGLES);
@@ -50,7 +49,6 @@ class	ACMAirStruc:public	AirStruc
 	SWord	MoveToDesiredPitch (ANGLES,ANGLES);
 	SWord	DesiredPitchChk (ANGLES,ANGLES);
 	SWord	DesiredAcPitchChk (ANGLES,ANGLES);					//RDH 01Nov96
-//DEADCODE RDH 21/02/99 	Bool	MoveToDesiredHdg (ANGLES,ANGLES);
 	Bool	MoveToDesiredHdg (ANGLES desiredhdg,ANGLES desiredpitch,ANGLES target);
 
 	Bool	ChkAtDesiredHdg (ANGLES,ANGLES);						//RDH 01Apr96
@@ -60,7 +58,6 @@ class	ACMAirStruc:public	AirStruc
 	SWord	MoveToDesiredHdgOnThisRoll (ANGLES,ANGLES,ANGLES);
 	void	ClimbAtBestSpeed ();
 	void	MoveToRoll (SWord,SWord);
-//DeadCode RDH 05Jan99 	void	TightClimbingTurn (ANGLES);
 	void	MoveToThrust (SWord);
 	void	SimpleMoveToThrust (SWord);							//RDH 11Oct96
 	void	SimpleCalcVel ();
@@ -68,7 +65,6 @@ class	ACMAirStruc:public	AirStruc
 	bool	WeldedWingSixOK();
 	bool	BreakCallNecessary(AirStrucPtr currac,AirStrucPtr unf, int range);
 
-//DeadCode RDH 05Jan99  	void	TightTurn (SLong recovery_alt);					//RDH 12Jul96
  	void	AutoShoot (Bool manual);							//RDH 22Oct96
 	void	SplitS ();
 	void	ZoomandDrop ();
@@ -135,18 +131,12 @@ class	ACMAirStruc:public	AirStruc
 	void	Regroup();										  //CSB 10/01/00
 
 
-//DeadCode AMM 21Sep00 	Bool	TurnToHdgAndPitch();
-//DeadCode RDH 07Jan99 	void	HotSideLagPursuitFight();
-//DeadCode RDH 07Jan99 	Bool	SandwichManoeuvres();
 //	SWord	RollforTurn(SWord reqdeltapitch,SWord deltahdg, Float& desiredturn);
 	SWord	RollforTurn(SWord reqdeltapitch,SWord deltahdg, Float& desiredturn,COORDS3D	target);
-//DeadCode AMM 21Sep00 	void		CalcDesiredPitchRate(SWord	reqdeltapitch, SWord	reqdeltapitch_sign, UWord	reqdeltapitch_pos);
 	FP		CoarseRollAdjust(FP rroll, FP fpitch);
 	FP		FineRollAdjust(SWord reqdeltapitch,SWord deltahdg,FP rroll, FP fpitch, FP fhdg);
-//DeadCode AMM 21Sep00 	Bool	UnfriendlyOnSameRoll();
 
 
-//DeadCode RDH 07Jan99 	void	SustainedTurn();
 	void	TurningFight();
 	void	TurningFightBomber();
 //	void	CalcLead(SWord& velx,SWord& vely,SWord& velz);
@@ -161,7 +151,6 @@ class	ACMAirStruc:public	AirStruc
 //	void	TurnFightSub(ANGLES	HdgIntercept, Bool sitbehindtarget);
 	void	SlowDownCheck(UWord reqdeltahdg_pos);
 	void	SlowDown(FP velc);
-//DeadCode AMM 21Sep00 	void	SpeedUp(FP velc);
 
 	SWord	ThrustfromFF();
 
@@ -171,16 +160,13 @@ class	ACMAirStruc:public	AirStruc
 
 	void	HighYoYo();
 	void	Zoom();
-//DeadCode AMM 21Sep00 	void	LowYoYo ( );
 	void	TurnFightTargetNotOnNose(SWord	reqdeltahdg, SWord	reqdeltapitch, SWord	reqdeltapitch_sign,UWord	reqdeltapitch_pos, ANGLES	deltapitch);
 	void	RollAndPull(SWord	reqdeltahdg, SWord dpitch);
 
 	void	InterceptHigh();
 	void	InterceptLow();
-//DeadCode AMM 21Sep00 	void	ClimbAtSustainedTurnSpeed();
 	
 	Bool	BanditOnColdSide();
-//DeadCode AMM 21Sep00 	Bool	BanditHasLead();
 
 	Bool 	AllOnTopCover ();										//RDH 19Aug96
 	Bool	AllButLdrNotOnCombat ();								//RDH 11Nov96
@@ -188,7 +174,6 @@ class	ACMAirStruc:public	AirStruc
 	void	Scissors ( );
 	void	MildScissors ( );
 	void	StraightandLevel ( );
-//DeadCode RDH 30Mar98 	void	AcmSideSlip ( );
 	void	SpinOut ( );
 	void	DiveforHome ( );
 	void	ClimbforHome ( );
@@ -196,18 +181,14 @@ class	ACMAirStruc:public	AirStruc
 	void	GoHome ( );
 	void	MakeForFriendly ( );
 	void	MoveAway ( );
-//DeadCode RDH 06Jan99 	void	AccidentalSpinOut ( );
 	void	SpinRecovery ( );								//RDH 21Aug96
 //rdh	void	TurningFight ( );
 	void	LowGYoYo ( );
 	void	RollAway ( );
-//DeadCode RDH 07Jan99 	void	VerticalLoop ( );
 	void	ImmelmannTurn ( );
 	void	HeadOnOffset ( );
 	void	Immelmann ( );
 	void	StayWithPrey ( );
-//DeadCode RDH 05Jan99 	void	GatherSpeed ();
-//DeadCode AMM 21Sep00 	void	LeadUnFriendly ();
 	void	CollisionAvoidance();									  //CSB 03/02/00
 	void FlyWing(AirStrucPtr lead, ANGLES relhdg, int dist);										//CSB 15/03/00
 
@@ -333,13 +314,8 @@ class	ACMAirStruc:public	AirStruc
 
 
 
-//DeadCode RDH 30Mar98 	void	SelectDefendManoeuvre();
-//DeadCode RDH 30Mar98 	void	SelectAttackManoeuvre();
-//DeadCode RDH 30Mar98 	Bool	SelectDefendManoeuvreSub(DEFENDMANOEUVRE);
-//DeadCode RDH 30Mar98 	Bool	SelectAttackManoeuvreSub(ATTACKMANOEUVRE);
 	Bool	TimeToChangeToEvade ();
 	Bool	WeHaveNumbersAdvantage ();
-//DeadCode RDH 30Mar98 	Bool	WeHaveNumbersAndACMAdvantage ();
 	Bool	DisengageAppropriate ();
 	Bool	NoseToTail (ANGLES angle);
 	void	SelectNextDisengageManoeuvre ();
@@ -368,7 +344,6 @@ class	ACMAirStruc:public	AirStruc
 	Bool 	M_BarrelRoll();
 	Bool 	M_ZoomAndDrop();
 	Bool 	M_SpinOut();
-//DeadCode RDH 07Jan99 	Bool 	M_SideSlip();
 	Bool 	M_SelfAsBait();
 	Bool	TargetHasCorrectLead(ANGLES lead, ANGLES maxlead);
 	MANOEUVRE	ManoeuvreBasedOnSkill(SkillType skill, MANOEUVRE goodman, MANOEUVRE badman);
@@ -414,7 +389,6 @@ class	MoveAirStruc:public	AirStruc
 	void AutoTaxi();											//RDH 28Feb96
 	void AutoFollowWp ();
 	void AutoCrossOverTurn();
-//DeadCode RDH 05Jan99 	void AutoTrainingACM ();
 	void AutoCrashSkid();
 	void AutoCrashBelly();
 	void AutoCrashDitch();
@@ -425,8 +399,6 @@ class	MoveAirStruc:public	AirStruc
 
 	void AutoAccelerate();
 	void AutoCrashRoll();
-//DeadCode RDH 05Jan99 	void AutoTrainingPreMerge ();
-//DeadCode RDH 05Jan99 	void SelectNextTrainingManoeuvre();
 	void AutoFollowWpWing (AirStrucPtr MyLeader = NULL);		//RDH 27Feb96	//CSB 20/04/99	
 	void AutoWait4Time();												//CSB 6Jul00
 	void AutoTakeOff ();										//RDH 17Jun96
@@ -441,7 +413,6 @@ class	MoveAirStruc:public	AirStruc
 	void AutoDeathSequence();									//RDH 10Sep96
 	void AutoDeathGlide();												//CSB 15Aug00
 	void AutoResurrect(AirStrucPtr);							//ARM 05Dec96
-//DEADCODE DAW 27/01/00 	void AutoToGrndPitchRoll(ANGLES grndroll,ANGLES grndpitch);	//RJS 03Oct96
 	void AutoStraffe();											//MS 18Oct96
 	void CheckBombingStatus();
 	void AutoBomb();											//MS 18Oct96

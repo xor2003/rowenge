@@ -260,13 +260,10 @@ void CRToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 		m_LButtonDown=1;
 		SetCapture();
 		m_lastdown=point;
-//DEADCODE JIM 16/06/00 		if (m_pList==&m_pFrame->m_bottom)
-//DEADCODE JIM 16/06/00 			m_pFrame->m_spacebar.ReAttach(true,false,1000);
 		Float();
 		SetWindowPos(&wndTop,0,0,0,0,SWP_NOMOVE | SWP_NOSIZE);
 		if (m_lastdown.x>m_length-(m_width/2)) m_lastdown.x=m_length-(m_width/2);
 		if (m_lastdown.y>m_length-(m_width/2)) m_lastdown.y=m_length-(m_width/2);
-//DeadCode JIM 11Oct00 		CDialog::OnLButtonDown(nFlags, point);
 	}
 	else
 	if (m_align && !AfxGetApp()->m_pMainWnd->IsZoomed())	//0 means not docked?
@@ -309,7 +306,6 @@ void CRToolBar::OnMouseMove(UINT nFlags, CPoint point)
 			rect.right=rect.left+m_width;
 			rect.bottom=rect.top+m_length;
 		}
-//DEADCODE JIM 16/06/00 		m_align=dockside;												//JIM 16/06/00
 		switch (dockside)
 		{
 			case 1:
@@ -377,7 +373,6 @@ void CRToolBar::OnLButtonUp(UINT nFlags, CPoint point)
 					break;
 					case 3:
 					m_pList=&m_pFrame->m_bottom;
-//DEADCODE JIM 16/06/00 					m_pFrame->m_spacebar.ReAttach(false,false);
 
 
 					break;
@@ -522,13 +517,10 @@ int CRToolBar::GetDockSide(CPoint point,bool allowsideifgripper)
 
 BOOL CRToolBar::OnEraseBkgnd(CDC* pDC) 
 {
-//DEADCODE JIM 04/04/00 	if (hidedrawing)
-//DEADCODE JIM 04/04/00 		return TRUE;
 	CRect rect;
 	GetWindowRect(rect);
 	CRect viewrect;
 	m_pFrame->GetClientRect(viewrect);
-//DeadCode JIM 20Oct00 	int m_length=0;
 //	if (rect.Width()>m_length || rect.Height()>m_length)  // presumably width is always smaller than length
 	{
 		// draw in some fill in artwork on the right hand side...
@@ -697,12 +689,6 @@ void CRToolBar::CalcWindowRect(LPRECT lpClientRect, UINT nAdjustType)
 
 
 
-//DEADCODE JIM 28/01/00 LRESULT CRToolBar::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
-//DEADCODE JIM 28/01/00 {
-//DEADCODE JIM 28/01/00 	// TODO: Add your specialized code here and/or call the base class
-//DEADCODE JIM 28/01/00 	
-//DEADCODE JIM 28/01/00 	return CDialog::DefWindowProc(message, wParam, lParam);
-//DEADCODE JIM 28/01/00 }
 
 BOOL CRToolBar::DestroyWindow() 
 {
@@ -812,12 +798,6 @@ void CRToolBar::Serialize(CArchive& ar)
 	}
 }
 
-//DEADCODE JIM 28/01/00 LRESULT CRToolBar::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
-//DEADCODE JIM 28/01/00 {
-//DEADCODE JIM 28/01/00 	// TODO: Add your specialized code here and/or call the base class
-//DEADCODE JIM 28/01/00 	
-//DEADCODE JIM 28/01/00 	return CDialog::WindowProc(message, wParam, lParam);
-//DEADCODE JIM 28/01/00 }
 
 void CRToolBar::WinHelp(DWORD dwData, UINT nCmd) 
 {
@@ -885,7 +865,6 @@ int	CRToolBar::ReAttach(bool enable,bool resort,int m_index)
 	if (enable)
 		if (!IsWindowVisible())
 		{
-//DEADCODE JIM 04/04/00 			hidedrawing=true;
 			SetWindowPos(NULL,	-1000,-1000,0,0,
 							SWP_SHOWWINDOW
 							+SWP_NOSIZE+SWP_NOMOVE+SWP_NOREDRAW
@@ -1008,12 +987,6 @@ BOOL CRToolBar::OnInitDialog()
 			scalinglookup[x][0][1]=baseunits.right;
 			scalinglookup[x][1][1]=baseunits.bottom;
 		}
-//deadcode JIM 18/06/01		// xfactor seems to be slightly smaller than yfactor
-//deadcode JIM 18/06/01		// for some reason
-//deadcode JIM 18/06/01		float yfactor=96.0f/RDialog::fontdpi;
-//deadcode JIM 18/06/01		float xfactor=yfactor;
-//deadcode JIM 18/06/01		if (xfactor!=1.0f)
-//deadcode JIM 18/06/01			xfactor*=0.94f; // fiddle factor
 	CRect rect;
 	CRect parentrect;
 	CWnd* pControl;
@@ -1081,19 +1054,6 @@ void CRToolBar::OnEnable(BOOL bEnable)
 
 
 
-//DeadCode JIM 11Oct00 void CRToolBar::OnRButtonDown(UINT nFlags, CPoint point) 
-//DeadCode JIM 11Oct00 {
-//DeadCode JIM 11Oct00 	// TODO: Add your message handler code here and/or call default
-//DeadCode JIM 11Oct00 	
-//DeadCode JIM 11Oct00 	CDialog::OnRButtonDown(nFlags, point);
-//DeadCode JIM 11Oct00 }
-//DeadCode JIM 11Oct00 
-//DeadCode JIM 11Oct00 void CRToolBar::OnNcRButtonDown(UINT nHitTest, CPoint point) 
-//DeadCode JIM 11Oct00 {
-//DeadCode JIM 11Oct00 	// TODO: Add your message handler code here and/or call default
-//DeadCode JIM 11Oct00 	
-//DeadCode JIM 11Oct00 	CDialog::OnNcRButtonDown(nHitTest, point);
-//DeadCode JIM 11Oct00 }
 
 void CRToolBar::OnContextMenu(CWnd* pWnd, CPoint point) 
 {

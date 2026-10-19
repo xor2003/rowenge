@@ -542,7 +542,6 @@ int genTri2(UByte pntCnt,PntDef* pntArray,UByte* orgPolyDesc,UByte*& tL)
 					tL=triangleList;
 					return totalFans;
 				}
-//DeadCode PD 15Oct98 					break;
 		}
 	}
 	if (pntCnt==3)

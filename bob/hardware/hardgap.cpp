@@ -120,15 +120,6 @@ void	Display::XX_ScreenFlip()
 
 }
 
-//DeadCode RJS 14Mar96 void	Display::XX_PhysMouseMove(MouseSave* oldpos,void* MouseShape,MouseSave* newpos)
-//DeadCode RJS 14Mar96 {
-//DeadCode RJS 14Mar96 	Display::XX_PhysMouseMove(oldpos,MouseShape,newpos);
-//DeadCode RJS 14Mar96 	STUB256();		//size of lib patch.
-//DeadCode RJS 14Mar96 	STUB256();		//size of lib patch.
-//DeadCode RJS 14Mar96 	STUB256();		//size of lib patch.
-//DeadCode RJS 14Mar96 	STUB256();		//size of lib patch.
-//DeadCode RJS 14Mar96 	STUB256();		//size of lib patch.
-//DeadCode RJS 14Mar96 }
 	STUBENDSPACE(Display);
 
 // DOS version stubs
@@ -214,7 +205,6 @@ SWord	Display::CountDrivers(){return (0);}					//PD 27May97
 Bool	Display::HardLine(LPLINETYPE){return (FALSE);}
 Bool	Display::HardPoint(LPPOINTTYPE){return (FALSE);}
 Bool	Display::HardPlainRectFill(Window*,SWord,SWord,SWord,SWord){return (FALSE);}
-//Old_Code PD 22May97 Bool	Display::HardPlainRectFill(SWord,SWord,SWord,SWord){return (FALSE);}
 Bool	Display::SetZUpdate(Bool flag){return (flag);}
 Bool	Display::SetPlayerTextures(Bool flag){return (flag);}
 Bool	Display::Hardware3D(){return (FALSE);}
@@ -224,9 +214,7 @@ Bool	Display::ModeSupported(ScreenRez*) {return (TRUE);}		//PD 29May97
 Bool	Display::DriverIsCapable(SWord) {return (FALSE);}		//PD 29May97
 
 void	Display::InitLand(){}
-//Old_Code PD 22May97 void	Display::InitLand(class item*){}
 void	Display::UpdateLand(class item*){}
-//Old_Code PD 22May97 void	Display::UpdateLand(class item*){}
 void 	Display::LandPoly(ULong ,ULong ,ULong ,landvertexptr){}
 void 	Display::SetImageMapTablePtr(SLong*){}
 void 	Display::SetFog(Colour,SLong,SLong){}

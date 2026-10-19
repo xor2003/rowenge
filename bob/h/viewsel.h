@@ -130,7 +130,6 @@ const	SLong		FlyBySteps = 0x00800;						//PD 18Jun96
 //and below the polygon cockpit when on inside view
 
 const UWord dpitchstrt = (UWord )ANGLES_70Deg;	//ANGLES_90Deg;	//PD 04Sep97
-//Old_Code PD 25Sep96 const UWord dpitchend  = (UWord )ANGLES_315Deg;
 const UWord dpitchend  = (UWord )((UWord)ANGLES_0Deg-1);
 
 const UWord dhdgstrt = (UWord )ANGLES_135Deg;
@@ -374,7 +373,6 @@ private:
 	Bool		bupdrawpolypit;									//PD 28Jan97
 	Bool		enemytoofar;									//PD 14Nov96
 	Bool		enemyvisible;									//PD 18Nov96
-//DEADCODE PD 01/12/99 	Bool		bDoingHW3D;
 	Bool		bPadlockOut;
 
 	ZmRtFlags	uiflag;
@@ -499,7 +497,6 @@ private:
 		void ViewFudge();										//PD 18Sep97
 		void ViewUnFudge();										//PD 18Sep97
 
-//DeadCode JON 23Oct00 		SLong BuildPeripheralVisionList(PVList*,SLong);		//PD 22Jul97
 		SLong CockpitOrientation(Window*,PVList*,SLong);		//PD 03Sep97
 
 		void SetViewRangeMinMax(SLong, SLong);					//PD 27Mar96

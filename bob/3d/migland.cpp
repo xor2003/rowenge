@@ -108,7 +108,6 @@ LandMapNumRecord*	LandMapNum::pRecord=&lmnr;							//RJS 10Jul00
 
 
 
-//DeadCode RJS 30May00 #define	_BLOCK_POS_DEBUGS_
 struct raiseLnStore
 {
 	int next;
@@ -331,7 +330,6 @@ typedef class LSFileBlock
 
 #include "jimtri.cpp"
 
-//DEADCODE JON 3/23/00 const double PI = 22./7.;
 const double PI = 3.141592654;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -747,9 +745,6 @@ void CDecompressData::UnPack(ULong x,ULong z,UByte*& ip,CDataBlock*& pDataBlk)
 	SETFPCW(cw);
 #endif
 
-//DeadCode JON 20Jun00 #pragma warnmsg ( "remove me" )
-//DeadCode JON 20Jun00 	if ( x==28311552 && z==33685504 )
-//DeadCode JON 20Jun00 		NOP;
 
 	UByte* inptr=ip;
 	static UByte LineBuff[6000];	//1500];
@@ -912,12 +907,6 @@ void CDecompressData::MakeIntData(	ULong x,ULong z,ULong rez,const bool doSheep,
 									void* pData,
 									CPrimaryDB*& pDataBlk)
 {
-//DeadCode JON 20Jun00 #pragma warnmsg ( "remove me" )
-//DeadCode JON 20Jun00 	if ( x==28311552 && z==33685504 )
-//DeadCode JON 20Jun00 	{
-//DeadCode JON 20Jun00 		NOP;
-//DeadCode JON 20Jun00 		UnpackIntData((UByte*)pData,0);
-//DeadCode JON 20Jun00 	} else
 	UnpackIntData((UByte*)pData,rez, x, z, doSheep);
 
  	//Add the newly decompressed data to the cache
@@ -2283,8 +2272,6 @@ inline bool HasCows(UByte at)
 	{
 		ULong at_shift = 1UL<<(at&AT_MASK);
 		const ULong at_shift_mask =
-//DeadCode JON 24Oct00 					(1UL<<(AT_golfCourse)) |
-//DeadCode JON 24Oct00 					(1UL<<(AT_garden)) |
 					(1UL<<(AT_midGrass)) |
 					(1UL<<(AT_darkGrass));
 		return ( (at_shift&at_shift_mask) != 0 );
@@ -2519,8 +2506,6 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 
 	ddhDst.noOfPolys=ddhSrc.noOfPolys;
 	ddhDst.noOfLines=ddhSrc.noOfLines;
-//DeadCode JON 24Oct00  	ddhDst.noOfTrees=0;
-//DEADCODE JON 11/30/99 	ddhDst.noOfWaves=0;
 
 	//convert the source draw data into the correct dest draw
 	//data format
@@ -2559,7 +2544,6 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 		for (int j=0;j<polyEdges;j++){
 			int    edgeIndex=edgIn[j];
 			UByte* pep=edgeLists[edgeIndex];
-//DEADCODE JON 12/3/99 			bool edgeFlipped=(BITTEST(dirFlags,j))?true:false;
 			bool edgeFlipped=(BITTEST(dirFlags,j));
 			UByte pointsOnEdge=*pep++; 	//no of points on edge inc start &
 										//end points
@@ -2628,12 +2612,6 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 			else
 			{
 				*insTriCntHere=totalFans;
-//DeadCode JON 25Oct00 				//generate trees on this set of poly data
-//DeadCode JON 4Oct00 
-//DeadCode JON 4Oct00 				if (treesEnabled && 
-//DeadCode JON 4Oct00 					IsWooded(areaType) &&
-//DeadCode JON 4Oct00 					ddhDst.noOfTrees<128)
-//DeadCode JON 4Oct00 					ddhDst.noOfTrees+=BuildTreeList(insTriCntHere,ppdDst,localTreeListPtr);
 			}
 		}
 
@@ -2641,84 +2619,6 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 		pSrc+=(polyEdges*2)+((polyEdges+7)>>3);
 	}
 }
-//DEADCODE JON 6/2/00 	for (i=0;i<ddhSrc.noOfPolys;i++)
-//DEADCODE JON 6/2/00 	{
-//DEADCODE JON 6/2/00 //TEMPCODE JON 6/2/00 		debugC++;
-//DEADCODE JON 6/2/00 //TEMPCODE JON 6/2/00 		if ( debugC == debugTest )
-//DEADCODE JON 6/2/00 //TEMPCODE JON 6/2/00 			int hdlgfh = 0;
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 		UByte* abortPolyPtr=pDst;
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 		//copy over polygon colour data first
-//DEADCODE JON 6/2/00 		UByte areaType=*pSrc++;
-//DEADCODE JON 6/2/00 		*pDst++=areaType;
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 		UByte* insTriCntHere=pDst++;
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 		//next byte of source is the polygon edge count
-//DEADCODE JON 6/2/00 		UByte polyEdges=*pSrc++;
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 		//build a local poly definition
-//DEADCODE JON 6/2/00 		UByte localPoly[256];
-//DEADCODE JON 6/2/00 		UByte localPolyLen=0;
-//DEADCODE JON 6/2/00 		UByte* dirFlags=pSrc+(polyEdges*2);		//edge direction flags for this
-//DEADCODE JON 6/2/00 											//polygon
-//DEADCODE JON 6/2/00 		UWord *edgIn = (UWord*)pSrc;
-//DEADCODE JON 6/2/00 		for (int j=0;j<polyEdges;j++){
-//DEADCODE JON 6/2/00 			int    edgeIndex=edgIn[j];
-//DEADCODE JON 6/2/00 			UByte* pep=edgeLists[edgeIndex];
-//DEADCODE JON 6/2/00 //DEADCODE JON 12/3/99 			bool edgeFlipped=(BITTEST(dirFlags,j))?true:false;
-//DEADCODE JON 6/2/00 			bool edgeFlipped=(BITTEST(dirFlags,j));
-//DEADCODE JON 6/2/00 			UByte pointsOnEdge=*pep++; 	//no of points on edge inc start &
-//DEADCODE JON 6/2/00 										//end points
-//DEADCODE JON 6/2/00 			if (!edgeFlipped){
-//DEADCODE JON 6/2/00 				for (int k=0;k<pointsOnEdge-1;k++)
-//DEADCODE JON 6/2/00 					localPoly[localPolyLen++]=usageTbl[pep[k]];
-//DEADCODE JON 6/2/00 			}
-//DEADCODE JON 6/2/00 			else{
-//DEADCODE JON 6/2/00 				for (int k=pointsOnEdge-1;k>0;k--)
-//DEADCODE JON 6/2/00 					localPoly[localPolyLen++]=usageTbl[pep[k]];
-//DEADCODE JON 6/2/00 			}
-//DEADCODE JON 6/2/00 		}
-//DEADCODE JON 6/2/00 		//localPoly & localPolyLen now contain the draw information
-//DEADCODE JON 6/2/00 		//for the current polygon
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 		RemoveStupids(localPolyLen,localPoly);
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 		if (localPolyLen<3){
-//DEADCODE JON 6/2/00 			pDst=abortPolyPtr;
-//DEADCODE JON 6/2/00 			ddhDst.noOfPolys--;
-//DEADCODE JON 6/2/00 		}
-//DEADCODE JON 6/2/00 		else
-//DEADCODE JON 6/2/00 		{
-//DEADCODE JON 6/2/00 			// build the edge database
-//DEADCODE JON 6/2/00 			*pEdgeBuf++=areaType;
-//DEADCODE JON 6/2/00 			*pEdgeBuf++=localPolyLen;
-//DEADCODE JON 6/2/00 			for ( int i=0; i< localPolyLen; i++ )
-//DEADCODE JON 6/2/00 				*pEdgeBuf++=localPoly[i];
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 			int totalFans=(*pGenTri)(localPolyLen,ppdDst,localPoly,pDst);
-//DEADCODE JON 6/2/00 			if (totalFans==0)
-//DEADCODE JON 6/2/00 			{
-//DEADCODE JON 6/2/00 				pDst=abortPolyPtr;
-//DEADCODE JON 6/2/00 				ddhDst.noOfPolys--;
-//DEADCODE JON 6/2/00 			}
-//DEADCODE JON 6/2/00 			else
-//DEADCODE JON 6/2/00 			{
-//DEADCODE JON 6/2/00 				*insTriCntHere=totalFans;
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 				//generate trees on this set of poly data
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 				if (treesEnabled && 
-//DEADCODE JON 6/2/00 					IsWooded(areaType) &&
-//DEADCODE JON 6/2/00 					ddhDst.noOfTrees<128)
-//DEADCODE JON 6/2/00 					ddhDst.noOfTrees+=BuildTreeList(insTriCntHere,ppdDst,localTreeListPtr);
-//DEADCODE JON 6/2/00 			}
-//DEADCODE JON 6/2/00 		}
-//DEADCODE JON 6/2/00 
-//DEADCODE JON 6/2/00 		//move the src pointer on to the next poly definition
-//DEADCODE JON 6/2/00 		pSrc+=(polyEdges*2)+((polyEdges+7)>>3);
-//DEADCODE JON 6/2/00 	}
 
 	
 	//assert(globalTriCount>=ddhDst.noOfPolys);
@@ -2748,7 +2648,6 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 		{
 			int edgeIndex=edgIn[j];
 			UByte* pep=edgeLists[edgeIndex];
-//DEADCODE JON 12/2/99 		 	bool edgeFlipped=(BITTEST(dirFlags,j))?true:false;
 			bool edgeFlipped=(BITTEST(dirFlags,j));
 
 			UByte pointsOnEdge=*pep++; 	//no of points on edge inc start &
@@ -2795,38 +2694,7 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 		return;
 	}
 
-//DeadCode JON 24Oct00 	//add tree data to the end of the list
-//DeadCode JON 24Oct00 	ddhDst.treeOffset=ULong(pDst)-ULong(pDataStart);
-//DeadCode JON 24Oct00 
-//DeadCode JON 24Oct00 	for (i=0;i<ddhDst.noOfTrees;i++)
-//DeadCode JON 24Oct00 	{
-//DeadCode JON 24Oct00 		*(SmallPoint*)pDst=ltl[i];
-//DeadCode JON 24Oct00 		pDst+=sizeof(SmallPoint);
-//DeadCode JON 24Oct00 	}
 
-//DEADCODE JON 5/3/00 	// jon - precalc the side lookup table if needed (only done once)
-//DEADCODE JON 5/3/00 	if ( SideLookUp == NULL )
-//DEADCODE JON 5/3/00 	{
-//DEADCODE JON 5/3/00 		SideLookUp = new raiseSide[NUM_SIDE_TYPES];
-//DEADCODE JON 5/3/00 		int t = 0;
-//DEADCODE JON 5/3/00 		for ( UByte i = 0; i < 32*4; i++ )
-//DEADCODE JON 5/3/00 		{
-//DEADCODE JON 5/3/00 			for ( UByte j = 0; j < 32*4; j++ )
-//DEADCODE JON 5/3/00 			{
-//DEADCODE JON 5/3/00 				if ( GetUnscaledRaiseHt(i) < GetUnscaledRaiseHt(j) )
-//DEADCODE JON 5/3/00 				{
-//DEADCODE JON 5/3/00 					SideLookUp[t].lowerAT=i;
-//DEADCODE JON 5/3/00 					SideLookUp[t].higherAT=j;
-//DEADCODE JON 5/3/00 					for ( int k = 0; k< t; k++ )
-//DEADCODE JON 5/3/00 						if ( SideLookUp[k] == SideLookUp[t] )
-//DEADCODE JON 5/3/00 							break;
-//DEADCODE JON 5/3/00 					if ( k == t ) // got all the way through, keep
-//DEADCODE JON 5/3/00 						t++;
-//DEADCODE JON 5/3/00 				}
-//DEADCODE JON 5/3/00 			}
-//DEADCODE JON 5/3/00 		}
-//DEADCODE JON 5/3/00 		// t now contains the number of different side types - should be equal to NUM_SIDE_TYPES
-//DEADCODE JON 5/3/00 	}
 
 
 	// generate sheep, cows etc...
@@ -3043,10 +2911,6 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 //			if ( destPntCnt == 42 && ddhSrc.noOfPolys == 10 && ddhSrc.edgeOffset == 2560 )
 //				INT3;
 			raiseSide testMe( back->at, along->at );
-//DeadCode JON 22Sep00 			if (	aphSrc.checksum == 1061300039 &&
-//DeadCode JON 22Sep00 					testMe.higherAT == 90
-//DeadCode JON 22Sep00 				)
-//DeadCode JON 22Sep00 				NOP;
 
 			if ( testMe.isWanted() )
 			{
@@ -3061,8 +2925,6 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 	*cliffFlag = false;
 	UByte* pointCliff = pDst;
 	memset( pointCliff, 0, destPntCnt );
-//DEADCODE JON 4/17/00 	for ( i = 0; i< destPntCnt; i++ )
-//DEADCODE JON 4/17/00 		pointCliff[i]=0; // set all points to false to start wiv
 
 	// add cliff information to the pointDB
 	int lineCount = ddhDst.noOfLines;
@@ -3121,13 +2983,7 @@ inline void CDecompressData::_UnpackIntData(UByte* pSrc,const ULong rez, const U
 //TEMPCODE JON 4/17/00 		}
 	}
 
-//DEADCODE JON 11/30/99 	ddhDst.waveOffset=ULong(pDst)-ULong(pDataStart);
 
-//DEADCODE JON 11/30/99 	for (i=0;i<ddhDst.noOfWaves;i++)
-//DEADCODE JON 11/30/99 	{
-//DEADCODE JON 11/30/99 		*(SmallPoint*)pDst=ltl[i];
-//DEADCODE JON 11/30/99 		pDst+=sizeof(SmallPoint);
-//DEADCODE JON 11/30/99 	}
 
 	delete[]usageTbl;
 
@@ -3231,62 +3087,6 @@ inline void CDecompressData::DeRezEdges(	ULong edgeCnt,EdgeDef* ped,
 		} // end of loop tru all 
 	}
 	
-//DeadCode JON 4Oct00 	UByte* pep=edgePoints;
-//DeadCode JON 4Oct00 	ULong dropCounter=0;
-//DeadCode JON 4Oct00 	for (int i=0;i<edgeCnt;i++)
-//DeadCode JON 4Oct00 	{
-//DeadCode JON 4Oct00 		UByte edgeLength=0;
-//DeadCode JON 4Oct00 		EdgeDef& ed=ped[i];
-//DeadCode JON 4Oct00 		edgeLists[i]=pep;
-//DeadCode JON 4Oct00 
-//DeadCode JON 4Oct00 		//step through an edge at a time and remove points when required
-//DeadCode JON 4Oct00 		UByte* insertEdgeLengthHere=pep++;
-//DeadCode JON 4Oct00 
-//DeadCode JON 4Oct00 		//always add the first and last points to the edge list
-//DeadCode JON 4Oct00 		*pep++=ed.startPoint;
-//DeadCode JON 4Oct00 		edgeLength++;
-//DeadCode JON 4Oct00 
-//DeadCode JON 4Oct00 		UByte* epl=pfrep+ed.edgeOffset;
-//DeadCode JON 4Oct00 		for (int j=0;j<ed.noOfPoints;j++)
-//DeadCode JON 4Oct00 		{
-//DeadCode JON 4Oct00 
-//DeadCode JON 4Oct00 		 	if (dropCounter==rez)
-//DeadCode JON 4Oct00 			{			//add a point to the edge
-//DeadCode JON 4Oct00 				UByte edgePoint=*epl++;
-//DeadCode JON 4Oct00 				*(usageTbl+edgePoint)=0xFF;
-//DeadCode JON 4Oct00 				*pep++=edgePoint;
-//DeadCode JON 4Oct00 				edgeLength++;
-//DeadCode JON 4Oct00 				dropCounter=0;
-//DeadCode JON 4Oct00 			}
-//DeadCode JON 4Oct00 			else
-//DeadCode JON 4Oct00 			{
-//DeadCode JON 4Oct00 				epl++;
-//DeadCode JON 4Oct00 				dropCounter++;
-//DeadCode JON 4Oct00 			}
-//DeadCode JON 4Oct00 			
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 		 	if (dropCounter==rez)
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 			{			//add a point to the edge
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 				UByte edgePoint=*epl++;
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 				*(usageTbl+edgePoint)=0xFF;
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 				*pep++=edgePoint;
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 				edgeLength++;
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 			}
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 			else
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 				epl++;
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 			dropCounter++;
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 			if (dropCounter>rez) 
-//DeadCode JON 4Oct00 //DEADCODE JON 6/2/00 				dropCounter=0;
-//DeadCode JON 4Oct00 		}
-//DeadCode JON 4Oct00 
-//DeadCode JON 4Oct00 		//always add the last point to the edge list
-//DeadCode JON 4Oct00 		*pep++=ed.endPoint;
-//DeadCode JON 4Oct00 		edgeLength++;
-//DeadCode JON 4Oct00 		*insertEdgeLengthHere=edgeLength;
-//DeadCode JON 4Oct00 
-//DeadCode JON 4Oct00 		*(usageTbl+ed.startPoint)=0xFF;
-//DeadCode JON 4Oct00 		*(usageTbl+ed.endPoint)=0xFF;
-//DeadCode JON 4Oct00 	} // end of loop tru all 
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -3542,7 +3342,6 @@ void CDecompressData::InsertEdgeDefs(	UByte pntCnt,UByte* poly,
 		{
 			bool dirFlipped;
 			UWord edgeIndex=AddEdge(poly[jStart],point,localPolyLen,localPoly,pep,dirFlipped);
-//DEADCODE JON 3/23/00 			*ppd++=UByte(edgeIndex);
 			*((UWord*)ppd)=edgeIndex;
 			ppd+=2;
 			if (dirFlipped)
@@ -3557,7 +3356,6 @@ void CDecompressData::InsertEdgeDefs(	UByte pntCnt,UByte* poly,
 
 	bool dirFlipped;
 	UWord edgeIndex=AddEdge(poly[jStart],poly[i],localPolyLen,localPoly,pep,dirFlipped);
-//DEADCODE JON 3/23/00 	*ppd++=UByte(edgeIndex);
 	*((UWord*)ppd)=edgeIndex;
 	ppd+=2;
 	if (dirFlipped)
@@ -3616,7 +3414,6 @@ void CDecompressData::InsertEdgeDefs2(	UByte pntCnt,UByte* line,
 		{
 			bool dirFlipped;
 			UWord edgeIndex=AddEdge(line[jStart],point,localLineLen,localLine,pep,dirFlipped);
-//DEADCODE JON 3/23/00 			*pld++=UByte(edgeIndex);
 			*((UWord*)pld)=edgeIndex;
 			pld+=2;
 			if (dirFlipped)
@@ -4372,8 +4169,11 @@ UWord CPrimaryCB::Search(int wx,int wz,int rez,CPrimaryDB*& pDBlk)
 			}
 			pScan=pScan->pEast;
 		}
-		pDBlk = pFound->pData;
-		if (pFound->resolution!=UWord(rez)) retval=1;
+		if (pFound)										//RERUN: scan may find nothing (analyser: unguarded deref)
+		{
+			pDBlk = pFound->pData;
+			if (pFound->resolution!=UWord(rez)) retval=1;
+		}
 	}
 	return retval;
 }
@@ -4608,8 +4408,6 @@ UByte* CMigLand::MakeIData(const DataRecord& dr,const ULong rez)
 	return (UByte*)pMigLandDecomp->pDataStart;
 }
 
-//DeadCode RJS 10Jul00 LandMapNumRecord	lmnr;
-//DeadCode RJS 10Jul00 LandMapNumRecord*	LandMapNum::pRecord=&lmnr;
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GetLandMapPtr
@@ -4667,8 +4465,6 @@ void LandMapNumRecord::Reset(FileNum dir)
 	for (int i=0;i<MAXMAPS;i++)
 		if (lm[i].body != NULL)			 //RJS 09Feb98
 		{
-//DeadCode RJS 10Jul00 			delete lm[i].body;			//RJS 09Feb98
-//DeadCode RJS 10Jul00 			lm[i].body=NULL;			//RJS 09Feb98
 	
 			Land_Scape.g_lpLib3d->UnloadTexture( lm + i );				//JON 7Aug00
 
@@ -4805,7 +4601,6 @@ SLong CMigLand::GetAltitude(COORDS3D& pos,UByte* pAreaType,bool fReallyGetData)
 		pz=pos.Z>>17;
 		pz=_northIndex(px,pz);	//offset index
 		SInfo sinfo=pMigFile->pNorth[pz];
-//DEADCODE JON 6/6/00 		px&=0x7f;				//skip count
 		px&=0x3F;				//skip count
 		SeekStruc ss;
 		ss.fileNum=FIL_AREAN_NUM;
@@ -4990,8 +4785,6 @@ void CRectangularCache::OneShotSeekRequest(SLong x,SLong z,SeekStrucP pSeek,Data
 inline void CRectangularCache::ProcessSeekRequests2()
 {
 	assert( masterseeklist!=NULL );
-//DeadCode JON 6Oct00 	if (masterseeklist==NULL)
-//DeadCode JON 6Oct00 		return;
 
 	SeekStrucP pThisReq=masterseeklist;
 
@@ -5928,7 +5721,6 @@ bool CRectangularCache::ProcessSeekRequests()
 		pingtimer=0;
 		pingcounter=0;
 		ProcessSeekRequests2();
-//DeadCode JON 14Sep00 		return masterseeklist==NULL?true:false;
 		if ( masterseeklist==NULL )
 			return true;
 		else
@@ -6000,7 +5792,6 @@ bool CRectangularCache::ProcessSeekRequests()
 	if (masterseeklist!=NULL && v_p && v_p->Accel())
 		ProcessSeekRequestsNF();
 
-//DeadCode JON 14Sep00 	return masterseeklist==NULL?true:false;
 	if ( masterseeklist==NULL )
 		return true;
 	else

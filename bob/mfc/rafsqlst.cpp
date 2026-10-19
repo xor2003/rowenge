@@ -146,7 +146,6 @@ void	RAFSquadList::RefreshList()
 
  	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
  	rlistbox->Clear();
 	//rlistbox->AddColumn(48);
 	//rlistbox->AddColumn(100);										  //RDH 02/06/99
@@ -234,58 +233,6 @@ BOOL RAFSquadList::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	
-//DeadCode RDH 16Dec99 	CRListBox* rlistbox;
-//DeadCode RDH 16Dec99 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 16Dec99 //DEADCODE AMM 15/12/99 	rlistbox->Clear();
-//DeadCode RDH 16Dec99 //DEADCODE AMM 15/12/99 	rlistbox->AddColumn(40);
-//DeadCode RDH 16Dec99 //DEADCODE AMM 15/12/99 	rlistbox->AddColumn(100);										  //RDH 02/06/99
-//DeadCode RDH 16Dec99 //DEADCODE AMM 15/12/99 	rlistbox->AddColumn(TARGETFIELDWIDTH);										  //RDH 02/06/99
-//DeadCode RDH 16Dec99 //DEADCODE AMM 15/12/99 	rlistbox->AddColumn(20);										  //RDH 02/06/99
-//DeadCode RDH 16Dec99 //DEADCODE AMM 15/12/99 	rlistbox->AddColumn(40);										  //RDH 02/06/99
-//DeadCode RDH 16Dec99 //DEADCODE AMM 15/12/99 	rlistbox->AddColumn(30);										  //RDH 02/06/99
-//DeadCode RDH 16Dec99 //DEADCODE AMM 15/12/99 	rlistbox->AddColumn(20);										  //RDH 02/06/99
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99 	rlistbox->AddString(RESSTRING(SQUAD),0);
-//DeadCode RDH 16Dec99 	rlistbox->AddString(RESSTRING(TYPE),1);
-//DeadCode RDH 16Dec99 	rlistbox->AddString(RESSTRING(BASE),2);
-//DeadCode RDH 16Dec99 	rlistbox->AddString(RESSTRING(CAT),3);
-//DeadCode RDH 16Dec99 	rlistbox->AddString(RESSTRING(READY),4);
-//DeadCode RDH 16Dec99 	rlistbox->AddString(RESSTRING(AC),5);
-//DeadCode RDH 16Dec99 	rlistbox->AddString(RESSTRING(PILOTS),6);
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99 	
-//DeadCode RDH 16Dec99 	rlistbox->AddString("222",0);
-//DeadCode RDH 16Dec99 	rlistbox->AddString("Spitfire",1);
-//DeadCode RDH 16Dec99 	rlistbox->AddString("Biggin Hill",2);
-//DeadCode RDH 16Dec99 	rlistbox->AddString("A",3);
-//DeadCode RDH 16Dec99 	rlistbox->AddString("12",4);
-//DeadCode RDH 16Dec99 	rlistbox->AddString("16",5);
-//DeadCode RDH 16Dec99 	rlistbox->AddString("12",6);
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99 		CRSpinBut* spinbut;
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99 	spinbut=GETDLGITEM(IDC_RSPINBUT_MINAC);
-//DeadCode RDH 16Dec99 	spinbut->Clear()->MakeNumList(20,0,1)->SetIndex(10);
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99 	spinbut=GETDLGITEM(IDC_RSPINBUT_MINPILOTS);
-//DeadCode RDH 16Dec99 	spinbut->Clear()->MakeNumList(20,0,1)->SetIndex(12);
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99  	spinbut=GETDLGITEM(IDC_RSPINBUT_CAT);
-//DeadCode RDH 16Dec99 	spinbut->Clear()->MakeNumList(3,0,1)->SetIndex(0);
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99 	CRCombo* combo;
-//DeadCode RDH 16Dec99 	combo=GETDLGITEM(IDC_RCOMBOAIRCRAFT);
-//DeadCode RDH 16Dec99 	combo->Clear()->RESCOMBO(HURRICANE,3)->
-//DeadCode RDH 16Dec99 					SetIndex(0);
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99  	combo=GETDLGITEM(IDC_RCOMBOGROUP);
-//DeadCode RDH 16Dec99 	combo->Clear()->RESCOMBO(10,6)->
-//DeadCode RDH 16Dec99 					SetIndex(2);
-//DeadCode RDH 16Dec99 
-//DeadCode RDH 16Dec99    	combo=GETDLGITEM(IDC_RCOMBOREADINESS);
-//DeadCode RDH 16Dec99 	combo->Clear();
 
 	CRSpinBut* spinbut;
 
@@ -319,9 +266,6 @@ BOOL RAFSquadList::OnInitDialog()
 	combo->Clear()->RESCOMBO(10,6)->
 					SetIndex(MMC.sl_group);
 
-//DeadCode RDH 16Aug00    	combo=GETDLGITEM(IDC_RCOMBOREADINESS);
-//DeadCode RDH 16Aug00 	combo->Clear();
-//DeadCode RDH 16Aug00 
 	RefreshList();
 
 	

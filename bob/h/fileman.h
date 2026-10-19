@@ -18,7 +18,6 @@
 
 #include	"myerror.h"
 
-//DeadCode PD 29Oct96 #include	"mscdex.h"
 
 struct RequestHeader; struct CDComm; struct dir_entry;
 
@@ -55,10 +54,6 @@ typedef class	fileblock *fileblockptr;
 
 typedef	char	voidbigblock;
 
-//DeadCode JIM 29Jul96 typedef void	proc;
-//Old_Code PD 13Oct95 #ifndef	_STDIO_H_INCLUDED
-//Old_Code PD 13Oct95 struct	FILE;
-//Old_Code PD 13Oct95 #endif
 //typedef 	FILE	*file;
 
 typedef  void	filetrans
@@ -290,7 +285,6 @@ string		pathnameptr;
 
 	struct	dirfileentry
 	{
-//DeadCode RDH 30Sep96 	public:
 	FileNum			driverfile;
 	DirNameInd		dirnameind;
 	dirindex		parentdir;
@@ -316,14 +310,6 @@ string		pathnameptr;
 		UWord	CDGetDirectoryEntry(struct dir_entry*,string);	//PD 30Oct96
 		UWord	CDSeek(ULong);									//PD 30Oct96
 		UWord	CDReadFileBlock(ULong,void*,ULong);				//PD 30Oct96
-//DeadCode PD 25Sep98 		void	SendCDCommand(UByteP);							//PD 16Dec96
-//Old_Code PD 18Nov96 		void	CDReSeek();										//PD 04Nov96
-//Old_Code PD 18Nov96 		void	CDMakeFileBlock(fileblock*,
-//Old_Code PD 18Nov96 								fileblocklink*,
-//Old_Code PD 18Nov96 								FileNum,
-//Old_Code PD 18Nov96 								ULong,
-//Old_Code PD 18Nov96 								ULong);							//PD 04Nov96
-//Old_Code PD 18Nov96 		Bool	CDgetthedata;									//PD 04Nov96
 
 public:															//JIM 10May96
 	dirfileentry	direntries[MAXDIRENTRIES];					//PD 18Nov96
@@ -331,11 +317,6 @@ void		InitFileSystem();
 void		makerootdirlist();									//JIM 10May96
 //void		CDSetup(string);									//PD 30Oct96
 void		CDCloseDown();										//PD 29Oct96
-//DeadCode PD 24Sep98 void		SetupAreaFiles(FileNum*);							//PD 18Nov96
-//DeadCode PD 24Sep98 void		CloseAreaFiles();									//PD 18Nov96
-//DeadCode PD 24Sep98 void		resetCDfile(FileNum);								//PD 18Nov96
-//DeadCode PD 24Sep98 void*		loadCDfile(FileNum,SLong,SLong,Bool skipread=TRUE);	//PD 18Nov96
-//DeadCode PD 24Sep98 void		pingCD();											//PD 17Dec96
 private:														//JIM 10May96
 //Don't tell anyone about these functions... they are a secret!	//JIM 10May96
 fileblockptr

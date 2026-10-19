@@ -68,8 +68,6 @@ public:
 	PTHRUSTPOINT pSlipThrustPoint[2];
 	char AmountInSlipstream;
 
-//DeadCode AMM 29Jun99 	ULong cCtrls;
-//DeadCode AMM 29Jun99 	PCTRL pCtrls;
 	PNEWCTRL pNewCtrls;
 
 	FCRD Pos[2][2];		//CSB 06/11/98
@@ -99,8 +97,6 @@ public:
 	FP fKMach;	// reset in header
 
 	FP DownWashAng[2];
-//DeadCode AMM 29Jun99 	Bool stalled[2][2];
-//DeadCode AMM 29Jun99 	FP StallAoa, UnStallAoa;
 	FP buffetAoa0,buffetAoa1;		//Angle of attack for onset and full buffet at M=0
 	FP buffetM0,  buffetM1;			//Mach no for onset and full buffet at Alpha=0
 	FP BuffetAoaMin;
@@ -141,18 +137,13 @@ public:
 		fCd0Mach = 1;
 		fKMach   = 1;
 
-//DeadCode AMM 29Jun99 		cCtrls = 0;
-//DeadCode AMM 29Jun99 		pCtrls = NULL;
 		pNewCtrls = NULL;
 
-//DeadCode AMM 29Jun99 		StallAoa = 0;
-//DeadCode AMM 29Jun99 		UnStallAoa = 0;
 
 		for(SWord wing = 0; wing < 2; wing++)
 			for(SWord section = 0; section < 2; section++)
 			{
 				aoa[wing][section] = 0.0;
-//DeadCode AMM 29Jun99 				stalled[wing][section] = FALSE;
 				NullVec(eForce[wing][section]);
 				NullVec(eMoment[wing][section]);
 				MaskAngle[wing][section] = 0.0;
@@ -168,7 +159,6 @@ public:
 
 	~MainPlane ()
 	{
-//DeadCode AMM 29Jun99 		while (pCtrls != NULL) delete pCtrls;
 		while (pNewCtrls != NULL) delete pNewCtrls;
 		List.Detach (this);
 	}
@@ -434,7 +424,6 @@ public:
 	void Process (AirStrucPtr const ControlledAC);
 
 	void SetCurves (char* accl, char* cl, char* accd, char* cd)
-//DeadCode CSB 25/02/99						char* accm, char* cm, char* accdm, char* cdm)
 	{
 		if ((*accl != 0) && (*cl != 0))
 			pClCurve = _CurveRsc.FindCurve (accl, cl);
@@ -446,15 +435,6 @@ public:
 		else
 			pCdCurve = NULL;
 
-//DeadCode CSB 25/02/99			if ((*accm != 0) && (*cm != 0))
-//DeadCode CSB 25/02/99				pCmCurve = _CurveRsc.FindCurve (accm, cm);
-//DeadCode CSB 25/02/99			else
-//DeadCode CSB 25/02/99				pCmCurve = NULL;
-//DeadCode CSB 25/02/99
-//DeadCode CSB 25/02/99			if ((*accdm != 0) && (*cdm != 0))
-//DeadCode CSB 25/02/99				pCdMCurve = _CurveRsc.FindCurve (accdm, cdm);
-//DeadCode CSB 25/02/99			else
-//DeadCode CSB 25/02/99				pCdMCurve = NULL;
 	}
 	void SetSlipstream (PTHRUSTPOINT thrust, char percentage)
 	{

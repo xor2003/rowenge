@@ -155,7 +155,6 @@ extern RequiredBankDataElement 	CombatReqBankData[];
 //				{ANGLES_5Deg, ANGLES_22Deg},
 //				{ANGLES_6Deg, ANGLES_30Deg},
 //				{ANGLES_10Deg, ANGLES_45Deg},
-////DeadCode RDH 17Jul96 				{ANGLES_22Deg, ANGLES_60Deg},
 //				{ANGLES_30Deg, MAXCOMBATROLL},
 //				{ANGLES_180BareDeg, MAXCOMBATROLL}
 //			};
@@ -947,7 +946,6 @@ void	AirStruc::DiveAndZoom ()
 //			else
 //				reqroll = ANGLES_70Deg;
 //			ACM.Roll ((Angles)reqroll);
-////DeadCode DAW 25Nov98 			ACM.LiftLimit();
 //			ACM.ZeroSpecificPower();
 
  			break;
@@ -1192,14 +1190,16 @@ void	AirStruc::LagPursuit()
 		{
 				SWord c,s;
 				SWord newhdg;
-				SLong range;
-				newhdg = unfriendly->hdg + ai.desiredhdg;
+				SLong range=METRES200;							//RERUN: else-path left it uninit
+				newhdg = unfriendly ? unfriendly->hdg + ai.desiredhdg : ai.desiredhdg;
 				Math_Lib.high_sin_cos((Angles)newhdg,s,c);
 				if (SubjectOnTargetTail(ANGLES_90Deg))
 					range = METRES200;
 				else
 					ai.PilotSkills.manoeuvre = MANOEUVRE_SELECT;
 
+				if (!unfriendly)
+					return;										//RERUN: target calcs need it
 				target.X = unfriendly->World.X + MULSHSIN(s, range, ANGLES_SHIFT);
 				target.Y = unfriendly->World.Y;
 				target.Z = unfriendly->World.Z + MULSHSIN(c, range, ANGLES_SHIFT);
@@ -2408,10 +2408,10 @@ void AirStruc::GoHome ( )
 				ai.PilotSkills.manoeuvre = MANOEUVRE_SELECT;
 
 
-				FP	Mach = MOD.Inst.MachNo;
-				if (Mach > 0.9)
-					Mach = 0.9;
-				if (Mach < 0.3)
+			FP	Mach = MOD.Inst.MachNo;
+			if (Mach > 0.9)
+				Mach = 0.9;
+			if (Mach < 0.3)
 					Mach = 0.3;
 
 				ANGLES desiredpitch;

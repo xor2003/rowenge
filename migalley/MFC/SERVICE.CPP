@@ -166,7 +166,7 @@ BOOL CSelectService::OnInitDialog()
 		temp=_DPlay.ServiceList;
 		if (temp)
 		{
-			strcpy(_DPlay.ServiceName,temp->sname);
+			strncpy(_DPlay.ServiceName,temp->sname,255); _DPlay.ServiceName[255]=0;
 		}
 	}
 	rlistbox->SetHilightRow(row);

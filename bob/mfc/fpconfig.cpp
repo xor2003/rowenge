@@ -529,8 +529,6 @@ Bool	RFullPanelDial::PreferencesExitPath(FullScreen*&fs)
 		else if (incomms)
 				SelectReadyRoom(fs);
 #endif
-//DeadCode CSB 11Sep00 		else if (gamestate==QUICK)
-//DeadCode CSB 11Sep00 			fs = &bobfrag;												//RDH 16/05/00
 		else
 		{
 			fs = &bobfrag;

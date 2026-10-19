@@ -166,7 +166,6 @@ static ULong vsets[16]=
 };
 
 
-//DEADCODE PD 03/12/99 extern SWord winmode_bpp;
 
 extern bool fNot16bit;
 
@@ -254,7 +253,6 @@ static OString OViewChaseTog(IDS_CHASE);
 static OString OViewCheatTog(IDS_NOCOCKPIT);
 
 
-//DeadCode JON 5Nov00 inline bool IsWide(SLong pwdth) {return pwdth<=640?false:true;}
 inline bool IsWide(SLong pwdth) {return pwdth<640?false:true;}
 inline bool IsExtraWide(SLong pwidth) {return pwidth<=800?false:true;}
 
@@ -462,12 +460,6 @@ int active_lines;
 const SWord POINTER_WIDTH=32;
 const SWord POINTER_HEIGHT=32;
 
-//DeadCode PD 20Feb99 ICON mouseCursor=
-//DeadCode PD 20Feb99 {
-//DeadCode PD 20Feb99 	{0,0,POINTER_WIDTH,POINTER_HEIGHT},
-//DeadCode PD 20Feb99 	{SQUEAKNO,{1,1,POINTER_WIDTH-2,POINTER_HEIGHT-2}},
-//DeadCode PD 20Feb99 	{SQUEAKNO,{1,1,POINTER_WIDTH-2,POINTER_HEIGHT-2}}
-//DeadCode PD 20Feb99 };
 
 //const SWord INFO_POINT_COUNT=sizeof(infoLine1)/sizeof(COORDS2D);
 //const SWord REPLAY_POINT_COUNT=sizeof(replayBar)/sizeof(COORDS2D);
@@ -484,12 +476,6 @@ SWord TOPLINE_Y=0;
 SWord TOPLINE_Y2=0;
 SWord TOPLINE_Y3=0;
 SWord TOPLINE_YY=0;
-//DeadCode RJS 7Dec00 const SWord ALTITUDE_X	=  10;
-//DeadCode RJS 7Dec00 const SWord HDG_X		= 110;
-//DeadCode RJS 7Dec00 const SWord SPEED_X		= 190;
-//DeadCode RJS 7Dec00 const SWord THRUST_X	= 310;
-//DeadCode RJS 7Dec00 const SWord AMMO_X		= 410;
-//DeadCode RJS 7Dec00 const SWord MACH_X		= 0;
 const SWord ALTITUDE_X	=  0;
 const SWord HDG_X		= 1;
 const SWord SPEED_X		= 2;
@@ -696,13 +682,11 @@ void COverlay::DrawInfoBar()
 		COORDS2D* pointList;
 		Save_Data.infoLineCount%=INFOLINESMAX;
 
-//DeadCode JON 13Jun00 		DoPointStruc dp;
 
 		SLong box_height;
 
 		GetSurfaceDimensions(physicalWidth,physicalHeight);
 
-//DeadCode JON 5Nov00 		fIsWide=IsWide(physicalWidth);
 
 		if (!fIsWide)	box_height=10;
 		else			box_height=18;
@@ -741,8 +725,6 @@ void COverlay::DrawInfoBar()
 //TempCode JON 14Jul00 			static ULong tCol = TEXT_MAP_WHITE;
 //TempCode JON 14Jul00 			g_lpLib3d->SetGlobal( TOGGLE_GLOBAL2DZDEPTH, zDepth );
 			g_lpLib3d->SetGlobal( TOGGLE_GLOBAL2DZDEPTH, 1 );
-//DeadCode JON 13Jul00 			SmokedGlassBox(0,physicalHeight-local_box_height,physicalWidth+1,local_box_height+1) ;
-//DeadCode JON 25Sep00 			SmokedGlassBox(0,physicalHeight-local_box_height,physicalWidth+1,local_box_height+1,INFO_BAR_COL,INFO_BAR_ALPHA);
 			SmokedGlassBox(0,physicalHeight-local_box_height,physicalWidth,local_box_height,INFO_BAR_COL,INFO_BAR_ALPHA);
 //TempCode JON 14Jul00 			SmokedGlassBox(0,physicalHeight-local_box_height,physicalWidth+1,local_box_height+1,bCol,bAlpha);
 			g_lpLib3d->SetFontColour(TEXT_MAP_WHITE);
@@ -811,14 +793,9 @@ void COverlay::DrawTopText()
 	SLong speed2,altitude2; float speedey;
 
 	altitude2=(altitude*305)/Save_Data.alt.mediummm;
-//DeadCode CSB 23/06/99		speedey=(float(speed)/.5147)*Save_Data.speed.mmpcs2perhr;
 	speedey = float(speed) * Save_Data.speed.mmpcs2perhr;	//CSB 23/06/99
 	speed2=SLong(speedey);
 
-//DeadCode JON 10Oct00 	const SLong doubleSpace=StrPixelLen2((char*)&"  ");
-//DeadCode JON 10Oct00 	const SLong digitWidth=StrPixelLen2((char*)&"8");
-//DeadCode JON 20Oct00 	const SLong doubleSpace=StrPixelWidthPadded((char*)&"  ");
-//DeadCode JON 20Oct00 	const SLong digitWidth=StrPixelWidthPadded((char*)&"8");
 //DEAD	if (!fIsWide)	doubleSpace>>=1;
 	char temp[128];
 	SWord xpos=0;
@@ -856,28 +833,6 @@ void COverlay::DrawTopText()
 	xpos = x_offsets[g_languageIndex][AMMO_X];						//RJS 7Dec00;
 	PrintAt2(xpos, TOPLINE_Y, temp);
 
-//DeadCode CSB 15Sep00 	SWord bupxpos=xpos;
-//DeadCode CSB 15Sep00 	sprintf(temp,"%s: %3d%s",OSpeedText.text,speed2,speedUnitStr);
-//DeadCode CSB 15Sep00 	PrintAt2(xpos,TOPLINE_Y,temp);
-//DeadCode CSB 15Sep00
-//DeadCode CSB 15Sep00 	xpos=bupxpos+StrPixelLen2(OSpeedText.text)+3*digitWidth+StrPixelLen2(speedUnitStr)+doubleSpace;
-//DeadCode CSB 15Sep00 	bupxpos=xpos;
-//DeadCode CSB 15Sep00 	sprintf(temp,"%s: %3d",OAmmoText.text,ammocount);
-//DeadCode CSB 15Sep00 	PrintAt2(xpos,TOPLINE_Y,temp);
-//DeadCode CSB 15Sep00
-//DeadCode CSB 15Sep00 	xpos=bupxpos+StrPixelLen2(OMachText.text)+4*digitWidth+doubleSpace;
-//DeadCode CSB 15Sep00 	bupxpos=xpos;
-//DeadCode CSB 15Sep00 	sprintf(temp,"%s: %5d%s",OAltitudeText.text,altitude2,heightUnitStr);
-//DeadCode CSB 15Sep00 	PrintAt2(xpos,TOPLINE_Y,temp);
-//DeadCode CSB 15Sep00
-//DeadCode CSB 15Sep00 	xpos=bupxpos+StrPixelLen2(OAltitudeText.text)+6*digitWidth+StrPixelLen2(heightUnitStr)+doubleSpace;
-//DeadCode CSB 15Sep00 	bupxpos=xpos;
-//DeadCode CSB 15Sep00 	sprintf(temp,"%s: %3d",OHdgText.text,heading);
-//DeadCode CSB 15Sep00 	PrintAt2(xpos,TOPLINE_Y,temp);
-//DeadCode CSB 15Sep00
-//DeadCode CSB 15Sep00 	xpos=bupxpos+StrPixelLen2(OHdgText.text)+3*digitWidth+doubleSpace;
-//DeadCode CSB 15Sep00 	sprintf(temp,"%s: %3d",OThrustText.text,thrust);
-//DeadCode CSB 15Sep00 	PrintAt2(xpos,TOPLINE_Y,temp);
 #else
 	PrintAt2(xpos,TOPLINE_Y,hitlinestr);
 #endif
@@ -927,7 +882,6 @@ void COverlay::DrawMessageText()
 void COverlay::PreFormatViewText()
 {
 	GetSurfaceDimensions(physicalWidth,physicalHeight);
-//DeadCode JON 5Nov00 	fIsWide=IsWide(physicalWidth);
 
 	SLong	vieweeLen=0,
 			viewTypeLen=0,
@@ -965,31 +919,6 @@ void COverlay::PreFormatViewText()
 		if ((j=StrPixelWidthPadded(listViewType[i]->text))>viewTypeLen)
 			viewTypeLen=j;
 
-//DeadCode JON 10Oct00 	const	SLong bigSpaceLen=StrPixelLen2("      ")>>1;
-//DeadCode JON 10Oct00 	const	SLong smallSpaceLen=bigSpaceLen>>1;
-//DeadCode JON 10Oct00 	const	SLong vieweeTextLen=StrPixelLen2(OViewee.text);
-//DeadCode JON 10Oct00 	const	SLong viewTypeTextLen=StrPixelLen2(OViewType.text);
-//DeadCode JON 10Oct00 	const	SLong rangeTextLen=StrPixelLen2(ORangeText.text);
-//DeadCode JON 10Oct00 	const	SLong relBrgTextLen=StrPixelLen2(ORelBrgText.text);
-//DeadCode JON 10Oct00 	const	SLong relAltTextLen=StrPixelLen2(ORelAltText.text);
-//DeadCode JON 10Oct00 	const	SLong rangeUnitsLen=(i=StrPixelLen2(shortDistUnitStr))>
-//DeadCode JON 10Oct00 								(j=StrPixelLen2(longDistUnitStr))?
-//DeadCode JON 10Oct00 								i:j;
-//DeadCode JON 10Oct00 	const	SLong relBrgUnitsLen=0;
-//DeadCode JON 10Oct00 	const	SLong relAltUnitsLen=StrPixelLen2(heightUnitStr);
-//DeadCode JON 10Oct00 	const	SLong rangeDigitLen=StrPixelLen2("00000000");
-//DeadCode JON 10Oct00 	const	SLong relBrgDigitLen=StrPixelLen2("0000");
-//DeadCode JON 10Oct00 	const	SLong relAltDigitLen=StrPixelLen2("00000000");
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 	//find the longest viewer & viewee strings
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 	for (i=VIEWEE_LIST_SIZE-1;i>=0;i--)
-//DeadCode JON 10Oct00 		if ((j=StrPixelLen2(listViewee[i]->text))>vieweeLen)
-//DeadCode JON 10Oct00 			vieweeLen=j;
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 	for (i=VIEWTYPE_LIST_SIZE-1;i>=0;i--)
-//DeadCode JON 10Oct00 		if ((j=StrPixelLen2(listViewType[i]->text))>viewTypeLen)
-//DeadCode JON 10Oct00 			viewTypeLen=j;
 
 	totalLen =	vieweeTextLen+
 				smallSpaceLen+
@@ -1087,147 +1016,13 @@ void COverlay::DrawViewText()
 	}
 }
 
-//DeadCode JON 13Jun00 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//DeadCode JON 13Jun00 //Procedure		DrawReplayBar
-//DeadCode JON 13Jun00 //Author		Paul
-//DeadCode JON 13Jun00 //Date			Thu 4 Jun 1998
-//DeadCode JON 13Jun00 //------------------------------------------------------------------------------
-//DeadCode JON 13Jun00 void COverlay::DrawReplayBar()
-//DeadCode JON 13Jun00 {
-//DeadCode JON 13Jun00 //	COORDS2D* pointList=replayBar;
-//DeadCode JON 13Jun00 //
-//DeadCode JON 13Jun00 //	POLYGON.createpoly(REPLAY_BAR_COLOR);
-//DeadCode JON 13Jun00 //
-//DeadCode JON 13Jun00 //	DoPointStruc dp;
-//DeadCode JON 13Jun00 //
-//DeadCode JON 13Jun00 //	for (int x=0;x<REPLAY_POINT_COUNT;x++){
-//DeadCode JON 13Jun00 //		dp.bodyx.f=Float(pointList[x].x-HALF_WIDTH_640)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //		dp.bodyy.f=Float(HALF_HEIGHT_640-pointList[x].y)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //		dp.bodyz.f=Float(1);
-//DeadCode JON 13Jun00 //		POLYGON.createvert(dp);
-//DeadCode JON 13Jun00 //	}
-//DeadCode JON 13Jun00 //	POLYGON.drawpoly();
-//DeadCode JON 13Jun00 }
 
-//DeadCode JON 13Jun00 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//DeadCode JON 13Jun00 //Procedure		DrawReplayIcons
-//DeadCode JON 13Jun00 //Author		Paul
-//DeadCode JON 13Jun00 //Date			Thu 4 Jun 1998
-//DeadCode JON 13Jun00 //------------------------------------------------------------------------------
-//DeadCode JON 13Jun00 void COverlay::DrawReplayIcons(bool pausedFlag)
-//DeadCode JON 13Jun00 {
-//DeadCode JON 13Jun00 //	ICON* iconList;
-//DeadCode JON 13Jun00 //	if (pausedFlag)	iconList=replayIcon;
-//DeadCode JON 13Jun00 //	else			iconList=replayIcon;
-//DeadCode JON 13Jun00 //
-//DeadCode JON 13Jun00 //	for (int i=0;i<REPLAY_ICON_COUNT;iconList++,i++) RenderIcon(*iconList);
-//DeadCode JON 13Jun00 //
-//DeadCode JON 13Jun00 //	//And the progress bar
-//DeadCode JON 13Jun00 //	RenderIcon(replayPanel);
-//DeadCode JON 13Jun00 }
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //Procedure		RenderIcon
 //Author		Paul
 //Date			Thu 4 Jun 1998
 //------------------------------------------------------------------------------
-//DeadCode JON 13Jun00 void COverlay::RenderIcon(ICON& icn,bool clicked)
-//DeadCode JON 13Jun00 {
-//DeadCode JON 13Jun00 	//position of the icon on screen is taken from the
-//DeadCode JON 13Jun00 	//hit box def
-//DeadCode JON 13Jun00 	//mapping coordinates are from the unclicked image def
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	IMAGEDEF* pid;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	if (clicked)	pid=&icn.clicked;
-//DeadCode JON 13Jun00 	else			pid=&icn.clicked;//unclicked;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	IMAGEDEF& id=*pid;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 //deadcode	POLYGON.createpoly(id.imageNo);
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	R3DVERTEX *pRVerts;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	g_lpLib3d->BeginPoly(HMATERIAL(Image_Map.GetImageMapPtr(id.imageNo)),4,pRVerts);
-//DeadCode JON 13Jun00 	Lib3DPoint* pRVerts = g_lpLib3d->BeginPoly( HMATERIAL(Image_Map.GetImageMapPtr(id.imageNo)),4 );
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	RECT2D& rect=id.mappingCoords;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	SWord u,v;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	//always 4 points...
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyx.f=Float(icn.hitBox.x-HALF_WIDTH_640)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyy.f=Float(HALF_HEIGHT_640-icn.hitBox.y)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyz.f=Float(1);
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->ix=u=rect.x;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->iy=v=rect.y;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts->setPosition(
-//DeadCode JON 13Jun00 		Float(icn.hitBox.x-HALF_WIDTH_640)/FHALF_WIDTH,
-//DeadCode JON 13Jun00 		Float(HALF_HEIGHT_640-icn.hitBox.y)/FHALF_WIDTH,
-//DeadCode JON 13Jun00 		Float(1)
-//DeadCode JON 13Jun00 	);
-//DeadCode JON 13Jun00 	pRVerts->setIMapCoords(
-//DeadCode JON 13Jun00 		rect.x,
-//DeadCode JON 13Jun00 		rect.y
-//DeadCode JON 13Jun00 	);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts++;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyx.f=Float(icn.hitBox.x+icn.hitBox.w-1-HALF_WIDTH_640)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyy.f=Float(HALF_HEIGHT_640-icn.hitBox.y)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyz.f=Float(1);
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->ix=u=rect.x+rect.w;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->iy=v=rect.y;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts->setPosition(
-//DeadCode JON 13Jun00 		Float(icn.hitBox.x+icn.hitBox.w-1-HALF_WIDTH_640)/FHALF_WIDTH,
-//DeadCode JON 13Jun00 		Float(HALF_HEIGHT_640-icn.hitBox.y)/FHALF_WIDTH,
-//DeadCode JON 13Jun00 		Float(1)
-//DeadCode JON 13Jun00 	);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts->setIMapCoords(
-//DeadCode JON 13Jun00 		rect.x+rect.w,
-//DeadCode JON 13Jun00 		rect.y
-//DeadCode JON 13Jun00 	);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts++;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyx.f=Float(icn.hitBox.x+icn.hitBox.w-1-HALF_WIDTH_640)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyy.f=Float(HALF_HEIGHT_640-icn.hitBox.y-icn.hitBox.h+1)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyz.f=Float(1);
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->ix=u=rect.x+rect.w;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->iy=v=rect.y+rect.h;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts->setPosition(
-//DeadCode JON 13Jun00 		Float(icn.hitBox.x+icn.hitBox.w-1-HALF_WIDTH_640)/FHALF_WIDTH,
-//DeadCode JON 13Jun00 		Float(HALF_HEIGHT_640-icn.hitBox.y-icn.hitBox.h+1)/FHALF_WIDTH,
-//DeadCode JON 13Jun00 		Float(1)
-//DeadCode JON 13Jun00 	);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts->setIMapCoords(
-//DeadCode JON 13Jun00 		rect.x+rect.w,
-//DeadCode JON 13Jun00 		rect.y+rect.h
-//DeadCode JON 13Jun00 	);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts++;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyx.f=Float(icn.hitBox.x-HALF_WIDTH_640)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyy.f=Float(HALF_HEIGHT_640-icn.hitBox.y-icn.hitBox.h+1)/FHALF_WIDTH;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->bodyz.f=Float(1);
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->ix=u=rect.x;
-//DeadCode JON 13Jun00 //DEADCODE JON 5/22/00 	pRVerts->iy=v=rect.y+rect.h;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts->setPosition(
-//DeadCode JON 13Jun00 		Float(icn.hitBox.x-HALF_WIDTH_640)/FHALF_WIDTH,
-//DeadCode JON 13Jun00 		Float(HALF_HEIGHT_640-icn.hitBox.y-icn.hitBox.h+1)/FHALF_WIDTH,
-//DeadCode JON 13Jun00 		Float(1)
-//DeadCode JON 13Jun00 	);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	pRVerts->setIMapCoords(
-//DeadCode JON 13Jun00 		rect.x,
-//DeadCode JON 13Jun00 		rect.y+rect.h
-//DeadCode JON 13Jun00 	);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	g_lpLib3d->EndPoly();
-//DeadCode JON 13Jun00 }
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //Procedure		ReplayIconHitTest
@@ -1326,38 +1121,6 @@ static UByte bigWidths[]=
 1,	1,	1,	1,	1,	1,	1,	1,
 1,	1,	1,	1,	1,	1,	1,	1};
 
-//DeadCode PD 10Jun99 {8,	2,	5,	8,	5,	8,	9,	2,
-//DeadCode PD 10Jun99 2,	2,	7,	7,	2,	7,	2,	10,
-//DeadCode PD 10Jun99 6,	3,	7,	6,	8,	6,	6,	7,
-//DeadCode PD 10Jun99 6,	6,	2,	2,	5,	6,	5,	6,
-//DeadCode PD 10Jun99 10,	10,	7,	7,	8,	7,	6,	8,
-//DeadCode PD 10Jun99 7,	2,	4,	7,	7,	9,	8,	8,
-//DeadCode PD 10Jun99 7,	8,	8,	7,	8,	8,	9,	11,
-//DeadCode PD 10Jun99 11,	7,	10,	3,	10,	3,	7,	7,
-//DeadCode PD 10Jun99 2,	7,	7,	6,	7,	6,	6,	7,
-//DeadCode PD 10Jun99 7,	2,	2,	7,	2,	12,	7,	7,
-//DeadCode PD 10Jun99 7,	9,	5,	6,	4,	7,	7,	12,
-//DeadCode PD 10Jun99 8,	7,	7,	5,	2,	5,	3,	5,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	9,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 13,	10,	11,	12,	9,	11,	7,	6,
-//DeadCode PD 10Jun99 6,	6,	6,	3,	3,	3,	3,	9,
-//DeadCode PD 10Jun99 8,	8,	8,	8,	8,	8,	6,	8,
-//DeadCode PD 10Jun99 8,	8,	8,	8,	7,	7,	7,	7,
-//DeadCode PD 10Jun99 7,	7,	9,	7,	7,	11,	6,	6,
-//DeadCode PD 10Jun99 6,	6,	6,	3,	3,	3,	3,	7,
-//DeadCode PD 10Jun99 7,	7,	7,	7,	7,	7,	6,	7,
-//DeadCode PD 10Jun99 7,	7,	7,	7,	7,	7,	7,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1,
-//DeadCode PD 10Jun99 1,	1,	1,	1,	1,	1,	1,	1};
 
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
@@ -1365,48 +1128,14 @@ static UByte bigWidths[]=
 //Author		Paul.
 //Date			Thu 17 Dec 1998
 //------------------------------------------------------------------------------
-//DeadCode JON 10Oct00 SLong COverlay::StrPixelLen(char* pstr)
-//DeadCode JON 10Oct00 {
-//DeadCode JON 10Oct00 	SLong retVal=0;						//RJS 14Jan98
-//DeadCode JON 10Oct00 	if (pstr)							//RJS 14Jan98
-//DeadCode JON 10Oct00 	{
-//DeadCode JON 10Oct00 		if (!fIsWide)
-//DeadCode JON 10Oct00 			return 7*strlen(pstr);
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 		while (*pstr)
-//DeadCode JON 10Oct00 		{
-//DeadCode JON 10Oct00 	 		retVal+=bigWidths[(*pstr)-32];
-//DeadCode JON 10Oct00 			pstr++;
-//DeadCode JON 10Oct00 		}
-//DeadCode JON 10Oct00 	}
-//DeadCode JON 10Oct00 	return retVal;
-//DeadCode JON 10Oct00 }
-//DeadCode JON 10Oct00 SLong COverlay::StrPixelLen2(char* pstr)
-//DeadCode JON 10Oct00 {
-//DeadCode JON 10Oct00 	SLong retVal=0;						//RJS 14Jan98
-//DeadCode JON 10Oct00 	if (pstr)							//RJS 14Jan98
-//DeadCode JON 10Oct00 	{
-//DeadCode JON 10Oct00 		if (!fIsWide)
-//DeadCode JON 10Oct00 			return 8*strlen(pstr);
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 		while (*pstr)
-//DeadCode JON 10Oct00 		{
-//DeadCode JON 10Oct00 	 		retVal+=bigWidths[(*pstr)-32]+1;
-//DeadCode JON 10Oct00 			pstr++;
-//DeadCode JON 10Oct00 		}
-//DeadCode JON 10Oct00 	}
-//DeadCode JON 10Oct00 	return retVal;
-//DeadCode JON 10Oct00 }
 
 void COverlay::ChopStr(CString& in,CString& out)
 {
 	out="";
 	GetSurfaceDimensions(physicalWidth,physicalHeight);
-//DeadCode JON 5Nov00 	fIsWide=IsWide(physicalWidth);
 	in.TrimRight();
 	in.TrimLeft();
 
-//DeadCode JON 10Oct00 	while (StrPixelLen(const_cast<char*>(LPCTSTR(in)))>=physicalWidth)
 	while (StrPixelWidth(const_cast<char*>(LPCTSTR(in)))>=physicalWidth)
 	{
 		int l=in.GetLength();
@@ -1425,10 +1154,8 @@ void COverlay::ChopStr(CString& in,CString& out)
 void COverlay::MakeDotDotDot(CString& in)
 {
 	GetSurfaceDimensions(physicalWidth,physicalHeight);
-//DeadCode JON 5Nov00 	fIsWide=IsWide(physicalWidth);
 	in.TrimLeft();
 	in.TrimRight();
-//DeadCode JON 10Oct00 	if (StrPixelLen(const_cast<char*>(LPCTSTR(in)))>=physicalWidth)
 	if (StrPixelWidth(const_cast<char*>(LPCTSTR(in)))>=physicalWidth)
 	{
 		CString temp;
@@ -1439,7 +1166,6 @@ void COverlay::MakeDotDotDot(CString& in)
 			temp=in+"...";
 		}
 		while (StrPixelWidth(const_cast<char*>(LPCTSTR(temp)))>=physicalWidth);
-//DeadCode JON 10Oct00 		while (StrPixelLen(const_cast<char*>(LPCTSTR(temp)))>=physicalWidth);
 		in=temp;
 	}
 }
@@ -1447,18 +1173,15 @@ void COverlay::MakeDotDotDot(CString& in)
 SWord COverlay::CalcTargIndex(CString& in)
 {
 	GetSurfaceDimensions(physicalWidth,physicalHeight);
-//DeadCode JON 5Nov00 	fIsWide=IsWide(physicalWidth);
 	in.TrimLeft();
 	in.TrimRight();
 
-//DeadCode JON 10Oct00 	if (StrPixelLen(const_cast<char*>(LPCTSTR(in)))<physicalWidth)
 	if (StrPixelWidth(const_cast<char*>(LPCTSTR(in)))<physicalWidth)
 		return 0;
     SLong i;
 	for (i=0;i<in.GetLength();i++)
 	{
 		CString temp=in.Right(in.GetLength()-i);
-//DeadCode JON 10Oct00 		if (StrPixelLen(const_cast<char*>(LPCTSTR(temp)))<physicalWidth)
 		if (StrPixelWidth(const_cast<char*>(LPCTSTR(temp)))<physicalWidth)
 		{
 			if (i+3<in.GetLength()) i+=3;
@@ -1477,7 +1200,6 @@ SWord COverlay::CalcTargIndex(CString& in)
 void COverlay::PutC(SWord& x,SWord& y,unsigned char c)
 {
 	//lo res version only displays upper case chars
-//DeadCode JON 5Nov00 	SWord extra=nofontkludge?0:1;
 
 	UByte tWidth=8;
 	SWord this_y;
@@ -1526,12 +1248,6 @@ void COverlay::PutC(SWord& x,SWord& y,unsigned char c)
 		fNot16bit=false;
 	}
 
-//DEADCODE JON 5/22/00 	R3DVALUE sx,sy;
-//DEADCODE JON 5/22/00 	R3DVALUE hx,hy;
-//DEADCODE JON 5/22/00 	hx=R3DVALUE(physicalWidth>>1);
-//DEADCODE JON 5/22/00 	hy=R3DVALUE(physicalHeight>>1);
-//DEADCODE JON 5/22/00 	sx=1.f/hx;
-//DEADCODE JON 5/22/00 	sy=-1.f/hy;
 	R3DVALUE sx,sy;
 	SWord hx,hy;
 	hx=physicalWidth>>1;
@@ -1597,30 +1313,6 @@ void COverlay::PutC(SWord& x,SWord& y,unsigned char c)
 //TEMPCODE JON 6/1/00 	*dp1=*dp;
 	g_lpLib3d->EndPoly();
 
-//DEADCODE JON 5/22/00  	dp[0].bodyx.f=R3DVALUE(x);
-//DEADCODE JON 5/22/00  	dp[0].bodyy.f=R3DVALUE(this_y);
-//DEADCODE JON 5/22/00  	dp[1].bodyx.f=R3DVALUE(x+pWidth-1);
-//DEADCODE JON 5/22/00  	dp[1].bodyy.f=R3DVALUE(this_y);
-//DEADCODE JON 5/22/00  	dp[2].bodyx.f=R3DVALUE(x+pWidth-1);
-//DEADCODE JON 5/22/00  	dp[2].bodyy.f=R3DVALUE(this_y+pHeight-1);
-//DEADCODE JON 5/22/00  	dp[3].bodyx.f=R3DVALUE(x);
-//DEADCODE JON 5/22/00  	dp[3].bodyy.f=R3DVALUE(this_y+pHeight-1);
-//DEADCODE JON 5/22/00 	dp[0].ix=ou;
-//DEADCODE JON 5/22/00  	dp[0].iy=ov;
-//DEADCODE JON 5/22/00  	dp[1].ix=ou+cWidth-1;
-//DEADCODE JON 5/22/00  	dp[1].iy=ov;
-//DEADCODE JON 5/22/00  	dp[2].ix=ou+cWidth-1;
-//DEADCODE JON 5/22/00  	dp[2].iy=ov+cHeight-1;
-//DEADCODE JON 5/22/00  	dp[3].ix=ou;
-//DEADCODE JON 5/22/00  	dp[3].iy=ov+cHeight-1;
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00
-//DEADCODE JON 5/22/00 	for (int i=3;i>=0;i--)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 	 	dp[i].bodyx.f=(dp[i].bodyx.f-hx)*sx;
-//DEADCODE JON 5/22/00 	 	dp[i].bodyy.f=(dp[i].bodyy.f-hy)*sy;
-//DEADCODE JON 5/22/00 		dp[i].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	}
 
  	x+=pWidth;
 
@@ -1776,7 +1468,6 @@ VOID	COverlay::PatchFontTable(ImageMapDesc* imap)
 void COverlay::PutC2(SWord& x,SWord& y,unsigned char c)
 {
 	//lo res version only displays upper case chars
-//DeadCode JON 5Nov00 	SWoréd extra=nofontkludge?0:1;
 
 	UByte tWidth=8;
 	SWord this_y;
@@ -1894,73 +1585,6 @@ void COverlay::PutC2(SWord& x,SWord& y,unsigned char c)
 	x+=pWidth;
 }
 
-//DeadCode JON 21Aug00 void COverlay::ClippedPutC(R3DVERTEX* idp,ImageMapDescPtr pmap,FRect& clip)
-//DeadCode JON 21Aug00 {
-//DeadCode JON 21Aug00 #pragma message(__HERE__ "clippedputc")
-//DeadCode JON 21Aug00 	/*
-//DeadCode JON 21Aug00 	DoPointStruc dp[4];
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	for (int i=0;i<4;dp[i++]=*idp++);
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	//check for completely clipped off screen
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	if (dp[0].bodyx.f>=clip.right ||
-//DeadCode JON 21Aug00 		dp[0].bodyy.f>=clip.bottom ||
-//DeadCode JON 21Aug00 		dp[2].bodyx.f<=clip.left ||
-//DeadCode JON 21Aug00 		dp[2].bodyy.f<=clip.top)
-//DeadCode JON 21Aug00 		return;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	//check for any clipping at all
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	if (!(dp[0].bodyx.f>=clip.left &&
-//DeadCode JON 21Aug00 		dp[1].bodyx.f<=clip.right &&
-//DeadCode JON 21Aug00 		dp[0].bodyy.f>=clip.top &&
-//DeadCode JON 21Aug00 		dp[3].bodyy.f<=clip.bottom))
-//DeadCode JON 21Aug00 	{
-//DeadCode JON 21Aug00 		//clip against left edge
-//DeadCode JON 21Aug00 		if (dp[0].bodyx.f<clip.left)
-//DeadCode JON 21Aug00 		{
-//DeadCode JON 21Aug00 			Float frac=(clip.left-dp[0].bodyx.f)/(dp[1].bodyx.f-dp[0].bodyx.f);
-//DeadCode JON 21Aug00 			dp[0].bodyx.f=dp[3].bodyx.f=clip.left;
-//DeadCode JON 21Aug00 			frac=Float(dp[1].ix-dp[0].ix)*frac;
-//DeadCode JON 21Aug00 			dp[0].ix=dp[3].ix=dp[0].ix+SWord(frac);
-//DeadCode JON 21Aug00 		}
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 		//clip against right edge
-//DeadCode JON 21Aug00 		if (dp[1].bodyx.f>clip.right)
-//DeadCode JON 21Aug00 		{
-//DeadCode JON 21Aug00 			Float frac=(clip.right-dp[0].bodyx.f)/(dp[1].bodyx.f-dp[0].bodyx.f);
-//DeadCode JON 21Aug00 			dp[1].bodyx.f=dp[2].bodyx.f=clip.right;
-//DeadCode JON 21Aug00 			frac=Float(dp[1].ix-dp[0].ix)*frac;
-//DeadCode JON 21Aug00 			dp[1].ix=dp[2].ix=dp[1].ix+SWord(frac);
-//DeadCode JON 21Aug00 		}
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 		//clip against bottom edge
-//DeadCode JON 21Aug00 		if (dp[2].bodyy.f>clip.bottom)
-//DeadCode JON 21Aug00 		{
-//DeadCode JON 21Aug00 			Float frac=(clip.bottom-dp[0].bodyy.f)/(dp[3].bodyy.f-dp[0].bodyy.f);
-//DeadCode JON 21Aug00 			dp[2].bodyy.f=dp[3].bodyy.f=clip.bottom;
-//DeadCode JON 21Aug00 			frac=Float(dp[3].iy-dp[0].iy)*frac;
-//DeadCode JON 21Aug00 			dp[2].iy=dp[3].iy=dp[0].iy+SWord(frac);
-//DeadCode JON 21Aug00 		}
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 		//clip against top edge
-//DeadCode JON 21Aug00 		if (dp[0].bodyy.f<clip.top)
-//DeadCode JON 21Aug00 		{
-//DeadCode JON 21Aug00 			Float frac=(clip.top-dp[0].bodyy.f)/(dp[3].bodyy.f-dp[0].bodyy.f);
-//DeadCode JON 21Aug00 			dp[0].bodyy.f=dp[1].bodyy.f=clip.top;
-//DeadCode JON 21Aug00 			frac=Float(dp[3].iy-dp[0].iy)*frac;
-//DeadCode JON 21Aug00 			dp[0].iy=dp[1].iy=dp[0].iy+SWord(frac);
-//DeadCode JON 21Aug00 		}
-//DeadCode JON 21Aug00 	}
-//DeadCode JON 21Aug00 //deadcode	pw->DoSetFontColour(TEXT_MAP_WHITE);
-//DeadCode JON 21Aug00 //deadcode	SWord oldTQ=pw->DoForceTQ(4);
-//DeadCode JON 21Aug00 //deadcode	bool oldMip=pw->DoSetMipMap(false);
-//DeadCode JON 21Aug00 	pw->DoPutC(pmap,dp);
-//DeadCode JON 21Aug00 //deadcode	pw->DoForceTQ(oldTQ);
-//DeadCode JON 21Aug00 //deadcode	pw->DoSetMipMap(oldMip);
-//DeadCode JON 21Aug00 	*/
-//DeadCode JON 21Aug00 }
 
 inline R3DVALUE scaledScreenX( const R3DVALUE x )
 {
@@ -1982,11 +1606,6 @@ void COverlay::PrintIcon(SLong sx,SLong sy,SLong sw,SLong sh,UWord iconIndex)
  	SWord ou,ov;
  	SWord cWidth,cHeight;
 	R3DVALUE scx,scy;
-//DEADCODE JON 5/22/00 	R3DVALUE hx,hy;
-//DEADCODE JON 5/22/00 	hx=R3DVALUE(physicalWidth>>1);
-//DEADCODE JON 5/22/00 	hy=R3DVALUE(physicalHeight>>1);
-//DEADCODE JON 5/22/00 	scx=1.f/hx;
-//DEADCODE JON 5/22/00 	scy=-1.f/hy;
 	SLong hx,hy;
 	hx=physicalWidth>>1;
 	hy=physicalHeight>>1;
@@ -2002,30 +1621,6 @@ void COverlay::PrintIcon(SLong sx,SLong sy,SLong sw,SLong sh,UWord iconIndex)
 	cWidth=currIcons[iconIndex].w;
 	cHeight=currIcons[iconIndex].h;
 	pmap=Image_Map.GetImageMapPtr(iconNo);
-//DEADCODE JON 5/22/00 	R3DVERTEX *dp;
-//DEADCODE JON 5/22/00  	g_lpLib3d->BeginPoly(HMATERIAL(pmap),4,dp);
-//DEADCODE JON 5/22/00  	dp[0].bodyx.f=Float(sx);
-//DEADCODE JON 5/22/00  	dp[0].bodyy.f=Float(sy);
-//DEADCODE JON 5/22/00  	dp[0].ix=ou;
-//DEADCODE JON 5/22/00  	dp[0].iy=ov;
-//DEADCODE JON 5/22/00  	dp[1].bodyx.f=Float(sx+sw);
-//DEADCODE JON 5/22/00  	dp[1].bodyy.f=Float(sy);
-//DEADCODE JON 5/22/00  	dp[1].ix=ou+cWidth;
-//DEADCODE JON 5/22/00  	dp[1].iy=ov;
-//DEADCODE JON 5/22/00  	dp[2].bodyx.f=Float(sx+sw);
-//DEADCODE JON 5/22/00  	dp[2].bodyy.f=Float(sy+sh);
-//DEADCODE JON 5/22/00  	dp[2].ix=ou+cWidth;
-//DEADCODE JON 5/22/00  	dp[2].iy=ov+cHeight;
-//DEADCODE JON 5/22/00  	dp[3].bodyx.f=Float(sx);
-//DEADCODE JON 5/22/00  	dp[3].bodyy.f=Float(sy+sh);
-//DEADCODE JON 5/22/00  	dp[3].ix=ou;
-//DEADCODE JON 5/22/00  	dp[3].iy=ov+cHeight;
-//DEADCODE JON 5/22/00 	for (int i=3;i>=0;i--)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 	 	dp[i].bodyx.f=(dp[i].bodyx.f-hx)*scx;
-//DEADCODE JON 5/22/00 	 	dp[i].bodyy.f=(dp[i].bodyy.f-hy)*scy;
-//DEADCODE JON 5/22/00 		dp[i].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	}
 	Lib3DPoint *dp = g_lpLib3d->BeginPoly(HMATERIAL(pmap),4);
 	dp[0].setPosition(
 		R3DVALUE(sx-hx)*scx,
@@ -2204,221 +1799,14 @@ void COverlay::DisplayProfileData(bool fDisplay)
 	}*/
 }
 
-//DeadCode JON 29Oct00 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//DeadCode JON 29Oct00 //Procedure		Prefs3D
-//DeadCode JON 29Oct00 //Author		Paul.
-//DeadCode JON 29Oct00 //Date			Thu 19 Nov 1998
-//DeadCode JON 29Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 struct SOption
-//DeadCode JON 29Oct00 {
-//DeadCode JON 29Oct00 	char* optionText;
-//DeadCode JON 29Oct00 	bool enabled;
-//DeadCode JON 29Oct00 	int selection;
-//DeadCode JON 29Oct00 	char** selectionList;
-//DeadCode JON 29Oct00 };
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 static char* OnOff[]={"On","Off",NULL};
-//DeadCode JON 29Oct00 static char* PoorLowMedHigh[]={"Poor","Low","Medium","High",NULL};
-//DeadCode JON 29Oct00 static char* MinMax[]={"Minimum","Maximum",NULL};
-//DeadCode JON 29Oct00 static char* MinMaxAuto[]={"Minimum","Maximum","Auto",NULL};
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 //3D Hardware related options...
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 static SOption OptTransp={"Transparency Effects: ",true,0,OnOff};
-//DeadCode JON 29Oct00 static SOption OptTextureQuality={"Texture Quality: ",true,0,PoorLowMedHigh};
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 //General 3D options
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 static SOption OptTrees={"Trees: ",false,0,OnOff};
-//DeadCode JON 29Oct00 static SOption OptHorizonFade={"Horizon Fade: ",false,0,MinMax};
-//DeadCode JON 29Oct00 static SOption OptAutoLand={"Altitude Detail: ",false,0,MinMaxAuto};
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 static SOption* gameOptions[]=
-//DeadCode JON 29Oct00 {
-//DeadCode JON 29Oct00 	&OptTransp,
-//DeadCode JON 29Oct00 	&OptTextureQuality,
-//DeadCode JON 29Oct00 	&OptTrees,
-//DeadCode JON 29Oct00 	&OptHorizonFade,
-//DeadCode JON 29Oct00 	&OptAutoLand,
-//DeadCode JON 29Oct00 };
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 static int Selection=3;
 
-//DeadCode JON 29Oct00 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//DeadCode JON 29Oct00 //Procedure		Prefs3D
-//DeadCode JON 29Oct00 //Author		Paul.
-//DeadCode JON 29Oct00 //Date			Thu 19 Nov 1998
-//DeadCode JON 29Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 29Oct00 void COverlay::Prefs3D()
-//DeadCode JON 29Oct00 {
-//DeadCode PD 02Dec99 	if (pvp==NULL||pw==NULL) return;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	static char tempStr[128];
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	const int num_options=sizeof(gameOptions)/sizeof(SOption*);
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	pw->DoGetSurfaceDimensions(physicalWidth,physicalHeight);
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	fIsWide=IsWide(physicalWidth);
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	pw->DoSetFontColour(TEXT_NORMAL);
-//DeadCode PD 02Dec99 	pw->DoSetGlobalAlpha(8);
-//DeadCode PD 02Dec99 	pw->DoSmokedGlassBox((physicalWidth>>2),(physicalHeight>>2),(physicalWidth>>1),(physicalHeight>>1),GLASS_COLOUR);
-//DeadCode PD 02Dec99 	pw->DoSetGlobalAlpha(255);
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	int lineHeight=fIsWide?10:8;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	SWord cx=(physicalWidth>>2)+lineHeight;
-//DeadCode PD 02Dec99 	SWord cy=fIsWide?(physicalHeight>>3)+lineHeight:(physicalHeight>>2)+lineHeight;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	//PrintAt(cx,cy,"Detail Settings");
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	cy+=lineHeight+lineHeight;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	for (SLong i=0;i<num_options;i++)
-//DeadCode PD 02Dec99 	{
-//DeadCode PD 02Dec99 		if (!gameOptions[i]->enabled)	pw->DoSetFontColour(TEXT_GREYED);
-//DeadCode PD 02Dec99 		else if (i==Selection)			pw->DoSetFontColour(TEXT_HI);
-//DeadCode PD 02Dec99 		else							pw->DoSetFontColour(TEXT_NORMAL);
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 		sprintf(tempStr,"%s%s",gameOptions[i]->optionText,gameOptions[i]->selectionList[gameOptions[i]->selection]);
-//DeadCode PD 02Dec99 		//PrintAt(cx,cy,tempStr);
-//DeadCode PD 02Dec99 		cy+=lineHeight;
-//DeadCode PD 02Dec99 	}
-//DeadCode PD 02Dec99 	cy+=lineHeight;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	if (Selection==num_options)	pw->DoSetFontColour(TEXT_HI);
-//DeadCode PD 02Dec99 	else						pw->DoSetFontColour(TEXT_NORMAL);
-//DeadCode PD 02Dec99 	//PrintAt(cx,cy,"Okay");
-//DeadCode PD 02Dec99 	cx+=lineHeight*10;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	if (Selection==num_options+1)	pw->DoSetFontColour(TEXT_HI);
-//DeadCode PD 02Dec99 	else							pw->DoSetFontColour(TEXT_NORMAL);
-//DeadCode PD 02Dec99 	//PrintAt(cx,cy,"Cancel");
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	//key tests here!
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	bool selectCurrent=false;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	if (Key_Tests.KeyPress3d(ELEVATOR_FORWARD))
-//DeadCode PD 02Dec99 	{
-//DeadCode PD 02Dec99 		Selection--;
-//DeadCode PD 02Dec99 		if (Selection<0) Selection=num_options+1;	//move to cancel
-//DeadCode PD 02Dec99 		if (Selection<num_options)
-//DeadCode PD 02Dec99 			while (gameOptions[Selection]->enabled==false)
-//DeadCode PD 02Dec99 			{
-//DeadCode PD 02Dec99 				Selection--;
-//DeadCode PD 02Dec99 				if (Selection<0)
-//DeadCode PD 02Dec99 				{
-//DeadCode PD 02Dec99 					Selection=num_options+1;
-//DeadCode PD 02Dec99 					break;
-//DeadCode PD 02Dec99 				}
-//DeadCode PD 02Dec99 			}
-//DeadCode PD 02Dec99 	}
-//DeadCode PD 02Dec99 	else if (Key_Tests.KeyPress3d(ELEVATOR_BACK))
-//DeadCode PD 02Dec99 	{
-//DeadCode PD 02Dec99 		Selection++;
-//DeadCode PD 02Dec99 		if (Selection>num_options+1) Selection=0;
-//DeadCode PD 02Dec99 		for (;Selection<num_options && gameOptions[Selection]->enabled==false;Selection++);
-//DeadCode PD 02Dec99 	}
-//DeadCode PD 02Dec99 	else if (Key_Tests.KeyPress3d(DROPBOMB) || Key_Tests.KeyPress3d(SHOOT))
-//DeadCode PD 02Dec99 		selectCurrent=true;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 	if (selectCurrent)
-//DeadCode PD 02Dec99 	{
-//DeadCode PD 02Dec99 		if (Selection<num_options)
-//DeadCode PD 02Dec99 		{
-//DeadCode PD 02Dec99 			SOption* selectedOption=gameOptions[Selection];
-//DeadCode PD 02Dec99 			selectedOption->selection++;
-//DeadCode PD 02Dec99 			if (selectedOption->selectionList[selectedOption->selection]==NULL)
-//DeadCode PD 02Dec99 				selectedOption->selection=0;
-//DeadCode PD 02Dec99
-//DeadCode PD 02Dec99 			UpdateSelections2();
-//DeadCode PD 02Dec99 			UpdateSelections();
-//DeadCode PD 02Dec99 		}
-//DeadCode PD 02Dec99 		else if (Selection==num_options)
-//DeadCode PD 02Dec99 		{
-//DeadCode PD 02Dec99 			fDonePrefs=true;
-//DeadCode PD 02Dec99 			delete pBackupSettings;
-//DeadCode PD 02Dec99 		}
-//DeadCode PD 02Dec99 		else if (Selection==num_options+1)
-//DeadCode PD 02Dec99 		{
-//DeadCode PD 02Dec99 			fDonePrefs=true;
-//DeadCode PD 02Dec99 			gameSettings=*pBackupSettings;
-//DeadCode PD 02Dec99 			delete pBackupSettings;
-//DeadCode PD 02Dec99 		}
-//DeadCode PD 02Dec99 	}
-//DeadCode JON 29Oct00 }
 
-//DeadCode JON 29Oct00 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//DeadCode JON 29Oct00 //Procedure		InitPrefs3D
-//DeadCode JON 29Oct00 //Author		Paul.
-//DeadCode JON 29Oct00 //Date			Fri 20 Nov 1998
-//DeadCode JON 29Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 29Oct00 void COverlay::InitPrefs3D()
-//DeadCode JON 29Oct00 {
-//DeadCode JON 29Oct00 	const int num_options=sizeof(gameOptions)/sizeof(SOption*);
-//DeadCode JON 29Oct00 	Selection=num_options;	//default to 'Okay' selected
-//DeadCode JON 29Oct00 	fDonePrefs=false;
-//DeadCode JON 29Oct00 	pBackupSettings=new GameSettings;
-//DeadCode JON 29Oct00 	*pBackupSettings=gameSettings;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	//set initial options based on the current game settings
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	UpdateSelections();
-//DeadCode JON 29Oct00 }
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //Procedure		UpdateSelections
 //Author		Paul.
 //Date			Fri 20 Nov 1998
 //------------------------------------------------------------------------------
-//DeadCode JON 29Oct00 void COverlay::UpdateSelections()
-//DeadCode JON 29Oct00 {
-//DeadCode JON 29Oct00 	//setup display based on the current values in 'gameSettings'
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	OptTrees.enabled=true;
-//DeadCode JON 29Oct00 	OptTrees.selection=Save_Data.detail_3d[DETAIL3D_INCONSEQUENTIALS]?1:0;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	OptHorizonFade.enabled=true;
-//DeadCode JON 29Oct00 	OptHorizonFade.selection=Save_Data.detail_3d[DETAIL3D_HORIZONFADE]?1:0;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	OptAutoLand.enabled=true;
-//DeadCode JON 29Oct00 	OptAutoLand.selection=Save_Data.detail_3d[DETAIL3D_AUTODETAIL]?1:0;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	//Hardware specific stuff
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	OptTransp.enabled=true;
-//DeadCode JON 29Oct00 	OptTransp.selection=Save_Data.detail_3d[DETAIL3D_TRANSSMOKE]?1:0;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	OptTextureQuality.enabled=true;
-//DeadCode JON 29Oct00 	OptTextureQuality.selection=Save_Data.textureQuality;
-//DeadCode JON 29Oct00 }
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//DeadCode JON 29Oct00 //Procedure		UpdateSelections2
-//DeadCode JON 29Oct00 //Author		Paul.
-//DeadCode JON 29Oct00 //Date			Fri 20 Nov 1998
-//DeadCode JON 29Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 29Oct00 void COverlay::UpdateSelections2()
-//DeadCode JON 29Oct00 {
-//DeadCode JON 29Oct00 	//Hardware specific stuff
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	Save_Data.textureQuality=OptTextureQuality.selection;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	if (OptHorizonFade.selection==0)	Save_Data.detail_3d%=DETAIL3D_HORIZONFADE;
-//DeadCode JON 29Oct00 	else								Save_Data.detail_3d|=DETAIL3D_HORIZONFADE;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	if (OptTrees.selection==0)	Save_Data.detail_3d%=DETAIL3D_INCONSEQUENTIALS;
-//DeadCode JON 29Oct00 	else						Save_Data.detail_3d|=DETAIL3D_INCONSEQUENTIALS;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	if (OptAutoLand.selection==0)		Save_Data.detail_3d%=DETAIL3D_AUTODETAIL;
-//DeadCode JON 29Oct00 	else								Save_Data.detail_3d|=DETAIL3D_AUTODETAIL;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 	if (OptTransp.selection==0)		Save_Data.detail_3d%=DETAIL3D_TRANSSMOKE;
-//DeadCode JON 29Oct00 	else							Save_Data.detail_3d|=DETAIL3D_TRANSSMOKE;
-//DeadCode JON 29Oct00 }
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //Procedure		SetViewVals
@@ -2492,14 +1880,10 @@ void COverlay::InitInfoTexts()
 		OString* str=OInfoPanelText[i];
 		if ( str->text == NULL )
 			str->text=LdStr(str->resID);
-//DeadCode JON 24Aug00 		AfxTrace( "%i: %X: %s\n", i, ULong(str->text), str->text );
 		if ( i==29 )
 			NOP;
 	}
 
-//DeadCode JON 24Aug00 	MsgText=new CString[2];
-//DeadCode JON 24Aug00 	MsgText[0]=MsgText[1]="";
-//DeadCode JON 24Aug00 	OtherText=new CString("");
 
 	blankMsgText=new CString[2];
 	blankMsgText[0]=blankMsgText[1]="";
@@ -2520,14 +1904,9 @@ void COverlay::ReleaseInfoTexts()
 	for (SLong i=0;i<_NumInfoTexts;i++)
 	{
 		OString* str=OInfoPanelText[i];
-//DeadCode JON 24Aug00 		AfxTrace( "%i: %X: %s\n", i, ULong(str->text), str->text );
 		if ( str->text != NULL )
 			delete[]str->text,str->text=NULL;
 	}
-//DeadCode JON 24Aug00 	delete[]msgText;
-//DeadCode JON 24Aug00 	delete otherText;
-//DeadCode JON 24Aug00 	otherText=NULL;
-//DeadCode JON 24Aug00 	msgText=NULL;
 	delete[]blankMsgText;
 	delete blankOtherText;
 	blankMsgText=NULL;
@@ -2590,8 +1969,6 @@ void COverlay::SetToMapScreen()
 		OverLay.pvp->ReturnFromMap();
 	else
 	{
-//DeadCode JON 17Oct00 		if (_DPlay.Implemented)	SetToUIScreen(&firstMapScrCOMMS);
-//DeadCode JON 17Oct00 		else					SetToUIScreen(&firstMapScr);
 		if ( Manual_Pilot.ControlledAC2 && Manual_Pilot.ControlledAC2->classtype->aerobaticfactor == AEROBATIC_LOW )
 			SetToUIScreen(&firstMapScrBomber);
 		else
@@ -2726,10 +2103,6 @@ bool COverlay::UpdateMousePos()
 
 	if (newMouseX==-0x8000) fMouseDisabled=true;
 
-//DeadCode JON 20Oct00 	int divfactor=1;
-//DeadCode JIM 12Sep00 	if (doInteractiveCockpit)
-//DeadCode JIM 12Sep00 	{
-//DeadCode CSB 22Aug00 		divfactor=(AM_HIGH-_Analogue.tune[AU_COCKPIT].mode)+1;
 
 		if (!(newMouseX==-0x8000))
 		{
@@ -2737,10 +2110,8 @@ bool COverlay::UpdateMousePos()
 			{
 				newMouseX=-newMouseX;
 			}
-	//DeadCode CSB 22Aug00 			newMouseX/=divfactor;
 			newMouseX+=32768;											//JIM 15Sep00
 		}
-//DeadCode JIM 12Sep00 	}
 
 //	if (newMouseX!=-0x8000)
 //	{
@@ -2764,15 +2135,12 @@ bool COverlay::UpdateMousePos()
 //TEMPCODE RDH 20/05/99 			lastMouseX=-1;
 //TEMPCODE RDH 20/05/99 		}
 //	}
-//DeadCode AMM 4Aug00 	int newMouseY=(SWord)_Analogue.ReadPosition(AU_UI_Y)+32768;
 	int newMouseY=(SWord)_Analogue.ReadPosition(AU_UI_Y);
  	if (newMouseY==-0x8000) fMouseDisabled=true;
 
 	if (
-//DeadCode JIM 12Sep00 		doInteractiveCockpit && !fMouseDisabled &&
 		!(newMouseY==-0x8000))
 	{
-//DeadCode CSB 22Aug00 		newMouseY/=divfactor;
 
 		if (_Analogue.tune[AU_UI_Y].aliased[AA_TT_REVERSE])
 		{
@@ -2820,9 +2188,6 @@ bool COverlay::UpdateMousePos()
 //------------------------------------------------------------------------------
 void COverlay::LoaderScreen(int stage)
 {
-//DEADCODE PD 01/12/99 	if (Save_Data.fSoftware)
-//DEADCODE PD 01/12/99 		return;
-//DeadCode JIM 22Jun99 	Sleep(0); //attempt to force redraw when we want it!
 
 	if (pball)															//JON 13Jun00
 		delete[](UByte*)pball;
@@ -2848,19 +2213,15 @@ void COverlay::LoaderScreen(int stage)
 	int realStage,subStage;
 	realStage=stage>>8;
 	subStage=stage&0xFF;
-//DeadCode JON 20Oct00 	const SLong LoaderTextX=400;
-//DeadCode JON 20Oct00 	const SLong LoaderTextY=60;
 	FileNum loaderArt=FIL_LOADING;
 	fileblockptr fbp=new fileblock(loaderArt);
 	g_lpLib3d->LoadBMP( (UByte*)fbp->getdata() );
-//deadcode	ShowLoaderArt((void*)fbp->getdata());
 	char* str=LdStr(IDS_LOADERSTAGE00+realStage);
 
 	SWord boxWidth=0;
 	for (int j=4;j>=0;j--)
 	{
 		char* stmp=LdStr(IDS_LOADERSTAGE00+j);
-//DeadCode JON 10Oct00 		SWord tmp=StrPixelLen2(stmp);
 		SWord tmp=StrPixelWidthPadded(stmp);
 		if (tmp>boxWidth)
 			boxWidth=tmp;
@@ -2876,14 +2237,11 @@ void COverlay::LoaderScreen(int stage)
 	SWord boxX=textx-2;
 	SWord boxY=texty-2;
 
-//deadcode	pw->DoSetGlobalAlpha(255);
 	SWord totBoxWidth = boxWidth-2;
 	SmokedGlassBox(boxX, boxY, boxWidth, 1, 0x8F8F8F, 255 );
 	SmokedGlassBox(boxX, boxY, 1, boxHeight, 0x8F8F8F, 255 );
 	SmokedGlassBox(boxX, boxY+boxHeight-1, boxWidth, 1, 0x8F8F8F, 255 );
 	SmokedGlassBox(boxX+boxWidth-1, boxY, 1, boxHeight, 0x8F8F8F, 255 );
-//DEADCODE JON 4/10/00 	DoSmokedGlassBox(boxX,boxY,boxWidth,boxHeight,0xFF8F8F8F);
-//DeadCode JON 20Oct00 	SWord scanW=boxWidth;
 	boxX+=1;
 	boxY+=1;
 	boxHeight-=2;
@@ -2892,10 +2250,6 @@ void COverlay::LoaderScreen(int stage)
 
 	SmokedGlassBox(boxX+boxWidth, boxY, totBoxWidth-boxWidth, boxHeight, 0x8F8FFF, 255 );
 	SmokedGlassBox(boxX, boxY, boxWidth, boxHeight, 0xFF0000, 255 );
-//deadcode	pw->DoSmokedGlassBox(boxX,boxY,boxWidth,boxHeight,0xFFFF0000);
-//DEADCODE PD 01/12/99 	if (!Save_Data.fSoftware)	pw->DoSetFontColour(0xFF000000);
-//DEADCODE PD 01/12/99 	else						POLYGON.SetFontColour(BLACK);
-//deadcode	pw->DoSetFontColour(0xFF000000);
 	g_lpLib3d->SetFontColour(0xFF000000);
 	// put this in to force the font imagemap to be made at full quality - should never be thrown away...
 	ULong curQual = ULong( HINT_FULL_RES_TEXTURE );							//JON 19Jul00
@@ -2913,13 +2267,10 @@ void COverlay::LoaderScreen(int stage)
 		PrintAt2( textx,texty, diagStr );
 	diagStr = NULL;
 
-//deadcode	pw->EndScene();
 	if (doneonce==1)
 	{
 		doneonce++;
-//DeadCode JON 5Nov00 		nofontkludge=true;//pw->DoScanForBottomPixelsOfText(boxX,scanY,scanW);
 	}
-//deadcode	pw->DoScreenSwap();
 //	_asm {int 3}
 
 	delete[]str;
@@ -2931,7 +2282,6 @@ void COverlay::LoaderScreen(int stage)
 
 void COverlay::CommsWaitingScreen(int stage)
 {
-//DeadCode JON 11Oct100 #pragma warnmsg("commswaitingscreen - talk to MACCA")
 	g_lpLib3d->BeginScene(RENDERTARGET_PRIMARY);
 	g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
@@ -2942,11 +2292,8 @@ void COverlay::CommsWaitingScreen(int stage)
 	int realStage,subStage;
 	realStage=stage>>8;
 	subStage=stage&0xFF;
-//DeadCode JON 20Oct00 	const SLong LoaderTextX=400;
-//DeadCode JON 20Oct00 	const SLong LoaderTextY=60;
 	char* str=LdStr(IDS_LOADERSTAGE03);
 	GetSurfaceDimensions(physicalWidth,physicalHeight);
-//DeadCode JON 5Nov00 	fIsWide=IsWide(physicalWidth);
 
 	SWord boxWidth=StrPixelWidthPadded(str);
 
@@ -2965,7 +2312,6 @@ void COverlay::CommsWaitingScreen(int stage)
 	SmokedGlassBox(boxX, boxY, 1, boxHeight, 0x8F8F8F, 255 );
 	SmokedGlassBox(boxX, boxY+boxHeight-1, boxWidth, 1, 0x8F8F8F, 255 );
 	SmokedGlassBox(boxX+boxWidth-1, boxY, 1, boxHeight, 0x8F8F8F, 255 );
-//DeadCode JON 20Oct00 	SWord scanW=boxWidth;
 	boxX+=1;
 	boxY+=1;
 	boxHeight-=2;
@@ -2975,13 +2321,7 @@ void COverlay::CommsWaitingScreen(int stage)
 	SmokedGlassBox(boxX+boxWidth, boxY, totBoxWidth-boxWidth, boxHeight, 0x8F8FFF, 255 );
 	SmokedGlassBox(boxX, boxY, boxWidth, boxHeight, 0xFF0000, 255 );
 	g_lpLib3d->SetFontColour(0xFF000000);
-//DeadCode JON 5Nov00 	// put this in to force the font imagemap to be made at full quality - should never be thrown away...
-//DeadCode JON 5Nov00 	ULong curQual = ULong( HINT_FULL_RES_TEXTURE );							//JON 19Jul00
-//DeadCode JON 5Nov00 	g_lpLib3d->SetGlobal( TOGGLE_TEXTURE_QUALITY, &curQual );				//JON 19Jul00
-//DeadCode JON 5Nov00 	g_lpLib3d->GiveHint( HINT_BILINEAR );									//JON 19Jul00
 	PrintAt2(textx,texty,str);
-//DeadCode JON 5Nov00 	g_lpLib3d->SetGlobal( TOGGLE_TEXTURE_QUALITY, &curQual );				//JON 19Jul00
-//DeadCode JON 5Nov00 	g_lpLib3d->GiveHint( HINT_TRILINEAR ); //note won't go above max avail  //JON 19Jul00
 
 	textx = 10;
 	texty = 10;
@@ -2994,7 +2334,6 @@ void COverlay::CommsWaitingScreen(int stage)
 	if (doneonce==1)
 	{
 		doneonce++;
-//DeadCode JON 5Nov00 		nofontkludge=true;//pw->DoScanForBottomPixelsOfText(boxX,scanY,scanW);
 	}
 
 	delete[]str;
@@ -3002,10 +2341,6 @@ void COverlay::CommsWaitingScreen(int stage)
 	g_lpLib3d->EndScene();
 	g_lpLib3d->ScreenSwap();
 /*
-//DeadCode AMM 16Nov99 	if (_DPlay.resyncbar)
-//DeadCode AMM 16Nov99 		str=LdStr(IDS_PHRASE_RESYNCHING);
-//DeadCode AMM 16Nov99 	else
-//DeadCode AMM 16Nov99 		str=LdStr(IDS_LOADERSTAGE03);
 
 	str=LdStr(IDS_COMMSWAITING);
 
@@ -3035,23 +2370,14 @@ void COverlay::CommsWaitingScreen(int stage)
 
 	SWord boxHeight=fIsWide?20:16;
 
-//deadcode	pw->BeginScene();
-//deadcode	pw->DoSetGlobalAlpha(255);
-//deadcode	pw->DoSmokedGlassBox(boxX,boxY,boxWidth,boxHeight,0xFF8F8F8F);
 	boxX+=1;
 	boxY+=1;
 	boxHeight-=2;
 	boxWidth-=2;
 	boxWidth=(boxWidth*subStage)>>8;
-//deadcode	pw->DoSmokedGlassBox(boxX,boxY,boxWidth,boxHeight,0xFFFF0000);
-//deadcode	if (!Save_Data.fSoftware)	pw->DoSetFontColour(0xFF000000);
-//deadcode	else						POLYGON.SetFontColour(BLACK);
 	PrintAt2(textx,texty,str);
-//deadcode	pw->EndScene();
-//deadcode	pw->DoScreenSwap();
 
 	delete[]str;
-//DeadCode AMM 08Jul99 	delete fbp;
 */
 }
 
@@ -3072,8 +2398,6 @@ void COverlay::DisplayMouseCursor()
 	SWord sw,sh;
 	SLong sx,sy;
 
-//deadcode	SWord oldTQ=pw->DoForceTQ(4);
-//deadcode	bool oldMip=pw->DoSetMipMap(false);
 
 	ImageMapDesc* pmap=Image_Map.GetImageMapPtr(SQUEAKNO);
 
@@ -3084,27 +2408,9 @@ void COverlay::DisplayMouseCursor()
 	cw=sw=pmap->w;
 	ch=sh=pmap->h;
 
-//deadcode	pw->DoSetFontColour(0xFFFFFFFF);
 	g_lpLib3d->SetFontColour(0xFFFFFFFF);
 //TEMPCODE RDH 20/05/99 	sx=SLong(Float(sx)*Float(physicalWidth)/Float(640));
 //TEMPCODE RDH 20/05/99 	sy=SLong(Float(sy)*Float(physicalHeight)/Float(480));
-//DEADCODE JON 5/22/00  	R3DVERTEX dp[4];
-//DEADCODE JON 5/22/00  	dp[0].bodyx.f=Float(sx);
-//DEADCODE JON 5/22/00  	dp[0].bodyy.f=Float(sy);
-//DEADCODE JON 5/22/00  	dp[0].ix=ou;
-//DEADCODE JON 5/22/00  	dp[0].iy=ov;
-//DEADCODE JON 5/22/00  	dp[1].bodyx.f=Float(sx+sw);
-//DEADCODE JON 5/22/00  	dp[1].bodyy.f=Float(sy);
-//DEADCODE JON 5/22/00  	dp[1].ix=ou+cw;
-//DEADCODE JON 5/22/00  	dp[1].iy=ov;
-//DEADCODE JON 5/22/00  	dp[2].bodyx.f=Float(sx+sw);
-//DEADCODE JON 5/22/00  	dp[2].bodyy.f=Float(sy+sh);
-//DEADCODE JON 5/22/00  	dp[2].ix=ou+cw;
-//DEADCODE JON 5/22/00  	dp[2].iy=ov+ch;
-//DEADCODE JON 5/22/00  	dp[3].bodyx.f=Float(sx);
-//DEADCODE JON 5/22/00  	dp[3].bodyy.f=Float(sy+sh);
-//DEADCODE JON 5/22/00  	dp[3].ix=ou;
-//DEADCODE JON 5/22/00  	dp[3].iy=ov+ch;
 
  	Lib3DPoint dp[4];
 
@@ -3119,8 +2425,6 @@ void COverlay::DisplayMouseCursor()
 
 	PutC(pmap,dp);
 
-//deadcode	pw->DoForceTQ(oldTQ);
-//deadcode	pw->DoSetMipMap(oldMip);
 }
 
 void COverlay::SetGridDimensions(MapScr *pscr)
@@ -3147,7 +2451,6 @@ void COverlay::SetGridDimensions(MapScr *pscr)
 				delete[]pstr;
 			}
 			//count pixel width of 'cs'
-//DeadCode JON 10Oct00 			SLong thisLen=StrPixelLen2(const_cast<char*>(LPCTSTR(cs)));
 			SLong thisLen=StrPixelWidthPadded(const_cast<char*>(LPCTSTR(cs)));
 			if (thisLen>maxChars)
 				maxChars=thisLen;
@@ -3198,7 +2501,6 @@ void COverlay::ProcessUIScreen()
 	{
 		SWord posx = 10, posy = 10;
 		char frameTimeStr[64];
-//DEADCODE JON 5/11/00 		sprintf( frameTimeStr, "%3.2f fps\n", 100.f/float( pvp->RealDrawFrameTime() ) );
 		sprintf( frameTimeStr, "%3.2f fps\n", 1000.f/float( pvp->getFrameTimeMSecs() ) );
 		static ULong tottime = 0;
 		tottime++;
@@ -3306,17 +2608,7 @@ void COverlay::ProcessUIScreen()
 	else if (pCurScr!=NULL)
 	{
 		SetUp3DUIMouse();
-//DeadCode RJS 16Mar00		g_lpLib3d->PushMatrix(MATRIX_OBJECT);
-//DeadCode RJS 16Mar00		g_lpLib3d->PushMatrix(MATRIX_VIEWER);
-//DeadCode RJS 16Mar00		g_lpLib3d->PushMatrix(MATRIX_PROJECTION);
-//DeadCode RJS 16Mar00
-//DeadCode RJS 16Mar00		g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
-//DeadCode RJS 16Mar00		g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
-//DeadCode RJS 16Mar00		g_lpLib3d->LoadIdentity(MATRIX_PROJECTION);
-//DeadCode RJS 16Mar00
-//DeadCode RJS 16Mar00		g_lpLib3d->GiveHint(HINT_2DRENDER);
 
-//DeadCode JON 5Nov00 		fIsWide=IsWide(physicalWidth);
 
 		//check for hilight/dehilight counter
 
@@ -3408,29 +2700,10 @@ void COverlay::ProcessUIScreen()
 				dp[2].setIMapCoords( pmap->w, pmap->h );
 				dp[3].setPosition( posx, posy+winHeight, 0.f );
 				dp[3].setIMapCoords( 0, pmap->h );
-//DEADCODE JON 5/22/00   				dp[0].bodyx.f=Float(posx);
-//DEADCODE JON 5/22/00 			 	dp[0].bodyy.f=Float(posy);
-//DEADCODE JON 5/22/00 			 	dp[0].ix=
-//DEADCODE JON 5/22/00 			 	dp[0].iy=0;
-//DEADCODE JON 5/22/00 			 	dp[1].bodyx.f=Float(posx+winWidth);
-//DEADCODE JON 5/22/00 			 	dp[1].bodyy.f=Float(posy);
-//DEADCODE JON 5/22/00 			 	dp[1].ix=pmap->w;
-//DEADCODE JON 5/22/00 			 	dp[1].iy=0;
-//DEADCODE JON 5/22/00 			 	dp[2].bodyx.f=Float(posx+winWidth);
-//DEADCODE JON 5/22/00 			 	dp[2].bodyy.f=Float(posy+winHeight);
-//DEADCODE JON 5/22/00 				dp[2].ix=pmap->w;
-//DEADCODE JON 5/22/00 			 	dp[2].iy=pmap->h;
-//DEADCODE JON 5/22/00 			 	dp[3].bodyx.f=Float(posx);
-//DEADCODE JON 5/22/00 			 	dp[3].bodyy.f=Float(posy+winHeight);
-//DEADCODE JON 5/22/00 			 	dp[3].ix=0;
-//DEADCODE JON 5/22/00 			 	dp[3].iy=pmap->h;
 				PutC(pmap,dp);
 			}
 			else
 			{
-//deadcode					pw->DoSetGlobalAlpha(8);
-//deadcode					pw->DoSmokedGlassBox(posx,posy,winWidth,winHeight,pCurScr->wipeColour);
-//deadcode					pw->DoSetGlobalAlpha(255);
 				SmokedGlassBox( posx, posy, winWidth, winHeight, pCurScr->wipeColour, 8 );
 			}
 			g_lpLib3d->SetGlobal( TOGGLE_GLOBAL2DZDEPTH, &oldZfiddle );
@@ -3494,8 +2767,6 @@ void COverlay::ProcessUIScreen()
 					//handle replay icons by printing them on screen as single
 					//characters using the text system
 
-//deadcode					if (!Save_Data.fSoftware)	pw->DoSetFontColour(pCurScr->textColour);
-//deadcode					else						POLYGON.SetFontColour(MAKE_SOFT_COL(pCurScr->textColour));
 					g_lpLib3d->SetFontColour(pCurScr->textColour);
 
 					UWord iconIndex=pCurOpt->resID-IDS_MAPICON00LO;
@@ -3515,16 +2786,6 @@ void COverlay::ProcessUIScreen()
 						g_lpLib3d->SetFontColour(pCurScr->hilightColour);
 					else
 						g_lpLib3d->SetFontColour(pCurScr->textColour);
-//deadcode					if (!Save_Data.fSoftware)
-//deadcode					{
-//deadcode						if (pCurOpt->key==hilight)	pw->DoSetFontColour(pCurScr->hilightColour);
-//deadcode						else						pw->DoSetFontColour(pCurScr->textColour);
-//deadcode					}
-//deadcode					else
-//deadcode					{
-//deadcode						if (pCurOpt->key==hilight)	POLYGON.SetFontColour(MAKE_SOFT_COL(pCurScr->hilightColour));
-//deadcode						else						POLYGON.SetFontColour(MAKE_SOFT_COL(pCurScr->textColour));
-//deadcode					}
 					char* theString;
 					theString=prefixTable[pCurOpt->key];
 					PrintAt2(curx,cury,theString);
@@ -3537,16 +2798,6 @@ void COverlay::ProcessUIScreen()
 						g_lpLib3d->SetFontColour(pCurScr->hilightColour);
 					else
 						g_lpLib3d->SetFontColour(pCurScr->textColour);
-//deadcode					if (!Save_Data.fSoftware)
-//deadcode					{
-//deadcode						if (pCurOpt->key==hilight)	pw->DoSetFontColour(pCurScr->hilightColour);
-//deadcode						else						pw->DoSetFontColour(pCurScr->textColour);
-//deadcode					}
-//deadcode					else
-//deadcode					{
-//deadcode						if (pCurOpt->key==hilight)	POLYGON.SetFontColour(MAKE_SOFT_COL(pCurScr->hilightColour));
-//deadcode						else						POLYGON.SetFontColour(MAKE_SOFT_COL(pCurScr->textColour));
-//deadcode					}
 
 					char* theString;
 					theString=prefixTable[pCurOpt->key];
@@ -3670,7 +2921,6 @@ void COverlay::ProcessUIScreen()
 **	FIRST MAP SCREEN **
 **********************/
 
-//DeadCode JON 9Nov00 static bool refreshLandscape=false;
 
 const UWord MapScreenX=370;
 const UWord MapScreenY=34;
@@ -3698,20 +2948,6 @@ inline void MakeTimeString(char* str,int time)
 	sprintf(str,"%2d:%02d",time,mins);
 }
 
-//DeadCode JON 8Nov00 WayPointPtr FindFirstWP(UniqueID uid,WayPointPtr wp)					//RJS 27Jun00
-//DeadCode JON 8Nov00 {
-//DeadCode JON 8Nov00 	WayPointPtr nwp=wp;
-//DeadCode JON 8Nov00 	//return straight away if no waypoint
-//DeadCode JON 8Nov00 	if (nwp==NULL)
-//DeadCode JON 8Nov00 		return nwp;
-//DeadCode JON 8Nov00 	//skip back until prev wp is NULL
-//DeadCode JON 8Nov00 	while (nwp->prev!=NULL)
-//DeadCode JON 8Nov00 		nwp=nwp->prev;
-//DeadCode JON 8Nov00 	//skip forward 'til get a valid waypoint
-//DeadCode JON 8Nov00 	while(nwp!=wp && (uid<nwp->skipunder || uid>nwp->skipover))			//RJS 27Jun00
-//DeadCode JON 8Nov00 		nwp=nwp->next;
-//DeadCode JON 8Nov00 	return nwp;
-//DeadCode JON 8Nov00 }
 
 inline WayPointPtr FindNextWP(UNIQUE_ID uid,WayPointPtr wp)
 {
@@ -3747,15 +2983,6 @@ inline WayPointPtr FindPrevWP(UNIQUE_ID uid,WayPointPtr wp)
 void MapScr::UpdateWaypointDisplay()
 {
 /*			resid=this_name+IDS_L_MAIN_WP_GAP;
-//DEADCODE DAW 22/11/99 			if (this_name==WPNAME_None)				resid=IDS_L_MAIN_WP_GAP;
-//DEADCODE DAW 22/11/99 			else if (this_name==WPNAME_Rendevous)	resid=IDS_MAIN_WP_RENDEVOUS;
-//DEADCODE DAW 22/11/99 			else if (this_name==WPNAME_Ingress)		resid=IDS_MAIN_WP_INGRESS;
-//DEADCODE DAW 22/11/99 			else if (this_name==WPNAME_Target)		resid=IDS_MAIN_WP_TARGET;
-//DEADCODE DAW 22/11/99 			else if (this_name==WPNAME_Regroup)		resid=IDS_MAIN_WP_REGROUP;
-//DEADCODE DAW 22/11/99 			else if (this_name==WPNAME_Egress)		resid=IDS_MAIN_WP_EGRESS;
-//DEADCODE DAW 22/11/99 			else if (this_name==WPNAME_Disperse)	resid=IDS_MAIN_WP_DISPERSE;
-//DEADCODE DAW 22/11/99 			else if (this_name==WPNAME_Landing)		resid=IDS_MAIN_WP_LAND;
-//DEADCODE DAW 22/11/99 			else									resid=IDS_L_MAIN_WP_GAP;
 			if (!Save_Data.fSoftware)	OverLay.pw->DoSetFontColour(messageColours[i]);
 			else						POLYGON.SetFontColour(softMessageColours[i]);
 			char temp[]="1234567890";
@@ -3836,7 +3063,6 @@ void MapScr::UpdateMessageDisplay()
 		OverLay.curr_waypoint=Manual_Pilot.ControlledAC2->waypoint;
 
 	ULong messageColours[3]={TEXT_MAP_WHITE,TEXT_HI,TEXT_MAP_WHITE};
-//DeadCode JON 20Oct00 	Colour softMessageColours[3]={WHITE,RED,WHITE};
 
 	for (SLong i=2;i>=0;i--)
 	{
@@ -4008,12 +3234,6 @@ inline SWord WorldZToSy640(SLong wz,SWord *y)
 //------------------------------------------------------------------------------
 inline	void	WorldToSxy(Coords3D& pos,SWord& screenx, SWord& screeny)
 {
-//DeadCode RJS 27Jun00 	float	rhw = 1./float(Three_Dee.ViewerY());
-//DeadCode RJS 27Jun00 	float	sx = float(OverLay.physicalWidth)*.5;
-//DeadCode RJS 27Jun00 	float	sy = float(OverLay.physicalHeight)*.5;
-//DeadCode RJS 27Jun00
-//DeadCode RJS 27Jun00 	screenx = (float(pos.X - Three_Dee.ViewerX())*rhw*sx)+sx;
-//DeadCode RJS 27Jun00 	screeny = (float(pos.Z - Three_Dee.ViewerZ())*-rhw*sy)+sy;
 	float	rhw = 1./float(Three_Dee.ViewerY());
 
 	screenx = (float(pos.X - Three_Dee.ViewerX())*rhw*320.)+320.;
@@ -4034,120 +3254,6 @@ inline SWord WorldZToSy640Zoomed(SLong wz,SLong *y)
 	return screen_y;
 }
 
-//DeadCode JON 8Nov00 void MapScr::ShowBackgroundMap(COORDS3D& pos,SWord *xc,SWord *yc)
-//DeadCode JON 8Nov00 {
-//DeadCode JON 8Nov00 #pragma warnmsg( "ShowBackgroundMap" )
-//DeadCode JON 8Nov00 //deadcode	OverLay.pw->DoSetFontColour(0xFFFFFFFF);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	//convert pos X & Z into texel coordinates in the range (0..255,0..511)
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	SWord tu,tv;
-//DeadCode JON 8Nov00 	tu=WorldXToTu(pos.X);
-//DeadCode JON 8Nov00 	tv=WorldZToTv(pos.Z);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	//i want to display the map with this texel in the center of the
-//DeadCode JON 8Nov00 	//screen unless this means that some of the screen window will not
-//DeadCode JON 8Nov00 	//be on the map
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	SWord x[2],y[2];
-//DeadCode JON 8Nov00 	UWord f;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	x[0]=tu-(MAP_SCREEN_WIDTH_640>>1);
-//DeadCode JON 8Nov00 	x[1]=tu+(MAP_SCREEN_WIDTH_640>>1);
-//DeadCode JON 8Nov00 	y[0]=tv-(MAP_SCREEN_HEIGHT_640>>1);
-//DeadCode JON 8Nov00 	y[1]=tv+(MAP_SCREEN_HEIGHT_640>>1);
-//DeadCode JON 8Nov00 	f=0;
-//DeadCode JON 8Nov00 	if (x[0]<0)						f|=OFFLEFT;
-//DeadCode JON 8Nov00 	if (x[1]>=MAP_TEXTURE_WIDTH)	f|=OFFRIGHT;
-//DeadCode JON 8Nov00 	if (y[0]<0)						f|=OFFTOP;
-//DeadCode JON 8Nov00 	if (y[1]>=MAP_TEXTURE_HEIGHT)	f|=OFFBOTTOM;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	if (f!=0)
-//DeadCode JON 8Nov00 	{
-//DeadCode JON 8Nov00 		//some of the display window doesn't cover the map
-//DeadCode JON 8Nov00 		//so the center needs adjusting...
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 		if (f&OFFLEFT)		tu+=(0-x[0]);
-//DeadCode JON 8Nov00 		if (f&OFFRIGHT)	tu+=(MAP_TEXTURE_WIDTH-x[1]);
-//DeadCode JON 8Nov00 		if (f&OFFTOP)		tv+=(0-y[0]);
-//DeadCode JON 8Nov00 		if (f&OFFBOTTOM)	tv+=(MAP_TEXTURE_HEIGHT-y[1]);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 		//regenerate the texture window coordinates
-//DeadCode JON 8Nov00 		x[0]=tu-(MAP_SCREEN_WIDTH_640>>1);
-//DeadCode JON 8Nov00 		x[1]=tu+(MAP_SCREEN_WIDTH_640>>1);
-//DeadCode JON 8Nov00 		y[0]=tv-(MAP_SCREEN_HEIGHT_640>>1);
-//DeadCode JON 8Nov00 		y[1]=tv+(MAP_SCREEN_HEIGHT_640>>1);
-//DeadCode JON 8Nov00 	}
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	//generate physical pixel coordinates of the screen window...
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	const SWord map_screen_x=SWord(Float(MAP_SCREEN_ORIGIN_X_640)*Float(OverLay.physicalWidth)/Float(640));
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	const SWord map_screen_y=SWord(Float(MAP_SCREEN_ORIGIN_Y_640)*Float(OverLay.physicalHeight)/Float(480));
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	const SWord map_screen_width=SWord(Float(MAP_SCREEN_WIDTH_640)*Float(OverLay.physicalWidth)/Float(640));
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	const SWord map_screen_height=SWord(Float(MAP_SCREEN_HEIGHT_640)*Float(OverLay.physicalHeight)/Float(480));
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	R3DVERTEX dp[4];
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	//is the top half of the map texture to be displayed?
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	if (y[0]<MAP_TEXTURE_HEIGHT>>1)
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	{
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[0].bodyx.f=dp[3].bodyx.f=map_screen_x;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[0].ix=dp[3].ix=x[0]>>MAP_SCALE;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[1].bodyx.f=dp[2].bodyx.f=map_screen_x+map_screen_width-1;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[1].ix=dp[2].ix=x[1]>>MAP_SCALE;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[0].bodyy.f=dp[1].bodyy.f=map_screen_y;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[0].iy=dp[1].iy=y[0]>>MAP_SCALE;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		//points 2 & 3 bodyy & iy are more complicated
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		//if the texture coordinates for the bottom of the map are
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		//in the top half of the map then there's no problem
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		if (y[1]<=MAP_TEXTURE_HEIGHT>>1)
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		{
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[2].bodyy.f=dp[3].bodyy.f=map_screen_y+map_screen_height-1;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[2].iy=dp[3].iy=y[1]>>MAP_SCALE;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		}
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		else
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		{
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			//only part of the top half of the texture is to be displayed
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			//but how much...
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			Float frac=Float((MAP_TEXTURE_HEIGHT>>1)-y[0])/Float(y[1]-y[0]);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[2].bodyy.f=dp[3].bodyy.f=map_screen_y+frac*map_screen_height;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[2].iy=dp[3].iy=MAP_TEXTURE_HEIGHT>>(1+MAP_SCALE);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		}
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		//display the map texture...
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		ImageMapDesc* pmap=Image_Map.GetImageMapPtr(THUMBTOPNO);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		OverLay.PutA(pmap,dp);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	}
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	//is the bottom half of the map texture to be displayed?
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	if (y[1]>MAP_TEXTURE_HEIGHT>>1)
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	{
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[0].bodyx.f=dp[3].bodyx.f=map_screen_x;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[0].ix=dp[3].ix=x[0]>>MAP_SCALE;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[1].bodyx.f=dp[2].bodyx.f=map_screen_x+map_screen_width-1;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[1].ix=dp[2].ix=x[1]>>MAP_SCALE;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[2].bodyy.f=dp[3].bodyy.f=map_screen_y+map_screen_height-1;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		dp[2].iy=dp[3].iy=y[1]>>MAP_SCALE;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		//points 0 & 1 bodyy & iy are more complicated
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		//if the texture coordinates for the top of the map are
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		//in the bottom half of the map then there's no problem
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		if (y[0]>=MAP_TEXTURE_HEIGHT>>1)
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		{
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[0].bodyy.f=dp[1].bodyy.f=map_screen_y;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[0].iy=dp[1].iy=y[0]>>MAP_SCALE;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		}
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		else
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		{
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			Float frac=Float((MAP_TEXTURE_HEIGHT>>1)-y[0])/Float(y[1]-y[0]);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[0].bodyy.f=dp[1].bodyy.f=map_screen_y+frac*map_screen_height;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[0].iy=dp[1].iy=MAP_TEXTURE_HEIGHT>>(1+MAP_SCALE);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		}
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		//display the map texture...
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		for (int i=3;i>=0;i--)
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 			dp[i].iy-=MAP_TEXTURE_HEIGHT>>(1+MAP_SCALE);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		ImageMapDesc* pmap=Image_Map.GetImageMapPtr(THUMBBOTNO);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 		OverLay.PutA(pmap,dp);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	}
-//DeadCode JON 8Nov00 	xc[0]=x[0]; xc[1]=x[1];
-//DeadCode JON 8Nov00 	yc[0]=y[0]; yc[1]=y[1];
-//DeadCode JON 8Nov00 }
 
 inline UWord MapClipFlags(SWord ix,SWord iy,SWord *x,SWord *y)
 {
@@ -4184,9 +3290,7 @@ inline bool ClipPoint(SWord& x,SWord& y,UWord f,SWord *xc,SWord *yc)
 
 	if (f&OFFBOTTOM)
 	{
-//DeadCode RJS 1Sep00 		frac = D3DVALUE(x)/D3DVALUE(y);
 		y = yc[1];
-//DeadCode RJS 1Sep00 		x = frac*D3DVALUE(y);
 
 		f=MapClipFlags(x,y,xc,yc);
 	}
@@ -4200,9 +3304,7 @@ inline bool ClipPoint(SWord& x,SWord& y,UWord f,SWord *xc,SWord *yc)
 
 	if (f&OFFRIGHT)
 	{
-//DeadCode RJS 1Sep00 		frac=D3DVALUE(y)/D3DVALUE(x);
 		x=xc[1];
-//DeadCode RJS 1Sep00 		y=frac*D3DVALUE(x);
 		f=MapClipFlags(x,y,xc,yc);
 	}
 	return f==0?true:false;
@@ -4338,76 +3440,6 @@ inline bool ClipLineZoomed(SLong *x,SLong *y,UWord *f,SLong *xc,SLong *yc)
 	return true;
 }
 
-//DeadCode JON 8Nov00 void MapScr::ShowWaypointIcon(SWord x,SWord y,WayPointPtr waypt)
-//DeadCode JON 8Nov00 {
-//DeadCode JON 8Nov00 	struct SAircraftIconDef{
-//DeadCode JON 8Nov00 		ImageMapNumber mapno;
-//DeadCode JON 8Nov00 		SWord x,y,w,h;
-//DeadCode JON 8Nov00 	};
-//DeadCode JON 8Nov00 	struct SMapAircraft{
-//DeadCode JON 8Nov00 		SAircraftIconDef standard,playerac,caller,messagesubject;
-//DeadCode JON 8Nov00 	};
-//DeadCode JON 8Nov00 	static SMapAircraft waypoint_map=
-//DeadCode JON 8Nov00 	{
-//DeadCode JON 8Nov00 		{MAPCHAPNO,0,48,3,3},	//standard waypt
-//DeadCode JON 8Nov00 		{MAPCHAPNO,16,48,3,3},	//player current waypt
-//DeadCode JON 8Nov00 		{MAPCHAPNO,0,48,6,6},	//standard waypt SELECTED
-//DeadCode JON 8Nov00 		{MAPCHAPNO,16,48,6,6}	//player current waypt SELECTED
-//DeadCode JON 8Nov00 	};
-//DeadCode JON 8Nov00 	const Float p_w=OverLay.physicalWidth;
-//DeadCode JON 8Nov00 	const Float p_h=OverLay.physicalHeight;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	//generate clipping values in physical pixels
-//DeadCode JON 8Nov00 	FRect clip;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	clip.left=Float(MAP_SCREEN_ORIGIN_X_640)*p_w/Float(640);
-//DeadCode JON 8Nov00 	clip.right=Float(MAP_SCREEN_ORIGIN_X_640+MAP_SCREEN_WIDTH_640-1)*p_w/Float(640);
-//DeadCode JON 8Nov00 	clip.top=Float(MAP_SCREEN_ORIGIN_Y_640)*p_h/Float(480);
-//DeadCode JON 8Nov00 	clip.bottom=Float(MAP_SCREEN_ORIGIN_Y_640+MAP_SCREEN_HEIGHT_640-1)*p_h/Float(480);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	//convert input pixels 640 to physical screen pixels
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	Float p_x,p_y;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	p_x=Float(x)*p_w/Float(640);
-//DeadCode JON 8Nov00 	p_y=Float(y)*p_h/Float(480);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	//select icon to render
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	ImageMapDesc* pmap;
-//DeadCode JON 8Nov00 	SAircraftIconDef* selectedIcon;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	if (waypt==Manual_Pilot.ControlledAC2->waypoint)
-//DeadCode JON 8Nov00 	{
-//DeadCode JON 8Nov00 		if (waypt==OverLay.curr_waypoint)	selectedIcon=&waypoint_map.messagesubject;
-//DeadCode JON 8Nov00 		else								selectedIcon=&waypoint_map.playerac;
-//DeadCode JON 8Nov00 	}
-//DeadCode JON 8Nov00 	else
-//DeadCode JON 8Nov00 	{
-//DeadCode JON 8Nov00 		if (waypt==OverLay.curr_waypoint)	selectedIcon=&waypoint_map.caller;
-//DeadCode JON 8Nov00 		else								selectedIcon=&waypoint_map.standard;
-//DeadCode JON 8Nov00 	}
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	pmap=Image_Map.GetImageMapPtr(selectedIcon->mapno);
-//DeadCode JON 8Nov00 	const SWord map_w=selectedIcon->w;
-//DeadCode JON 8Nov00 	const SWord map_h=selectedIcon->h;
-//DeadCode JON 8Nov00 	Float f_w_2,f_h_2;
-//DeadCode JON 8Nov00 	f_w_2=Float(map_w>>1);
-//DeadCode JON 8Nov00 	f_h_2=Float(map_h>>1);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 #pragma warnmsg( "ShowWaypointIcon" )
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	R3DVERTEX dp[4];
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	dp[0].bodyx.f=dp[3].bodyx.f=int(p_x-f_w_2);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	dp[0].ix=dp[3].ix=selectedIcon->x;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	dp[1].bodyx.f=dp[2].bodyx.f=dp[3].bodyx.f+map_w;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	dp[1].ix=dp[2].ix=selectedIcon->x+map_w;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	dp[0].bodyy.f=dp[1].bodyy.f=int(p_y-f_h_2);
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	dp[0].iy=dp[1].iy=selectedIcon->y;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	dp[2].bodyy.f=dp[3].bodyy.f=dp[1].bodyy.f+map_h;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	dp[2].iy=dp[3].iy=selectedIcon->y+map_h;
-//DeadCode JON 8Nov00 //TEMPCODE JON 5/22/00 	OverLay.ClippedPutC(dp,pmap,clip);
-//DeadCode JON 8Nov00 }
 
 void WorldToScreenXY( double& sx, double& sy, COORDS3D& pos )				//JON 8Nov00
 {
@@ -4528,507 +3560,9 @@ inline bool ClipLineToScreen( double& sx, double& sy, double& ex, double& ey )		
 	return retVal;
 }
 
-//DeadCode JON 8Nov00 void MapScr::ShowAircraftRoute(AirStrucPtr itemPtr,SWord *x,SWord *y,bool flag)
-//DeadCode JON 8Nov00 {
-//DeadCode JON 8Nov00 	//skip to itemPtr's first waypoint...
-//DeadCode JON 8Nov00 	WayPointPtr lastwaypt=NULL,waypt=itemPtr->waypoint;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 	SWord xc_640[2],yc_640[2];
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 	xc_640[0]=MAP_SCREEN_ORIGIN_X_640;
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 	xc_640[1]=MAP_SCREEN_ORIGIN_X_640+MAP_SCREEN_WIDTH_640-1;
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 	yc_640[0]=MAP_SCREEN_ORIGIN_Y_640;
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 	yc_640[1]=MAP_SCREEN_ORIGIN_Y_640+MAP_SCREEN_HEIGHT_640-1;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	COORDS3D home_pos;
-//DeadCode JON 8Nov00 	COORDS3D start_pos;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	if (waypt!=NULL)
-//DeadCode JON 8Nov00 	{
-//DeadCode JON 8Nov00 		UniqueID	itemUID = itemPtr->uniqueID.count;					//RJS 27Jun00
-//DeadCode JON 8Nov00 		if (	itemPtr->fly.expandedsag
-//DeadCode JON 8Nov00 			&& (itemPtr->fly.numinsag==0)	)
-//DeadCode JON 8Nov00 			itemUID = itemPtr->fly.expandedsag->uniqueID.count;			//RJS 27Jun00
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 		waypt=FindFirstWP(itemUID,waypt);	//while (waypt->prev) waypt=waypt->prev;	//RJS 27Jun00
-//DeadCode JON 8Nov00 		start_pos=*::FindDesPos(waypt);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 		if (itemPtr->ai.homebase)
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 		{
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			home_pos=itemPtr->ai.homebase->World;
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			//draw a line from home_pos to start_pos
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			SWord wx[2],wy[2];
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			UWord cf[2];
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			WorldToSxy(start_pos,wx[0],wy[0]);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			WorldToSxy(home_pos,wx[1],wy[1]);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			cf[0]=MapClipFlags(wx[0],wy[0],xc_640,yc_640);				//RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			cf[1]=MapClipFlags(wx[1],wy[1],xc_640,yc_640);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			if ((cf[0]&cf[1])==0)
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			{
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  				//clip the waypoint line between (wx[0],wy[0]) and (wx[1],wy[1])
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  				if ((cf[0]|cf[1])==0 || ClipLine(wx,wy,cf,xc_640,yc_640))
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  				{
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					const float p_w=OverLay.physicalWidth/640.;
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					const float p_h=OverLay.physicalHeight/480.;
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					for (int i=1;i>=0;i--)
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					{
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  						wx[i]=SWord(float(wx[i])*p_w);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  						wy[i]=SWord(float(wy[i])*p_h);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					}
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					OverLay.DrawLine(wx[0],wy[0],wx[1],wy[1],Colour(252));
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  				}
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			}
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 		}
-//DeadCode JON 8Nov00 		lastwaypt=waypt;
-//DeadCode JON 8Nov00 		waypt = waypt->NextWP(itemPtr);									//RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 		waypt=FindNextWP(itemUID,waypt);	//waypt->next;				//RJS 27Jun00
-//DeadCode JON 8Nov00 		while (waypt!=lastwaypt)										//RJS 27Jun00
-//DeadCode JON 8Nov00 		{
-//DeadCode JON 8Nov00 			COORDS3D end_pos=*::FindDesPos(waypt);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 			SWord wx[2],wy[2];
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 			UWord cf[2];
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 			WorldToSxy(start_pos,wx[0],wy[0]);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 			WorldToSxy(end_pos,wx[1],wy[1]);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 			cf[0]=MapClipFlags(wx[0],wy[0],xc_640,yc_640);				//RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  			cf[1]=MapClipFlags(wx[1],wy[1],xc_640,yc_640);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  			if ((cf[0]&cf[1])==0)
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  			{
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				//clip the waypoint line between (wx[0],wy[0]) and (wx[1],wy[1])
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				if ((cf[0]|cf[1])==0 || ClipLine(wx,wy,cf,xc_640,yc_640))
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				{
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  					const float p_w=OverLay.physicalWidth/640.;
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  					const float p_h=OverLay.physicalHeight/480.;
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  					for (int i=1;i>=0;i--)
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  					{
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  						wx[i]=SWord(float(wx[i])*p_w);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  						wy[i]=SWord(float(wy[i])*p_h);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  					}
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  					OverLay.DrawLine(wx[0],wy[0],wx[1],wy[1],Colour(252));
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				}
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  			}
-//DeadCode JON 8Nov00 			double sx,sy,ex,ey;
-//DeadCode JON 8Nov00 			WorldToScreenXY( sx, sy, start_pos );
-//DeadCode JON 8Nov00 			WorldToScreenXY( ex, ey, end_pos );
-//DeadCode JON 8Nov00 			if ( ClipLineToScreen( sx, sy, ex, sy ) )
-//DeadCode JON 8Nov00 			{ // it's visible
-//DeadCode JON 8Nov00 				OverLay.DrawLine(SWord( sx ),SWord( sy ),SWord( ex ),SWord( ey ),Colour(252));
-//DeadCode JON 8Nov00 			}
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			start_pos=end_pos;
-//DeadCode JON 8Nov00 			lastwaypt=waypt;
-//DeadCode JON 8Nov00 			waypt = waypt->NextWP(itemPtr);										//RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			waypt=waypt->next;
-//DeadCode JON 8Nov00 		}
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 		if (itemPtr->ai.homebase)
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 		{
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			start_pos=*::FindDesPos(lastwaypt);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			//draw a line from home_pos to start_pos
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			SWord wx[2],wy[2];
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			UWord cf[2];
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			WorldToSxy(start_pos,wx[0],wy[0]);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			WorldToSxy(home_pos,wx[1],wy[1]);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 			cf[0]=MapClipFlags(wx[0],wy[0],xc_640,yc_640);				//RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			cf[1]=MapClipFlags(wx[1],wy[1],xc_640,yc_640);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			if ((cf[0]&cf[1])==0)
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			{
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  				//clip the waypoint line between (wx[0],wy[0]) and (wx[1],wy[1])
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  				if ((cf[0]|cf[1])==0 || ClipLine(wx,wy,cf,xc_640,yc_640))
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  				{
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					const float p_w=OverLay.physicalWidth/640.;
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					const float p_h=OverLay.physicalHeight/480.;
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					for (int i=1;i>=0;i--)
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					{
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  						wx[i]=SWord(float(wx[i])*p_w);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  						wy[i]=SWord(float(wy[i])*p_h);
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					}
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  					OverLay.DrawLine(wx[0],wy[0],wx[1],wy[1],Colour(252));
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  				}
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00  			}
-//DeadCode JON 8Nov00 //DeadCode RJS 27Jun00 		}
-//DeadCode JON 8Nov00 	}
-//DeadCode JON 8Nov00 	if (flag)// && itemPtr->waypoint)	//draw line from pilotedac pos to current waypoint...
-//DeadCode JON 8Nov00 	{
-//DeadCode JON 8Nov00 		if (itemPtr->waypoint)	home_pos=*(itemPtr->waypoint->FindDesPos());
-//DeadCode JON 8Nov00 		else					home_pos=itemPtr->ai.homebase->World;
-//DeadCode JON 8Nov00 		start_pos=itemPtr->World;
-//DeadCode JON 8Nov00 		//draw a line from home_pos to start_pos
-//DeadCode JON 8Nov00 		double sx,sy,ex,ey;
-//DeadCode JON 8Nov00 		WorldToScreenXY( sx, sy, start_pos );
-//DeadCode JON 8Nov00 		WorldToScreenXY( ex, ey, home_pos );
-//DeadCode JON 8Nov00 		if ( ClipLineToScreen( sx, sy, ex, sy ) )
-//DeadCode JON 8Nov00 		{ // it's visible
-//DeadCode JON 8Nov00 			OverLay.DrawLine(SWord( sx ),SWord( sy ),SWord( ex ),SWord( ey ),Colour(252));
-//DeadCode JON 8Nov00 		}
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 		SWord wx[2],wy[2];
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 		UWord cf[2];
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 		WorldToSxy(start_pos,wx[0],wy[0]);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00 		WorldToSxy(home_pos,wx[1],wy[1]);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  		cf[0]=MapClipFlags(wx[0],wy[0],xc_640,yc_640);				//RJS 27Jun00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  		cf[1]=MapClipFlags(wx[1],wy[1],xc_640,yc_640);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  		if ((cf[0]&cf[1])==0)
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  		{
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  			//clip the waypoint line between (wx[0],wy[0]) and (wx[1],wy[1])
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  			if ((cf[0]|cf[1])==0 || ClipLine(wx,wy,cf,xc_640,yc_640))
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  			{
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				const float p_w=OverLay.physicalWidth/640.;
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				const float p_h=OverLay.physicalHeight/480.;
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				for (int i=1;i>=0;i--)
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				{
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  					wx[i]=SWord(float(wx[i])*p_w);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  					wy[i]=SWord(float(wy[i])*p_h);
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				}
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  				OverLay.DrawLine(wx[0],wy[0],wx[1],wy[1],Colour(252));
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  			}
-//DeadCode JON 8Nov00 //DeadCode JON 8Nov00  		}
-//DeadCode JON 8Nov00 	}
-//DeadCode JON 8Nov00 }
 
-//DeadCode JON 8Nov00 #pragma warnmsg( "ShowAircraftRouteZoomed" )
-//DeadCode JON 8Nov00 void MapScr::ShowAircraftRouteZoomed(AirStrucPtr itemPtr,SLong *x,SLong *y,bool flag)
-//DeadCode JON 8Nov00 {
-//DeadCode JON 8Nov00 	//skip to itemPtr's first waypoint...
-//DeadCode JON 8Nov00 	WayPointPtr lastwaypt=NULL,waypt=itemPtr->waypoint;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	SLong xc_640[2],yc_640[2];
-//DeadCode JON 8Nov00 	xc_640[0]=MAP_SCREEN_ORIGIN_X_640;
-//DeadCode JON 8Nov00 	xc_640[1]=MAP_SCREEN_ORIGIN_X_640+MAP_SCREEN_WIDTH_640-1;
-//DeadCode JON 8Nov00 	yc_640[0]=MAP_SCREEN_ORIGIN_Y_640;
-//DeadCode JON 8Nov00 	yc_640[1]=MAP_SCREEN_ORIGIN_Y_640+MAP_SCREEN_HEIGHT_640-1;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	COORDS3D home_pos;
-//DeadCode JON 8Nov00 	COORDS3D start_pos;
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 	if (waypt!=NULL)
-//DeadCode JON 8Nov00 	{
-//DeadCode JON 8Nov00 		while (waypt->prev) waypt=waypt->prev;
-//DeadCode JON 8Nov00 		start_pos=*::FindDesPos(waypt);
-//DeadCode JON 8Nov00 		if (itemPtr->ai.homebase)
-//DeadCode JON 8Nov00 		{
-//DeadCode JON 8Nov00 			home_pos=itemPtr->ai.homebase->World;
-//DeadCode JON 8Nov00 			//draw a line from home_pos to start_pos
-//DeadCode JON 8Nov00 			SLong wx[2],wy[2];
-//DeadCode JON 8Nov00 			UWord cf[2];
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			wx[0]=WorldXToSx640Zoomed(start_pos.X,x);
-//DeadCode JON 8Nov00 			wy[0]=WorldZToSy640Zoomed(start_pos.Z,y);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			wx[1]=WorldXToSx640Zoomed(home_pos.X,x);
-//DeadCode JON 8Nov00 			wy[1]=WorldZToSy640Zoomed(home_pos.Z,y);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			cf[0]=MapClipFlagsZoomed(wx[0],wy[0],xc_640,yc_640);
-//DeadCode JON 8Nov00 			cf[1]=MapClipFlagsZoomed(wx[1],wy[1],xc_640,yc_640);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			if ((cf[0]&cf[1])==0)
-//DeadCode JON 8Nov00 			{
-//DeadCode JON 8Nov00 				//clip the waypoint line between (wx[0],wy[0]) and (wx[1],wy[1])
-//DeadCode JON 8Nov00 				if ((cf[0]|cf[1])==0 || ClipLineZoomed(wx,wy,cf,xc_640,yc_640))
-//DeadCode JON 8Nov00 				{
-//DeadCode JON 8Nov00 					const Float p_w=OverLay.physicalWidth;
-//DeadCode JON 8Nov00 					const Float p_h=OverLay.physicalHeight;
-//DeadCode JON 8Nov00 					for (int i=1;i>=0;i--)
-//DeadCode JON 8Nov00 					{
-//DeadCode JON 8Nov00 						wx[i]=SWord(Float(wx[i])*p_w/Float(640));
-//DeadCode JON 8Nov00 						wy[i]=SWord(Float(wy[i])*p_h/Float(480));
-//DeadCode JON 8Nov00 					}
-//DeadCode JON 8Nov00 					OverLay.DrawLine(wx[0],wy[0],wx[1],wy[1],Colour(252));
-//DeadCode JON 8Nov00 				}
-//DeadCode JON 8Nov00 			}
-//DeadCode JON 8Nov00 		}
-//DeadCode JON 8Nov00 		lastwaypt=waypt;
-//DeadCode JON 8Nov00 		waypt=waypt->next;
-//DeadCode JON 8Nov00 		while (waypt!=NULL)
-//DeadCode JON 8Nov00 		{
-//DeadCode JON 8Nov00 			COORDS3D end_pos=*::FindDesPos(waypt);
-//DeadCode JON 8Nov00 			SLong wx[2],wy[2];
-//DeadCode JON 8Nov00 			UWord cf[2];
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			wx[0]=WorldXToSx640Zoomed(start_pos.X,x);
-//DeadCode JON 8Nov00 			wy[0]=WorldZToSy640Zoomed(start_pos.Z,y);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			wx[1]=WorldXToSx640Zoomed(end_pos.X,x);
-//DeadCode JON 8Nov00 			wy[1]=WorldZToSy640Zoomed(end_pos.Z,y);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			cf[0]=MapClipFlagsZoomed(wx[0],wy[0],xc_640,yc_640);
-//DeadCode JON 8Nov00 			cf[1]=MapClipFlagsZoomed(wx[1],wy[1],xc_640,yc_640);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			if ((cf[0]&cf[1])==0)
-//DeadCode JON 8Nov00 			{
-//DeadCode JON 8Nov00 				if (cf[0]==0) ShowWaypointIcon(wx[0],wy[0],lastwaypt);
-//DeadCode JON 8Nov00 				//clip the waypoint line between (wx[0],wy[0]) and (wx[1],wy[1])
-//DeadCode JON 8Nov00 				if ((cf[0]|cf[1])==0 || ClipLineZoomed(wx,wy,cf,xc_640,yc_640))
-//DeadCode JON 8Nov00 				{
-//DeadCode JON 8Nov00 					const Float p_w=OverLay.physicalWidth;
-//DeadCode JON 8Nov00 					const Float p_h=OverLay.physicalHeight;
-//DeadCode JON 8Nov00 					for (int i=1;i>=0;i--)
-//DeadCode JON 8Nov00 					{
-//DeadCode JON 8Nov00 						wx[i]=SWord(Float(wx[i])*p_w/Float(640));
-//DeadCode JON 8Nov00 						wy[i]=SWord(Float(wy[i])*p_h/Float(480));
-//DeadCode JON 8Nov00 					}
-//DeadCode JON 8Nov00 					OverLay.DrawLine(wx[0],wy[0],wx[1],wy[1],Colour(252));
-//DeadCode JON 8Nov00 				}
-//DeadCode JON 8Nov00 			}
-//DeadCode JON 8Nov00 			start_pos=end_pos;
-//DeadCode JON 8Nov00 			lastwaypt=waypt;
-//DeadCode JON 8Nov00 			waypt=waypt->next;
-//DeadCode JON 8Nov00 		}
-//DeadCode JON 8Nov00 		if (itemPtr->ai.homebase)
-//DeadCode JON 8Nov00 		{
-//DeadCode JON 8Nov00 			start_pos=*::FindDesPos(lastwaypt);
-//DeadCode JON 8Nov00 			//draw a line from home_pos to start_pos
-//DeadCode JON 8Nov00 			SLong wx[2],wy[2];
-//DeadCode JON 8Nov00 			UWord cf[2];
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			wx[0]=WorldXToSx640Zoomed(start_pos.X,x);
-//DeadCode JON 8Nov00 			wy[0]=WorldZToSy640Zoomed(start_pos.Z,y);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			wx[1]=WorldXToSx640Zoomed(home_pos.X,x);
-//DeadCode JON 8Nov00 			wy[1]=WorldZToSy640Zoomed(home_pos.Z,y);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			cf[0]=MapClipFlagsZoomed(wx[0],wy[0],xc_640,yc_640);
-//DeadCode JON 8Nov00 			cf[1]=MapClipFlagsZoomed(wx[1],wy[1],xc_640,yc_640);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 			if ((cf[0]&cf[1])==0)
-//DeadCode JON 8Nov00 			{
-//DeadCode JON 8Nov00 				if (cf[0]==0) ShowWaypointIcon(wx[0],wy[0],lastwaypt);
-//DeadCode JON 8Nov00 				//clip the waypoint line between (wx[0],wy[0]) and (wx[1],wy[1])
-//DeadCode JON 8Nov00 				if ((cf[0]|cf[1])==0 || ClipLineZoomed(wx,wy,cf,xc_640,yc_640))
-//DeadCode JON 8Nov00 				{
-//DeadCode JON 8Nov00 					const Float p_w=OverLay.physicalWidth;
-//DeadCode JON 8Nov00 					const Float p_h=OverLay.physicalHeight;
-//DeadCode JON 8Nov00 					for (int i=1;i>=0;i--)
-//DeadCode JON 8Nov00 					{
-//DeadCode JON 8Nov00 						wx[i]=SWord(Float(wx[i])*p_w/Float(640));
-//DeadCode JON 8Nov00 						wy[i]=SWord(Float(wy[i])*p_h/Float(480));
-//DeadCode JON 8Nov00 					}
-//DeadCode JON 8Nov00 					OverLay.DrawLine(wx[0],wy[0],wx[1],wy[1],Colour(252));
-//DeadCode JON 8Nov00 				}
-//DeadCode JON 8Nov00 			}
-//DeadCode JON 8Nov00 		}
-//DeadCode JON 8Nov00 	}
-//DeadCode JON 8Nov00 	if (flag)	// && itemPtr->waypoint)	//draw line from pilotedac pos to current waypoint...
-//DeadCode JON 8Nov00 	{
-//DeadCode JON 8Nov00 		if (itemPtr->waypoint)	home_pos=*(itemPtr->waypoint->FindDesPos());
-//DeadCode JON 8Nov00 		else					home_pos=itemPtr->ai.homebase->World;
-//DeadCode JON 8Nov00 		start_pos=itemPtr->World;
-//DeadCode JON 8Nov00 		//draw a line from home_pos to start_pos
-//DeadCode JON 8Nov00 		SLong wx[2],wy[2];
-//DeadCode JON 8Nov00 		UWord cf[2];
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 		wx[0]=WorldXToSx640Zoomed(start_pos.X,x);
-//DeadCode JON 8Nov00 		wy[0]=WorldZToSy640Zoomed(start_pos.Z,y);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 		wx[1]=WorldXToSx640Zoomed(home_pos.X,x);
-//DeadCode JON 8Nov00 		wy[1]=WorldZToSy640Zoomed(home_pos.Z,y);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 		cf[0]=MapClipFlagsZoomed(wx[0],wy[0],xc_640,yc_640);
-//DeadCode JON 8Nov00 		cf[1]=MapClipFlagsZoomed(wx[1],wy[1],xc_640,yc_640);
-//DeadCode JON 8Nov00
-//DeadCode JON 8Nov00 		if ((cf[0]&cf[1])==0)
-//DeadCode JON 8Nov00 		{
-//DeadCode JON 8Nov00 			//clip the waypoint line between (wx[0],wy[0]) and (wx[1],wy[1])
-//DeadCode JON 8Nov00 			if ((cf[0]|cf[1])==0 || ClipLineZoomed(wx,wy,cf,xc_640,yc_640))
-//DeadCode JON 8Nov00 			{
-//DeadCode JON 8Nov00 				const Float p_w=OverLay.physicalWidth;
-//DeadCode JON 8Nov00 				const Float p_h=OverLay.physicalHeight;
-//DeadCode JON 8Nov00 				for (int i=1;i>=0;i--)
-//DeadCode JON 8Nov00 				{
-//DeadCode JON 8Nov00 					wx[i]=SWord(Float(wx[i])*p_w/Float(640));
-//DeadCode JON 8Nov00 					wy[i]=SWord(Float(wy[i])*p_h/Float(480));
-//DeadCode JON 8Nov00 				}
-//DeadCode JON 8Nov00 				OverLay.DrawLine(wx[0],wy[0],wx[1],wy[1],Colour(252));
-//DeadCode JON 8Nov00 			}
-//DeadCode JON 8Nov00 		}
-//DeadCode JON 8Nov00 	}
-//DeadCode JON 8Nov00 }
 
-//DeadCode JON 29Oct00 void MapScr::ShowAircraftIcon(SWord x,SWord y,AirStrucPtr ip)
-//DeadCode JON 29Oct00 {
-//DeadCode RJS 05Jun00 	struct SAircraftIconDef{
-//DeadCode RJS 05Jun00 		ImageMapNumber mapno;
-//DeadCode RJS 05Jun00 		SWord x,y,w,h;
-//DeadCode RJS 05Jun00 	};
-//DeadCode RJS 05Jun00 	struct SMapAircraft{
-//DeadCode RJS 05Jun00 		SAircraftIconDef standard,playerac,caller,messagesubject;
-//DeadCode RJS 05Jun00 	};
-//DeadCode RJS 05Jun00 	static SMapAircraft map_red_ac=
-//DeadCode RJS 05Jun00 	{
-//DeadCode RJS 05Jun00 		{MAPCHAPNO,0,32,16,16},	//standard red
-//DeadCode RJS 05Jun00 		{MAPCHAPNO,16,32,16,16},	//player red outline
-//DeadCode RJS 05Jun00 		{MAPCHAPNO,32,32,16,16},	//caller red outline
-//DeadCode RJS 05Jun00 		{MAPCHAPNO,48,32,16,16}	//message subject red outline
-//DeadCode RJS 05Jun00 	};
-//DeadCode RJS 05Jun00 	static SMapAircraft map_blue_ac=
-//DeadCode RJS 05Jun00 	{
-//DeadCode RJS 05Jun00 		{MAPCHAPNO,0,0,16,16},	//standard blue outline
-//DeadCode RJS 05Jun00 		{MAPCHAPNO,16,0,16,16},	//player blue outline
-//DeadCode RJS 05Jun00 		{MAPCHAPNO,32,0,16,16},	//caller blue outline
-//DeadCode RJS 05Jun00 		{MAPCHAPNO,48,0,16,16}	//message subject blue outline
-//DeadCode RJS 05Jun00 	};
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	const Float p_w=OverLay.physicalWidth;
-//DeadCode RJS 05Jun00 	const Float p_h=OverLay.physicalHeight;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	//generate clipping values in physical pixels
-//DeadCode RJS 05Jun00 	FRect clip;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	clip.left=Float(MAP_SCREEN_ORIGIN_X_640)*p_w/Float(640);
-//DeadCode RJS 05Jun00 	clip.right=Float(MAP_SCREEN_ORIGIN_X_640+MAP_SCREEN_WIDTH_640-1)*p_w/Float(640);
-//DeadCode RJS 05Jun00 	clip.top=Float(MAP_SCREEN_ORIGIN_Y_640)*p_h/Float(480);
-//DeadCode RJS 05Jun00 	clip.bottom=Float(MAP_SCREEN_ORIGIN_Y_640+MAP_SCREEN_HEIGHT_640-1)*p_h/Float(480);
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	//convert input pixels 640 to physical screen pixels
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	Float p_x,p_y;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	p_x=Float(x)*p_w/Float(640);
-//DeadCode RJS 05Jun00 	p_y=Float(y)*p_h/Float(480);
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	//select icon to render
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	R3DVERTEX dp[4];
-//DeadCode RJS 05Jun00 	ImageMapDesc* pmap;
-//DeadCode RJS 05Jun00 	SAircraftIconDef* selectedIcon;
-//DeadCode RJS 05Jun00 	SMapAircraft* selectedSide;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	if (ip->nationality==NAT_BLUE)	selectedSide=&map_blue_ac;
-//DeadCode RJS 05Jun00 	else							selectedSide=&map_red_ac;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	bool noOutline=false;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	if (ip==Manual_Pilot.ControlledAC2)				selectedIcon=&selectedSide->playerac;
-//DeadCode RJS 05Jun00 	else if (ip==OverLay.message_caller)			selectedIcon=&selectedSide->caller;
-//DeadCode RJS 05Jun00 	else if (itemptr(ip)==OverLay.message_target)	selectedIcon=&selectedSide->messagesubject;
-//DeadCode RJS 05Jun00 	else
-//DeadCode RJS 05Jun00 	{
-//DeadCode RJS 05Jun00 		noOutline=true;
-//DeadCode RJS 05Jun00 		selectedIcon=&selectedSide->standard;
-//DeadCode RJS 05Jun00 	}
-//DeadCode RJS 05Jun00 	pmap=Image_Map.GetImageMapPtr(selectedIcon->mapno);
-//DeadCode RJS 05Jun00 	const SWord map_w=selectedIcon->w;
-//DeadCode RJS 05Jun00 	const SWord map_h=selectedIcon->h;
-//DeadCode RJS 05Jun00 	Float f_w_2,f_h_2;
-//DeadCode RJS 05Jun00 	f_w_2=Float(map_w>>1);
-//DeadCode RJS 05Jun00 	f_h_2=Float(map_h>>1);
-//DeadCode RJS 05Jun00 	dp[0].bodyx.f=dp[3].bodyx.f=int(p_x-f_w_2);
-//DeadCode RJS 05Jun00 	dp[0].ix=dp[3].ix=selectedIcon->x;
-//DeadCode RJS 05Jun00 	dp[1].bodyx.f=dp[2].bodyx.f=dp[3].bodyx.f+map_w;
-//DeadCode RJS 05Jun00 	dp[1].ix=dp[2].ix=selectedIcon->x+map_w;
-//DeadCode RJS 05Jun00 	dp[0].bodyy.f=dp[1].bodyy.f=int(p_y-f_h_2);
-//DeadCode RJS 05Jun00 	dp[0].iy=dp[1].iy=selectedIcon->y;
-//DeadCode RJS 05Jun00 	dp[2].bodyy.f=dp[3].bodyy.f=dp[1].bodyy.f+map_h;
-//DeadCode RJS 05Jun00 	dp[2].iy=dp[3].iy=selectedIcon->y+map_h;
-//DeadCode RJS 05Jun00 	if (!noOutline) OverLay.ClippedPutC(dp,pmap,clip);
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	//rotate coordinates to show the ac heading...
-//DeadCode RJS 05Jun00  	SWord sinAng,cosAng;
-//DeadCode RJS 05Jun00 	ANGLES hdgAng=-ip->hdg;
-//DeadCode RJS 05Jun00 	Math_Lib.high_sin_cos(hdgAng,sinAng,cosAng);
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	//generate 2D rotation matrix
-//DeadCode RJS 05Jun00 	Float m[4];
-//DeadCode RJS 05Jun00 	const Float af(ANGLES_FRACT);
-//DeadCode RJS 05Jun00 	m[0]=m[3]=Float(cosAng)/af;
-//DeadCode RJS 05Jun00 	m[1]=Float(sinAng)/af;
-//DeadCode RJS 05Jun00 	m[2]=-Float(sinAng)/af;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	selectedIcon=&selectedSide->standard;
-//DeadCode RJS 05Jun00 	dp[0].ix=dp[3].ix=selectedIcon->x;
-//DeadCode RJS 05Jun00 	dp[1].ix=dp[2].ix=selectedIcon->x+map_w;
-//DeadCode RJS 05Jun00 	dp[0].iy=dp[1].iy=selectedIcon->y;
-//DeadCode RJS 05Jun00 	dp[2].iy=dp[3].iy=selectedIcon->y+map_h;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	bool abortDraw=false;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	for (int i=3;i>=0 && !abortDraw;i--)
-//DeadCode RJS 05Jun00 	{
-//DeadCode RJS 05Jun00 		Float tx,ty;
-//DeadCode RJS 05Jun00 		tx=dp[i].bodyx.f-p_x;
-//DeadCode RJS 05Jun00 		ty=dp[i].bodyy.f-p_y;
-//DeadCode RJS 05Jun00 		dp[i].bodyx.f=p_x+(m[0]*tx+m[1]*ty);
-//DeadCode RJS 05Jun00 		dp[i].bodyy.f=p_y+(m[2]*tx+m[3]*ty);
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 		if (dp[i].bodyx.f<=clip.left ||
-//DeadCode RJS 05Jun00 			dp[i].bodyx.f>=clip.right ||
-//DeadCode RJS 05Jun00 			dp[i].bodyy.f<=clip.top ||
-//DeadCode RJS 05Jun00 			dp[i].bodyy.f>=clip.bottom)
-//DeadCode RJS 05Jun00 			abortDraw=true;
-//DeadCode RJS 05Jun00 	}
-//DeadCode RJS 05Jun00 	if (!abortDraw) OverLay.ClippedPutC(dp,pmap,clip);
-//DeadCode JON 29Oct00 }
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 void MapScr::ShowAircraftIcons(SWord *x,SWord *y,bool flag)
-//DeadCode JON 29Oct00 {
-//DeadCode RJS 05Jun00 	SWord xc_640[2],yc_640[2];
-//DeadCode RJS 05Jun00 	xc_640[0]=MAP_SCREEN_ORIGIN_X_640;
-//DeadCode RJS 05Jun00 	xc_640[1]=MAP_SCREEN_ORIGIN_X_640+MAP_SCREEN_WIDTH_640-1;
-//DeadCode RJS 05Jun00 	yc_640[0]=MAP_SCREEN_ORIGIN_Y_640;
-//DeadCode RJS 05Jun00 	yc_640[1]=MAP_SCREEN_ORIGIN_Y_640+MAP_SCREEN_HEIGHT_640-1;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	AirStrucPtr itemPtr=(AirStrucPtr)OverLay.pvp->GetFirstAC();
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	while (itemPtr!=NULL)
-//DeadCode RJS 05Jun00 	{
-//DeadCode RJS 05Jun00 		if (!itemPtr->Status.deadtime &&
-//DeadCode RJS 05Jun00 			(itemPtr->nationality==Manual_Pilot.ControlledAC2->nationality || Save_Data.gamedifficulty[GD_VISIBLEMIGSCHEAT]))
-//DeadCode RJS 05Jun00 		{
-//DeadCode RJS 05Jun00 			SWord sx_640,sy_640;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 			sx_640=WorldXToSx640(itemPtr->World.X,x);
-//DeadCode RJS 05Jun00 			sy_640=WorldZToSy640(itemPtr->World.Z,y);
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 			if (itemPtr==Manual_Pilot.ControlledAC2 || (!flag && itemPtr->formpos==0))
-//DeadCode RJS 05Jun00 			{
-//DeadCode RJS 05Jun00 				if (MapClipFlags(sx_640,sy_640,xc_640,yc_640)==0)
-//DeadCode RJS 05Jun00 					ShowAircraftIcon(sx_640,sy_640,itemPtr);
-//DeadCode RJS 05Jun00 			}
-//DeadCode RJS 05Jun00 		}
-//DeadCode RJS 05Jun00 		itemPtr=(AirStrucPtr)OverLay.pvp->GetNextAC(itemPtr);
-//DeadCode RJS 05Jun00 	}
-//DeadCode JON 29Oct00 }
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 void MapScr::ShowAircraftIconsZoomed(SLong *x,SLong *y,bool flag)
-//DeadCode JON 29Oct00 {
-//DeadCode RJS 05Jun00 	SWord xc_640[2],yc_640[2];
-//DeadCode RJS 05Jun00 	xc_640[0]=MAP_SCREEN_ORIGIN_X_640;
-//DeadCode RJS 05Jun00 	xc_640[1]=MAP_SCREEN_ORIGIN_X_640+MAP_SCREEN_WIDTH_640-1;
-//DeadCode RJS 05Jun00 	yc_640[0]=MAP_SCREEN_ORIGIN_Y_640;
-//DeadCode RJS 05Jun00 	yc_640[1]=MAP_SCREEN_ORIGIN_Y_640+MAP_SCREEN_HEIGHT_640-1;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	AirStrucPtr itemPtr=(AirStrucPtr)OverLay.pvp->GetFirstAC();
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 	while (itemPtr!=NULL)
-//DeadCode RJS 05Jun00 	{
-//DeadCode RJS 05Jun00 		if (!itemPtr->Status.deadtime)
-//DeadCode RJS 05Jun00 		{
-//DeadCode RJS 05Jun00 			SWord sx_640,sy_640;
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 			sx_640=WorldXToSx640Zoomed(itemPtr->World.X,x);
-//DeadCode RJS 05Jun00 			sy_640=WorldZToSy640Zoomed(itemPtr->World.Z,y);
-//DeadCode RJS 05Jun00
-//DeadCode RJS 05Jun00 			if (itemPtr==Manual_Pilot.ControlledAC2 || !flag)
-//DeadCode RJS 05Jun00 			{
-//DeadCode RJS 05Jun00 				if (MapClipFlags(sx_640,sy_640,xc_640,yc_640)==0)
-//DeadCode RJS 05Jun00 					ShowAircraftIcon(sx_640,sy_640,itemPtr);
-//DeadCode RJS 05Jun00 			}
-//DeadCode RJS 05Jun00 		}
-//DeadCode RJS 05Jun00 		itemPtr=(AirStrucPtr)OverLay.pvp->GetNextAC(itemPtr);
-//DeadCode RJS 05Jun00 	}
-//DeadCode JON 29Oct00 }
 
-//DeadCode JON 29Oct00 void MapScr::ShowTargetIcon(SWord x,SWord y,itemptr ip)
-//DeadCode JON 29Oct00 {
-//DeadCode JON 29Oct00 #pragma warnmsg("ShowTargetIcon" )
 //TEMPCODE JON 5/22/00 	struct SAircraftIconDef{
 //TEMPCODE JON 5/22/00 		ImageMapNumber mapno;
 //TEMPCODE JON 5/22/00 		SWord x,y,w,h;
@@ -5073,24 +3607,7 @@ inline bool ClipLineToScreen( double& sx, double& sy, double& ex, double& ey )		
 //TEMPCODE JON 5/22/00 	dp[2].bodyy.f=dp[3].bodyy.f=dp[1].bodyy.f+map_h;
 //TEMPCODE JON 5/22/00 	dp[2].iy=dp[3].iy=selectedIcon->y+map_h;
 //TEMPCODE JON 5/22/00 	OverLay.ClippedPutC(dp,pmap,clip);
-//DeadCode JON 29Oct00 }
 
-//DeadCode JON 29Oct00 void MapScr::ShowTargetLocation(itemptr itemPtr,SWord *x,SWord *y)
-//DeadCode JON 29Oct00 {
-//DeadCode JON 29Oct00 	if (itemPtr!=NULL)
-//DeadCode JON 29Oct00 	{
-//DeadCode JON 29Oct00 		SWord xc_640[2],yc_640[2];
-//DeadCode JON 29Oct00 		xc_640[0]=MAP_SCREEN_ORIGIN_X_640;
-//DeadCode JON 29Oct00 		xc_640[1]=MAP_SCREEN_ORIGIN_X_640+MAP_SCREEN_WIDTH_640-1;
-//DeadCode JON 29Oct00 		yc_640[0]=MAP_SCREEN_ORIGIN_Y_640;
-//DeadCode JON 29Oct00 		yc_640[1]=MAP_SCREEN_ORIGIN_Y_640+MAP_SCREEN_HEIGHT_640-1;
-//DeadCode JON 29Oct00
-//DeadCode JON 29Oct00 		SWord sx_640,sy_640;
-//DeadCode JON 29Oct00 		sx_640=WorldXToSx640(itemPtr->World.X,x);
-//DeadCode JON 29Oct00 		sy_640=WorldZToSy640(itemPtr->World.Z,y);
-//DeadCode JON 29Oct00 		if (MapClipFlags(sx_640,sy_640,xc_640,yc_640)==0) ShowTargetIcon(sx_640,sy_640,itemPtr);
-//DeadCode JON 29Oct00 	}
-//DeadCode JON 29Oct00 }
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //Procedure		ShowItemIcons
@@ -5111,27 +3628,11 @@ void MapScr::ShowItemIcons(bool flag)
 			Save_Data.gamedifficulty^=GD_VISIBLEMIGSCHEAT;
 	}
 
-//DeadCode JON 8Nov00 	SWord x[2],y[2];
-//DeadCode JON 8Nov00 	ShowBackgroundMap(Manual_Pilot.ControlledAC2->World,x,y);
-//DeadCode JON 8Nov00 	ShowAircraftRoute(Manual_Pilot.ControlledAC2,x,y,true);	//flag);
-//DeadCode JON 29Oct00 	ShowTargetLocation(OverLay.target_item,x,y);
-//DeadCode JON 29Oct00 	ShowAircraftIcons(x,y,flag);
 }
 
 void MapScr::ShowItemIconsZoomed(bool flag)
 {
-//DeadCode JON 8Nov00 	SLong x[2],y[2];
-//DeadCode JON 8Nov00 	//generate world coordinated of the area covered by the
-//DeadCode JON 8Nov00 	//map window...
-//DeadCode JON 8Nov00 	SLong offset=OverLay.pvp->World.Y;
-//DeadCode JON 8Nov00 	x[0]=OverLay.pvp->World.X-offset;
-//DeadCode JON 8Nov00 	x[1]=OverLay.pvp->World.X+offset;
-//DeadCode JON 8Nov00 	offset=(3*offset)>>2;
-//DeadCode JON 8Nov00 	y[0]=OverLay.pvp->World.Z+offset;
-//DeadCode JON 8Nov00 	y[1]=OverLay.pvp->World.Z-offset;
-//DeadCode JON 8Nov00 	ShowAircraftRouteZoomed(Manual_Pilot.ControlledAC2,x,y,true);	//flag);
 //	ShowTargetLocation(OverLay.target_item,x,y);
-//DeadCode JON 29Oct00 	ShowAircraftIconsZoomed(x,y,flag);
 }
 
 MESSAGE_STRUC* localMsg;
@@ -5149,9 +3650,7 @@ void MapScr::ShowPositionIndicators()
 	//						(2) current position
 	//						(3) block end
 
-//DeadCode AMM 27Jul00 	_Analogue.PollPosition();
 
-//DeadCode JON 20Oct00 	bool markerDone=false;
 
 	SWord _TopY=40;
 	SWord _LeftX=8;
@@ -5172,15 +3671,6 @@ void MapScr::ShowPositionIndicators()
 	endBlockX=((endBlockX*_Width)>>8)+_LeftX;
 	currentPosX=((currentPosX*_Width)>>8)+_LeftX;
 
-//DeadCode JON 11Aug00 	if (IsExtraWide(OverLay.physicalWidth))
-//DeadCode JON 11Aug00 	{
-//DeadCode JON 11Aug00 		_TopY<<=1;
-//DeadCode JON 11Aug00 		_Height<<=1;
-//DeadCode JON 11Aug00 		_Height_2<<=1;
-//DeadCode JON 11Aug00 		startBlockX<<=1;
-//DeadCode JON 11Aug00 		currentPosX<<=1;
-//DeadCode JON 11Aug00 		endBlockX<<=1;
-//DeadCode JON 11Aug00 	}
 
 	float scx = float(OverLay.physicalWidth)/640.0;
 	float scy = float(OverLay.physicalHeight)/480.0;
@@ -5296,8 +3786,6 @@ Key MapScr::FirstMapInit()
 	_MsgBuffer.InitMessageWindow();
 	if (!_DPlay.Implemented)
 		OverLay.keyFlags=KF_PAUSEON;
-//Old_Code DAW 26Mar99 	OverLay.keyFlags=KF_PAUSEON;
-//DeadCode JON 9Nov00 	refreshLandscape=false;
 	return SEL_0;
 }
 
@@ -5321,34 +3809,18 @@ MapScr* MapScr::SelectFromFirstMap(UByte&,Key k)
 		retval=&COverlay::waypointMapScr;
 		break;
 	case SEL_3:
-//DeadCode JON 17Oct00 		if (_DPlay.Implemented)											//JON 17Oct00
-//DeadCode JON 17Oct00 		{ // we are in comms 3d...
-//DeadCode JON 17Oct00 			retval=&COverlay::radioMapScrCOMMS;
-//DeadCode JON 17Oct00 		} else
-//DeadCode JON 17Oct00 		{
 		if ( Manual_Pilot.ControlledAC2 && Manual_Pilot.ControlledAC2->classtype->aerobaticfactor != AEROBATIC_LOW )
 			retval=&COverlay::radioMapScr;
-//DeadCode JON 17Oct00 		}
 		break;
 	case SEL_4:
 		OverLay.DoPossibleLandscapeRefresh();
 		OverLay.fZoomedMap=OverLay.fZoomedMap?false:true;
 		break;
-//DeadCode JON 17Oct00 	case SEL_5:
-//DeadCode JON 17Oct00 		if (_DPlay.Implemented)//AMM20May
-//DeadCode JON 17Oct00 			retval=&COverlay::commsMsgMapScr;
-//DeadCode JON 17Oct00 		break;
-//DeadCode JON 17Oct00 	case SEL_6:
-//DeadCode JON 17Oct00 		if (_DPlay.Implemented)//AMM20May
-//DeadCode JON 17Oct00 			retval=&COverlay::commsRecipientMapScr;
-//DeadCode JON 17Oct00 		break;
 	case SEL_0:
 	case SEL_ESC:
 		OverLay.SetPossibleLandscapeResfresh();							//JON 9Nov00
 		OverLay.keyFlags=KF_PAUSEOFF|KF_ACCELOFF;
 		OverLay.pvp->ReturnFromMap();
-//DeadCode JON 9Nov00 		if (refreshLandscape)
-//DeadCode JON 9Nov00 			Land_Scape.RefreshLandscape();
 		retval=NULL;
 		break;
 	default:
@@ -5379,7 +3851,6 @@ MapScr COverlay::firstMapScr=
 		{IDS_MAP_WAYPOINTS,0,SEL_2,MYPREFIX MapScr::SelectFromFirstMap},
 		{IDS_MAP_RADIO,0,SEL_3,MYPREFIX MapScr::SelectFromFirstMap},
 		{IDS_MAP_ZOOM,0,SEL_4,MYPREFIX MapScr::SelectFromFirstMap},
-//DeadCode JON 17Oct00 		MSBlankLine,
 		MSBlankLine,
 		MSEscapeLine(MYPREFIX MapScr::SelectFromFirstMap),
 		{IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromFirstMap},
@@ -5418,36 +3889,6 @@ MapScr COverlay::firstMapScrBomber=
 	}
 };
 
-//DeadCode JON 17Oct00 MapScr COverlay::firstMapScrCOMMS=
-//DeadCode JON 17Oct00 {
-//DeadCode JON 17Oct00 	MapScr::SCALE_GRIDORIGIN+/*MapScr::SCALE_GRIDOFFSETS+*/
-//DeadCode JON 17Oct00 	MapScr::SCALE_DYNAMICSIZE+
-//DeadCode JON 17Oct00 	MapScr::FLAG_MOUSEOVERHI,
-//DeadCode JON 17Oct00 	MapScreenX,MapScreenY,
-//DeadCode JON 17Oct00 	MapScreenWidth,MapScreenHeight,
-//DeadCode JON 17Oct00 	MapGridXOffset,MapGridYOffset,
-//DeadCode JON 17Oct00 	SET_WIPE_TEXTURE(RADIONO),//NO_BACKGROUND_WIPE,//if the alpha part of this ulong is null then it'll draw it as a colour
-//DeadCode JON 17Oct00 	// otherwise it'll assume it is a imagemap filenum
-//DeadCode JON 17Oct00 	TEXT_MAP_BLACK,
-//DeadCode JON 17Oct00 	TEXT_HI,
-//DeadCode JON 17Oct00 	MapColumnWidth,MapRowHeight,
-//DeadCode JON 17Oct00 	MapGridNumCols,MapGridNumRows,
-//DeadCode JON 17Oct00 	0x0000,
-//DeadCode JON 17Oct00 	MapScr::FirstMapInit,
-//DeadCode JON 17Oct00 	MapScr::UpdateMessageDisplay,
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 		{IDS_MAP_ACCEL,0,SEL_1,MapScr::SelectFromFirstMap},
-//DeadCode JON 17Oct00 		{IDS_MAP_WAYPOINTS,0,SEL_2,MapScr::SelectFromFirstMap},
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		{IDS_MAP_COMMSMSG,0,SEL_5,MapScr::SelectFromFirstMap},
-//DeadCode JON 17Oct00 		{IDS_MAP_COMMSRECIPIENT,0,SEL_6,MapScr::SelectFromFirstMap},
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSEscapeLine(MapScr::SelectFromFirstMap),
-//DeadCode JON 17Oct00 		{IDS_MAP_EXIT,0,SEL_0,MapScr::SelectFromFirstMap},
-//DeadCode JON 17Oct00 		MSListEnd
-//DeadCode JON 17Oct00 	}
-//DeadCode JON 17Oct00 };
 
 /*******************
 **	ORDERS SCREEN **
@@ -5481,40 +3922,9 @@ void COverlay::SendMessageAndCall(MESSAGE_STRUC* msg,DecisionAI* dec)
 void COverlay::MsgOptionSelected(MESSAGE_STRUC* msg,SLong op)
 {
 	DecisionAI* dec=msg->decisionhandler;
-//DeadCode AMM 21May99 	DecisionAI::OptionRef* opt=dec->GetMsgOptions();
 
 	DecisionMessage(dec,op,msg->callee,msg->target,msg->callee);
 
-//DeadCode AMM 21May99 	opt+=op;
-//DeadCode AMM 21May99
-//DeadCode AMM 21May99 	if (_DPlay.Implemented || _Replay.Record)
-//DeadCode AMM 21May99 	{
-//DeadCode AMM 21May99 // COMMS: send message to other players indicating option selected
-//DeadCode AMM 21May99 // decision=0-100=7bits, option=0-9=4 bits, target=UID=14 bits (25 bits, only have 24!)
-//DeadCode AMM 21May99 // callee and caller are sender of packet
-//DeadCode AMM 21May99
-//DeadCode AMM 21May99
-//DeadCode AMM 21May99 		UByte option=(UByte)op;
-//DeadCode AMM 21May99 		UniqueID trg=msg->target->uniqueID.count;
-//DeadCode AMM 21May99 		UByte decision=msg->decisionhandler->optionnumber;
-//DeadCode AMM 21May99
-//DeadCode AMM 21May99 		_DPlay.NewWingmanCommand(decision,option,trg);
-//DeadCode AMM 21May99
-//DeadCode AMM 21May99 // On receipt Maybe call Send message and call instead of the following 3 lines
-//DeadCode AMM 21May99
-//DeadCode AMM 21May99 //		MESSAGE_STRUC newMsg(opt->saidmsg,MSG_HIPRIORITY,msg->callee,msg->target,msg->callee);
-//DeadCode AMM 21May99 //		dec->AutoMsgDecision((AirStruc*)msg->callee,msg->target,(AirStruc*)msg->callee,&Art_Int,&newMsg);
-//DeadCode AMM 21May99 //		_Radio.TriggerMsg(newMsg);
-//DeadCode AMM 21May99
-//DeadCode AMM 21May99 	}
-//DeadCode AMM 21May99 	else
-//DeadCode AMM 21May99 	{
-//DeadCode AMM 21May99
-//DeadCode AMM 21May99 		MESSAGE_STRUC newMsg(opt->saidmsg,MSG_HIPRIORITY,msg->callee,msg->target,msg->callee);
-//DeadCode AMM 21May99 //DeadCode DAW 06Apr99 		dec->AutoMsgDecision((AirStruc*)msg->callee,msg->target,(AirStruc*)msg->callee,&Art_Int,&newMsg);
-//DeadCode AMM 21May99 //DeadCode DAW 06Apr99 		_Radio.TriggerMsg(newMsg);
-//DeadCode AMM 21May99 		SendMessageAndCall(&newMsg,opt->airesult[0]);
-//DeadCode AMM 21May99 	}
 }
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
@@ -5525,7 +3935,6 @@ void COverlay::MsgOptionSelected(MESSAGE_STRUC* msg,SLong op)
 void COverlay::ActionMessage(MESSAGE_STRUC* msg)
 {
 //TempCode JON 22Sep00 #pragma warnmsg ("RadioChat: Action Message commented out. UMM... NOW ITS NOT. PLEASE REMOVE THESE MESSAGES WHEN YOU HAVE FINISHED WITH THEM!")
-//DEADCODE CSB 23/02/00 	/*
 
 	MapScr::OptionList termOpt=MSListEnd;
 	MapScr::OptionList escOpt=MSEscapeLine(MYPREFIX MapScr::SelectFrom3DOrders);
@@ -5561,7 +3970,6 @@ void COverlay::ActionMessage(MESSAGE_STRUC* msg)
 			SetToOrdersScreen();
 		}
 	}
-//DEADCODE CSB 23/02/00 	*/
 }
 
 EXTERNAI(GroupInfoMsg,		 AirStrucPtr);							  //CSB 11/02/00
@@ -5576,7 +3984,6 @@ EXTERNAI(PostCombatMsg,		 AirStrucPtr);							  //CSB 11/02/00
 EXTERNAI(TowerMsg,			 AirStrucPtr);							  //CSB 11/02/00
 EXTERNAI(Strike,			 AirStrucPtr);							  //CSB 11/02/00
 EXTERNAI(QuitContinue,		 AirStrucPtr);							  //CSB 11/02/00
-//DEADCODE CSB 11/02/00 EXTERNAI(FACMsg,AirStrucPtr);
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //Procedure		UserMsgInit
@@ -5668,43 +4075,6 @@ MapScr* MapScr::SelectFromUserMsg(UByte&,Key k)
 		default:
 			break;
 	}
-//DEADCODE CSB 11/02/00 	switch (k)
-//DEADCODE CSB 11/02/00 	{
-//DEADCODE CSB 11/02/00 	case SEL_1:
-//DEADCODE CSB 11/02/00 		localDec=GroupInfoMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_2:
-//DEADCODE CSB 11/02/00 		localDec=PreCombatMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_3:
-//DEADCODE CSB 11/02/00 		localDec=CombatMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_4:
-//DEADCODE CSB 11/02/00 		localDec=PostCombatMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_5:
-//DEADCODE CSB 11/02/00 		localDec=TowerMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_6:
-//DEADCODE CSB 11/02/00 		localDec=FACMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_7:
-//DEADCODE CSB 11/02/00 //		localDec=CommsPlyrMsg;
-//DEADCODE CSB 11/02/00 //DeadCode AMM 14May99 		retval=&COverlay::commsMsgOrdersScr;
-//DEADCODE CSB 11/02/00 		if (_DPlay.Implemented)//AMM20May
-//DEADCODE CSB 11/02/00 			retval=&COverlay::commsRecipientOrdersScr;
-//DEADCODE CSB 11/02/00 		localDec=NULL;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_8:
-//DEADCODE CSB 11/02/00 //		localDec=CommsMsgMsg;
-//DEADCODE CSB 11/02/00 		localDec=NULL;
-//DEADCODE CSB 11/02/00 //DeadCode AMM 14May99 		retval=&COverlay::commsRecipientOrdersScr;
-//DEADCODE CSB 11/02/00 		if (_DPlay.Implemented)//AMM20May
-//DEADCODE CSB 11/02/00 			retval=&COverlay::commsMsgOrdersScr;					//AMM 14May99
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	default:
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	}
 
 	if (localDec!=NULL)
 	{
@@ -5895,7 +4265,6 @@ MapScr COverlay::userMsgScrCOMMS=
 Key MapScr::UserOptionsInit()
 {
 //TempCode JON 22Sep00 	#pragma warnmsg ("RadioChat: UserOptionsInit commented out")
-//DEADCODE CSB 23/02/00 	/*
 	MapScr::OptionList termOpt=MSListEnd;
 	MapScr::OptionList escOpt=MSEscapeLine(MYPREFIX MapScr::SelectFromUserOptions);
 	MapScr::OptionList blankOpt=MSBlankLine;
@@ -5921,7 +4290,6 @@ Key MapScr::UserOptionsInit()
 	*ol++=quitOpt;
 	*ol=termOpt;
 
-//DEADCODE CSB 23/02/00 	*/
 	return SEL_0;
 
 }
@@ -5931,11 +4299,8 @@ Key MapScr::UserOptionsInit()
 //------------------------------------------------------------------------------
 Key MapScr::UserOptsMapInit()
 {
-//DeadCode JON 22Sep00 	#pragma warnmsg ("RadioChat: UserOptsMapInit commented out")
-//DEADCODE CSB 23/02/00 /*
 	MapScr::OptionList termOpt=MSListEnd;
 	MapScr::OptionList escOpt=MSEscapeLine(MYPREFIX MapScr::SelectFromUserOptsMap);
-//DeadCode JON 20Oct00 	MapScr::OptionList blankOpt=MSBlankLine;
 	MapScr::OptionList quitOpt={IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromUserOptsMap};
 	MapScr::OptionList miscOpt={IDS_INDIRECT00,0,SEL_1,MYPREFIX MapScr::SelectFromUserOptsMap};
 
@@ -5958,7 +4323,6 @@ Key MapScr::UserOptsMapInit()
 	*ol++=quitOpt;
 	*ol=termOpt;
 
-//DEADCODE CSB 23/02/00 	*/
 		return SEL_0;
 
 }
@@ -5976,7 +4340,6 @@ MapScr* MapScr::SelectFromUserOptsMap(UByte& a,Key k)
 		return &COverlay::firstMapScr;
 
 
-//DeadCode JON 26Oct00 	return &COverlay::firstMapScr;
 }
 
 MapScr COverlay::userOptsMapScr=
@@ -6028,7 +4391,6 @@ MapScr* MapScr::SelectFromUserOptions(UByte&,Key k)
 
 	if (dec)
 	{
-//DeadCode AMM 21May99 		DecisionAI::OptionRef* opt=dec->GetMsgOptions();
 
 		if (k>=SEL_1 && k<=SEL_9)
 		{
@@ -6038,23 +4400,6 @@ MapScr* MapScr::SelectFromUserOptions(UByte&,Key k)
 								Persons2::PlayerGhostAC->ai.unfriendly,
 								Persons2::PlayerGhostAC);
 
-//DeadCode AMM 21May99 			opt+=SLong(k-SEL_1);
-//DeadCode AMM 21May99 			if (_DPlay.Implemented || _Replay.Record)			//AMM 17May99
-//DeadCode AMM 21May99 			{													//AMM 17May99
-//DeadCode AMM 21May99 				UByte option=(UByte)(k-SEL_1);					//AMM 17May99
-//DeadCode AMM 21May99 				UniqueID trg=Persons2::PlayerGhostAC->uniqueID.count;//AMM 17May99
-//DeadCode AMM 21May99 				UByte decision=dec->optionnumber;				//AMM 17May99
-//DeadCode AMM 21May99 				_DPlay.NewWingmanCommand(decision,option,trg);	//AMM 17May99
-//DeadCode AMM 21May99 			}													//AMM 17May99
-//DeadCode AMM 21May99 			else												//AMM 17May99
-//DeadCode AMM 21May99 			{													//AMM 17May99
-//DeadCode AMM 21May99 				MESSAGE_STRUC newMsg(opt->saidmsg,
-//DeadCode AMM 21May99 									MSG_HIPRIORITY,
-//DeadCode AMM 21May99 									Persons2::PlayerGhostAC,	//AMM 17May99
-//DeadCode AMM 21May99 									Persons2::PlayerGhostAC->ai.unfriendly, //MS 18/05/99
-//DeadCode AMM 21May99 									Persons2::PlayerGhostAC);	//AMM 17May99
-//DeadCode AMM 21May99 				OverLay.SendMessageAndCall(&newMsg,opt->airesult[0]);
-//DeadCode AMM 21May99 			}													//AMM 17May99
 			retval=NULL;
 		}
 	}
@@ -6150,8 +4495,6 @@ void MapScr::TimeLimitedDisplay()
 //------------------------------------------------------------------------------
 MapScr* MapScr::SelectFrom3DOrders(UByte&,Key k)
 {
-//DeadCode JON 22Sep00 #pragma warnmsg ("RadioChat: SelectFrom3DOrders  commented out")
-//DEADCODE CSB 23/02/00 	/*
 	MapScr* retval=this;	//close on selection of an option
 	DecisionAI* dec=NULL;
 
@@ -6163,7 +4506,6 @@ MapScr* MapScr::SelectFrom3DOrders(UByte&,Key k)
 
 	if (dec)
 	{
-//DeadCode JON 20Oct00 		DecisionAI::OptionRef* opt=dec->GetMsgOptions();
 
 		if (k>=SEL_1 && k<=SEL_9)
 		{
@@ -6192,8 +4534,6 @@ MapScr* MapScr::SelectFrom3DOrders(UByte&,Key k)
 	}
 	else retval=NULL;
 	return retval;
-//DEADCODE CSB 23/02/00 	*/
-//DEADCODE CSB 23/02/00 	return NULL;
 }
 
 MapScr COverlay::orders3dScr=
@@ -6297,7 +4637,6 @@ void COverlay::CancelAccel()
 	if (pCurScr) pCurScr=pNewScr=accelMapScr.SelectFromAccelMap(dummy,SEL_0);
 	else
 	{
-//DeadCode AMM 16Nov99 		if (_DPlay.Implemented)	_DPlay.SendDeselectAccelMessage();
 		OverLay.keyFlags|=KF_ACCELOFF;
 		Manual_Pilot.AutoToggle(ManualPilot::MANUAL);
 	}
@@ -6379,91 +4718,28 @@ MapScr* MapScr::SelectFromAccelMap(UByte&,Key k)
 		UByte dummy;
 		if (!_DPlay.Implemented)
 			OverLay.keyFlags=KF_PAUSEON+KF_SLOWACCEL;
-//DeadCode AMM 16Nov99 		else
-//DeadCode AMM 16Nov99 		{
-//DeadCode AMM 16Nov99 			_DPlay.SendDeselectAccelMessage();
-//DeadCode AMM 16Nov99 		}
 
 		OverLay.keyFlags|=KF_ACCELOFF;
 		Manual_Pilot.AutoToggle(ManualPilot::MANUAL);
 		retval=SelectFromFirstMap(dummy,k);
 		break;
 	case SEL_2:	//to next waypoint
-//DeadCode AMM 10Jun99 		//force the selected option to be hilighted
-//DeadCode AMM 10Jun99 		if (_DPlay.Implemented) // && !_DPlay.mapaccelselection)
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			_DPlay.SendMapAccelSelection(k);
-//DeadCode AMM 10Jun99 		}
-//DeadCode AMM 10Jun99 		else
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			OverLay.hilight=k;
-//DeadCode AMM 10Jun99 			OverLay.keyFlags=KF_ACCELON+KF_FASTACCEL;
-//DeadCode AMM 10Jun99 			Manual_Pilot.AutoToggle(ManualPilot::AUTOACCEL_WAYPT);
-//DeadCode AMM 10Jun99 			Manual_Pilot.acceltochanged=Manual_Pilot.ControlledAC2->waypoint;					  //JIM 18/04/99
-//DeadCode AMM 10Jun99 			refreshLandscape=true;
-//DeadCode AMM 10Jun99 		}
 		OverLay.AccelSelection(k,DPlay::ACCEL_NEXTWP);
 		break;
 	case SEL_1:	//forwards
 		//force the selected option to be hilighted
-//DeadCode AMM 10Jun99 		if (_DPlay.Implemented) // && !_DPlay.mapaccelselection)
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			_DPlay.SendMapAccelSelection(k);
-//DeadCode AMM 10Jun99 		}
-//DeadCode AMM 10Jun99 		else
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			OverLay.hilight=k;
-//DeadCode AMM 10Jun99 			OverLay.keyFlags=KF_ACCELON+KF_FASTACCEL;
-//DeadCode AMM 10Jun99 			Manual_Pilot.AutoToggle(ManualPilot::AUTOACCEL_FWD);
-//DeadCode AMM 10Jun99 			refreshLandscape=true;
-//DeadCode AMM 10Jun99 		}
 		OverLay.AccelSelection(k,DPlay::ACCEL_FORWARD);
 		break;
 	case SEL_3:	//message subject
 		//force the selected option to be hilighted
-//DeadCode AMM 10Jun99 		if (_DPlay.Implemented) // && !_DPlay.mapaccelselection)
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			_DPlay.SendMapAccelSelection(k);
-//DeadCode AMM 10Jun99 		}
-//DeadCode AMM 10Jun99 		else
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			OverLay.hilight=k;
-//DeadCode AMM 10Jun99 			OverLay.keyFlags=KF_ACCELON+KF_FASTACCEL;
-//DeadCode AMM 10Jun99 			Manual_Pilot.AutoToggle(ManualPilot::AUTOACCEL_MSG);
-//DeadCode AMM 10Jun99 			refreshLandscape=true;
-//DeadCode AMM 10Jun99 		}
 		OverLay.AccelSelection(k,DPlay::ACCEL_MESSAGESUBJECT);
 		break;
 	case SEL_4:	//mission IP
 		//force the selected option to be hilighted
-//DeadCode AMM 10Jun99 		if (_DPlay.Implemented) // && !_DPlay.mapaccelselection)
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			_DPlay.SendMapAccelSelection(k);
-//DeadCode AMM 10Jun99 		}
-//DeadCode AMM 10Jun99 		else
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			OverLay.hilight=k;
-//DeadCode AMM 10Jun99 			OverLay.keyFlags=KF_ACCELON+KF_FASTACCEL;
-//DeadCode AMM 10Jun99 			Manual_Pilot.AutoToggle(ManualPilot::AUTOACCEL_MISS);
-//DeadCode AMM 10Jun99 			Manual_Pilot.acceltochanged=Manual_Pilot.ControlledAC2->waypoint->FindWP(WPNAME_Target);
-//DeadCode AMM 10Jun99 			refreshLandscape=true;
-//DeadCode AMM 10Jun99 		}
 		OverLay.AccelSelection(k,DPlay::ACCEL_MISSIONIP);
 		break;
 	case SEL_5:	//home
 		//force the selected option to be hilighted
-//DeadCode AMM 10Jun99 		if (_DPlay.Implemented) // && !_DPlay.mapaccelselection)
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			_DPlay.SendMapAccelSelection(k);
-//DeadCode AMM 10Jun99 		}
-//DeadCode AMM 10Jun99 		else
-//DeadCode AMM 10Jun99 		{
-//DeadCode AMM 10Jun99 			OverLay.hilight=k;
-//DeadCode AMM 10Jun99 			OverLay.keyFlags=KF_ACCELON+KF_FASTACCEL;
-//DeadCode AMM 10Jun99 			Manual_Pilot.AutoToggle(ManualPilot::AUTOACCEL_MISS);
-//DeadCode AMM 10Jun99 			Manual_Pilot.acceltochanged=Manual_Pilot.ControlledAC2->waypoint->FindWP(WPNAME_Disperse);
-//DeadCode AMM 10Jun99 			refreshLandscape=true;
-//DeadCode AMM 10Jun99 		}
 		OverLay.AccelSelection(k,DPlay::ACCEL_HOME);
 		break;
 	default:
@@ -6515,30 +4791,7 @@ MapScr COverlay::accelMapScr=
 //------------------------------------------------------------------------------
 Key MapScr::WaypointMapInit()
 {
-//DeadCode JON 8Nov00 	bool allowall=true;
-//DeadCode JON 8Nov00 	if (Manual_Pilot.ControlledAC2 && Manual_Pilot.ControlledAC2->movecode!=AUTO_FOLLOWWP) allowall=false;
-//DeadCode JON 8Nov00 	if (_DPlay.Implemented) allowall=false;
 
-//DeadCode JON 8Nov00 	MapScr::OptionList termOpt=MSListEnd;
-//DeadCode JON 8Nov00 	MapScr::OptionList escOpt=MSEscapeLine(MYPREFIX MapScr::SelectFromWaypointMap);
-//DeadCode JON 8Nov00 	MapScr::OptionList blankOpt=MSBlankLine;
-//DeadCode JON 8Nov00 	MapScr::OptionList quitOpt={IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromWaypointMap};
-//DeadCode JON 8Nov00 	MapScr::OptionList snwOpt={IDS_MAP_SETNEXTWP,0,SEL_1,MYPREFIX MapScr::SelectFromWaypointMap};
-//DeadCode JON 8Nov00 	MapScr::OptionList anwOpt={IDS_MAP_ACCELTONEXTWP,0,SEL_2,MYPREFIX MapScr::SelectFromWaypointMap};
-//DeadCode JON 8Nov00 //dead	MapScr::OptionList ahwOpt={IDS_MAP_ACCELTOHILIGHTEDWP,0,SEL_3,MYPREFIX MapScr::SelectFromWaypointMap};
-//DeadCode JON 8Nov00 	OptionList* ol=this->optionList;
-//DeadCode JON 8Nov00 	*ol++=snwOpt;
-//DeadCode JON 8Nov00 	*ol++=(allowall)?anwOpt:blankOpt;
-//DeadCode JON 8Nov00 //dead	*ol++=(allowall)?ahwOpt:blankOpt;
-//DeadCode JON 8Nov00 	*ol++=blankOpt;
-//DeadCode JON 8Nov00 	*ol++=blankOpt;
-//DeadCode JON 8Nov00 	*ol++=blankOpt;
-//DeadCode JON 8Nov00 	*ol++=blankOpt;
-//DeadCode JON 8Nov00 	*ol++=blankOpt;
-//DeadCode JON 8Nov00 	*ol++=blankOpt;
-//DeadCode JON 8Nov00 	*ol++=escOpt;
-//DeadCode JON 8Nov00 	*ol++=quitOpt;
-//DeadCode JON 8Nov00 	*ol++=termOpt;
 	return SEL_0;
 }
 
@@ -6571,13 +4824,6 @@ MapScr* MapScr::SelectFromWaypointMap(UByte&,Key k)
 		}
 		break;
 	case SEL_2:	//accel to hilighted waypoint
-//DeadCode AMM 10Jun99 		OverLay.hilight=k;
-//DeadCode AMM 10Jun99 		OverLay.fZoomedMap=false;
-//DeadCode AMM 10Jun99 		OverLay.keyFlags=KF_ACCELON+KF_FASTACCEL;
-//DeadCode AMM 10Jun99 		Manual_Pilot.AutoToggle(ManualPilot::AUTOACCEL_WAYPT);
-//DeadCode AMM 10Jun99 		Manual_Pilot.acceltochanged=Manual_Pilot.ControlledAC2->waypoint;
-//DeadCode AMM 10Jun99 		OverLay.curr_waypoint=Manual_Pilot.ControlledAC2->waypoint;
-//DeadCode AMM 10Jun99 		refreshLandscape=true;
 
 	OverLay.AccelSelection(k,DPlay::ACCEL_WP_NEXTWP);
 
@@ -6622,10 +4868,6 @@ MapScr* MapScr::SelectFromWaypointMap(UByte&,Key k)
 	case SEL_0:
 	case SEL_ESC:
 		UByte dummy;
-//DeadCode AMM 16Nov99 		if (_DPlay.Implemented)
-//DeadCode AMM 16Nov99 		{
-//DeadCode AMM 16Nov99 			_DPlay.SendDeselectAccelMessage();
-//DeadCode AMM 16Nov99 		}
 		OverLay.SetPossibleLandscapeResfresh();
 		if (OverLay.pvp && OverLay.pvp->Accel())
 		{
@@ -6668,7 +4910,6 @@ MapScr COverlay::waypointMapScr=
 		{IDS_NEXT,0,SEL_3,MYPREFIX MapScr::SelectFromWaypointMap},
 		{IDS_PREV,0,SEL_4,MYPREFIX MapScr::SelectFromWaypointMap},
 		{IDS_MAP_ZOOM,0,SEL_5,MYPREFIX MapScr::SelectFromWaypointMap},
-//DeadCode JON 9Nov00 		MSBlankLine,
 		MSEscapeLine(MYPREFIX MapScr::SelectFromWaypointMap),
 		{IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromWaypointMap},
 		MSListEnd
@@ -6761,42 +5002,12 @@ MapScr* MapScr::SelectFromRadioMap(UByte&,Key k)
 			break;
 	}
 
-//DEADCODE CSB 11/02/00 	switch (k)
-//DEADCODE CSB 11/02/00 	{
-//DEADCODE CSB 11/02/00 	case SEL_1:
-//DEADCODE CSB 11/02/00 		localDec=GroupInfoMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_2:
-//DEADCODE CSB 11/02/00 		localDec=PreCombatMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_3:
-//DEADCODE CSB 11/02/00 		localDec=CombatMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_4:
-//DEADCODE CSB 11/02/00 		localDec=PostCombatMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_5:
-//DEADCODE CSB 11/02/00 		localDec=TowerMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_6:
-//DEADCODE CSB 11/02/00 		localDec=FACMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_7:
-//DEADCODE CSB 11/02/00 //TEMP		localDec=(DecisionAI*)&CommsPlyrMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	case SEL_8:
-//DEADCODE CSB 11/02/00 //TEMP		localDec=(DecisionAI*)&CommsMsgMsg;
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	default:
-//DEADCODE CSB 11/02/00 		break;
-//DEADCODE CSB 11/02/00 	}
 
 	if (localDec!=NULL)
 	{
 		retval=&COverlay::userOptsMapScr;
 	}
 	else retval=&COverlay::firstMapScr;
-	//DeadCode JON 17Oct00 	else retval=_DPlay.Implemented?&COverlay::firstMapScrCOMMS:&COverlay::firstMapScr;
 
 	return retval;
 }
@@ -6824,8 +5035,6 @@ MapScr COverlay::radioMapScr=
 		{IDS_UM_POSTCOMBAT,0,SEL_4,MYPREFIX MapScr::SelectFromRadioMap},
 		{IDS_UM_TOWER,0,SEL_5,MYPREFIX MapScr::SelectFromRadioMap},
 		{IDS_UM_FAC,0,SEL_6,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_COMMSPLAYER,0,SEL_7,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_COMMSMSG,0,SEL_8,MYPREFIX MapScr::SelectFromRadioMap},
 		MSBlankLine,
 		MSEscapeLine(MYPREFIX MapScr::SelectFromRadioMap),
 		{IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromRadioMap},
@@ -6833,37 +5042,6 @@ MapScr COverlay::radioMapScr=
 	}
 };
 
-//DeadCode JON 17Oct00 MapScr COverlay::radioMapScrCOMMS=										//JON 17Oct00
-//DeadCode JON 17Oct00 {
-//DeadCode JON 17Oct00 	MapScr::SCALE_GRIDORIGIN+/*MapScr::SCALE_GRIDOFFSETS+*/
-//DeadCode JON 17Oct00 	MapScr::SCALE_DYNAMICSIZE+
-//DeadCode JON 17Oct00 	MapScr::FLAG_MOUSEOVERHI,
-//DeadCode JON 17Oct00 	MapScreenX,MapScreenY,
-//DeadCode JON 17Oct00 	MapScreenWidth,MapScreenHeight,
-//DeadCode JON 17Oct00 	MapGridXOffset,MapGridYOffset,
-//DeadCode JON 17Oct00 	SET_WIPE_TEXTURE(RADIONO),
-//DeadCode JON 17Oct00 	TEXT_MAP_BLACK,
-//DeadCode JON 17Oct00 	TEXT_HI,
-//DeadCode JON 17Oct00 	MapColumnWidth,MapRowHeight,
-//DeadCode JON 17Oct00 	1,11,			//MapGridNumCols,MapGridNumRows,
-//DeadCode JON 17Oct00 	0x0000,
-//DeadCode JON 17Oct00 	MapScr::RadioMapInit,
-//DeadCode JON 17Oct00 	MapScr::UpdateMessageDisplay,
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 		{IDS_UM_GROUPINFO,0,SEL_1,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_PRECOMBAT,0,SEL_2,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_COMBAT,0,SEL_3,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_POSTCOMBAT,0,SEL_4,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_TOWER,0,SEL_5,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_FAC,0,SEL_6,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_COMMSPLAYER,0,SEL_7,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		{IDS_UM_COMMSMSG,0,SEL_8,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSEscapeLine(MYPREFIX MapScr::SelectFromRadioMap),
-//DeadCode JON 17Oct00 		{IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromRadioMap},
-//DeadCode JON 17Oct00 		MSListEnd
-//DeadCode JON 17Oct00 	}
-//DeadCode JON 17Oct00 };
 
 
 /*************************
@@ -6880,66 +5058,6 @@ Key MapScr::CommsMsgMapInit()
 	return SEL_0;
 }
 
-//DeadCode JON 17Oct00 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//DeadCode JON 17Oct00 //Procedure		SelectFromCommsMsgMap
-//DeadCode JON 17Oct00 //Author		Paul.
-//DeadCode JON 17Oct00 //Date			Fri 19 Feb 1999
-//DeadCode JON 17Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 17Oct00 MapScr* MapScr::SelectFromCommsMsgMap(UByte&,Key k)
-//DeadCode JON 17Oct00 {
-//DeadCode JON 17Oct00 	MapScr* retval=_DPlay.Implemented?&COverlay::firstMapScrCOMMS:&COverlay::firstMapScr;
-//DeadCode JON 17Oct00
-//DeadCode JON 17Oct00 	switch (k)
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 	case SEL_1:
-//DeadCode JON 17Oct00 	case SEL_2:
-//DeadCode JON 17Oct00 	case SEL_3:
-//DeadCode JON 17Oct00 	case SEL_4:
-//DeadCode JON 17Oct00 	case SEL_5:
-//DeadCode JON 17Oct00 	case SEL_6:
-//DeadCode JON 17Oct00 	case SEL_7:
-//DeadCode JON 17Oct00 	case SEL_8:
-//DeadCode JON 17Oct00 		_DPlay.NewPlayerMessage(k);
-//DeadCode JON 17Oct00 		break;
-//DeadCode JON 17Oct00 	case SEL_0:
-//DeadCode JON 17Oct00 	case SEL_ESC:
-//DeadCode JON 17Oct00 		break;
-//DeadCode JON 17Oct00 	default:
-//DeadCode JON 17Oct00 		break;
-//DeadCode JON 17Oct00 	}
-//DeadCode JON 17Oct00 	return retval;
-//DeadCode JON 17Oct00 }
-//DeadCode JON 17Oct00
-//DeadCode JON 17Oct00 MapScr COverlay::commsMsgMapScr=
-//DeadCode JON 17Oct00 {
-//DeadCode JON 17Oct00 	MapScr::SCALE_GRIDORIGIN+/*MapScr::SCALE_GRIDOFFSETS+*/
-//DeadCode JON 17Oct00 	MapScr::SCALE_DYNAMICSIZE+
-//DeadCode JON 17Oct00 	MapScr::FLAG_MOUSEOVERHI,
-//DeadCode JON 17Oct00 	MapScreenX,MapScreenY,
-//DeadCode JON 17Oct00 	MapScreenWidth,MapScreenHeight,
-//DeadCode JON 17Oct00 	MapGridXOffset,MapGridYOffset,
-//DeadCode JON 17Oct00 	SET_WIPE_TEXTURE(RADIONO),
-//DeadCode JON 17Oct00 	TEXT_MAP_BLACK,
-//DeadCode JON 17Oct00 	TEXT_HI,
-//DeadCode JON 17Oct00 	MapColumnWidth,MapRowHeight,
-//DeadCode JON 17Oct00 	MapGridNumCols,MapGridNumRows,
-//DeadCode JON 17Oct00 	0x0000,
-//DeadCode JON 17Oct00 	MapScr::CommsMsgMapInit,
-//DeadCode JON 17Oct00 	MapScr::UpdateMessageDisplay,
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 		{IDS_INDIRECT00,0,SEL_1,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		{IDS_INDIRECT01,0,SEL_2,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		{IDS_INDIRECT02,0,SEL_3,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		{IDS_INDIRECT03,0,SEL_4,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		{IDS_INDIRECT04,0,SEL_5,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		{IDS_INDIRECT05,0,SEL_6,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		{IDS_INDIRECT06,0,SEL_7,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		{IDS_INDIRECT07,0,SEL_8,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		MSEscapeLine(MYPREFIX MapScr::SelectFromCommsMsgMap),
-//DeadCode JON 17Oct00 		{IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromCommsMsgMap},
-//DeadCode JON 17Oct00 		MSListEnd
-//DeadCode JON 17Oct00 	}
-//DeadCode JON 17Oct00 };
 
 /****************************
 **	COMMSMSG ORDERS SCREEN **
@@ -7030,62 +5148,7 @@ Key MapScr::CommsRecipientMapInit()
 	return SEL_0;
 }
 
-//DeadCode JON 17Oct00 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//DeadCode JON 17Oct00 //Procedure		SelectFromCommsRecipientMap
-//DeadCode JON 17Oct00 //Author		Paul.
-//DeadCode JON 17Oct00 //Date			Fri 19 Feb 1999
-//DeadCode JON 17Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 17Oct00 MapScr* MapScr::SelectFromCommsRecipientMap(UByte&,Key k)
-//DeadCode JON 17Oct00 {
-//DeadCode JON 17Oct00 	MapScr* retval=_DPlay.Implemented?&COverlay::firstMapScrCOMMS:&COverlay::firstMapScr;
-//DeadCode JON 17Oct00
-//DeadCode JON 17Oct00 	switch (k)
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 	case SEL_1:
-//DeadCode JON 17Oct00 		_DPlay.MsgRecipientAll=true;
-//DeadCode JON 17Oct00 		break;
-//DeadCode JON 17Oct00 	case SEL_2:
-//DeadCode JON 17Oct00 		_DPlay.MsgRecipientAll=false;
-//DeadCode JON 17Oct00 		break;
-//DeadCode JON 17Oct00 	case SEL_0:
-//DeadCode JON 17Oct00 	case SEL_ESC:
-//DeadCode JON 17Oct00 		break;
-//DeadCode JON 17Oct00 	default:
-//DeadCode JON 17Oct00 		break;
-//DeadCode JON 17Oct00 	}
-//DeadCode JON 17Oct00 	return retval;
-//DeadCode JON 17Oct00 }
 
-//DeadCode JON 17Oct00 MapScr COverlay::commsRecipientMapScr=
-//DeadCode JON 17Oct00 {
-//DeadCode JON 17Oct00 	MapScr::SCALE_GRIDORIGIN+/*MapScr::SCALE_GRIDOFFSETS+*/
-//DeadCode JON 17Oct00 	MapScr::SCALE_DYNAMICSIZE+
-//DeadCode JON 17Oct00 	MapScr::FLAG_MOUSEOVERHI,
-//DeadCode JON 17Oct00 	MapScreenX,MapScreenY,
-//DeadCode JON 17Oct00 	MapScreenWidth,MapScreenHeight,
-//DeadCode JON 17Oct00 	MapGridXOffset,MapGridYOffset,
-//DeadCode JON 17Oct00 	SET_WIPE_TEXTURE(RADIONO),
-//DeadCode JON 17Oct00 	TEXT_MAP_BLACK,
-//DeadCode JON 17Oct00 	TEXT_HI,
-//DeadCode JON 17Oct00 	MapColumnWidth,MapRowHeight,
-//DeadCode JON 17Oct00 	MapGridNumCols,MapGridNumRows,
-//DeadCode JON 17Oct00 	0x0000,
-//DeadCode JON 17Oct00 	MapScr::CommsRecipientMapInit,
-//DeadCode JON 17Oct00 	MapScr::UpdateMessageDisplay,
-//DeadCode JON 17Oct00 	{
-//DeadCode JON 17Oct00 		{IDS_EVERYBODY,0,SEL_1,MYPREFIX MapScr::SelectFromCommsRecipientMap},
-//DeadCode JON 17Oct00 		{IDS_MYSIDEONLY,0,SEL_2,MYPREFIX MapScr::SelectFromCommsRecipientMap},
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSBlankLine,
-//DeadCode JON 17Oct00 		MSEscapeLine(MYPREFIX MapScr::SelectFromCommsRecipientMap),
-//DeadCode JON 17Oct00 		{IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromCommsRecipientMap},
-//DeadCode JON 17Oct00 		MSListEnd
-//DeadCode JON 17Oct00 	}
-//DeadCode JON 17Oct00 };
 
 /*******************************
 **	COMMSRECIPIENT ORDERS SCREEN **
@@ -7142,7 +5205,6 @@ MapScr COverlay::commsRecipientOrdersScr=
 	MapGridNumCols,MapGridNumRows,
 	0x0000,
 	MYPREFIX MapScr::CommsRecipientOrdersInit,
-//DeadCode AMM 14May99 	MapScr::UpdateMessageDisplay,
 	MYPREFIX MapScr::TimeLimitedDisplay,
 	{
 		{IDS_EVERYBODY,0,SEL_1,MYPREFIX MapScr::SelectFromCommsRecipientOrders},
@@ -7360,7 +5422,6 @@ MapScr* MapScr::SelectFromReplayScreen(UByte&,Key k)
 			OverLay.hilight=k;
 			retval=NULL;
 			_DPlay.SimulateExitKey=TRUE;
-//DeadCode RJS 11Oct00 			OverLay.quit3d=1;
 			break;
 		case SEL_MINUS:	//mark start:
 			OverLay.hilight=k;
@@ -7383,7 +5444,6 @@ MapScr* MapScr::SelectFromReplayScreen(UByte&,Key k)
 
 MapScr COverlay::replayPlayingScr=
 {
-//DeadCode JON 11Aug00 MapScr::SCALE_DOUBLEIFGT800,
 	MapScr::SCALE_GRIDELEMENTS,
 	0,0,
 	320,32,
@@ -7401,7 +5461,6 @@ MapScr COverlay::replayPlayingScr=
 		{IDS_MAPICON02LO,1,SEL_2,MYPREFIX MapScr::SelectFromReplayScreen},		//back a block
 		{IDS_MAPICON12LO,1,SEL_3,MYPREFIX MapScr::SelectFromReplayScreen},		//back a frame
 		{IDS_MAPICON04LO,1,SEL_4,MYPREFIX MapScr::SelectFromReplayScreen},		//play
-//DeadCode AMM 24Feb99 		{IDS_MAPICON03LO,1,SEL_4,MYPREFIX MapScr::SelectFromReplayScreen},		//pause
 		{IDS_MAPICON11LO,1,SEL_5,MYPREFIX MapScr::SelectFromReplayScreen},		//forward a frame
 		{IDS_MAPICON05LO,1,SEL_6,MYPREFIX MapScr::SelectFromReplayScreen},		//forward a block
 		{IDS_MAPICON10LO,1,SEL_7,MYPREFIX MapScr::SelectFromReplayScreen},		//skip forward
@@ -7431,7 +5490,6 @@ MapScr COverlay::replayPlayingScr=
 
 MapScr COverlay::replayScr=
 {
-//DeadCode JON 11Aug00 MapScr::SCALE_DOUBLEIFGT800,
 	MapScr::SCALE_GRIDELEMENTS,
 	0,0,
 	320,32,
@@ -7448,7 +5506,6 @@ MapScr COverlay::replayScr=
 		{IDS_MAPICON01LO,1,SEL_1,MYPREFIX MapScr::SelectFromReplayScreen},		//skip back
 		{IDS_MAPICON02LO,1,SEL_2,MYPREFIX MapScr::SelectFromReplayScreen},		//back a block
 		{IDS_MAPICON12LO,1,SEL_3,MYPREFIX MapScr::SelectFromReplayScreen},		//back a frame
-//DeadCode AMM 24Feb99 		{IDS_MAPICON04LO,1,SEL_4,MYPREFIX MapScr::SelectFromReplayScreen},		//play
 		{IDS_MAPICON03LO,1,SEL_4,MYPREFIX MapScr::SelectFromReplayScreen},		//pause
 		{IDS_MAPICON11LO,1,SEL_5,MYPREFIX MapScr::SelectFromReplayScreen},		//forward a frame
 		{IDS_MAPICON05LO,1,SEL_6,MYPREFIX MapScr::SelectFromReplayScreen},		//forward a block
@@ -7698,13 +5755,9 @@ void COverlay::DisplayTargName()
 	if (targName)
 	{
 		LPCTSTR ps=LPCTSTR(*targName);
-//deadcode		pw->DoSetGlobalAlpha(255);
-//deadcode		pw->DoSetFontColour(TEXT_MAP_WHITE);
 
 
 		GetSurfaceDimensions(physicalWidth,physicalHeight);
-//DeadCode JON 5Nov00 		fIsWide=IsWide(physicalWidth);
-//DeadCode JON 10Oct00 		SWord text_width=StrPixelLen((char*)ps);
 		SWord text_width=StrPixelWidth((char*)ps);
 
 		SWord text_x=(physicalWidth-text_width)>>1;
@@ -7723,27 +5776,6 @@ R3DVALUE AbsRoot(R3DVALUE f)
 	return f;
 }
 
-//deadcode Float AbsRoot(Float f)
-//deadcode{
-//deadcode	double d;
-//deadcode	bool pos;
-//deadcode	if (f<0)
-//deadcode	{
-//deadcode		pos=false;
-//deadcode		d=-f;
-//deadcode	}
-//deadcode	else
-//deadcode	{
-//deadcode		pos=true;
-//deadcode		d=f;
-//deadcode	}
-//deadcode	_asm{
-//deadcode		fld	d;
-//deadcode		fsqrt;
-//deadcode		fstp d;
-//deadcode	}
-//deadcode	return pos?Float(d):Float(-d);
-//deadcode}
 
 inline R3DVALUE Sx640ToFrac(int sx)
 {
@@ -7762,14 +5794,6 @@ void COverlay::DoThreat()
 {
 //#pragma message ( __HERE__ "DoThreat" )
 	//display threat indicator in the top left corner of the screen
-//DeadCode JON 13Jun00 	const SWord THREAT_X=10;
-//DeadCode JON 13Jun00 	const SWord THREAT_Y=0;
-//DeadCode JON 13Jun00 	const SWord THREAT_W=64*2;
-//DeadCode JON 13Jun00 	const SWord THREAT_H=64*2;
-//DeadCode JON 13Jun00 	const SWord THREAT_CX=31*2;
-//DeadCode JON 13Jun00 	const SWord THREAT_CY=31*2;
-//DeadCode JON 13Jun00 	const SWord THREAT_RAD=29*2;
-//DeadCode JON 13Jun00 	const SWord THREAT_DISC_H=6*2;
 	const SWord MAX_THREATS=320;
 
 	GetSurfaceDimensions(physicalWidth,physicalHeight);
@@ -7793,64 +5817,10 @@ void COverlay::DoThreat()
 	const SLong THREAT_ALT= 8*100*1000;//MaxVisibleRange;
 
 //	GetSurfaceDimensions(physicalWidth,physicalHeight);
-//deadcode	const Float scx=1./640.;	//Float(physicalWidth)/640.;
-//deadcode	const Float scy=1./480.;	//Float(physicalHeight)/480.;
-//DeadCode JON 13Jun00 	const Float scaled_x=Sx640ToFrac(THREAT_X)-1.f;
-//DeadCode JON 13Jun00 	const Float scaled_w=Sx640ToFrac(THREAT_W);
-//DeadCode JON 13Jun00 	const Float scaled_threat_radx=Sx640ToFrac(THREAT_RAD);
-//DeadCode JON 13Jun00 	const Float scaled_threat_disc_hx=Sx640ToFrac(THREAT_DISC_H);
-//DeadCode JON 13Jun00 	const Float scaled_y=1.f-Sy480ToFrac(THREAT_Y);
-//DeadCode JON 13Jun00 	const Float scaled_h=Sy480ToFrac(THREAT_H);
-//DeadCode JON 13Jun00 	const Float scaled_threat_rady=Sy480ToFrac(THREAT_RAD);
-//DeadCode JON 13Jun00 	const Float scaled_threat_disc_hy=Sy480ToFrac(THREAT_DISC_H);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	const Float scaled_orix=scaled_x+scaled_w*.5;
-//DeadCode JON 13Jun00 	const Float scaled_oriy=scaled_y+scaled_h*.5;
 
 	ImageMapDesc* pmap=Image_Map.GetImageMapPtr(THREAT01NO);
 
-//DEADCODE JON 5/22/00 	R3DVERTEX *dp;
-//DEADCODE JON 5/22/00 	g_lpLib3d->BeginPoly(HMATERIAL(pmap),4,dp);
-//DEADCODE JON 5/22/00  	//DoPointStruc dp[4];
-//DEADCODE JON 5/22/00   	dp[0].bodyx.f=Float(scaled_x);
-//DEADCODE JON 5/22/00  	dp[0].bodyy.f=Float(scaled_y);
-//DEADCODE JON 5/22/00  	dp[0].ix=
-//DEADCODE JON 5/22/00  	dp[0].iy=0;
-//DEADCODE JON 5/22/00  	dp[1].bodyx.f=Float(scaled_x+scaled_w);
-//DEADCODE JON 5/22/00  	dp[1].bodyy.f=Float(scaled_y);
-//DEADCODE JON 5/22/00  	dp[1].ix=128;
-//DEADCODE JON 5/22/00  	dp[1].iy=0;
-//DEADCODE JON 5/22/00  	dp[2].bodyx.f=Float(scaled_x+scaled_w);
-//DEADCODE JON 5/22/00  	dp[2].bodyy.f=Float(scaled_y+scaled_h);
-//DEADCODE JON 5/22/00  	dp[2].ix=
-//DEADCODE JON 5/22/00  	dp[2].iy=128;
-//DEADCODE JON 5/22/00  	dp[3].bodyx.f=Float(scaled_x);
-//DEADCODE JON 5/22/00  	dp[3].bodyy.f=Float(scaled_y+scaled_h);
-//DEADCODE JON 5/22/00  	dp[3].ix=0;
-//DEADCODE JON 5/22/00  	dp[3].iy=128;
-//DEADCODE JON 5/22/00 	g_lpLib3d->EndPoly();
 
-//DeadCode JON 13Jun00 	Lib3DPoint* dp = g_lpLib3d->BeginPoly(HMATERIAL(pmap),4);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	dp[0].setPosition( scaled_x, scaled_y, 0.f );
-//DeadCode JON 13Jun00 	dp[0].setIMapCoords( 0, 0 );
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	dp[1].setPosition( scaled_x+scaled_w, scaled_y, 0.f );
-//DeadCode JON 13Jun00 	dp[1].setIMapCoords( 128, 0 );
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	dp[2].setPosition( scaled_x+scaled_w, scaled_y+scaled_h, 0.f );
-//DeadCode JON 13Jun00 	dp[2].setIMapCoords( 128, 128 );
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	dp[3].setPosition( scaled_x, scaled_y+scaled_h, 0.f );
-//DeadCode JON 13Jun00 	dp[3].setIMapCoords( 0, 128 );
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 	g_lpLib3d->EndPoly();
-//deadcode	if (!Save_Data.fSoftware)	pw->DoSetFontColour(0xFFFFFFFF);
-//deadcode	else						POLYGON.SetFontColour(WHITE);
-//deadcode	if (Save_Data.fSoftware)	POLYGON.DoPutC(pmap,dp);
-//deadcode	PutC(pmap,dp);
-//deadcode	pw->DoForceTQ(oldTQ);
-//deadcode	pw->DoSetMipMap(oldMip);
 
 	Lib3DPoint dp[4];
 	dp[0].setPosition( sTOP_LEFT_X, sTOP_LEFT_Y, 0.f );
@@ -7883,7 +5853,6 @@ void COverlay::DoThreat()
 			//generate the screen coordinates for each
 			//aircraft on the threat indicator.
 
-//DeadCode JON 30Aug00 			if (crd[i].Y>-THREAT_ALT && crd[i].Y<THREAT_ALT)
 			{
 
 				SWord baseStickX, baseStickY, stickHeight; // screen coords and height in pixels
@@ -7908,55 +5877,11 @@ void COverlay::DoThreat()
 		}
 
 
-//DeadCode JON 13Jun00 			Float ix,iy,iz;
-//DeadCode JON 13Jun00 			ix=AbsRoot(Float(crd[i].X)/Float(THREAT_RANGE));
-//DeadCode JON 13Jun00 			iz=AbsRoot(Float(crd[i].Z)/Float(THREAT_RANGE));
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 			ix*=scaled_threat_radx;
-//DeadCode JON 13Jun00 			iz*=scaled_threat_disc_hy;
-//DeadCode JON 13Jun00 			ix=scaled_orix+ix;
-//DeadCode JON 13Jun00 			iz=scaled_oriy-iz;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 			if (crd[i].Y>-THREAT_ALT && crd[i].Y<THREAT_ALT)
-//DeadCode JON 13Jun00 			{
-//DeadCode JON 13Jun00 				iy=scaled_threat_rady*AbsRoot(Float(crd[i].Y)/Float(THREAT_ALT));
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 				SWord lsx,lsy,lex,ley,lbx,lby,bex,bey;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 				lbx=SWord(scaled_orix);
-//DeadCode JON 13Jun00 				lby=SWord(scaled_oriy);
-//DeadCode JON 13Jun00 				lsx=lex=SWord(ix);
-//DeadCode JON 13Jun00 				lsy=SWord(iz);
-//DeadCode JON 13Jun00 				ley=lsy-SWord(iy);
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 				if (lsy==ley) ley++;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 				SWord flag=(lsy>ley)?2:-2;
-//DeadCode JON 13Jun00
-//DeadCode JON 13Jun00 				if (col[i])
-//DeadCode JON 13Jun00 				{
-//DeadCode JON 13Jun00 					DrawLine(lbx,lby,lsx,lsy,RED);
-//DeadCode JON 13Jun00 					DrawLine(lsx,lsy,lex,ley,RED);
-//DeadCode JON 13Jun00 					lex=lsx=lex+1;
-//DeadCode JON 13Jun00 					lsy=ley+flag;
-//DeadCode JON 13Jun00 					DrawLine(lsx,lsy,lex,ley,RED);
-//DeadCode JON 13Jun00 				}
-//DeadCode JON 13Jun00 				else
-//DeadCode JON 13Jun00 				{
-//DeadCode JON 13Jun00 					DrawLine(lbx,lby,lsx,lsy,Colour(197));			  //RDH 05/05/99 was 208 light blue
-//DeadCode JON 13Jun00 					DrawLine(lsx,lsy,lex,ley,Colour(197));			  //RDH 05/05/99
-//DeadCode JON 13Jun00 					lex=lsx=lex+1;
-//DeadCode JON 13Jun00 					lsy=ley+flag;
-//DeadCode JON 13Jun00 					DrawLine(lsx,lsy,lex,ley,Colour(197));			  //RDH 05/05/99
-//DeadCode JON 13Jun00 				}
-//DeadCode JON 13Jun00 			}
-//DeadCode JON 13Jun00 		}
 	}
 	delete[]col;
 	delete[]crd;
 }
 
-//DeadCode JON 13Jun00 static int lastoffset=0x7fffffff;
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 //Procedure		SetupCheatBox
@@ -8015,37 +5940,6 @@ void COverlay::SetupCheatBox()
 				}
 			}
 
-//DeadCode JON 5Oct00
-//DeadCode JON 5Oct00 			R3DVERTEX pos;
-//DeadCode JON 5Oct00 			pos.x = pvp->trackeditem2->World.X-pvp->World.X;
-//DeadCode JON 5Oct00 			pos.y = pvp->trackeditem2->World.Y-pvp->World.Y;
-//DeadCode JON 5Oct00 			pos.z = pvp->trackeditem2->World.Z-pvp->World.Z;
-//DeadCode JON 5Oct00 			if(pvp->trackeditem2->Status.size >= MOBILESIZE)
-//DeadCode JON 5Oct00 			{
-//DeadCode JON 5Oct00 				MovingItem*	mip = (MovingItem*)pvp->trackeditem2;
-//DeadCode JON 5Oct00
-//DeadCode JON 5Oct00 				pos.x += float(mip->vel_x + Three_Dee.wind_x)*Three_Dee.fView_dt_frac;//RJS 19Sep00
-//DeadCode JON 5Oct00 				pos.y += float(mip->vel_y + Three_Dee.wind_y)*Three_Dee.fView_dt_frac;//RJS 19Sep00
-//DeadCode JON 5Oct00 				pos.z += float(mip->vel_z + Three_Dee.wind_z)*Three_Dee.fView_dt_frac;//RJS 19Sep00
-//DeadCode JON 5Oct00 //DeadCode RJS 14Sep00 				SLong dt = Three_Dee.View_Dt();
-//DeadCode JON 5Oct00 //DeadCode RJS 14Sep00 				pos.x += SLong(mip->vel_x * dt) / 1e5;
-//DeadCode JON 5Oct00 //DeadCode RJS 14Sep00 				pos.y += SLong(mip->vel_y * dt) / 1e5;
-//DeadCode JON 5Oct00 //DeadCode RJS 14Sep00 				pos.z += SLong(mip->vel_z * dt) / 1e5;
-//DeadCode JON 5Oct00 			}
-//DeadCode JON 5Oct00 			if (pvp->trackeditem2==pvp)
-//DeadCode JON 5Oct00 			{
-//DeadCode JON 5Oct00 				pos.x=pvp->trackedItem2World.X-pvp->World.X;
-//DeadCode JON 5Oct00 				pos.y=pvp->trackedItem2World.Y-pvp->World.Y;
-//DeadCode JON 5Oct00 				pos.z=pvp->trackedItem2World.Z-pvp->World.Z;
-//DeadCode JON 5Oct00 			}
-//DeadCode JON 5Oct00 			else
-//DeadCode JON 5Oct00 			if (pvp->trackeditem2->Status.size==WAYPOINTSIZE && WayPointPtr(pvp->trackeditem2)->target)
-//DeadCode JON 5Oct00 			{
-//DeadCode JON 5Oct00 				pos.x+=WayPointPtr(pvp->trackeditem2)->target->World.X;
-//DeadCode JON 5Oct00 				pos.y+=WayPointPtr(pvp->trackeditem2)->target->World.Y;
-//DeadCode JON 5Oct00 				pos.z+=WayPointPtr(pvp->trackeditem2)->target->World.Z;
-//DeadCode JON 5Oct00
-//DeadCode JON 5Oct00 			}
 			g_lpLib3d->PushMatrix(MATRIX_OBJECT);
 			g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
 			g_lpLib3d->BodyToScreen( pos, cheatBoxX, cheatBoxY, cheatBoxZ, &cheatBoxScale );
@@ -8091,7 +5985,6 @@ void COverlay::DoCheatBox()
 	const float CHEATBOXSIZEMINSIZE = 10.f;
 // hmmmm, see if cheat box works properly in comms yet, probably not...
 
-//DeadCode AMM 12Oct00 	if (!_DPlay.Implemented)
 	{
 		if (	( cheatBoxX > -0.5f )
 			&&	( cheatBoxZ > 1.f)	)
@@ -8400,31 +6293,16 @@ void COverlay::DoArtHoriz()
 	const SWord THREAT_Y=10;
 	const SWord THREAT_W=64;
 	const SWord THREAT_H=64;
-//DeadCode JON 20Oct00 	const SWord THREAT_CX=31;
-//DeadCode JON 20Oct00 	const SWord THREAT_CY=31;
-//DeadCode JON 20Oct00 	const SWord THREAT_RAD=29;
-//DeadCode JON 20Oct00 	const SWord THREAT_DISC_H=6;
-//DeadCode JON 20Oct00 	const SLong THREAT_RANGE=1000000;
-//DeadCode JON 20Oct00 	const SLong THREAT_ALT=1000000;
-//DeadCode JON 20Oct00 	const SWord MAX_THREATS=32;
 
 	GetSurfaceDimensions(physicalWidth,physicalHeight);
 	const Float scx=Float(physicalWidth)/640.;
 	const Float scy=Float(physicalHeight)/480.;
 	const Float scaled_x=scx*Float(THREAT_X);
 	const Float scaled_w=scx*Float(THREAT_W);
-//DeadCode JON 20Oct00 	const Float scaled_threat_radx=scx*Float(THREAT_RAD);
-//DeadCode JON 20Oct00 	const Float scaled_threat_disc_hx=scx*Float(THREAT_DISC_H);
 	const Float scaled_y=scy*Float(THREAT_Y);
 	const Float scaled_h=scy*Float(THREAT_H);
-//DeadCode JON 20Oct00 	const Float scaled_threat_rady=scy*Float(THREAT_RAD);
-//DeadCode JON 20Oct00 	const Float scaled_threat_disc_hy=scy*Float(THREAT_DISC_H);
 
-//DeadCode JON 20Oct00 	const Float scaled_orix=scaled_x+scaled_w*.5;
-//DeadCode JON 20Oct00 	const Float scaled_oriy=scaled_y+scaled_h*.5;
 
-//deadcode	SWord oldTQ=pw->DoForceTQ(4);
-//deadcode	bool oldMip=pw->DoSetMipMap(false);
 
 	//make ball center image
 
@@ -8444,6 +6322,7 @@ void COverlay::DoArtHoriz()
 		pball->paletteindex=pMaskImage->paletteindex;
 		pball->isMasked=pMaskImage->isMasked;
 		pball->hTextureMap=0UL;
+		pball->blendType=BLEND_AVERAGEALPHA;
 		UByte* pBallAlpha=pball->alpha;
 		UByte* pMaskAlpha=pMaskImage->body;
 		for (int w=0;w<pball->w*pball->h;w++)
@@ -8501,23 +6380,6 @@ void COverlay::DoArtHoriz()
 	m[1]=Float(sinAng)/Float(ANGLES_FRACT);
 	m[2]=-Float(sinAng)/Float(ANGLES_FRACT);
 
-//DEADCODE JON 5/22/00  	R3DVERTEX dp[4],dp2[4];
-//DEADCODE JON 5/22/00   	dp[0].bodyx.f=Float(scaled_x);
-//DEADCODE JON 5/22/00  	dp[0].bodyy.f=Float(scaled_y);
-//DEADCODE JON 5/22/00  	dp[0].ix=
-//DEADCODE JON 5/22/00  	dp[0].iy=0;
-//DEADCODE JON 5/22/00  	dp[1].bodyx.f=Float(scaled_x+scaled_w);
-//DEADCODE JON 5/22/00  	dp[1].bodyy.f=Float(scaled_y);
-//DEADCODE JON 5/22/00  	dp[1].ix=128;
-//DEADCODE JON 5/22/00  	dp[1].iy=0;
-//DEADCODE JON 5/22/00  	dp[2].bodyx.f=Float(scaled_x+scaled_w);
-//DEADCODE JON 5/22/00  	dp[2].bodyy.f=Float(scaled_y+scaled_h);
-//DEADCODE JON 5/22/00  	dp[2].ix=
-//DEADCODE JON 5/22/00  	dp[2].iy=128;
-//DEADCODE JON 5/22/00  	dp[3].bodyx.f=Float(scaled_x);
-//DEADCODE JON 5/22/00  	dp[3].bodyy.f=Float(scaled_y+scaled_h);
-//DEADCODE JON 5/22/00  	dp[3].ix=0;
-//DEADCODE JON 5/22/00  	dp[3].iy=128;
  	Lib3DPoint dp[4];
 	dp[0].setPosition( scaled_x, scaled_y, 0.f );
 	dp[0].setIMapCoords( 0, 0 );
@@ -8546,13 +6408,6 @@ void COverlay::DoArtHoriz()
 	ori_x/=4;
 	ori_y/=4;
 
-//DEADCODE JON 5/22/00 	for (i=0;i<4;i++)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 		Float tx=dp[i].bodyx.f-ori_x;
-//DEADCODE JON 5/22/00 		Float tz=dp[i].bodyy.f-ori_y;
-//DEADCODE JON 5/22/00 		dp[i].bodyx.f=m[0]*tx+m[1]*tz+ori_x;
-//DEADCODE JON 5/22/00 		dp[i].bodyy.f=m[2]*tx+m[3]*tz+ori_y;
-//DEADCODE JON 5/22/00 	}
 	for (int i=0;i<4;i++)
 	{
 		Float tx=dp[i].getPosX()-ori_x;
@@ -8564,36 +6419,8 @@ void COverlay::DoArtHoriz()
 		);
 	}
 
-//deadcode	if (!Save_Data.fSoftware)	pw->DoSetFontColour(0xFFFFFFFF);
-//deadcode	else						POLYGON.SetFontColour(WHITE);
-//deadcode	if (!Save_Data.fSoftware)
 	PutC(pball,dp,offset!=lastArtHorizOffset?true:false);
 
-//DEADCODE JON 5/22/00 	dp2[0].bodyx.f=Float(scaled_x);
-//DEADCODE JON 5/22/00  	dp2[0].bodyy.f=Float(scaled_y);
-//DEADCODE JON 5/22/00  	dp2[0].ix=
-//DEADCODE JON 5/22/00  	dp2[0].iy=0;
-//DEADCODE JON 5/22/00  	dp2[1].bodyx.f=Float(scaled_x+scaled_w);
-//DEADCODE JON 5/22/00  	dp2[1].bodyy.f=Float(scaled_y);
-//DEADCODE JON 5/22/00  	dp2[1].ix=128;
-//DEADCODE JON 5/22/00  	dp2[1].iy=0;
-//DEADCODE JON 5/22/00  	dp2[2].bodyx.f=Float(scaled_x+scaled_w);
-//DEADCODE JON 5/22/00  	dp2[2].bodyy.f=Float(scaled_y+scaled_h);
-//DEADCODE JON 5/22/00  	dp2[2].ix=
-//DEADCODE JON 5/22/00  	dp2[2].iy=128;
-//DEADCODE JON 5/22/00  	dp2[3].bodyx.f=Float(scaled_x);
-//DEADCODE JON 5/22/00  	dp2[3].bodyy.f=Float(scaled_y+scaled_h);
-//DEADCODE JON 5/22/00  	dp2[3].ix=0;
-//DEADCODE JON 5/22/00  	dp2[3].iy=128;
-//deadcode	if (Save_Data.fSoftware)
-//deadcode	{
-//deadcode		POLYGON.DoPutC(pOuterImage,dp2);
-//deadcode		POLYGON.DoPutC(pball,dp);
-//deadcode	}
-//deadcode	else
-//DEADCODE JON 5/22/00 	PutC(pOuterImage,dp2);
-//deadcode	pw->DoForceTQ(oldTQ);
-//deadcode	pw->DoSetMipMap(oldMip);
 
 	lastArtHorizOffset=offset;
 }
@@ -8603,7 +6430,6 @@ void COverlay::CrossHair()
 	if((pvp) && (pvp->viewnum.viewmode == VM_InsideCheat))
 	{
 		GetSurfaceDimensions(physicalWidth, physicalHeight);
-//DeadCode CSB 10Nov00 		Colour colour = Colour(223);
 		Colour colour = Colour(127);
 		FP halfwidth  = physicalWidth / 2;
 		FP halfheight = physicalHeight / 2;
@@ -8636,38 +6462,10 @@ void COverlay::CrossHair()
 		DrawLine(halfwidth, halfheight - 1, halfwidth, halfheight + 2, colour);
 	}
 
-//DeadCode CSB 11Aug00 	if (pvp && pvp->viewnum.viewmode==VM_InsideCheat)
-//DeadCode CSB 11Aug00 	{
-//DeadCode CSB 11Aug00 		GetSurfaceDimensions(physicalWidth,physicalHeight);
-//DeadCode CSB 11Aug00 		const SLong CROSS_WH_2=16;
-//DeadCode CSB 11Aug00 		const SLong CROSS_Y_SHIFT=3;
-//DeadCode CSB 11Aug00 		SLong cross_w=(CROSS_WH_2*physicalWidth)/640;
-//DeadCode CSB 11Aug00 		SLong cross_h=(CROSS_WH_2*physicalHeight)/480;
-//DeadCode CSB 11Aug00 		SLong cross_y_shift=(CROSS_Y_SHIFT*physicalHeight)/640;
-//DeadCode CSB 11Aug00 		SWord x1,y1,x2,y2;
-//DeadCode CSB 11Aug00 		x1=x2=physicalWidth>>1;
-//DeadCode CSB 11Aug00 		y1=(physicalHeight>>1)-cross_h+cross_y_shift;
-//DeadCode CSB 11Aug00 		y2=(physicalHeight>>1)+cross_h+cross_y_shift;
-//DeadCode CSB 11Aug00 		DrawLine(x1,y1,x2,y2,RED);
-//DeadCode CSB 11Aug00 		y1=y2=(physicalHeight>>1)+cross_y_shift;
-//DeadCode CSB 11Aug00 		x1=(physicalWidth>>1)-cross_w;
-//DeadCode CSB 11Aug00 		x2=(physicalWidth>>1)+cross_w;
-//DeadCode CSB 11Aug00 		DrawLine(x1,y1,x2,y2,RED);
-//DeadCode CSB 11Aug00 	}
 }
 
 void COverlay::DrawLine(SWord sx,SWord sy,SWord ex,SWord ey,Colour c)
 {
-//DEADCODE JON 5/22/00 	R3DTLVERTEX start,finish;
-//DEADCODE JON 5/22/00 	start.sx=sx;
-//DEADCODE JON 5/22/00 	start.sy=sy;
-//DEADCODE JON 5/22/00 	start.sz=0;
-//DEADCODE JON 5/22/00 	start.rhw=1;
-//DEADCODE JON 5/22/00 	finish.sx=ex;
-//DEADCODE JON 5/22/00 	finish.sy=ey;
-//DEADCODE JON 5/22/00 	finish.sz=0;
-//DEADCODE JON 5/22/00 	finish.rhw=1;
-//DEADCODE JON 5/22/00 	g_lpLib3d->DrawLine(HMATERIAL(c),start,finish);
 	DoPointStruc start,finish;
 	start.setPosition( sx, sy, 0.f );
 	start.setRHW( 1.f );
@@ -8812,16 +6610,6 @@ void COverlay::HotKeyTriggerMenu(SWord sel)
 			default:
 				break;
 		}
-//DEADCODE CSB 11/02/00 		switch (k)
-//DEADCODE CSB 11/02/00 		{
-//DEADCODE CSB 11/02/00 		case SEL_1:	localDec=GroupInfoMsg;	break;
-//DEADCODE CSB 11/02/00 		case SEL_2:	localDec=PreCombatMsg;	break;
-//DEADCODE CSB 11/02/00 		case SEL_3:	localDec=CombatMsg;		break;
-//DEADCODE CSB 11/02/00 		case SEL_4:	localDec=PostCombatMsg;	break;
-//DEADCODE CSB 11/02/00 		case SEL_5:	localDec=TowerMsg;		break;
-//DEADCODE CSB 11/02/00 		case SEL_6:	localDec=FACMsg;		break;
-//DEADCODE CSB 11/02/00 		default:	break;
-//DEADCODE CSB 11/02/00 		}
 		if (localDec!=NULL)	SetToUIScreen(&userOptionsScr);
 	}
 }
@@ -8895,20 +6683,9 @@ void COverlay::HotKeyTriggerMessage(SWord sel1,SWord sel2)
 			default:
 				break;
 		}
-//DEADCODE CSB 11/02/00 		switch (k)
-//DEADCODE CSB 11/02/00 		{
-//DEADCODE CSB 11/02/00 		case SEL_1:	dec=GroupInfoMsg;	break;
-//DEADCODE CSB 11/02/00 		case SEL_2:	dec=PreCombatMsg;	break;
-//DEADCODE CSB 11/02/00 		case SEL_3:	dec=CombatMsg;		break;
-//DEADCODE CSB 11/02/00 		case SEL_4:	dec=PostCombatMsg;	break;
-//DEADCODE CSB 11/02/00 		case SEL_5:	dec=TowerMsg;		break;
-//DEADCODE CSB 11/02/00 		case SEL_6:	dec=FACMsg;			break;
-//DEADCODE CSB 11/02/00 		default:	break;
-//DEADCODE CSB 11/02/00 		}
 		if (dec!=NULL)
 		{
 			k=(Key)sel2;
-//DeadCode AMM 21May99 			DecisionAI::OptionRef* opt=dec->GetMsgOptions();
 			if (k>=SEL_1 && k<=SEL_9)
 			{
 				DecisionMessage(dec,
@@ -8916,26 +6693,6 @@ void COverlay::HotKeyTriggerMessage(SWord sel1,SWord sel2)
 								Persons2::PlayerGhostAC,
 								Persons2::PlayerGhostAC,
 								Persons2::PlayerGhostAC);
-//DeadCode AMM 21May99 				opt+=SLong(k-SEL_1);
-//DeadCode AMM 21May99 				if (_DPlay.Implemented || _Replay.Record)		//AMM 17May99
-//DeadCode AMM 21May99 				{												//AMM 17May99
-//DeadCode AMM 21May99 					UByte option=(UByte)(k-SEL_1);				//AMM 17May99
-//DeadCode AMM 21May99 					UniqueID trg=Persons2::PlayerGhostAC->uniqueID.count;//AMM 17May99
-//DeadCode AMM 21May99 					UByte decision=dec->optionnumber;			//AMM 17May99
-//DeadCode AMM 21May99 					_DPlay.NewWingmanCommand(decision,option,trg);//AMM 17May99
-//DeadCode AMM 21May99 				}												//AMM 17May99
-//DeadCode AMM 21May99 				else											//AMM 17May99
-//DeadCode AMM 21May99 				{												//AMM 17May99
-//DeadCode AMM 21May99 					MESSAGE_STRUC newMsg(opt->saidmsg,
-//DeadCode AMM 21May99 										MSG_HIPRIORITY,
-//DeadCode AMM 21May99 										Persons2::PlayerGhostAC,//AMM 17May99
-//DeadCode AMM 21May99 										Persons2::PlayerGhostAC,//AMM 17May99
-//DeadCode AMM 21May99 										Persons2::PlayerGhostAC);//AMM 17May99
-//DeadCode AMM 21May99 //DeadCode AMM 17May99 											Manual_Pilot.ControlledAC2,
-//DeadCode AMM 21May99 //DeadCode AMM 17May99 											Manual_Pilot.ControlledAC2,
-//DeadCode AMM 21May99 //DeadCode AMM 17May99 											Manual_Pilot.ControlleddAC2);
-//DeadCode AMM 21May99 					SendMessageAndCall(&newMsg,opt->airesult[0]);
-//DeadCode AMM 21May99				}												//AMM 17May99
 			}
 		}
 	}
@@ -9087,32 +6844,12 @@ void COverlay::DecisionMessage(DecisionAI* dec,SWord option,AirStrucPtr callee,I
 void	COverlay::AccelSelection(UByte hilight,ULong acceltype)
 {
 	_DPlay.AccelComms=(DPlay::AccelTypeComms)acceltype;
-//DeadCode AMM 16Nov99 	_DPlay.Accelhilight=hilight;
 
 // No accel in comms quick missions allowed
 
 	if (_DPlay.Implemented)											  //AMM 02/07/99
 		return;														  //AMM 02/07/99
 
-//DeadCode AMM 01Jul99 // in comms only allow accel forward
-//DeadCode AMM 01Jul99
-//DeadCode AMM 01Jul99 	if (_DPlay.Implemented && _DPlay.AccelComms==DPlay::ACCEL_FORWARD)
-//DeadCode AMM 01Jul99 	{
-//DeadCode AMM 01Jul99 // if this is the first time I have pressed accel then send
-//DeadCode AMM 01Jul99 // a message to other players indicating I want accel
-//DeadCode AMM 01Jul99
-//DeadCode AMM 01Jul99 		if (!(_DPlay.accelselected&(1<<_DPlay.mySlot)))
-//DeadCode AMM 01Jul99 		{
-//DeadCode AMM 01Jul99 			_DPlay.SendStartAccelMessage();
-//DeadCode AMM 01Jul99 		}
-//DeadCode AMM 01Jul99
-//DeadCode AMM 01Jul99
-//DeadCode AMM 01Jul99 // we are still waiting for players to select accel
-//DeadCode AMM 01Jul99 // dont do it yet
-//DeadCode AMM 01Jul99
-//DeadCode AMM 01Jul99 		if (_DPlay.accelselected!=_DPlay.ActivePlayers)
-//DeadCode AMM 01Jul99 			return;
-//DeadCode AMM 01Jul99 	}
 
  	OverLay.hilight=(Key)hilight;
 	OverLay.keyFlags=KF_ACCELON+KF_FASTACCEL;
@@ -9187,25 +6924,6 @@ void COverlay::PutC(ImageMapDesc *pmap,const Lib3DPoint* dp,bool forceReload)
 	pRVerts->setPosition( (pRVerts->getPosX()-hx)*sx, (pRVerts->getPosY()-hy)*sy, 0.f );
 	g_lpLib3d->EndPoly();
 
-//DEADCODE JON 5/22/00 	R3DVERTEX *pRVerts;
-//DEADCODE JON 5/22/00 	if (forceReload)
-//DEADCODE JON 5/22/00 		g_lpLib3d->UnloadTexture(pmap);
-//DEADCODE JON 5/22/00 	R3DVALUE hx=R3DVALUE(physicalWidth>>1);
-//DEADCODE JON 5/22/00 	R3DVALUE hy=R3DVALUE(physicalHeight>>1);
-//DEADCODE JON 5/22/00 	R3DVALUE sx=1.f/hx;
-//DEADCODE JON 5/22/00 	R3DVALUE sy=-1.f/hy;
-//DEADCODE JON 5/22/00 	for (int i=3;i>=0;i--)
-//DEADCODE JON 5/22/00 	{
-//DEADCODE JON 5/22/00 	 	dp[i].bodyx.f=(dp[i].bodyx.f-hx)*sx;
-//DEADCODE JON 5/22/00 	 	dp[i].bodyy.f=(dp[i].bodyy.f-hy)*sy;
-//DEADCODE JON 5/22/00 		dp[i].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	}
-//DEADCODE JON 5/22/00 	g_lpLib3d->BeginPoly(HMATERIAL(pmap),4,pRVerts);
-//DEADCODE JON 5/22/00 	*pRVerts++=dp[0];
-//DEADCODE JON 5/22/00 	*pRVerts++=dp[1];
-//DEADCODE JON 5/22/00 	*pRVerts++=dp[2];
-//DEADCODE JON 5/22/00 	*pRVerts=dp[3];
-//DEADCODE JON 5/22/00 	g_lpLib3d->EndPoly();
 }
 
 void COverlay::SmokedGlassBox(SLong x,SLong y,SLong width,SLong height)
@@ -9247,33 +6965,6 @@ void COverlay::SmokedGlassBox(SLong x,SLong y,SLong width,SLong height)
 
 	g_lpLib3d->EndPoly();
 
-//DEADCODE JON 5/22/00 	R3DVERTEX *dp;
-//DEADCODE JON 5/22/00 	R3DVALUE hx=R3DVALUE(physicalWidth>>1);
-//DEADCODE JON 5/22/00 	R3DVALUE hy=R3DVALUE(physicalHeight>>1);
-//DEADCODE JON 5/22/00 	R3DVALUE sx=1.f/hx;
-//DEADCODE JON 5/22/00 	R3DVALUE sy=-1.f/hy;
-//DEADCODE JON 5/22/00 	g_lpLib3d->BeginPoly(HMATERIAL(Image_Map.GetImageMapPtr(RADIONO)),4,dp);
-//DEADCODE JON 5/22/00  	dp[0].bodyx.f=(R3DVALUE(x)-hx)*sx;
-//DEADCODE JON 5/22/00  	dp[0].bodyy.f=(R3DVALUE(y)-hy)*sy;
-//DEADCODE JON 5/22/00 	dp[0].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	dp[0].ix=8;
-//DEADCODE JON 5/22/00 	dp[0].iy=8;
-//DEADCODE JON 5/22/00  	dp[1].bodyx.f=(R3DVALUE(x+width)-hx)*sx;
-//DEADCODE JON 5/22/00  	dp[1].bodyy.f=(R3DVALUE(y)-hy)*sy;
-//DEADCODE JON 5/22/00 	dp[1].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	dp[1].ix=16;
-//DEADCODE JON 5/22/00 	dp[1].iy=8;
-//DEADCODE JON 5/22/00  	dp[2].bodyx.f=(R3DVALUE(x+width)-hx)*sx;
-//DEADCODE JON 5/22/00  	dp[2].bodyy.f=(R3DVALUE(y+height)-hy)*sy;
-//DEADCODE JON 5/22/00 	dp[2].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	dp[2].ix=16;
-//DEADCODE JON 5/22/00 	dp[2].iy=16;
-//DEADCODE JON 5/22/00  	dp[3].bodyx.f=(R3DVALUE(x)-hx)*sx;
-//DEADCODE JON 5/22/00  	dp[3].bodyy.f=(R3DVALUE(y+height)-hy)*sy;
-//DEADCODE JON 5/22/00 	dp[3].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	dp[3].ix=8;
-//DEADCODE JON 5/22/00 	dp[3].iy=16;
-//DEADCODE JON 5/22/00 	g_lpLib3d->EndPoly();
 }
 
 
@@ -9319,42 +7010,8 @@ inline void COverlay::SmokedGlassBox(const SLong x,const SLong y,const SLong wid
 	g_lpLib3d->SetObjectLighting( lf );
 	g_lpLib3d->SetGlobal( TOGGLE_GLOBALALPHA, alpha );  // set globalpha back
 
-//DEADCODE JON 5/22/00 	g_lpLib3d->SetGlobal( TOGGLE_GLOBALALPHA, alpha );
-//DEADCODE JON 5/22/00 	g_lpLib3d->SetFontColour(col);
-//DEADCODE JON 5/22/00 	R3DVERTEX *dp;
-//DEADCODE JON 5/22/00 	R3DVALUE hx=R3DVALUE(physicalWidth>>1);
-//DEADCODE JON 5/22/00 	R3DVALUE hy=R3DVALUE(physicalHeight>>1);
-//DEADCODE JON 5/22/00 	R3DVALUE sx=1.f/hx;
-//DEADCODE JON 5/22/00 	R3DVALUE sy=-1.f/hy;
-//DEADCODE JON 5/22/00 	g_lpLib3d->BeginPoly(HMATERIAL(UByte(0)),4,dp); // used only in 2d render therefore draw in font col
-//DEADCODE JON 5/22/00  	dp[0].bodyx.f=(R3DVALUE(x)-hx)*sx;
-//DEADCODE JON 5/22/00  	dp[0].bodyy.f=(R3DVALUE(y)-hy)*sy;
-//DEADCODE JON 5/22/00 	dp[0].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	dp[0].ix=8;
-//DEADCODE JON 5/22/00 	dp[0].iy=8;
-//DEADCODE JON 5/22/00  	dp[1].bodyx.f=(R3DVALUE(x+width)-hx)*sx;
-//DEADCODE JON 5/22/00  	dp[1].bodyy.f=(R3DVALUE(y)-hy)*sy;
-//DEADCODE JON 5/22/00 	dp[1].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	dp[1].ix=16;
-//DEADCODE JON 5/22/00 	dp[1].iy=8;
-//DEADCODE JON 5/22/00  	dp[2].bodyx.f=(R3DVALUE(x+width)-hx)*sx;
-//DEADCODE JON 5/22/00  	dp[2].bodyy.f=(R3DVALUE(y+height)-hy)*sy;
-//DEADCODE JON 5/22/00 	dp[2].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	dp[2].ix=16;
-//DEADCODE JON 5/22/00 	dp[2].iy=16;
-//DEADCODE JON 5/22/00  	dp[3].bodyx.f=(R3DVALUE(x)-hx)*sx;
-//DEADCODE JON 5/22/00  	dp[3].bodyy.f=(R3DVALUE(y+height)-hy)*sy;
-//DEADCODE JON 5/22/00 	dp[3].bodyz.f=0.f;
-//DEADCODE JON 5/22/00 	dp[3].ix=8;
-//DEADCODE JON 5/22/00 	dp[3].iy=16;
-//DEADCODE JON 5/22/00 	g_lpLib3d->EndPoly();
-//DEADCODE JON 5/22/00 	g_lpLib3d->SetGlobal( TOGGLE_GLOBALALPHA, alpha );  // set globalpha back
 }
 
-//DeadCode JON 21Aug00 void COverlay::PutA(ImageMapDesc *pmap,R3DVERTEX* dp)
-//DeadCode JON 21Aug00 {
-//DeadCode JON 21Aug00 #pragma warnmsg("puta")
-//DeadCode JON 21Aug00 }
 
 void	COverlay::ShapeCheat(char*	shpdebugline)
 {
@@ -9373,7 +7030,6 @@ void	COverlay::ShapeCheat(char*	shpdebugline)
 //////////////////////////////////////////////////////////////////////
 inline SLong COverlay::CharPixelWidth( const char theChar )
 {
-//DeadCode JON 5Nov00 	SLong	extra=nofontkludge?0:1;
 	return (!fIsWide)?7/*+extra*/:bigWidths[theChar-32]+1/*+extra*/;
 }
 
@@ -9391,7 +7047,6 @@ inline SLong COverlay::CharPixelWidth( const char theChar )
 //////////////////////////////////////////////////////////////////////
 inline SLong		COverlay::StrPixelWidthPadded(const char*	theString)
 {
-//DeadCode JON 5Nov00 	SLong	extra=nofontkludge?0:1;
 	SLong pixelwidth;
 
 	if ( !fIsWide )
@@ -9427,7 +7082,6 @@ inline SLong		COverlay::StrPixelWidthPadded(const char*	theString)
 //------------------------------------------------------------------------------
 inline SLong		COverlay::StrPixelWidth(const char*	theString)
 {
-//DeadCode JON 5Nov00 	SLong	extra=nofontkludge?0:1;
 	SLong pixelwidth;
 
 	if ( !fIsWide )
@@ -9446,29 +7100,6 @@ inline SLong		COverlay::StrPixelWidth(const char*	theString)
 	}
 
 	return pixelwidth;
-//DeadCode JON 10Oct00 	SLong		pixelwidth = 0;
-//DeadCode JON 10Oct00 	const char*	str = theString;
-//DeadCode JON 10Oct00 	char	c;
-//DeadCode JON 10Oct00 	SWord	extra=nofontkludge?0:1;
-//DeadCode JON 10Oct00 	UByte	tWidth=8;
-//DeadCode JON 10Oct00 	SWord	this_y,pWidth;
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 	while ((c=*str++)!=0)
-//DeadCode JON 10Oct00 	{
-//DeadCode JON 10Oct00 		tWidth=8;
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 		if (!fIsWide && c>='a' && c<='z') c=c-'a'+'A';
-//DeadCode JON 10Oct00 		else tWidth=bigWidths[c-32]+1+extra;
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 		if (!fIsWide)
-//DeadCode JON 10Oct00  			pWidth=7+extra;		//8;
-//DeadCode JON 10Oct00 		else
-//DeadCode JON 10Oct00  			pWidth=tWidth;
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00  		pixelwidth+=pWidth;
-//DeadCode JON 10Oct00 	}
-//DeadCode JON 10Oct00
-//DeadCode JON 10Oct00 	return pixelwidth;
 }
 
 //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
@@ -9599,7 +7230,6 @@ void	COverlay::PrintID(ItemPtr	theItem)
 {
 #ifndef	_NOTFORDEMO_
 	if (
-//DeadCode JON 17Oct00 		Save_Data.detail_3d[DETAIL3D_PADLOCKCHEAT] &&
 		(theItem != Persons2::PlayerSeenAC)			)
 	{
 		if (	!theItem->Status.deadtime								//RJS 5Oct00
@@ -9655,7 +7285,6 @@ void	COverlay::PrintID(ItemPtr	theItem)
 					}
 					else
 					{
-//DeadCode JIM 23Oct00 						_Radio.ExpandMessage(phrasebuff,MESSAGE_STRUC((ac->classtype->phrasename-PHRASE_ONE_AIRCRAFT)+PHRASE_ONE_AIRCRAFT_EXCLAIM,MSG_HIPRIORITY,VOICE_PLAYER,ac,ac));
 						//Radio code can't say blenheim
 						char* str=LdStr(IDS_L_SPIT_A+ac->classtype->planetext);
 						acID=str;
@@ -9841,14 +7470,6 @@ void	COverlay::SetUp3DUIMouse()
 	if (!MouseSet)
 	{
 		MouseSet=true;
-//DeadCode AMM 27Jul00 		if (Key_Tests.mshift)
-//DeadCode AMM 27Jul00 			PreviousMouseState=1;
-//DeadCode AMM 27Jul00 		else
-//DeadCode AMM 27Jul00 			PreviousMouseState=0;
-//DeadCode AMM 27Jul00
-//DeadCode AMM 27Jul00 		Key_Tests.SetMouseShiftMode(SHIFTED);
-//DeadCode AMM 27Jul00 		_Analogue.SetAllAxesFromBackup();
-//DeadCode AMM 27Jul00 		_Analogue.Initialise((int)Master_3d.winst,(int)Master_3d.hinst,Key_Tests.mshift,Key_Tests.jshift,true);
 		MouseRestore=true;
 	}
 }
@@ -9857,15 +7478,6 @@ void	COverlay::RestoreMouse()
 {
 	if (MouseRestore)
 	{
-//DeadCode AMM 27Jul00 		if (PreviousMouseState)
-//DeadCode AMM 27Jul00 			Key_Tests.SetMouseShiftMode(SHIFTED);
-//DeadCode AMM 27Jul00 		else
-//DeadCode AMM 27Jul00 			Key_Tests.SetMouseShiftMode(NORMAL);
-//DeadCode AMM 27Jul00
-//DeadCode AMM 27Jul00 		_Analogue.SetAllAxesFromBackup();
-//DeadCode AMM 27Jul00 		_Analogue.Initialise((int)Master_3d.winst,(int)Master_3d.hinst,Key_Tests.mshift,Key_Tests.jshift,true);
-//DeadCode AMM 27Jul00 		MouseSet=false;
-//DeadCode AMM 27Jul00 		MouseRestore=false;
 	}
 }
 

@@ -870,7 +870,7 @@ void Model::RealBase (AirStrucPtr const ControlledAC)
 
 	if(EngineList)
 	{
-		SWord ThrustVol;
+		SWord ThrustVol=0;									//RERUN: uninit for non-piston/jet engines
 		if (EngineList->Type == ET_PISTON)
 			ThrustVol = (255.0 * EngineList->Power) / 1590.0;			//RJS 14Jan99 CSB 15Sep99
 
@@ -2703,7 +2703,7 @@ void Model::CalcStickForceFeedback()
 			{
 				FP DynPress = DynamicPressure / AirSpeed;
 				PENGINE pEngine = EngineList;
-				if(pEngine->Type == ET_PISTON)			//Prop Aircraft
+				if(pEngine && pEngine->Type == ET_PISTON)		//RERUN: EngineList may be empty			//Prop Aircraft
 					DynPress = 0.5 * AmbDensity * pEngine->SlipVel;// * pEngine->SlipVel;
 
 				Stiffz = DynPress * (FP)ControlForce * (1500000.0 * 0.01);	//Elevator

@@ -29,7 +29,6 @@ class LWDiaryDetails : public RowanDialog
 {
 // Construction
 public:
-//DEADCODE  11/02/00 	cloakref(Diary::RaidGroup,RaidGroup);
 	UINT lwdiary_timer;
 	static RDialog* Make(SquadNum* grupnumptr, int* currentryptr, SquadronBase**	grdetailsptr, bool quickmsn);
 

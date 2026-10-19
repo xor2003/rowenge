@@ -267,7 +267,7 @@ void	MigDisplay::XX_SetGraphicsMode()
 	if (DD.PaletteBuffer==NULL)
 		DD.PaletteBuffer = new MYPALETTEENTRY [256];
 
-	if (bupLogicalScreenPtr!=NULL && (intptr_t)oldscreenaddr!=-1)
+	if (bupLogicalScreenPtr!=NULL && oldscreenaddr!=NULL && (intptr_t)oldscreenaddr!=-1)
 	{
 		MigWindow* window;
 
@@ -379,7 +379,7 @@ else
 										DDBLT_WAIT, 
 										&ddbltfx); //Address of the DDBLTFX structure ???
 #else
-		ddrval = SDL_UpdateTexture(Master_3d.SdlMigTexture, &rect, DD.lpDDSBack->pixels, DD.lpDDSBack->pitch);
+		ddrval = DD.lpDDSBack ? SDL_UpdateTexture(Master_3d.SdlMigTexture, &rect, DD.lpDDSBack->pixels, DD.lpDDSBack->pitch) : DD_OK;
 #endif
 		if (ddrval != DD_OK)
 		{			 //DDERR_SURFACELOST
@@ -994,8 +994,9 @@ ULong MigDisplay::SetDirectDrawMode (InitDisplayDef& Mode)
 		if (DD.lpDDSBack == NULL)
 		{
 			printf("Error creating back surface: %s.\n", SDL_GetError());
+			return 5;
 		}
-			
+
 		DD.lpddsd->lpSurface = DD.lpDDSBack->pixels;
 		DD.lpddsd->dwWidth = DD.lpDDSBack->w; // 800;
 		DD.lpddsd->dwHeight = DD.lpDDSBack->h; // 600;
@@ -1154,8 +1155,9 @@ ULong MigDisplay::SetDirectDrawMode (InitDisplayDef& Mode)
 	if (DD.lpDDSBack == NULL)
 	{
 		printf("Error creating back surface: %s.\n", SDL_GetError());
+		return 5;
 	}
-		
+
 	DD.lpddsd->lpSurface = DD.lpDDSBack->pixels;
 	DD.lpddsd->dwWidth = DD.lpDDSBack->w; // 800;
 	DD.lpddsd->dwHeight = DD.lpDDSBack->h; // 600;

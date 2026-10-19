@@ -104,9 +104,6 @@ void BasesTitle::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(BasesTitle, CDialog)
 	//{{AFX_MSG_MAP(BasesTitle)
-//DeadCode RDH 11Jul99 	ON_WM_MOVE()
-//DeadCode RDH 11Jul99 	ON_WM_HSCROLL()
-//DeadCode RDH 11Jul99 	ON_WM_VSCROLL()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -122,24 +119,3 @@ BOOL BasesTitle::OnInitDialog()
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-//DeadCode RDH 11Jul99 void BasesTitle::OnMove(int x, int y) 
-//DeadCode RDH 11Jul99 {
-//DeadCode RDH 11Jul99 	CDialog::OnMove(x, y);
-//DeadCode RDH 11Jul99 	
-//DeadCode RDH 11Jul99 	// TODO: Add your message handler code here
-//DeadCode RDH 11Jul99 	
-//DeadCode RDH 11Jul99 }
-//DeadCode RDH 11Jul99 
-//DeadCode RDH 11Jul99 void BasesTitle::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
-//DeadCode RDH 11Jul99 {
-//DeadCode RDH 11Jul99 	// TODO: Add your message handler code here and/or call default
-//DeadCode RDH 11Jul99 	
-//DeadCode RDH 11Jul99 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
-//DeadCode RDH 11Jul99 }
-//DeadCode RDH 11Jul99 
-//DeadCode RDH 11Jul99 void BasesTitle::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
-//DeadCode RDH 11Jul99 {
-//DeadCode RDH 11Jul99 	// TODO: Add your message handler code here and/or call default
-//DeadCode RDH 11Jul99 	
-//DeadCode RDH 11Jul99 	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
-//DeadCode RDH 11Jul99 }

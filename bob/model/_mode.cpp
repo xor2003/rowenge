@@ -68,7 +68,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "..\MODEL\Acmmodel.cpp"
 #include "..\MODEL\Acmsimpl.cpp"
 #include "..\MODEL\Aerodev.cpp"
-//DEADCODE DAW 22/11/99 #include "..\MODEL\Cdat.cpp"
 #include "..\MODEL\Ctrl.cpp"
 #include "..\MODEL\Curves.cpp"
 //#include "..\MODEL\Dervs.cpp"

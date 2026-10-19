@@ -266,7 +266,8 @@ void	formationitem::GetFollower_xyz (FormationTypeIndex	formationtype, Formation
 
 	if(leader == NULL)
 	{
-		leader=*this->leader;
+		if (this->leader)							//RERUN: *NULL field was a nullref deref
+			leader=*this->leader;
 		if (!leader)
 			leader=AirStrucPtr(*this)->fly.leadelt();
 	}
@@ -2888,7 +2889,7 @@ void AirStruc::AutoAccelerate()
 		if (Save_Data.gamedifficulty[GD_TACTICALRANGE])
 			ItemBase::desposrange = MILES05;
 
-		SLong DeltaRange = World.Y - dpflyto->Y;	//CSB 30/06/99	
+		SLong DeltaRange = dpflyto ? World.Y - dpflyto->Y : 0;	//CSB 30/06/99	//RERUN: dpflyto NULL when accel branch skipped
 		if(DeltaRange < 0) DeltaRange *= -1;		//CSB 30/06/99	
 		ItemBase::desposrange += DeltaRange;					//CSB 30/06/99
 
@@ -3455,8 +3456,8 @@ void AirStruc::AutoPreCombat ()
 //------------------------------------------------------------------------------
 COORDS3D*	AirStruc::FindCombatPos ()
 {
-	SLong	desrange=Range,desalt;
-	ANGLES	deshdg;
+	SLong	desrange=Range,desalt=0;	//RERUN: switch has no default - desalt/deshdg could stay garbage
+	ANGLES	deshdg=ANGLES_0Deg;
 	despos	=	ai.unfriendly->World;
 
 
@@ -4165,7 +4166,7 @@ void AirStruc::AutoTakeOff ()
 				ai.PilotSkills.ManStep=TO_RUNWAYPOWER;
 				SetManoeuvreTime(SECS100/2);	//how long to 'blast'
 			}
-			if (lead->ai.PilotSkills.ManStep==ai.PilotSkills.ManStep)
+			if (lead && lead->ai.PilotSkills.ManStep==ai.PilotSkills.ManStep)	//RERUN: lead still NULL here
 			{
 				hdg=lead->hdg;
 				velx=lead->velx;
@@ -6347,6 +6348,7 @@ void AirStruc::AutoBombFollow()
 
 	AutoFollowWpWing();
 
+	if (lf)														//RERUN: every case derefs lf
 	switch(ai.PilotSkills.ManStep)
 	{
 		case 0:
@@ -8096,15 +8098,12 @@ void AirStruc::CalcNewPosWithWind(SLong deltax,SLong deltay,SLong deltaz,SLong g
 //rdh change to MA wind
 //		if (World.Y > groundlevel)
 //		{
-////DeadCode RDH 24Oct96 			deltax +=  Save_Data.wind.velx	* TimerCode::FIXEDFRAMETIME /10;
-////DeadCode RDH 24Oct96 			deltaz +=  Save_Data.wind.velz	* TimerCode::FIXEDFRAMETIME /10;
 //			deltax +=  MMC.wind.velx	* TimerCode::FIXEDFRAMETIME /10;
 //			deltaz +=  MMC.wind.velz	* TimerCode::FIXEDFRAMETIME /10;
 //		}else
 //		{
 //			dhdg = hdg - MMC.wind.direction+ ANGLES_180Deg;
 //			Math_Lib.high_sin_cos (dhdg, sind_hdg, cosd_hdg);
-////DeadCode RDH 24Oct96 			horivel =  Save_Data.wind.speed * cosd_hdg / ANGLES_FRACT;
 //			horivel =  MMC.wind.speed * cosd_hdg / ANGLES_FRACT;
 //			horivel+= velhori;
 //			if ((horivel < 0) ||  (velhori ==0))
@@ -8166,8 +8165,6 @@ void AirStruc::CalcNewPosWithWind(SLong deltax,SLong deltay,SLong deltaz,SLong g
 //	d1 =	airdensityratiosquareroot[altitude_1000m];
 //	d2 =	airdensityratiosquareroot[altitude_1000m+1];
 //	densityratio = (UWord) (d1+ (d2-d1) * (altitude_cm - altitude_1000m*100000)/100000); 
-////DeadCode ARM 27Aug97 	fly.i_a_s = (SWord) ((SLong) vel * densityratio /WORD_FRACT);
-////DeadCode ARM 27Aug97 	fly.i_a_s = (SWord)(fly.pModel->IndicatedAirSpeed * 10);	//ARM 26Aug97
 //
 //}
 //------------------------------------------------------------------------------
@@ -9169,7 +9166,7 @@ Bool AirStruc::SelectBombTarget(Bool NewTarg)
 //CSB					break;
 
 				if( ((AnyoneInPhaseN(2)) && (!AnyoneInPhaseN(1))) || (!NewTarg))
-					if(bomblead->ai.unfriendly)
+					if(bomblead && bomblead->ai.unfriendly)	//RERUN: bomblead stays NULL if no follower found
 					{
 						ai.unfriendly = bomblead->ai.unfriendly;	//CSB 27/05/99	
 						ai.PilotSkills.manoeuvre = (MANOEUVRE)bomblead->ai.PilotSkills.manoeuvre;

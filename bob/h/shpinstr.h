@@ -425,13 +425,6 @@ DOIFNE,
 
 //������������������������������������������������������������������������������
 //������������������������������������������������������������������������������
-//DeadCode RJS 06Apr98 typedef struct _doifflag
-//DeadCode RJS 06Apr98 {
-//DeadCode RJS 06Apr98 	SWord	param1,
-//DeadCode RJS 06Apr98 			param2;
-//DeadCode RJS 06Apr98 }
-//DeadCode RJS 06Apr98 DOIFFLAG,
-//DeadCode RJS 06Apr98 DOIFFLAG_PTR;
 
 //������������������������������������������������������������������������������
 //������������������������������������������������������������������������������
@@ -459,24 +452,9 @@ typedef	struct _dodot
 DODOT,
 *DODOT_PTR;
 
-//DeadCode RJS 03Mar98 //������������������������������������������������������������������������������
-//DeadCode RJS 03Mar98 //������������������������������������������������������������������������������
-//DeadCode RJS 03Mar98 typedef struct _dosmall
-//DeadCode RJS 03Mar98 {
-//DeadCode RJS 03Mar98 	UWord	vertex;
-//DeadCode RJS 03Mar98 	SWord	xcoord, ycoord, zcoord;
-//DeadCode RJS 03Mar98 }
-//DeadCode RJS 03Mar98 DOSMALL,
-//DeadCode RJS 03Mar98 *DOSMALL_PTR;
 
 //������������������������������������������������������������������������������
 //������������������������������������������������������������������������������
-//DeadCode RJS 04Mar98 typedef struct _dotcolour
-//DeadCode RJS 04Mar98 {
-//DeadCode RJS 04Mar98 	UWord	colour;
-//DeadCode RJS 04Mar98 }
-//DeadCode RJS 04Mar98 DOTCOLOUR,
-//DeadCode RJS 04Mar98 *DOTCOLOUR_PTR;
 
 //������������������������������������������������������������������������������
 //������������������������������������������������������������������������������
@@ -917,22 +895,6 @@ typedef struct _doisphere
 DOISPHERE,													//RJS 10Feb98
 *DOISPHERE_PTR;
 
-//DeadCode RJS 16Dec97 typedef struct _doosphere										
-//DeadCode RJS 16Dec97 {																
-//DeadCode RJS 16Dec97 	UByte	flagoffset;											
-//DeadCode RJS 16Dec97 	UWord	vertex;												
-//DeadCode RJS 16Dec97 	SLong 	radius;												
-//DeadCode RJS 16Dec97 	SWord	image;												
-//DeadCode RJS 16Dec97 	SWord	minx;												
-//DeadCode RJS 16Dec97 	SWord	miny;												
-//DeadCode RJS 16Dec97 	SWord	maxx;												
-//DeadCode RJS 16Dec97  	SWord	maxy;												
-//DeadCode RJS 16Dec97 	SWord	width;												
-//DeadCode RJS 16Dec97  	SWord	height;												
-//DeadCode RJS 16Dec97 	UByte	factor;												
-//DeadCode RJS 16Dec97 }																
-//DeadCode RJS 16Dec97 DOOSPHERE,														
-//DeadCode RJS 16Dec97 *DOOSPHERE_PTR;
 
 typedef struct _dorealisphere
 {
@@ -1202,11 +1164,6 @@ typedef	struct	_dotransformlight
 DOTRANSFORMLIGHT,
 *DOTRANSFORMLIGHT_PTR;
 
-//DeadCode RJS 30Apr98 typedef	struct	_doicon
-//DeadCode RJS 30Apr98 {
-//DeadCode RJS 30Apr98 }
-//DeadCode RJS 30Apr98 DOICON,
-//DeadCode RJS 30Apr98 *DOICON_PTR;
 
 typedef	struct	_dodrawipoly
 {
@@ -1314,7 +1271,6 @@ typedef	struct _dolauncher
 	SByte	trailtype;											//RJS 28Jan98
 	UByte	damthresh;											//RJS 02Apr98
 	UWord	damageflag;											//RJS 31Mar98
-//DeadCode RJS 13Mar00 	UWord	TransLauncher;										//RJS 02Apr98
 	UByte	noChildren:7,										//RJS 15Nov99
 			isTwinned:1;										//RJS 15Nov99
 	SByte	hdg;												//RJS 03Dec99
@@ -1404,8 +1360,6 @@ typedef	struct	_dosmktrail
 	UByte	noframes;											//RJS 24Nov98
 	UWord	frametime;											//RJS 24Nov98
 	UByte	minix2,miniy2;										//RJS 25Nov98
-//DeadCode RJS 16Dec99 	UByte	width3,height3;										//RJS 16Dec99
-//DeadCode RJS 16Dec99 	SWord	imagemap3;											//RJS 16Dec99
 }																
 DOSMKTRAIL,														
 *DOSMKTRAIL_PTR;												
@@ -2095,8 +2049,6 @@ DORESETANIM,
 
 typedef struct _maxanimnode										//RJS 08Nov99
 {
-//DeadCode RJS 03Apr00 	float	matrixscale;
-//DeadCode RJS 03Apr00 	SWord	matrix[9];
 	SWord	hdg,pitch,roll;										//RJS 03Apr00
 	SLong	px:11,
 			py:11,

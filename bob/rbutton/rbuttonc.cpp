@@ -337,7 +337,6 @@ void CRButtonCtrl::DoPropExchange(CPropExchange* pPX)
 
 	}
 	m_alignment=m_ResourceNumber>>24;
-//DeadCode MS 04May100 	UByteP(0xB0000)[160*5]='0'+m_alignment;
 	m_ResourceNumber&=0x00ffffff;
 
 	if (pPX->IsLoading())
@@ -441,8 +440,6 @@ void CRButtonCtrl::OnDraw(
 //			m_bHelpButton=TRUE; // remove this if it becomes a persistent property
 //		else
 //			m_bHelpButton=FALSE;
-//DEADCODE JIM 01/06/99 		if(!m_bCloseButton && !m_bTickButton)
-//DEADCODE JIM 01/06/99 			m_bHelpButton=FALSE;
 		if (m_bCloseButton) 
 		{
 			m_closeUpIcon=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_BYEUP));
@@ -771,7 +768,6 @@ void CRButtonCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 void CRButtonCtrl::OnLButtonUp(UINT nFlags, CPoint point) 
 {
 	COleControl::OnLButtonUp(nFlags, point);							//JIM 11Oct00
-//DEADCODE DAW 12/04/99 	if (m_bDisabled) return;
 	ReleaseCapture();
 	InvalidateControl();
 	if (phintbox)
@@ -899,7 +895,6 @@ void  CRButtonCtrl::DisplayHint()
 
 void CRButtonCtrl::OnMouseMove(UINT nFlags, CPoint point) 
 {
-//DeadCode JIM 9Aug00 	if (m_LButtonDown&&m_bMovesParent) m_LButtonDown=FALSE;
 	GetParentWndInfo();
 	
 //TempCode JIM 9Aug00 	ButtonPos buttonpresspos=GetPressMouseOver(point);

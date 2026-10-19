@@ -149,7 +149,6 @@ void	LWTaskAircraft::FillList()
 		do
 		{
 			sq = Node_Data[(SquadNum)pk[i].squadnum];
-//DeadCode JIM 20Oct00 			int am = pk[i].method;
 			if (		(pk[i].method == pk.attackmethod)
 					&&	(	(forcedisplay)
 							||
@@ -257,50 +256,6 @@ void	LWTaskAircraft::Refresh()
 	Profile& pk = Todays_Packages.pack[Todays_Packages.hipack];
 
 
-//DEADCODE  15/02/00 	UByte		wadernum;
-//DEADCODE  15/02/00  	UByte		gruppennum;
-//DEADCODE  15/02/00 	Gruppen* sq = Node_Data[(SquadNum)pk[i].squadnum];
-//DEADCODE  15/02/00 	wadernum = sq->wadernum;
-//DEADCODE  15/02/00  	gruppennum = sq->gruppennum;
-//DEADCODE  15/02/00 	bool forcedisplay = true;
-//DEADCODE  15/02/00 	if (pk.squadlist) 
-//DEADCODE  15/02/00 	{
-//DEADCODE  15/02/00 		do
-//DEADCODE  15/02/00 		{
-//DEADCODE  15/02/00 			sq = Node_Data[(SquadNum)pk[i].squadnum];
-//DEADCODE  15/02/00 			int am = pk[i].method;
-//DEADCODE  15/02/00 			if (		(pk[i].method == pk.attackmethod)
-//DEADCODE  15/02/00 					&&	(	(forcedisplay)
-//DEADCODE  15/02/00 							||
-//DEADCODE  15/02/00 							(unitdisplaylevel == DISPLAY_STAFFEL)
-//DEADCODE  15/02/00 							||
-//DEADCODE  15/02/00 							(	(unitdisplaylevel = DISPLAY_GRUPPE)
-//DEADCODE  15/02/00 								&&	(gruppennum != sq->gruppennum)
-//DEADCODE  15/02/00 							)
-//DEADCODE  15/02/00 							||
-//DEADCODE  15/02/00 							(	(unitdisplaylevel = DISPLAY_GESCHWADER)
-//DEADCODE  15/02/00 								&&	(wadernum != sq->wadernum)
-//DEADCODE  15/02/00 							)
-//DEADCODE  15/02/00 						)
-//DEADCODE  15/02/00 				)
-//DEADCODE  15/02/00 			{
-//DEADCODE  15/02/00 				forcedisplay = false;
-//DEADCODE  15/02/00 				wadernum = sq->wadernum;
-//DEADCODE  15/02/00 				gruppennum = sq->gruppennum;
-//DEADCODE  15/02/00  				CString name = sq->ShortName() + "/";
-//DEADCODE  15/02/00 				name = name + sq->SubName();
-//DEADCODE  15/02/00 				rlistbox->AddString(name,0);
-//DEADCODE  15/02/00 				rlistbox->AddString(GetTargName(pk.packagetarget[pk[i].targetindex].currentid),1);
-//DEADCODE  15/02/00 				rlistbox->AddString(RESLIST(PS_SPARE,pk.packagestatus),2);
-//DEADCODE  15/02/00 				for (int actype = PT_JU87; actype < PT_VEHICLES;actype++)
-//DEADCODE  15/02/00 						if (sq->AcType() == actype)
-//DEADCODE  15/02/00 							me110bomber = false;
-//DEADCODE  15/02/00 				maxunits++;
-//DEADCODE  15/02/00 
-//DEADCODE  15/02/00 			}
-//DEADCODE  15/02/00 			i++;
-//DEADCODE  15/02/00 		}while (i < pk.squadlist);
-//DEADCODE  15/02/00 	}
 	FillList();
 	int i = 0;
  	UByte		gruppennum;
@@ -353,21 +308,6 @@ BOOL LWTaskAircraft::OnInitDialog()
  int LWTaskAircraft::FindSquad(long index)
 {
 	int i = UnitList[index];
-//DEADCODE  15/02/00 	Profile* pk = &Todays_Packages.pack[Todays_Packages.hipack];
-//DEADCODE  15/02/00 	int i=0, j =-1;
-//DEADCODE  15/02/00 	while (		(i < pk->squadlist)
-//DEADCODE  15/02/00 			&&	(j != index)
-//DEADCODE  15/02/00 		)
-//DEADCODE  15/02/00 	{
-//DEADCODE  15/02/00 		if (pk->squadlist[i].method == pk->attackmethod)
-//DEADCODE  15/02/00 		{
-//DEADCODE  15/02/00 			j++;
-//DEADCODE  15/02/00 		}
-//DEADCODE  15/02/00 		i++;
-//DEADCODE  15/02/00 	}
-//DEADCODE  15/02/00 	i--;
-//DEADCODE  15/02/00 	if (j != index)
-//DEADCODE  15/02/00 		i = -1;
 	return(i);
  
 }
@@ -417,7 +357,6 @@ void LWTaskAircraft::OnSelectRlistboxctrl1(long row, long column)
 				TitleBarPtr().OpenSelTrg(FindSquad(row-1), 1, unitdisplaylevel, STM_GROUND);
 		}
 		Todays_Packages.SetTaskData();
-//DeadCode JIM 13Nov00 		pk.ReShareSecondaries();												//JIM 28Aug00
 		AttackMethodField	am=pk.ScanAttackMethods();
 		pk.ReorderPackage(am);
 		pk.CalcRoutePositionsAndTime(pk.primarytargetETA,false);

@@ -41,7 +41,6 @@
 
 //#include "display.h"
 
-//DEADCODE DAW 29/01/00 #include	"files.g"
 enum	FileNum;
 #define	DEFAULT_KEYTEST 0
 
@@ -59,18 +58,7 @@ enum	KeyBounce	{KEYHIT,KEYDBLHIT,KEYHELD,KEYREL,KEYHOT,KEYENDOFLIST};
 //bit 6: RHS Shift
 //bit 7: LHS Shift		//LHS shift			//RHS shift			//Both shifts
 //
-//DEADCODE AMM 07/12/99 enum	KeyShifts	{	KEYSH_none=0,		KEYSH_norm=1,		KEYSH_extsh=2, KEYSH_normext = 3,
-//DEADCODE AMM 07/12/99 						KEYSH_AltL=4,		KEYSH_AltGR=8,		KEYSH_Alt=12,
-//DEADCODE AMM 07/12/99 						KEYSH_CtrlL=16,		KEYSH_CtrlR=32,		KEYSH_Ctrl=48,
-//DEADCODE AMM 07/12/99 						KEYSH_ShiftL=64,	KEYSH_ShiftR=128,	KEYSH_Shift=192
-//DEADCODE AMM 07/12/99 					};
 
-//DEADCODE AMM 07/12/99 enum	KeyShift_BN	{	KEYSH_BN_norm=0,
-//DEADCODE AMM 07/12/99 						KEYSH_BN_extsh=1,
-//DEADCODE AMM 07/12/99 						KEYSH_BN_AltL=2,		KEYSH_BN_AltGR=3,
-//DEADCODE AMM 07/12/99 						KEYSH_BN_CtrlL=4,		KEYSH_BN_CtrlR=5,
-//DEADCODE AMM 07/12/99 						KEYSH_BN_ShiftL=6,		KEYSH_BN_ShiftR=7
-//DEADCODE AMM 07/12/99 					};
 enum	KeyValUI	{KeyValUI_MAX=32767};
 /*#ifdef __BCPLUSPLUS__
 enum	KeyVal3D	{keyVal3D_MAX=TOTALKEYBITFLAGS};
@@ -180,8 +168,6 @@ void	ClearKeyTables();
 public:
 	struct	DPMIMem	{void* flat;};
 DPMIMem	reftable3d,hitqueueui,isr_code,isr_data;				//ARM 25Jun96
-//DeadCode JIM 2Nov00 Bool	ModeIs3D;
-//DeadCode JIM 2Nov00 bool	jshift;
 bool	mshift;
 UWord		lastkeyasciicode;
 //ScreenXY	lastkeymousexy;
@@ -205,7 +191,6 @@ void	(keytests::*KeyFake3dThru) (KeyVal3D,Bool held,Bool hit);
 void	SetMouseShiftMode(DeviceMode);
 void	SetJoystickShiftMode(DeviceMode);
 
-//DeadCode JIM 2Nov00 UByte	MouseMode;
 };
 
 extern	keytests	Key_Tests;

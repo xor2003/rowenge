@@ -81,8 +81,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 	#include	"myAngles.h"
 #include "mathasm.h" //RERUN for SHDIVUNS (was extern asm symbol)
 #include <cmath> //RERUN for std::sqrt
-//DeadCode DAW 15Apr96 	#include	"screen.h"
-//DeadCode DAW 19Mar96 	#include	"getset.h"
 	#include	"mymath.h"
 	#include	"Worldinc.h"
 	#include	"World.h"
@@ -92,10 +90,7 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 //	#include	"winmove.h"										//ARM 25Oct96
 
-//DeadCode JIM 05Jan96 	extern class Main _Main;
-//DeadCode JIM 05Jan96 	extern class Error _Error;			//For 'EmitSysErr'
 
-//DeadCode PD 29Nov95 	class mathlib	_mathlib;
 	class	MathLib	Math_Lib;									//PD 29Nov95
 
 #define	sin_index	0
@@ -547,47 +542,6 @@ void MathLib::SetRndLookUp (UWord n, UWord val)					//ARM 04Sep96
 }																//ARM 04Sep96
 
 
-//DEADCODE DAW 08/05/00 //////////////////////////////////////////////////////////////////////
-//DEADCODE DAW 08/05/00 //
-//DEADCODE DAW 08/05/00 // Function:    FillFastSqrt
-//DEADCODE DAW 08/05/00 // Date:		08/05/00
-//DEADCODE DAW 08/05/00 // Author:		DAW
-//DEADCODE DAW 08/05/00 //
-//DEADCODE DAW 08/05/00 //Description: Fast square root using 2 digit rule.
-//DEADCODE DAW 08/05/00 //	(1.0 - 10.0] * base^exponent SQUARED = (1.0 - 100.0] * base^2*exponent
-//DEADCODE DAW 08/05/00 //So square root should input 2 digits worth.
-//DEADCODE DAW 08/05/00 //////////////////////////////////////////////////////////////////////
-//DEADCODE DAW 08/05/00 One for the future...
-//DEADCODE DAW 08/05/00 Need to test exact bit patterns.
-//DEADCODE DAW 08/05/00
-//DEADCODE DAW 08/05/00 UWord	MathLib::SqrtLookup[65536];
-//DEADCODE DAW 08/05/00
-//DEADCODE DAW 08/05/00 void	MathLib::FillFastSqrt()
-//DEADCODE DAW 08/05/00 {
-//DEADCODE DAW 08/05/00 	union
-//DEADCODE DAW 08/05/00 	{
-//DEADCODE DAW 08/05/00 		float	f;
-//DEADCODE DAW 08/05/00 		ULong	i;
-//DEADCODE DAW 08/05/00 	}	x,y,z;
-//DEADCODE DAW 08/05/00 	x.f=2.0;
-//DEADCODE DAW 08/05/00 	for(int i=0;i!=65536;x.i+=0x100,i++);
-//DEADCODE DAW 08/05/00 	{
-//DEADCODE DAW 08/05/00 		y.f=SquareRoot(x.f);
-//DEADCODE DAW 08/05/00 		SqrtLookup[i]=(y.i>>7)&0xffff;
-//DEADCODE DAW 08/05/00 	}
-//DEADCODE DAW 08/05/00 }
-//DEADCODE DAW 08/05/00
-//DEADCODE DAW 08/05/00 float	MathLib::FastSqrt(float in)
-//DEADCODE DAW 08/05/00 {
-//DEADCODE DAW 08/05/00 	union
-//DEADCODE DAW 08/05/00 	{
-//DEADCODE DAW 08/05/00 		float	f;
-//DEADCODE DAW 08/05/00 		ULong	i;
-//DEADCODE DAW 08/05/00 	}	x,y,z;
-//DEADCODE DAW 08/05/00 	x.f=in;
-//DEADCODE DAW 08/05/00 	y.i=(( ((x.i+(1<<23))&0x7f800000))>>1)+(126<<22)+(SqrtLookup[(x.i>>8)&0xffff]<<7);
-//DEADCODE DAW 08/05/00
-//DEADCODE DAW 08/05/00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure	sin_cos
 //------------------------------------------------------------------------------
@@ -695,21 +649,6 @@ void MathLib::high_sin_cos(ANGLES ang, Float& sin_ang, Float& cos_ang)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //Looking for exact matches... do not use!
-//DeadCode JIM 20Oct00 ANGLES MathLib::arcsin(SWord ax)
-//DeadCode JIM 20Oct00 {
-//DeadCode JIM 20Oct00 	ANGLES ang;
-//DeadCode JIM 20Oct00 	SWord i;
-//DeadCode JIM 20Oct00
-//DeadCode JIM 20Oct00 	for (i=0;i<256;i++)											//RJS 17Nov97
-//DeadCode JIM 20Oct00 	{															//RJS 17Nov97
-//DeadCode JIM 20Oct00 		if (sincos_table[i]==ax)								//RJS 17Nov97
-//DeadCode JIM 20Oct00 		{														//RJS 17Nov97
-//DeadCode JIM 20Oct00 			ang =(Angles) i;									//RJS 17Nov97
-//DeadCode JIM 20Oct00 			break;												//RJS 17Nov97
-//DeadCode JIM 20Oct00 		}														//RJS 17Nov97
-//DeadCode JIM 20Oct00 	}															//RJS 17Nov97
-//DeadCode JIM 20Oct00 	return(ang);
-//DeadCode JIM 20Oct00 }
 /*
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		high_arc_cos
@@ -791,21 +730,6 @@ ANGLES MathLib::high_arc_sin(SWord sa)
 //Externals
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-//DeadCode JON 30Aug00 ANGLES MathLib::arccos(SWord ax)
-//DeadCode JON 30Aug00 {
-//DeadCode JON 30Aug00 	ANGLES ang;
-//DeadCode JON 30Aug00 	SWord i;
-//DeadCode JON 30Aug00
-//DeadCode JON 30Aug00 	for (i=0;i<256;i++)
-//DeadCode JON 30Aug00 		{
-//DeadCode JON 30Aug00 			if (sincos_table[i+cos_index]==ax)
-//DeadCode JON 30Aug00 				{
-//DeadCode JON 30Aug00 					ang = (Angles) i;
-//DeadCode JON 30Aug00 				}
-//DeadCode JON 30Aug00 		}
-//DeadCode JON 30Aug00 	return(ang);
-//DeadCode JON 30Aug00
-//DeadCode JON 30Aug00 }
 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -849,23 +773,16 @@ ANGLES MathLib::arctan(SLong dx, SLong dy)
 				}
 			if (dy<0)
 				{
-//DeadCode JIM 26Sep96 					temp = dy;
 					dy = -dy;
 					if (dx<=dy)
 						{
-//DeadCode JIM 26Sep96 							temp = dx;
-//DeadCode JIM 26Sep96 							dx = temp * 256;
 							temp = SHDIVUNS(dx,8,dy);
-//DeadCode JIM 26Sep96 							temp2 = ;
 							ang= (Angles) (ANGLES_180Deg - matan[temp]);
 							return (ang);
 						}
 					else  //i.e if dx>dy
 						{
-//DeadCode JIM 26Sep96 							temp = dy;
-//DeadCode JIM 26Sep96 							dy = temp * 256;
 							temp = SHDIVUNS(dy,8,dx);
-//DeadCode JIM 26Sep96 							temp2 = ;
 							ang = (Angles) (ANGLES_90Deg + matan[temp]);
 							return (ang);
 						}
@@ -874,19 +791,13 @@ ANGLES MathLib::arctan(SLong dx, SLong dy)
 				{
 					if (dx<=dy)
 						{
-//DeadCode JIM 26Sep96 							temp = dx;
-//DeadCode JIM 26Sep96 							dx = temp * 256;
 							temp = SHDIVUNS(dx,8,dy);
-//DeadCode JIM 26Sep96 							temp2 = ;
 							ang= (Angles) matan[temp];
 							return (ang);
 						}
 					else  //i.e if dx>dy
 						{
-//DeadCode JIM 26Sep96 							temp = dy;
-//DeadCode JIM 26Sep96 							dy = temp * 256;
 							temp = SHDIVUNS(dy,8,dx);
-//DeadCode JIM 26Sep96 							temp2 = ;
 							ang = (Angles) (ANGLES_90Deg - matan[temp]);
 							return (ang);
 						}
@@ -903,25 +814,16 @@ ANGLES MathLib::arctan(SLong dx, SLong dy)
 				}
 			if (dy<0)
 				{
-//DeadCode JIM 26Sep96 					temp = dy;
 					dy = -dy;
-//DeadCode JIM 26Sep96 					temp = dx;
-//DeadCode JIM 26Sep96 					dx = -temp;
 					if (dx<=dy)
 						{
-//DeadCode JIM 26Sep96 							temp = dx;
-//DeadCode JIM 26Sep96 							dx= temp * 256;
 							temp = SHDIVUNS(dx,8,dy);
-//DeadCode JIM 26Sep96 							temp2 = ;
 							ang = (Angles) (matan[temp] + ANGLES_180Deg);
 							return (ang);
 						}
 					else
 						{
-//DeadCode JIM 26Sep96 							temp = dy;
-//DeadCode JIM 26Sep96 							dy = temp * 256;
 							temp = SHDIVUNS(dy,8,dx);
-//DeadCode JIM 26Sep96 							temp2 =;
 							ang = (Angles) (ANGLES_270Deg - matan[temp]);
 							return (ang);
 
@@ -929,30 +831,20 @@ ANGLES MathLib::arctan(SLong dx, SLong dy)
 				}
 			if (dy>0)
 				{
-//DeadCode JIM 26Sep96 					temp = dx;
-//DeadCode JIM 26Sep96 					dx = - temp;
 					if (dx<=dy)
 						{
-//DeadCode JIM 26Sep96 							temp = dx;
-//DeadCode JIM 26Sep96 							dx = temp * 256;
 							temp = SHDIVUNS(dx,8,dy);
-//DeadCode JIM 26Sep96 							temp2 = ANGLES_0Deg;
 							ang = (Angles)( - matan[temp]);
 							return (ang);
 						}
 					else
 						{
-//DeadCode JIM 26Sep96 							temp = dy;
-//DeadCode JIM 26Sep96 							dy = temp * 256;
 							temp = SHDIVUNS(dy,8,dx);
-//DeadCode JIM 26Sep96 							temp = ;
 							ang = (Angles)( ANGLES_270Deg+matan[temp]);
 							return (ang);
 						}
 				}
 		}
-//DeadCode JIM 26Sep96 	if (dx==0)
-//DeadCode JIM 26Sep96 		{
 			if (dy==0)
 				{
 					ang = ANGLES_0Deg;	//ANGLES_270Deg; - result not really defined//PD 24May96
@@ -965,7 +857,6 @@ ANGLES MathLib::arctan(SLong dx, SLong dy)
 				{
 					ang = ANGLES_0Deg;
 				}
-//DeadCode JIM 26Sep96 		}
 	return (ang);
 */
 }
@@ -986,13 +877,10 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 {
 	ANGLES ang;
 
-//DeadCode JIM 27Sep96 	SLong dx,dy;
 	SLong temp,temp2;
 
 	SWord	thistan;
 
-//DeadCode JIM 27Sep96 	dx = deltax;
-//DeadCode JIM 27Sep96 	dy = deltay;
 
 	if (dx>0)
 	{
@@ -1015,7 +903,6 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 			else  //i.e if dx>dy
 			{
 				temp 	= SHDIVUNS(dy,16,dx);
-//DeadCode JIM 26Sep96 				temp	= (dy<<16)/dx;
 				temp2	= temp &0x0FF;
 				temp	>>= 8;
 				thistan	= matan[temp];
@@ -1029,7 +916,6 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 			if (dx<=dy)
 			{
 				temp 	= SHDIVUNS(dx,16,dy);
-//DeadCode JIM 26Sep96 				temp	= (dx<<16)/dy;
 				temp2	= temp & 0x0FF;
 				temp	>>= 8;
 				thistan	= matan[temp];
@@ -1040,7 +926,6 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 			else  //i.e if dx>dy
 			{
 				temp 	= SHDIVUNS(dy,16,dx);
-//DeadCode JIM 26Sep96 				temp 	= (dy<<16)/dx;
 				temp2 	= temp & 0x0FF;
 				temp	>>= 8;
 				thistan = matan[temp];
@@ -1062,7 +947,6 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 			if (dx<=dy)
 			{
 				temp 	= SHDIVUNS(dx,16,dy);
-//DeadCode JIM 26Sep96 				temp 	= (dx<<16)/dy;
 				temp2 	= temp & 0x0FF;
 				temp	>>= 8;
 				thistan	= matan[temp];
@@ -1073,7 +957,6 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 			else
 			{
 				temp 	= SHDIVUNS(dy,16,dx);
-//DeadCode JIM 26Sep96 				temp 	= (dy<<16)/dx;
 				temp2 	= temp & 0x0FF;
 				temp	>>= 8;
 				thistan	= matan[temp];
@@ -1088,7 +971,6 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 			if (dx<=dy)
 			{
 				temp 	= SHDIVUNS(dx,16,dy);
-//DeadCode JIM 26Sep96 				temp 	= (dx<<16)/dy;
 				temp2 	= temp & 0x0FF;
 				temp	>>=8;
 				thistan	= matan[temp];
@@ -1099,7 +981,6 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 			else
 			{
 				temp 	= SHDIVUNS(dy,16,dx);
-//DeadCode JIM 26Sep96 				temp 	= (dy<<16)/dx;
 				temp2 	= temp & 0x0FF;
 				temp	>>=	8;
 				thistan	= matan[temp];
@@ -1109,15 +990,11 @@ ANGLES MathLib::HighArcTan(SLong dx, SLong dy)
 			}
 		}
 	}
-//DeadCode JIM 26Sep96 	if (dx==0)
-//DeadCode JIM 26Sep96 	{
 //TempCode PD 04Jul96 		if (dy==0)
 //TempCode PD 04Jul96 			_Error.EmitSysErr(__FILE__":ArcTan(0/0) is undefined");
 
 		if (dy<0)	return (ANGLES_180Deg);
 
-//DeadCode JIM 26Sep96 		if (dy>0)	return (ANGLES_0Deg);
-//DeadCode JIM 26Sep96 	}
 	return (ANGLES_0Deg);
 }
 
@@ -1151,41 +1028,12 @@ SWord MathLib::tan(ANGLES ang)
 		{
 			ang = (Angles)(ang & ANGLES_90Deg-1);
 			ang = (Angles)(ang>>6);
-//DeadCode AMM 30Aug00 			tan_ang = -tan_table[256-ang];						//RDH 19Feb96
 			tan_ang = -tan_table[255-ang];								//AMM 30Aug00
 		}
 
 	return(tan_ang);
 }
 
-//DeadCode JON 30Aug00 SLong MathLib::hightan(ANGLES ang)
-//DeadCode JON 30Aug00 {
-//DeadCode JON 30Aug00 	ANGLES a0, angmod;
-//DeadCode JON 30Aug00 	SLong tan0, tan1, reqtan;
-//DeadCode JON 30Aug00
-//DeadCode JON 30Aug00 	if (!(ang & ANGLES_90Deg))										//RDH 30Nov95
-//DeadCode JON 30Aug00 	{
-//DeadCode JON 30Aug00 		angmod = (Angles)(ang & ANGLES_90Deg-1);
-//DeadCode JON 30Aug00 		a0 = angmod = (Angles)(angmod>>6);
-//DeadCode JON 30Aug00 		tan0 = tan_table[angmod];
-//DeadCode JON 30Aug00 		if (angmod < 255)
-//DeadCode JON 30Aug00 			angmod++;
-//DeadCode JON 30Aug00 		tan1 = tan_table[angmod];
-//DeadCode JON 30Aug00 	}
-//DeadCode JON 30Aug00 	else
-//DeadCode JON 30Aug00 	{
-//DeadCode JON 30Aug00 		angmod = (Angles)(ang & ANGLES_90Deg-1);
-//DeadCode JON 30Aug00 		a0 = angmod = (Angles)(angmod>>6);
-//DeadCode JON 30Aug00 		tan0 = -tan_table[256-angmod];						//RDH 19Feb96
-//DeadCode JON 30Aug00 		if (angmod > 0)
-//DeadCode JON 30Aug00 			angmod++;
-//DeadCode JON 30Aug00 		tan1 = -tan_table[256 - angmod];
-//DeadCode JON 30Aug00 	}
-//DeadCode JON 30Aug00
-//DeadCode JON 30Aug00 //	reqtan = 256 * tan0 + 256 * (tan1 - tan0) * (ang - a0 * 64)/64
-//DeadCode JON 30Aug00 	reqtan = 256 * tan0 + 4 * (tan1 - tan0) * (ang - a0 * 64);
-//DeadCode JON 30Aug00 	return (reqtan);
-//DeadCode JON 30Aug00 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Author		Martin Alderton
 //Date			Mon 18 Sep 1995
@@ -1398,7 +1246,6 @@ UWord MathLib::Distance_Unsigned(UWord dx, UWord dy)
  		temp = dy * ANGLES_45Deg /dx;							//RDH 30Nov95
 		sin_cos((Angles) temp,sin_ang,cos_ang);
 		temp = (sin_ang * dy /ANGLES_FRACT) + (cos_ang *dx /ANGLES_FRACT);
-//DeadCode MGA 19Sep95 		return(temp);
 		}
 	else
 		{
@@ -1484,8 +1331,6 @@ void MathLib::Intercept (SLong deltax,SLong deltay,SLong deltaz,
 
 {
 
-//DeadCode JIM 26Sep96 	SLong	modifier,maxdelta;
-//DeadCode JIM 26Sep96 	SWord	moddeltax,moddeltay,moddeltaz;
 	ULong	range2d;
 
 	Range = MathLib::distance3d(deltax,deltay,deltaz);
@@ -1499,12 +1344,8 @@ void MathLib::HighIntercept (SLong deltax,SLong deltay,SLong deltaz,
 
 {
 
-//DeadCode JIM 26Sep96 	SLong	modifier,maxdelta;
-//DeadCode JIM 26Sep96 	SWord	moddeltax,moddeltay,moddeltaz;
 	ULong	range2d;
 
-//DeadCode JIM 26Sep96 	Range = MathLib::distance3d(deltax,deltay,deltaz);
-//DeadCode JIM 26Sep96 	range2d = MathLib::Distance2d(deltax,deltaz);
 	HdgIntercept = MathLib::HighArcTan(deltax,deltaz);
 	SWord	s,c;
 
@@ -1546,7 +1387,6 @@ void MathLib::InterceptHdg(ULong Wx1, ULong Wz1, ULong Wx2, ULong Wz2, ULong &di
 
 }
 
-//DeadCode DAW 28Nov95 mathlib	Math_Lib;
 
 ULong	MathLib::a2iend(string&	source)
 {
@@ -1568,39 +1408,6 @@ ULong	MathLib::a2iend				//returns numeric value found
 	}
 	return(retval);
 }
-//DeadCode JIM 02May96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 02May96 //Procedure		Pos
-//DeadCode JIM 02May96 //Author		R. Hyde
-//DeadCode JIM 02May96 //Date			Fri 27 Oct 1995
-//DeadCode JIM 02May96 //
-//DeadCode JIM 02May96 //Description	New, efficient inline version.
-//DeadCode JIM 02May96 //
-//DeadCode JIM 02May96 //Inputs
-//DeadCode JIM 02May96 //
-//DeadCode JIM 02May96 //Returns
-//DeadCode JIM 02May96 //
-//DeadCode JIM 02May96 //------------------------------------------------------------------------------
-//DeadCode JIM 02May96 void MathLib::Pos (SWord inputvar, SWord &posvar,SWord &signvar)
-//DeadCode JIM 02May96
-//DeadCode JIM 02May96 {
-//DeadCode JIM 02May96 	if (inputvar >= 0)
-//DeadCode JIM 02May96 	{
-//DeadCode JIM 02May96  		signvar = POSITIVE;
-//DeadCode JIM 02May96 		posvar = inputvar;
-//DeadCode JIM 02May96 	}else
-//DeadCode JIM 02May96 	{
-//DeadCode JIM 02May96 		signvar = NEGATIVE;
-//DeadCode JIM 02May96 		if (inputvar == -32768)	//I CANT DO THIS EFFICIENTLY!	//RDH 18Dec95
-//DeadCode JIM 02May96 		{						//WE NEVER USED TO DO IT!		//RDH 18Dec95
-//DeadCode JIM 02May96 			posvar = 32767;										//RDH 18Dec95
-//DeadCode JIM 02May96 		}else													//RDH 18Dec95
-//DeadCode JIM 02May96 		{
-//DeadCode JIM 02May96 			posvar = (SWord)-inputvar;
-//DeadCode JIM 02May96 		}
-//DeadCode JIM 02May96 	}
-//DeadCode JIM 02May96
-//DeadCode JIM 02May96 }
-//DeadCode JIM 02May96
 
 
 

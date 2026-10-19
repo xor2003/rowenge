@@ -38,7 +38,6 @@ public:
 	ULong pOffset;	// offset from AirStrucPtr of destination
 	SLong pSrcOffset;	// offset from AirStrucPtr of destination
 
-//DeadCode DAW 11Nov97 	UByte* pAnimByte;
 	void* pAnim;	// destination
 	void* pSrce;	// source
 

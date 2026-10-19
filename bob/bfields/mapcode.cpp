@@ -70,12 +70,10 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //
 #include	"dosdefs.h"
 #define		F_COMMON
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"uniqueID.h"
 #include	"bfnumber.h"
 #include	"persons2.h"
 #include	"world.h"
-//DEADCODE DAW 03/02/00 #include	"NODE.H"
 #include	"fileman.h"
 #include "savegame.h"
 #include	"missman2.h"
@@ -115,7 +113,6 @@ static CString	LoadResString(int resnum)
 //////////////////////////////////////////////////////////////////////
 void	Persons4::StartUpMapWorld(bool loadpackages, char* name)
 {		//do whenever we go to the map screen
-//DeadCode CSB 3Oct00 	Mono_Text.Print((UByteP)"StartUpMapWorld(");
 	pItem=WorldStuff::pItem;
 	{	for (int i=0;i<PITEMTABLESIZE;i++)
 		{	delete(pItem[i]);
@@ -128,59 +125,8 @@ void	Persons4::StartUpMapWorld(bool loadpackages, char* name)
 		Persons_4.LoadSubPiece(NULL,FIL_1_MAINWLD,0,LOAD); //RJS 16/11/99
 //TEMPCODE RJS 16/11/99 		Persons_4.LoadSubPiece(NULL,FIL_1_convoy,0,LOAD);
 	}
-//DeadCode CSB 3Oct00 	Mono_Text.Print((UByteP)"1");
-//DeadCode CSB 3Oct00 	Mono_Text.Print((UByteP)"2");
 	Node_Data.LoadConvoys();
-//DeadCode CSB 3Oct00 	Mono_Text.Print((UByteP)"3");
 
-//DEADCODE JIM 16/11/99 	for (int front=0;front<3;front++)		//JIM EDIT HERE		//JIM 18Feb99
-//DEADCODE JIM 16/11/99 //DeadCode DAW 27Jun99 		if (SupplyTree::supplylines[front]->frontline->status==FRONTLINE)
-//DEADCODE JIM 16/11/99 		{
-//DEADCODE JIM 16/11/99 			FileNum	bf=FIL_NULL;
-//DEADCODE JIM 16/11/99 			FileNum	bn=FIL_NULL;
-//DEADCODE JIM 16/11/99 			if (	SupplyTree::supplylines[front]->initiative==REDATTACKING
-//DEADCODE JIM 16/11/99 				||	SupplyTree::supplylines[front]->initiative==REDINITIATIVE
-//DEADCODE JIM 16/11/99 				)
-//DEADCODE JIM 16/11/99 			{
-//DEADCODE JIM 16/11/99 				bf=SupplyTree::supplylines[front]->frontline->bluefrontBF->bf;
-//DEADCODE JIM 16/11/99 				bn=SupplyTree::supplylines[front]->frontline->bluefrontBF->nodetree;
-//DEADCODE JIM 16/11/99 			}
-//DEADCODE JIM 16/11/99 			else
-//DEADCODE JIM 16/11/99 			if (SupplyTree::supplylines[front]->initiative==BLUEATTACKING
-//DEADCODE JIM 16/11/99 				||	SupplyTree::supplylines[front]->initiative==BLUEINITIATIVE
-//DEADCODE JIM 16/11/99 				)
-//DEADCODE JIM 16/11/99 			{
-//DEADCODE JIM 16/11/99 				bf=SupplyTree::supplylines[front]->frontline->redfrontBF->bf;
-//DEADCODE JIM 16/11/99 				bn=SupplyTree::supplylines[front]->frontline->redfrontBF->nodetree;
-//DEADCODE JIM 16/11/99 			}
-//DEADCODE JIM 16/11/99 			if (bf)
-//DEADCODE JIM 16/11/99 			{
-//DEADCODE JIM 16/11/99 				Persons4	Persons_4;
-//DEADCODE JIM 16/11/99 				Persons_4.LoadSubPiece(NULL,bf,front+1,LOAD);
-//DEADCODE JIM 16/11/99 				SupplyTree::supplylines[front]->groundbattle.LoadBattleNodes(bn);
-//DEADCODE JIM 16/11/99 				SupplyTree::supplylines[front]->groundbattle.LinkBattleNodes();
-//DEADCODE JIM 16/11/99
-//DEADCODE JIM 16/11/99 #ifndef NDEBUG
-//DEADCODE JIM 16/11/99 				CString missingnodes="";
-//DEADCODE JIM 16/11/99 				for(int node=0;node<SupplyTree::supplylines[front]->groundbattle.usednodes;node++)
-//DEADCODE JIM 16/11/99 				{
-//DEADCODE JIM 16/11/99 					SuperBattleNode* bn=&SupplyTree::supplylines[front]->groundbattle.nodelist[node];
-//DEADCODE JIM 16/11/99 					CString onenode="";
-//DEADCODE JIM 16/11/99 					if (bn->in.uid && Persons2::ConvertPtrUID(bn->in.uid)==NULL)
-//DEADCODE JIM 16/11/99 						onenode+=CSprintf(" I:%04x",bn->in.uid);
-//DEADCODE JIM 16/11/99 					if (bn->out.uid && Persons2::ConvertPtrUID(bn->out.uid)==NULL)
-//DEADCODE JIM 16/11/99 						onenode+=CSprintf(" O:%04x",bn->out.uid);
-//DEADCODE JIM 16/11/99 					if (bn->mainuid && Persons2::ConvertPtrUID(bn->mainuid)==NULL)
-//DEADCODE JIM 16/11/99 						onenode+=CSprintf(" M:%04x",bn->mainuid);
-//DEADCODE JIM 16/11/99 					if (onenode!="")
-//DEADCODE JIM 16/11/99 						missingnodes+=LoadResString(bn->mainids)+onenode+"\n";
-//DEADCODE JIM 16/11/99 				}
-//DEADCODE JIM 16/11/99 				if (missingnodes!="")
-//DEADCODE JIM 16/11/99 					_Error.EmitSysErr(CString("The following nodes are not in the file %s:\n")+missingnodes,File_Man.namenumberedfile(bf));
-//DEADCODE JIM 16/11/99 #endif
-//DEADCODE JIM 16/11/99
-//DEADCODE JIM 16/11/99 			}
-//DEADCODE JIM 16/11/99 		}			   //END OF JIM EDIT
 	if(loadpackages)
 	{
 		char buffer[fileman::pathnamesize];
@@ -198,18 +144,8 @@ void	Persons4::StartUpMapWorld(bool loadpackages, char* name)
 			if (bis.is_open())
 				Todays_Packages.LoadGame(bis);
 		}
-//DeadCode CSB 3Oct00 	Mono_Text.Print((UByteP)"4");
 		Persons3::RestoreAircraftPositions();
 	}
-//DEADCODE DAW 27/03/00 	for (int i=0,f=0;i<Profile::MAX_PACKS;i++)
-//DEADCODE DAW 27/03/00 	{
-//DEADCODE DAW 27/03/00 		if (Todays_Packages.PreLoad(i))
-//DEADCODE DAW 27/03/00 		{
-//DEADCODE DAW 27/03/00 			Todays_Packages.PreLoad(i,FIL_RUNTIMEPACK0,NULL,true,true,f);
-//DEADCODE DAW 27/03/00 			Todays_Packages.Load(i,FIL_RUNTIMEPACK0,NULL,f);
-//DEADCODE DAW 27/03/00 			f++;
-//DEADCODE DAW 27/03/00 		}
-//DEADCODE DAW 27/03/00 	}
 //	Miss_Man.currcampaignnum = MissMan::SCRAMBLECAMPAIGN;		//RDH 16Apr96
 //	Miss_Man.camp = Miss_Man.campaigntable[MissMan::SCRAMBLECAMPAIGN];
 
@@ -218,7 +154,6 @@ void	Persons4::StartUpMapWorld(bool loadpackages, char* name)
 //	MMC.currtime = HR11;
 
 //	MMC.Sky.SetMissionConditions ();
-//DeadCode CSB 3Oct00 	Mono_Text.Print((UByteP)")StartUpMapWorld");
 
 }
 
@@ -283,41 +218,7 @@ void	Persons4::ShutDownMapWorld()
 }
 
 
-//DeadCode JIM 29Oct00 bool	PackageList::PreLoad(int packnum,FileNum fil,const char* name,bool copyprimary,bool copysecondaries,int filecount)
-//DeadCode JIM 29Oct00 {	//need to pre-read package header..
-//DeadCode JIM 29Oct00 	if (fil || copyprimary || copysecondaries)
-//DeadCode JIM 29Oct00 	{
-//DeadCode JIM 29Oct00 		if (!fil)
-//DeadCode JIM 29Oct00 			fil=FileNum(FIL_RUNTIMEPACK0+packnum);
-//DeadCode JIM 29Oct00 		if (name)
-//DeadCode JIM 29Oct00 			fil = File_Man.fakefile(fil,name);
-//DeadCode JIM 29Oct00 		fil=FileNum(fil+filecount);
-//DeadCode JIM 29Oct00 		fileblock f(fil);
-//DeadCode JIM 29Oct00 		pack[packnum].DecodePackage((string)f.getdata(),copyprimary);
-//DeadCode JIM 29Oct00 		return true;
-//DeadCode JIM 29Oct00 	}
-//DeadCode JIM 29Oct00 	else
-//DeadCode JIM 29Oct00 		return (pack[packnum].packagestatus!=Profile::PS_SPARE);
-//DeadCode JIM 29Oct00 }
-//DeadCode JIM 17Aug00 void	PackageList::Load(int packnum,FileNum fil,const char* name,int filecount)
-//DeadCode JIM 17Aug00 {
-//DeadCode JIM 17Aug00 		Persons4	Persons_4;
-//DeadCode JIM 17Aug00 		if (!fil)
-//DeadCode JIM 17Aug00 			fil=FileNum(FIL_RUNTIMEPACK0+packnum);
-//DeadCode JIM 17Aug00 		if (name)
-//DeadCode JIM 17Aug00 			fil = File_Man.fakefile(fil,name);
-//DeadCode JIM 17Aug00 		fil=FileNum(fil+filecount);
-//DeadCode JIM 17Aug00
-//DeadCode JIM 17Aug00 		pack[packnum].SetTargetUIDs();
-//DeadCode JIM 17Aug00 		Persons_4.LoadSubPiece(NULL,fil,Persons4::LOADEDBFS+packnum,Persons4::LOAD);
-//DeadCode JIM 17Aug00 		FixupAircraft(packnum);
-//DeadCode JIM 17Aug00 		pack[packnum].CountWaypoints();
-//DeadCode JIM 17Aug00 }
 
-//DEADCODE JIM 31/03/00 void Profile::SetACTypesFromGeneric()
-//DEADCODE JIM 31/03/00 {
-//DEADCODE JIM 31/03/00
-//DEADCODE JIM 31/03/00 }
 
 
 void	PackageList::SaveGame(BOStream& bos)
@@ -335,10 +236,8 @@ void	PackageList::SaveGame(BOStream& bos)
 
 void	PackageList::FixupAircraft(int packnum)
 {
-//DeadCode JIM 20Oct00 		int wave=-1;
 		int group;
 		int i;
-//DeadCode JIM 20Oct00 		UniqueID	baseac=Persons2::assignuid(SagBAND);
 
 		//NOTE:
 			//Coming back from the 3d, the information represented here
@@ -348,8 +247,6 @@ void	PackageList::FixupAircraft(int packnum)
 			//This note is repeated in Persons4.cpp
 
 
-//DeadCode JIM 17Aug00 		UniqueID wpu=UniqueID(GR_lastroutefirstwaypoint);
-//DeadCode JIM 17Aug00 		pack[packnum].route=wpu;
 	//fix up references to waypoints:
 	UniqueID u=pack[packnum].route;
 	if (Persons2::ConvertPtrUID(u))
@@ -387,7 +284,6 @@ void	PackageList::FixupAircraft(int packnum)
 			info_waypointPtr w=Persons2::ConvertPtrUID(a->wpref);
 			if (w->applygroup!=ENABLE_COMPLEX_VAL)
 			{
-//DeadCode MS 26Sep00 				assert(	w->target.Evaluate()==J->homebase.Evaluate());
 				if(	w->target.Evaluate()!=pack[packnum].squadlist[i].Squadron().homeairfield)
 					INT3;
 			}
@@ -406,8 +302,6 @@ void	PackageList::LoadGame(BIStream& bis)
 	bis>>(ULong&)hiwp;
 	for (int p=0;p<Profile::MAX_PACKS;p++)
 		ClearPack(p);
-//DEADCODE JIM 20/06/00 	oldhipack = hipack=oldhisquad=hisquad=0;//wave=higroup=0;								  //DAW 24/11/99
-//DEADCODE JIM 20/06/00 	hiwp=UID_NULL;
 
 	enum	{SIZ=32*1024,SIZ2=2*SIZ};
 	char* buffer=new char[SIZ2];										//JIM 31/05/00

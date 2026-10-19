@@ -271,18 +271,9 @@ void RAFDirectives::Refresh()
 	CRRadio* pradio;
 
 	pradio=GETDLGITEM(IDC_RRADIOSIZE);
-//DeadCode RDH 2Aug00 	pradio->AddButton(RESSTRING(L_SQUADRONORLESS));
-//DeadCode RDH 2Aug00 	pradio->AddButton(RESSTRING(PAIREDSQUADRONS));
-//DeadCode RDH 2Aug00 	pradio->AddButton(RESSTRING(L_BIGWING));
-//DeadCode RDH 2Aug00 
 	pradio->SetCurrentSelection(dr->tempdir.unitsize);
 
  	pradio=GETDLGITEM(IDC_RRADIO_CONVOYSUPPORT);
-//DeadCode RDH 2Aug00 	pradio->AddButton(RESSTRING(L_NORESPONSE));
-//DeadCode RDH 2Aug00 	pradio->AddButton(RESSTRING(30RESPONSE));
-//DeadCode RDH 2Aug00 	pradio->AddButton(RESSTRING(60RESPONSE));
-//DeadCode RDH 2Aug00 	pradio->AddButton(RESSTRING(MATCHEDRESPONSE));
-//DeadCode RDH 2Aug00 
 	float ind = dr->tempdir.convoylevel * 3.1;
 	pradio->SetCurrentSelection((int)ind);
 
@@ -290,9 +281,6 @@ void RAFDirectives::Refresh()
 //TEMPCODE RDH 11/05/00 	float sq  = dr->tempdir.interceptbeforetarget;
 //TEMPCODE RDH 11/05/00 	sq = sq*20;
 //TEMPCODE RDH 11/05/00 
-//DEADCODE RDH 11/05/00 	spinbut=GETDLGITEM(IDC_RSPINBUT_INTERCEPTBEFORE);
-//DEADCODE RDH 11/05/00 	spinbut->Clear()->MakeNumList(21,0,5)->SetIndex(sq);
-//DEADCODE RDH 11/05/00 
 	b = GETDLGITEM(IDC_TICK_INTERCEPT);
 	b->SetPressed(dr->tempdir.interceptbeforetarget);
 
@@ -356,7 +344,6 @@ void RAFDirectivesResults::FindSquadsAvail(RAFDirectivesResults* dr)
 	while (		(Node_Data.squadron[i].squadron != SQ_ZERO)
 		  )
 	{
-//DeadCode JIM 20Oct00 		PlaneTypeSelect	actype = Node_Data.squadron[i].AcType();
 
 		UniqueID uid = Node_Data.squadron[i].homeairfield;
 		TargetFighterField* af;
@@ -383,12 +370,6 @@ void RAFDirectivesResults::FindSquadsAvail(RAFDirectivesResults* dr)
 	int	gr11total=dr->availsquads.gr11total;
 	int	gr1012total=dr->availsquads.gr1012total;
 
-//DeadCode JON 17Nov00 	if (dr->availsquads.gr11total+dr->availsquads.gr1012total>Profile::MAXRAFPATROLS)
-//DeadCode JON 17Nov00 	{
-//DeadCode JON 17Nov00 		gr11total=gr11total*Profile::MAXRAFPATROLS/(dr->availsquads.gr11total+dr->availsquads.gr1012total);
-//DeadCode JON 17Nov00 		gr1012total=gr1012total*Profile::MAXRAFPATROLS/(dr->availsquads.gr11total+dr->availsquads.gr1012total);
-//DeadCode JON 17Nov00 
-//DeadCode JON 17Nov00 	}
 	temp = dr->availsquads.gr11total;
 	temp = dr->availsquads.gr1012total;
 	if ((temp=dr->tempdir.gr11radarpatrol+ dr->tempdir.gr11convoypatrol+dr->tempdir.gr11coastalpatrol)>1.0)
@@ -425,8 +406,6 @@ void RAFDirectivesResults::FindSquadsAvail(RAFDirectivesResults* dr)
 		dr->tempdir.gr1012supfactpat*=temp;
 
 
-//DeadCode MS 18Nov00 		gr11total=gr11total*Profile::MAXRAFPATROLS/temp;
-//DeadCode MS 18Nov00 		gr1012total=gr1012total*Profile::MAXRAFPATROLS/temp;
 	}
 	dr->availsquads.gr11maxtotal=gr11total;
 	dr->availsquads.gr1012maxtotal=gr1012total;
@@ -561,9 +540,6 @@ void RAFDirectives::OnTextChangedRspinbutHoles(LPCTSTR caption, short Index)
 
 void RAFDirectives::OnTextChangedRspinbutInterceptbefore(LPCTSTR caption, short Index) 
 {
-//DEADCODE RDH 11/05/00 	float sq = Index;
-//DEADCODE RDH 11/05/00 	dr->tempdir.interceptbeforetarget = sq/20;
-//DEADCODE RDH 11/05/00 	Refresh();	
 	
 }
 
@@ -613,7 +589,6 @@ void	RAFDirectivesResults::SetDirectivesResults(RAFDirectivesResults* dr)
 {
 	int patrols, k = 0;
 
-//DeadCode JIM 20Oct00 	Profile::BetterRule br = Profile::BR_NONE;
 
 
 //coastal, use radar
@@ -643,15 +618,6 @@ void	RAFDirectivesResults::SetDirectivesResults(RAFDirectivesResults* dr)
 	SetAfPatrolTargets(dr);
 	k = SetPatrols(dr, patrols, k, Profile::BR_B_EITHERWL);
 //supply factory patrols
-//DeadCode RDH 10Sep00 	patrols = dr->availsquads.gr1012supfactpat/(dr->tempdir.unitsize+1);
-//DeadCode RDH 10Sep00 	if (	(dr->availsquads.gr1012supfactpat != 0) && (patrols < 1))
-//DeadCode RDH 10Sep00 		patrols = 1;
-//DeadCode RDH 10Sep00 
-//DeadCode RDH 10Sep00 	
-//DeadCode RDH 10Sep00 	SetStdPatrolTargets(dr, PowerStationBAND, AircraftFactoryBAND, true);
-//DeadCode RDH 10Sep00 
-//DeadCode RDH 10Sep00 
-//DeadCode RDH 10Sep00 	k = SetPatrols(dr, patrols, k, Profile::BR_B_EITHERWL);
 
 	//a/c factory patrols												//RDH 16Sep00
 	patrols = dr->availsquads.gr1012acfactpat/(dr->tempdir.unitsize+1);
@@ -871,7 +837,7 @@ void RAFDirectives::OnClickedTickIntercept()
 void	Directives::RAF::SessionAI()
 {
 	Node_Data.FillRAFStrengthInfo(false);
-	RAFDirectivesResults* dr = new RAFDirectivesResults;
+	RAFDirectivesResults drc; RAFDirectivesResults* dr = &drc;
 
 	dr->oldfrontlinefields = dr->FindAfUsage();
 
@@ -893,15 +859,11 @@ void	Directives::RAF::SessionAI()
 		dr->MoveSquadronswrtFrontLine();
 
 	Node_Data.SwapSquadron();
-	delete dr;
 }
 void	Directives::RAF::ModifyPatrols()
 {
-//DeadCode RDH 10Sep00 	float fractionpatrolsused= MMC.directives.raf.current.gr1012supfactpat 
-//DeadCode RDH 10Sep00 									   +MMC.directives.raf.current.gr1012afpat
-//DeadCode RDH 10Sep00 									   +MMC.directives.raf.current.gr1012acfactpat;
 
-	RAFDirectivesResults* dr = new RAFDirectivesResults;
+	RAFDirectivesResults drc; RAFDirectivesResults* dr = &drc;
 	dr->tempdir = MMC.directives.raf.current; 
 	
 	RAFDirectivesResults::FindSquadsAvail(dr);
@@ -1021,8 +983,6 @@ void	Directives::RAF::ModifyPatrols()
 
 
 	MMC.directives.raf.current = dr->tempdir;
-	if (dr)
-		delete dr;
 
 }
  void	Directives::RAF::AI()

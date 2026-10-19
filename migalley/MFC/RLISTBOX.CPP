@@ -1137,6 +1137,9 @@ void CRListBox::Shrink()
 		}
 	}
 
+	// Multi-column bars (the bottom button rows like Back|Create|Join) need
+	// real separation, not just a text margin — 10px made neighbours touch.
+	int pad = (data.colWidths.size() > 1) ? 28 : 10;
 	for (size_t col = 0; col < data.colWidths.size(); ++col) {
 		int maxWidth = 0;
 		if (data.columns.count(col)) {
@@ -1147,7 +1150,7 @@ void CRListBox::Shrink()
 				}
 			}
 		}
-		data.colWidths[col] = maxWidth + 10; // Add some padding
+		data.colWidths[col] = maxWidth + pad;
 	}
 
 	if (pOldFont) {

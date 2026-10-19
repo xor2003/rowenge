@@ -316,8 +316,6 @@ raiseTable RaiseLookUp[]=
 
 SLong 	_cloudLayerHeight=15000*33;	//1500ft in cm
 SLong	lowestgroundpoint;
-//DEADCODE PD 03/12/99 		extern void GreyPalette(UByte*,UByte*,UByte*);
-//DEADCODE PD 03/12/99 		extern bool mono3d;
 
 struct LandScape::RouteData{
  	UWord type;
@@ -450,15 +448,10 @@ static SLong lastMeshDataZ = -10000;
 //
 //------------------------------------------------------------------------------
 void LandScape::RenderLandscape(	CLib3D *lib3d )
-//DEADCODE JON 4/6/00 									ViewPoint* vp,
-//DEADCODE JON 4/6/00 									FPMATRIX_PTR matrixptr,
-//DEADCODE JON 4/6/00 									ULong& wx, ULong& wy, ULong& wz,
-//DEADCODE JON 4/6/00 									ANGLES heading)
 {
 	g_lpLib3d=lib3d;
 
 	Bool	old_xprod;
-//DeadCode JON 13Jul00 	Bool	otherfade;
 
 	bool notMap=true;
 
@@ -468,7 +461,7 @@ void LandScape::RenderLandscape(	CLib3D *lib3d )
 	if (View_Point!=NULL)
 		notMap=(View_Point->viewnum.viewmode!=VM_Map || (View_Point->viewnum.viewmode==VM_Map && OverLay.fZoomedMap))?true:false;
 
-	if (View_Point->drawmap == FALSE)
+	if (View_Point!=NULL && View_Point->drawmap == FALSE)	//RERUN: View_Point NULL at first init
 	{
 		lightDesc.lowRGB=currentLighting.landAmbientCollo.col();
 		lightDesc.highRGB=currentLighting.landAmbientColhi.col();
@@ -492,26 +485,12 @@ void LandScape::RenderLandscape(	CLib3D *lib3d )
 
 	//Initialise variables local to 'LandScape'
 
-//DEADCODE JON 4/6/00 	viewer_hdg = heading;
-//DEADCODE JON 4/6/00 	viewer_x = wx;
-//DEADCODE JON 4/6/00 	viewer_y = wy;
-//DEADCODE JON 4/6/00 	viewer_z = wz;
 
-//DEADCODE JON 4/6/00 	fpviewer_matrix = matrixptr;
 
 	//Set various distance variables up
 	View_Ground_Height = SetViewDetail();						//RJS 25Jun98
 
 
-//DEADCODE JON 4/7/00 	g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
-//DEADCODE JON 4/7/00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->hdg);
-//DEADCODE JON 4/7/00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_PITCH,(Angles)-(int)View_Point->pitch);
-//DEADCODE JON 4/7/00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_ROLL,(Angles)-(int)View_Point->roll);
-//DEADCODE JON 4/7/00 	if (View_Point->InCockpit())								//RJS 15Mar00
-//DEADCODE JON 4/7/00 		g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->eyeHeading);
-//DeadCode RJS 15Mar100 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,1,14829100,0);
-//DEADCODE JON 4/7/00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,50,view_dist);
-//DEADCODE JON 4/7/00 	g_lpLib3d->SetFogColour(0x0090B8E8);
 
 	g_lpLib3d->PushMatrix(MATRIX_OBJECT);
 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
@@ -550,7 +529,6 @@ void LandScape::RenderLandscape(	CLib3D *lib3d )
 		g_lpLib3d->SetGlobal( TOGGLE_TEXTURE_ZBIAS, 2 );
 
 		lowestgroundpoint=0x7FFFFFFF;								//PD 12Dec96
-//DeadCode JON 13Jul00 		otherfade=(!Three_Dee.IsPaused())?BadVision():FALSE;
 #ifndef	_NOLANDSCAPE_
 		GeneratePointData();
 #endif
@@ -566,7 +544,6 @@ void LandScape::RenderLandscape(	CLib3D *lib3d )
 #ifndef	_NOCLOUDS_
 			DistDrawClouds(0);
 #endif
-//deadcode JON 19/06/01				DoRain(View_Point,View_Ground_Height);							//RJS 25Jun98
 		}
 
 
@@ -575,26 +552,6 @@ void LandScape::RenderLandscape(	CLib3D *lib3d )
 
 	doneUpdateLandscape = false;
 
-	//DeadCode JON 21Aug00 	g_lpLib3d->DecGlobal( TOGGLE_TEXTURE_ZBIAS );
-//DeadCode JON 21Aug00 	static bool dotest = false;
-//DeadCode JON 21Aug00 	if ( dotest )
-//DeadCode JON 21Aug00 	{
-//DeadCode JON 21Aug00 		g_lpLib3d->SetGlobal( TOGGLE_TEXTURE_ZBIAS, ULong(0) );
-//DeadCode JON 21Aug00 		g_lpLib3d->FlushAsBackground();
-//DeadCode JON 21Aug00 		RenderMirrorLandscape();
-//DeadCode JON 21Aug00 		g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
-//DeadCode JON 21Aug00 		g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
-//DeadCode JON 21Aug00 		SVertex* jon = g_lpLib3d->BeginPoly( 4 );
-//DeadCode JON 21Aug00 		g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,Three_Dee.clipNearZ,2000.f);
-//DeadCode JON 21Aug00 		jon->setPosition( 0, 0, Three_Dee.clipNearZ );
-//DeadCode JON 21Aug00 		jon++;
-//DeadCode JON 21Aug00 		jon->setPosition( 0, 1.f, Three_Dee.clipNearZ+10.f );
-//DeadCode JON 21Aug00 		jon++;
-//DeadCode JON 21Aug00 		jon->setPosition( 0.5f, 0.5f, 1000.f );
-//DeadCode JON 21Aug00 		jon++;
-//DeadCode JON 21Aug00 		jon->setPosition( 1.f, 0, 2000.f );
-//DeadCode JON 21Aug00 		g_lpLib3d->EndPoly();
-//DeadCode JON 21Aug00 	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -766,85 +723,6 @@ void LandScape::RenderMirrorLandscape( void )
 
 }
 
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 // assume x down and z goes left to right
-//DEADCODE JON 5/3/00 struct vec2d
-//DEADCODE JON 5/3/00 {
-//DEADCODE JON 5/3/00 	long x,z; // the position
-//DEADCODE JON 5/3/00 	long ex; // the other end used to throw out stuff..
-//DEADCODE JON 5/3/00 	double dx; // the direction vector
-//DEADCODE JON 5/3/00 	double dz;
-//DEADCODE JON 5/3/00 	double m; // gradient - how far to move in z for 1 in x - speedup cheat.
-//DEADCODE JON 5/3/00 	bool horiz; // is it horizontal
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 	// constructor from 2 points
-//DEADCODE JON 5/3/00 	bool buildFromPts( long x1, long z1, long x2, long z2 )
-//DEADCODE JON 5/3/00 	{
-//DEADCODE JON 5/3/00 		if ( x1 == x2 && z1 == z2 )
-//DEADCODE JON 5/3/00 			return false; // not a line
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 		x = x1;
-//DEADCODE JON 5/3/00 		z = z1;
-//DEADCODE JON 5/3/00 		ex = x2;
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 		dx = double(x2-x1);
-//DEADCODE JON 5/3/00 		dz = double(z2-z1);
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 		horiz = false;
-//DEADCODE JON 5/3/00 		if ( x1 != x2 )
-//DEADCODE JON 5/3/00 			m = dz/dx;
-//DEADCODE JON 5/3/00 		else
-//DEADCODE JON 5/3/00 			horiz = true;
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 		// normalize
-//DEADCODE JON 5/3/00 //		double nv = fastMath.FastInvSqrt((dx*dx)+(dz*dz)); // seems not to be accurate enough
-//DEADCODE JON 5/3/00 		double nv = 1.0/sqrt( (dx*dx)+(dz*dz) );
-//DEADCODE JON 5/3/00 		dx*=nv;
-//DEADCODE JON 5/3/00 		dz*=nv;
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 		return true;
-//DEADCODE JON 5/3/00 	}
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 	// get the angle between lines
-//DEADCODE JON 5/3/00 	double getAngleSize( vec2d &t )
-//DEADCODE JON 5/3/00 	{
-//DEADCODE JON 5/3/00 		double V = t.getAngleSizeToVert() - getAngleSizeToVert();
-//DEADCODE JON 5/3/00 		if ( V < 0 )
-//DEADCODE JON 5/3/00 			return 4.0+V;
-//DEADCODE JON 5/3/00 		else
-//DEADCODE JON 5/3/00 			return V;
-//DEADCODE JON 5/3/00 	}
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 	// vert pointing down as X increaces...
-//DEADCODE JON 5/3/00 	double getAngleSizeToVert()
-//DEADCODE JON 5/3/00 	{ // the other direction vector would have dx = 1, dz = 0;
-//DEADCODE JON 5/3/00 	  // therefore dx*1 + dz*0 = dx  - dead simple!
-//DEADCODE JON 5/3/00 	  // don't bother with doing an inverse cosine on the angle just to be able to compare sizes
-//DEADCODE JON 5/3/00 	  // just return 1-dx which will give the angle's relative size.
-//DEADCODE JON 5/3/00 		if ( dz > 0.0 ) // range from 0->2
-//DEADCODE JON 5/3/00 			return 1.0-dx;
-//DEADCODE JON 5/3/00 		else // oh its over 180 degrees - make the values range from 4 to 2...
-//DEADCODE JON 5/3/00 			return 3.0+dx;
-//DEADCODE JON 5/3/00 	}
-//DEADCODE JON 5/3/00 	// return the z for given x.
-//DEADCODE JON 5/3/00 	ULong getz( long tx, bool &inBounds )
-//DEADCODE JON 5/3/00 	{
-//DEADCODE JON 5/3/00 		if ( tx>>Grid_Base::WORLDSPACEMOD >= x>>Grid_Base::WORLDSPACEMOD
-//DEADCODE JON 5/3/00 				&& tx>>Grid_Base::WORLDSPACEMOD <= ex>>Grid_Base::WORLDSPACEMOD
-//DEADCODE JON 5/3/00 				|| tx>>Grid_Base::WORLDSPACEMOD <= x>>Grid_Base::WORLDSPACEMOD
-//DEADCODE JON 5/3/00 				&& tx>>Grid_Base::WORLDSPACEMOD >= ex>>Grid_Base::WORLDSPACEMOD )
-//DEADCODE JON 5/3/00 		if ( tx >= x && tx <= ex || tx <= x && tx >= ex )
-//DEADCODE JON 5/3/00 			inBounds = true;
-//DEADCODE JON 5/3/00 		else
-//DEADCODE JON 5/3/00 			inBounds = false;
-//DEADCODE JON 5/3/00
-//DEADCODE JON 5/3/00 //		if ( tx > x )
-//DEADCODE JON 5/3/00 //			return z+ULong(m*float(tx-x)+.5f);
-//DEADCODE JON 5/3/00 //		else
-//DEADCODE JON 5/3/00 //			return z-ULong(m*float(x-tx)-.5f);
-//DEADCODE JON 5/3/00 		return z+long(m*float(tx-x)+.5f);
-//DEADCODE JON 5/3/00 	}
-//DEADCODE JON 5/3/00 };
 
 inline void interceptBase( COORDS3D &below, const COORDS3D &above )
 {
@@ -872,7 +750,6 @@ void LandScape::UpdateHorizTexture( const int x, const int z )
 	// unload the old one from the card.
 	g_lpLib3d->UnloadTexture( horizonImg );
 
-//DEADCODE CSB 25/05/00 	fileblock fb( FIL_4COLGRID, Grid_Base::makeGridAt );
 	Grid_Long* colD = (Grid_Long*) Grid_Base::gridfiles[Grid_Base::GF_COLOUR].getdata();
 
 	UByte* t = horizonImg->body;
@@ -905,9 +782,6 @@ inline void LandScape::UpdateCloseHorizCornerPoints( const int x, const int z )
 	DoPointStruc* curPoint=horizPoint;
 
 	// get the grid data 4 min altitudes
-//DeadCode JON 9Jun00 			fileblock fb1( FIL_MINALT, Grid_Base::makeGridAt );
-//DeadCode JON 9Jun00 			Grid_Base* minAlt = (Grid_Base*) fb1.getdata();
-//DeadCode JON 9Aug00 	Grid_Base* minAlt = (Grid_Base*) Grid_Base::gridfiles[Grid_Base::GF_MINALT].getdata();
 	Grid_Base* cornerAlt = (Grid_Base*) Grid_Base::gridfiles[Grid_Base::GF_CORNERALT].getdata();
 
 
@@ -924,13 +798,9 @@ inline void LandScape::UpdateCloseHorizCornerPoints( const int x, const int z )
 		imx = rowStart;
 		for ( int sx=0; sx<_cornerLengthMIN; sx++,rowx+=_blockWidth,curPoint++,imx+=2)  // loop x
 		{
-//DEADCODE JON 5/24/00 					curPoint->y=(minAlt->getMod( x-_halfAreaSizeMIN+sx, z-_halfAreaSizeMIN+sz )-2)<<9;
-//DEADCODE JON 5/24/00 					curPoint->x=rowx;
-//DEADCODE JON 5/24/00 					curPoint->z=pz;
 			curPoint->setPosition(
 					rowx,
 					(cornerAlt->getMod( x-_halfAreaSizeMIN+sx, z-_halfAreaSizeMIN+sz ) << _altitudeShift),
-//DeadCode JON 9Aug00 					(minAlt->getMod( x-_halfAreaSizeMIN+sx, z-_halfAreaSizeMIN+sz )-2)<<9,
 					pz
 				);
 			curPoint->setIMapCoords( imx, imz ); // maybe needed if no tile imagemap
@@ -943,7 +813,6 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 											ULong& wx, ULong& wy, ULong& wz,
 											ANGLES heading, bool doMaxResTiles )
 {
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"SUVC: start ");
 	// set up variables local to landscape
 	g_lpLib3d=lib3d;
 	viewer_hdg = heading;
@@ -962,14 +831,7 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->hdg);
 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_PITCH,(Angles)-(int)View_Point->pitch);
 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_ROLL,(Angles)-(int)View_Point->roll);
-//DEADCODE RJS 5/9/00 	if (View_Point->InCockpit())								//RJS 15Mar00
-//DEADCODE RJS 5/9/00 	{
-//DEADCODE RJS 5/9/00 		g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->eyeHeading);
-//DEADCODE RJS 5/9/00 		viewer_hdg += View_Point->eyeHeading;
-//DEADCODE RJS 5/9/00 	}
-//DeadCode RJS 15Mar100 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,1,14829100,0);
 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,10,view_dist,true);
-	//DEADCODE JON 4/18/00 	g_lpLib3d->SetFogColour(0x0090B8E8);
 
 	D3DVECTOR viewMods;
 	viewMods.x=(D3DVALUE)-viewer_x;
@@ -985,14 +847,9 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 	if ( Save_Data.detail_3d[DETAIL3D_HORIZONDIST] )
 	{ // HIGH DISTANCE HORIZON
 
-//DeadCode MS 15Aug00 		Mono_Text.Print((UByte*)"SUVC: high distance horizon ");
 		// cheap mem zero - change if _wholeAreaSizeMIN changes.
-		long* t = (long*)gridCone;
-		for ( int i = 0; i< 72; i++ )
-		{
-			*t++ = 0;
-		}
-		gridCone[288] = 0;
+		//RERUN: 72*long assumed 4-byte longs (Win32); LP64 longs overflow 289B
+		memset( gridCone, 0, _wholeAreaSizeMIN*_wholeAreaSizeMIN );
 
 		if ( gridOffs.hasMoved( x, z ) ) // have we moved to a new block
 		{
@@ -1037,18 +894,12 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 						);
 					curPoint->setIMapCoords( imx, imz );
 //TEMPCODE JON 6/1/00 					curPoint->info.setUnique();
-//DEADCODE JON 5/24/00 					curPoint->y=(minAlt->getMod( x-_horizonDist+sx, z-_horizonDist+sz )-2)<<9;
-//DEADCODE JON 5/24/00 					curPoint->x=rowx;
-//DEADCODE JON 5/24/00 					curPoint->z=pz;
-//DEADCODE JON 5/24/00 					curPoint->ix = imx;
-//DEADCODE JON 5/24/00 					curPoint->iy = imz;
 				}
 			}
 
 		} // end of update stored stuff
 
 		ULong flags[_horizonPoints*_horizonPoints];
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"SUVC: visiblecheck ");
 
 		g_lpLib3d->VisibleCheck(horizPoint,_horizonPoints*_horizonPoints,flags);
 
@@ -1066,7 +917,6 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 		hirezGroundRadiusSqMin+=((_wholeAreaSizeMIN-1)*(_wholeAreaSizeMIN-1));//(_halfAreaSizeMIN*_halfAreaSizeMIN);
 
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"SUVC: for sz ");
 		for (int sz=0;sz<_horizonAreaSize;sz++)
 		{
 			lowf2=lowf;
@@ -1085,7 +935,6 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 					dz *= dz;
 					UWord distSq = dx+dz;  // dist from center squared
 
-//DeadCode JON 14Sep00 					if ( distSq > ((_wholeAreaSizeMIN)*(_wholeAreaSizeMIN)) )
 					if ( distSq > hirezGroundRadiusSq )
 					{ // draw in a distant horizon tile at a later point
 						*horizConePos = true;
@@ -1093,7 +942,6 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 					{  // set the flag 4 the hirez tile to be drawn
 
 						const int FUDGE_VAL = 110; // enough to ensure an overlap...
-//DeadCode JON 14Sep00 						if ( distSq >= ((_wholeAreaSizeMIN-1)*(_wholeAreaSizeMIN-1))-FUDGE_VAL)
 						if ( distSq >= (hirezGroundRadiusSq)-FUDGE_VAL)
 							*horizConePos = true;
 						else
@@ -1130,7 +978,6 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 	} else
 	{	// LOW DISTANCE HORIZON
 
-//DeadCode MS 15Aug00 		Mono_Text.Print((UByte*)"SUVC: low distance horizon ");
 		//  _wholeAreaSizeMIN
 		if ( gridOffs.hasMoved( x, z ) ) // have we moved to a new block
 		{
@@ -1170,7 +1017,6 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 
 	}
 	// remake any textures needed
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"SUVC: last test ");
 	if (Land_Scape.UpdateTexturesWRTViewPos()==false &&
 		Land_Scape.UpdateTexturesWRTViewPos()==false &&
 		Land_Scape.UpdateTexturesWRTViewPos()==false)
@@ -1179,7 +1025,6 @@ void LandScape::SetUpVisibleCones(	CLib3D *lib3d,
 		if ( !UpdateTexturesWRTViewPos() )
 			assert(false&&"Unrecoverable landscape error");
 	}
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"SUVC: stop\n");
 
 	lastMeshDataX = x;
 	lastMeshDataZ = z;
@@ -1208,89 +1053,6 @@ void LandScape::DrawHorizon( void )
 		for ( int i = 1; i<=NUM_FILL_BANDS; i++ )
 		{
 			g_lpLib3d->SetFarClipPlane( float(_hirezDrawDist)*float(i)/float(NUM_FILL_BANDS) );
-//DeadCode JON 3Nov00 			const int baseDepth = -700*100;
-//DeadCode JON 3Nov00 			const int edgeDepth = -200*100;
-//DeadCode JON 3Nov00 			// quick cheat - draw a plain poly across the base in order to cover up the nasty blue tears
-//DeadCode JON 3Nov00 			cornerVert = g_lpLib3d->BeginPoly( HMATERIAL(47), 3 );
-//DeadCode JON 3Nov00 			cornerVert[0].setPosition(
-//DeadCode JON 3Nov00 				viewer_x-(dist),
-//DeadCode JON 3Nov00 				edgeDepth,
-//DeadCode JON 3Nov00 				viewer_z+(dist)
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert[1].setPosition(
-//DeadCode JON 3Nov00 				viewer_x+(dist),
-//DeadCode JON 3Nov00 				edgeDepth,
-//DeadCode JON 3Nov00 				viewer_z+(dist)
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert[2].setPosition(
-//DeadCode JON 3Nov00 				viewer_x,
-//DeadCode JON 3Nov00 				baseDepth,
-//DeadCode JON 3Nov00 				viewer_z
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00 			g_lpLib3d->EndPoly();
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 3Nov00 			cornerVert[0].setPosition(
-//DeadCode JON 3Nov00 				viewer_x+(dist),
-//DeadCode JON 3Nov00 				edgeDepth,
-//DeadCode JON 3Nov00 				viewer_z+(dist)
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert[1].setPosition(
-//DeadCode JON 3Nov00 				viewer_x+(dist),
-//DeadCode JON 3Nov00 				edgeDepth,
-//DeadCode JON 3Nov00 				viewer_z-(dist)
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert[2].setPosition(
-//DeadCode JON 3Nov00 				viewer_x,
-//DeadCode JON 3Nov00 				baseDepth,
-//DeadCode JON 3Nov00 				viewer_z
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00 			g_lpLib3d->EndPoly();
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 3Nov00 			cornerVert[0].setPosition(
-//DeadCode JON 3Nov00 				viewer_x+(dist),
-//DeadCode JON 3Nov00 				edgeDepth,
-//DeadCode JON 3Nov00 				viewer_z-(dist)
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert[1].setPosition(
-//DeadCode JON 3Nov00 				viewer_x-(dist),
-//DeadCode JON 3Nov00 				edgeDepth,
-//DeadCode JON 3Nov00 				viewer_z-(dist)
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert[2].setPosition(
-//DeadCode JON 3Nov00 				viewer_x,
-//DeadCode JON 3Nov00 				baseDepth,
-//DeadCode JON 3Nov00 				viewer_z
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00 			g_lpLib3d->EndPoly();
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 3Nov00 			cornerVert[0].setPosition(
-//DeadCode JON 3Nov00 				viewer_x-(dist),
-//DeadCode JON 3Nov00 				edgeDepth,
-//DeadCode JON 3Nov00 				viewer_z-(dist)
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert[1].setPosition(
-//DeadCode JON 3Nov00 				viewer_x-(dist),
-//DeadCode JON 3Nov00 				edgeDepth,
-//DeadCode JON 3Nov00 				viewer_z+(dist)
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 			cornerVert[2].setPosition(
-//DeadCode JON 3Nov00 				viewer_x,
-//DeadCode JON 3Nov00 				baseDepth,
-//DeadCode JON 3Nov00 				viewer_z
-//DeadCode JON 3Nov00 			);
-//DeadCode JON 3Nov00 			g_lpLib3d->EndPoly();
 
 			cornerVert = g_lpLib3d->BeginPoly( HMATERIAL(47), 4 );
 			cornerVert[0].setPosition(
@@ -1356,97 +1118,8 @@ void LandScape::DrawHorizon( void )
 #endif
 
 		// calculate the current block position
-//DeadCode JON 5Jul00 		int x = viewer_x>>Grid_Base::WORLDSPACEMOD;
-//DeadCode JON 5Jul00 		int z = viewer_z>>Grid_Base::WORLDSPACEMOD;
 		g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,(_hirezDrawDist-(_blockWidth*4)),view_dist,true);	//JON 29Aug00
-//DeadCode JON 23Oct00 #ifndef _NO_UNDERGROUND_FILL
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		const int baseDepth = -700*100;
-//DeadCode JON 23Oct00 		const int edgeDepth = -200*100;
-//DeadCode JON 23Oct00 		// quick cheat - draw a plain poly across the base in order to cover up the nasty blue tears
-//DeadCode JON 23Oct00 		cornerVert = g_lpLib3d->BeginPoly( HMATERIAL(47), 3 );
-//DeadCode JON 23Oct00 		cornerVert[0].setPosition(
-//DeadCode JON 23Oct00 			viewer_x-(_blockWidth*_horizonDist),
-//DeadCode JON 23Oct00 			edgeDepth,
-//DeadCode JON 23Oct00 			viewer_z+(_blockWidth*_horizonDist)
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert[1].setPosition(
-//DeadCode JON 23Oct00 			viewer_x+(_blockWidth*_horizonDist),
-//DeadCode JON 23Oct00 			edgeDepth,
-//DeadCode JON 23Oct00 			viewer_z+(_blockWidth*_horizonDist)
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert[2].setPosition(
-//DeadCode JON 23Oct00 			viewer_x,
-//DeadCode JON 23Oct00 			baseDepth,
-//DeadCode JON 23Oct00 			viewer_z
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00 		g_lpLib3d->EndPoly();
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 23Oct00 		cornerVert[0].setPosition(
-//DeadCode JON 23Oct00 			viewer_x+(_blockWidth*_horizonDist),
-//DeadCode JON 23Oct00 			edgeDepth,
-//DeadCode JON 23Oct00 			viewer_z+(_blockWidth*_horizonDist)
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert[1].setPosition(
-//DeadCode JON 23Oct00 			viewer_x+(_blockWidth*_horizonDist),
-//DeadCode JON 23Oct00 			edgeDepth,
-//DeadCode JON 23Oct00 			viewer_z-(_blockWidth*_horizonDist)
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert[2].setPosition(
-//DeadCode JON 23Oct00 			viewer_x,
-//DeadCode JON 23Oct00 			baseDepth,
-//DeadCode JON 23Oct00 			viewer_z
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00 		g_lpLib3d->EndPoly();
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 23Oct00 		cornerVert[0].setPosition(
-//DeadCode JON 23Oct00 			viewer_x+(_blockWidth*_horizonDist),
-//DeadCode JON 23Oct00 			edgeDepth,
-//DeadCode JON 23Oct00 			viewer_z-(_blockWidth*_horizonDist)
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert[1].setPosition(
-//DeadCode JON 23Oct00 			viewer_x-(_blockWidth*_horizonDist),
-//DeadCode JON 23Oct00 			edgeDepth,
-//DeadCode JON 23Oct00 			viewer_z-(_blockWidth*_horizonDist)
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert[2].setPosition(
-//DeadCode JON 23Oct00 			viewer_x,
-//DeadCode JON 23Oct00 			baseDepth,
-//DeadCode JON 23Oct00 			viewer_z
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00 		g_lpLib3d->EndPoly();
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 23Oct00 		cornerVert[0].setPosition(
-//DeadCode JON 23Oct00 			viewer_x-(_blockWidth*_horizonDist),
-//DeadCode JON 23Oct00 			edgeDepth,
-//DeadCode JON 23Oct00 			viewer_z-(_blockWidth*_horizonDist)
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert[1].setPosition(
-//DeadCode JON 23Oct00 			viewer_x-(_blockWidth*_horizonDist),
-//DeadCode JON 23Oct00 			edgeDepth,
-//DeadCode JON 23Oct00 			viewer_z+(_blockWidth*_horizonDist)
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00
-//DeadCode JON 23Oct00 		cornerVert[2].setPosition(
-//DeadCode JON 23Oct00 			viewer_x,
-//DeadCode JON 23Oct00 			baseDepth,
-//DeadCode JON 23Oct00 			viewer_z
-//DeadCode JON 23Oct00 		);
-//DeadCode JON 23Oct00 		g_lpLib3d->EndPoly();
-//DeadCode JON 23Oct00 #endif
 
-//DeadCode JON 21Aug00 		g_lpLib3d->DecGlobal( TOGGLE_TEXTURE_ZBIAS );
 
 		bool *horizConePos = horizCone;
 		DoPointStruc *offPos = horizPoint;
@@ -1460,20 +1133,14 @@ void LandScape::DrawHorizon( void )
 				if ( *horizConePos )
 				{ // draw in a distant horizon tile
 
-//DEADCODE JON 6/1/00 					cornerVert = g_lpLib3d->BeginFan(HMATERIAL(horizonImg),4);
 					cornerVert = g_lpLib3d->BeginPoly(HMATERIAL(horizonImg),4);
 
-//DEADCODE JON 6/1/00 					cornerVert[0] = offPos[0];
-//DEADCODE JON 6/1/00 					cornerVert[1]=offPos[_horizonPoints];
-//DEADCODE JON 6/1/00 					cornerVert[2]=offPos[_horizonPoints+1];
-//DEADCODE JON 6/1/00 					cornerVert[3]=offPos[1];
 					cornerVert[0].CountAndCopy( offPos[0] );
 					cornerVert[1].CountAndCopy( offPos[_horizonPoints] );
 					cornerVert[2].CountAndCopy( offPos[_horizonPoints+1] );
 					cornerVert[3].CountAndCopy( offPos[1] );
 
 					g_lpLib3d->EndPoly();
-//DEADCODE JON 6/1/00 					g_lpLib3d->EndFan();
 
 				}
 			}
@@ -1498,89 +1165,6 @@ void LandScape::DrawHorizon( void )
 		{
 			g_lpLib3d->SetFarClipPlane( float(dist)*float(i)/float(NUM_FILL_BANDS) );
 
-//DeadCode JON 3Nov00 		const int baseDepth = -700*100;
-//DeadCode JON 3Nov00 		const int edgeDepth = -200*100;
-//DeadCode JON 3Nov00 		// quick cheat - draw a plain poly across the base in order to cover up the nasty blue tears
-//DeadCode JON 3Nov00 		cornerVert = g_lpLib3d->BeginPoly( HMATERIAL(47), 3 );
-//DeadCode JON 3Nov00 		cornerVert[0].setPosition(
-//DeadCode JON 3Nov00 			viewer_x-(dist),
-//DeadCode JON 3Nov00 			edgeDepth,
-//DeadCode JON 3Nov00 			viewer_z+(dist)
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert[1].setPosition(
-//DeadCode JON 3Nov00 			viewer_x+(dist),
-//DeadCode JON 3Nov00 			edgeDepth,
-//DeadCode JON 3Nov00 			viewer_z+(dist)
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert[2].setPosition(
-//DeadCode JON 3Nov00 			viewer_x,
-//DeadCode JON 3Nov00 			baseDepth,
-//DeadCode JON 3Nov00 			viewer_z
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00 		g_lpLib3d->EndPoly();
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 3Nov00 		cornerVert[0].setPosition(
-//DeadCode JON 3Nov00 			viewer_x+(dist),
-//DeadCode JON 3Nov00 			edgeDepth,
-//DeadCode JON 3Nov00 			viewer_z+(dist)
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert[1].setPosition(
-//DeadCode JON 3Nov00 			viewer_x+(dist),
-//DeadCode JON 3Nov00 			edgeDepth,
-//DeadCode JON 3Nov00 			viewer_z-(dist)
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert[2].setPosition(
-//DeadCode JON 3Nov00 			viewer_x,
-//DeadCode JON 3Nov00 			baseDepth,
-//DeadCode JON 3Nov00 			viewer_z
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00 		g_lpLib3d->EndPoly();
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 3Nov00 		cornerVert[0].setPosition(
-//DeadCode JON 3Nov00 			viewer_x+(dist),
-//DeadCode JON 3Nov00 			edgeDepth,
-//DeadCode JON 3Nov00 			viewer_z-(dist)
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert[1].setPosition(
-//DeadCode JON 3Nov00 			viewer_x-(dist),
-//DeadCode JON 3Nov00 			edgeDepth,
-//DeadCode JON 3Nov00 			viewer_z-(dist)
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert[2].setPosition(
-//DeadCode JON 3Nov00 			viewer_x,
-//DeadCode JON 3Nov00 			baseDepth,
-//DeadCode JON 3Nov00 			viewer_z
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00 		g_lpLib3d->EndPoly();
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert = g_lpLib3d->BeginPoly( 3 );
-//DeadCode JON 3Nov00 		cornerVert[0].setPosition(
-//DeadCode JON 3Nov00 			viewer_x-(dist),
-//DeadCode JON 3Nov00 			edgeDepth,
-//DeadCode JON 3Nov00 			viewer_z-(dist)
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert[1].setPosition(
-//DeadCode JON 3Nov00 			viewer_x-(dist),
-//DeadCode JON 3Nov00 			edgeDepth,
-//DeadCode JON 3Nov00 			viewer_z+(dist)
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00
-//DeadCode JON 3Nov00 		cornerVert[2].setPosition(
-//DeadCode JON 3Nov00 			viewer_x,
-//DeadCode JON 3Nov00 			baseDepth,
-//DeadCode JON 3Nov00 			viewer_z
-//DeadCode JON 3Nov00 		);
-//DeadCode JON 3Nov00 		g_lpLib3d->EndPoly();
 
 			cornerVert = g_lpLib3d->BeginPoly( HMATERIAL(47), 4 );
 			cornerVert[0].setPosition(
@@ -1768,20 +1352,13 @@ void LandScape::DistDrawClouds(SLong layerNumber )
 	int x = gridOffs.jx;
 	int z = gridOffs.jz;
 
-//DeadCode JON 27Sep00 	static int hx = -1;
-//DeadCode JON 27Sep00 	static int hz = -1;
-//DeadCode JON 27Sep00 	static int jx = -1;
-//DeadCode JON 27Sep00 	static int jz = -1;
 	static 	D3DVECTOR pos[_horizonPoints*_horizonPoints];
 
 	if ( cloudOffs.hasMoved( x, z ) )
 	{
-//DeadCode JON 27Sep00 		jx = x;
-//DeadCode JON 27Sep00 		jz = z;
 		cloudOffs.set( x, z );
 
 		// do we need to redo the imagemap?
-//DeadCode JON 27Sep00 		if ( x < hx-4 || x > hx+4 || z<hz-4 || z>hz+4 )
 		if ( cloudOffs.needColMapUpdate( x, z ) )
 		{ // we need to recalculate the imagemap
 			// unload the old one from the card.
@@ -1932,622 +1509,8 @@ void LandScape::DistDrawClouds(SLong layerNumber )
 }
 
 
-//DeadCode JON 31Jul00 void LandScape::DistDrawClouds(SLong layerNumber )
-//DeadCode JON 31Jul00 {
-//DeadCode JON 31Jul00 	ImageMapDescPtr cloudImg;
-//DeadCode JON 31Jul00 	SLong layerAltitude;
-//DeadCode JON 31Jul00 	SLong xoff,zoff;
-//DeadCode JON 31Jul00 	UByte side;			//0=in, 1=above, 2=below
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	switch (layerNumber)
-//DeadCode JON 31Jul00 	{
-//DeadCode JON 31Jul00 	case 0:
-//DeadCode JON 31Jul00 		cloudImg=cloudImg0;
-//DeadCode JON 31Jul00 		xoff=zoff=0;
-//DeadCode JON 31Jul00 		layerAltitude=FT_5000;
-//DeadCode JON 31Jul00 		break;
-//DeadCode JON 31Jul00 	case 1:
-//DeadCode JON 31Jul00 		cloudImg=cloudImg1;
-//DeadCode JON 31Jul00 		xoff=zoff=131072*32;
-//DeadCode JON 31Jul00 		layerAltitude=FT_10000;
-//DeadCode JON 31Jul00 		break;
-//DeadCode JON 31Jul00 	case 2:
-//DeadCode JON 31Jul00 	default:
-//DeadCode JON 31Jul00 		cloudImg=cloudImg2;
-//DeadCode JON 31Jul00 		xoff=zoff=-131072*32;
-//DeadCode JON 31Jul00 		layerAltitude=FT_15000;
-//DeadCode JON 31Jul00 		break;
-//DeadCode JON 31Jul00 	}
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	if (viewer_y>layerAltitude+FT_500)
-//DeadCode JON 31Jul00 	{
-//DeadCode JON 31Jul00 		side=1;		//above
-//DeadCode JON 31Jul00 	} else if (viewer_y<layerAltitude-FT_500)
-//DeadCode JON 31Jul00 	{
-//DeadCode JON 31Jul00 		side=2;		//below
-//DeadCode JON 31Jul00 //		g_lpLib3d->SetGlobal( TOGGLE_GLOBALALPHA, 3 );//255-8 ); // make them more seethru when below...
-//DeadCode JON 31Jul00 	} else
-//DeadCode JON 31Jul00 	{
-//DeadCode JON 31Jul00 		side=0;		//in
-//DeadCode JON 31Jul00 	}
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	// calculate the current block position
-//DeadCode JON 31Jul00 //	int x = viewer_x>>Grid_Base::WORLDSPACEMOD;
-//DeadCode JON 31Jul00 //	int z = viewer_z>>Grid_Base::WORLDSPACEMOD;
-//DeadCode JON 31Jul00 	int x = gridOffs.jx;
-//DeadCode JON 31Jul00 	int z = gridOffs.jz;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	static int hx = -1;
-//DeadCode JON 31Jul00 	static int hz = -1;
-//DeadCode JON 31Jul00 	static int jx = -1;
-//DeadCode JON 31Jul00 	static int jz = -1;
-//DeadCode JON 31Jul00 	static 	D3DVECTOR pos[_horizonPoints*_horizonPoints];
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	if ( x != jx || z != jz )
-//DeadCode JON 31Jul00 	{
-//DeadCode JON 31Jul00 		jx = x;
-//DeadCode JON 31Jul00 		jz = z;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 		// do we need to redo the imagemap?
-//DeadCode JON 31Jul00 		if ( x < hx-4 || x > hx+4 || z<hz-4 || z>hz+4 )
-//DeadCode JON 31Jul00 		{ // we need to recalculate the imagemap
-//DeadCode JON 31Jul00 			// unload the old one from the card.
-//DeadCode JON 31Jul00 			g_lpLib3d->UnloadTexture( cloudImg );
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 //DEADCODE JIM 25/05/00 			fileblock fb( FIL_4COLGRID, Grid_Base::makeGridAt );
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 			Grid_Long* colD = (Grid_Long*) Grid_Base::gridfiles[Grid_Base::GF_COLOUR]->getdata();
-//DeadCode JON 31Jul00 			Grid_Byte* col = (Grid_Byte*) Grid_Base::gridfiles[Grid_Base::GF_CLOUDLAYER0].getdata();
-//DeadCode JON 31Jul00 //DEADCODE JIM 25/05/00 			Grid_Long* colD = (Grid_Long*) fb.getdata();
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 			UByte* t = ((UByte*)cloudImg)+sizeof(*cloudImg);
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 			for ( int sz = (z<<1)-128; sz < (z<<1)+128; sz++ )
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 				for ( int sx = (x<<1)-128; sx < (x<<1)+128; sx++ )
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 				{
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 					*t++ = ((colD->getModD( sx, sz )<<3)|0x07)+8;
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 				}
-//DeadCode JON 31Jul00 			UByte* t = ((UByte*)cloudImg)+sizeof(*cloudImg);
-//DeadCode JON 31Jul00 			for ( int sz = z-64; sz < z+64; sz++ )
-//DeadCode JON 31Jul00 				for ( int sx = x-64; sx < x+64; sx++ )
-//DeadCode JON 31Jul00 				{
-//DeadCode JON 31Jul00 					*t++ = ((col->getMod( sx, sz )));//<<3)|0x07)+8;
-//DeadCode JON 31Jul00 //					*t++ = 128;
-//DeadCode JON 31Jul00 //					*t++ = ((col->getMod( sx, sz )<<3)|0x07)+8;
-//DeadCode JON 31Jul00 				}
-//DeadCode JON 31Jul00 			hx = x;
-//DeadCode JON 31Jul00 			hz = z;
-//DeadCode JON 31Jul00 		}
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 		// recalc horizon vertex points
-//DeadCode JON 31Jul00 		//Generate start position based on the current viewpoint
-//DeadCode JON 31Jul00 		SLong px,pz;
-//DeadCode JON 31Jul00 		px = (x-_horizonDist)<<Grid_Base::WORLDSPACEMOD;
-//DeadCode JON 31Jul00 		pz = (z-_horizonDist)<<Grid_Base::WORLDSPACEMOD;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 		D3DVECTOR lpos,mpos,*lowptr;
-//DeadCode JON 31Jul00 		SLong lx,lz,mx;
-//DeadCode JON 31Jul00 		lowptr=pos;
-//DeadCode JON 31Jul00 		lx=px;
-//DeadCode JON 31Jul00 		lz=pz;
-//DeadCode JON 31Jul00 		lpos.x=lx;
-//DeadCode JON 31Jul00 		lpos.z=lz;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 		// get the grid data 4 min altitudes
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 		fileblock fb1( FIL_MINALT, Grid_Base::makeGridAt );
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 		Grid_Base* minAlt = (Grid_Base*) fb1.getdata();
-//DeadCode JON 31Jul00 		Grid_Base* minAlt = (Grid_Base*) Grid_Base::gridfiles[Grid_Base::GF_CLOUDLAYER0].getdata();
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 		for (int sz=0; sz<_horizonPoints;sz++) // loop tru z
-//DeadCode JON 31Jul00 		{
-//DeadCode JON 31Jul00 			mpos=lpos;
-//DeadCode JON 31Jul00 			mx=lx;
-//DeadCode JON 31Jul00 			for (int sx=0;sx<_horizonPoints;sx++) // loop x
-//DeadCode JON 31Jul00 			{
-//DeadCode JON 31Jul00 				SLong min;
-//DeadCode JON 31Jul00 				min = layerAltitude+(minAlt->getMod( x-_horizonDist+sx, z-_horizonDist+sz )<<5);
-//DeadCode JON 31Jul00 				*lowptr=mpos;
-//DeadCode JON 31Jul00 				lowptr->y=min;
-//DeadCode JON 31Jul00 				mpos.x+=_blockWidth;
-//DeadCode JON 31Jul00 				mx+=_blockWidth;
-//DeadCode JON 31Jul00 				lowptr++;
-//DeadCode JON 31Jul00 			}
-//DeadCode JON 31Jul00 			lpos.z+=_blockWidth;
-//DeadCode JON 31Jul00 			lz+=_blockWidth;
-//DeadCode JON 31Jul00 		}
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	}
-//DeadCode JON 31Jul00 	// right now we need to make a mesh for the distant hills and paste the horizon imagemap down onto it...
-//DeadCode JON 31Jul00 	// find out which blocks need to be used to make the hill mesh.
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	const int CLOUD_REDUCTION = 5;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	ULong flags[_horizonPoints*_horizonPoints];
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 //	g_lpLib3d->PushMatrix( MATRIX_PROJECTION );
-//DeadCode JON 31Jul00 	g_lpLib3d->SetProjectionMatrix( (Angles)(int)Save_Data.fieldOfView,1,100,_blockWidth*(_horizonDist-CLOUD_REDUCTION),true );
-//DeadCode JON 31Jul00 	g_lpLib3d->VisibleCheck(pos,_horizonPoints*_horizonPoints,flags);
-//DeadCode JON 31Jul00 	g_lpLib3d->SetProjectionMatrix( (Angles)(int)Save_Data.fieldOfView,1,100,view_dist);
-//DeadCode JON 31Jul00 //	g_lpLib3d->PopMatrix( MATRIX_PROJECTION );
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	// now modify the object matrix to make the transformation for viewer_x,y and z happen... (simple
-//DeadCode JON 31Jul00 	// translations) - this is as the object matrix is used before the viewer matrix
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 //	const int CLOUDRADIUS = _horizonDist - CLOUD_REDUCTION;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	ULong *lowf=flags, *lowf2;
-//DeadCode JON 31Jul00 	D3DVECTOR *lowptr = pos, *lowptr2;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	int imx,imz,rowStart; // image map coords
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 	imz = (((z-(_horizonDist))-hz)+64)<<1;
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 	rowStart = (((x-(_horizonDist))-hx)+64)<<1;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	imz = (((z-(_horizonDist))-hz)+64);
-//DeadCode JON 31Jul00 	rowStart = (((x-(_horizonDist))-hx)+64);
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 //TEMPCODE JON 5/3/00 	imz = (((z-(CLOUDRADIUS))-hz)+64)<<1;
-//DeadCode JON 31Jul00 //TEMPCODE JON 5/3/00 	rowStart = (((x-(CLOUDRADIUS))-hx)+64)<<1;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 //TEMPCODE JON 5/3/00 	lowptr+=(_horizonPoints*CLOUD_REDUCTION)+CLOUD_REDUCTION;
-//DeadCode JON 31Jul00 //TEMPCODE JON 5/3/00 	lowf+=(_horizonPoints*CLOUD_REDUCTION)+CLOUD_REDUCTION;
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 	HMATERIAL cloudMaterial(cloudImg,Image_Map.GetImageMapPtr(CLOUDNO));
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 //TEMPCODE JON 5/3/00 	for (int sz=CLOUDRADIUS*2+1;sz!=0;sz--,imz+=2)
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 	for (int sz=_horizonAreaSize;sz!=0;sz--,imz+=2)
-//DeadCode JON 31Jul00 	for (int sz=_horizonAreaSize;sz!=0;sz--,imz++)
-//DeadCode JON 31Jul00 	{
-//DeadCode JON 31Jul00 		lowf2=lowf;
-//DeadCode JON 31Jul00 		lowf+=_horizonPoints;
-//DeadCode JON 31Jul00 		lowptr2=lowptr;
-//DeadCode JON 31Jul00 		lowptr+=_horizonPoints;
-//DeadCode JON 31Jul00 		imx = rowStart;
-//DeadCode JON 31Jul00 //TEMPCODE JON 5/3/00 		for (int sx=CLOUDRADIUS*2+1;sx!=0;sx--,lowf2++,lowptr2++,imx+=2)
-//DeadCode JON 31Jul00 //		for (int sx=_horizonAreaSize;sx!=0;sx--,lowf2++,lowptr2++,imx+=2)
-//DeadCode JON 31Jul00 		for (int sx=_horizonAreaSize;sx!=0;sx--,lowf2++,lowptr2++,imx++)
-//DeadCode JON 31Jul00 		{
-//DeadCode JON 31Jul00 			ULong flag=lowf2[0]&lowf2[1]&lowf2[_horizonPoints]&lowf2[_horizonPoints+1];
-//DeadCode JON 31Jul00 			if ( !flag )
-//DeadCode JON 31Jul00 			{ // draw this grid
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 				//top
-//DeadCode JON 31Jul00 				if (side!=2)
-//DeadCode JON 31Jul00 				{
-//DeadCode JON 31Jul00 					Lib3DPoint* cornerVert = g_lpLib3d->BeginFan(cloudMaterial,4);
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 					cornerVert[0].setPosition(
-//DeadCode JON 31Jul00 							lowptr2[0].x,
-//DeadCode JON 31Jul00 		 					lowptr2[0].y,
-//DeadCode JON 31Jul00 							lowptr2[0].z
-//DeadCode JON 31Jul00 						);
-//DeadCode JON 31Jul00 					cornerVert[0].setIMapCoords( imx, imz );
-//DeadCode JON 31Jul00 					cornerVert[0].setIMapCoords1( 0, 0 );
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 					cornerVert[1].setPosition(
-//DeadCode JON 31Jul00 							lowptr2[_horizonPoints].x,
-//DeadCode JON 31Jul00 		 					lowptr2[_horizonPoints].y,
-//DeadCode JON 31Jul00 							lowptr2[_horizonPoints].z
-//DeadCode JON 31Jul00 						);
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 					cornerVert[1].setIMapCoords( imx, imz+2 );
-//DeadCode JON 31Jul00 					cornerVert[1].setIMapCoords( imx, imz+1 );
-//DeadCode JON 31Jul00 					cornerVert[1].setIMapCoords1( 0, 255 );
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 					cornerVert[2].setPosition(
-//DeadCode JON 31Jul00 							lowptr2[_horizonPoints+1].x,
-//DeadCode JON 31Jul00 		 					lowptr2[_horizonPoints+1].y,
-//DeadCode JON 31Jul00 							lowptr2[_horizonPoints+1].z
-//DeadCode JON 31Jul00 						);
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 					cornerVert[2].setIMapCoords( imx+2, imz+2 );
-//DeadCode JON 31Jul00 					cornerVert[2].setIMapCoords( imx+1, imz+1 );
-//DeadCode JON 31Jul00 					cornerVert[2].setIMapCoords1( 255, 255 );
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 					cornerVert[3].setPosition(
-//DeadCode JON 31Jul00 							lowptr2[1].x,
-//DeadCode JON 31Jul00 		 					lowptr2[1].y,
-//DeadCode JON 31Jul00 							lowptr2[1].z
-//DeadCode JON 31Jul00 						);
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 					cornerVert[3].setIMapCoords( imx+2, imz );
-//DeadCode JON 31Jul00 					cornerVert[3].setIMapCoords( imx+1, imz );
-//DeadCode JON 31Jul00 					cornerVert[3].setIMapCoords1( 255, 0 );
-//DeadCode JON 31Jul00 					g_lpLib3d->EndFan();
-//DeadCode JON 31Jul00 				}
-//DeadCode JON 31Jul00 				//bottom
-//DeadCode JON 31Jul00 				if (side!=1)
-//DeadCode JON 31Jul00 				{
-//DeadCode JON 31Jul00 					Lib3DPoint* cornerVert = g_lpLib3d->BeginFan(cloudMaterial,4);
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 					cornerVert[3].setPosition(
-//DeadCode JON 31Jul00 							lowptr2[0].x,
-//DeadCode JON 31Jul00 		 					lowptr2[0].y,
-//DeadCode JON 31Jul00 							lowptr2[0].z
-//DeadCode JON 31Jul00 						);
-//DeadCode JON 31Jul00 					cornerVert[3].setIMapCoords( imx, imz );
-//DeadCode JON 31Jul00 					cornerVert[3].setIMapCoords1( 0, 0 );
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 					cornerVert[2].setPosition(
-//DeadCode JON 31Jul00 							lowptr2[_horizonPoints].x,
-//DeadCode JON 31Jul00 		 					lowptr2[_horizonPoints].y,
-//DeadCode JON 31Jul00 							lowptr2[_horizonPoints].z
-//DeadCode JON 31Jul00 						);
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 					cornerVert[2].setIMapCoords( imx, imz+2 );
-//DeadCode JON 31Jul00 					cornerVert[2].setIMapCoords( imx, imz+1 );
-//DeadCode JON 31Jul00 					cornerVert[2].setIMapCoords1( 0, 255 );
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 					cornerVert[1].setPosition(
-//DeadCode JON 31Jul00 							lowptr2[_horizonPoints+1].x,
-//DeadCode JON 31Jul00 		 					lowptr2[_horizonPoints+1].y,
-//DeadCode JON 31Jul00 							lowptr2[_horizonPoints+1].z
-//DeadCode JON 31Jul00 						);
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 					cornerVert[1].setIMapCoords( imx+2, imz+2 );
-//DeadCode JON 31Jul00 					cornerVert[1].setIMapCoords( imx+1, imz+1 );
-//DeadCode JON 31Jul00 					cornerVert[1].setIMapCoords1( 255, 255 );
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 					cornerVert[0].setPosition(
-//DeadCode JON 31Jul00 							lowptr2[1].x,
-//DeadCode JON 31Jul00 		 					lowptr2[1].y,
-//DeadCode JON 31Jul00 							lowptr2[1].z
-//DeadCode JON 31Jul00 						);
-//DeadCode JON 31Jul00 //DeadCode JON 9Jun00 					cornerVert[0].setIMapCoords( imx+2, imz );
-//DeadCode JON 31Jul00 					cornerVert[0].setIMapCoords( imx+1, imz );
-//DeadCode JON 31Jul00 					cornerVert[0].setIMapCoords1( 255, 0 );
-//DeadCode JON 31Jul00 					g_lpLib3d->EndFan();				}
-//DeadCode JON 31Jul00
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				R3DVERTEX *pRVerts;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				R3DVERTEX2 cornerVert[4];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				R3DVERTEX2 *insertVerts;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[0].bodyx.f=lowptr2[0].x;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 		 		cornerVert[0].bodyy.f=lowptr2[0].y;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[0].bodyz.f=lowptr2[0].z;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[0].ix=imx;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[0].iy=imz;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[0].ix1=
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					cornerVert[0].iy1=0;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[1].bodyx.f=lowptr2[_horizonPoints].x;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[1].bodyy.f=lowptr2[_horizonPoints].y;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[1].bodyz.f=lowptr2[_horizonPoints].z;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[1].ix=imx;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[1].iy=imz+2;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[1].ix1=0;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[1].iy1=255;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[2].bodyx.f=lowptr2[_horizonPoints+1].x;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[2].bodyy.f=lowptr2[_horizonPoints+1].y;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[2].bodyz.f=lowptr2[_horizonPoints+1].z;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[2].ix=imx+2;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[2].iy=imz+2;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[2].ix1=255;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[2].iy1=255;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[3].bodyx.f=lowptr2[1].x;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[3].bodyy.f=lowptr2[1].y;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[3].bodyz.f=lowptr2[1].z;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[3].ix=imx+2;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[3].iy=imz;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[3].ix1=255;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				cornerVert[3].iy1=0;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				//top
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				if (side!=2)
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				{
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					g_lpLib3d->BeginFan(cloudMaterial,4,pRVerts);
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					insertVerts=(R3DVERTEX2*)pRVerts;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					*insertVerts++=cornerVert[0];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					*insertVerts++=cornerVert[1];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					*insertVerts++=cornerVert[2];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					*insertVerts=cornerVert[3];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					g_lpLib3d->EndFan();
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				}
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				//bottom
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				if (side!=1)
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				{
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					g_lpLib3d->BeginFan(cloudMaterial,4,pRVerts);
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					insertVerts=(R3DVERTEX2*)pRVerts;
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					*insertVerts++=cornerVert[3];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					*insertVerts++=cornerVert[2];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					*insertVerts++=cornerVert[1];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					*insertVerts=cornerVert[0];
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 					g_lpLib3d->EndFan();
-//DeadCode JON 31Jul00 //DEADCODE JON 5/24/00 				}
-//DeadCode JON 31Jul00 			}
-//DeadCode JON 31Jul00 		}
-//DeadCode JON 31Jul00 	}
-//DeadCode JON 31Jul00 	g_lpLib3d->SetGlobal( TOGGLE_GLOBALALPHA, 255 );
-//DeadCode JON 31Jul00 //#endif
-//DeadCode JON 31Jul00 }
 
-//DEADCODE JON 3/30/00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DEADCODE JON 3/30/00 //Procedure		GridCone
-//DEADCODE JON 3/30/00 //Author		Paul.
-//DEADCODE JON 3/30/00 //Date			Mon 22 Jun 1998
-//DEADCODE JON 3/30/00 //------------------------------------------------------------------------------
-//DEADCODE JON 3/30/00 void LandScape::GridCone(const SLong px,const SLong pz)
-//DEADCODE JON 3/30/00 {
-//DEADCODE JON 3/30/00 	D3DVECTOR pos[_cornerLengthMIN*_cornerLengthMIN*2];
-//DEADCODE JON 3/30/00 	ULong flags[_cornerLengthMIN*_cornerLengthMIN*2];
-//DEADCODE JON 3/30/00
-//DEADCODE JON 3/30/00 	D3DVECTOR lpos,mpos,*lowptr,*hiptr;
-//DEADCODE JON 3/30/00 	SLong lx,lz,mx;
-//DEADCODE JON 3/30/00 	lowptr=pos;
-//DEADCODE JON 3/30/00 	hiptr=lowptr+_cornerLengthMIN*_cornerLengthMIN;
-//DEADCODE JON 3/30/00 	lx=px;
-//DEADCODE JON 3/30/00 	lz=pz;
-//DEADCODE JON 3/30/00 	lpos.x=lx-viewer_x;
-//DEADCODE JON 3/30/00 	lpos.z=lz-viewer_z;
-//DEADCODE JON 3/30/00 	// get the grid data 4 min and maximum altitudes
-//DEADCODE JON 3/30/00 	fileblock fb( FIL_MAXALT, Grid_Base::makeGridAt );
-//DEADCODE JON 3/30/00 	Grid_Base* maxAlt = (Grid_Base*) fb.getdata();
-//DEADCODE JON 3/30/00 	fileblock fb1( FIL_MINALT, Grid_Base::makeGridAt );
-//DEADCODE JON 3/30/00 	Grid_Base* minAlt = (Grid_Base*) fb1.getdata();
-//DEADCODE JON 3/30/00
-//DEADCODE JON 3/30/00 	for (int i=_cornerLengthMIN;i!=0;i--)
-//DEADCODE JON 3/30/00 	{
-//DEADCODE JON 3/30/00 		mpos=lpos;
-//DEADCODE JON 3/30/00 		mx=lx;
-//DEADCODE JON 3/30/00 		for (int j=_cornerLengthMIN;j!=0;j--)
-//DEADCODE JON 3/30/00 		{
-//DEADCODE JON 3/30/00 			SLong min,max;
-//DEADCODE JON 3/30/00 //DEADCODE JON 1/27/00 			Three_Dee.pTMake->GetMinMaxAlt(mx,lz,min,max);
-//DEADCODE JON 3/30/00 			min = minAlt->getWorld( mx, lz )<<9;
-//DEADCODE JON 3/30/00 			max = maxAlt->getWorld( mx, lz )<<9;
-//DEADCODE JON 3/30/00 			*lowptr=mpos;
-//DEADCODE JON 3/30/00 //DEADCODE JON 1/31/00 			min*=_altitudeScale;
-//DEADCODE JON 3/30/00 			*hiptr=mpos;
-//DEADCODE JON 3/30/00 //DEADCODE JON 1/31/00 			max*=_altitudeScale;
-//DEADCODE JON 3/30/00 			lowptr->y=min-viewer_y;
-//DEADCODE JON 3/30/00 			hiptr->y=max-viewer_y;
-//DEADCODE JON 3/30/00 			mpos.x+=_blockWidth;
-//DEADCODE JON 3/30/00 			mx+=_blockWidth;
-//DEADCODE JON 3/30/00 			lowptr++;
-//DEADCODE JON 3/30/00 			hiptr++;
-//DEADCODE JON 3/30/00 		}
-//DEADCODE JON 3/30/00 		lpos.z+=_blockWidth;
-//DEADCODE JON 3/30/00 		lz+=_blockWidth;
-//DEADCODE JON 3/30/00 	}
-//DEADCODE JON 3/30/00 	g_lpLib3d->VisibleCheck(pos,_cornerLengthMIN*_cornerLengthMIN*2,flags);
-//DEADCODE JON 3/30/00
-//DEADCODE JON 3/30/00 	ULong *lowf,*hif;
-//DEADCODE JON 3/30/00 	lowf=flags;
-//DEADCODE JON 3/30/00 	hif=flags+_cornerLengthMIN*_cornerLengthMIN;
-//DEADCODE JON 3/30/00 	for (i=_cornerLengthMIN*_cornerLengthMIN;i!=0;*lowf&=*hif,lowf++,hif++,i--);
-//DEADCODE JON 3/30/00
-//DEADCODE JON 3/30/00 	lowf=flags;
-//DEADCODE JON 3/30/00 	UByte* res=gridCone;
-//DEADCODE JON 3/30/00
-//DEADCODE JON 3/30/00 	for (i=_wholeAreaSizeMIN;i!=0;i--)
-//DEADCODE JON 3/30/00 	{
-//DEADCODE JON 3/30/00 		ULong *lowf2=lowf;
-//DEADCODE JON 3/30/00 		lowf+=_cornerLengthMIN;
-//DEADCODE JON 3/30/00 		for (int j=_wholeAreaSizeMIN;j!=0;j--,lowf2++)
-//DEADCODE JON 3/30/00 		{
-//DEADCODE JON 3/30/00 			ULong flag=lowf2[0]&lowf2[1]&lowf2[_cornerLengthMIN]&lowf2[_cornerLengthMIN+1];
-//DEADCODE JON 3/30/00 			*res++=flag?0:1;
-//DEADCODE JON 3/30/00 		}
-//DEADCODE JON 3/30/00 	}
-//DEADCODE JON 3/30/00 }
-//Old_Code PD 29Nov99 void LandScape::GridCone(const SLong px,const SLong pz)
-//Old_Code PD 29Nov99 {
-//Old_Code PD 29Nov99 	const Float _fbw=Float(_blockWidth);
-//Old_Code PD 29Nov99 	FPMATRIX& mat=*fpviewer_matrix;
-//Old_Code PD 29Nov99 	fpCOORDS3D tbasepos,tdeltawx,tdeltawy,tdeltawz;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	SLong intbaseposX=px;
-//Old_Code PD 29Nov99 	SLong intbaseposZ=pz;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	tbasepos.X.i=px-viewer_x;
-//Old_Code PD 29Nov99 	tbasepos.Y.i=-viewer_y;
-//Old_Code PD 29Nov99 	tbasepos.Z.i=pz-viewer_z;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	_matrix.transform(&mat,tbasepos.X,tbasepos.Y,tbasepos.Z);
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	tdeltawx.X.f=mat.L11*_fbw;
-//Old_Code PD 29Nov99 	tdeltawx.Y.f=mat.L21*_fbw;
-//Old_Code PD 29Nov99 	tdeltawx.Z.f=mat.L31*_fbw;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	tdeltawy.X.f=mat.L12*Float(_altitudeScale);
-//Old_Code PD 29Nov99 	tdeltawy.Y.f=mat.L22*Float(_altitudeScale);
-//Old_Code PD 29Nov99 	tdeltawy.Z.f=mat.L32*Float(_altitudeScale);
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	tdeltawz.X.f=mat.L13*_fbw;
-//Old_Code PD 29Nov99 	tdeltawz.Y.f=mat.L23*_fbw;
-//Old_Code PD 29Nov99 	tdeltawz.Z.f=mat.L33*_fbw;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	UByte* ptr=gridCorners;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	SLong cornerLength,wholeAreaSize;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	cornerLength=_cornerLengthMIN;
-//Old_Code PD 29Nov99 	wholeAreaSize=_wholeAreaSizeMIN;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	for (int r=0;r<cornerLength;r++)
-//Old_Code PD 29Nov99 	{
-//Old_Code PD 29Nov99 		fpCOORDS3D 	tbaseinner=tbasepos;
-//Old_Code PD 29Nov99 		SLong intinnerposX=intbaseposX;
-//Old_Code PD 29Nov99 		SLong intinnerposZ=intbaseposZ;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 		for (int c=0;c<cornerLength;c++)
-//Old_Code PD 29Nov99 		{
-//Old_Code PD 29Nov99 			fpCOORDS3D low,high;
-//Old_Code PD 29Nov99 			SLong min,max;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 			Three_Dee.pTMake->GetMinMaxAlt(intinnerposX,intinnerposZ,min,max);
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 			low.X.f=tbaseinner.X.f+tdeltawy.X.f*Float(min);
-//Old_Code PD 29Nov99 			low.Y.f=tbaseinner.Y.f+tdeltawy.Y.f*Float(min);
-//Old_Code PD 29Nov99 			low.Z.f=tbaseinner.Z.f+tdeltawy.Z.f*Float(min);
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 			high.X.f=tbaseinner.X.f+tdeltawy.X.f*Float(max);
-//Old_Code PD 29Nov99 			high.Y.f=tbaseinner.Y.f+tdeltawy.Y.f*Float(max);
-//Old_Code PD 29Nov99 			high.Z.f=tbaseinner.Z.f+tdeltawy.Z.f*Float(max);
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 			*ptr++=_matrix.GenClipFlags(low)&_matrix.GenClipFlags(high);
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 			intinnerposX+=_blockWidth;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 			tbaseinner.X.f+=tdeltawx.X.f;
-//Old_Code PD 29Nov99 			tbaseinner.Y.f+=tdeltawx.Y.f;
-//Old_Code PD 29Nov99 			tbaseinner.Z.f+=tdeltawx.Z.f;
-//Old_Code PD 29Nov99 		}
-//Old_Code PD 29Nov99 		intbaseposZ+=_blockWidth;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 		tbasepos.X.f+=tdeltawz.X.f;
-//Old_Code PD 29Nov99 		tbasepos.Y.f+=tdeltawz.Y.f;
-//Old_Code PD 29Nov99 		tbasepos.Z.f+=tdeltawz.Z.f;
-//Old_Code PD 29Nov99 	}
-//Old_Code PD 29Nov99 	ptr=gridCorners;
-//Old_Code PD 29Nov99 	UByte* res=gridCone;
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 	for (r=0;r<wholeAreaSize;r++,ptr+=cornerLength)
-//Old_Code PD 29Nov99 	{
-//Old_Code PD 29Nov99 		UByte* ptr2=ptr;
-//Old_Code PD 29Nov99 	 	for (int c=0;c<wholeAreaSize;c++,ptr2++)
-//Old_Code PD 29Nov99 		{
-//Old_Code PD 29Nov99 			UByte andedFlags=*ptr2;
-//Old_Code PD 29Nov99 			andedFlags&=*(ptr2+1);
-//Old_Code PD 29Nov99 			andedFlags&=*(ptr2+cornerLength);
-//Old_Code PD 29Nov99 			andedFlags&=*(ptr2+cornerLength+1);
-//Old_Code PD 29Nov99
-//Old_Code PD 29Nov99 			if (andedFlags!=0)	*res++=0;
-//Old_Code PD 29Nov99 			else				*res++=1;
-//Old_Code PD 29Nov99 		}
-//Old_Code PD 29Nov99 	}
-//Old_Code PD 29Nov99 //	if (!Manual_Pilot.ControlledAC2)
-//Old_Code PD 29Nov99 //		memset(gridCone,1,wholeAreaSize*wholeAreaSize);
-//Old_Code PD 29Nov99 }
 
-//DEADCODE JON 4/27/00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DEADCODE JON 4/27/00 //Procedure		ScrollGrid
-//DEADCODE JON 4/27/00 //Author		Paul.
-//DEADCODE JON 4/27/00 //Date			Mon 9 Nov 1998
-//DEADCODE JON 4/27/00 //------------------------------------------------------------------------------
-//DEADCODE JON 4/27/00 void LandScape::ScrollGrid(SLong dx,SLong dz,UByte* pGrid)
-//DEADCODE JON 4/27/00 {
-//DEADCODE JON 4/27/00 	const SLong wholeAreaSize=_wholeAreaSizeMIN;
-//DEADCODE JON 4/27/00 	const SLong GRID_SIZE=wholeAreaSize*wholeAreaSize;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 	while (dx>0)
-//DEADCODE JON 4/27/00 	{
-//DEADCODE JON 4/27/00 		//scroll data left (west) 'cos we're moving east
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		UByte* ptmp=pGrid;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		for (SLong c=wholeAreaSize;c--;)
-//DEADCODE JON 4/27/00 		{
-//DEADCODE JON 4/27/00 			for (SLong r=wholeAreaSize-1;r--;)
-//DEADCODE JON 4/27/00 			{
-//DEADCODE JON 4/27/00 			 	ptmp[0]=ptmp[1];
-//DEADCODE JON 4/27/00 				ptmp++;
-//DEADCODE JON 4/27/00 			}
-//DEADCODE JON 4/27/00 			*ptmp++=0xFF;
-//DEADCODE JON 4/27/00 		}
-//DEADCODE JON 4/27/00 		dx-=_blockWidth;
-//DEADCODE JON 4/27/00 	}
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 	while (dx<0)
-//DEADCODE JON 4/27/00 	{
-//DEADCODE JON 4/27/00 		//scroll data right (east) 'cos we're moving west
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		UByte* ptmp=pGrid+GRID_SIZE-1;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		for (SLong r=wholeAreaSize;r--;)
-//DEADCODE JON 4/27/00 		{
-//DEADCODE JON 4/27/00 			for (SLong c=wholeAreaSize-1;c--;)
-//DEADCODE JON 4/27/00 			{
-//DEADCODE JON 4/27/00 				ptmp[0]=ptmp[-1];
-//DEADCODE JON 4/27/00 				ptmp--;
-//DEADCODE JON 4/27/00 			}
-//DEADCODE JON 4/27/00 			*ptmp--=0xFF;
-//DEADCODE JON 4/27/00 		}
-//DEADCODE JON 4/27/00 		dx+=_blockWidth;
-//DEADCODE JON 4/27/00 	}
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 	while (dz>0)
-//DEADCODE JON 4/27/00 	{
-//DEADCODE JON 4/27/00 		//scroll data up (south) 'cos we're moving north
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		UByte* ptmp=pGrid;
-//DEADCODE JON 4/27/00 		UByte* ptmp2=ptmp+wholeAreaSize;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		SLong r;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		for (r=GRID_SIZE-wholeAreaSize;r--;)
-//DEADCODE JON 4/27/00 			*ptmp++=*ptmp2++;
-//DEADCODE JON 4/27/00 		for (r=wholeAreaSize;r--;)
-//DEADCODE JON 4/27/00 			*ptmp++=0xFF;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		dz-=_blockWidth;
-//DEADCODE JON 4/27/00 	}
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 	while (dz<0)
-//DEADCODE JON 4/27/00 	{
-//DEADCODE JON 4/27/00 		//scroll data down (north) 'cos we're moving south
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		UByte* ptmp=pGrid+GRID_SIZE-1;
-//DEADCODE JON 4/27/00 		UByte* ptmp2=ptmp-wholeAreaSize;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		SLong r;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		for (r=GRID_SIZE-wholeAreaSize;r--;)
-//DEADCODE JON 4/27/00 			*ptmp--=*ptmp2--;
-//DEADCODE JON 4/27/00 		for (r=wholeAreaSize;r--;)
-//DEADCODE JON 4/27/00 			*ptmp--=0xFF;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 		dz+=_blockWidth;
-//DEADCODE JON 4/27/00 	}
-//DEADCODE JON 4/27/00 }
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 void LandScape::ScrollGridDis(SLong dx,SLong dz,HTEXT* pGrid,Dropped* pDiscarded)
-//DEADCODE JON 4/27/00 {
-//DEADCODE JON 4/27/00 	const SLong wholeAreaSize=_wholeAreaSizeMIN;
-//DEADCODE JON 4/27/00 	const SLong GRID_SIZE=wholeAreaSize*wholeAreaSize;
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 	while (dx>0)
-//DEADCODE JON 4/27/00 	{
-//DEADCODE JON 4/27/00 		//scroll data left (west) 'cos we're moving east
-//DEADCODE JON 4/27/00 		HTEXT* ptmp=pGrid;
-//DEADCODE JON 4/27/00 		for (SLong c=wholeAreaSize-1;c>=0;c--)
-//DEADCODE JON 4/27/00 		{
-//DEADCODE JON 4/27/00 			if (ptmp[0]!=HTEXTNULL)	pDiscarded->hText[pDiscarded->num++]=ptmp[0];
-//DEADCODE JON 4/27/00 			for (SLong r=wholeAreaSize-1;r;r--,ptmp++) ptmp[0]=ptmp[1];
-//DEADCODE JON 4/27/00 			*ptmp++=HTEXTNULL;
-//DEADCODE JON 4/27/00 		}
-//DEADCODE JON 4/27/00 		dx-=_blockWidth;
-//DEADCODE JON 4/27/00 	}
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 	while (dx<0)
-//DEADCODE JON 4/27/00 	{
-//DEADCODE JON 4/27/00 		//scroll data right (east) 'cos we're moving west
-//DEADCODE JON 4/27/00 		HTEXT* ptmp=pGrid+GRID_SIZE-1;
-//DEADCODE JON 4/27/00 		for (SLong r=wholeAreaSize-1;r>=0;r--)
-//DEADCODE JON 4/27/00 		{
-//DEADCODE JON 4/27/00 			if (ptmp[0]!=HTEXTNULL)	pDiscarded->hText[pDiscarded->num++]=ptmp[0];
-//DEADCODE JON 4/27/00 			for (SLong c=wholeAreaSize-1;c;c--,ptmp--) ptmp[0]=ptmp[-1];
-//DEADCODE JON 4/27/00 			*ptmp--=HTEXTNULL;
-//DEADCODE JON 4/27/00 		}
-//DEADCODE JON 4/27/00 		dx+=_blockWidth;
-//DEADCODE JON 4/27/00 	}
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 	while (dz>0)
-//DEADCODE JON 4/27/00 	{
-//DEADCODE JON 4/27/00 		//scroll data up (south) 'cos we're moving north
-//DEADCODE JON 4/27/00 		HTEXT *ptmp=pGrid,*ptmp2=ptmp+wholeAreaSize;
-//DEADCODE JON 4/27/00 		for (SLong r=wholeAreaSize-1;r>=0;r--)	if (ptmp[r]!=HTEXTNULL) pDiscarded->hText[pDiscarded->num++]=ptmp[r];
-//DEADCODE JON 4/27/00 		for (r=GRID_SIZE-wholeAreaSize;r--;)	*ptmp++=*ptmp2++;
-//DEADCODE JON 4/27/00 		for (r=wholeAreaSize;r--;)				*ptmp++=HTEXTNULL;
-//DEADCODE JON 4/27/00 		dz-=_blockWidth;
-//DEADCODE JON 4/27/00 	}
-//DEADCODE JON 4/27/00
-//DEADCODE JON 4/27/00 	while (dz<0)
-//DEADCODE JON 4/27/00 	{
-//DEADCODE JON 4/27/00 		//scroll data down (north) 'cos we're moving south
-//DEADCODE JON 4/27/00 		HTEXT *ptmp=pGrid+GRID_SIZE-1,*ptmp2=ptmp-wholeAreaSize;
-//DEADCODE JON 4/27/00 		for (SLong r=wholeAreaSize-1;r>=0;r--)	if (ptmp[-r]!=HTEXTNULL) pDiscarded->hText[pDiscarded->num++]=ptmp[-r];
-//DEADCODE JON 4/27/00 		for (r=GRID_SIZE-wholeAreaSize;r--;)	*ptmp--=*ptmp2--;
-//DEADCODE JON 4/27/00 		for (r=wholeAreaSize;r--;)				*ptmp--=HTEXTNULL;
-//DEADCODE JON 4/27/00 		dz+=_blockWidth;
-//DEADCODE JON 4/27/00 	}
-//DEADCODE JON 4/27/00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ScrollTileGrid
@@ -2599,18 +1562,6 @@ void LandScape::ScrollTileGrid(SLong dx,SLong dz)
 	while (dz>0)
 	{
 		//scroll data up (south) 'cos we're moving north
-//DeadCode JON 18Jul00 		TileElement* ptmp=tileCacheGrid,*ptmp2=ptmp+wholeAreaSize;
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 		for (SLong r=wholeAreaSize-1;r>=0;r--)
-//DeadCode JON 18Jul00 			if (ptmp[r].textHandle!=HTEXTNULL)
-//DeadCode JON 18Jul00 				g_lpLib3d->FreeLandscapeTexture( ptmp[r].textHandle.textureHandle );
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 		for (r=GRID_SIZE-wholeAreaSize;r--;)
-//DeadCode JON 18Jul00 			*ptmp++=*ptmp2++;
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 		for (r=wholeAreaSize;r--;ptmp++)
-//DeadCode JON 18Jul00 			ptmp->reset();
-//DeadCode JON 18Jul00 		dz--;
 		TileElement* ptmp=tileCacheGrid;
 		TileElement* ptmp2=tileCacheGrid;
 		{
@@ -2717,7 +1668,6 @@ inline void LandScape::MakeSpaceInList( TileResList* currResList, UWord& numDesi
 bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 {
 #pragma warnmsg ( "Optimise here as many frame invariants are re-calculated on a per frame basis" )
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: start ");
 	bool allAtReqLevel = true;
 
 	// why is this delay here you may ask
@@ -2733,9 +1683,7 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	}
 
 
-//DeadCode JON 2Aug00 	const UWord AGEMASK = 0xFFFF>>1;
 	const int WIDTH=_wholeAreaSizeMIN;
-//DeadCode JON 31Jul00 	const int MAX_AT_EACH_RES = 7;
 
 	// tile making factors - multiply the values by num of that type of tiles
 	// stop making when the cumulative is greater than MAX_WEIGHTED
@@ -2745,7 +1693,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	const int CHANGED_TILE_WEIGHT = 40;
 //	const int OFFSCREEN_TILE_WEIGHT = 50;
 
-//DeadCode JON 2Aug00 	static UWord ageCount = 0x7FFF-1;
 
 	UWord bgList = NULLTILEOFFSET; // the tiles to be done in the background if possible
 	int bgCount = 0; // number of tiles to do in the background
@@ -2760,7 +1707,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 #define DEBUG_GRID
 #endif
 #ifdef DEBUG_GRID
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: debug ");
 	// right quick test code
 	const int dGS = 17*18; // debug grid size
 	const int gS = 17*17; // grid size
@@ -2807,21 +1753,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	}
 #endif
 
-//DeadCode JON 2Aug00 	if ( ++ageCount < 0x7FFF )
-//DeadCode JON 2Aug00 	{
-//DeadCode JON 2Aug00 		ageCount = 0x7FFF;
-//DeadCode JON 2Aug00 		// now must clear the top bit of all ages
-//DeadCode JON 2Aug00 		TileElement* tmp = tileCacheGrid;
-//DeadCode JON 2Aug00 		for ( int i = 0; i < WIDTH*WIDTH; i++, tmp++ )
-//DeadCode JON 2Aug00 			tmp->age&=AGEMASK;
-//DeadCode JON 2Aug00
-//DeadCode JON 2Aug00 		for ( i=0; i<8; i++ )
-//DeadCode JON 2Aug00 		{
-//DeadCode JON 2Aug00 			tileResList[i].oldestAge&=AGEMASK;
-//DeadCode JON 2Aug00 			tileResList[i].nextOldestAge&=AGEMASK;
-//DeadCode JON 2Aug00 		}
-//DeadCode JON 2Aug00 	}
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: get count ");
 	g_lpLib3d->GetLandscapeTextureCount(
 		tileResList[7].totalTiles, // num 1024 res
 		tileResList[6].totalTiles, // num 512
@@ -2834,10 +1765,8 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	);
 
 
-//DeadCode JON 31Jul00 	int maxAtRes;
 	if ( maxResTiles )
 	{
-//DeadCode JON 31Jul00 		maxAtRes = 500; // note can't be 256 tiles
 		g_lpLib3d->GetLandscapeTextureCount(
 				tileResList[7].onScreenMax, // num 1024 res
 				tileResList[6].onScreenMax, // num 512
@@ -2851,7 +1780,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 
 	} else
 	{
-//DeadCode JON 31Jul00 		maxAtRes = MAX_AT_EACH_RES;
 		g_lpLib3d->GetLandscapeTextureOnScreenMax(
 			tileResList[7].onScreenMax, // num 1024 res
 			tileResList[6].onScreenMax, // num 512
@@ -2866,7 +1794,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	}
 
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: reset loop ");
 	for ( int j = 0; j < 8; tileResList[j++].reset() )
 	{/* re initialising the lists*/}
 
@@ -2895,14 +1822,9 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	};
 	Phase	phase=PH_0;
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: while loop ");
 	while(phase!=PH_END)	//optimiser should make case statement bypass while statement
 	{
 //		Process(curr); // curr ptr to current grid loc, process do the work.
-//DeadCode JON 31Jul00 		if ( (tileResList[currentRes].desiredTiles == maxAtRes || tileResList[currentRes].desiredTiles == tileResList[currentRes].totalTiles )/*&& currentRes>0*/ )
-//DeadCode JON 31Jul00 		{
-//DeadCode JON 31Jul00 			currentRes--;
-//DeadCode JON 31Jul00 		}
 
 		while ( tileResList[currentRes].desiredTiles == tileResList[currentRes].onScreenMax )
 		{
@@ -2923,7 +1845,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 
 		if ( *(gridCone+curr) )
 		{ // this tile is visible
-//DeadCode JON 2Aug00 			cTile->age = ageCount;
 			cTile->desiredRes = currentRes;
 
 			tileResList[currentRes].desiredTiles++;		 // one more desired.
@@ -2963,26 +1884,8 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 						tileResList[cTile->currentRes].offScreen,
 						curr );
 
-//DeadCode JON 2Aug00 				if ( cTile->age == tileResList[cTile->currentRes].oldestAge )
-//DeadCode JON 2Aug00 				{ // add to the oldest age list
-//DeadCode JON 2Aug00 					TileResList::add(
-//DeadCode JON 2Aug00 						tileResList[cTile->currentRes].offScreenOldest,
-//DeadCode JON 2Aug00 						curr );
-//DeadCode JON 2Aug00 				} else
-//DeadCode JON 2Aug00 				{ // add to the remaining offscreen tiles
-//DeadCode JON 2Aug00 					TileResList::add(
-//DeadCode JON 2Aug00 						tileResList[cTile->currentRes].offScreenRemaining,
-//DeadCode JON 2Aug00 						curr );
-//DeadCode JON 2Aug00 					if ( cTile->age < tileResList[cTile->currentRes].nextOldestAge )
-//DeadCode JON 2Aug00 						tileResList[cTile->currentRes].nextOldestAge = cTile->age;
-//DeadCode JON 2Aug00 				}
 			} else
 			{ // not visible and not cached
-//DEADCODE JON 6/6/00 				if ( bgCount > 0 )
-//DEADCODE JON 6/6/00 				{
-//DEADCODE JON 6/6/00 					bgCount--;
-//DEADCODE JON 6/6/00 					TileResList::add( bgList, curr );
-//DEADCODE JON 6/6/00 				}
 				if ( bgCount++ < MAX_BACKGROUND )
 				{
 					TileResList::add( bgList, curr );
@@ -3253,8 +2156,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 		}
 	} // end of while
 
-//DEADCODE JON 5/12/00 	if ( numNewTiles > 3 )
-//DEADCODE JON 5/12/00 		int i=0;
 
 // now we have to go through the lists we have built and render the tile changes that we can.
 // step one: shuffle things about so there are enough tiles of each resolution to build the new
@@ -3264,10 +2165,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 
 	// ok now first we can reduce the res of anything wanting it as it's virtually free...
 
-//DeadCode JON 17Jul00 	// when lowering resolutions start at the highest res and move on down
-//DeadCode JON 17Jul00 	// note - no need to start at the very highest as there will be nothing
-//DeadCode JON 17Jul00 	// of higher resolution anyway.
-//DeadCode JON 17Jul00 	for ( rez = 6; rez >= 0; rez-- )
 
 	int offScreenRes;// = OFF_SCREEN_HIGHEST_REZ;
 	for ( offScreenRes = 0; offScreenRes<8 && tileResList[offScreenRes].freeTiles==0; offScreenRes++ )
@@ -3285,7 +2182,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	// rez because of a lost tile
 	// note - no need to start at the very highest as there will be nothing
 	// of higher resolution anyway.
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: for res=0 ");
 	for ( rez = 0; rez <7; rez++ )
 	{
 		TileResList* currResList = &tileResList[rez];
@@ -3296,29 +2192,10 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 			{ // try to free some tiles
 
 				UWord numReq = 1 + currResList->numNewTiles;
-//DeadCode JON 2Aug00 				MakeSpaceInList( currResList, numReq, currResList->offScreenOldest, offScreenRes );
-//DeadCode JON 2Aug00 				MakeSpaceInList( currResList, numReq, currResList->offScreenRemaining, offScreenRes );
 				MakeSpaceInList( currResList, numReq, currResList->offScreen, offScreenRes );
 				if ( currResList->freeTiles < numReq )
 					break;
 
-//DeadCode JON 18Jul00 				if ( currResList->offScreenOldest != NULLTILEOFFSET )
-//DeadCode JON 18Jul00 				{
-//DeadCode JON 18Jul00 					TileElement* delTile = tileCacheGrid+currResList->offScreenOldest;
-//DeadCode JON 18Jul00 					g_lpLib3d->FreeLandscapeTexture(delTile->textHandle.textureHandle);
-//DeadCode JON 18Jul00 					currResList->offScreenOldest = delTile->nextLink;
-//DeadCode JON 18Jul00 					delTile->reset();
-//DeadCode JON 18Jul00 					currResList->freeTiles++;
-//DeadCode JON 18Jul00 				} else if ( currResList->offScreenRemaining != NULLTILEOFFSET )
-//DeadCode JON 18Jul00 				{
-//DeadCode JON 18Jul00 					TileElement* delTile = tileCacheGrid+currResList->offScreenRemaining;
-//DeadCode JON 18Jul00 					g_lpLib3d->FreeLandscapeTexture(delTile->textHandle.textureHandle);
-//DeadCode JON 18Jul00 					currResList->offScreenRemaining = delTile->nextLink;
-//DeadCode JON 18Jul00 					delTile->reset();
-//DeadCode JON 18Jul00 					currResList->freeTiles++;
-//DeadCode JON 18Jul00 				}
-//DeadCode JON 18Jul00 //DeadCode JON 18Jul00 				else
-//DeadCode JON 18Jul00 //DeadCode JON 18Jul00 					break; // can't make any more space.
 			}
 
 			TileElement* cTile = tileCacheGrid+offset;
@@ -3360,7 +2237,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	}
 
 	// prepare to make any new tiles as needed
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: ror res=7 ");
 	for ( rez = 7; rez >= 0; rez-- )
 	{
 		TileResList* currResList = &tileResList[rez];
@@ -3370,93 +2246,10 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 			{
 				// we need to free up some tiles at this rez to continue.
 				// try the oldest first
-//DeadCode JON 2Aug00 				MakeSpaceInList( currResList, currResList->numNewTiles, currResList->offScreenOldest, offScreenRes );
-//DeadCode JON 2Aug00 				MakeSpaceInList( currResList, currResList->numNewTiles, currResList->offScreenRemaining, offScreenRes );
 				MakeSpaceInList( currResList, currResList->numNewTiles, currResList->offScreen, offScreenRes );
 
-//DeadCode JON 18Jul00 				int reducedRez = OFF_SCREEN_HIGHEST_REZ;
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 				UWord remOffset = currResList->offScreenOldest;
-//DeadCode JON 18Jul00 				while ( remOffset != NULLTILEOFFSET &&
-//DeadCode JON 18Jul00 					currResList->freeTiles < currResList->numNewTiles )
-//DeadCode JON 18Jul00 				{
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 					// rather than delete these offscreen tiles, reduce their quality as it is quick
-//DeadCode JON 18Jul00 					TileElement* cTile = tileCacheGrid+remOffset; // the tile to reduce
-//DeadCode JON 18Jul00 					remOffset = cTile->nextLink;
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 					// we can do some background processing - hurrah.
-//DeadCode JON 18Jul00 					TileResList* reducedResList = &tileResList[rez];
-//DeadCode JON 18Jul00 //DeadCode JON 17Jul00 					while ( reducedResList->freeTiles <= currResList->numNewTiles )
-//DeadCode JON 18Jul00 					while ( reducedRez >= 0 && reducedResList->freeTiles <= reducedResList->numNewTiles )
-//DeadCode JON 18Jul00 					{ // find the available offscreen resoultions
-//DeadCode JON 18Jul00 						reducedResList = &tileResList[--reducedRez];
-//DeadCode JON 18Jul00 					}
-//DeadCode JON 18Jul00 					if ( reducedRez >= 0 )
-//DeadCode JON 18Jul00 					{ // we can do the reduce
-//DeadCode JON 18Jul00 						reducedResList->freeTiles--;
-//DeadCode JON 18Jul00 						HTEXT newTH;
-//DeadCode JON 18Jul00 						g_lpLib3d->AllocateLandscapeTexture( 7-reducedRez, newTH.textureHandle);
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 						// now make the lower rez version
-//DeadCode JON 18Jul00 						g_lpLib3d->ReduceLandQuality( cTile->textHandle.textureHandle, newTH.textureHandle );
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DeadCode JON 18Jul00 						cTile->textHandle=newTH;
-//DeadCode JON 18Jul00 						cTile->currentRes=reducedRez;
-//DeadCode JON 18Jul00 						cTile->nextLink = NULLTILEOFFSET; // shouldn't be needed
-//DeadCode JON 18Jul00 					} else
-//DeadCode JON 18Jul00 					{ // none spare, just delete
-//DeadCode JON 18Jul00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DeadCode JON 18Jul00 						cTile->reset();
-//DeadCode JON 18Jul00 					}
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 					currResList->freeTiles++;
-//DeadCode JON 18Jul00 					currResList->offScreenOldest = remOffset;
-//DeadCode JON 18Jul00 				}
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 				// try the rest
-//DeadCode JON 18Jul00 				remOffset = currResList->offScreenRemaining;
-//DeadCode JON 18Jul00 				while ( remOffset != NULLTILEOFFSET &&
-//DeadCode JON 18Jul00 					currResList->freeTiles < currResList->numNewTiles )
-//DeadCode JON 18Jul00 				{
-//DeadCode JON 18Jul00 					// rather than delete these offscreen tiles, reduce their quality as it is quick
-//DeadCode JON 18Jul00 					TileElement* cTile = tileCacheGrid+remOffset; // the tile to reduce
-//DeadCode JON 18Jul00 					remOffset = cTile->nextLink;
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 					// we can do some background processing - hurrah.
-//DeadCode JON 18Jul00 					TileResList* reducedResList = &tileResList[rez];
-//DeadCode JON 18Jul00 //DeadCode JON 17Jul00 					while ( reducedResList->freeTiles <= currResList->numNewTiles )
-//DeadCode JON 18Jul00 					while ( reducedRez >= 0 && reducedResList->freeTiles <= reducedResList->numNewTiles )
-//DeadCode JON 18Jul00 					{ // find the available offscreen resoultions
-//DeadCode JON 18Jul00 						reducedResList = &tileResList[--reducedRez];
-//DeadCode JON 18Jul00 					}
-//DeadCode JON 18Jul00 					if ( reducedRez >= 0 )
-//DeadCode JON 18Jul00 					{ // we can do the reduce
-//DeadCode JON 18Jul00 						reducedResList->freeTiles--;
-//DeadCode JON 18Jul00 						HTEXT newTH;
-//DeadCode JON 18Jul00 						g_lpLib3d->AllocateLandscapeTexture( 7-reducedRez, newTH.textureHandle);
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 						// now make the lower rez version
-//DeadCode JON 18Jul00 						g_lpLib3d->ReduceLandQuality( cTile->textHandle.textureHandle, newTH.textureHandle );
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DeadCode JON 18Jul00 						cTile->textHandle=newTH;
-//DeadCode JON 18Jul00 						cTile->currentRes=reducedRez;
-//DeadCode JON 18Jul00 						cTile->nextLink = NULLTILEOFFSET; // shouldn't be needed
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 					} else
-//DeadCode JON 18Jul00 					{ // none spare, just delete
-//DeadCode JON 18Jul00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DeadCode JON 18Jul00 						cTile->reset();
-//DeadCode JON 18Jul00 					}
-//DeadCode JON 18Jul00
-//DeadCode JON 18Jul00 					currResList->freeTiles++;
-//DeadCode JON 18Jul00 					currResList->offScreenOldest = remOffset;
-//DeadCode JON 18Jul00 				}
 				if ( currResList->freeTiles < currResList->numNewTiles )
 				{
-//DeadCode JON 2Aug00 					currResList->offScreenRemaining = NULLTILEOFFSET;
 					currResList->offScreen = NULLTILEOFFSET;
 					// right now we need to shove any tiles we are unable to do into the next rez list
 					allAtReqLevel = false;
@@ -3501,7 +2294,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	cumWeight*=NEW_TILE_WEIGHT;
 
 	// now do a pass to make as many changed tiles as we can
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: cumWeight ");
 	if ( cumWeight < MAX_WEIGHTED && bgCount > DO_BACKGROUND_CUTOFF )
 	{
 		// great we can now make some resolution changes
@@ -3524,24 +2316,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 //TempCode JON 18Jul00 					if ( currResList->freeTiles < numReq )
 //TempCode JON 18Jul00 						break;
 
-//DeadCode JON 2Aug00 					if ( currResList->offScreenOldest != NULLTILEOFFSET )
-//DeadCode JON 2Aug00 					{
-//DeadCode JON 2Aug00 						TileElement* cTile = tileCacheGrid+currResList->offScreenOldest;
-//DeadCode JON 2Aug00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DeadCode JON 2Aug00 						currResList->offScreenOldest = cTile->nextLink;
-//DeadCode JON 2Aug00 						cTile->reset();
-//DeadCode JON 2Aug00 						currResList->freeTiles++;
-//DeadCode JON 2Aug00 					} else if ( currResList->offScreenRemaining != NULLTILEOFFSET )
-//DeadCode JON 2Aug00 					{
-//DeadCode JON 2Aug00 						TileElement* cTile = tileCacheGrid+currResList->offScreenRemaining;
-//DeadCode JON 2Aug00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DeadCode JON 2Aug00 						currResList->offScreenRemaining = cTile->nextLink;
-//DeadCode JON 2Aug00 						cTile->reset();
-//DeadCode JON 2Aug00 						currResList->freeTiles++;
-//DeadCode JON 2Aug00 					} else
-//DeadCode JON 2Aug00 					{
-//DeadCode JON 2Aug00 						break; // can't make any more space.
-//DeadCode JON 2Aug00 					}
 					if ( currResList->offScreen != NULLTILEOFFSET )
 					{
 						TileElement* cTile = tileCacheGrid+currResList->offScreen;
@@ -3573,7 +2347,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 		}
 	}
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: cumWeight==0 ");
 	if ( cumWeight == 0 && offScreenRes>=0 )
 	{ // we can do some background processing - hurrah.
 		rez = offScreenRes;//OFF_SCREEN_HIGHEST_REZ;
@@ -3587,7 +2360,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 			currResList->numNewTiles++;
 			TileElement* cTile = (tileCacheGrid+bgList);
 			UWord tmp = cTile->nextLink;
-//DeadCode JON 2Aug00 			cTile->age = ageCount&AGEMASK;
 			TileResList::add( currResList->newTile, bgList );
 			bgList = tmp;
 		}
@@ -3595,7 +2367,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 
 //TEMPCODE JON 6/7/00 	int numTilesMade = 0;
 	// now actually make the new tiles
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: actually make ");
 	for ( rez = 0; rez < 8; rez++ )
 	{
 		TileResList* currResList = &tileResList[rez];
@@ -3606,21 +2377,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 #ifndef NDEBUG
 			if ( cTile->textHandle != HTEXTNULL )
 				NOP;
-//DeadCode MS 16Aug00
-//DeadCode MS 16Aug00 			//calculate the block number...
-//DeadCode MS 16Aug00 			ULong blockX = (px+((offset%_wholeAreaSizeMIN)*_blockWidth)+(_blockWidth>>1)) >> Grid_Base::WORLDSPACEMOD;
-//DeadCode MS 16Aug00 			ULong blockY = (pz+((offset/_wholeAreaSizeMIN)*_blockWidth)+(_blockWidth>>1)) >> Grid_Base::WORLDSPACEMOD;
-//DeadCode MS 16Aug00 //			char blockStr[7];
-//DeadCode MS 16Aug00 			char blockStr[]="Render Block: ?????? ";
-//DeadCode MS 16Aug00 			const int stPos = 14;
-//DeadCode MS 16Aug00 //			blockStr[stPos+6] = char(0);
-//DeadCode MS 16Aug00 			blockStr[stPos+5] = '1'+char(blockY%8);
-//DeadCode MS 16Aug00 			blockStr[stPos+3] = '1'+char((blockY/8)%8);
-//DeadCode MS 16Aug00 			blockStr[stPos+1] = '1'+char((blockY/64)%8);
-//DeadCode MS 16Aug00 			blockStr[stPos+4] = '1'+char(blockX%8);
-//DeadCode MS 16Aug00 			blockStr[stPos+2] = '1'+char((blockX/8)%8);
-//DeadCode MS 16Aug00 			blockStr[stPos+0] = '1'+char((blockX/64)%8);
-//DeadCode MS 16Aug00 		    Mono_Text.Print((UByte*)blockStr);
 
 #endif
 			HTEXT newTH;
@@ -3628,23 +2384,18 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 			cTile->textHandle = newTH;
 
 			//render the tile colour data to this DD surface
-//DeadCode MS 15Aug00 			Mono_Text.Print((UByte*)"MHLT: R2S ");
 #ifndef _NO_TEXTURE_RENDER
 			if (newTH!=HTEXTNULL)
 				Three_Dee.pTMake->Render2Surface(newTH, 7-rez ,offset);
 #endif
-			//DeadCode MS 16Aug00 			Mono_Text.Print((UByte*)"MHLT: R2SE ");
 			currResList->freeTiles--;
 			cTile->currentRes = rez;
 			offset = cTile->nextLink;
 //TEMPCODE JON 6/7/00 			numTilesMade++;
 		}
-//DeadCode JON 2Aug00 		if ( currResList->offScreenOldest == NULLTILEOFFSET )
-//DeadCode JON 2Aug00 			currResList->oldestAge = currResList->nextOldestAge;
 	}
 
 #ifdef DEBUG_GRID
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"MHLT: debug2 ");
 	for ( i = 0; i< gS; i++ )
 		resGrid[i+(2*dGS)] = tileCacheGrid[i].currentRes;
 
@@ -3663,7 +2414,6 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 	}
 #endif
 
-//DeadCode MS 16Aug00 	Mono_Text.Print((UByte*)"MHLT: return ");
 	return allAtReqLevel;
 
 //TEMPCODE JON 6/7/00 	if ( numTilesMade > numNewTiles && numTilesMade > 3 )
@@ -3671,491 +2421,8 @@ bool LandScape::ManageHighLandTextures(SLong px,SLong pz)
 
 
 // what it was
-//DEADCODE JON 6/7/00 		int cumWeight = 0; // cumulative tile weight
-//DEADCODE JON 6/7/00 	int rez;
-//DEADCODE JON 6/7/00 	for ( rez = 7; rez >= 0; rez-- )
-//DEADCODE JON 6/7/00 	{
-//DEADCODE JON 6/7/00 		TileResList* currResList = &tileResList[rez];
-//DEADCODE JON 6/7/00 		if ( currResList->newTile != NULLTILEOFFSET )
-//DEADCODE JON 6/7/00 		{ // make some more space if needed
-//DEADCODE JON 6/7/00 			if ( currResList->freeTiles < currResList->numNewTiles )
-//DEADCODE JON 6/7/00 			{
-//DEADCODE JON 6/7/00 				// we need to free up some tiles at this rez to continue.
-//DEADCODE JON 6/7/00 				UWord remOffset = currResList->offScreenOldest;
-//DEADCODE JON 6/7/00 				while ( remOffset != NULLTILEOFFSET &&
-//DEADCODE JON 6/7/00 					currResList->freeTiles < currResList->numNewTiles )
-//DEADCODE JON 6/7/00 				{
-//DEADCODE JON 6/7/00 					TileElement* cTile = tileCacheGrid+remOffset;
-//DEADCODE JON 6/7/00 					remOffset = cTile->nextLink;
-//DEADCODE JON 6/7/00 					g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 					cTile->reset();
-//DEADCODE JON 6/7/00 					currResList->freeTiles++;
-//DEADCODE JON 6/7/00 					currResList->offScreenOldest = remOffset;
-//DEADCODE JON 6/7/00 				}
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 				remOffset = currResList->offScreenRemaining;
-//DEADCODE JON 6/7/00 				while ( remOffset != NULLTILEOFFSET &&
-//DEADCODE JON 6/7/00 					currResList->freeTiles < currResList->numNewTiles )
-//DEADCODE JON 6/7/00 				{
-//DEADCODE JON 6/7/00 					TileElement* cTile = tileCacheGrid+remOffset;
-//DEADCODE JON 6/7/00 					remOffset = cTile->nextLink;
-//DEADCODE JON 6/7/00 					g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 					cTile->reset();
-//DEADCODE JON 6/7/00 					currResList->freeTiles++;
-//DEADCODE JON 6/7/00 					currResList->offScreenRemaining = remOffset;
-//DEADCODE JON 6/7/00 				}
-//DEADCODE JON 6/7/00 				if ( currResList->freeTiles < currResList->numNewTiles )
-//DEADCODE JON 6/7/00 				{
-//DEADCODE JON 6/7/00 					currResList->offScreenRemaining = NULLTILEOFFSET;
-//DEADCODE JON 6/7/00 					// right now we need to shove any tiles we are unable to do into the next rez list
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 					if ( rez > 0 )
-//DEADCODE JON 6/7/00 					{
-//DEADCODE JON 6/7/00 						// get to the first one to move ( move the end of the list not the start )
-//DEADCODE JON 6/7/00 						UWord offset = currResList->newTile;
-//DEADCODE JON 6/7/00 						UWord tmp;
-//DEADCODE JON 6/7/00 						if ( currResList->freeTiles > 0 )
-//DEADCODE JON 6/7/00 						{
-//DEADCODE JON 6/7/00 							for ( int i = currResList->freeTiles; i>0; i-- )
-//DEADCODE JON 6/7/00 								offset = (tileCacheGrid+offset)->nextLink;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 							tmp = offset;
-//DEADCODE JON 6/7/00 							offset = (tileCacheGrid+offset)->nextLink;
-//DEADCODE JON 6/7/00 							(tileCacheGrid+tmp)->nextLink = NULLTILEOFFSET;
-//DEADCODE JON 6/7/00 						} else
-//DEADCODE JON 6/7/00 						{
-//DEADCODE JON 6/7/00 							currResList->newTile = NULLTILEOFFSET;
-//DEADCODE JON 6/7/00 						}
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 						while( offset != NULLTILEOFFSET )
-//DEADCODE JON 6/7/00 						{
-//DEADCODE JON 6/7/00 							currResList->numNewTiles--;
-//DEADCODE JON 6/7/00 							tileResList[rez-1].numNewTiles++;
-//DEADCODE JON 6/7/00 							tmp = (tileCacheGrid+offset)->nextLink;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 							TileResList::add( tileResList[rez-1].newTile, offset );
-//DEADCODE JON 6/7/00 							offset = tmp;
-//DEADCODE JON 6/7/00 						}
-//DEADCODE JON 6/7/00 					}
-//DEADCODE JON 6/7/00 				}
-//DEADCODE JON 6/7/00 			}
-//DEADCODE JON 6/7/00 		}
-//DEADCODE JON 6/7/00 		cumWeight += currResList->numNewTiles;
-//DEADCODE JON 6/7/00 	}
-//DEADCODE JON 6/7/00 	cumWeight*=NEW_TILE_WEIGHT;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 	// now do a pass to make as many changed tiles as we can
-//DEADCODE JON 6/7/00 	if ( cumWeight < MAX_WEIGHTED && bgCount > DO_BACKGROUND_CUTOFF )
-//DEADCODE JON 6/7/00 	{
-//DEADCODE JON 6/7/00 		// great we can now make some resolution changes
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 		// switch so we alternativley lower then raise resolutions
-//DEADCODE JON 6/7/00 		static bool lowerRes = true;
-//DEADCODE JON 6/7/00 		lowerRes = !lowerRes;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 		if ( lowerRes )
-//DEADCODE JON 6/7/00 		{
-//DEADCODE JON 6/7/00 			// when lowering resolutions start at the highest res and move on down
-//DEADCODE JON 6/7/00 			// note - no need to start at the very highest as there will be nothing
-//DEADCODE JON 6/7/00 			// of higher resolution anyway.
-//DEADCODE JON 6/7/00 			for ( rez = 6; rez >= 0; rez-- )
-//DEADCODE JON 6/7/00 			{
-//DEADCODE JON 6/7/00 				TileResList* currResList = &tileResList[rez];
-//DEADCODE JON 6/7/00 				UWord offset = currResList->overResTile;
-//DEADCODE JON 6/7/00 				while ( offset != NULLTILEOFFSET && cumWeight < MAX_WEIGHTED )
-//DEADCODE JON 6/7/00 				{
-//DEADCODE JON 6/7/00 					if ( currResList->freeTiles == currResList->numNewTiles )
-//DEADCODE JON 6/7/00 					{ // try to free some tiles
-//DEADCODE JON 6/7/00 						if ( currResList->offScreenOldest != NULLTILEOFFSET )
-//DEADCODE JON 6/7/00 						{
-//DEADCODE JON 6/7/00 							TileElement* cTile = tileCacheGrid+currResList->offScreenOldest;
-//DEADCODE JON 6/7/00 							g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 							currResList->offScreenOldest = cTile->nextLink;
-//DEADCODE JON 6/7/00 							cTile->reset();
-//DEADCODE JON 6/7/00 							currResList->freeTiles++;
-//DEADCODE JON 6/7/00 						} else if ( currResList->offScreenRemaining != NULLTILEOFFSET )
-//DEADCODE JON 6/7/00 						{
-//DEADCODE JON 6/7/00 							TileElement* cTile = tileCacheGrid+currResList->offScreenRemaining;
-//DEADCODE JON 6/7/00 							g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 							currResList->offScreenRemaining = cTile->nextLink;
-//DEADCODE JON 6/7/00 							cTile->reset();
-//DEADCODE JON 6/7/00 							currResList->freeTiles++;
-//DEADCODE JON 6/7/00 						} else
-//DEADCODE JON 6/7/00 							break; // can't make any more space.
-//DEADCODE JON 6/7/00 					}
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 					TileElement* cTile = tileCacheGrid+offset;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 					if ( cTile->textHandle != HTEXTNULL )
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 					{
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 						tileResList[cTile->currentRes].freeTiles++;
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 						cTile->textHandle=HTEXTNULL;
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 					}
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 					currResList->overResTile = cTile->nextLink;
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 					TileResList::add( currResList->newTile, offset );
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 					offset = currResList->overResTile;
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 					currResList->numNewTiles++;
-//DEADCODE JON 6/7/00 //DEADCODE JON 6/7/00 					cumWeight+=CHANGED_TILE_WEIGHT;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 					if ( cTile->textHandle != HTEXTNULL )
-//DEADCODE JON 6/7/00 					{ // we can do the quick reduce
-//DEADCODE JON 6/7/00 						tileResList[cTile->currentRes].freeTiles++;
-//DEADCODE JON 6/7/00 						currResList->freeTiles--;
-//DEADCODE JON 6/7/00 						HTEXT newTH;
-//DEADCODE JON 6/7/00 						g_lpLib3d->AllocateLandscapeTexture( 7-rez, newTH.textureHandle);
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 						// now make the lower rez version
-//DEADCODE JON 6/7/00 						g_lpLib3d->ReduceLandQuality( cTile->textHandle.textureHandle, newTH.textureHandle );
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 						cTile->textHandle=newTH;
-//DEADCODE JON 6/7/00 						cTile->currentRes=rez;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 						currResList->overResTile = cTile->nextLink;
-//DEADCODE JON 6/7/00 						offset = currResList->overResTile;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 //						cumWeight+=CHANGED_TILE_WEIGHT;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 					} else
-//DEADCODE JON 6/7/00 					{ // can't do the quick reduce as we've already killed the source when reducing other stuff ( i think...)
-//DEADCODE JON 6/7/00 						currResList->overResTile = cTile->nextLink;
-//DEADCODE JON 6/7/00 						TileResList::add( currResList->newTile, offset );
-//DEADCODE JON 6/7/00 						offset = currResList->overResTile;
-//DEADCODE JON 6/7/00 						currResList->numNewTiles++;
-//DEADCODE JON 6/7/00 						cumWeight+=CHANGED_TILE_WEIGHT;
-//DEADCODE JON 6/7/00 					}
-//DEADCODE JON 6/7/00 				}
-//DEADCODE JON 6/7/00 			}
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 		} else
-//DEADCODE JON 6/7/00 		{
-//DEADCODE JON 6/7/00 			// when raising resolutions start at the highest again,
-//DEADCODE JON 6/7/00 			// but don't bother wiv the lowest
-//DEADCODE JON 6/7/00 			for ( rez = 7; rez >0; rez-- )
-//DEADCODE JON 6/7/00 			{
-//DEADCODE JON 6/7/00 				TileResList* currResList = &tileResList[rez];
-//DEADCODE JON 6/7/00 				UWord offset = currResList->underResTile;
-//DEADCODE JON 6/7/00 				while ( offset != NULLTILEOFFSET && cumWeight < MAX_WEIGHTED )
-//DEADCODE JON 6/7/00 				{
-//DEADCODE JON 6/7/00 					if ( currResList->freeTiles == currResList->numNewTiles )
-//DEADCODE JON 6/7/00 					{ // try to free some tiles
-//DEADCODE JON 6/7/00 						if ( currResList->offScreenOldest != NULLTILEOFFSET )
-//DEADCODE JON 6/7/00 						{
-//DEADCODE JON 6/7/00 							TileElement* cTile = tileCacheGrid+currResList->offScreenOldest;
-//DEADCODE JON 6/7/00 							g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 							currResList->offScreenOldest = cTile->nextLink;
-//DEADCODE JON 6/7/00 							cTile->reset();
-//DEADCODE JON 6/7/00 							currResList->freeTiles++;
-//DEADCODE JON 6/7/00 						} else if ( currResList->offScreenRemaining != NULLTILEOFFSET )
-//DEADCODE JON 6/7/00 						{
-//DEADCODE JON 6/7/00 							TileElement* cTile = tileCacheGrid+currResList->offScreenRemaining;
-//DEADCODE JON 6/7/00 							g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 							currResList->offScreenRemaining = cTile->nextLink;
-//DEADCODE JON 6/7/00 							cTile->reset();
-//DEADCODE JON 6/7/00 							currResList->freeTiles++;
-//DEADCODE JON 6/7/00 						} else
-//DEADCODE JON 6/7/00 							break; // can't make any more space.
-//DEADCODE JON 6/7/00 					}
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 					TileElement* cTile = tileCacheGrid+offset;
-//DEADCODE JON 6/7/00 					if ( cTile->textHandle != HTEXTNULL )
-//DEADCODE JON 6/7/00 					{
-//DEADCODE JON 6/7/00 						tileResList[cTile->currentRes].freeTiles++;
-//DEADCODE JON 6/7/00 						g_lpLib3d->FreeLandscapeTexture(cTile->textHandle.textureHandle);
-//DEADCODE JON 6/7/00 						cTile->textHandle=HTEXTNULL;
-//DEADCODE JON 6/7/00 					}
-//DEADCODE JON 6/7/00 					currResList->underResTile = cTile->nextLink;
-//DEADCODE JON 6/7/00 					TileResList::add( currResList->newTile, offset );
-//DEADCODE JON 6/7/00 					offset = currResList->underResTile;
-//DEADCODE JON 6/7/00 					currResList->numNewTiles++;
-//DEADCODE JON 6/7/00 					cumWeight+=CHANGED_TILE_WEIGHT;
-//DEADCODE JON 6/7/00 				}
-//DEADCODE JON 6/7/00 			}
-//DEADCODE JON 6/7/00 		}
-//DEADCODE JON 6/7/00 	}
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 	if ( cumWeight == 0 )
-//DEADCODE JON 6/7/00 	{ // we can do some background processing - hurrah.
-//DEADCODE JON 6/7/00 		rez = 3;
-//DEADCODE JON 6/7/00 		TileResList* currResList = &tileResList[rez];
-//DEADCODE JON 6/7/00 		while ( currResList->freeTiles <= currResList->numNewTiles && rez > 0)
-//DEADCODE JON 6/7/00 		{
-//DEADCODE JON 6/7/00 			currResList = &tileResList[--rez];
-//DEADCODE JON 6/7/00 		}
-//DEADCODE JON 6/7/00 		while( currResList->freeTiles > currResList->numNewTiles && bgList != NULLTILEOFFSET )
-//DEADCODE JON 6/7/00 		{
-//DEADCODE JON 6/7/00 			currResList->numNewTiles++;
-//DEADCODE JON 6/7/00 			TileElement* cTile = (tileCacheGrid+bgList);
-//DEADCODE JON 6/7/00 			UWord tmp = cTile->nextLink;
-//DEADCODE JON 6/7/00 			cTile->age = ageCount&AGEMASK;
-//DEADCODE JON 6/7/00 			TileResList::add( currResList->newTile, bgList );
-//DEADCODE JON 6/7/00 			bgList = tmp;
-//DEADCODE JON 6/7/00 		}
-//DEADCODE JON 6/7/00 	}
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 //TEMPCODE JON 5/12/00 	int numTilesMade = 0;
-//DEADCODE JON 6/7/00 	// now actually make the new tiles
-//DEADCODE JON 6/7/00 	for ( rez = 0; rez < 8; rez++ )
-//DEADCODE JON 6/7/00 	{
-//DEADCODE JON 6/7/00 		TileResList* currResList = &tileResList[rez];
-//DEADCODE JON 6/7/00 		UWord offset = currResList->newTile;
-//DEADCODE JON 6/7/00 		while( offset != NULLTILEOFFSET && currResList->freeTiles > 0)
-//DEADCODE JON 6/7/00 		{ // render these new tiles.
-//DEADCODE JON 6/7/00 			TileElement* cTile = (tileCacheGrid+offset);
-//DEADCODE JON 6/7/00 			HTEXT newTH;
-//DEADCODE JON 6/7/00 			g_lpLib3d->AllocateLandscapeTexture( 7-rez, newTH.textureHandle);
-//DEADCODE JON 6/7/00 			cTile->textHandle = newTH;
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 			//render the tile colour data to this DD surface
-//DEADCODE JON 6/7/00 			if (newTH!=HTEXTNULL)
-//DEADCODE JON 6/7/00 				Three_Dee.pTMake->Render2Surface(newTH, 7-rez ,offset);
-//DEADCODE JON 6/7/00
-//DEADCODE JON 6/7/00 			currResList->freeTiles--;
-//DEADCODE JON 6/7/00 			cTile->currentRes = rez;
-//DEADCODE JON 6/7/00 			offset = cTile->nextLink;
-//DEADCODE JON 6/7/00 //TEMPCODE JON 5/12/00 			numTilesMade++;
-//DEADCODE JON 6/7/00 		}
-//DEADCODE JON 6/7/00 		if ( currResList->offScreenOldest == NULLTILEOFFSET )
-//DEADCODE JON 6/7/00 			currResList->oldestAge = currResList->nextOldestAge;
-//DEADCODE JON 6/7/00 	}
 
 
-//DEADCODE JON 4/26/00 	SLong 	NUM_1024_TEXTURES,
-//DEADCODE JON 4/26/00 			NUM_512_TEXTURES,
-//DEADCODE JON 4/26/00 			NUM_256_TEXTURES,
-//DEADCODE JON 4/26/00 			NUM_128_TEXTURES,
-//DEADCODE JON 4/26/00 			NUM_64_TEXTURES,
-//DEADCODE JON 4/26/00 			NUM_32_TEXTURES,
-//DEADCODE JON 4/26/00 			NUM_16_TEXTURES,
-//DEADCODE JON 4/26/00 			NUM_8_TEXTURES;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	g_lpLib3d->GetLandscapeTextureCount(NUM_1024_TEXTURES,	NUM_512_TEXTURES,
-//DEADCODE JON 4/26/00 										NUM_256_TEXTURES,	NUM_128_TEXTURES,
-//DEADCODE JON 4/26/00 										NUM_64_TEXTURES,	NUM_32_TEXTURES,
-//DEADCODE JON 4/26/00 										NUM_16_TEXTURES,	NUM_8_TEXTURES);
-//DEADCODE JON 3/30/00 	const SLong MAX_TILES_PER_FRAME=8;
-//DEADCODE JON 4/26/00 	const SLong wholeAreaSize=_wholeAreaSizeMIN;
-//DEADCODE JON 4/26/00 	const SLong GRID_SIZE=wholeAreaSize*wholeAreaSize;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	struct ChangedTile
-//DEADCODE JON 4/26/00 	{
-//DEADCODE JON 4/26/00 		UWord offset;
-//DEADCODE JON 4/26/00 		HTEXT oldHTexture;
-//DEADCODE JON 4/26/00 		UByte newRez;
-//DEADCODE JON 4/26/00 		UByte pad;
-//DEADCODE JON 4/26/00 	};
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	struct NewTile
-//DEADCODE JON 4/26/00 	{
-//DEADCODE JON 4/26/00 		UWord offset;
-//DEADCODE JON 4/26/00 		UByte newRez;
-//DEADCODE JON 4/26/00 		UByte pad;
-//DEADCODE JON 4/26/00 	};
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	if (pLastGrid==NULL)
-//DEADCODE JON 4/26/00 	{
-//DEADCODE JON 4/26/00 		pLastGrid=new UByte[GRID_SIZE];
-//DEADCODE JON 4/26/00 		pHTextureGrid=new HTEXT[GRID_SIZE];
-//DEADCODE JON 4/26/00 	 	memset(pLastGrid,0xFF,GRID_SIZE);
-//DEADCODE JON 4/26/00 	 	memset(pHTextureGrid,0xFF,GRID_SIZE*sizeof(HTEXT));
-//DEADCODE JON 4/26/00 	}
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	ChangedTile* changedTiles=new ChangedTile[GRID_SIZE];
-//DEADCODE JON 4/26/00 	NewTile* newTiles=new NewTile[GRID_SIZE];
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00  	if (lastPx!=px || lastPz!=pz)
-//DEADCODE JON 4/26/00  	{
-//DEADCODE JON 4/26/00  		if (lastPx!=-1 && lastPz!=-1)
-//DEADCODE JON 4/26/00  		{
-//DEADCODE JON 4/26/00  			Dropped* droppedTextures=new Dropped;
-//DEADCODE JON 4/26/00  			ScrollGrid(px-lastPx,pz-lastPz,pLastGrid);
-//DEADCODE JON 4/26/00  			ScrollGridDis(px-lastPx,pz-lastPz,pHTextureGrid,droppedTextures);
-//DEADCODE JON 4/26/00  			for (SLong i=droppedTextures->num;i>=0;i--)
-//DEADCODE JON 4/26/00 				g_lpLib3d->FreeLandscapeTexture(droppedTextures->hText[i].textureHandle);
-//DEADCODE JON 4/26/00  			delete[]droppedTextures;
-//DEADCODE JON 4/26/00  		}
-//DEADCODE JON 4/26/00  		lastPx=px;
-//DEADCODE JON 4/26/00  		lastPz=pz;
-//DEADCODE JON 4/26/00  	}
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	UByte* pnewgrid=new UByte[GRID_SIZE];
-//DEADCODE JON 4/26/00 	memset(pnewgrid,0xFF,GRID_SIZE);
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	ULong startPos=GRID_SIZE>>1;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	UByte* psrc=gridCone+startPos;
-//DEADCODE JON 4/26/00 	UByte* pdst=pnewgrid+startPos;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	SLong h_dda,v_dda;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	UByte dir_state,dir_count,dir_max;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	UByte texture_scale,texture_count,texture_max;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	texture_scale=texture_count=0;
-//DEADCODE JON 4/26/00 	texture_max=NUM_1024_TEXTURES;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	dir_state=dir_count=0;
-//DEADCODE JON 4/26/00 	dir_max=1;
-//DEADCODE JON 4/26/00 	h_dda=1;
-//DEADCODE JON 4/26/00 	v_dda=-wholeAreaSize;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	//check to see whether the very high detail textures have
-//DEADCODE JON 4/26/00 	//been disabled!
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	if (texture_max==0)
-//DEADCODE JON 4/26/00 		while (texture_max==0)
-//DEADCODE JON 4/26/00 		{
-//DEADCODE JON 4/26/00 			texture_scale++;
-//DEADCODE JON 4/26/00 			if (texture_scale==1)		texture_max=NUM_512_TEXTURES;
-//DEADCODE JON 4/26/00 			else if (texture_scale==2)	texture_max=NUM_256_TEXTURES;
-//DEADCODE JON 4/26/00 			else if (texture_scale==3)	texture_max=NUM_128_TEXTURES;
-//DEADCODE JON 4/26/00 			else if (texture_scale==4)	texture_max=NUM_64_TEXTURES;
-//DEADCODE JON 4/26/00 			else if (texture_scale==5)	texture_max=NUM_32_TEXTURES;
-//DEADCODE JON 4/26/00 			else if (texture_scale==6)	texture_max=NUM_16_TEXTURES;
-//DEADCODE JON 4/26/00 			else if (texture_scale==7)	texture_max=NUM_8_TEXTURES;
-//DEADCODE JON 4/26/00 			else assert(false&&"ERROR: Run out of textures(1)");
-//DEADCODE JON 4/26/00 		}
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	for (SLong i=GRID_SIZE;i--;)
-//DEADCODE JON 4/26/00 	{
-//DEADCODE JON 4/26/00 		if (*psrc==1)
-//DEADCODE JON 4/26/00 		{
-//DEADCODE JON 4/26/00 			*pdst=texture_scale;
-//DEADCODE JON 4/26/00 			texture_count++;
-//DEADCODE JON 4/26/00 			if (texture_count==texture_max)
-//DEADCODE JON 4/26/00 			{
-//DEADCODE JON 4/26/00 				texture_scale++;
-//DEADCODE JON 4/26/00 				texture_count=0;
-//DEADCODE JON 4/26/00 				if (texture_scale==1)		texture_max=NUM_512_TEXTURES;
-//DEADCODE JON 4/26/00 				else if (texture_scale==2)	texture_max=NUM_256_TEXTURES;
-//DEADCODE JON 4/26/00 				else if (texture_scale==3)	texture_max=NUM_128_TEXTURES;
-//DEADCODE JON 4/26/00 				else if (texture_scale==4)	texture_max=NUM_64_TEXTURES;
-//DEADCODE JON 4/26/00 				else if (texture_scale==5)	texture_max=NUM_32_TEXTURES;
-//DEADCODE JON 4/26/00 				else if (texture_scale==6)	texture_max=NUM_16_TEXTURES;
-//DEADCODE JON 4/26/00 				else if (texture_scale==7)	texture_max=NUM_8_TEXTURES;
-//DEADCODE JON 4/26/00 				else assert(false&&"ERROR: Run out of textures(2)");
-//DEADCODE JON 4/26/00 			}
-//DEADCODE JON 4/26/00 		}
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 		if (dir_state==0)
-//DEADCODE JON 4/26/00 		{
-//DEADCODE JON 4/26/00 			psrc+=h_dda;
-//DEADCODE JON 4/26/00 			pdst+=h_dda;
-//DEADCODE JON 4/26/00 			dir_count++;
-//DEADCODE JON 4/26/00 			if (dir_count==dir_max)
-//DEADCODE JON 4/26/00 			{
-//DEADCODE JON 4/26/00 				dir_count=0;
-//DEADCODE JON 4/26/00 				dir_state++;
-//DEADCODE JON 4/26/00 			}
-//DEADCODE JON 4/26/00 		}
-//DEADCODE JON 4/26/00 		else
-//DEADCODE JON 4/26/00 		{
-//DEADCODE JON 4/26/00 			psrc+=v_dda;
-//DEADCODE JON 4/26/00 			pdst+=v_dda;
-//DEADCODE JON 4/26/00 			dir_count++;
-//DEADCODE JON 4/26/00 			if (dir_count==dir_max)
-//DEADCODE JON 4/26/00 			{
-//DEADCODE JON 4/26/00 				h_dda=-h_dda;
-//DEADCODE JON 4/26/00 				v_dda=-v_dda;
-//DEADCODE JON 4/26/00 				dir_count=0;
-//DEADCODE JON 4/26/00 				dir_state=0;
-//DEADCODE JON 4/26/00 				dir_max++;
-//DEADCODE JON 4/26/00 			}
-//DEADCODE JON 4/26/00 		}
-//DEADCODE JON 4/26/00 	}
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	//compare the new grid with the old grid to determine
-//DEADCODE JON 4/26/00 	//what texture updates are needed
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	psrc=pnewgrid;
-//DEADCODE JON 4/26/00 	pdst=pLastGrid;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	SLong new_tiles,changed_tiles;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	new_tiles=changed_tiles=0;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	for (i=GRID_SIZE;i--;psrc++,pdst++)
-//DEADCODE JON 4/26/00 		if (*psrc!=*pdst)
-//DEADCODE JON 4/26/00 		{
-//DEADCODE JON 4/26/00 		 	//found a difference!!
-//DEADCODE JON 4/26/00 			UByte srcVal=*psrc;
-//DEADCODE JON 4/26/00 			UByte dstVal=*pdst;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 			//test to see if a new tile that wasn't visible on the
-//DEADCODE JON 4/26/00 			//last frame has just moved in to view
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 			if (dstVal==0xFF)
-//DEADCODE JON 4/26/00 			{
-//DEADCODE JON 4/26/00 				newTiles[new_tiles].newRez=srcVal;
-//DEADCODE JON 4/26/00 				newTiles[new_tiles++].offset=
-//DEADCODE JON 4/26/00 					(UWord)(ULong(pdst)-ULong(pLastGrid));
-//DEADCODE JON 4/26/00 				*pdst=*psrc;
-//DEADCODE JON 4/26/00 			}
-//DEADCODE JON 4/26/00 			//test to see if a tile that was visible on the last frame
-//DEADCODE JON 4/26/00 			//has just gone out of view
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 			else if (srcVal==0xFF)
-//DEADCODE JON 4/26/00 			{
-//DEADCODE JON 4/26/00 				UWord offset=(UWord)(ULong(pdst)-ULong(pLastGrid));
-//DEADCODE JON 4/26/00 				g_lpLib3d->FreeLandscapeTexture((pHTextureGrid+offset)->textureHandle);
-//DEADCODE JON 4/26/00 				*(pHTextureGrid+offset)=HTEXTNULL;
-//DEADCODE JON 4/26/00 				*pdst=*psrc;
-//DEADCODE JON 4/26/00 			}
-//DEADCODE JON 4/26/00 			//the difference must be due to a tile resolution change
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 			else
-//DEADCODE JON 4/26/00 			{
-//DEADCODE JON 4/26/00 				UWord offset=(UWord)(ULong(pdst)-ULong(pLastGrid));
-//DEADCODE JON 4/26/00 				changedTiles[changed_tiles].oldHTexture=*(pHTextureGrid+offset);
-//DEADCODE JON 4/26/00 				g_lpLib3d->FreeLandscapeTexture(changedTiles[changed_tiles].oldHTexture.textureHandle);
-//DEADCODE JON 4/26/00 				*(pHTextureGrid+offset)=HTEXTNULL;
-//DEADCODE JON 4/26/00 				changedTiles[changed_tiles].newRez=srcVal;
-//DEADCODE JON 4/26/00 				changedTiles[changed_tiles++].offset=offset;
-//DEADCODE JON 4/26/00 			}
-//DEADCODE JON 4/26/00 		}
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	//deal with any tile resolution changes
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	ChangedTile* pct=changedTiles;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	while (changed_tiles--)
-//DEADCODE JON 4/26/00 	{
-//DEADCODE JON 4/26/00 		//release the old tile
-//DEADCODE JON 4/26/00 		UWord offset=pct->offset;
-//DEADCODE JON 4/26/00 		*(pLastGrid+offset)=pct->newRez;
-//DEADCODE JON 4/26/00 		HTEXT newTH;
-//DEADCODE JON 4/26/00 		g_lpLib3d->FreeLandscapeTexture((pHTextureGrid+offset)->textureHandle);
-//DEADCODE JON 4/26/00 		g_lpLib3d->AllocateLandscapeTexture(pct->newRez,newTH.textureHandle);
-//DEADCODE JON 4/26/00 		*(pHTextureGrid+offset)=newTH;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 		//render the tile colour data to this DD surface
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 		if (newTH!=HTEXTNULL)
-//DEADCODE JON 4/26/00 			Three_Dee.pTMake->Render2Surface(newTH,pct->newRez,offset);
-//DEADCODE JON 4/26/00 		pct++;
-//DEADCODE JON 4/26/00 	}
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	NewTile* pnt=newTiles;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	while (new_tiles--)
-//DEADCODE JON 4/26/00 	{
-//DEADCODE JON 4/26/00 		UWord offset=pnt->offset;
-//DEADCODE JON 4/26/00 		HTEXT newTH;
-//DEADCODE JON 4/26/00 		g_lpLib3d->AllocateLandscapeTexture(pnt->newRez,newTH.textureHandle);
-//DEADCODE JON 4/26/00 		*(pHTextureGrid+offset)=newTH;
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 		//render the tile colour data to this DD surface
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 		if (newTH!=HTEXTNULL)
-//DEADCODE JON 4/26/00 			Three_Dee.pTMake->Render2Surface(newTH,pnt->newRez,offset);
-//DEADCODE JON 4/26/00 		pnt++;
-//DEADCODE JON 4/26/00 	}
-//DEADCODE JON 4/26/00
-//DEADCODE JON 4/26/00 	delete[]pnewgrid;
-//DEADCODE JON 4/26/00 	delete[]changedTiles;
-//DEADCODE JON 4/26/00 	delete[]newTiles;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -4171,51 +2438,6 @@ bool LandScape::FillDataGrid(SLong ox,SLong oz)
 	DataRecord* dataBlock=pDataBlocks;
 //	UByte* pGroundDetail=groundDetail;
 
-//DeadCode JON 2Aug00 #pragma message( __HERE__ "ground detail levels here" )
-//DeadCode JON 2Aug00 	static UByte rezLevels[ _wholeAreaSizeMIN*_wholeAreaSizeMIN ];
-//DeadCode JON 2Aug00 	static bool make = true;
-//DeadCode JON 2Aug00 	if ( make  ) // make the damn thing
-//DeadCode JON 2Aug00 	{
-//DeadCode JON 2Aug00 		make = false;
-//DeadCode JON 2Aug00 		UByte* cur = rezLevels;
-//DeadCode JON 2Aug00 		for( int x = 0; x<_wholeAreaSizeMIN; x++ )
-//DeadCode JON 2Aug00 			for ( int y = 0; y<_wholeAreaSizeMIN; y++ )
-//DeadCode JON 2Aug00 			{
-//DeadCode JON 2Aug00 				int xoff = (_wholeAreaSizeMIN/2)-x;
-//DeadCode JON 2Aug00 				int yoff = (_wholeAreaSizeMIN/2)-y;
-//DeadCode JON 2Aug00 				int d = sqrt( xoff*xoff + yoff*yoff );
-//DeadCode JON 2Aug00 				switch (d)
-//DeadCode JON 2Aug00 				{
-//DeadCode JON 2Aug00 				case 0:
-//DeadCode JON 2Aug00 				case 1:
-//DeadCode JON 2Aug00 					*cur++ = 0;
-//DeadCode JON 2Aug00 					break;
-//DeadCode JON 2Aug00 				case 2:
-//DeadCode JON 2Aug00 				case 3:
-//DeadCode JON 2Aug00 					*cur++ = 1;
-//DeadCode JON 2Aug00 					break;
-//DeadCode JON 2Aug00 				case 4:
-//DeadCode JON 2Aug00 					*cur++ = 2;
-//DeadCode JON 2Aug00 					break;
-//DeadCode JON 2Aug00 				case 5:
-//DeadCode JON 2Aug00 					*cur++ = 3;
-//DeadCode JON 2Aug00 					break;
-//DeadCode JON 2Aug00 				case 6:
-//DeadCode JON 2Aug00 					*cur++ = 4;
-//DeadCode JON 2Aug00 					break;
-//DeadCode JON 2Aug00 				case 7:
-//DeadCode JON 2Aug00 					*cur++ = 5;
-//DeadCode JON 2Aug00 					break;
-//DeadCode JON 2Aug00 				case 8:
-//DeadCode JON 2Aug00 					*cur++ = 6;
-//DeadCode JON 2Aug00 					break;
-//DeadCode JON 2Aug00 				default:
-//DeadCode JON 2Aug00 					*cur++ = 7;
-//DeadCode JON 2Aug00 					break;
-//DeadCode JON 2Aug00 				}
-//DeadCode JON 2Aug00 			}
-//DeadCode JON 2Aug00 	}
-//DeadCode JON 2Aug00 	UByte* pGroundDetail=rezLevels;
 
 	TileElement* cTile = tileCacheGrid;
 
@@ -4231,15 +2453,11 @@ bool LandScape::FillDataGrid(SLong ox,SLong oz)
 				//Fill in array of land data pointers for later
 
 				DataRecord& dR=*dataBlock;
-//DeadCode JON 2Aug00 				UByte gD=*pGroundDetail;
 #ifdef _ALWAYS_FULL_REZ
 				UByte gD=0;
 #else
 				UByte gD=cTile->meshRes;
 #endif
-//DeadCode JON 20Jun00 #pragma warnmsg ( "remove me" )
-//DeadCode JON 20Jun00 	if ( ix==28311552 && oz==33685504 )
-//DeadCode JON 20Jun00 		NOP;
 				dR=Three_Dee.pTMake->GetBlock(ix,oz);
 				dR=Three_Dee.pMigLand->GetData(ix,oz,gD,( /*cTile->viewRadius < 2 &&*/ gD< TILE_REZ_LIMIT_ITEM ),dR);
 			}
@@ -4251,7 +2469,6 @@ bool LandScape::FillDataGrid(SLong ox,SLong oz)
 			}
 			pConeData++;
 			dataBlock++;
-//DeadCode JON 2Aug00 			pGroundDetail++;
 			cTile++;
 			ix+=_blockWidth;
 		}
@@ -4288,26 +2505,8 @@ SLong ibase_x,ibase_z,iscale_factor,itexture;
 bool LandScape::UpdateTexturesWRTViewPos()
 {
 #ifndef	_NOLANDSCAPE_
-//DEADCODE JON 4/6/00 	g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
-//DEADCODE JON 4/6/00 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
-//DEADCODE JON 4/6/00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->hdg);
-//DEADCODE JON 4/6/00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_PITCH,(Angles)-(int)View_Point->pitch);
-//DEADCODE JON 4/6/00 	g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_ROLL,(Angles)-(int)View_Point->roll);
-//DEADCODE JON 4/6/00 	if (View_Point->InCockpit())								//RJS 15Mar00
-//DEADCODE JON 4/6/00 		g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_HEADING,(Angles)(int)View_Point->eyeHeading);
-//DEADCODE JON 4/6/00 //DeadCode RJS 15Mar100 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,1,14829100,0);
-//DEADCODE JON 4/6/00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,50,view_dist);
-//DEADCODE JON 4/6/00 	g_lpLib3d->SetFogColour(0x0090B8E8);
-//DEADCODE JON 4/6/00
-//DEADCODE JON 4/6/00 	D3DVECTOR viewMods;
-//DEADCODE JON 4/6/00 	viewMods.x=(D3DVALUE)-viewer_x;
-//DEADCODE JON 4/6/00 	viewMods.y=(D3DVALUE)-viewer_y;
-//DEADCODE JON 4/6/00 	viewMods.z=(D3DVALUE)-viewer_z;
-//DEADCODE JON 4/6/00 	g_lpLib3d->Translate( MATRIX_OBJECT, viewMods );
 
-//DEADCODE JON 4/6/00 	SetUpVisibleCones();
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: start ");
 	SLong gx,gz;
 	gx=View_Point->World.X;
 	gz=View_Point->World.Z;
@@ -4322,44 +2521,31 @@ bool LandScape::UpdateTexturesWRTViewPos()
 	ox=(gx&~ULong(_blockWidth-1))-((_halfAreaSizeMIN)*_blockWidth);
 	oz=(gz&~ULong(_blockWidth-1))-((_halfAreaSizeMIN)*_blockWidth);
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: check ");
 	if (!Three_Dee.pTMake->CheckCache())
 	{
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: refresh1 ");
 		PossibleTeleport();
 //		RefreshLandscape();
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: false ");
 
 		return false;
 	}
-//DEADCODE JON 3/8/00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,50,_hirezDrawDist);
-//DEADCODE JON 3/8/00 	GridCone(ox,oz);
-//DEADCODE JON 3/8/00 	g_lpLib3d->SetProjectionMatrix((Angles)(int)Save_Data.fieldOfView,1,50,_blockWidth*_horizonDist);
-//DEADCODE JON 3/8/00 	g_lpLib3d->SetFogColour(0x0090B8E8);
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: manage ");
 #ifndef _NOTILEMAKE
 	ManageHighLandTextures(ox,oz);
 #endif
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: fill ");
 	if (!FillDataGrid(ox,oz))
 	{
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: refresh2 ");
 		PossibleTeleport();
 //		RefreshLandscape();
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: false ");
 		return false;
 	}
 #endif
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"UTWRTVP: true ");
 	return true;
 }
 void LandScape::GeneratePointData()
 {
 	SLong ox,oz;
 	SLong halfAreaSize=_halfAreaSizeMIN;
-//DeadCode JON 20Oct00 	SLong wholeAreaSize=_wholeAreaSizeMIN;
 	ox=(viewer_x&~ULong(_blockWidth-1))-halfAreaSize*_blockWidth;
 	oz=(viewer_z&~ULong(_blockWidth-1))-halfAreaSize*_blockWidth;
 	View_Point->isLightShaded=TRUE;
@@ -4373,7 +2559,6 @@ void LandScape::GeneratePointData()
 								R3DVALUE(sunPos.nk.i));
 	g_lpLib3d->SetObjectLighting(lf);
 	bAnyLandDrawn=FALSE;
-//DeadCode JON 20Sep00 	ProcessLights(ox,oz);
 	HighDetailTileRender(ox,oz);
 	lf=LF_AMBIENT;
 	g_lpLib3d->SetObjectLighting(lf);
@@ -4395,7 +2580,6 @@ inline void LandScape::HorizonTile( const int x, const int z )
 
 	LIGHTFLAG lf = LF_AMBIENT;
 	g_lpLib3d->SetObjectLighting( lf );
-//DeadCode JON 28Sep00 	const int offsetAmount = (((_horizonPoints-_wholeAreaSizeMIN)/2) + 64) - _horizonDist;
 	const int offsetAmount = 64;
 	float imx = ( ix/*+gridOffs.jx*/ + offsetAmount - gridOffs.hx ) << 1;
 	float imz = ( oz/*+gridOffs.jz*/ + offsetAmount - gridOffs.hz ) << 1;
@@ -4487,8 +2671,6 @@ void LandScape::HighDetailTileRender(SLong ox,SLong oz)
 				{
 //					HTEXT textureHandle,
 					const HTEXT nullHandle;
-//DeadCode JON 23Oct00 					ULong dataLen;
-//DeadCode JON 22Oct00 					UByte* pDataStream;
 
 //					textureHandle = currentGridElement->textHandle;
 					const int tmpFudge = 7;
@@ -4504,8 +2686,6 @@ void LandScape::HighDetailTileRender(SLong ox,SLong oz)
 					if ( true )
 #endif
 					{
-//DeadCode JON 23Oct00 						dataLen=dataBlock->dataLen;
-//DeadCode JON 20Oct00 						UByte* psavedata=pDataStream=(UByte*)dataBlock->pData;
 
 //TempCode JON 23Oct00 						static int poo;
 //TempCode JON 23Oct00 						if ( (poo++&1) )
@@ -4561,8 +2741,6 @@ inline void LandScape::RenderSheep(const UByte* pDS,ULong sheepCount,const COORD
 		while ( itemCount-- )
 		{
 			sheepItem.World = *sheepPos;
-//DeadCode JON 25Oct00 			sheepItem.World.X+=view.X;
-//DeadCode JON 25Oct00 			sheepItem.World.Z+=view.Z;
 
 			Three_Dee.do_object_dummy(&sheepItem,STATIC_OBJECT);
 			sheepPos++;
@@ -4597,8 +2775,6 @@ inline void LandScape::RenderSheep(const UByte* pDS,ULong sheepCount,const COORD
 //Author		Paul
 //Date			Fri 14 Aug 1998
 //------------------------------------------------------------------------------
-//deadcode JON 19/06/01	void LandScape::RenderTrees(UByte* pds,COORDS3D& view)
-//deadcode JON 19/06/01	{
 /*	if (!((!Save_Data.detail_3d[DETAIL3D_INCONSEQUENTIALS]) ||
 		View_Ground_Height>6*FT_250))
 	{
@@ -4615,7 +2791,6 @@ inline void LandScape::RenderSheep(const UByte* pDS,ULong sheepCount,const COORD
 
 	if (SLong(dd)>24*FT_250) return;
 
-	ShapeNum treeShapes[]={TREE1,TREE2};//DeadCode RJS 15Dec99 ,TREE3,TREE4};
 
 	AltPointsHdr& aph=*(AltPointsHdr*)pds;
 
@@ -4659,19 +2834,8 @@ inline void LandScape::RenderSheep(const UByte* pDS,ULong sheepCount,const COORD
 	LIGHTFLAG lf=LF_LIGHTING;
 	g_lpLib3d->SetObjectLighting(lf);
 	*/
-//deadcode JON 19/06/01	}
 
 
-//DeadCode JON 24Oct00 inline bool IsGrassy(UByte at)
-//DeadCode JON 24Oct00 {
-//DeadCode JON 24Oct00 	at&=0x1f;
-//DeadCode JON 24Oct00 	switch (at)
-//DeadCode JON 24Oct00 	{
-//DeadCode JON 24Oct00 	case AT_darkGrass:case AT_midGrass: case AT_lightGrass:case AT_garden:
-//DeadCode JON 24Oct00 		return true;
-//DeadCode JON 24Oct00 	}
-//DeadCode JON 24Oct00 	return false;
-//DeadCode JON 24Oct00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		HiRezTile
@@ -4679,50 +2843,6 @@ inline void LandScape::RenderSheep(const UByte* pDS,ULong sheepCount,const COORD
 //Date			Tue 10 Nov 1998
 //------------------------------------------------------------------------------
 
-//DeadCode JON 20Oct00 #pragma warnmsg ( "what does this do???" )
-//DeadCode JON 20Oct00 static UByte atRecs[256];
-//DeadCode JON 20Oct00
-//DeadCode JON 20Oct00 void LandScape::MakeATRecs(UByte *pDataStream)
-//DeadCode JON 20Oct00 {
-//DeadCode JON 20Oct00 	AltPointsHdr& aph=*(AltPointsHdr*)pDataStream;
-//DeadCode JON 20Oct00 	int	vertexCount=aph.vertexCount;
-//DeadCode JON 20Oct00 	pDataStream+=sizeof(AltPointsHdr);
-//DeadCode JON 20Oct00 	pDataStream+=vertexCount*sizeof(PointDef);
-//DeadCode JON 20Oct00 	DrawDataHdr& ddh=*(DrawDataHdr*)pDataStream;
-//DeadCode JON 20Oct00 	pDataStream+=sizeof(ddh);
-//DeadCode JON 20Oct00 	int	polyCount=ddh.noOfPolys;
-//DeadCode JON 20Oct00 //DeadCode JON 20Oct00 	int lineCount=ddh.noOfLines;
-//DeadCode JON 20Oct00 //DeadCode JON 20Oct00 	int totalTriCount=ddh.totalTris;
-//DeadCode JON 20Oct00 	memset(atRecs,0,vertexCount);
-//DeadCode JON 20Oct00 	ULong edgePointMax=aph.topEdgePoints+aph.rightEdgePoints+aph.bottomEdgePoints+aph.leftEdgePoints+4;
-//DeadCode JON 20Oct00 	// start from beggining of poly data.
-//DeadCode JON 20Oct00 	while (polyCount--)
-//DeadCode JON 20Oct00 	{
-//DeadCode JON 20Oct00 		UByte thisAt=*pDataStream++;
-//DeadCode JON 20Oct00 		ULong fanCount=*pDataStream++;
-//DeadCode JON 20Oct00 		UByte thisFlag;
-//DeadCode JON 20Oct00
-//DeadCode JON 20Oct00 		if (IsGrassy(thisAt))		thisFlag=0x01;
-//DeadCode JON 20Oct00 //temp		else if (IsBeach(thisAt))	thisFlag=0x02;
-//DeadCode JON 20Oct00 //temp		else if (IsWater(thisAt))	thisFlag=0x04;
-//DeadCode JON 20Oct00 		else						thisFlag=0x00;
-//DeadCode JON 20Oct00
-//DeadCode JON 20Oct00 		if (thisFlag)
-//DeadCode JON 20Oct00 		{
-//DeadCode JON 20Oct00 			while (fanCount--)
-//DeadCode JON 20Oct00 			{
-//DeadCode JON 20Oct00 				ULong triCount=(*pDataStream++)+2;
-//DeadCode JON 20Oct00 				while (triCount--)
-//DeadCode JON 20Oct00 				{
-//DeadCode JON 20Oct00 					ULong thisIndex=*pDataStream++;
-//DeadCode JON 20Oct00 					if (thisIndex>=edgePointMax)
-//DeadCode JON 20Oct00 						atRecs[thisIndex]|=thisFlag;
-//DeadCode JON 20Oct00 				}
-//DeadCode JON 20Oct00 			}
-//DeadCode JON 20Oct00 		}
-//DeadCode JON 20Oct00 		else while (fanCount--) pDataStream+=ULong(*pDataStream++)+2;
-//DeadCode JON 20Oct00 	}
-//DeadCode JON 20Oct00 }
 
 // Simple bounds checking array in debug - should compile to standary array in release.
 class UByteA	//JON 22Sep00
@@ -4789,8 +2909,6 @@ private:
 		SIDE_TEXTURE_HEIGHT = 128,
 		NULL_OUTLEVEL=255
 	};
-//DeadCode JON 22Sep00 	UByte outLevel[NUM_POSS_OFFSETS*MAX_TILE_POINTS];
-//DeadCode JON 22Sep00 	UByte alreadyUsed[MAX_TILE_POINTS]; // the number of slots already used...
 	UByteA outLevel;//(NUM_POSS_OFFSETS*MAX_TILE_POINTS);
 	UByteA alreadyUsed;
 public:
@@ -4930,7 +3048,6 @@ public:
 //------------------------------------------------------------------------------
 inline void LandScape::DrawCliffFace( const int& startPoint, const int& endPoint, const AltPointIndexer& pointOffsets )
 {
-//DeadCode JON 28Sep00 	g_lpLib3d->IncGlobal( TOGGLE_TEXTURE_ZBIAS );
 
 	DoPointStruc *pPoints = SHAPE.newco;
 	Lib3DPoint *pRVerts;
@@ -4950,19 +3067,14 @@ inline void LandScape::DrawCliffFace( const int& startPoint, const int& endPoint
 	*(++pRVerts)=pPoints[endPoint];						// top right point
 	pRVerts->setIMapCoords( dist, 0 );
 
-//DEADCODE JON 5/31/00 	*(++pRVerts)=pPoints[endPoint];						// bottom right point
-//DEADCODE JON 5/31/00 	pRVerts->setPosY( 0.f );							// make sea level
 	*(++pRVerts)=pPoints[ pointOffsets.getCliffBaseIndexNoMake( endPoint ) ];
 	pRVerts->setIMapCoords( dist, CLIFFTHEIGHT );
 
 
-//DEADCODE JON 5/31/00 	*(++pRVerts)=pPoints[startPoint];					// bottom left point
-//DEADCODE JON 5/31/00 	pRVerts->setPosY( 0.f );							// make sea level
 	*(++pRVerts)=pPoints[ pointOffsets.getCliffBaseIndexNoMake( startPoint ) ];
 	pRVerts->setIMapCoords( 0, CLIFFTHEIGHT );
 
 	g_lpLib3d->EndPoly();
-//DeadCode JON 28Sep00 	g_lpLib3d->DecGlobal( TOGGLE_TEXTURE_ZBIAS );
 
 }
 
@@ -4980,14 +3092,10 @@ void LandScape::LoRezTile(UByte* &pDS,ULong& dataLen,COORDS3D& view,const HTEXT&
 	UByte* pDataStream=pDS;
 
 	//Now render this texture over the whole tile...
-//DeadCode JON 20Oct00 	AltPointsHdr& aph=*(AltPointsHdr*)pDataStream;
-//DeadCode JON 20Oct00 	int	vertexCount=aph.vertexCount;
 	pDataStream+=sizeof(AltPointsHdr);
 	PointDef* pPointDefs=(PointDef*)pDataStream;
-//DeadCode JON 20Oct00 	COORDS3D* pCoordData=tileCoords;
 	DoPointStruc* pPoints =SHAPE.newco;
 
-//DeadCode JON 20Oct00 	UWord clipTest=0;
 	{
 		for (int t=0;t<4;t++)
 		{
@@ -5127,7 +3235,6 @@ void LandScape::HiRezTile(
 		NODEFAULT;
 	}
 
-//DeadCode JON 8Aug00 	_HiRezTile( pDS, dataLen, view, hTexture, Save_Data.filtering==3, (Save_Data.detail_3d[DETAIL3D_INCONSEQUENTIALS]), Save_Data.textureQuality==4,seaptr,seaAnimOffset );
 }
 
 inline void LandScape::_HiRezTile(
@@ -5150,47 +3257,8 @@ inline void LandScape::_HiRezTile(
 	Lib3DPoint *pRVerts;
 	UWord thisMaterial;
 	thisMaterial = hTexture.textureHandle;
-//DeadCode JON 8Aug00 //	FileNum	seaFile = FileNum(seaBase + (ULong(totTime/25)&0x03) );
-//DeadCode JON 8Aug00
-//DeadCode JON 8Aug00 	FileNum seaFile = FileNum(seaBase);
-//DeadCode JON 8Aug00 	LandMapNum seamap=LandMapNum(seaFile);
-//DeadCode JON 8Aug00 	ImageMapDescPtr	seaptr = seamap.GetLandMapPtr();
-//DeadCode JON 8Aug00
-//DeadCode JON 8Aug00 	static bool spthjfkkkkkf= true;
-//DeadCode JON 8Aug00 	if ( spthjfkkkkkf )
-//DeadCode JON 8Aug00 	{
-//DeadCode JON 8Aug00 		spthjfkkkkkf = false;
-//DeadCode JON 8Aug00
-//DeadCode JON 8Aug00 		g_lpLib3d->UploadAsDitherTexture( seaptr );
-//DeadCode JON 8Aug00
-//DeadCode JON 8Aug00 		seaFile = FileNum(seaBase+1);
-//DeadCode JON 8Aug00 		seamap=LandMapNum(seaFile);
-//DeadCode JON 8Aug00 		ImageMapDescPtr seamipptr = seamap.GetLandMapPtr();
-//DeadCode JON 8Aug00 		g_lpLib3d->UploadAsMipMapLevel( seaptr, seamipptr, 1 );
-//DeadCode JON 8Aug00
-//DeadCode JON 8Aug00 		seaFile = FileNum(seaBase+2);
-//DeadCode JON 8Aug00 		seamap=LandMapNum(seaFile);
-//DeadCode JON 8Aug00 		seamipptr = seamap.GetLandMapPtr();
-//DeadCode JON 8Aug00 		g_lpLib3d->UploadAsMipMapLevel( seaptr, seamipptr, 2 );
-//DeadCode JON 8Aug00
-//DeadCode JON 8Aug00 		seaFile = FileNum(seaBase+3);
-//DeadCode JON 8Aug00 		seamap=LandMapNum(seaFile);
-//DeadCode JON 8Aug00 		seamipptr = seamap.GetLandMapPtr();
-//DeadCode JON 8Aug00 		g_lpLib3d->UploadAsMipMapLevel( seaptr, seamipptr, 3 );
-//DeadCode JON 8Aug00
-//DeadCode JON 8Aug00 	}
-//DeadCode JON 8Aug00
 
 
-//DeadCode JON 15Aug00 	ImageMapDescPtr dithImg;
-//DeadCode JON 15Aug00 	if ( doDither )
-//DeadCode JON 15Aug00 	{
-//DeadCode JON 15Aug00 		FileNum	dithFile = FileNum( FIL_DITHER1_NUM);
-//DeadCode JON 15Aug00 		LandMapNum dithMap=LandMapNum(dithFile);
-//DeadCode JON 15Aug00 		dithImg = dithMap.GetLandMapPtr();
-//DeadCode JON 15Aug00 //DeadCode JON 10Aug00 		dithImg = Image_Map.GetImageMapPtr(DITHER1NO);
-//DeadCode JON 15Aug00 //DeadCode JON 10Aug00 		g_lpLib3d->UploadAsDitherTexture( dithImg );
-//DeadCode JON 15Aug00 	}
 
 	const UByte* pDataStream=pDS;
 
@@ -5199,10 +3267,8 @@ inline void LandScape::_HiRezTile(
 	int	vertexCount=aph.vertexCount;
 	pDataStream+=sizeof(AltPointsHdr);
 	PointDef* pPointDefs=(PointDef*)pDataStream;
-//DeadCode JON 20Oct00 	COORDS3D* pCoordData=tileCoords;
 	DoPointStruc* pPoints =SHAPE.newco;
 
-//DeadCode JON 20Oct00 	UWord clipTest=0;
 
 	PointDef* inptDefs = pPointDefs;
 
@@ -5288,10 +3354,6 @@ inline void LandScape::_HiRezTile(
 	if ( !doRaises || raiseFlag == NORAISE )
 	{
 		// *************************   non raised landscape
-//DeadCode JON 15Aug00 		if ( doDither )
-//DeadCode JON 15Aug00 			g_lpLib3d->SetMaterial(thisMaterial, dithImg );
-//DeadCode JON 15Aug00 		else
-//DeadCode JON 15Aug00 			g_lpLib3d->SetMaterial(thisMaterial);
 		if ( !doDither )
 #ifndef _RENDER_SIMPLE_TEXTURE
 			g_lpLib3d->SetMaterial(thisMaterial);
@@ -5346,10 +3408,6 @@ inline void LandScape::_HiRezTile(
 							}
 							g_lpLib3d->EndFan();
 						}						// end of loop fans
-//DeadCode JON 15Aug00 						if ( doDither )
-//DeadCode JON 15Aug00 							g_lpLib3d->SetMaterial(thisMaterial, dithImg );
-//DeadCode JON 15Aug00 						else
-//DeadCode JON 15Aug00 							g_lpLib3d->SetMaterial(thisMaterial);
 						if ( !doDither )
 #ifndef _RENDER_SIMPLE_TEXTURE
 							g_lpLib3d->SetMaterial(thisMaterial );
@@ -5446,10 +3504,6 @@ inline void LandScape::_HiRezTile(
 							g_lpLib3d->EndFan();
 
 						}						// end of loop fans
-//DeadCode JON 15Aug00 						if ( doDither )
-//DeadCode JON 15Aug00 							g_lpLib3d->SetMaterial(thisMaterial, dithImg );
-//DeadCode JON 15Aug00 						else
-//DeadCode JON 15Aug00 							g_lpLib3d->SetMaterial(thisMaterial);
 						if ( !doDither )
 #ifndef _RENDER_SIMPLE_TEXTURE
 							g_lpLib3d->SetMaterial(thisMaterial);
@@ -5518,13 +3572,8 @@ inline void LandScape::_HiRezTile(
 		if ( doItems )
 			RenderSheep( (pDS+ddh.sheepOffset), ddh.noOfSheep, view, inptDefs ); // only do if raisd landscape...
 
-//DeadCode JON 28Sep00 		g_lpLib3d->IncGlobal( TOGGLE_TEXTURE_ZBIAS );
 
 // PASS 1 - draw all of the ground level, lowres stuff.
-//DeadCode JON 15Aug00 		if ( doDither )
-//DeadCode JON 15Aug00 			g_lpLib3d->SetMaterial(thisMaterial, dithImg );
-//DeadCode JON 15Aug00 		else
-//DeadCode JON 15Aug00 			g_lpLib3d->SetMaterial(thisMaterial);
 		if ( !doDither )
 #ifndef _RENDER_SIMPLE_TEXTURE
 			g_lpLib3d->SetMaterial(thisMaterial);
@@ -5583,10 +3632,6 @@ inline void LandScape::_HiRezTile(
 								}
 								g_lpLib3d->EndFan();
 							}						// end of loop fans
-//DeadCode JON 15Aug00 							if ( doDither )
-//DeadCode JON 15Aug00 								g_lpLib3d->SetMaterial(thisMaterial, dithImg );
-//DeadCode JON 15Aug00 							else
-//DeadCode JON 15Aug00 								g_lpLib3d->SetMaterial(thisMaterial);
 							if ( !doDither )
 #ifndef _RENDER_SIMPLE_TEXTURE
 								g_lpLib3d->SetMaterial(thisMaterial);
@@ -5696,10 +3741,6 @@ inline void LandScape::_HiRezTile(
 								g_lpLib3d->EndFan();
 
 							}						// end of loop fans
-//DeadCode JON 15Aug00 							if ( doDither )
-//DeadCode JON 15Aug00 								g_lpLib3d->SetMaterial(thisMaterial, dithImg );
-//DeadCode JON 15Aug00 							else
-//DeadCode JON 15Aug00 								g_lpLib3d->SetMaterial(thisMaterial);
 							if ( !doDither )
 #ifndef _RENDER_SIMPLE_TEXTURE
 								g_lpLib3d->SetMaterial(thisMaterial);
@@ -5872,10 +3913,6 @@ inline void LandScape::_HiRezTile(
 				if ( !doHirez || !IsHirez( at ) )
 				{											// not a hirez area
 															// normal draw method
-//DeadCode JON 15Aug00 					if ( doDither )
-//DeadCode JON 15Aug00 						g_lpLib3d->SetMaterial(thisMaterial, dithImg );
-//DeadCode JON 15Aug00 					else
-//DeadCode JON 15Aug00 						g_lpLib3d->SetMaterial(thisMaterial);
 					if ( doDither )
 					{
 #ifndef _RENDER_SIMPLE_TEXTURE
@@ -5938,10 +3975,6 @@ inline void LandScape::_HiRezTile(
 
 
 					} // end of loop thru fans
-//DeadCode JON 15Aug00 					if ( doDither )
-//DeadCode JON 15Aug00 						g_lpLib3d->SetMaterial(thisMaterial, dithImg );
-//DeadCode JON 15Aug00 					else
-//DeadCode JON 15Aug00 						g_lpLib3d->SetMaterial(thisMaterial);
 				}											// end of hirez or not
 			}												// end of raised or not
 		}													// end of loop all poly's
@@ -5953,12 +3986,9 @@ inline void LandScape::_HiRezTile(
 	// also draw in cliff faces...
 	lf = LF_AMBIENT;
 	g_lpLib3d->SetObjectLighting( lf );
-//DeadCode JON 28Sep00 	g_lpLib3d->DecGlobal( TOGGLE_TEXTURE_ZBIAS );
 
 	if ( doRaises && hedgeHeight > sRaise ) // only do when closeup
 	{
-//DeadCode JON 7Nov00 		item treeItem;
-//DeadCode JON 7Nov00 		treeItem.Anim=CloudAnimP;
 
 		pDataStream = pDS+ddh.lineOffset;
 		Float ddy;
@@ -5990,21 +4020,6 @@ inline void LandScape::_HiRezTile(
 					tEndPtr->incPosY( ddy );
 					*bEndPtr = pPoints[endP];
 
-//DeadCode JON 7Nov00 					// do a tree...
-//DeadCode JON 7Nov00 					if ( doItems )
-//DeadCode JON 7Nov00 					{
-//DeadCode JON 7Nov00 						float xT, yT, zT;
-//DeadCode JON 7Nov00 						bEndPtr->getPosition(
-//DeadCode JON 7Nov00 							xT, yT, zT
-//DeadCode JON 7Nov00 						);
-//DeadCode JON 7Nov00
-//DeadCode JON 7Nov00 						treeItem.World.X=view.X+SLong(F2UL_Round( xT ));
-//DeadCode JON 7Nov00 						treeItem.World.Y=SLong(F2UL_Round( yT ));
-//DeadCode JON 7Nov00 						treeItem.World.Z=view.Z+SLong(F2UL_Round( zT ));
-//DeadCode JON 7Nov00 						treeItem.shape=ShapeNum(TREE1+((inptDefs[endP].alt+ inptDefs[endP].z )&1));
-//DeadCode JON 7Nov00
-//DeadCode JON 7Nov00 						Three_Dee.do_object_dummy(&treeItem,STATIC_OBJECT);
-//DeadCode JON 7Nov00 					}
 
 					while (secCount--)
 					{
@@ -6023,21 +4038,6 @@ inline void LandScape::_HiRezTile(
 						*bEndPtr = pPoints[endP];
 						// end of iterate
 
-//DeadCode JON 7Nov00 						// do a tree...
-//DeadCode JON 7Nov00 						if ( doItems )
-//DeadCode JON 7Nov00 						{
-//DeadCode JON 7Nov00 							float xT, yT, zT;
-//DeadCode JON 7Nov00 							bEndPtr->getPosition(
-//DeadCode JON 7Nov00 								xT, yT, zT
-//DeadCode JON 7Nov00 							);
-//DeadCode JON 7Nov00
-//DeadCode JON 7Nov00 							treeItem.World.X=view.X+SLong(F2UL_Round( xT ));
-//DeadCode JON 7Nov00 							treeItem.World.Y=SLong(F2UL_Round( yT ));
-//DeadCode JON 7Nov00 							treeItem.World.Z=view.Z+SLong(F2UL_Round( zT ));
-//DeadCode JON 7Nov00 							treeItem.shape=ShapeNum(TREE1+((inptDefs[endP].alt+ inptDefs[endP].z )&1));
-//DeadCode JON 7Nov00
-//DeadCode JON 7Nov00 							Three_Dee.do_object_dummy(&treeItem,STATIC_OBJECT);
-//DeadCode JON 7Nov00 						}
 
 
 						//work out texture tiling coords
@@ -6045,15 +4045,11 @@ inline void LandScape::_HiRezTile(
 						float dz = bStartPtr->getPosZ() - bEndPtr->getPosZ();
 						float dist = fastMath.FastSqrt( (dx*dx) + (dz*dz) );
 
-//DeadCode JON 31Aug00 						bEndPtr->setIMapCoords( lastTileCoord, 128 );
-//DeadCode JON 31Aug00 						tEndPtr->setIMapCoords( lastTileCoord, 0 );
 						bEndPtr->setIMapCoords( lastTileCoord, 129 );
 						tEndPtr->setIMapCoords( lastTileCoord, 1 );
 
 						lastTileCoord +=short( dist*(1.0/48.0) );
 
-//DeadCode JON 31Aug00 						bStartPtr->setIMapCoords( lastTileCoord, 128 );
-//DeadCode JON 31Aug00 						tStartPtr->setIMapCoords( lastTileCoord, 0 );
 						bStartPtr->setIMapCoords( lastTileCoord, 129 );
 						tStartPtr->setIMapCoords( lastTileCoord, 1 );
 
@@ -6124,7 +4120,6 @@ inline void LandScape::_HiRezTile(
 				break;
 			}  // end of switch route type
 		} // end of loop through lines
-//DeadCode JON 7Nov00 		treeItem.Anim = ANIM_NULL;
 	} else
 	{															// don't draw hedges
 		pDataStream = pDS+ddh.lineOffset;
@@ -6378,13 +4373,11 @@ LandScape::LandScape()
 	// build the sidelookup table... - initialise the RaiseLookup wiv full raises (and copy the offsets)
 	{
 		hedgeHeight = HEDGE_HEIGHT;
-//DeadCode JON 4Oct00 		cliffHeight = CLIFF_HEIGHT;
 		for ( int i=0; i<FULLHTOFFSET; i++ )
 			RaiseLookUp[i]=RaiseLookUp[i+FULLHTOFFSET];
 	}
 
 
-//DeadCode JON 21Sep00 #pragma warnmsg ( "check why the extra buffer is needed - something is stomping" )
 	// jon - precalc the side lookup table (only done once)
 	SideLookUp = new raiseSide[NUM_SIDE_TYPES+1]; //extra one for the one being tested...
 	int t = 0;
@@ -6443,23 +4436,14 @@ const RouteData NULLRoute(0xFFFF,2000,2000,BLACK,roadMap,0,0,63,127,roadMsk,0,0,
 	pRouteData=routeData;
 
 	cloud_base=CloudsAt10000ft;									//PD 11Oct96
-//DEADCODE PD 02/12/99 	currscreen=NULL;
 	cloudset.X = 0;
 	cloudset.Y = 0;
 	cloudset.Z = 0;
 
-//DeadCode JON 12Sep00 	gridCorners=NULL;
 	gridCone=NULL;
 	horizCone=NULL;
-//DeadCode JON 5Sep00 	softGrid=NULL;
-//DeadCode JON 12Sep00 	lightCone=NULL;
-//DEADCODE JON 4/26/00 	pLastGrid=NULL;
 	tileCacheGrid=NULL;
 	TileResList::theGrid = NULL;
-//DEADCODE JON 4/27/00 	pHTextureGrid=NULL;
-//DeadCode JON 12Sep00 	routeDetail=NULL;
-//DeadCode JON 3Aug00 	groundDetail=NULL;
-//DeadCode JON 12Sep00 	landRnd=NULL;
 	tileCoords=NULL;
 	pDataBlocks=NULL;
 	mistenabled=false;
@@ -6474,9 +4458,9 @@ const RouteData NULLRoute(0xFFFF,2000,2000,BLACK,roadMap,0,0,63,127,roadMsk,0,0,
 	midR=midG=midB=0;
 	imageVTile=1;
 	theHorizonStrip=FileNum(NULL);
-//DeadCode JON 3Aug00 	highco=NULL;
 
-	CloudAnimP = new UByte[8];									//RJS 21Apr99
+	CloudAnimP = new UByte[8];
+	memset(CloudAnimP,0,8);									//RJS 21Apr99
 	if (CloudAnimP != NULL)										//RJS 21Apr99
 	{
 		CloudAnimP = (AnimSizeField)sizeof(MinAnimData);		//RJS 01Dec99
@@ -6503,12 +4487,6 @@ const RouteData NULLRoute(0xFFFF,2000,2000,BLACK,roadMap,0,0,63,127,roadMsk,0,0,
 		{P(80),		P(00),		P(00)},	//		-- NON SHADED OBJECTS ?? LOWEST
 		{P(60),		P(60),		P(60)},//		-- NON SHADED OBJECTS ?? HIGHEST
 		{P(90),		P(90),		P(90)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS AMBIENT
 
 		{B(101),	B(111),		B(135)},	//		-- deepestSkyCol	//AM 14Sep00
 		{B(164),	B(187),		B(196)},	//		-- otherSkyCol - towards sun	//AM 14Sep00
@@ -6540,12 +4518,6 @@ const RouteData NULLRoute(0xFFFF,2000,2000,BLACK,roadMap,0,0,63,127,roadMsk,0,0,
 		{P(80),		P(00),		P(00)},	//		-- NON SHADED OBJECTS ?? LOWEST
 		{P(100),	P(100),		P(100)},//		-- NON SHADED OBJECTS ?? HIGHEST
 		{P(90),		P(90),		P(90)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS AMBIENT
 		{B(1),		B(77),		B(215)},	//		-- deepestSkyCol	//AM 14Sep00
 		{B(144),	B(184),		B(232)},	//		-- otherSkyCol - towards sun	//AM 14Sep00
 		{B(198),	B(216),		B(237)},	//		-- cloudCol - towards sun	//AM 14Sep00	//AM 14Sep00
@@ -6577,12 +4549,6 @@ const RouteData NULLRoute(0xFFFF,2000,2000,BLACK,roadMap,0,0,63,127,roadMsk,0,0,
 		{P(80),		P(00),		P(00)},	//		-- NON SHADED OBJECTS ?? LOWEST
 		{B(255),	B(163),		B(43)},	//		-- NON SHADED OBJECTS ?? HIGHEST
 		{P(50),		P(50),		P(50)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS AMBIENT
 		{B(243),	B(130),		B(69)},		//		-- deepestSkyCol	//AM 14Sep00
 		{B(214),	B(179),		B(94)},	//		-- otherSkyCol - towards sun	//AM 14Sep00
 		{B(228),	B(215),		B(156)},	//		-- cloudCol - towards sun	//AM 14Sep00	//AM 14Sep00
@@ -6614,12 +4580,6 @@ const RouteData NULLRoute(0xFFFF,2000,2000,BLACK,roadMap,0,0,63,127,roadMsk,0,0,
 		{P(5),		P(5),		P(5)},	//		-- NON SHADED OBJECTS ?? LOWEST
 		{P(15),		P(15),		P(15)},	//		-- NON SHADED OBJECTS ?? HIGHEST
 		{P(10),		P(10),		P(10)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//		-- EFFECTS LOWEST	//AM 14Jul00
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//		-- EFFECTS HIGHEST	//AM 14Jul00
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//		-- EFFECTS AMBIENT	//AM 14Jul00
 		{B(0),		B(0),		B(0)},	//		-- deepestSkyCol
 		{B(5),		B(5),		B(5)},	//		-- otherSkyCol - towards sun
 		{B(10),		B(10),		B(10)},	//		-- cloudCol - towards sun
@@ -6633,430 +4593,18 @@ const RouteData NULLRoute(0xFFFF,2000,2000,BLACK,roadMap,0,0,63,127,roadMsk,0,0,
 
 		{B(0),		B(0),		B(0)},	//		-- The colour to shade the sun...
 
-//DeadCode JON 2Oct00 		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour
 		{B(87),		B(88),		B(143)}	//		-- The maximum specular highlight colour
 
 	};
 
-//DeadCode JON 2Nov00 	static SLightingRGB badWLighting=
-//DeadCode JON 2Nov00 	{
-//DeadCode JON 2Nov00 	//	RED			GREEN		BLUE			-- enter values as % of full strength
-//DeadCode JON 2Nov00 	//
-//DeadCode JON 2Nov00 		{P(40),		P(40),		P(40)},	//		-- LANDSCAPE LOWEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},//		-- LANDSCAPE HIGHEST
-//DeadCode JON 2Nov00 		{P(70),		P(70),		P(70)},	//		-- LANDSCAPE AMBIENT
-//DeadCode JON 2Nov00 		{P(40),		P(40),		P(40)},	//		-- SHADED OBJECTS LOWEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},//		-- SHADED OBJECTS HIGHEST
-//DeadCode JON 2Nov00 		{P(70),		P(70),		P(70)},	//		-- SHADED OBJECTS AMBIENT
-//DeadCode JON 2Nov00 		{P(40),		P(40),		P(40)},	//		-- NON SHADED OBJECTS ?? LOWEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},//		-- NON SHADED OBJECTS ?? HIGHEST
-//DeadCode JON 2Nov00 		{P(70),		P(70),		P(70)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode JON 2Nov00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS AMBIENT	};
-//DeadCode JON 2Nov00 		{B(0x44),	B(0x44),	B(0xFF)},	//		-- deepestSkyCol
-//DeadCode JON 2Nov00 		{B(0xAA),	B(0xAA),	B(0xFF)},	//		-- otherSkyCol - towards sun
-//DeadCode JON 2Nov00 		{B(0xFF),	B(0xFF),	B(0xFF)},	//		-- cloudCol - towards sun
-//DeadCode JON 2Nov00 		{B(0x90),	B(0xB8),	B(0xE8)},	//		-- horizonCol - towards sun
-//DeadCode JON 2Nov00 		{B(0x70),	B(0x98),	B(0xC8)},	//		-- fogCol - towards sun
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		{B(0xAA),	B(0xAA),	B(0xFF)},	//		-- otherSkyCol -away from sun
-//DeadCode JON 2Nov00 		{B(0xFF),	B(0xFF),	B(0xFF)},	//		-- cloudCol -away from sun
-//DeadCode JON 2Nov00 		{B(0x90),	B(0xB8),	B(0xE8)},	//		-- horizonCol -away from sun
-//DeadCode JON 2Nov00 		{B(0x70),	B(0x98),	B(0xC8)},	//		-- fogCol -away from sun
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		{B(240),	B(240),		B(240)}, //		-- The colour to shade the sun...
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 	};
 
 
-//DeadCode JON 2Nov00 	static SLightingRGB mapLighting= // do i need this?????
-//DeadCode JON 2Nov00 	{
-//DeadCode JON 2Nov00 	//	RED			GREEN		BLUE			-- enter values as % of full strength
-//DeadCode JON 2Nov00 	//
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- LANDSCAPE LOWEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- LANDSCAPE HIGHEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- LANDSCAPE AMBIENT
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- SHADED OBJECTS LOWEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- SHADED OBJECTS HIGHEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- SHADED OBJECTS AMBIENT
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- NON SHADED OBJECTS ?? LOWEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- NON SHADED OBJECTS ?? HIGHEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- COCKPIT LOWEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- COCKPIT HIGHEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- COCKPIT AMBIENT
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- EFFECTS LOWEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- EFFECTS HIGHEST
-//DeadCode JON 2Nov00 		{P(100),	P(100),		P(100)},	//	-- EFFECTS AMBIENT
-//DeadCode JON 2Nov00 		{B(0x44),	B(0x44),	B(0xFF)},	//		-- deepestSkyCol
-//DeadCode JON 2Nov00 		{B(0xAA),	B(0xAA),	B(0xFF)},	//		-- otherSkyCol - towards sun
-//DeadCode JON 2Nov00 		{B(0xFF),	B(0xFF),	B(0xFF)},	//		-- cloudCol - towards sun
-//DeadCode JON 2Nov00 		{B(0x90),	B(0xB8),	B(0xE8)},	//		-- horizonCol - towards sun
-//DeadCode JON 2Nov00 		{B(0x70),	B(0x98),	B(0xC8)},	//		-- fogCol - towards sun
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		{B(0xAA),	B(0xAA),	B(0xFF)},	//		-- otherSkyCol -away from sun
-//DeadCode JON 2Nov00 		{B(0xFF),	B(0xFF),	B(0xFF)},	//		-- cloudCol -away from sun
-//DeadCode JON 2Nov00 		{B(0x90),	B(0xB8),	B(0xE8)},	//		-- horizonCol -away from sun
-//DeadCode JON 2Nov00 		{B(0x70),	B(0x98),	B(0xC8)},	//		-- fogCol -away from sun
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		{B(240),	B(240),		B(240)}, //		-- The colour to shade the sun...
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 	};
 
-//DeadCode CSB 19Oct100 	static SLightingRGB dawnLighting=
-//DeadCode CSB 19Oct100 	{
-//DeadCode CSB 19Oct100 	//	RED			GREEN		BLUE			-- enter values as % of full strength
-//DeadCode CSB 19Oct100 	//
-//DeadCode CSB 19Oct100 		{P(20),		P(20),		P(20)},	//		-- LANDSCAPE LOWEST
-//DeadCode CSB 19Oct100 		{P(40),		P(40),		P(40)},//		-- LANDSCAPE HIGHEST
-//DeadCode CSB 19Oct100 		{P(50),		P(50),		P(50)},	//		-- LANDSCAPE AMBIENT
-//DeadCode CSB 19Oct100 		{P(45),		P(45),		P(45)},	//		-- SHADED OBJECTS LOWEST
-//DeadCode CSB 19Oct100 		{B(255),	B(255),		B(255)},//		-- SHADED OBJECTS HIGHEST
-//DeadCode CSB 19Oct100 		{B(247),	B(246),		B(177)},	//		-- SHADED OBJECTS AMBIENT
-//DeadCode CSB 19Oct100 		{P(20),		P(20),		P(20)},	//		-- NON SHADED OBJECTS ?? LOWEST
-//DeadCode CSB 19Oct100 		{P(40),		P(40),		P(40)},//		-- NON SHADED OBJECTS ?? HIGHEST
-//DeadCode CSB 19Oct100 		{P(50),		P(50),		P(50)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS AMBIENT
-//DeadCode CSB 19Oct100 		{B(7),		B(76),		B(141)},	//		-- deepestSkyCol	//AM 14Sep00	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{B(174),	B(192),		B(192)},	//		-- otherSkyCol - towards sun	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(244),	B(228),		B(152)},	//		-- cloudCol - towards sun	//AM 14Sep00	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(251),	B(242),		B(201)},	//		-- horizonCol - towards sun	//AM 14Sep00	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(245),	B(246),		B(128)},	//		-- fogCol - towards sun	//AM 14Sep00
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(122),	B(127),		B(150)},	//		-- otherSkyCol -away from sun
-//DeadCode CSB 19Oct100 		{B(182),	B(168),		B(102)},	//		-- cloudCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(163),	B(153),		B(107)},	//		-- horizonCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(121),	B(121),		B(81)},		//		-- fogCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(255),	B(122),		B(57)},	//		-- The colour to shade the sun...
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 //		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour 	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(251),	B(242),		B(201)}	//		-- The maximum specular highlight colour
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 //DeadCode JON 11Sep00 		{B(0),		B(0),		B(155)},	//		-- deepestSkyCol
-//DeadCode CSB 19Oct100 //DeadCode JON 11Sep00 		{B(84),		B(100),		B(144)},	//		-- otherSkyCol		//AM 14Jul00
-//DeadCode CSB 19Oct100 //DeadCode JON 11Sep00 		{B(86),		B(129),		B(130)},	//		-- cloudCol			//AM 14Jul00
-//DeadCode CSB 19Oct100 //DeadCode JON 11Sep00 		{B(245),	B(222),		B(141)},	//		-- horizonCol		//AM 14Jul00
-//DeadCode CSB 19Oct100 //DeadCode JON 11Sep00 		{B(254),	B(191),		B(40)}		//		-- fogCol			//AM 14Jul00
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	};
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 	static SLightingRGB dayLighting=
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 	{
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 	//	RED			GREEN		BLUE			-- enter values as % of full strength
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 	//
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(80),		P(80),		P(80)},	//		-- LANDSCAPE LOWEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(100),	P(100),		P(100)},//		-- LANDSCAPE HIGHEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(90),		P(90),		P(90)},	//		-- LANDSCAPE AMBIENT
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(80),		P(80),		P(80)},	//		-- SHADED OBJECTS LOWEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(100),	P(100),		P(100)},//		-- SHADED OBJECTS HIGHEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(90),		P(90),		P(90)},	//		-- SHADED OBJECTS AMBIENT
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(80),		P(80),		P(80)},	//		-- NON SHADED OBJECTS ?? LOWEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(100),	P(100),		P(100)},//		-- NON SHADED OBJECTS ?? HIGHEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(90),		P(90),		P(90)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 		{P(0),		P(0),		P(0)}	//		-- EFFECTS AMBIENT
-//DeadCode CSB 19Oct100 //TEMPCODE JON 4/19/00 	};
-//DeadCode CSB 19Oct100 	static SLightingRGB dayLighting=
-//DeadCode CSB 19Oct100 	{
-//DeadCode CSB 19Oct100 	//	RED			GREEN		BLUE			-- enter values as % of full strength
-//DeadCode CSB 19Oct100 	//
-//DeadCode CSB 19Oct100 		{P(50),		P(50),		P(50)},	//		-- LANDSCAPE LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},//		-- LANDSCAPE HIGHEST
-//DeadCode CSB 19Oct100 		{P(90),		P(90),		P(90)},	//		-- LANDSCAPE AMBIENT
-//DeadCode CSB 19Oct100 		{P(45),		P(45),		P(45)},	//		-- SHADED OBJECTS LOWEST
-//DeadCode CSB 19Oct100 		{B(255),	B(255),		B(255)},//		-- SHADED OBJECTS HIGHEST
-//DeadCode CSB 19Oct100 		{B(213),	B(245),		B(245)},	//		-- SHADED OBJECTS AMBIENT
-//DeadCode CSB 19Oct100 		{P(80),		P(00),		P(00)},	//		-- NON SHADED OBJECTS ?? LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},//		-- NON SHADED OBJECTS ?? HIGHEST
-//DeadCode CSB 19Oct100 		{P(90),		P(90),		P(90)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS AMBIENT
-//DeadCode CSB 19Oct100 		{B(1),		B(77),		B(215)},	//		-- deepestSkyCol	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(144),	B(184),		B(232)},	//		-- otherSkyCol - towards sun	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(198),	B(216),		B(237)},	//		-- cloudCol - towards sun	//AM 14Sep00	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(162),	B(195),		B(236)},	//		-- horizonCol - towards sun	//AM 14Sep00	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(144),	B(184),		B(232)},	//		-- fogCol - towards sun	//AM 14Sep00
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(112),	B(165),		B(224)},	//		-- otherSkyCol -away from sun
-//DeadCode CSB 19Oct100 		{B(198),	B(216),		B(237)},	//		-- cloudCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(162),	B(195),		B(236)},	//		-- horizonCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(144),	B(184),		B(232)},	//		-- fogCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(255),	B(255),		B(255)},	//		-- The colour to shade the sun...
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 //		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour 	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(255),	B(255),		B(255)}	//		-- The maximum specular highlight colour
-//DeadCode CSB 19Oct100 	};
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	static SLightingRGB duskLighting=
-//DeadCode CSB 19Oct100 	{
-//DeadCode CSB 19Oct100 	//	RED			GREEN		BLUE			-- enter values as % of full strength if P or byte vals if B
-//DeadCode CSB 19Oct100 	//
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{P(20),		P(20),		P(20)},	//		-- LANDSCAPE LOWEST		//AM 15Sep00
-//DeadCode CSB 19Oct100 		{P(45),		P(50),		P(30)},//		-- LANDSCAPE HIGHEST	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{P(30),		P(30),		P(30)},	//		-- LANDSCAPE AMBIENT	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{P(45),		P(45),		P(45)},	//		-- SHADED OBJECTS LOWEST	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{B(255),	B(255),		B(255)},//		-- SHADED OBJECTS HIGHEST	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{B(213),	B(245),		B(245)},	//		-- SHADED OBJECTS AMBIENT	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{P(80),		P(00),		P(00)},	//		-- NON SHADED OBJECTS ?? LOWEST	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{P(40),		P(40),		P(50)},//		-- NON SHADED OBJECTS ?? HIGHEST	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{P(20),		P(20),		P(20)},	//		-- NON SHADED OBJECTS ?? AMBIENT	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS AMBIENT
-//DeadCode CSB 19Oct100 		{B(85),		B(114),		B(161)},	//		-- deepestSkyCol	//AM 14Sep00	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{B(139),	B(143),		B(159)},	//		-- otherSkyCol - towards sun	//AM 14Sep00	//AM 15Sep00
-//DeadCode CSB 19Oct100 		{B(140),	B(140),		B(140)},	//		-- cloudCol - towards sun	//AM 14Sep00	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(164),	B(163),		B(116)},	//		-- horizonCol - towards sun	//AM 14Sep00	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(151),	B(167),		B(131)},	//		-- fogCol - towards sun	//AM 14Sep00
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(117),	B(122),		B(141)},	//		-- otherSkyCol -away from sun
-//DeadCode CSB 19Oct100 		{B(120),	B(120),		B(120)},	//		-- cloudCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(120),	B(120),		B(80)},	//		-- horizonCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(133),	B(148),		B(112)},	//		-- fogCol -away from sun	//AM 14Sep00
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(255),	B(122),		B(57)},	//		-- The colour to shade the sun...
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 //		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour 	//AM 14Sep00
-//DeadCode CSB 19Oct100 		{B(175),	B(177),		B(111)}	//		-- The maximum specular highlight colour
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	};
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	static SLightingRGB niteLighting=
-//DeadCode CSB 19Oct100 	{
-//DeadCode CSB 19Oct100 	//	RED			GREEN		BLUE			-- enter values as % of full strength
-//DeadCode CSB 19Oct100 	//
-//DeadCode CSB 19Oct100 		{P(5),		P(5),		P(5)},	//		-- LANDSCAPE LOWEST
-//DeadCode CSB 19Oct100 		{P(15),		P(15),		P(15)},	//		-- LANDSCAPE HIGHEST
-//DeadCode CSB 19Oct100 		{P(10),		P(10),		P(10)},	//		-- LANDSCAPE AMBIENT
-//DeadCode CSB 19Oct100 		{P(5),		P(5),		P(5)},	//		-- SHADED OBJECTS LOWEST
-//DeadCode CSB 19Oct100 		{P(15),		P(15),		P(15)},	//		-- SHADED OBJECTS HIGHEST
-//DeadCode CSB 19Oct100 		{P(10),		P(10),		P(10)},	//		-- SHADED OBJECTS AMBIENT
-//DeadCode CSB 19Oct100 		{P(5),		P(5),		P(5)},	//		-- NON SHADED OBJECTS ?? LOWEST
-//DeadCode CSB 19Oct100 		{P(15),		P(15),		P(15)},	//		-- NON SHADED OBJECTS ?? HIGHEST
-//DeadCode CSB 19Oct100 		{P(10),		P(10),		P(10)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//		-- EFFECTS LOWEST	//AM 14Jul00
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//		-- EFFECTS HIGHEST	//AM 14Jul00
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//		-- EFFECTS AMBIENT	//AM 14Jul00
-//DeadCode CSB 19Oct100 		{B(0),		B(0),		B(0)},	//		-- deepestSkyCol
-//DeadCode CSB 19Oct100 		{B(5),		B(5),		B(5)},	//		-- otherSkyCol - towards sun
-//DeadCode CSB 19Oct100 		{B(10),		B(10),		B(10)},	//		-- cloudCol - towards sun
-//DeadCode CSB 19Oct100 		{B(0),		B(0),		B(0)},	//		-- horizonCol - towards sun
-//DeadCode CSB 19Oct100 		{B(0),		B(0),		B(5)},	//		-- fogCol - towards sun
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(5),		B(5),		B(5)},	//		-- otherSkyCol -away from sun
-//DeadCode CSB 19Oct100 		{B(10),		B(10),		B(10)},	//		-- cloudCol -away from sun
-//DeadCode CSB 19Oct100 		{B(0),		B(0),		B(0)},	//		-- horizonCol -away from sun
-//DeadCode CSB 19Oct100 		{B(0),		B(0),		B(5)},	//		-- fogCol -away from sun
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(0),		B(0),		B(0)},	//		-- The colour to shade the sun...
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 //DeadCode JON 2Oct00 		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour
-//DeadCode CSB 19Oct100 		{B(87),		B(88),		B(143)}	//		-- The maximum specular highlight colour
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	};
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	static SLightingRGB badWLighting=
-//DeadCode CSB 19Oct100 	{
-//DeadCode CSB 19Oct100 	//	RED			GREEN		BLUE			-- enter values as % of full strength
-//DeadCode CSB 19Oct100 	//
-//DeadCode CSB 19Oct100 		{P(40),		P(40),		P(40)},	//		-- LANDSCAPE LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},//		-- LANDSCAPE HIGHEST
-//DeadCode CSB 19Oct100 		{P(70),		P(70),		P(70)},	//		-- LANDSCAPE AMBIENT
-//DeadCode CSB 19Oct100 		{P(40),		P(40),		P(40)},	//		-- SHADED OBJECTS LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},//		-- SHADED OBJECTS HIGHEST
-//DeadCode CSB 19Oct100 		{P(70),		P(70),		P(70)},	//		-- SHADED OBJECTS AMBIENT
-//DeadCode CSB 19Oct100 		{P(40),		P(40),		P(40)},	//		-- NON SHADED OBJECTS ?? LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},//		-- NON SHADED OBJECTS ?? HIGHEST
-//DeadCode CSB 19Oct100 		{P(70),		P(70),		P(70)},	//		-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- COCKPIT AMBIENT
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS LOWEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS HIGHEST
-//DeadCode CSB 19Oct100 		{P(0),		P(0),		P(0)},	//		-- EFFECTS AMBIENT	};
-//DeadCode CSB 19Oct100 		{B(0x44),	B(0x44),	B(0xFF)},	//		-- deepestSkyCol
-//DeadCode CSB 19Oct100 		{B(0xAA),	B(0xAA),	B(0xFF)},	//		-- otherSkyCol - towards sun
-//DeadCode CSB 19Oct100 		{B(0xFF),	B(0xFF),	B(0xFF)},	//		-- cloudCol - towards sun
-//DeadCode CSB 19Oct100 		{B(0x90),	B(0xB8),	B(0xE8)},	//		-- horizonCol - towards sun
-//DeadCode CSB 19Oct100 		{B(0x70),	B(0x98),	B(0xC8)},	//		-- fogCol - towards sun
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(0xAA),	B(0xAA),	B(0xFF)},	//		-- otherSkyCol -away from sun
-//DeadCode CSB 19Oct100 		{B(0xFF),	B(0xFF),	B(0xFF)},	//		-- cloudCol -away from sun
-//DeadCode CSB 19Oct100 		{B(0x90),	B(0xB8),	B(0xE8)},	//		-- horizonCol -away from sun
-//DeadCode CSB 19Oct100 		{B(0x70),	B(0x98),	B(0xC8)},	//		-- fogCol -away from sun
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(240),	B(240),		B(240)}, //		-- The colour to shade the sun...
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	};
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	static SLightingRGB mapLighting= // do i need this?????
-//DeadCode CSB 19Oct100 	{
-//DeadCode CSB 19Oct100 	//	RED			GREEN		BLUE			-- enter values as % of full strength
-//DeadCode CSB 19Oct100 	//
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- LANDSCAPE LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- LANDSCAPE HIGHEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- LANDSCAPE AMBIENT
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- SHADED OBJECTS LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- SHADED OBJECTS HIGHEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- SHADED OBJECTS AMBIENT
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- NON SHADED OBJECTS ?? LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- NON SHADED OBJECTS ?? HIGHEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- NON SHADED OBJECTS ?? AMBIENT
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- COCKPIT LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- COCKPIT HIGHEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- COCKPIT AMBIENT
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- EFFECTS LOWEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- EFFECTS HIGHEST
-//DeadCode CSB 19Oct100 		{P(100),	P(100),		P(100)},	//	-- EFFECTS AMBIENT
-//DeadCode CSB 19Oct100 		{B(0x44),	B(0x44),	B(0xFF)},	//		-- deepestSkyCol
-//DeadCode CSB 19Oct100 		{B(0xAA),	B(0xAA),	B(0xFF)},	//		-- otherSkyCol - towards sun
-//DeadCode CSB 19Oct100 		{B(0xFF),	B(0xFF),	B(0xFF)},	//		-- cloudCol - towards sun
-//DeadCode CSB 19Oct100 		{B(0x90),	B(0xB8),	B(0xE8)},	//		-- horizonCol - towards sun
-//DeadCode CSB 19Oct100 		{B(0x70),	B(0x98),	B(0xC8)},	//		-- fogCol - towards sun
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(0xAA),	B(0xAA),	B(0xFF)},	//		-- otherSkyCol -away from sun
-//DeadCode CSB 19Oct100 		{B(0xFF),	B(0xFF),	B(0xFF)},	//		-- cloudCol -away from sun
-//DeadCode CSB 19Oct100 		{B(0x90),	B(0xB8),	B(0xE8)},	//		-- horizonCol -away from sun
-//DeadCode CSB 19Oct100 		{B(0x70),	B(0x98),	B(0xC8)},	//		-- fogCol -away from sun
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(240),	B(240),		B(240)}, //		-- The colour to shade the sun...
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 		{B(255),	B(224),		B(192)}	//		-- The maximum specular highlight colour
-//DeadCode CSB 19Oct100
-//DeadCode CSB 19Oct100 	};
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	static SLightingRGB dawnLighting=
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	{
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(105), B(84), B(46)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(158), B(158), B(109)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(174), B(174), B(94)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(162), B(165), B(129)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(252), B(207), B(190)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(198), B(199), B(223)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(77), B(59), B(50)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(206), B(179), B(132)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(105), B(84), B(46)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(128),B(128),B(128)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255), B(255), B(255)}
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	};
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	static SLightingRGB dayLighting=
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	{
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(142), B(166), B(200)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(208), B(228), B(240)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(216), B(232), B(248)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255), B(255), B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(159), B(181), B(222)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(102), B(138), B(201)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255), B(255), B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(248), B(254), B(203)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255), B(255), B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255), B(255), B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255), B(255), B(255)}
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	};
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	static SLightingRGB duskLighting=
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	{
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(72), B(77), B(100)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(199), B(158), B(84)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(233), B(105), B(50)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(214), B(113), B(69)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(149), B(162), B(166)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(24), B(38), B(63)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(41), B(55), B(68)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(236), B(122), B(47)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(61), B(84), B(112)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(128),B(128),B(128)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255), B(255), B(255)}
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	};
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	static SLightingRGB niteLighting=
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	{
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(60), B(82), B(89)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(94), B(129), B(140)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(61), B(56), B(116)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(45), B(43), B(64)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(82), B(79), B(123)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(7), B(9), B(30)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(17), B(23), B(28)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(60), B(60), B(70)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(34), B(51), B(71)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(128),B(128),B(128)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255), B(255), B(255)}
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	};
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	static SLightingRGB badWLighting=
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	{
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//horizon base
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//top of hrzn strip
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//under clouds
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//at clouds
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//above clouds
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//ceiling colour
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//land ambient
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//l-shade ambient
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff},		//other ambient
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{0x3fff,0x3fff,0x3fff}
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	};
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	static SLightingRGB mapLighting=
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	{
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)},
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 		{B(255),B(255),B(255)}
-//DeadCode CSB 19Oct100 //DEADCODE JON 3/30/00 	};
 
 	pDawn=&dawnLighting;
 	pDay=&dayLighting;
 	pDusk=&duskLighting;
 	pNite=&niteLighting;
-//DeadCode JON 2Nov00 	pBadW=&badWLighting;
-//DeadCode JON 2Nov00 	pMapL=&mapLighting;
 
 	currentLighting=dayLighting;	//safe default...
 
@@ -7088,7 +4636,6 @@ void LandScape::DecDetailLevel()
 	else if (Save_Data.detail_3d[DETAIL3D_INCONSEQUENTIALS])	Save_Data.detail_3d%=DETAIL3D_INCONSEQUENTIALS;
 	else if (Save_Data.contourDetail==1)						Save_Data.contourDetail--;
 	else if (Save_Data.detail_3d[DETAIL3D_AIRCRAFTSHADOWS])		Save_Data.detail_3d%=DETAIL3D_AIRCRAFTSHADOWS;
-//DeadCode JON 22Sep00 	else if (Save_Data.detail_3d[DETAIL3D_ITEMSHADING])			Save_Data.detail_3d%=DETAIL3D_ITEMSHADING;
 	else if (Save_Data.itemShading)
 	{
 		Save_Data.itemShading--;
@@ -7099,15 +4646,6 @@ void LandScape::DecDetailLevel()
 	else if (Save_Data.detail_3d[DETAIL3D_ITEMSHADOWS])			Save_Data.detail_3d%=DETAIL3D_ITEMSHADOWS;
 	else if (Save_Data.detail_3d[DETAIL3D_GROUNDSHADING])		Save_Data.detail_3d%=DETAIL3D_GROUNDSHADING;
 
-//DeadCode JON 3Aug00 	if (Save_Data.cockpit3Ddetail[COCK3D_SKYIMAGES])		Save_Data.cockpit3Ddetail%=COCK3D_SKYIMAGES;
-//DeadCode JON 3Aug00 	else if (Save_Data.detail_3d[DETAIL3D_INCONSEQUENTIALS])Save_Data.detail_3d%=DETAIL3D_INCONSEQUENTIALS;
-//DeadCode JON 3Aug00 	else if (Save_Data.detail_3d[DETAIL3D_AIRCRAFTSHADOWS])	Save_Data.detail_3d%=DETAIL3D_AIRCRAFTSHADOWS;
-//DeadCode JON 3Aug00 	else if (!Save_Data.detail_3d[DETAIL3D_HORIZONFADE])	Save_Data.detail_3d|=DETAIL3D_HORIZONFADE;
-//DeadCode JON 3Aug00 	else if (Save_Data.detail_3d[DETAIL3D_ITEMSHADING])		Save_Data.detail_3d%=DETAIL3D_ITEMSHADING;
-//DeadCode JON 3Aug00 	else if (Save_Data.detail_3d[DETAIL3D_ITEMSHADOWS])		Save_Data.detail_3d%=DETAIL3D_ITEMSHADOWS;
-//DeadCode JON 3Aug00 	else if (Save_Data.detail_3d[DETAIL3D_GROUNDSHADING])	Save_Data.detail_3d%=DETAIL3D_GROUNDSHADING;
-//DeadCode JON 3Aug00 	else if (Save_Data.detail_3d[DETAIL3D_ROUTES])			Save_Data.detail_3d%=DETAIL3D_ROUTES;
-//DeadCode JON 3Aug00 	else if (Save_Data.detail_3d[DETAIL3D_CONTOURDETAIL])	Save_Data.detail_3d%=DETAIL3D_CONTOURDETAIL;
 
 }
 
@@ -7128,7 +4666,6 @@ inline void LandScape::IncDetailLevel()
 
 	if (Save_Data.detail_3d[DETAIL3D_GROUNDSHADING])			Save_Data.detail_3d|=DETAIL3D_GROUNDSHADING;
 	else if (Save_Data.detail_3d[DETAIL3D_ITEMSHADOWS])			Save_Data.detail_3d|=DETAIL3D_ITEMSHADOWS;
-//DeadCode JON 22Sep00 	else if (Save_Data.detail_3d[DETAIL3D_ITEMSHADING])			Save_Data.detail_3d|=DETAIL3D_ITEMSHADING;
 	else if (Save_Data.itemShading<2)
 	{
 		Save_Data.itemShading++;
@@ -7146,15 +4683,6 @@ inline void LandScape::IncDetailLevel()
 	else if (Save_Data.contourDetail==3)						Save_Data.contourDetail++;
 
 
-//DeadCode JON 3Aug00 	if (!Save_Data.detail_3d[DETAIL3D_CONTOURDETAIL])		Save_Data.detail_3d|=DETAIL3D_CONTOURDETAIL;
-//DeadCode JON 3Aug00 	else if (!Save_Data.detail_3d[DETAIL3D_ROUTES])			Save_Data.detail_3d|=DETAIL3D_ROUTES;
-//DeadCode JON 3Aug00 	else if (!Save_Data.detail_3d[DETAIL3D_GROUNDSHADING])	Save_Data.detail_3d|=DETAIL3D_GROUNDSHADING;
-//DeadCode JON 3Aug00 	else if (!Save_Data.detail_3d[DETAIL3D_ITEMSHADOWS])	Save_Data.detail_3d|=DETAIL3D_ITEMSHADOWS;
-//DeadCode JON 3Aug00 	else if (!Save_Data.detail_3d[DETAIL3D_ITEMSHADING])	Save_Data.detail_3d|=DETAIL3D_ITEMSHADING;
-//DeadCode JON 3Aug00 	else if (Save_Data.detail_3d[DETAIL3D_HORIZONFADE])		Save_Data.detail_3d%=DETAIL3D_HORIZONFADE;
-//DeadCode JON 3Aug00 	else if (!Save_Data.detail_3d[DETAIL3D_AIRCRAFTSHADOWS])Save_Data.detail_3d|=DETAIL3D_AIRCRAFTSHADOWS;
-//DeadCode JON 3Aug00 	else if (!Save_Data.detail_3d[DETAIL3D_INCONSEQUENTIALS])Save_Data.detail_3d|=DETAIL3D_INCONSEQUENTIALS;
-//DeadCode JON 3Aug00 	else if (!Save_Data.cockpit3Ddetail[COCK3D_SKYIMAGES])	Save_Data.cockpit3Ddetail|=COCK3D_SKYIMAGES;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -7196,138 +4724,6 @@ LandScape::~LandScape()
 //Returns
 //
 //------------------------------------------------------------------------------
-//deadcode JON 19/06/01	void	LandScape::DoRain(ViewPoint	*vp,SLong	gheight)
-//deadcode JON 19/06/01	{
-//deadcode JON 19/06/01
-//deadcode JON 19/06/01
-//deadcode JON 19/06/01		// if it is raining and below cloud layer....
-//DEADCODE RDH 5/19/00 	if (Save_Data.gamedifficulty[GD_WEATHEREFFECTS] &&
-//DEADCODE RDH 5/19/00 		Manual_Pilot.ControlledAC2 &&
-//DEADCODE RDH 5/19/00 		MissManCampSky().Conditions==1)			//raining!
-//DEADCODE RDH 5/19/00 	{
-//DEADCODE RDH 5/19/00 		int			i;
-//DEADCODE RDH 5/19/00 		SWord		XSeed;
-//DEADCODE RDH 5/19/00 		SWord		YSeed;
-//DEADCODE RDH 5/19/00 		SWord		ZSeed;
-//DEADCODE RDH 5/19/00 		DoPointStruc dp0,dp1;
-//DEADCODE RDH 5/19/00 		LINETYPE	ltLine;
-//DEADCODE RDH 5/19/00 		struct		vertex	startVertex,endVertex;
-//DEADCODE RDH 5/19/00 		Float		z0,z1;
-//DEADCODE RDH 5/19/00 		FPMATRIX		nmat;
-//DEADCODE RDH 5/19/00 		FPMATRIX_PTR	nmatp = &nmat;
-//DEADCODE RDH 5/19/00 		ANGLES			hdg, pitch, roll;
-//DEADCODE RDH 5/19/00 //DEADCODE CSB 08/11/99 		SLong			theVel = Manual_Pilot.ControlledAC2->velhori;
-//DEADCODE RDH 5/19/00 		SLong			theVel = Manual_Pilot.ControlledAC2->vel_; //CSB 08/11/99
-//DEADCODE RDH 5/19/00 		SWord			RainHeight = 5;
-//DEADCODE RDH 5/19/00 		SLong			distfromground = gheight;	//vp->World.Y - gheight;
-//DEADCODE RDH 5/19/00 		SLong			theVol;
-//DEADCODE RDH 5/19/00 		UWord			andedFlags;
-//DEADCODE RDH 5/19/00 		Bool			inCockpit = FALSE;
-//DEADCODE RDH 5/19/00 		Bool			drawit;
-//DEADCODE RDH 5/19/00 		Colour			base_colour = (Colour)24;				//RJS 03Jun99
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 		if (vp->PolyPitEnabled())
-//DEADCODE RDH 5/19/00 			inCockpit = TRUE;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 		if (theVel >= 1000)
-//DEADCODE RDH 5/19/00 			theVel = ANGLES_90Deg;
-//DEADCODE RDH 5/19/00 		else
-//DEADCODE RDH 5/19/00 			theVel = (theVel * ANGLES_90Deg)/1000;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 		hdg = Manual_Pilot.ControlledAC2->hdg;
-//DEADCODE RDH 5/19/00 		pitch = (Angles) -theVel;
-//DEADCODE RDH 5/19/00 		roll = ANGLES_0Deg;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 		g_lpLib3d->PushMatrix(MATRIX_OBJECT);
-//DEADCODE RDH 5/19/00 		g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_ROLL,(Angles)(int)roll);
-//DEADCODE RDH 5/19/00 		g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_PITCH,(Angles)(int)pitch);
-//DEADCODE RDH 5/19/00 		g_lpLib3d->Rotate(MATRIX_OBJECT,AXIS_HEADING,(Angles)(int)hdg);
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 		theVol = 128 - ((distfromground * 128)/10000);
-//DEADCODE RDH 5/19/00 //		if (theVol > 0)
-//DEADCODE RDH 5/19/00 //			_Miles.PlayLooped(FIL_SFX_RAIN_LOOP,NULL,theVol);
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 		if (Three_Dee.IsPaused())
-//DEADCODE RDH 5/19/00 		{
-//DEADCODE RDH 5/19/00 			for (i=0; i < 96; i++)
-//DEADCODE RDH 5/19/00 			{
-//DEADCODE RDH 5/19/00 				XSeed = (SByte) SHAPE.Noise(vp->World.X+i,vp->World.Y+i,vp->World.Z+i);
-//DEADCODE RDH 5/19/00 				YSeed = (SByte) SHAPE.Noise(XSeed+i,vp->World.Y+i,vp->World.Z+i);
-//DEADCODE RDH 5/19/00 				ZSeed = (SByte) SHAPE.Noise(vp->World.X+i,YSeed+i,vp->World.Z+i);
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 				XSeed <<= 4;
-//DEADCODE RDH 5/19/00 				YSeed <<= 4;
-//DEADCODE RDH 5/19/00 				ZSeed <<= 4;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 				drawit = TRUE;
-//DEADCODE RDH 5/19/00 				if (inCockpit)
-//DEADCODE RDH 5/19/00 				{
-//DEADCODE RDH 5/19/00 					if (	((XSeed > -800) && (XSeed < 800))
-//DEADCODE RDH 5/19/00 						&&	((YSeed > -800) && (YSeed < 800))
-//DEADCODE RDH 5/19/00 						&&	((ZSeed > -800) && (ZSeed < 800))	)
-//DEADCODE RDH 5/19/00 						drawit = FALSE;
-//DEADCODE RDH 5/19/00 				}
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 				if (drawit)
-//DEADCODE RDH 5/19/00 				{
-//DEADCODE RDH 5/19/00 					dp0.bodyx.f = XSeed;
-//DEADCODE RDH 5/19/00 					dp0.bodyy.f = YSeed;
-//DEADCODE RDH 5/19/00 					dp0.bodyz.f = ZSeed;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 					dp1.bodyx.f = XSeed;
-//DEADCODE RDH 5/19/00 					dp1.bodyy.f = YSeed + RainHeight;
-//DEADCODE RDH 5/19/00 					dp1.bodyz.f = ZSeed;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 //deadcode					if (andedFlags == 0 && dp0.bodyz.f>5*100 && dp1.bodyz.f>5*100)
-//DEADCODE RDH 5/19/00 //deadcode					{
-//DEADCODE RDH 5/19/00 						g_lpLib3d->DrawLine(HMATERIAL(base_colour),dp0,dp1);
-//DEADCODE RDH 5/19/00 //deadcode					}
-//DEADCODE RDH 5/19/00 				}
-//DEADCODE RDH 5/19/00 			}
-//DEADCODE RDH 5/19/00 		}
-//DEADCODE RDH 5/19/00 		else
-//DEADCODE RDH 5/19/00 		{
-//DEADCODE RDH 5/19/00 			RainHeight = 40;
-//DEADCODE RDH 5/19/00 			for (i=0; i < 96; i++)
-//DEADCODE RDH 5/19/00 			{
-//DEADCODE RDH 5/19/00 				XSeed = Math_Lib.rnd();
-//DEADCODE RDH 5/19/00 				YSeed = Math_Lib.rnd();
-//DEADCODE RDH 5/19/00 				ZSeed = Math_Lib.rnd();
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 				XSeed >>= 4;
-//DEADCODE RDH 5/19/00 				YSeed >>= 4;
-//DEADCODE RDH 5/19/00 				ZSeed >>= 4;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 				drawit = TRUE;
-//DEADCODE RDH 5/19/00 				if (inCockpit)
-//DEADCODE RDH 5/19/00 				{
-//DEADCODE RDH 5/19/00 					if (	((XSeed > -600) && (XSeed < 600))
-//DEADCODE RDH 5/19/00 						&&	((YSeed > -400) && (YSeed < 400))
-//DEADCODE RDH 5/19/00 						&&	((ZSeed > -600) && (ZSeed < 600))	)
-//DEADCODE RDH 5/19/00 						drawit = FALSE;
-//DEADCODE RDH 5/19/00 				}
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 				if (drawit)
-//DEADCODE RDH 5/19/00 				{
-//DEADCODE RDH 5/19/00 					dp0.bodyx.f = XSeed;
-//DEADCODE RDH 5/19/00 					dp0.bodyy.f = YSeed;
-//DEADCODE RDH 5/19/00 					dp0.bodyz.f = ZSeed;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 					dp1.bodyx.f = XSeed;
-//DEADCODE RDH 5/19/00 					dp1.bodyy.f = YSeed + RainHeight;
-//DEADCODE RDH 5/19/00 					dp1.bodyz.f = ZSeed;
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 //deadcode					if (andedFlags == 0 && dp0.bodyz.f>5*100 && dp1.bodyz.f>5*100)
-//DEADCODE RDH 5/19/00 //deadcode					{
-//DEADCODE RDH 5/19/00
-//DEADCODE RDH 5/19/00 						g_lpLib3d->DrawLine(HMATERIAL(base_colour),dp0,dp1);
-//DEADCODE RDH 5/19/00 //deadcode					}
-//DEADCODE RDH 5/19/00 				}
-//DEADCODE RDH 5/19/00 			}
-//DEADCODE RDH 5/19/00 		}
-//DEADCODE RDH 5/19/00 		g_lpLib3d->PopMatrix(MATRIX_OBJECT);
-//DEADCODE RDH 5/19/00 	}
-//deadcode JON 19/06/01	}
 static UByte scaledToCeil=0;
 static int hStep;
 
@@ -7357,35 +4753,6 @@ inline void fpTan(ANGLES ang,Float& tanAng)
 }
 */
 
-//DEADCODE JON 5/24/00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DEADCODE JON 5/24/00 //Procedure		GStrip
-//DEADCODE JON 5/24/00 //Author		Paul.
-//DEADCODE JON 5/24/00 //Date			Tue 19 Jan 1999
-//DEADCODE JON 5/24/00 //------------------------------------------------------------------------------
-//DEADCODE JON 5/24/00 void LandScape::GStrip(	DoPointStruc** pp,
-//DEADCODE JON 5/24/00 						UByte br,UByte bg,UByte bb,
-//DEADCODE JON 5/24/00 						UByte tr,UByte tg,UByte tb)
-//DEADCODE JON 5/24/00 {
-//DEADCODE JON 5/24/00 //deadcode	if (!(	pp[0]->clipFlags&
-//DEADCODE JON 5/24/00 //deadcode			pp[1]->clipFlags&
-//DEADCODE JON 5/24/00 //deadcode			pp[2]->clipFlags&
-//DEADCODE JON 5/24/00 //deadcode			pp[3]->clipFlags))
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		R3DVERTEX *pRVerts;
-//DEADCODE JON 5/24/00 		g_lpLib3d->BeginPoly(HMATERIAL(UByte(0)),4,pRVerts);
-//DEADCODE JON 5/24/00 		*pRVerts++=*pp[3];
-//DEADCODE JON 5/24/00 		*pRVerts++=*pp[0];
-//DEADCODE JON 5/24/00 		*pRVerts++=*pp[1];
-//DEADCODE JON 5/24/00 		*pRVerts++=*pp[2];
-//DEADCODE JON 5/24/00 		g_lpLib3d->EndPoly();
-//DEADCODE JON 5/24/00 //deadcode		POLYGON.createpoly(POLYTYPE::PT_GColour);
-//DEADCODE JON 5/24/00 //deadcode		POLYGON.createvert(*pp[3],br,bg,bb,0xFF);
-//DEADCODE JON 5/24/00 //deadcode		POLYGON.createvert(*pp[0],br,bg,bb,0xFF);
-//DEADCODE JON 5/24/00 //deadcode		POLYGON.createvert(*pp[1],tr,tg,tb,0xFF);
-//DEADCODE JON 5/24/00 //deadcode		POLYGON.createvert(*pp[2],tr,tg,tb,0xFF);
-//DEADCODE JON 5/24/00 //deadcode		POLYGON.drawpoly();
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GenerateStrip
@@ -7398,41 +4765,20 @@ void LandScape::InfiniteStrip( const ANGLES pitch, const ANGLES roll)
 #ifdef _NO_INFI_STRIP
 	return;
 #endif
-//DeadCode JON 2Nov00 	SLong layerAltitude =	(MissManCampSky().Layer[0].AltBase + MissManCampSky().Layer[0].AltTop)>>1;
 
 	const SLong layerAltitudeTop = MissManCampSky().Layer[0].AltTop;
 	const SLong layerAltitudeBottom = MissManCampSky().Layer[0].AltBase;
 //	SLong layerAltitude = MissManCampSky().Layer[0].AltTop;
 
-//DeadCode JON 2Nov00 	const double cloud_height=double(layerAltitude)/double(CEILING_ALT);
 	const double cloud_height_top=double(layerAltitudeTop)/double(CEILING_ALT);
 	const double cloud_height_bottom=double(layerAltitudeBottom)/double(CEILING_ALT);
 	const double BELOW_GROUND=-1.0;//00.0;///double(CEILING_ALT);
 
 	double fvy=double(viewer_y)/double(CEILING_ALT);
-//DeadCode JON 20Oct00 	double fvy2=fvy*fvy;
 
 	DoPointStruc* ptr = shape::newco;
 
 	double fvr=double(view_dist*0.999999);
-//DeadCode JON 5Oct00 	{
-//DeadCode JON 5Oct00 		D3DVECTOR scaleVec={fvr,fvr,0.f};
-//DeadCode JON 5Oct00 		D3DVECTOR trnsVec={0,0,fvr};
-//DeadCode JON 5Oct00
-//DeadCode JON 5Oct00 		g_lpLib3d->PushMatrix(MATRIX_OBJECT);
-//DeadCode JON 5Oct00 		g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
-//DeadCode JON 5Oct00
-//DeadCode JON 5Oct00 		g_lpLib3d->PushMatrix(MATRIX_VIEWER);
-//DeadCode JON 5Oct00 		g_lpLib3d->LoadIdentity(MATRIX_VIEWER);
-//DeadCode JON 5Oct00 		g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_PITCH,(Angles)-(int)View_Point->pitch);
-//DeadCode JON 5Oct00 		g_lpLib3d->Rotate(MATRIX_VIEWER,AXIS_ROLL,(Angles)-(int)View_Point->roll);
-//DeadCode JON 5Oct00 		g_lpLib3d->Scale(MATRIX_VIEWER,scaleVec);
-//DeadCode JON 5Oct00 		g_lpLib3d->Translate(MATRIX_VIEWER,trnsVec);
-//DeadCode JON 5Oct00 		trnsVec.y=-fvy;
-//DeadCode JON 5Oct00 		trnsVec.z=0;
-//DeadCode JON 5Oct00 		g_lpLib3d->Translate(MATRIX_OBJECT,trnsVec);
-//DeadCode JON 5Oct00 		g_lpLib3d->EnableFogging( false );
-//DeadCode JON 5Oct00 	}
 
 	LIGHTFLAG lf = LF_VERTEX;
 	g_lpLib3d->SetObjectLighting( lf );
@@ -7490,14 +4836,6 @@ void LandScape::InfiniteStrip( const ANGLES pitch, const ANGLES roll)
 		grHorizCol.interpRGB( grHorizColShade, sunProportion );
 
 		R3DCOLOUR midCol;
-//DeadCode JON 2Nov00 		midCol =	(((currentLighting.fogColSun.red() + currentLighting.horizonColSun.red())&~1)<<15) +
-//DeadCode JON 2Nov00 						(((currentLighting.fogColSun.green() + currentLighting.horizonColSun.green())&~1)<<7) +
-//DeadCode JON 2Nov00 						((currentLighting.fogColSun.blue() + currentLighting.horizonColSun.blue())>>1);
-//DeadCode JON 2Nov00 		R3DCOLOUR midColShade;
-//DeadCode JON 2Nov00 		midColShade =	(((currentLighting.fogColShade.red() + currentLighting.horizonColShade.red())&~1)<<15) +
-//DeadCode JON 2Nov00 						(((currentLighting.fogColShade.green() + currentLighting.horizonColShade.green())&~1)<<7) +
-//DeadCode JON 2Nov00 						((currentLighting.fogColShade.blue() + currentLighting.horizonColShade.blue())>>1);
-//DeadCode JON 2Nov00 		midCol.interpRGB( midColShade, sunProportion );
 
 		midCol = grHorizCol;
 		midCol.interpRGB( fogCol, 0.5 );
@@ -7701,164 +5039,14 @@ void LandScape::InfiniteStrip( const ANGLES pitch, const ANGLES roll)
 
 	}
 	int i;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 /* 	Generate vertex data for
-//DEADCODE JON 4/18/00  *	infinite strip along the
-//DEADCODE JON 4/18/00  *	ground
-//DEADCODE JON 4/18/00  */
 
-//DEADCODE JON 4/20/00 	ULong col = 0xFF;
-//DEADCODE JON 4/20/00 	ULong rgCol = 0xAAAA00;
-//DEADCODE JON 4/20/00 //TEMPCODE JON 4/18/00 	ULong rgStep = 0x0A0A00;
-//DEADCODE JON 4/20/00 	ULong rgStep = 0x0F0F00;
 
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 	for (int i=0;i<SubDivideLevel+1;i++)
-//DEADCODE JON 4/18/00 	{
-//DEADCODE JON 4/18/00 		R3DVALUE this_range=R3DVALUE(i)*Max_Range/4.;
-//DEADCODE JON 4/18/00 		this_range=this_range*this_range-fvy2;
-//DEADCODE JON 4/18/00 		if (this_range<0.f) this_range=0.f;
-//DEADCODE JON 4/18/00 		else
-//DEADCODE JON 4/18/00 		{
-//DEADCODE JON 4/18/00 			this_range=fastMath.FastSqrt(this_range);
-//DEADCODE JON 4/18/00 			this_range=fvy*(this_range-1.f)/this_range;
-//DEADCODE JON 4/18/00 		}
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		if (this_range>cloud_height)
-//DEADCODE JON 4/18/00 			break;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		ptr->bodyx.f=-1.f;
-//DEADCODE JON 4/18/00 		ptr->bodyy.f=this_range;
-//DEADCODE JON 4/18/00 		ptr->bodyz.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->vertexCol=0x0090B8E8;//col+rgCol;
-//DEADCODE JON 4/18/00 		ptr++;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		ptr->bodyx.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->bodyy.f=this_range;
-//DEADCODE JON 4/18/00 		ptr->bodyz.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->vertexCol=0x0090B8E8;//col+rgCol;
-//DEADCODE JON 4/18/00 //TEMPCODE JON 4/18/00 		rgCol-=rgStep;
-//DEADCODE JON 4/18/00 		ptr++;
-//DEADCODE JON 4/18/00 	}
-//DEADCODE JON 4/18/00 	rgCol-=rgStep;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 	// where is this one??
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 	for (i=1;i<SubDivideLevel+1;i++)
-//DEADCODE JON 4/18/00 	{
-//DEADCODE JON 4/18/00 		R3DVALUE this_range=R3DVALUE(i)*Max_Range/4.;
-//DEADCODE JON 4/18/00 		this_range=this_range*this_range-fvy2;
-//DEADCODE JON 4/18/00 		if (this_range<0.f) this_range=0.f;
-//DEADCODE JON 4/18/00 		else
-//DEADCODE JON 4/18/00 		{
-//DEADCODE JON 4/18/00 			this_range=fastMath.FastSqrt(this_range);
-//DEADCODE JON 4/18/00 			this_range=fvy*(this_range-1.f)/this_range;
-//DEADCODE JON 4/18/00 		}
-//DEADCODE JON 4/18/00 		if (this_range>cloud_height)
-//DEADCODE JON 4/18/00 			break;
-//DEADCODE JON 4/18/00 		ptr->bodyx.f=-1.f;
-//DEADCODE JON 4/18/00 		ptr->bodyy.f=this_range;
-//DEADCODE JON 4/18/00 		ptr->bodyz.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->vertexCol=0x00FF00;//col+rgCol;
-//DEADCODE JON 4/18/00 		ptr++;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		ptr->bodyx.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->bodyy.f=this_range;
-//DEADCODE JON 4/18/00 		ptr->bodyz.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->vertexCol=0x00FF00;//col+rgCol;
-//DEADCODE JON 4/18/00 //TEMPCODE JON 4/18/00 		rgCol-=rgStep;
-//DEADCODE JON 4/18/00 		ptr++;
-//DEADCODE JON 4/18/00 	}
-//DEADCODE JON 4/18/00 	rgCol-=rgStep;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 	double cvy=cloud_height-fvy;
-//DEADCODE JON 4/18/00 	if (cvy<0) cvy=-cvy;
-//DEADCODE JON 4/18/00 	fvy2=cvy*cvy;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 /* 	Generate vertex data for
-//DEADCODE JON 4/18/00  *	infinite strip under the
-//DEADCODE JON 4/18/00  *	cloud layer
-//DEADCODE JON 4/18/00  */
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 	for (i=SubDivideLevel+1;--i>=0;)
-//DEADCODE JON 4/18/00 	{
-//DEADCODE JON 4/18/00 		R3DVALUE this_range=R3DVALUE(i)*Max_Range/4.;
-//DEADCODE JON 4/18/00 		this_range=this_range*this_range-fvy2;
-//DEADCODE JON 4/18/00 		if (this_range<0.f) this_range=0.f;
-//DEADCODE JON 4/18/00 		else
-//DEADCODE JON 4/18/00 		{
-//DEADCODE JON 4/18/00 			this_range=fastMath.FastSqrt(this_range);
-//DEADCODE JON 4/18/00 			this_range=cvy*(this_range-1.f)/this_range;
-//DEADCODE JON 4/18/00 		}
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		this_range=cloud_height-this_range;
-//DEADCODE JON 4/18/00 		if (this_range>cloud_height)
-//DEADCODE JON 4/18/00 			this_range=cloud_height;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		ptr->bodyx.f=-1.f;
-//DEADCODE JON 4/18/00 		ptr->bodyy.f=this_range;
-//DEADCODE JON 4/18/00 		ptr->bodyz.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->vertexCol=0xFFFF00;//col+rgCol;
-//DEADCODE JON 4/18/00 		ptr++;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		ptr->bodyx.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->bodyy.f=this_range;
-//DEADCODE JON 4/18/00 		ptr->bodyz.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->vertexCol=0xFFFF00;//col+rgCol;
-//DEADCODE JON 4/18/00 //TEMPCODE JON 4/18/00 		rgCol-=rgStep;
-//DEADCODE JON 4/18/00 		ptr++;
-//DEADCODE JON 4/18/00 	}
-//DEADCODE JON 4/18/00 	rgCol-=rgStep;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 	fvy2=cvy*cvy;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 /* 	Generate vertex data for
-//DEADCODE JON 4/18/00  *	infinite strip above the
-//DEADCODE JON 4/18/00  *	cloud layer
-//DEADCODE JON 4/18/00  */
-//DEADCODE JON 4/18/00 	// actually do the stuff above the top layer
-//DEADCODE JON 4/18/00 	for (i=0;i<SubDivideLevel+1;i++)
-//DEADCODE JON 4/18/00 	{
-//DEADCODE JON 4/18/00 		R3DVALUE this_range=R3DVALUE(i)*Max_Range/4.;
-//DEADCODE JON 4/18/00 		this_range=this_range*this_range-fvy2;
-//DEADCODE JON 4/18/00 		if (this_range<0.f) this_range=0.f;
-//DEADCODE JON 4/18/00 		else
-//DEADCODE JON 4/18/00 		{
-//DEADCODE JON 4/18/00 			this_range=fastMath.FastSqrt(this_range);
-//DEADCODE JON 4/18/00 			this_range=cvy*(this_range-1.f)/this_range;
-//DEADCODE JON 4/18/00 		}
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		this_range=cloud_height+this_range;
-//DEADCODE JON 4/18/00 		if (this_range<cloud_height)
-//DEADCODE JON 4/18/00 		{
-//DEADCODE JON 4/18/00 			this_range=cloud_height;
-//DEADCODE JON 4/18/00 		}
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		ptr->bodyx.f=-1.f;
-//DEADCODE JON 4/18/00 		ptr->bodyy.f=this_range;
-//DEADCODE JON 4/18/00 		ptr->bodyz.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->vertexCol=0xFF00FF;//col+rgCol;
-//DEADCODE JON 4/18/00
-//DEADCODE JON 4/18/00 		ptr++;
-//DEADCODE JON 4/18/00 		ptr->bodyx.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->bodyy.f=this_range;
-//DEADCODE JON 4/18/00 		ptr->bodyz.f=1.f;
-//DEADCODE JON 4/18/00 		ptr->vertexCol=0xFF00FF;//col+rgCol;
-//DEADCODE JON 4/18/00 //TEMPCODE JON 4/18/00 		rgCol-=rgStep;
-//DEADCODE JON 4/18/00 		ptr++;
-//DEADCODE JON 4/18/00 	}
-//DEADCODE JON 4/18/00 	rgCol-=rgStep;
-//DEADCODE JON 4/18/00
 
 	// draw in the top dome type bits...
 //	const double totop_z[]={1.0,.75,.5,.25,0};
 	const double totop_z[]={1.0, .9, .8, .7, .6, .5, .4, .3, .2, .1 ,0};
 	const SLong steps=sizeof(totop_z)/sizeof(double);
 
-//DeadCode JON 2Nov00 	const double fromtop_z[]={-.25,	-.5,	-.75,	-1.0,	-1.0,	-1.0};
-//DeadCode JON 2Nov00 	const double fromtop_y[]={1.0,	1.0,	1.0,	0.9,	0.8,	0.7};
-//DeadCode JON 2Nov00 	const SLong steps2=sizeof(fromtop_z)/sizeof(double);
 
 	//	SLayerRGB	deepestSkyCol,otherSkyCol,cloudCol,horizonCol,fogCol;	//JON 4/20/00
 
@@ -7866,9 +5054,6 @@ void LandScape::InfiniteStrip( const ANGLES pitch, const ANGLES roll)
 //	ULong endCol = (currentLighting.deepestSkyCol.red()<<16)+(currentLighting.deepestSkyCol.green()<<8)+currentLighting.deepestSkyCol.blue();
 //	ULong colStep = (endCol-curCol)/(steps+steps2);
 
-//DeadCode JON 11Sep00 	SLong curR = currentLighting.otherSkyCol.red()<<16;
-//DeadCode JON 11Sep00 	SLong curG = currentLighting.otherSkyCol.green()<<16;
-//DeadCode JON 11Sep00 	SLong curB = currentLighting.otherSkyCol.blue()<<16;
 
 	const int gradientSteps = 7;
 
@@ -7941,94 +5126,14 @@ void LandScape::InfiniteStrip( const ANGLES pitch, const ANGLES roll)
 	ptr++;
 
 
-//DeadCode JON 2Nov00 	for (i=0;i<steps2;i++) // draw across the top - sort of...
-//DeadCode JON 2Nov00 	{
-//DeadCode JON 2Nov00 		double this_z=fromtop_z[i];
-//DeadCode JON 2Nov00 		double this_y=fromtop_y[i];
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		ptr->setPosition( -1.f, this_y, this_z );
-//DeadCode JON 2Nov00 		ptr->setVertexCol( deepestSkyCol );
-//DeadCode JON 2Nov00 		ptr++;
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		ptr->setPosition( 1.f, this_y, this_z );
-//DeadCode JON 2Nov00 		ptr->setVertexCol( deepestSkyCol );
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		ptr++;
-//DeadCode JON 2Nov00 	}
 
 
-//DeadCode JON 2Nov00 	for (i=0;i<steps;i++) // draws up to the back...
-//DeadCode JON 2Nov00 	{
-//DeadCode JON 2Nov00 		double this_z=totop_z[i];
-//DeadCode JON 2Nov00 //DeadCode JON 2Nov00 		double this_y=1.;
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyx.f=-1.f;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyy.f=this_y;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyz.f=this_z;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 //DEADCODE JON 4/20/00 		ptr->vertexCol=col+rgCol;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->vertexCol=RGBMake(UByte(curR>>16),UByte(curG>>16),UByte(curB>>16));
-//DeadCode JON 2Nov00 		ptr->setPosition( -1.f, toTopY, this_z );
-//DeadCode JON 2Nov00 //		if ( i < 7 )
-//DeadCode JON 2Nov00 			ptr->setVertexCol( RGBMake(UByte(curR>>16),UByte(curG>>16),UByte(curB>>16)) );
-//DeadCode JON 2Nov00 //		else
-//DeadCode JON 2Nov00 //			ptr->setVertexCol( 0x00FF0000 );
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		ptr++;
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyx.f=1.f;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyy.f=this_y;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyz.f=this_z;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 //DEADCODE JON 4/20/00 		ptr->vertexCol=col+rgCol;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 //DEADCODE JON 4/20/00 		rgCol-=rgStep;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->vertexCol=(ptr-1)->vertexCol;
-//DeadCode JON 2Nov00 		ptr->setPosition( 1.f, toTopY, this_z );
-//DeadCode JON 2Nov00 		ptr->setVertexCol( (ptr-1)->getVertexCol() );
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		curR+=stepR;
-//DeadCode JON 2Nov00 		curG+=stepG;
-//DeadCode JON 2Nov00 		curB+=stepB;
-//DeadCode JON 2Nov00 		ptr++;
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		toTopY+=topYinc;
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 	}
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 	for (i=0;i<steps2;i++) // draw across the top - sort of...
-//DeadCode JON 2Nov00 	{
-//DeadCode JON 2Nov00 		double this_z=fromtop_z[i];
-//DeadCode JON 2Nov00 		double this_y=fromtop_y[i];
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyx.f=-1.f;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyy.f=this_y;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyz.f=this_z;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 //DEADCODE JON 4/20/00 		ptr->vertexCol=col+rgCol;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->vertexCol=RGBMake(UByte(curR>>16),UByte(curG>>16),UByte(curB>>16));
-//DeadCode JON 2Nov00 		ptr->setPosition( -1.f, this_y, this_z );
-//DeadCode JON 2Nov00 		ptr->setVertexCol( RGBMake(UByte(curR>>16),UByte(curG>>16),UByte(curB>>16)) );
-//DeadCode JON 2Nov00 		ptr++;
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyx.f=1.f;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyy.f=this_y;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->bodyz.f=this_z;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 //DEADCODE JON 4/20/00 		ptr->vertexCol=col+rgCol;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 //DEADCODE JON 4/20/00  		rgCol-=rgStep;
-//DeadCode JON 2Nov00 //DEADCODE JON 5/24/00 		ptr->vertexCol=(ptr-1)->vertexCol;
-//DeadCode JON 2Nov00 		ptr->setPosition( 1.f, this_y, this_z );
-//DeadCode JON 2Nov00 		ptr->setVertexCol( (ptr-1)->getVertexCol() );
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		curR+=stepR;
-//DeadCode JON 2Nov00 		curG+=stepG;
-//DeadCode JON 2Nov00 		curB+=stepB;
-//DeadCode JON 2Nov00 		ptr++;
-//DeadCode JON 2Nov00 	}
 
 /*	Calculate the number of
  *	polygons required to
  *	render the horizon
  */
 
-//DeadCode JON 5Oct00 	Float dummy;
-//DeadCode JON 5Oct00 	Bool oldZState;
 
 	const int fudge = 1;  //eh, why have I got thids in the wrong place???
 	over_sun_count-= fudge;
@@ -8093,36 +5198,7 @@ void LandScape::InfiniteStrip( const ANGLES pitch, const ANGLES roll)
  *	range variables
  */
 
-//DEADCODE JON 2/1/00 	UByte 	fr=currentLighting.horizonBase.red(),
-//DEADCODE JON 2/1/00 			fg=currentLighting.horizonBase.green(),
-//DEADCODE JON 2/1/00 			fb=currentLighting.horizonBase.blue();
 
-//deadcode	currscreen->DoGammaCorr(fr,fg,fb);
-//deadcode	GreyPalette(&fr,&fg,&fb);
-//deadcode	currscreen->DoSetHorizonColour(fr,fg,fb);
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 	SLong fogdist,fogbegin;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 //DEADCODE JON 2/1/00 	double frsq=double(viewer_y)*double(viewer_y)+double(view_range)*double(view_range);
-//DEADCODE JON 4/19/00 	double frsq=double(viewer_y)*double(viewer_y)+double(_blockWidth*_horizonDist)*double(_blockWidth*_horizonDist);
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 	_asm{
-//DEADCODE JON 4/19/00 	fld frsq;
-//DEADCODE JON 4/19/00 	fsqrt;
-//DEADCODE JON 4/19/00 	fstp frsq;
-//DEADCODE JON 4/19/00 	}
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 	if (frsq>MissManCampSky().Visibility) frsq=MissManCampSky().Visibility;
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 	fogdist=SLong(frsq);
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 	if (!Save_Data.detail_3d[DETAIL3D_HORIZONFADE])	fogbegin=fogdist>>1;
-//DEADCODE JON 4/19/00 	else											fogbegin=fogdist-(fogdist>>3);
-//DEADCODE JON 4/19/00 	groundFogBegin=fogbegin;
-//DEADCODE JON 4/19/00 	groundFogEnd=fogdist;
-//DEADCODE JON 4/19/00 	SetFogMode(fogbegin,fogdist);
-//DEADCODE JON 4/19/00
-//DEADCODE JON 4/19/00 	cloud_base=Cloud_Layer_Height=_cloudLayerHeight;
 
 	g_lpLib3d->PopMatrix(MATRIX_VIEWER);
 
@@ -8161,256 +5237,6 @@ void LandScape::InfiniteStrip( const ANGLES pitch, const ANGLES roll)
 //Author		Paul.
 //Date			Fri 9 Oct 1998
 //------------------------------------------------------------------------------
-//DEADCODE JON 2/1/00 void LandScape::StripHorizon()
-//DEADCODE JON 2/1/00 {
-//DEADCODE JON 2/1/00 	struct SHCoords	{Float X,Y,Z;} HStripPts[]=
-//DEADCODE JON 2/1/00 	{
-//DEADCODE JON 2/1/00 	{-1,0,1}, 		{1,0,1},
-//DEADCODE JON 2/1/00 	{-1,.125,1},	{1,.125,1},
-//DEADCODE JON 2/1/00 	{-1,.2-.0125,1},{1,.2-.0125,1},
-//DEADCODE JON 2/1/00 	{-1,.2,1},		{1,.2,1},		//cloud layer
-//DEADCODE JON 2/1/00 	{-1,.2125,1},	{1,.2125,1},
-//DEADCODE JON 2/1/00 	{-1,.4,1},		{1,.4,1},
-//DEADCODE JON 2/1/00 	{-1,.6,1},		{1,.6,1},
-//DEADCODE JON 2/1/00 	{-1,.8,1},		{1,.8,1},
-//DEADCODE JON 2/1/00 	{-1,1,.75},		{1,1,.75},
-//DEADCODE JON 2/1/00 	{-1,1,.5},		{1,1,.5},
-//DEADCODE JON 2/1/00 	{-1,1,.25},		{1,1,.25},
-//DEADCODE JON 2/1/00 	{-1,1,0},		{1,1,0},		//point directly over head
-//DEADCODE JON 2/1/00 	{-1,1,-.25},	{1,1,-.25},
-//DEADCODE JON 2/1/00 	{-1,1,-.5},		{1,1,-.5},
-//DEADCODE JON 2/1/00 	{-1,1,-.75},	{1,1,-.75},
-//DEADCODE JON 2/1/00 	{-1,.8,-1},		{1,.8,-1}
-//DEADCODE JON 2/1/00 	};
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	struct SStripPoly {SLong v[4];}	HStripPoly[]=
-//DEADCODE JON 2/1/00 	{
-//DEADCODE JON 2/1/00 	{0,2,3,1},
-//DEADCODE JON 2/1/00 	{2,4,5,3},
-//DEADCODE JON 2/1/00 	{4,6,7,5},
-//DEADCODE JON 2/1/00 	{6,8,9,7},
-//DEADCODE JON 2/1/00 	{8,10,11,9},
-//DEADCODE JON 2/1/00 	{10,12,13,11},
-//DEADCODE JON 2/1/00 	{12,14,15,13},
-//DEADCODE JON 2/1/00 	{14,16,17,15},
-//DEADCODE JON 2/1/00 	{16,18,19,17},
-//DEADCODE JON 2/1/00 	{18,20,21,19},
-//DEADCODE JON 2/1/00 	{20,22,23,21},
-//DEADCODE JON 2/1/00 	{22,24,25,23},
-//DEADCODE JON 2/1/00 	{24,26,27,25},
-//DEADCODE JON 2/1/00 	{26,28,29,27},
-//DEADCODE JON 2/1/00 	{28,30,31,29}
-//DEADCODE JON 2/1/00 	};
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	const SLong _stripPoints=sizeof(HStripPts)/sizeof(fpCOORDS3D);
-//DEADCODE JON 2/1/00 	const SLong _stripPolys=sizeof(HStripPoly)/sizeof(SStripPoly);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	const SLong _topOfTheWorld=10;
-//DEADCODE JON 2/1/00 	SLong curIndex=0;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	_cloudLayerHeight=HStripPts[6].Y*Float(CEILING_ALT);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	FPMATRIX 	mat,scale;
-//DEADCODE JON 2/1/00 	Bool 		oldZState;
-//DEADCODE JON 2/1/00 	Float 		dummy=0.;
-//DEADCODE JON 2/1/00 	UByte 		br,bg,bb;
-//DEADCODE JON 2/1/00 	UByte 		tr,tg,tb;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	br=currentLighting.horizonBase.red();
-//DEADCODE JON 2/1/00 	bg=currentLighting.horizonBase.green();
-//DEADCODE JON 2/1/00 	bb=currentLighting.horizonBase.blue();
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	tr=currentLighting.horizonMid.red();
-//DEADCODE JON 2/1/00 	tg=currentLighting.horizonMid.green();
-//DEADCODE JON 2/1/00 	tb=currentLighting.horizonMid.blue();
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 //DEADCODE PD 03/12/99 	GreyPalette(&br,&bg,&bb);
-//DEADCODE JON 2/1/00 //DEADCODE PD 03/12/99 	GreyPalette(&tr,&tg,&tb);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 //TempCode PD 01Dec99 	currscreen->DoSetHorizonColour(br,bg,bb);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//calculate horizontal scaling factor for the
-//DEADCODE JON 2/1/00 	//horizon object based on the view cone
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	Float fvr=Float(view_range);
-//DEADCODE JON 2/1/00 	Float fvy=Float(viewer_y)/Float(CEILING_ALT);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//false horizon test code
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 //	Float hy=fvy*99./100.;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 //	HStripPts[2].Y=HStripPts[3].Y=hy;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	Float 	*m=(Float*)&mat,
-//DEADCODE JON 2/1/00 			*s=(Float*)&scale;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	_matrix.Generate(ANGLES_0Deg,View_Point->pitch,View_Point->roll,&mat);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	s[0]=s[8]=fvr;
-//DEADCODE JON 2/1/00 	s[4]=Float(CEILING_ALT);
-//DEADCODE JON 2/1/00 	s[1]=s[2]=s[3]=s[5]=s[6]=s[7]=0;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	_matrix.multiply(&scale,&mat);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//transform all the points using this matrix
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	DoPointStruc* pdp=SHAPE.newco;
-//DEADCODE JON 2/1/00 	SHCoords* psp=HStripPts;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	for (SLong i=_stripPoints;i--;)
-//DEADCODE JON 2/1/00 	{
-//DEADCODE JON 2/1/00 		Float py=psp->Y-fvy;
-//DEADCODE JON 2/1/00 		pdp->bodyx.f=s[0]*psp->X+s[1]*py+s[2]*psp->Z;
-//DEADCODE JON 2/1/00 		pdp->bodyy.f=s[3]*psp->X+s[4]*py+s[5]*psp->Z;
-//DEADCODE JON 2/1/00 		pdp->bodyz.f=s[6]*psp->X+s[7]*py+s[8]*psp->Z;
-//DEADCODE JON 2/1/00 		pdp++;
-//DEADCODE JON 2/1/00 		psp++;
-//DEADCODE JON 2/1/00 	}
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//render the polys
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	DoPointStruc* pp[4];
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//draw the strip along the edge of the horizon first
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	pp[0]=SHAPE.newco+HStripPoly[curIndex].v[0];
-//DEADCODE JON 2/1/00 	pp[1]=SHAPE.newco+HStripPoly[curIndex].v[1];
-//DEADCODE JON 2/1/00 	pp[2]=SHAPE.newco+HStripPoly[curIndex].v[2];
-//DEADCODE JON 2/1/00 	pp[3]=SHAPE.newco+HStripPoly[curIndex].v[3];
-//DEADCODE JON 2/1/00 	GStrip(pp,br,bg,bb,tr,tg,tb);
-//DEADCODE JON 2/1/00 	curIndex++;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//next, draw the strip between the last one and the one under
-//DEADCODE JON 2/1/00 	//the base of the cloud layer
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	br=tr;
-//DEADCODE JON 2/1/00 	bg=tg;
-//DEADCODE JON 2/1/00 	bb=tb;
-//DEADCODE JON 2/1/00 //	#pragma message(__HERE__ "PUT THIS BACK AFTER THE RUNNING DEMO")
-//DEADCODE JON 2/1/00  	tr=currentLighting.horizonUnderClouds.red();
-//DEADCODE JON 2/1/00 	tg=currentLighting.horizonUnderClouds.green();
-//DEADCODE JON 2/1/00  	tb=currentLighting.horizonUnderClouds.blue();
-//DEADCODE JON 2/1/00 //	currscreen->DoGammaCorr(tr,tg,tb);
-//DEADCODE JON 2/1/00 //DEADCODE PD 03/12/99 	GreyPalette(&tr,&tg,&tb);
-//DEADCODE JON 2/1/00 	pp[0]=SHAPE.newco+HStripPoly[curIndex].v[0];
-//DEADCODE JON 2/1/00 	pp[1]=SHAPE.newco+HStripPoly[curIndex].v[1];
-//DEADCODE JON 2/1/00 	pp[2]=SHAPE.newco+HStripPoly[curIndex].v[2];
-//DEADCODE JON 2/1/00 	pp[3]=SHAPE.newco+HStripPoly[curIndex].v[3];
-//DEADCODE JON 2/1/00 	GStrip(pp,br,bg,bb,tr,tg,tb);
-//DEADCODE JON 2/1/00 	curIndex++;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//next, draw the strip under the base of the cloud layer
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	br=tr;
-//DEADCODE JON 2/1/00 	bg=tg;
-//DEADCODE JON 2/1/00 	bb=tb;
-//DEADCODE JON 2/1/00 	tr=currentLighting.horizonAtClouds.red();
-//DEADCODE JON 2/1/00 	tg=currentLighting.horizonAtClouds.green();
-//DEADCODE JON 2/1/00 	tb=currentLighting.horizonAtClouds.blue();
-//DEADCODE JON 2/1/00 //	currscreen->DoGammaCorr(tr,tg,tb);
-//DEADCODE JON 2/1/00 //DEADCODE PD 03/12/99 	GreyPalette(&tr,&tg,&tb);
-//DEADCODE JON 2/1/00 	pp[0]=SHAPE.newco+HStripPoly[curIndex].v[0];
-//DEADCODE JON 2/1/00 	pp[1]=SHAPE.newco+HStripPoly[curIndex].v[1];
-//DEADCODE JON 2/1/00 	pp[2]=SHAPE.newco+HStripPoly[curIndex].v[2];
-//DEADCODE JON 2/1/00 	pp[3]=SHAPE.newco+HStripPoly[curIndex].v[3];
-//DEADCODE JON 2/1/00 	GStrip(pp,br,bg,bb,tr,tg,tb);
-//DEADCODE JON 2/1/00 	curIndex++;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//next, draw the strip above the top of the cloud layer
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	br=tr;
-//DEADCODE JON 2/1/00 	bg=tg;
-//DEADCODE JON 2/1/00 	bb=tb;
-//DEADCODE JON 2/1/00 	tr=currentLighting.horizonAboveClouds.red();
-//DEADCODE JON 2/1/00 	tg=currentLighting.horizonAboveClouds.green();
-//DEADCODE JON 2/1/00 	tb=currentLighting.horizonAboveClouds.blue();
-//DEADCODE JON 2/1/00 //	currscreen->DoGammaCorr(tr,tg,tb);
-//DEADCODE JON 2/1/00 //DEADCODE PD 03/12/99 	GreyPalette(&tr,&tg,&tb);
-//DEADCODE JON 2/1/00 	pp[0]=SHAPE.newco+HStripPoly[curIndex].v[0];
-//DEADCODE JON 2/1/00 	pp[1]=SHAPE.newco+HStripPoly[curIndex].v[1];
-//DEADCODE JON 2/1/00 	pp[2]=SHAPE.newco+HStripPoly[curIndex].v[2];
-//DEADCODE JON 2/1/00 	pp[3]=SHAPE.newco+HStripPoly[curIndex].v[3];
-//DEADCODE JON 2/1/00 	GStrip(pp,br,bg,bb,tr,tg,tb);
-//DEADCODE JON 2/1/00 	curIndex++;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//next, draw all the strips between here and the top of the world
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	SLong rval,gval,bval;
-//DEADCODE JON 2/1/00 	SLong rdda,gdda,bdda;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	br=tr;
-//DEADCODE JON 2/1/00 	bg=tg;
-//DEADCODE JON 2/1/00 	bb=tb;
-//DEADCODE JON 2/1/00 	rval=SLong(br)<<8;
-//DEADCODE JON 2/1/00 	gval=SLong(bg)<<8;
-//DEADCODE JON 2/1/00 	bval=SLong(bb)<<8;
-//DEADCODE JON 2/1/00 	tr=currentLighting.horizonTop.red();
-//DEADCODE JON 2/1/00 	tg=currentLighting.horizonTop.green();
-//DEADCODE JON 2/1/00 	tb=currentLighting.horizonTop.blue();
-//DEADCODE JON 2/1/00 //	currscreen->DoGammaCorr(tr,tg,tb);
-//DEADCODE JON 2/1/00 //DEADCODE PD 03/12/99 	GreyPalette(&tr,&tg,&tb);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 //	#pragma message(__HERE__ "PUT THIS BACK AFTER THE RUNNING DEMO")
-//DEADCODE JON 2/1/00  	rdda=((SLong(tr)<<8)-rval)/(1+_topOfTheWorld-curIndex);
-//DEADCODE JON 2/1/00  	gdda=((SLong(tg)<<8)-gval)/(1+_topOfTheWorld-curIndex);
-//DEADCODE JON 2/1/00  	bdda=((SLong(tb)<<8)-bval)/(1+_topOfTheWorld-curIndex);
-//DEADCODE JON 2/1/00 	rdda=gdda=bdda=0;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	for (;curIndex<=_topOfTheWorld;curIndex++)
-//DEADCODE JON 2/1/00 	{
-//DEADCODE JON 2/1/00 		pp[0]=SHAPE.newco+HStripPoly[curIndex].v[0];
-//DEADCODE JON 2/1/00 		pp[1]=SHAPE.newco+HStripPoly[curIndex].v[1];
-//DEADCODE JON 2/1/00 		pp[2]=SHAPE.newco+HStripPoly[curIndex].v[2];
-//DEADCODE JON 2/1/00 		pp[3]=SHAPE.newco+HStripPoly[curIndex].v[3];
-//DEADCODE JON 2/1/00 		rval+=rdda;
-//DEADCODE JON 2/1/00 		gval+=gdda;
-//DEADCODE JON 2/1/00 		bval+=bdda;
-//DEADCODE JON 2/1/00 		tr=UByte(rval>>8);
-//DEADCODE JON 2/1/00 		tg=UByte(gval>>8);
-//DEADCODE JON 2/1/00 		tb=UByte(bval>>8);
-//DEADCODE JON 2/1/00 		GStrip(pp,br,bg,bb,tr,tg,tb);
-//DEADCODE JON 2/1/00 		br=tr;
-//DEADCODE JON 2/1/00 		bg=tg;
-//DEADCODE JON 2/1/00 		bb=tb;
-//DEADCODE JON 2/1/00 	}
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	for (;curIndex<_stripPolys;curIndex++)
-//DEADCODE JON 2/1/00 	{
-//DEADCODE JON 2/1/00 		pp[0]=SHAPE.newco+HStripPoly[curIndex].v[0];
-//DEADCODE JON 2/1/00 		pp[1]=SHAPE.newco+HStripPoly[curIndex].v[1];
-//DEADCODE JON 2/1/00 		pp[2]=SHAPE.newco+HStripPoly[curIndex].v[2];
-//DEADCODE JON 2/1/00 		pp[3]=SHAPE.newco+HStripPoly[curIndex].v[3];
-//DEADCODE JON 2/1/00 		GStrip(pp,br,bg,bb,br,bg,bb);
-//DEADCODE JON 2/1/00 	}
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	SLong fogdist,fogbegin;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	Float frsq=Float(viewer_y)*Float(viewer_y)+fvr*fvr;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	_asm
-//DEADCODE JON 2/1/00 	{
-//DEADCODE JON 2/1/00 		fld frsq;
-//DEADCODE JON 2/1/00 		fsqrt;
-//DEADCODE JON 2/1/00 		fstp frsq;
-//DEADCODE JON 2/1/00 	}
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//force fog to match visibility settings
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	if (frsq>MMC.Sky.Visibility) frsq=MMC.Sky.Visibility;
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	//test code... Set visibility to 1km
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	fogdist=SLong(frsq);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	if (!Save_Data.detail_3d[DETAIL3D_HORIZONFADE])	fogbegin=fogdist>>1;
-//DEADCODE JON 2/1/00 	else											fogbegin=fogdist-(fogdist>>2);
-//DEADCODE JON 2/1/00
-//DEADCODE JON 2/1/00 	groundFogBegin=fogbegin;
-//DEADCODE JON 2/1/00 	groundFogEnd=fogdist;
-//DEADCODE JON 2/1/00 	SetFogMode(fogbegin,fogdist);
-//DEADCODE JON 2/1/00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GenerateGroundPoints
@@ -8571,26 +5397,16 @@ SLong LandScape::SetViewDetail()
 
 	shape_band_start=viewer_range-(viewer_range>>2);
 
-//DEADCODE JON 2/1/00 	view_range=viewer_range;
-//DEADCODE JON 2/1/00 	CalcVisibleRanges(view_range,viewer_y);
-//DEADCODE JON 4/19/00 	CalcVisibleRanges(_blockWidth*_horizonDist,viewer_y);
 	CalcVisibleRanges(view_dist,viewer_y);
 
-//DEADCODE PD 02/12/99 	_matrix.SetViewParams(currscreen,Save_Data.fieldOfView,gvisrange);
 
 	gnd_band_end 	= gvisrange;
 	sky_band_end 	= cvisrange;
 	fade_band_start = gnd_band_start;
 	fade_band_end 	= gnd_band_end;
 
-//DeadCode JON 20Oct00 	SLong fogstart=gnd_band_start;
-//DeadCode JON 20Oct00 	SLong fogend=gvisrange;
 	gnd_band_end=sky_band_end=viewer_range;
-//DEADCODE PD 02/12/99 	currscreen->DoSetFogState(TRUE);
-//DEADCODE PD 02/12/99 	currscreen->DoSetMatrices(gvisrange,viewconeangle);
 //	g_lpLib3d->SetProjectionMatrix(Angles(Save_Data.fieldOfView>>1),1,1,gvisrange);
-//DEADCODE PD 01/12/99 	currscreen->HCls(FALSE);
-//DEADCODE PD 01/12/99 	POLYGON.setpolyscrn(currscreen,gvisrange,viewconeangle);
 
 	return(height);
 }
@@ -8769,7 +5585,6 @@ Bool LandScape::BadVision()
 	{
 		g_lpLib3d->DoFade( 0, blackingout );
 	}
-//DeadCode RJS 20Apr00 	return TRUE;
  	if (!blackingout)											//RJS 21Oct97
  	{
  		//White out test here
@@ -8800,77 +5615,6 @@ Bool LandScape::BadVision()
  	}
 	return TRUE;
 
-//DEADCODE JON 4/11/00 	if (blackingout || forceredfade || whitingout)
-//DEADCODE JON 4/11/00 	{
-//DEADCODE JON 4/11/00 		//There will only be 1 fade at a time.
-//DEADCODE JON 4/11/00 		//The priorities are as follows...
-//DEADCODE JON 4/11/00 		//red should come first, cos that means you're dead.
-//DEADCODE JON 4/11/00 		//Redout > Blackout > Whiteout
-//DEADCODE JON 4/11/00
-//DEADCODE JON 4/11/00 		GREY3DTYPE	gtdt;
-//DEADCODE JON 4/11/00
-//DEADCODE JON 4/11/00 		Bool	fading=FALSE;
-//DEADCODE JON 4/11/00
-//DEADCODE JON 4/11/00 		if (forceredfade)										//RJS 21Oct97
-//DEADCODE JON 4/11/00 		{
-//DEADCODE JON 4/11/00 			gtdt = (GREY3DTYPE )redingout;						//RJS 21Oct97
-//DEADCODE JON 4/11/00 			tdftFadeType = _BLACKOUT;							//PD 05Jun97
-//DEADCODE JON 4/11/00 			fading=TRUE;										//PD 27Nov96
-//DEADCODE JON 4/11/00 		}
-//DEADCODE JON 4/11/00 		else
-//DEADCODE JON 4/11/00 		{
-//DEADCODE JON 4/11/00 			if (blackingout)									//RJS 21Oct97
-//DEADCODE JON 4/11/00 			{
-//DEADCODE JON 4/11/00 				gtdt = (GREY3DTYPE )blackingout;				//RJS 21Oct97
-//DEADCODE JON 4/11/00 				tdftFadeType = _REDOUT;							//PD 05Jun97
-//DEADCODE JON 4/11/00 				fading=TRUE;									//PD 27Nov96
-//DEADCODE JON 4/11/00 			}
-//DEADCODE JON 4/11/00 			else
-//DEADCODE JON 4/11/00 			{
-//DEADCODE JON 4/11/00 				if (whitingout)									//RJS 21Oct97
-//DEADCODE JON 4/11/00 				{
-//DEADCODE JON 4/11/00 					gtdt = (GREY3DTYPE )whitingout;
-//DEADCODE JON 4/11/00 					tdftFadeType = _WHITEOUT;					//PD 05Jun97
-//DEADCODE JON 4/11/00 					fading=TRUE;								//PD 27Nov96
-//DEADCODE JON 4/11/00 				}
-//DEADCODE JON 4/11/00 			}
-//DEADCODE JON 4/11/00 		}
-//DEADCODE JON 4/11/00
-//DEADCODE JON 4/11/00 		if (fading)												//PD 27Nov96
-//DEADCODE JON 4/11/00 		{														//PD 09Sep96
-//DEADCODE JON 4/11/00 			TWODEFFECT tde=TDE_UNIFORM;
-//DEADCODE JON 4/11/00
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 			if (!Save_Data.fSoftware)
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 			{
-//DEADCODE JON 4/11/00 				Colour	tCol;
-//DEADCODE JON 4/11/00 				switch (tdftFadeType)
-//DEADCODE JON 4/11/00 				{
-//DEADCODE JON 4/11/00 					case _WHITEOUT:	tCol = WHITE; tde = TDE_INSIDE2OUT; break;
-//DEADCODE JON 4/11/00 					case _BLACKOUT:	tCol = RED; tde = TDE_OUTSIDE2IN; break;
-//DEADCODE JON 4/11/00 					case _REDOUT:	tCol = BLACK; tde = TDE_OUTSIDE2IN; break;
-//DEADCODE JON 4/11/00 				}
-//DEADCODE JON 4/11/00
-//DEADCODE JON 4/11/00 //DEADCODE PD 02/12/99 				currscreen->DoSetFade(tCol,((SLong)gtdt)>>1,tde);//RJS 12Jun98
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 			}
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 			else
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 			{
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 				switch (tdftFadeType)
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 				{
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 				case _WHITEOUT: POLYGON.SetSoftwareFades(2,UWord(gtdt)>>1); break;
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 				case _BLACKOUT: POLYGON.SetSoftwareFades(1,UWord(gtdt)>>1); break;
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 				case _REDOUT: POLYGON.SetSoftwareFades(0,UWord(gtdt)>>1); break;
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 				}
-//DEADCODE JON 4/11/00 //DEADCODE PD 01/12/99 			}
-//DEADCODE JON 4/11/00 		}														//PD 09Sep96
-//DEADCODE JON 4/11/00
-//DEADCODE JON 4/11/00 		retval = TRUE;
-//DEADCODE JON 4/11/00 	}
-//DEADCODE JON 4/11/00 	else
-//DEADCODE JON 4/11/00 	{
-//DEADCODE JON 4/11/00 		retval = FALSE;
-//DEADCODE JON 4/11/00 	}
-//DEADCODE JON 4/11/00
-//DEADCODE JON 4/11/00 	return (retval);
 
 }
 
@@ -8922,22 +5666,17 @@ SLong LandScape::GetFadeEnd()
 //Returns
 //
 //------------------------------------------------------------------------------
-//DEADCODE JIM 12/06/00 int	Cloud_Flag=2;
 void LandScape::CloudLayer(ViewPoint* vp)
 {
 #ifndef _NOCLOUDS_
 #ifndef _NO_FLUFFY_CLOUDS_
 
 	if (Save_Data.hardwareconfig[HW_FLUFFYCLOUDS])
-//DEADCODE JIM 12/06/00 	if (Cloud_Flag==0)
-//DEADCODE JIM 12/06/00 		return;
 
 	if (Save_Data.hardwareconfig[HW_FLUFFYCLOUDS])						//RJS 26Jun00
 	{
   		SLong sectorshift=20;
 		SLong sectorsize=1<<sectorshift;
-//DeadCode JON 20Oct00 		SLong sectormask=sectorsize-1;
-//DeadCode JON 20Oct00 		SLong	sectorsizehalf = sectorsize >> 1;
 		SLong	sectorstep;
 
 		// All cloud shapes MUST have same anim data...
@@ -8957,11 +5696,8 @@ void LandScape::CloudLayer(ViewPoint* vp)
 
   		COORDS3D curpos;
 
-//DeadCode JON 23Oct00   		int		cloudselect=0,
 		int		cloudindex;
 
-//DeadCode JON 20Oct00   		int		altselect=0xFF;
-//DeadCode JON 20Oct00 		int realalt;
   		COORDS3D corner = vp->World;
 
 		UWord	sector_x, sector_z;
@@ -9014,7 +5750,6 @@ void LandScape::CloudLayer(ViewPoint* vp)
   						dummyitem.World.Z = newZ;
   						dummyitem.World.Y = FT_8000 + newY;
   						dummyitem.shape = cloudshapes[cloudindex];
-//DEADCODE JIM 12/06/00   				  		if (Cloud_Flag>1)
 	  						Three_Dee.do_object_dummy(&dummyitem,STATIC_OBJECT);//RJS 04Feb00
 
   						curpos.X += sectorstep;
@@ -9045,42 +5780,6 @@ void LandScape::CloudLayer(ViewPoint* vp)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-//DeadCode JON 23Oct00 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JON 23Oct00 //Procedure		SetFogMode
-//DeadCode JON 23Oct00 //Author		Paul.
-//DeadCode JON 23Oct00 //Date			Wed 28 May 1997
-//DeadCode JON 23Oct00 //
-//DeadCode JON 23Oct00 //Description
-//DeadCode JON 23Oct00 //
-//DeadCode JON 23Oct00 //Inputs
-//DeadCode JON 23Oct00 //
-//DeadCode JON 23Oct00 //Returns
-//DeadCode JON 23Oct00 //
-//DeadCode JON 23Oct00 //------------------------------------------------------------------------------
-//DeadCode JON 23Oct00 void LandScape::SetFogMode(SLong start,SLong end)
-//DeadCode JON 23Oct00 {
-//DeadCode JON 23Oct00 //deadcode	Colour	fogcolour;
-//DeadCode JON 23Oct00 //deadcode	UByte hr,hg,hb;
-//DeadCode JON 23Oct00 //deadcode
-//DeadCode JON 23Oct00 //deadcode	if (incloudlayer==TRUE)
-//DeadCode JON 23Oct00 //deadcode	{
-//DeadCode JON 23Oct00 //deadcode		start;
-//DeadCode JON 23Oct00 //deadcode		end <<= 3;
-//DeadCode JON 23Oct00 //deadcode		fogcolour = WHITE;
-//DeadCode JON 23Oct00 //deadcode		hr=hg=hb=0xFF;
-//DeadCode JON 23Oct00 //deadcode	}
-//DeadCode JON 23Oct00 //deadcode	else
-//DeadCode JON 23Oct00 //deadcode	{
-//DeadCode JON 23Oct00 //deadcode		fogcolour = (Colour)0x00;	//currscreen->DoGetHorizonColour();
-//DeadCode JON 23Oct00 //deadcode		hr=currentLighting.horizonBase.red();
-//DeadCode JON 23Oct00 //deadcode		hg=currentLighting.horizonBase.green();
-//DeadCode JON 23Oct00 //deadcode		hb=currentLighting.horizonBase.blue();
-//DeadCode JON 23Oct00 //deadcode	}
-//DeadCode JON 23Oct00 //DEADCODE PD 01/12/99 	currscreen->DoGammaCorr(hr,hg,hb);
-//DeadCode JON 23Oct00 //DEADCODE PD 03/12/99 	GreyPalette(&hr,&hg,&hb);
-//DeadCode JON 23Oct00 //DEADCODE PD 01/12/99 	currscreen->DoSetFog(hr,hg,hb,start,end);
-//DeadCode JON 23Oct00 //DEADCODE PD 01/12/99 	currscreen->DoSetHorizonColour(hr,hg,hb);
-//DeadCode JON 23Oct00 }
 
 void LandScape::SetSkyMap(FileNum	theFile)
 {
@@ -9124,23 +5823,6 @@ void LandScape::AutoScaleFrameRate()
 	testingtime++;
 	if (testingtime)
 		return;
-//DeadCode JON 3Aug00 #define FRAMES_RECORDED 20
-//DeadCode JON 3Aug00 	static SWord framerec[FRAMES_RECORDED]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-//DeadCode JON 3Aug00 	static SWord findex=0;
-//DeadCode JON 3Aug00 	if (View_Point && !View_Point->Accel())
-//DeadCode JON 3Aug00 	{
-//DeadCode JON 3Aug00 		framerec[findex++]=View_Point->RealFrameTime();
-//DeadCode JON 3Aug00 		if (findex==FRAMES_RECORDED) findex=0;
-//DeadCode JON 3Aug00 	}
-//DeadCode JON 3Aug00 	SWord averageFramesPerSec;
-//DeadCode JON 3Aug00
-//DeadCode JON 3Aug00 	if (framerec[FRAMES_RECORDED-1])
-//DeadCode JON 3Aug00 	{
-//DeadCode JON 3Aug00 		SWord tot=framerec[0];
-//DeadCode JON 3Aug00 		for (int i=19;i>0;i--) tot+=framerec[i];
-//DeadCode JON 3Aug00 		averageFramesPerSec=(100*FRAMES_RECORDED)/tot;
-//DeadCode JON 3Aug00 	}
-//DeadCode JON 3Aug00 	else averageFramesPerSec=Save_Data.desiredfps;
 // there's nothing wrong with the above code - however this is better, and now I understand it...
 
 	const int RECORDED_FRAMES = 20;
@@ -9196,82 +5878,6 @@ void LandScape::AutoScaleFrameRate()
 	// the logic behind the (mig) code below was that even if autoscale framerate wasn't
 	// set then the mesh detail can be altered...  This is no longer the case for bob...
 
-//DeadCode JON 3Aug00 	bool alterDetail;
-//DeadCode JON 3Aug00 	SLong wholeAreaSize,halfAreaSize;
-//DeadCode JON 3Aug00
-//DeadCode JON 3Aug00 	wholeAreaSize=_wholeAreaSizeMIN;
-//DeadCode JON 3Aug00
-//DeadCode JON 3Aug00 	halfAreaSize=wholeAreaSize>>1;
-//DeadCode JON 3Aug00
-//DeadCode JON 3Aug00 	alterDetail=false;
-//DeadCode JON 3Aug00
-//DeadCode JON 3Aug00 	if (!Save_Data.detail_3d[DETAIL3D_AUTODETAIL])
-//DeadCode JON 3Aug00 	{
-//DeadCode JON 3Aug00 		if (!Save_Data.detail_3d[DETAIL3D_CONTOURDETAIL])
-//DeadCode JON 3Aug00 		{
-//DeadCode JON 3Aug00 			if (land_min_detail!=2)
-//DeadCode JON 3Aug00 			{
-//DeadCode JON 3Aug00 				land_min_detail=2;
-//DeadCode JON 3Aug00 				alterDetail=true;
-//DeadCode JON 3Aug00 			}
-//DeadCode JON 3Aug00 		}
-//DeadCode JON 3Aug00 		else
-//DeadCode JON 3Aug00 		{
-//DeadCode JON 3Aug00 			if (land_min_detail!=halfAreaSize)
-//DeadCode JON 3Aug00 			{
-//DeadCode JON 3Aug00 				land_min_detail=halfAreaSize;
-//DeadCode JON 3Aug00 				alterDetail=true;
-//DeadCode JON 3Aug00 			}
-//DeadCode JON 3Aug00 		}
-//DeadCode JON 3Aug00
-//DeadCode JON 3Aug00 	}
-//DeadCode JON 3Aug00 	else if (averageFramesPerSec>(Save_Data.desiredfps+5))
-//DeadCode JON 3Aug00 	{
-//DeadCode JON 3Aug00 		land_min_detail++;
-//DeadCode JON 3Aug00 		if (land_min_detail>halfAreaSize)
-//DeadCode JON 3Aug00 			land_min_detail=halfAreaSize;
-//DeadCode JON 3Aug00 		else
-//DeadCode JON 3Aug00 			alterDetail=true;
-//DeadCode JON 3Aug00 		IncDetailLevel();
-//DeadCode JON 3Aug00 	}
-//DeadCode JON 3Aug00 	else if (averageFramesPerSec<Save_Data.desiredfps)
-//DeadCode JON 3Aug00 	{
-//DeadCode JON 3Aug00 		land_min_detail--;
-//DeadCode JON 3Aug00 		if (land_min_detail<2)
-//DeadCode JON 3Aug00 			land_min_detail=2;
-//DeadCode JON 3Aug00 		else
-//DeadCode JON 3Aug00 			alterDetail=true;
-//DeadCode JON 3Aug00 		DecDetailLevel();
-//DeadCode JON 3Aug00 	}
-//DeadCode JON 3Aug00
-//DeadCode JON 3Aug00 	if (alterDetail)
-//DeadCode JON 3Aug00 	{
-//DeadCode JON 3Aug00 		UByte* pResG=groundDetail;
-//DeadCode JON 3Aug00
-//DeadCode JON 3Aug00 		UByte min_val;
-//DeadCode JON 3Aug00 //DEADCODE PD 01/12/99 		if (Save_Data.fSoftware)	min_val=2;
-//DeadCode JON 3Aug00 		min_val=0;
-//DeadCode JON 3Aug00 		for (SLong x=0;x<wholeAreaSize;x++)
-//DeadCode JON 3Aug00 		{
-//DeadCode JON 3Aug00 			SLong tx=x-halfAreaSize;
-//DeadCode JON 3Aug00 			tx*=tx;
-//DeadCode JON 3Aug00 			for (SLong y=0;y<wholeAreaSize;y++)
-//DeadCode JON 3Aug00 			{
-//DeadCode JON 3Aug00 				SLong ty=y-halfAreaSize;
-//DeadCode JON 3Aug00 				ty=ty*ty+tx;
-//DeadCode JON 3Aug00 				double fp_dist;
-//DeadCode JON 3Aug00 				_asm
-//DeadCode JON 3Aug00 				{
-//DeadCode JON 3Aug00 					fild ty;
-//DeadCode JON 3Aug00 					fsqrt;
-//DeadCode JON 3Aug00 					fstp fp_dist;
-//DeadCode JON 3Aug00 				}
-//DeadCode JON 3Aug00 				ty=SLong(fp_dist+.5);
-//DeadCode JON 3Aug00 				if (ty<=land_min_detail)	*pResG++=min_val;
-//DeadCode JON 3Aug00 				else						*pResG++=254;
-//DeadCode JON 3Aug00 			}
-//DeadCode JON 3Aug00 		}
-//DeadCode JON 3Aug00 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -9281,31 +5887,20 @@ void LandScape::AutoScaleFrameRate()
 //------------------------------------------------------------------------------
 void LandScape::Init(CLib3D *lib3d)
 {
-//DEADCODE PD 01/12/99 	if (Save_Data.fSoftware)	land_min_detail=4;
 	lastMeshDataX = -10000;									//JON 9Nov00
 	lastMeshDataZ = -10000;
 
 	g_lpLib3d=lib3d;
 	land_min_detail=2;
 
-//DeadCode JON 20Oct00 	SLong cornerBufferSize=_cornerBufferSizeMIN;
 	SLong wholeAreaSize=_wholeAreaSizeMIN;
-//DeadCode JON 20Oct00 	SLong halfAreaSize=_halfAreaSizeMIN;
 
-//DeadCode JON 12Sep00 	if (!gridCorners) gridCorners=new UByte[cornerBufferSize];
-//DeadCode JON 5Sep00 	if (!softGrid) softGrid=new UByte[wholeAreaSize*wholeAreaSize];
-	if (!gridCone) gridCone=new UByte[wholeAreaSize*wholeAreaSize];
-	if (!horizCone) horizCone=new bool[_horizonAreaSize*_horizonAreaSize];
-//DeadCode JON 12Sep00 	if (!lightCone) lightCone=new UByte[wholeAreaSize*wholeAreaSize];
-//DeadCode JON 12Sep00 	if (!routeDetail) routeDetail=new UByte[wholeAreaSize*wholeAreaSize];
-//DeadCode JON 3Aug00 	if (!groundDetail) groundDetail=new UByte[wholeAreaSize*wholeAreaSize];
-//DeadCode JON 12Sep00 	if (!landRnd) landRnd=new UByte[256];
-//DeadCode JON 12Sep00 #pragma warnmsg ( "remove me" )
-//DeadCode JON 12Sep00 	DbgMemTest3( landRnd );
+	if (!gridCone) gridCone=new UByte[wholeAreaSize*wholeAreaSize]();
+	if (!horizCone) horizCone=new bool[_horizonAreaSize*_horizonAreaSize]();
 
-	if (!tileCoords) tileCoords=new COORDS3D[256];
-	if (!pDataBlocks) pDataBlocks=new DataRecord[wholeAreaSize*wholeAreaSize];
-	if (!tileCacheGrid) tileCacheGrid=new TileElement[_wholeAreaSizeMIN*_wholeAreaSizeMIN];
+	if (!tileCoords) tileCoords=new COORDS3D[256]();
+	if (!pDataBlocks) pDataBlocks=new DataRecord[wholeAreaSize*wholeAreaSize]();
+	if (!tileCacheGrid) tileCacheGrid=new TileElement[_wholeAreaSizeMIN*_wholeAreaSizeMIN]();
 	TileResList::theGrid = tileCacheGrid;
 
 	// now clear the tile cache grid.
@@ -9313,62 +5908,16 @@ void LandScape::Init(CLib3D *lib3d)
 	{
 		tileCacheGrid[j].reset();
 	}
-//DEADCODE JON 4/27/00 	pHTextureGrid=new HTEXT[_wholeAreaSizeMIN*_wholeAreaSizeMIN];
-//DEADCODE JON 4/27/00  	memset(pHTextureGrid,0xFF,_wholeAreaSizeMIN*_wholeAreaSizeMIN*sizeof(HTEXT));
 
-	//DEADCODE JON 4/27/00 	memset(tileCacheGrid,0,sizeof(TileElement)*_wholeAreaSizeMIN*_wholeAreaSizeMIN);
 
 
 	//Setup random table...
-//DeadCode JON 12Sep00 	for (int x=0;x<256;landRnd[x++]=Math_Lib.rnd(SLong(0xFF)));
 
 	//Setup route detail table
-//DeadCode JON 12Sep00 	UByte* pResR=routeDetail;
-//DeadCode JON 12Sep00 //DeadCode JON 3Aug00 	UByte* pResG=groundDetail;
-//DeadCode JON 12Sep00 	for (x=0;x<wholeAreaSize;x++){
-//DeadCode JON 12Sep00 		int tx=x-halfAreaSize;
-//DeadCode JON 12Sep00 		Float dx=Float(tx); dx*=dx*Float(_blockWidth)*Float(_blockWidth);
-//DeadCode JON 12Sep00 	 	for (int y=0;y<wholeAreaSize;y++){
-//DeadCode JON 12Sep00 			int ty=y-halfAreaSize;
-//DeadCode JON 12Sep00 			Float dy=Float(ty);
-//DeadCode JON 12Sep00 			dy*=dy*Float(_blockWidth)*Float(_blockWidth);
-//DeadCode JON 12Sep00 			dy+=dx;
-//DeadCode JON 12Sep00 			_asm {
-//DeadCode JON 12Sep00 			fld dy;
-//DeadCode JON 12Sep00 			fsqrt;
-//DeadCode JON 12Sep00 			fstp dy;
-//DeadCode JON 12Sep00 			}
-//DeadCode JON 12Sep00 			ty=int(dy);
-//DeadCode JON 12Sep00 			//Fill in route detail grid
-//DeadCode JON 12Sep00 			if (ty<_routeMPolySize) *pResR++=UByte(_doMPoly);
-//DeadCode JON 12Sep00 			else if (ty<_routePolySize) *pResR++=UByte(_doPoly);
-//DeadCode JON 12Sep00 			else if (ty<_routeLineSize) *pResR++=UByte(_doLine);
-//DeadCode JON 12Sep00 			else *pResR++=UByte(_doNowt);
-//DeadCode JON 12Sep00 			//Fill in land detali grid
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 			if (ty<_groundHighSize)
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 				*pResG++=UByte(_doHighGround);
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 			else if (ty<_groundMedSize)
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 			{
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 				ty-=_groundHighSize;
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 				ty<<=4;
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 				ty/=(_groundMedSize-_groundHighSize);
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 				ty++;
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 				if (ty>3) ty=254;	//overkill to make sure that the tiles
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 									//are reduced as much as possible
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 				else ty=0;
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 				*pResG++=UByte(ty);
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 			}
-//DeadCode JON 12Sep00 //DeadCode JON 4Aug00 			else *pResG++=UByte(254);
-//DeadCode JON 12Sep00 		}
-//DeadCode JON 12Sep00 	}
-//DeadCode JON 3Aug00 	highco=new DoPointStruc[256];
 	blackingout=0;
 	redingout=0;
 	whitingout=0;
-//DEADCODE PD 02/12/99 	currscreen=NULL;
 	lastPx=lastPz=-1;
-//deadcode JON 19/06/01		ResetLights();
 
 	sun_screen_x = sun_screen_y = sun_glare = 0;				//RJS 20Apr00
 
@@ -9387,9 +5936,6 @@ void LandScape::Init(CLib3D *lib3d)
 	horizonImg = ImageMapDesc::init( 256, 256 );
 	horizonImg->paletteindex = 2;
 
-//DeadCode JON 9Jun00 	cloudImg0 = ImageMapDesc::init( 256, 256, false);
-//DeadCode JON 9Jun00 	cloudImg1 = ImageMapDesc::init( 256, 256, false);
-//DeadCode JON 9Jun00 	cloudImg2 = ImageMapDesc::init( 256, 256, false);
 
 	cloudImg0 = ImageMapDesc::init( 128, 128 );
 	cloudImg0->alpha = cloudImg0->body;
@@ -9413,8 +5959,6 @@ void LandScape::Init(CLib3D *lib3d)
 //TempCode JON 26Sep00 			col++;
 //TempCode JON 26Sep00 		}
 
-//DeadCode JON 26Sep00 	cloudImg1 = ImageMapDesc::init( 128, 128, false);
-//DeadCode JON 26Sep00 	cloudImg2 = ImageMapDesc::init( 128, 128, false);
 
 	for (int smkindex=0; smkindex < MaxSmokeClouds; smkindex++)
 	{
@@ -9430,7 +5974,6 @@ void LandScape::Init(CLib3D *lib3d)
 //------------------------------------------------------------------------------
 void LandScape::Exit()
 {
-//DeadCode JON 12Sep00 	if (gridCorners) delete[]gridCorners,gridCorners=NULL;
 	if (gridCone)
 	{
 		delete[]gridCone;
@@ -9441,16 +5984,6 @@ void LandScape::Exit()
 		delete[]horizCone;
 		horizCone=NULL;
 	}
-//DeadCode JON 12Sep00 	if (lightCone) delete[]lightCone,lightCone=NULL;
-//DeadCode JON 12Sep00 	if (routeDetail) delete[]routeDetail,routeDetail=NULL;
-//DeadCode JON 3Aug00 	if (groundDetail) delete[]groundDetail,groundDetail=NULL;
-//DeadCode JON 12Sep00 	if (landRnd)
-//DeadCode JON 12Sep00 	{
-//DeadCode JON 12Sep00 #pragma warnmsg ( "remove me" )
-//DeadCode JON 12Sep00 		DbgMemTest3( landRnd );
-//DeadCode JON 12Sep00 		delete[]landRnd;
-//DeadCode JON 12Sep00 		landRnd=NULL;
-//DeadCode JON 12Sep00 	}
 
 	if (tileCoords)
 	{
@@ -9472,27 +6005,19 @@ void LandScape::Exit()
 		delete[]pointList;
 		pointList=NULL;
 	}
-//DEADCODE JON 4/26/00 	if (pLastGrid) delete[]pLastGrid,pLastGrid=NULL;
 	if (tileCacheGrid)
 	{
 		delete[]tileCacheGrid;
 		tileCacheGrid=NULL;
 		TileResList::theGrid=NULL;
 	}
-//DEADCODE JON 4/27/00 	if (pHTextureGrid) delete[]pHTextureGrid,pHTextureGrid=NULL;
-//DeadCode JON 3Aug00 	if (highco) delete[]highco,highco=NULL;
-//DeadCode JON 5Sep00 	if (softGrid) delete[]softGrid,softGrid=NULL;
 
 	Three_Dee.nomorereallygetdata=false;
 
 	delete [](UByteP)horizonImg;
 	delete [](UByteP)cloudImg0;
-//DeadCode JON 26Sep00 	delete [](UByteP)cloudImg1;
-//DeadCode JON 26Sep00 	delete [](UByteP)cloudImg2;
 	horizonImg = NULL;
 	cloudImg0 = NULL;
-//DeadCode JON 26Sep00 	cloudImg1 = NULL;
-//DeadCode JON 26Sep00 	cloudImg2 = NULL;
 }
 
 void LandScape::SetFogBand()
@@ -9514,29 +6039,6 @@ void LandScape::SetFogBand()
 //Author		Paul.
 //Date			Tue 9 Jun 1998
 //------------------------------------------------------------------------------
-//deadcode JON 19/06/01	void LandScape::SetMist(DoPointStruc& dp)
-//deadcode JON 19/06/01	{
-//DEADCODE PD 01/12/99 	//dp is untransformed point
-//DEADCODE PD 01/12/99 	if (dp.bodyy.i<=_snowLine){
-//DEADCODE PD 01/12/99 		dp.mist=0;
-//DEADCODE PD 01/12/99 		if (dp.bodyy.i<=_mistTop){
-//DEADCODE PD 01/12/99 			SLong temp=((dp.bodyy.i-_mistTop)<<8)/_mistTop;
-//DEADCODE PD 01/12/99 			if (temp>0xFF) temp=0xFF;
-//DEADCODE PD 01/12/99 			else if (temp<0) temp=0;
-//DEADCODE PD 01/12/99 			temp=0xFF-temp;
-//DEADCODE PD 01/12/99 			dp.snow=UByte(temp);
-//DEADCODE PD 01/12/99 		}
-//DEADCODE PD 01/12/99 		else dp.snow=0;
-//DEADCODE PD 01/12/99 	}
-//DEADCODE PD 01/12/99 	else if (dp.bodyy.i>=_snowLine+10000)	dp.mist=255;
-//DEADCODE PD 01/12/99 	else
-//DEADCODE PD 01/12/99 	{
-//DEADCODE PD 01/12/99 	 	SLong temp=((dp.bodyy.i-_snowLine)<<8)/10000;
-//DEADCODE PD 01/12/99 		if (temp>0xFF)		temp=0xFF;
-//DEADCODE PD 01/12/99 		else if (temp<0)	temp=0;
-//DEADCODE PD 01/12/99 		dp.mist=UByte(temp);
-//DEADCODE PD 01/12/99 	}
-//deadcode JON 19/06/01	}
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		PrintDebugs
 //Author		Paul.
@@ -9597,8 +6099,6 @@ inline void fpSinCos(ANGLES ang,Float& sinAng,Float& cosAng)
 //Author		Paul.
 //Date			Fri 23 Oct 1998
 //------------------------------------------------------------------------------
-//deadcode JON 19/06/01	void LandScape::DoCloudLayer()
-//deadcode JON 19/06/01	{
 /*	const Float CLOUD_DELTA=.002;
 	struct SHCoords
 	{
@@ -9916,7 +6416,6 @@ inline void fpSinCos(ANGLES ang,Float& sinAng,Float& cosAng)
 	currscreen->DoSetTranspFade(false);
 	currscreen->DoSetFog(saveR,saveG,saveB,groundFogBegin,groundFogEnd);
 	currscreen->DoSetFog(saveR,saveG,saveB);*/
-//deadcode JON 19/06/01	}
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GetMinMaxAlt
@@ -10022,9 +6521,7 @@ void LandScape::PossibleTeleport()
 //------------------------------------------------------------------------------
 void LandScape::RefreshLandscape()
 {
-//DEADCODE JON 4/26/00 	if (pLastGrid) delete[]pLastGrid,pLastGrid=NULL;
 
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"RefreshLandscape: entry ");
 
 	if (tileCacheGrid)
 	{
@@ -10035,27 +6532,14 @@ void LandScape::RefreshLandscape()
 			tileCacheGrid[j].reset();
 		}
 
-//DeadCode MS 15Aug00 		Mono_Text.Print((UByte*)"RefreshLandscape: definatley clear land texts ");
 
-//DeadCode MS 16Aug00 #pragma warnmsg ("don't put me in the version" )
-//DeadCode MS 16Aug00 		for ( j = 0; j <256; j++ )
-//DeadCode MS 16Aug00 			g_lpLib3d->FreeLandscapeTexture( j );
 
-//DEADCODE JO  4/27/00 		memset(tileCacheGrid,0,sizeof(TileElement)*_wholeAreaSizeMIN*_wholeAreaSizeMIN);
 	}
-//DEADCODE JON 4/27/00 	if (pHTextureGrid) delete[]pHTextureGrid,pHTextureGrid=NULL;
-//DeadCode MS 15Aug00  	Mono_Text.Print((UByte*)"RefreshLandscape: biginit ");
 
 	Three_Dee.pMigLand->BigInit(View_Point);
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"RefreshLandscape: reinit ");
 
 	Three_Dee.pTMake->Reinit(View_Point->World.X,View_Point->World.Z,g_lpLib3d);
-//DEADCODE PD 01/12/99 	if (!Save_Data.fSoftware)	currscreen->DoFreeTextures();
-//DEADCODE PD 01/12/99 	else						Three_Dee.pTMake->DoFreeTextures();
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"RefreshLandscape: force horiz image update ");
 
-//DeadCode JON 6Oct00 	g_lpLib3d->UnloadTexture( horizonImg );
-//DeadCode MS 15Aug00 	Mono_Text.Print((UByte*)"RefreshLandscape: exit ");
 	doneUpdateLandscape = true;
 
 }
@@ -10084,7 +6568,6 @@ Bool LandScape::SetLighting(SLong curTime)			//RJS 15Jun99
 
 	if (View_Point && View_Point->viewnum.viewmode==VM_Map)
 	{
-//DeadCode JON 2Nov00 		currentLighting=*pMapL;
 		return FALSE;											//RJS 15Jun99
 	}
 
@@ -10153,21 +6636,12 @@ Bool LandScape::SetLighting(SLong curTime)			//RJS 15Jun99
 	if (scaleFactor==0)
 	{
 		currentLighting=*pHighLight;
-//DEADCODE JON 4/11/00 		currentLighting=*pLowLight;
 	}
 	else
 	{
-//deadcode		InterpLight(horizonBase);
-//deadcode		InterpLight(horizonMid);
-//deadcode		InterpLight(horizonUnderClouds);
-//deadcode		InterpLight(horizonAtClouds);
-//deadcode		InterpLight(horizonAboveClouds);
-//deadcode		InterpLight(horizonTop);
 		InterpLight(landAmbientCollo);		InterpLight(landAmbientColhi);		InterpLight(landAmbientColamb);
 		InterpLight(shadedAmbientCollo);	InterpLight(shadedAmbientColhi);	InterpLight(shadedAmbientColamb);
 		InterpLight(staticAmbientCollo);	InterpLight(staticAmbientColhi);	InterpLight(staticAmbientColamb);
-//DeadCode JON 2Nov00 		InterpLight(cockpitAmbientCollo);	InterpLight(cockpitAmbientColhi);	InterpLight(cockpitAmbientColamb);
-//DeadCode JON 2Nov00 		InterpLight(effectsAmbientCollo);	InterpLight(effectsAmbientColhi);	InterpLight(effectsAmbientColamb);
 
 		// and the back horizon fill stuff								//JON 4/20/00
 		InterpLight(deepestSkyCol);
@@ -10188,63 +6662,11 @@ Bool LandScape::SetLighting(SLong curTime)			//RJS 15Jun99
 
 	//account for bad weather here...
 
-//DeadCode JON 2Nov00 	if (Save_Data.gamedifficulty[GD_WEATHEREFFECTS] && MissManCampSky().Conditions==1)
-//DeadCode JON 2Nov00   	{
-//DeadCode JON 2Nov00 		preBadW=currentLighting;
-//DeadCode JON 2Nov00 		pLowLight=&preBadW;
-//DeadCode JON 2Nov00 		pHighLight=pBadW;
-//DeadCode JON 2Nov00 #pragma warnmsg( "look at weather lighting here - JON" )
-//DeadCode JON 2Nov00 		scaleFactor=32768;	//how bad 0==very bad 65536=clear weather
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 //deadcode		InterpLight(horizonBase);
-//DeadCode JON 2Nov00 //deadcode		InterpLight(horizonMid);
-//DeadCode JON 2Nov00 //deadcode		InterpLight(horizonUnderClouds);
-//DeadCode JON 2Nov00 //deadcode		InterpLight(horizonAtClouds);
-//DeadCode JON 2Nov00 //deadcode		InterpLight(horizonAboveClouds);
-//DeadCode JON 2Nov00 //deadcode		InterpLight(horizonTop);
-//DeadCode JON 2Nov00 		InterpLight(landAmbientCollo);		InterpLight(landAmbientColhi);		InterpLight(landAmbientColamb);
-//DeadCode JON 2Nov00 		InterpLight(shadedAmbientCollo);	InterpLight(shadedAmbientColhi);	InterpLight(shadedAmbientColamb);
-//DeadCode JON 2Nov00 		InterpLight(staticAmbientCollo);	InterpLight(staticAmbientColhi);	InterpLight(staticAmbientColamb);
-//DeadCode JON 2Nov00 //DeadCode JON 2Nov00 		InterpLight(cockpitAmbientCollo);	InterpLight(cockpitAmbientColhi);	InterpLight(cockpitAmbientColamb);
-//DeadCode JON 2Nov00 //DeadCode JON 2Nov00 		InterpLight(effectsAmbientCollo);	InterpLight(effectsAmbientColhi);	InterpLight(effectsAmbientColamb);
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 		// and the back horizon fill stuff								//JON 4/20/00
-//DeadCode JON 2Nov00 		InterpLight(deepestSkyCol);
-//DeadCode JON 2Nov00 		InterpLight(otherSkyColSun);
-//DeadCode JON 2Nov00 		InterpLight(otherSkyColShade);
-//DeadCode JON 2Nov00 		InterpLight(cloudColSun);
-//DeadCode JON 2Nov00 		InterpLight(cloudColShade);
-//DeadCode JON 2Nov00 		InterpLight(horizonColSun);
-//DeadCode JON 2Nov00 		InterpLight(horizonColShade);
-//DeadCode JON 2Nov00 		InterpLight(fogColSun);
-//DeadCode JON 2Nov00 		InterpLight(fogColShade);
-//DeadCode JON 2Nov00 		InterpLight(specularHighlight);
-//DeadCode JON 2Nov00
-//DeadCode JON 2Nov00 	}
 	//currentLighting contains the lighting info
 	//for the correct time of day and weather type
 
 	// set the fog colour now... - actually set it in infinite strip - relative to the direction
-//DeadCode JON 11Sep00 	Three_Dee.fogCol = (currentLighting.fogCol.red()<<16)+(currentLighting.fogCol.green()<<8)+currentLighting.fogCol.blue();
 
-//DEADCODE PD 03/12/99 	if (mono3d)
-//DEADCODE PD 03/12/99 	{
-//DEADCODE PD 03/12/99 		currentLighting.landAmbientCol.g=
-//DEADCODE PD 03/12/99 			currentLighting.landAmbientCol.b=
-//DEADCODE PD 03/12/99 			currentLighting.landAmbientCol.r;
-//DEADCODE PD 03/12/99 		currentLighting.shadedAmbientCol.g=
-//DEADCODE PD 03/12/99 			currentLighting.shadedAmbientCol.b=
-//DEADCODE PD 03/12/99 			currentLighting.shadedAmbientCol.r;
-//DEADCODE PD 03/12/99 		currentLighting.staticAmbientCol.g=
-//DEADCODE PD 03/12/99 			currentLighting.staticAmbientCol.b=
-//DEADCODE PD 03/12/99 			currentLighting.staticAmbientCol.r;
-//DEADCODE PD 03/12/99 		currentLighting.cockpitAmbientCol.g=
-//DEADCODE PD 03/12/99 			currentLighting.cockpitAmbientCol.b=
-//DEADCODE PD 03/12/99 			currentLighting.cockpitAmbientCol.r;
-//DEADCODE PD 03/12/99 		currentLighting.effectsAmbientCol.g=
-//DEADCODE PD 03/12/99 			currentLighting.effectsAmbientCol.b=
-//DEADCODE PD 03/12/99 			currentLighting.effectsAmbientCol.r;
-//DEADCODE PD 03/12/99 	}
 	return lightson;												//RJS 15Jun99
 }
 
@@ -10253,148 +6675,18 @@ Bool LandScape::SetLighting(SLong curTime)			//RJS 15Jun99
 //Author		Paul.
 //Date			Mon 1 Mar 1999
 //------------------------------------------------------------------------------
-//deadcode JON 19/06/01	void LandScape::ResetLights()
-//deadcode JON 19/06/01	{
-//DeadCode JON 20Sep00 	for (SLong i=0;i<_MaxLights;lightList[i++].timer=0){}
-//deadcode JON 19/06/01	}
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		AddLight
 //Author		Paul.
 //Date			Mon 1 Mar 1999
 //------------------------------------------------------------------------------
-//deadcode JON 19/06/01	void LandScape::AddLight(SLandLight* newlight)
-//deadcode JON 19/06/01	{
-//DeadCode JON 20Sep00 	for (SLong i=0;i<_MaxLights;i++)
-//DeadCode JON 20Sep00 		if (lightList[i].timer==0)
-//DeadCode JON 20Sep00 			break;
-//DeadCode JON 20Sep00 	if (i<_MaxLights)
-//DeadCode JON 20Sep00 		lightList[i]=*newlight;
-//deadcode JON 19/06/01	}
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ProcessLights
 //Author		Paul.
 //Date			Mon 1 Mar 1999
 //------------------------------------------------------------------------------
-//DeadCode JON 20Sep00 void LandScape::ProcessLights(SLong ox,SLong oz)
-//DeadCode JON 20Sep00 {
-//DeadCode JON 20Sep00 #pragma warnmsg ( "ProcessLights" )
-//DeadCode JON 21Aug00 	return;
-//DeadCode JON 21Aug00 	SLong wholeAreaSize;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	SLong thisTime=View_Point->FrameTime();
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	UByte actTbl[_MaxLights];
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	UWord addTo=0;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	UByte *pGridCone,*pLightCone;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	lightsActive=0;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	for (SLong i=0;i<_MaxLights;i++)
-//DeadCode JON 21Aug00 	{
-//DeadCode JON 21Aug00 		if (lightList[i].timer!=0 &&
-//DeadCode JON 21Aug00 			(lightList[i].timer-=thisTime)>0)
-//DeadCode JON 21Aug00 			actTbl[lightsActive++]=UByte(i);
-//DeadCode JON 21Aug00 		else
-//DeadCode JON 21Aug00 			if (lightList[i].timer!=0) lightList[i].timer=0;
-//DeadCode JON 21Aug00 	}
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	if (lightsActive==0) return;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	for (i=0;i<_wholeAreaSizeMAX;lightTable[i++].numLights=0){}
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 //	wholeAreaSize=Save_Data.detail_3d[DETAIL3D_HORIZONDIST]?_wholeAreaSizeMAX:_wholeAreaSizeMIN;
-//DeadCode JON 21Aug00 	wholeAreaSize=_wholeAreaSizeMIN;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	pGridCone=gridCone;
-//DeadCode JON 21Aug00 	pLightCone=lightCone;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 	for (SLong row=0;row<wholeAreaSize;row++)
-//DeadCode JON 21Aug00 	{
-//DeadCode JON 21Aug00 		SLong ix=ox;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 		for (SLong col=0;col<wholeAreaSize;col++)
-//DeadCode JON 21Aug00 		{
-//DeadCode JON 21Aug00 			if (*pGridCone)
-//DeadCode JON 21Aug00 			{
-//DeadCode JON 21Aug00 				//check this cell against active light list
-//DeadCode JON 21Aug00 				SLong cx0,cx1,cz0,cz1;
-//DeadCode JON 21Aug00 				SLong lx0,lx1,lz0,lz1;
-//DeadCode JON 21Aug00 				SLong lrange;
-//DeadCode JON 21Aug00 				bool anyAdded=false;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 				for (SLong lights=0;lights<lightsActive;lights++)
-//DeadCode JON 21Aug00 				{
-//DeadCode JON 21Aug00 					SLong index=actTbl[lights];
-//DeadCode JON 21Aug00 					lrange=lightList[index].range;
-//DeadCode JON 21Aug00 					SLong dx=lightList[index].pos.X-ix-_halfBlockWidth;
-//DeadCode JON 21Aug00 					if (dx<0) dx=-dx;
-//DeadCode JON 21Aug00 					if (dx<_blockWidth)
-//DeadCode JON 21Aug00 					{
-//DeadCode JON 21Aug00 						SLong dz=lightList[index].pos.Z-oz-_halfBlockWidth;
-//DeadCode JON 21Aug00 						if (dz<0) dz=-dz;
-//DeadCode JON 21Aug00 						if (dz<_blockWidth)
-//DeadCode JON 21Aug00 						{
-//DeadCode JON 21Aug00 							bool lightIn=false;
-//DeadCode JON 21Aug00 							lx0=lx1=lightList[index].pos.X;
-//DeadCode JON 21Aug00 							lz0=lz1=lightList[index].pos.Z;
-//DeadCode JON 21Aug00 							lx0-=lrange;
-//DeadCode JON 21Aug00 							lz0-=lrange;
-//DeadCode JON 21Aug00 							lx1+=lrange;
-//DeadCode JON 21Aug00 							lz1+=lrange;
-//DeadCode JON 21Aug00 							cx0=ix;
-//DeadCode JON 21Aug00 							cx1=ix+_blockWidth;
-//DeadCode JON 21Aug00 							cz0=oz;
-//DeadCode JON 21Aug00 							cz1=oz+_blockWidth;
-//DeadCode JON 21Aug00 							if (lrange>_blockWidth)
-//DeadCode JON 21Aug00 							{
-//DeadCode JON 21Aug00 								//check to see if this tile lies inside the
-//DeadCode JON 21Aug00 								//area covered by the light
-//DeadCode JON 21Aug00 								if (cx0>=lx0 && cx0<=lx1 && cz0>=lz0 && cz0<=lz1) lightIn=true;
-//DeadCode JON 21Aug00 								if (!lightIn && cx1>=lx0 && cx1<=lx1 && cz0>=lz0 && cz0<=lz1) lightIn=true;
-//DeadCode JON 21Aug00 								if (!lightIn && cx1>=lx0 && cx1<=lx1 && cz1>=lz0 && cz1<=lz1) lightIn=true;
-//DeadCode JON 21Aug00 								if (!lightIn && cx0>=lx0 && cx0<=lx1 && cz1>=lz0 && cz1<=lz1) lightIn=true;
-//DeadCode JON 21Aug00 							}
-//DeadCode JON 21Aug00 							else
-//DeadCode JON 21Aug00 							{
-//DeadCode JON 21Aug00 								//check to see if this light lies inside the
-//DeadCode JON 21Aug00 								//area covered by the tile
-//DeadCode JON 21Aug00 								if (lx0>=cx0 && lx0<=cx1 && lz0>=cz0 && lz0<=cz1) lightIn=true;
-//DeadCode JON 21Aug00 								if (!lightIn && lx1>=cx0 && lx1<=cx1 && lz0>=cz0 && lz0<=cz1) lightIn=true;
-//DeadCode JON 21Aug00 								if (!lightIn && lx1>=cx0 && lx1<=cx1 && lz1>=cz0 && lz1<=cz1) lightIn=true;
-//DeadCode JON 21Aug00 								if (!lightIn && lx0>=cx0 && lx0<=cx1 && lz1>=cz0 && lz1<=cz1) lightIn=true;
-//DeadCode JON 21Aug00 							}
-//DeadCode JON 21Aug00 							if (lightIn)
-//DeadCode JON 21Aug00 							{
-//DeadCode JON 21Aug00 								//find a spare light table entry to use
-//DeadCode JON 21Aug00 								UWord thisOne=lightTable[addTo].numLights;
-//DeadCode JON 21Aug00 								lightTable[addTo].lightIndices[thisOne++]=index;
-//DeadCode JON 21Aug00 								lightTable[addTo].numLights=thisOne;
-//DeadCode JON 21Aug00 								anyAdded=true;
-//DeadCode JON 21Aug00 							}
-//DeadCode JON 21Aug00 						}
-//DeadCode JON 21Aug00 					}
-//DeadCode JON 21Aug00 				}
-//DeadCode JON 21Aug00 				if (anyAdded)
-//DeadCode JON 21Aug00 				{
-//DeadCode JON 21Aug00 					*pLightCone=UByte(addTo);
-//DeadCode JON 21Aug00 					addTo++;
-//DeadCode JON 21Aug00 					if (addTo==_wholeAreaSizeMAX)
-//DeadCode JON 21Aug00 						return;
-//DeadCode JON 21Aug00 				}
-//DeadCode JON 21Aug00 			}
-//DeadCode JON 21Aug00 			else *pLightCone=0xFF;
-//DeadCode JON 21Aug00
-//DeadCode JON 21Aug00 			pGridCone++;
-//DeadCode JON 21Aug00 			pLightCone++;
-//DeadCode JON 21Aug00 			ix+=_blockWidth;
-//DeadCode JON 21Aug00 		}
-//DeadCode JON 21Aug00 		oz+=_blockWidth;
-//DeadCode JON 21Aug00 	}
-//DeadCode JON 20Sep00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		GroundHuggingAltitude
@@ -10640,231 +6932,7 @@ void LandScape::InitialiseCloudTables()
 //
 // Render a single level of the data
 //
-//DEADCODE JON 5/24/00 void LandScape::RenderLevel00(const COORDS3D& base,UWord *pntArray,UWord scale,R3DVALUE *vals)
-//DEADCODE JON 5/24/00 {
-//DEADCODE JON 5/24/00 #ifndef _REDO_ME1_
-//DEADCODE JON 5/24/00 	R3DVERTEX *pRVert,*pListA,*pListB;
-//DEADCODE JON 5/24/00 	UWord *pPntsA,*pPntsB;
-//DEADCODE JON 5/24/00 	COORDS3D crdsA,crdsB;
-//DEADCODE JON 5/24/00 	ImageMapDesc *pImg;
-//DEADCODE JON 5/24/00 	SLong step;
-//DEADCODE JON 5/24/00 	SWord halfMapWidth,halfMapHeight;
-//DEADCODE JON 5/24/00 	SWord widthMask,heightMask;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	step=((4096<<5)>>scale);
-//DEADCODE JON 5/24/00 	pImg=Image_Map.GetImageMapPtr(CLOUDNO);
-//DEADCODE JON 5/24/00 	halfMapWidth=pImg->w>>1;
-//DEADCODE JON 5/24/00 	halfMapHeight=pImg->h>>1;
-//DEADCODE JON 5/24/00 	widthMask=(pImg->w)-1;
-//DEADCODE JON 5/24/00 	heightMask=(pImg->h)-1;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	g_lpLib3d->PushMatrix(MATRIX_OBJECT);
-//DEADCODE JON 5/24/00 	g_lpLib3d->LoadIdentity(MATRIX_OBJECT);
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	pRVert=new R3DVERTEX[TILE_WH*TILE_WH];
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	pListA=pRVert;
-//DEADCODE JON 5/24/00 	pPntsA=pntArray;
-//DEADCODE JON 5/24/00 	crdsA.X=base.X;
-//DEADCODE JON 5/24/00 	crdsA.Y=base.Y;
-//DEADCODE JON 5/24/00 	crdsA.Z=base.Z;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	pListB=pRVert+TILE_WH*(TILE_WH-1);
-//DEADCODE JON 5/24/00 	pPntsB=pntArray+TILE_WH*(TILE_WH-1);
-//DEADCODE JON 5/24/00 	crdsB.X=base.X;
-//DEADCODE JON 5/24/00 	crdsB.Y=base.Y;
-//DEADCODE JON 5/24/00 	crdsB.Z=base.Z+(TILE_WH-1)*step;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	pListA[0].x=crdsA.X;
-//DEADCODE JON 5/24/00 	pListA[0].y=crdsA.Y+pPntsA[0];
-//DEADCODE JON 5/24/00 	pListA[0].z=crdsA.Z;
-//DEADCODE JON 5/24/00 	pListA[0].ix=0;
-//DEADCODE JON 5/24/00 	pListA[0].iy=0;
-//DEADCODE JON 5/24/00 	pListB[0].x=crdsB.X;
-//DEADCODE JON 5/24/00 	pListB[0].y=crdsB.Y+pPntsB[0];
-//DEADCODE JON 5/24/00 	pListB[0].z=crdsB.Z;
-//DEADCODE JON 5/24/00 	pListB[0].ix=0;
-//DEADCODE JON 5/24/00 	pListB[0].iy=0;
-//DEADCODE JON 5/24/00 	for (int i=2;i<TILE_WH;i+=2)
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		crdsA.X+=step;
-//DEADCODE JON 5/24/00 		pListA[i-1].x=crdsA.X;
-//DEADCODE JON 5/24/00 		pListA[i-1].z=crdsA.Z;
-//DEADCODE JON 5/24/00 		pListA[i-1].ix=(pListA[i-2].ix+halfMapWidth)&widthMask;
-//DEADCODE JON 5/24/00 		pListA[i-1].iy=pListA[i-2].iy;
-//DEADCODE JON 5/24/00 		crdsA.X+=step;
-//DEADCODE JON 5/24/00 		pListA[i].x=crdsA.X;
-//DEADCODE JON 5/24/00 		pListA[i].y=crdsA.Y+pPntsA[i];
-//DEADCODE JON 5/24/00 		pListA[i].z=crdsA.Z;
-//DEADCODE JON 5/24/00 		pListA[i].ix=(pListA[i-1].ix+halfMapWidth)&widthMask;
-//DEADCODE JON 5/24/00 		pListA[i].iy=pListA[i-1].iy;
-//DEADCODE JON 5/24/00 		pListA[i-1].y=.5f*(pListA[i].y+pListA[i-2].y);
-//DEADCODE JON 5/24/00 		crdsB.X+=step;
-//DEADCODE JON 5/24/00 		pListB[i-1].x=crdsB.X;
-//DEADCODE JON 5/24/00 		pListB[i-1].z=crdsB.Z;
-//DEADCODE JON 5/24/00 		pListB[i-1].ix=(pListB[i-2].ix+halfMapWidth)&widthMask;
-//DEADCODE JON 5/24/00 		pListB[i-1].iy=pListB[i-2].iy;
-//DEADCODE JON 5/24/00 		crdsB.X+=step;
-//DEADCODE JON 5/24/00 		pListB[i].x=crdsB.X;
-//DEADCODE JON 5/24/00 		pListB[i].y=crdsB.Y+pPntsB[i];
-//DEADCODE JON 5/24/00 		pListB[i].z=crdsB.Z;
-//DEADCODE JON 5/24/00 		pListB[i].ix=(pListB[i-1].ix+halfMapWidth)&widthMask;
-//DEADCODE JON 5/24/00 		pListB[i].iy=pListB[i-1].iy;
-//DEADCODE JON 5/24/00 		pListB[i-1].y=.5f*(pListB[i].y+pListB[i-2].y);
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	crdsA.X=base.X;
-//DEADCODE JON 5/24/00 	crdsA.Y=base.Y;
-//DEADCODE JON 5/24/00 	crdsA.Z=base.Z;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	pListB=pRVert+(TILE_WH-1);
-//DEADCODE JON 5/24/00 	pPntsB=pntArray+(TILE_WH-1);
-//DEADCODE JON 5/24/00 	crdsB.X=base.X+step*(TILE_WH-1);
-//DEADCODE JON 5/24/00 	crdsB.Y=base.Y;
-//DEADCODE JON 5/24/00 	crdsB.Z=base.Z;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	int index=TILE_WH*2;
-//DEADCODE JON 5/24/00 	for (i=2;i<TILE_WH;i+=2,index+=TILE_WH)
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		int iprev=index-TILE_WH;
-//DEADCODE JON 5/24/00 		int iprev2=iprev-TILE_WH;
-//DEADCODE JON 5/24/00 		crdsA.Z+=step;
-//DEADCODE JON 5/24/00 		pListA[iprev].x=crdsA.X;
-//DEADCODE JON 5/24/00 		pListA[iprev].z=crdsA.Z;
-//DEADCODE JON 5/24/00 		pListA[iprev].ix=pListA[iprev2].ix;
-//DEADCODE JON 5/24/00 		pListA[iprev].iy=(pListA[iprev2].iy+halfMapHeight)&heightMask;
-//DEADCODE JON 5/24/00 		crdsA.Z+=step;
-//DEADCODE JON 5/24/00 		pListA[index].x=crdsA.X;
-//DEADCODE JON 5/24/00 		pListA[index].y=crdsA.Y+pPntsA[index];
-//DEADCODE JON 5/24/00 		pListA[index].z=crdsA.Z;
-//DEADCODE JON 5/24/00 		pListA[index].ix=pListA[iprev].ix;
-//DEADCODE JON 5/24/00 		pListA[index].iy=(pListA[iprev].iy+halfMapHeight)&heightMask;
-//DEADCODE JON 5/24/00 		pListA[iprev].y=.5f*(pListA[index].y+pListA[iprev2].y);
-//DEADCODE JON 5/24/00 		crdsB.Z+=step;
-//DEADCODE JON 5/24/00 		pListB[iprev].x=crdsB.X;
-//DEADCODE JON 5/24/00 		pListB[iprev].z=crdsB.Z;
-//DEADCODE JON 5/24/00 		pListB[iprev].ix=pListB[iprev2].ix;
-//DEADCODE JON 5/24/00 		pListB[iprev].iy=(pListB[iprev2].iy+halfMapHeight)&heightMask;
-//DEADCODE JON 5/24/00 		crdsB.Z+=step;
-//DEADCODE JON 5/24/00 		pListB[index].x=crdsB.X;
-//DEADCODE JON 5/24/00 		pListB[index].y=crdsB.Y+pPntsB[index];
-//DEADCODE JON 5/24/00 		pListB[index].z=crdsB.Z;
-//DEADCODE JON 5/24/00 		pListB[index].ix=pListB[iprev].ix;
-//DEADCODE JON 5/24/00 		pListB[index].iy=(pListB[iprev].iy+halfMapHeight)&heightMask;
-//DEADCODE JON 5/24/00 		pListB[iprev].y=.5f*(pListB[index].y+pListB[iprev2].y);
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	crdsA.X=base.X+step;
-//DEADCODE JON 5/24/00 	crdsA.Y=base.Y;
-//DEADCODE JON 5/24/00 	crdsA.Z=base.Z+step;
-//DEADCODE JON 5/24/00 	crdsB=crdsA;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	for (i=1;i<TILE_WH-1;i++)
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		int index=i*TILE_WH;
-//DEADCODE JON 5/24/00 		crdsA=crdsB;
-//DEADCODE JON 5/24/00 		crdsB.Z+=step;
-//DEADCODE JON 5/24/00 		for (int j=1;j<TILE_WH-1;j++)
-//DEADCODE JON 5/24/00 		{
-//DEADCODE JON 5/24/00 			pListA[index+j].x=crdsA.X;
-//DEADCODE JON 5/24/00 			pListA[index+j].y=crdsA.Y+pPntsA[index+j];
-//DEADCODE JON 5/24/00 			pListA[index+j].z=crdsA.Z;
-//DEADCODE JON 5/24/00 			pListA[index+j].ix=(pListA[index+j-1].ix+halfMapWidth)&widthMask;
-//DEADCODE JON 5/24/00 			pListA[index+j].iy=(pListA[index+j-TILE_WH].iy+halfMapHeight)&heightMask;
-//DEADCODE JON 5/24/00 			crdsA.X+=step;
-//DEADCODE JON 5/24/00 		}
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	for (i=0;i<TILE_WH-1;i++)
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		int index=i*TILE_WH;
-//DEADCODE JON 5/24/00 		for (int j=index;j<index+TILE_WH-1;j++)
-//DEADCODE JON 5/24/00 		{
-//DEADCODE JON 5/24/00 			R3DVERTEX *pVB;
-//DEADCODE JON 5/24/00 			g_lpLib3d->BeginPoly(HMATERIAL(pImg),3,pVB);
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j];
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j+1];
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j+TILE_WH+1];
-//DEADCODE JON 5/24/00 			g_lpLib3d->EndPoly();
-//DEADCODE JON 5/24/00 			g_lpLib3d->BeginPoly(HMATERIAL(pImg),3,pVB);
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j];
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j+TILE_WH+1];
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j+TILE_WH];
-//DEADCODE JON 5/24/00 			g_lpLib3d->EndPoly();
-//DEADCODE JON 5/24/00 			g_lpLib3d->BeginPoly(HMATERIAL(pImg),3,pVB);
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j];
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j+TILE_WH+1];
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j+1];
-//DEADCODE JON 5/24/00 			g_lpLib3d->EndPoly();
-//DEADCODE JON 5/24/00 			g_lpLib3d->BeginPoly(HMATERIAL(pImg),3,pVB);
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j];
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j+TILE_WH];
-//DEADCODE JON 5/24/00 			*pVB++=pRVert[j+TILE_WH+1];
-//DEADCODE JON 5/24/00 			g_lpLib3d->EndPoly();
-//DEADCODE JON 5/24/00 		}
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00 	delete[]pRVert;
-//DEADCODE JON 5/24/00 	g_lpLib3d->PopMatrix(MATRIX_OBJECT);
-//DEADCODE JON 5/24/00 #endif
-//DEADCODE JON 5/24/00 }
 
-//DEADCODE JON 5/24/00 void LandScape::RenderACloudLayer(const COORDS3D& viewerPos,const UWord whichLayer)
-//DEADCODE JON 5/24/00 {
-//DEADCODE JON 5/24/00 	COORDS3D viewFrustrum[8];
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	g_lpLib3d->BackProjectViewCone(viewFrustrum);
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	BoundingBox boundingBox(8,viewFrustrum);
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	g_lpLib3d->SetFogColour(0x00FFFFFF);
-//DEADCODE JON 5/24/00 	SLong scaleMask=-(1<<18);
-//DEADCODE JON 5/24/00 	for (SLong scale=0;scale<7;scale++,scaleMask>>=1)
-//DEADCODE JON 5/24/00 		if ((viewerPos.X&scaleMask)!=(scaleBase[scale].X&scaleMask) ||
-//DEADCODE JON 5/24/00 			(viewerPos.Z&scaleMask)!=(scaleBase[scale].Z&scaleMask))
-//DEADCODE JON 5/24/00 			break;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	for (;scale<7;scale++,scaleMask>>=1)
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		scaleBase[scale].X=viewerPos.X;
-//DEADCODE JON 5/24/00 		scaleBase[scale].Z=viewerPos.Z;
-//DEADCODE JON 5/24/00 		if (!scale)
-//DEADCODE JON 5/24/00 			MakeTopLevel(scaleBase[0].X&scaleMask,scaleBase[0].Z&scaleMask,pLevels[0]);
-//DEADCODE JON 5/24/00 		else
-//DEADCODE JON 5/24/00 		{
-//DEADCODE JON 5/24/00 			SLong dx=(scaleBase[scale].X>>(18-scale))&0x01;
-//DEADCODE JON 5/24/00 			SLong dz=(scaleBase[scale].Z>>(18-scale))&0x01;
-//DEADCODE JON 5/24/00 			UWord *samplePos=pLevels[scale-1]+TILE_OFFX+TILE_OFFZ;
-//DEADCODE JON 5/24/00 			samplePos+=dz*TILE_WH+dx;
-//DEADCODE JON 5/24/00 			DoubleRez(samplePos,scale,pLevels[scale]);
-//DEADCODE JON 5/24/00 		}
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00 	COORDS3D tileOffset;
-//DEADCODE JON 5/24/00 	scale=0;
-//DEADCODE JON 5/24/00 	SLong dxz=((4096<<5)>>scale)*(TILE_WH>>1);
-//DEADCODE JON 5/24/00 	scaleMask=(-(1<<18))>>scale;
-//DEADCODE JON 5/24/00 	tileOffset.X=(scaleBase[scale].X&scaleMask)-dxz-viewerPos.X;
-//DEADCODE JON 5/24/00 	tileOffset.Z=(scaleBase[scale].Z&scaleMask)-dxz-viewerPos.Z;
-//DEADCODE JON 5/24/00
-//DEADCODE JON 5/24/00 	if (whichLayer&WL_LOWER)
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		tileOffset.Y=FT_8000-viewerPos.Y;
-//DEADCODE JON 5/24/00 		RenderLevel00(tileOffset,pLevels[scale],scale,layer00table);
-//DEADCODE JON 5/24/00 		RenderLevel00(tileOffset,pLevels[scale],scale,layer10table);
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00 	if (whichLayer&WL_MIDDLE)
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		tileOffset.Y=FT_10000-viewerPos.Y;
-//DEADCODE JON 5/24/00 		RenderLevel00(tileOffset,pLevels[scale],scale,layer01table);
-//DEADCODE JON 5/24/00 		RenderLevel00(tileOffset,pLevels[scale],scale,layer11table);
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00 	if (whichLayer&WL_TOP)
-//DEADCODE JON 5/24/00 	{
-//DEADCODE JON 5/24/00 		tileOffset.Y=FT_15000-viewerPos.Y;
-//DEADCODE JON 5/24/00 		RenderLevel00(tileOffset,pLevels[scale],scale,layer02table);
-//DEADCODE JON 5/24/00 		RenderLevel00(tileOffset,pLevels[scale],scale,layer12table);
-//DEADCODE JON 5/24/00 	}
-//DEADCODE JON 5/24/00 	g_lpLib3d->SetFogColour(0x0090B8E8);
-//DEADCODE JON 5/24/00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		SmokeyCockpit
@@ -10872,41 +6940,6 @@ void LandScape::InitialiseCloudTables()
 //Date			Fri 3 Dec 1999
 //
 //------------------------------------------------------------------------------
-//deadcode JON 19/06/01	void LandScape::SmokeyCockpit()
-//deadcode JON 19/06/01	{
-//DEADCODE JON 5/24/00 #ifndef _REDO_ME1_
-//DEADCODE JON 5/24/00 	static UWord height=0;
-//DEADCODE JON 5/24/00 	ImageMapNumber SmokeyImage;
-//DEADCODE JON 5/24/00 	ImageMapDesc *pSmokeyImage;
-//DEADCODE JON 5/24/00 	HMATERIAL hMaterial;
-//DEADCODE JON 5/24/00 	ROWANSURFACEDESC rsd;
-//DEADCODE JON 5/24/00 	R3DTLVERTEX *pRTLVert;
-//DEADCODE JON 5/24/00 	SmokeyImage=CLOUDNO;
-//DEADCODE JON 5/24/00 	pSmokeyImage=Image_Map.GetImageMapPtr(SmokeyImage);
-//DEADCODE JON 5/24/00 	hMaterial=HMATERIAL(pSmokeyImage);
-//DEADCODE JON 5/24/00 	height+=View_Point->RealFrameTime();
-//DEADCODE JON 5/24/00 	rsd.dwSize=sizeof(ROWANSURFACEDESC);
-//DEADCODE JON 5/24/00 	g_lpLib3d->GetSurfaceDesc(&rsd);
-//DEADCODE JON 5/24/00 	g_lpLib3d->BeginPoly(hMaterial,4,pRTLVert);
-//DEADCODE JON 5/24/00 	pRTLVert[0].sx=0;
-//DEADCODE JON 5/24/00 	pRTLVert[0].sy=0;
-//DEADCODE JON 5/24/00 	pRTLVert[0].ix=0;
-//DEADCODE JON 5/24/00 	pRTLVert[0].iy=0+(height>>7);
-//DEADCODE JON 5/24/00 	pRTLVert[1].sx=rsd.dwWidth-1;
-//DEADCODE JON 5/24/00 	pRTLVert[1].sy=0;
-//DEADCODE JON 5/24/00 	pRTLVert[1].ix=pSmokeyImage->w;
-//DEADCODE JON 5/24/00 	pRTLVert[1].iy=0+(height>>7);
-//DEADCODE JON 5/24/00 	pRTLVert[2].sx=rsd.dwWidth-1;
-//DEADCODE JON 5/24/00 	pRTLVert[2].sy=rsd.dwHeight-1;
-//DEADCODE JON 5/24/00 	pRTLVert[2].ix=pSmokeyImage->w;
-//DEADCODE JON 5/24/00 	pRTLVert[2].iy=pSmokeyImage->h+(height>>7);
-//DEADCODE JON 5/24/00 	pRTLVert[3].sx=0;
-//DEADCODE JON 5/24/00 	pRTLVert[3].sy=rsd.dwHeight-1;
-//DEADCODE JON 5/24/00 	pRTLVert[3].ix=0;
-//DEADCODE JON 5/24/00 	pRTLVert[3].iy=pSmokeyImage->h+(height>>7);
-//DEADCODE JON 5/24/00 	g_lpLib3d->EndPoly();
-//DEADCODE JON 5/24/00 #endif _REDO_ME1_
-//deadcode JON 19/06/01	}
 
 //
 //axis aligned BSP tree rendering class
@@ -11207,6 +7240,7 @@ void	LandScape::StompImageMap(SWord	mapnumber, SWord splodge)
 
 SmkCloudDesc::SmkCloudDesc()
 {
+	pos.X=pos.Y=pos.Z=0;
 	animdata = new UByte[SmokeAnimSize];
 	animdata = AnimSizeField(SmokeAnimSize);
 	animdata = AnimFlagField(1<<MINANIM);
@@ -11704,11 +7738,11 @@ void LandScape::DrawWayPointIcon( const COORDS3D& pos, const ULong viewerx, cons
 			tlx = 48;
 			tly = 0;
 		break;
+		default: //RERUN: unmatched type left tlx/tly garbage
 		case 0: // waypoint
 			tlx = 32;
 			tly = 0;
 		break;
-		NODEFAULT;
 	}
 
 	g_lpLib3d->PushMatrix( MATRIX_OBJECT );

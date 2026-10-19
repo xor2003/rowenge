@@ -151,42 +151,18 @@ void CReadyRoom::RedrawRadioButtons()
 	CRStatic* s = GETDLGITEM(IDC_RSTATICCTRL3);
 	
 
-//DeadCode AMM 22Feb99 	if (_DPlay.GameType==DEATHMATCH)
-//DeadCode AMM 22Feb99 	{
-//DeadCode AMM 22Feb99 		pradio->ShowWindow(SW_HIDE);
-//DeadCode AMM 22Feb99 		s->ShowWindow(SW_HIDE);
-//DeadCode AMM 22Feb99 
-//DeadCode AMM 22Feb99 	}else
-//DeadCode AMM 22Feb99 	{
-//DeadCode AMM 22Feb99 		pradio->ShowWindow(SW_SHOW);
-//DeadCode AMM 22Feb99 		s->ShowWindow(SW_SHOW);
-//DeadCode AMM 22Feb99 		pradio->AddButton(RESSTRING(EVERYBODY));
-//DeadCode AMM 22Feb99 		pradio->AddButton(RESSTRING(MYSIDEONLY));
-//DeadCode AMM 22Feb99 		if (_DPlay.sendtowho==255)
-//DeadCode AMM 22Feb99 			pradio->SetCurrentSelection(0);
-//DeadCode AMM 22Feb99 		else
-//DeadCode AMM 22Feb99 			pradio->SetCurrentSelection(1);
-//DeadCode AMM 22Feb99 	}	
 
-//DeadCode AMM 22Feb99 	pradio->ShowWindow(SW_SHOW);
-//DeadCode AMM 22Feb99 	s->ShowWindow(SW_SHOW);
-//DeadCode AMM 22Feb99 	pradio->AddButton(RESSTRING(EVERYBODY));
-//DeadCode AMM 22Feb99 
-//DeadCode AMM 22Feb99 	if (_DPlay.GameType!=DEATHMATCH)
-//DeadCode AMM 22Feb99 		pradio->AddButton(RESSTRING(MYSIDEONLY));
 
 	if (_DPlay.sendtowho==255 || _DPlay.GameType==DEATHMATCH)
 	{
 		_DPlay.sendtowho=255;
 		pradio->SetCurrentSelection(0);
 	}
-//DeadCode DAW 27Jun99 		pradio->SetCurrentSelection(0);
 	else
 	{
 		_DPlay.sendtowho=128;
 		pradio->SetCurrentSelection(1);
 	}
-//DeadCode DAW 27Jun99 		pradio->SetCurrentSelection(1);
 
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLIST_UN_PLAYER);
@@ -225,7 +201,6 @@ BOOL CReadyRoom::OnInitDialog()
 		{
 			res=_DPlay.UINewPlayer(&_DPlay.PlayerName[0],&_DPlay.SessionName[0]);
 		}
-//DeadCode DAW 28Oct99 		res=_DPlay.UINewPlayer(&_DPlay.PlayerName[0],&_DPlay.SessionName[0]);
 
 		if (res)
 		{
@@ -233,7 +208,6 @@ BOOL CReadyRoom::OnInitDialog()
 
 			if (!res)
 			{
-//DeadCode AMM 14Dec98 				MessageBox("Could not set up player","Warning",MB_OK);
 				RMessageBox(IDS_MIGALLEY,IDS_COULDNTSETUPPLAYER,0,IDS_OK);
 
 				_DPlay.LeaveCommsFlag=TRUE;
@@ -241,7 +215,6 @@ BOOL CReadyRoom::OnInitDialog()
 		}
 		else
 		{
-//DeadCode AMM 14Dec98 			MessageBox("Could not create session or player","Warning",MB_OK);
 			RMessageBox(IDS_MIGALLEY,IDS_NOTSESSION,0,IDS_OK);
 
 // dont create ready room - leave
@@ -252,116 +225,9 @@ BOOL CReadyRoom::OnInitDialog()
 
 	if (_DPlay.GameType==COMMSQUICKMISSION) // && _DPlay.Host)
 	{
-//DeadCode AMM 05May99 		strncpy(_DPlay.GameName,RESLIST(QUICK_1,CSQuick1::currquickmiss),59);
-//DeadCode AMM 05May99 		_DPlay.GameName[59]=NULL;
 		_DPlay.GameIndex=CSQuick1::currquickmiss;
 	}
 
-//DeadCode AMM 05Aug98 	ULong n;
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	rlistbox=(CRListBox*)this->GetDlgItem(IDC_RLIST_UN_PLAYER);
-//DeadCode AMM 05Aug98 	rlistbox->Clear();
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(30);
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(150);
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(50);
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(30);
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(30);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_UN);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("1",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("2",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("3",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("4",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("5",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("6",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("7",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("8",0);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_NAME);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,1);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_AIRCRAFT);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,2);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Eric Cartman",1);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Kyle",1);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Stan",1);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Kenny",1);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Mr Hankey",1);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Eric Cartman",1);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Kyle",1);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Stan",1);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	for (n=0;n<MAXPLAYERS;n++)
-//DeadCode AMM 05Aug98 	{
-//DeadCode AMM 05Aug98 		if ((DPlay::H2H_Player+n)->MyTeam==TS_UN)
-//DeadCode AMM 05Aug98 		{
-//DeadCode AMM 05Aug98 			string.LoadString(IDS_NAME);
-//DeadCode AMM 05Aug98 			rlistbox->AddString((DPlay::H2H_Player+n)->name,1);
-//DeadCode AMM 05Aug98 			string.LoadString(IDS_AIRCRAFT);
-//DeadCode AMM 05Aug98 			rlistbox->AddString("F 86",2);
-//DeadCode AMM 05Aug98 		}
-//DeadCode AMM 05Aug98 	}	
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 20Jul98 	string.LoadString(IDS_AIRCRAFT);
-//DeadCode AMM 20Jul98 	rlistbox->AddString(string,2);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("F 86",2);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("F 86",2);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("F 86",2);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("F 86",2);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("F 86",2);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("F 86",2);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("F 86",2);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("F 86",2);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_KILLS);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,3);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_LOSSES);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,4);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	rlistbox=(CRListBox*)this->GetDlgItem(IDC_RLIST_RED_PLAYER);
-//DeadCode AMM 05Aug98 	rlistbox->Clear();
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(30);
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(150);
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(50);
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(30);
-//DeadCode AMM 05Aug98 	rlistbox->AddColumn(30);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_RED);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("1",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("2",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("3",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("4",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("5",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("6",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("7",0);
-//DeadCode AMM 05Aug98 	rlistbox->AddString("8",0);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_NAME);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,1);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_AIRCRAFT);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,2);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	for (n=0;n<MAXPLAYERS;n++)
-//DeadCode AMM 05Aug98 	{
-//DeadCode AMM 05Aug98 		if ((DPlay::H2H_Player+n)->MyTeam==TS_COMMIE)
-//DeadCode AMM 05Aug98 		{
-//DeadCode AMM 05Aug98 			string.LoadString(IDS_NAME);
-//DeadCode AMM 05Aug98 			rlistbox->AddString((DPlay::H2H_Player+n)->name,1);
-//DeadCode AMM 05Aug98 			string.LoadString(IDS_AIRCRAFT);
-//DeadCode AMM 05Aug98 			rlistbox->AddString("MIG",2);
-//DeadCode AMM 05Aug98 		}
-//DeadCode AMM 05Aug98 	}	
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_KILLS);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,3);
-//DeadCode AMM 05Aug98 
-//DeadCode AMM 05Aug98 	string.LoadString(IDS_LOSSES);
-//DeadCode AMM 05Aug98 	rlistbox->AddString(string,4);
 
 	rlistbox=GETDLGITEM(IDC_RLIST_INCOMING_CHAT);
 	rlistbox->Clear();
@@ -372,8 +238,6 @@ BOOL CReadyRoom::OnInitDialog()
 //	rlistbox->Clear();
 //	rlistbox->AddString(_DPlay.GameName,1);
 
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Stan",0);
-//DeadCode AMM 20Jul98 	rlistbox->AddString("Oh, my God! They killed Kenny! You Bastards!",1);
 
 	CRRadio* pradio;
 	pradio=GETDLGITEM(IDC_RRADIO_DETAILS);
@@ -394,8 +258,6 @@ BOOL CReadyRoom::OnInitDialog()
 	if (!_DPlay.LoadRadioMessages())
 	{//initialise messages
 		_DPlay.InitMessages();
-//DeadCode AMM 18Jan99 		for (int n=0;n<10;n++)
-//DeadCode AMM 18Jan99 			strcpy(_DPlay.Messages[_DPlay.mySlot][n],RESSTRING(L_RADIOMSG0+n));
 	}
 	
 	rroom_timer=SetTimer(TIMER_READYROOM,0,NULL); // set sheet up first before starting timer
@@ -464,9 +326,7 @@ void CReadyRoom::OnReturnPressedPlayerchat(LPCTSTR text)
 		}
 		else
 		{
-//DeadCode DAW 28Oct99 			rlistbox=GETDLGITEM(IDC_RLIST_INCOMING_CHAT);
 
-	//DeadCode AMM 05Aug98 	rlistbox->AddString(&_DPlay.PlayerName[0],0);
 			rlistbox->AddString((DPlay::H2H_Player+_DPlay.mySlot)->name,0);
 			rlistbox->AddString(text,1);
 	//	_DPlay.UISendDialogue((DPlay::H2H_Player+_DPlay.mySlot),(char*)text);
@@ -485,7 +345,6 @@ void CReadyRoom::OnReturnPressedPlayerchat(LPCTSTR text)
 			poo->SetCaption("");										  //AMM 06/07/99
 		}
 
-//DeadCode AMM 07Jul99 		poo->SetWindowText("");
 	}
 }
 void	CReadyRoom::OnOK()
@@ -512,16 +371,6 @@ void CReadyRoom::OnTimer(UINT nIDEvent)
 
 	if (nIDEvent==rroom_timer && _DPlay.PlayerCreated)
 	{
-//DeadCode AMM 24Feb99 		if (_DPlay.LeaveCommsFlag)
-//DeadCode AMM 24Feb99 		{
-//DeadCode AMM 24Feb99 			KillTimer(rroom_timer);
-//DeadCode AMM 24Feb99 
-//DeadCode AMM 24Feb99 // get me outta here asap
-//DeadCode AMM 24Feb99 
-//DeadCode AMM 24Feb99 //DeadCode JIM 12Jan99 			RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
-//DeadCode AMM 24Feb99 			FullPanel()->OnSelectRlistbox(0,0);					//JIM 12Jan99
-//DeadCode AMM 24Feb99 			return;
-//DeadCode AMM 24Feb99 		}
 
 		if (_DPlay.DisplayInfo)
 		{
@@ -531,15 +380,6 @@ void CReadyRoom::OnTimer(UINT nIDEvent)
 
 		_DPlay.UIUpdateMainSheet();
 
-//DeadCode AMM 02Dec98 		if (_DPlay.LeaveCommsFlag)
-//DeadCode AMM 02Dec98 		{
-//DeadCode AMM 02Dec98 // get me outta here asap
-//DeadCode AMM 02Dec98 
-//DeadCode AMM 02Dec98 			RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
-//DeadCode AMM 02Dec98 			fullscreen->OnSelectRlistbox(0,0);
-//DeadCode AMM 02Dec98 			return;
-//DeadCode AMM 02Dec98 		}
-//DeadCode AMM 02Dec98 		else if (_DPlay.FlyNowFlag)
 		if (_DPlay.FlyNowFlag)
 		{
 			if (_DPlay.UINetworkSelectFly())
@@ -548,7 +388,6 @@ void CReadyRoom::OnTimer(UINT nIDEvent)
 
 // need to launch quickmissionflight sheet
 
-//DeadCode JIM 12Jan99 				RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
 // 				FullScreen* fs;
 				FullPanel()->OnSelectRlistbox(1,1);
 				return;
@@ -589,8 +428,6 @@ void	DPlay::DisplayPlayerInfo()
 {
 // now only called from ready room so dont need check
 
-//DeadCode AMM 17Nov98 	if (DPlay::H2H_Player[_DPlay.mySlot].status!=CPS_READYROOM)
-//DeadCode AMM 17Nov98 		return;
 
 	CRListBox* rlistbox;
 	CString string;
@@ -600,13 +437,10 @@ void	DPlay::DisplayPlayerInfo()
 
 	if (_DPlay.GameType==COMMSQUICKMISSION) 
 	{
-//DeadCode AMM 05May99 		strncpy(_DPlay.GameName,RESLIST(QUICK_1,CSQuick1::currquickmiss),59);
-//DeadCode AMM 05May99 		_DPlay.GameName[59]=NULL;
 		_DPlay.GameIndex=CSQuick1::currquickmiss;
 	}
 
 	rlistbox=(CRListBox*)RDialog::m_pView->m_pfullpane->pdial[0]->GetDlgItem(IDC_RLIST_UN_PLAYER);
-//DeadCode AMM 05Aug98 	rlistbox=(CRListBox*)this->GetDlgItem(IDC_RLIST_UN_PLAYER);
 	rlistbox->Clear();
 	rlistbox->AddColumn(40);
 	rlistbox->AddColumn(140);
@@ -647,13 +481,11 @@ void	DPlay::DisplayPlayerInfo()
 			else
 			{
 				std::snprintf(score, sizeof(score), "%d", t++);
-				strcpy(score,"UN ");
-				strcat(score,num);
+				snprintf(score,sizeof(score),"UN %s",num);
 			}
 			rlistbox->AddString(score,0);
 			rlistbox->AddString(H2H_Player[n].name,1);
 			rlistbox->AddString(RESLIST(SQ_BF_F86A, H2H_Player[n].squadron), 2);
-//DeadCode AMM 14Dec98 			rlistbox->AddString(RESLIST(CPS_QUIT,H2H_Player[n].status),3);
 			rlistbox->AddString(RESLIST(CPS_STATUS,H2H_Player[n].status),3);
 
 //create score
@@ -678,7 +510,7 @@ void	DPlay::DisplayPlayerInfo()
 				{
 					std::snprintf(num2, sizeof(num2), "%d", EnemyTeamKills);
 				}
-				strcpy(score,num);
+				snprintf(score,sizeof(score),"%s",num);
 				strcat(score,"/");
 				strcat(score,num2);
 				rlistbox->AddString(score,4);
@@ -693,7 +525,7 @@ void	DPlay::DisplayPlayerInfo()
 				{
 					std::snprintf(num2, sizeof(num2), "%d", EnemyTeamDeaths);
 				}
-				strcpy(score,num);
+				snprintf(score,sizeof(score),"%s",num);
 				strcat(score,"/");
 				strcat(score,num2);
 				rlistbox->AddString(score,5);
@@ -703,30 +535,6 @@ void	DPlay::DisplayPlayerInfo()
 	}
 
 
-//DeadCode AMM 05Aug98 	rlistbox=(CRListBox*)this->GetDlgItem(IDC_RLIST_RED_PLAYER);
-//DeadCode AMM 03Sep98 	rlistbox=(CRListBox*)RDialog::m_pView->m_pfullpane->pdial[0]->GetDlgItem(IDC_RLIST_RED_PLAYER);
-//DeadCode AMM 03Sep98 	rlistbox=(CRListBox*)RDialog::m_pView->m_pfullpane->pdial[0]->GetDlgItem(IDC_RLIST_UN_PLAYER);
-//DeadCode AMM 03Sep98 	rlistbox->Clear();
-//DeadCode AMM 03Sep98 	rlistbox->AddColumn(30);
-//DeadCode AMM 03Sep98 	rlistbox->AddColumn(150);
-//DeadCode AMM 03Sep98 	rlistbox->AddColumn(50);
-//DeadCode AMM 03Sep98 	rlistbox->AddColumn(30);
-//DeadCode AMM 03Sep98 	rlistbox->AddColumn(30);
-//DeadCode AMM 03Sep98 
-//DeadCode AMM 03Sep98 	string.LoadString(IDS_RED);
-//DeadCode AMM 03Sep98 	rlistbox->AddString(string,0);
-//DeadCode AMM 03Sep98 
-//DeadCode AMM 03Sep98 	string.LoadString(IDS_NAME);
-//DeadCode AMM 03Sep98 	rlistbox->AddString(string,1);
-//DeadCode AMM 03Sep98 
-//DeadCode AMM 03Sep98 	string.LoadString(IDS_AIRCRAFT);
-//DeadCode AMM 03Sep98 	rlistbox->AddString(string,2);
-//DeadCode AMM 03Sep98 
-//DeadCode AMM 03Sep98 	string.LoadString(IDS_KILLS);
-//DeadCode AMM 03Sep98 	rlistbox->AddString(string,3);
-//DeadCode AMM 03Sep98 
-//DeadCode AMM 03Sep98 	string.LoadString(IDS_LOSSES);
-//DeadCode AMM 03Sep98 	rlistbox->AddString(string,4);
 
 	if (_DPlay.GameType!=DEATHMATCH)
 		t=1;
@@ -742,17 +550,11 @@ void	DPlay::DisplayPlayerInfo()
 			else
 			{
 				std::snprintf(score, sizeof(score), "%d", t++);
-				strcpy(score,"Red ");
-				strcat(score,num);
+				snprintf(score,sizeof(score),"Red %s",num);
 			}
 			rlistbox->AddString(score,0);
 			rlistbox->AddString(H2H_Player[n].name,1);
-//DeadCode AMM 13Oct98 			string.LoadString(IDS_NAME);
-//DeadCode AMM 13Oct98 			rlistbox->AddString((H2H_Player+n)->name,1);
-//DeadCode AMM 13Oct98 			string.LoadString(IDS_AIRCRAFT);
-//DeadCode AMM 13Oct98 			rlistbox->AddString("MIG",2);
 			rlistbox->AddString(RESLIST(SQ_BF_F86A, H2H_Player[n].squadron), 2);
-//DeadCode AMM 14Dec98 			rlistbox->AddString(RESLIST(CPS_QUIT,H2H_Player[n].status),3);
 			rlistbox->AddString(RESLIST(CPS_STATUS,H2H_Player[n].status),3);
 
 //create score
@@ -777,7 +579,7 @@ void	DPlay::DisplayPlayerInfo()
 				{
 					std::snprintf(num2, sizeof(num2), "%d", EnemyTeamKills);
 				}
-				strcpy(score,num);
+				snprintf(score,sizeof(score),"%s",num);
 				strcat(score,"/");
 				strcat(score,num2);
 				rlistbox->AddString(score,4);
@@ -791,7 +593,7 @@ void	DPlay::DisplayPlayerInfo()
 				{
 					std::snprintf(num2, sizeof(num2), "%d", EnemyTeamDeaths);
 				}
-				strcpy(score,num);
+				snprintf(score,sizeof(score),"%s",num);
 				strcat(score,"/");
 				strcat(score,num2);
 				rlistbox->AddString(score,5);			
@@ -810,7 +612,6 @@ void	DPlay::DisplayPlayerInfo()
 //		rstatic->SetString(RESLIST(QUICK_1, CSQuick1::currquickmiss));
 //	}else
 //	{
-//DeadCode AMM 05May99 		rstatic->SetString(_DPlay.GameName);
 //	}
 	//delete	rstatic;
 	if (_DPlay.GameType==COMMSQUICKMISSION)
@@ -831,24 +632,6 @@ void CReadyRoom::OnDestroy()
 
 void CReadyRoom::OnSelectedRradioDetails(long ButtonNum) 
 {
-//DeadCode AMM 22Feb99 	if (_DPlay.sendtowho<128)
-//DeadCode AMM 22Feb99 	{
-//DeadCode AMM 22Feb99 		if (_DPlay.allchat)
-//DeadCode AMM 22Feb99 			_DPlay.sendtowho=255;
-//DeadCode AMM 22Feb99 		else
-//DeadCode AMM 22Feb99 			_DPlay.sendtowho=128;
-//DeadCode AMM 22Feb99 	}
-//DeadCode AMM 22Feb99 	else
-//DeadCode AMM 22Feb99 	if (_DPlay.sendtowho==255 && _DPlay.GameType!=DEATHMATCH)
-//DeadCode AMM 22Feb99 	{
-//DeadCode AMM 22Feb99 		_DPlay.sendtowho = 128;
-//DeadCode AMM 22Feb99 		_DPlay.allchat=false;
-//DeadCode AMM 22Feb99 	}
-//DeadCode AMM 22Feb99 	else
-//DeadCode AMM 22Feb99 	{
-//DeadCode AMM 22Feb99 		_DPlay.sendtowho = 255;
-//DeadCode AMM 22Feb99 		_DPlay.allchat=true;
-//DeadCode AMM 22Feb99 	}
 
 	if (ButtonNum)
 		_DPlay.sendtowho=128;

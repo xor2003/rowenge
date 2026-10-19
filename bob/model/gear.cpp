@@ -118,6 +118,7 @@ Gear::Gear (PMODEL pmodel, GEAR_IDENT id)
 
 	LegPos = 0;
 	OldLegPos = 0;
+	Touched = FALSE;
 	NullVec (LegForce);
 	NullVec (GroundForce);
 	NullVec (TyreForce);
@@ -282,7 +283,6 @@ Bool Gear::CalcIntL (UByte* pTexture)
 	iwpos0.Z = WPos0.z;
 
 	FP delta = 0;
-//DeadCode CSB 2Nov00 	if(pModel->Speed < 50)
 	{
 		SWord px = iwpos0.X * 16;
 		SWord pz = iwpos0.Z * 16;
@@ -290,7 +290,6 @@ Bool Gear::CalcIntL (UByte* pTexture)
 		Math_Lib.high_sin_cos(Angles(px), sx, cx);
 		Math_Lib.high_sin_cos(Angles(pz), sz, cz);
 		delta = 4.0 * FP(sx) * FP(sz);/// (32768.0 * 32678.0);
-//DeadCode CSB 2Nov00 		delta *= 1.0 * (1.0 - pModel->Speed * (1.0 / 50.0));
 	}
 
 	FP g0 = _Collide.GroundAltitude (iwpos0, pTexture);	//CSB 12/01/99
@@ -334,14 +333,12 @@ Bool Gear::CalcIntL (UByte* pTexture)
 	FP g1 = _Collide.GroundAltitude (iwpos1);
 	g1 += delta;
 
-//DeadCode CSB 03/12/99		FP div = (g1 - g0 - WPos1.y + WPos0.y);
 	FP div = (WPos1.y - WPos0.y);
 
 	if (div == 0) return FALSE;
 
 	if (WPos1.y <= WPos0.y) return FALSE;
 
-//DeadCode CSB 03/12/99		IntL = (WPos0.y - g0) / div;
 	IntL = (g0 - WPos0.y) / div;
 
 	return TRUE;
@@ -361,14 +358,6 @@ Bool Gear::CalcIntL (UByte* pTexture)
 //------------------------------------------------------------------------------
 void Gear::CalcIntPos ()
 {
-//DEADCODE CB 03/11/99 
-//DEADCODE CB 03/11/99 	FP le = IntL;
-//DEADCODE CB 03/11/99 
-//DEADCODE CB 03/11/99 	if (le > 1) le = 1;
-//DEADCODE CB 03/11/99 
-//DEADCODE CB 03/11/99 	IntPos.x = (le * LegVec.x) + pos0.x;
-//DEADCODE CB 03/11/99 	IntPos.y = (le * LegVec.y) + pos0.y;
-//DEADCODE CB 03/11/99 	IntPos.z = (le * LegVec.z) + pos0.z;
 
 }
 
@@ -399,20 +388,6 @@ void Model::ProcessGears (AirStrucPtr const ControlledAC, FP forcex, FP forcey, 
 
 	if(FirstCycle)
 	{
-//DeadCode CSB 26Jun00 		UByte temp;
-//DeadCode CSB 26Jun00 		PGEAR gf = NULL, gb = NULL, gl = NULL, gr = NULL;
-//DeadCode CSB 26Jun00 		for(pGear = GearList; pGear; pGear = pGear->List.NextItem())
-//DeadCode CSB 26Jun00 		{
-//DeadCode CSB 26Jun00 			pGear->CalcIntL(&temp);
-//DeadCode CSB 26Jun00 			if(pGear->Ident == NOSE)	gf = pGear;
-//DeadCode CSB 26Jun00 			if(pGear->Ident == TAIL)	gb = pGear;
-//DeadCode CSB 26Jun00 			if(pGear->Ident == PORT)	gl = pGear;
-//DeadCode CSB 26Jun00 			if(pGear->Ident == STBD)	gr = pGear;
-//DeadCode CSB 26Jun00 		}
-//DeadCode CSB 26Jun00 
-//DeadCode CSB 26Jun00 //DeadCode CSB 26Jun00 		SWord newroll  = Rads2Rowan(CalcAngle(gl->LegVec * gl->IntL - gr->LegVec * gr->IntL, gr->pos0.x - gl->pos0.x));
-//DeadCode CSB 26Jun00 
-//DeadCode CSB 26Jun00 		ResetAngles(ControlledAC, -ControlledAC->hdg, newpitch, 0);
 
 		COORDS3D AcPos;
 		AcPos.X = ControlledAC->World.X;
@@ -535,19 +510,15 @@ void Model::ProcessGears (AirStrucPtr const ControlledAC, FP forcex, FP forcey, 
 		{
 			case NOSE:
 				PrintVar(10, 13, "GP: %.2f ", pGear->LegPos);
-	//DEADCODE CB 02/11/99 			PrintVar(10, 14, "G V: %.2f ", WheelVel.x);
 				break;
 			case PORT:
 				PrintVar( 5, 15, "GP: %.2f ", pGear->LegPos);
-	//DEADCODE CB 02/11/99 			PrintVar( 5, 16, "G V: %.2f ", WheelVel.x);
 				break;
 			case STBD:
 				PrintVar(15, 15, "GP: %.2f ", pGear->LegPos);
-	//DEADCODE CB 02/11/99 			PrintVar(15, 16, "G V: %.2f ", WheelVel.x);
 				break;
 			case TAIL:
 				PrintVar(10, 17, "GP: %.2f ", pGear->LegPos);
-	//DEADCODE CB 02/11/99 			PrintVar(10, 18, "G V: %.2f ", WheelVel.x);
 				break;
 		}
 #endif
@@ -561,12 +532,6 @@ void Model::ProcessGears (AirStrucPtr const ControlledAC, FP forcex, FP forcey, 
 		pGear = pGear->List.NextItem();
 	}
 
-//DEADCODE CB 02/11/99 	pGear = GearList;
-//DEADCODE CB 02/11/99 	while (pGear != NULL)
-//DEADCODE CB 02/11/99 	{
-//DEADCODE CB 02/11/99 		pGear->CalcTyreSideForce(ControlledAC, TotalReaction, forcex, Texture);
-//DEADCODE CB 02/11/99 		pGear = pGear->List.NextItem();
-//DEADCODE CB 02/11/99 	}
 
 	PGEAR pNose = NULL;
 	PGEAR pTail = NULL;
@@ -607,8 +572,6 @@ void Model::ProcessGears (AirStrucPtr const ControlledAC, FP forcex, FP forcey, 
 		GroundVel.z = Vel.z;
 
 		RotateVec2D(GroundVel.x, GroundVel.z, fHdg);
-//DEADCODE CB 12/11/99 PrintVar(10, 11, "VX %.2f ", FP(GroundVel.x));
-//DEADCODE CB 12/11/99 PrintVar(10, 12, "VZ %.2f ", FP(GroundVel.z));
 
 		FP ReqForceX = -GroundVel.x * Mass / 10 - forcex;
 		if(!pTail->LegPos)
@@ -697,7 +660,6 @@ void Model::ProcessGears (AirStrucPtr const ControlledAC, FP forcex, FP forcey, 
 		{
 			RotateVec2D(pGear->TyreForce.x, pGear->TyreForce.z, -fHdg);
 			pGear->TyreForce.y += pGear->GroundForce.y;
-//DEADCODE CB 02/11/99 			AddVec(pGear->TyreForce, pGear->TyreForce, pGear->GroundForce);
 			TnsAxs(pGear->TyreForce, pGear->TyreForce, Ori);
 			pGear->TyreForce.y = pGear->LegForce.y;
 		}
@@ -723,67 +685,12 @@ void Model::ProcessGears (AirStrucPtr const ControlledAC, FP forcex, FP forcey, 
 		if (ControlledAC->nationality==NAT_RED)  EnemyColour = NAT_BLUE;
 
 		SWord i = 0;
-//DEADCODE JIM 16/11/99 		while (SupplyTree::airfieldinfo[i].nationality != NAT_ALIGN)
-//DEADCODE JIM 16/11/99 		{
-//DEADCODE JIM 16/11/99 			if(SupplyTree::airfieldinfo[i].nationality != EnemyColour)
-//DEADCODE JIM 16/11/99 			{
-//DEADCODE JIM 16/11/99 				itemptr	ThisAF = *Persons2::ConvertPtrUID(SupplyTree::airfieldinfo[i].airfield);
-//DEADCODE JIM 16/11/99 				ControlledAC->InterceptandRange(ThisAF);
-//DEADCODE JIM 16/11/99 				if((AFRange == -1) || (ControlledAC->Range < AFRange))
-//DEADCODE JIM 16/11/99 				{
-//DEADCODE JIM 16/11/99 					NearestAF = ThisAF;			
-//DEADCODE JIM 16/11/99 					AFRange = ControlledAC->Range;
-//DEADCODE JIM 16/11/99 				}
-//DEADCODE JIM 16/11/99 			}
-//DEADCODE JIM 16/11/99 			i++;
-//DEADCODE JIM 16/11/99 		}
 		
-//DEADCODE CSB 04/05/00 		if(AFRange != -1)
-//DEADCODE CSB 04/05/00 		{
-//DEADCODE CSB 04/05/00 			if(AFRange < MILES01)
-//DEADCODE CSB 04/05/00 			{
-//DEADCODE CSB 04/05/00 				_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_TAXITOHOLD, MSG_STATUSRESPONSE_DELAY_LP_RPT, VOICE_TOWER, NULL, ControlledAC));
-//DEADCODE CSB 04/05/00 		
-//DEADCODE CSB 04/05/00 //DEADCODE DAW 08/03/00 				if(NearestAF = ControlledAC->ai.homebase)
-//DEADCODE CSB 04/05/00 //DEADCODE DAW 08/03/00 					Persons2::UpdatePlayerLog(ControlledAC, EventLog::LANDOKATHOME);
-//DEADCODE CSB 04/05/00 //DEADCODE DAW 08/03/00 				else
-//DEADCODE CSB 04/05/00 //DEADCODE DAW 08/03/00 					Persons2::UpdatePlayerLog(ControlledAC, EventLog::LANDOK);
-//DEADCODE CSB 04/05/00 			}
-//DEADCODE CSB 04/05/00 //DEADCODE DAW 08/03/00 			else
-//DEADCODE CSB 04/05/00 //DEADCODE DAW 08/03/00 				Persons2::UpdatePlayerLog(ControlledAC, EventLog::CRASHLAND);
-//DEADCODE CSB 04/05/00 		}
 
 		Landed   = TRUE;
 		Takenoff = FALSE;	
 	}
 	
-//DeadCode  11Oct00 	if((!Exitted) && (Landed) && (Speed <= 0.1) && (TotalReaction > 0) && (ControlledAC->fly.thrustpercent <= 10))
-//DeadCode  11Oct00 	{
-//DeadCode  11Oct00 		if (_DPlay.Implemented && _DPlay.GameType<DPlay::COMMSQUICKMISSION)
-//DeadCode  11Oct00 		{
-//DeadCode  11Oct00 // if in comms begin resurrect phase 
-//DeadCode  11Oct00 
-//DeadCode  11Oct00 			if (ControlledAC==Persons2::PlayerSeenAC)
-//DeadCode  11Oct00 			{
-//DeadCode  11Oct00 // in resurrectme flight model is initialised which can cause slight rounding
-//DeadCode  11Oct00 // errors in deltas
-//DeadCode  11Oct00 
-//DeadCode  11Oct00 				_DPlay.CheckSeen();
-//DeadCode  11Oct00 				_DPlay.AddDeltas(Persons2::PlayerSeenAC,FALSE,5); //AMM 14/02/00
-//DeadCode  11Oct00 				_DPlay.ResurrectMe(Persons2::PlayerSeenAC,true);//AMM 23/06/99
-//DeadCode  11Oct00 				_DPlay.AddDeltas(Persons2::PlayerSeenAC,TRUE,5); //AMM 14/02/00
-//DeadCode  11Oct00 				_DPlay.BackupSeen();
-//DeadCode  11Oct00 
-//DeadCode  11Oct00 				Takenoff = TRUE;
-//DeadCode  11Oct00 				Landed = FALSE;
-//DeadCode  11Oct00 			}
-//DeadCode  11Oct00 		}
-//DeadCode  11Oct00 //DEADCODE CB 02/11/99 		else
-//DeadCode  11Oct00 //DEADCODE CB 02/11/99 		{
-//DeadCode  11Oct00 //DEADCODE CB 02/11/99 			OverLay.quit3d=1;
-//DeadCode  11Oct00 //DEADCODE CB 02/11/99 			Exitted = TRUE;
-//DeadCode  11Oct00 //DEADCODE CB 02/11/99 		}
-//DeadCode  11Oct00 	}
 //Exit the game!!!!!
 
 
@@ -848,7 +755,6 @@ void Model::CheckGearPos (AirStrucPtr const ControlledAC)
 		if(g1 > WPos1.y)
 		{
 			Pos.y += (g1 - WPos1.y);
-//DeadCode CSB 13/01/99				Vel.y += (g1 - wpos1.y) / MODEL_DT;
 		}
 
 		pGear = pGear->List.NextItem();
@@ -950,7 +856,6 @@ void Gear::CalcLegForce_Reaction (AirStrucPtr const ControlledAC, UByte* Texture
 
 			if(GearVel.y < 0)
 			{
-//DeadCode AMM 24Nov99 				FP ReqAcc = -GearVel.y / pModel->MODEL_DT;
 				FP ReqAcc = -GearVel.y / MODEL_DT;				//AMM 24Nov99
 
 				GroundForce.x = 0;
@@ -975,14 +880,10 @@ void Gear::CalcLegForce_Reaction (AirStrucPtr const ControlledAC, UByte* Texture
 				FP ForceFactor = ReqAcc / LocalAcc.y;
 				GroundForce.y = 0;
 	
-//DeadCode AMM 24Nov99 				pModel->Vel.y += ForceFactor / pModel->Mass * pModel->MODEL_DT;
 				pModel->Vel.y += ForceFactor / pModel->Mass * MODEL_DT;//AMM 24Nov99
 	
-//DeadCode AMM 24Nov99 				pModel->RotVel.x += ForceFactor * acRotAcc.x * pModel->MODEL_DT;
 				pModel->RotVel.x += ForceFactor * acRotAcc.x * MODEL_DT;//AMM 24Nov99
-//DeadCode AMM 24Nov99 				pModel->RotVel.y += ForceFactor * acRotAcc.y * pModel->MODEL_DT;
 				pModel->RotVel.y += ForceFactor * acRotAcc.y * MODEL_DT;//AMM 24Nov99
-//DeadCode AMM 24Nov99 				pModel->RotVel.z += ForceFactor * acRotAcc.z * pModel->MODEL_DT;
 				pModel->RotVel.z += ForceFactor * acRotAcc.z * MODEL_DT;//AMM 24Nov99
 	
 				CPrd(GearRotVel, pos1, pModel->RotVel);
@@ -1002,8 +903,6 @@ void Gear::CalcLegForce_Reaction (AirStrucPtr const ControlledAC, UByte* Texture
 				{
 					RollRes		= DamageRollRes;
 					CFriction	= 1000;
-//DeadCode CSB 20/05/99						CStiffness	/= 10;
-//DeadCode CSB 20/05/99						CDamping	*= 10;
 					_Miles.PlayOnce(FIL_SFX_METAL_SNAP,ControlledAC);					
 				}
 
@@ -1052,7 +951,6 @@ void Gear::CalcTyreSideForce (AirStrucPtr const ControlledAC, FP TotalReaction, 
 	AddVec(WheelVel, WheelVel, pModel->Vel);
 
 	FP angle = ControlledAC->fly.pModel->fHdg;
-//DeadCode CSB 22/06/99		FP angle = CalcAngle(pModel->Ori.z.z, pModel->Ori.z.x);
 	
 	//Steering
 	SWord FSteering = pModel->Rudder;
@@ -1083,7 +981,6 @@ void Gear::CalcTyreSideForce (AirStrucPtr const ControlledAC, FP TotalReaction, 
 		}
 	}
 
-//DeadCode AMM 24Nov99 	FP xReqAcc	= -WheelVel.x / pModel->MODEL_DT - forcex / pModel->Mass;
 	FP xReqAcc	= -WheelVel.x / MODEL_DT - forcex / pModel->Mass;//AMM 24Nov99
 	FP xAcc1	= 1 / pModel->Mass;						//Effect of +1 Newton side force
 	FP yRotAcc	= WheelPos.z / pModel->RotInertia.y;
@@ -1092,7 +989,6 @@ void Gear::CalcTyreSideForce (AirStrucPtr const ControlledAC, FP TotalReaction, 
 	
 	GroundForce.x = xReqAcc / xAcc * GroundForce.y / TotalReaction;
 
-//DeadCode CSB 09/02/99		GroundForce.x -= 1.0 * (pModel->Mass * WheelVel.x / pModel->MODEL_DT - forcex) * (GroundForce.y / TotalReaction);
 	
 //	if(WheelVel.z > 0) WheelVel.z += 5;	//To keep aircraft still on ground
 //	if(WheelVel.z < 0) WheelVel.z -= 5;
@@ -1101,7 +997,6 @@ void Gear::CalcTyreSideForce (AirStrucPtr const ControlledAC, FP TotalReaction, 
 	if(WheelVel.z > 0)	GroundForce.z = -RollRes * GroundForce.y - brake;
 	else				GroundForce.z =  RollRes * GroundForce.y + brake;
 
-//DeadCode AMM 24Nov99 	FP DeltaV = TotalReaction / GroundForce.y * GroundForce.z / pModel->Mass * pModel->MODEL_DT;	//Approx
 	FP DeltaV = TotalReaction / GroundForce.y * GroundForce.z / pModel->Mass * MODEL_DT;	//Approx//AMM 24Nov99
 	if( (WheelVel.z > 0) && (-DeltaV > WheelVel.z) )
 		GroundForce.z *= -WheelVel.z / DeltaV;			//Just enough force to stop aircraft rolling
@@ -1113,32 +1008,15 @@ void Gear::CalcTyreSideForce (AirStrucPtr const ControlledAC, FP TotalReaction, 
 	TyreForce.z = GroundForce.z;
 
 //Check for skidding
-//DeadCode CSB 14/06/99		FP OldTyreForce = TyreForce.x;
-//DeadCode CSB 14/06/99		MODLIMIT(TyreForce.x, MaxSideForce);
-//DeadCode CSB 14/06/99		if(TyreForce.x != OldTyreForce) pModel->GearSkid = TRUE;
-//DeadCode CSB 14/06/99		OldTyreForce = TyreForce.z;
-//DeadCode CSB 14/06/99		MODLIMIT(TyreForce.z, MaxSideForce);
-//DeadCode CSB 14/06/99		if(TyreForce.z != OldTyreForce) pModel->GearSkid = TRUE;
 	FP OldForceX = TyreForce.x;
 	FP OldForceZ = TyreForce.z;
 
-//DeadCode CSB 03/12/99		if(TyreForce.x > MaxSideForce)
-//DeadCode CSB 03/12/99			TyreForce.x = GroundForce.y * 0.5;
-//DeadCode CSB 03/12/99		if(TyreForce.x < -MaxSideForce)
-//DeadCode CSB 03/12/99			TyreForce.x = -GroundForce.y * 0.5;
-//DeadCode CSB 03/12/99		if(TyreForce.z > MaxSideForce)
-//DeadCode CSB 03/12/99			TyreForce.z = GroundForce.y * 0.5;
-//DeadCode CSB 03/12/99		if(TyreForce.z < -MaxSideForce)
-//DeadCode CSB 03/12/99			TyreForce.z = -GroundForce.y * 0.5;
 	MODLIMIT(TyreForce.x, MaxSideForce);
 	MODLIMIT(TyreForce.z, MaxSideForce);
 
 	if((TyreForce.x != OldForceX) || (TyreForce.z != OldForceZ))
 		pModel->GearSkid = TRUE;
 
-//DeadCode CSB 21/06/99		RotateVec2D (TyreForce.x, TyreForce.z, -angle);
-//DeadCode CSB 21/06/99	
-//DeadCode CSB 21/06/99		TnsAxs(TyreForce, TyreForce, pModel->Ori);
 
 	FCRD temp = TyreForce;
 	FP sinang = FSin(pModel->fRoll);
@@ -1223,30 +1101,14 @@ void Gear::CalcTyreSideForce (AirStrucPtr const ControlledAC, FP TotalReaction, 
 		AircraftAnimData*	adptr = (AircraftAnimData*) ControlledAC->Anim;
 		switch(Ident)
 		{
-//DEADCODE CSB 22/11/99 			case NOSE:
-//DEADCODE CSB 22/11/99 			{
-//DEADCODE CSB 22/11/99 	//DeadCode CSB 20/05/99				PrintVar(40, 10, "Text %.0f ", FP(Texture & AT_MASK));
-//DEADCODE CSB 22/11/99 				MaxVel *= 1 - (FP)adptr->FRONTWHEEL / (FP)BS_DEAD;
-//DEADCODE CSB 22/11/99 				MaxVelY *= 1 - (FP)adptr->FRONTWHEEL / (FP)BS_DEAD;
-//DEADCODE CSB 22/11/99 				break;
-//DEADCODE CSB 22/11/99 			}
-//DEADCODE CSB 22/11/99 			case TAIL:
-//DEADCODE CSB 22/11/99 			{
-//DEADCODE CSB 22/11/99 	//DeadCode CSB 20/05/99				PrintVar(40, 20, "Text %.0f ", FP(Texture & AT_MASK));
-//DEADCODE CSB 22/11/99 				MaxVel *= 1 - (FP)adptr->BACKWHEEL / (FP)BS_DEAD;
-//DEADCODE CSB 22/11/99 				MaxVelY *= 1 - (FP)adptr->BACKWHEEL / (FP)BS_DEAD;
-//DEADCODE CSB 22/11/99 				break;
-//DEADCODE CSB 22/11/99 			}
 			case PORT:
 			{
-	//DeadCode CSB 20/05/99				PrintVar(30, 15, "Text %.0f ", FP(Texture & AT_MASK));
 				MaxVel *= 1 - (FP)adptr->LEFTWHEEL / (FP)BS_DEAD;
 				MaxVelY *= 1 - (FP)adptr->LEFTWHEEL / (FP)BS_DEAD;
 				break;
 			}
 			case STBD:
 			{
-	//DeadCode CSB 20/05/99				PrintVar(50, 15, "Text %.0f ", FP(Texture & AT_MASK));
 				MaxVel *= 1 - (FP)adptr->RIGHTWHEEL / (FP)BS_DEAD;
 				MaxVelY *= 1 - (FP)adptr->RIGHTWHEEL / (FP)BS_DEAD;
 				break;
@@ -1257,8 +1119,6 @@ void Gear::CalcTyreSideForce (AirStrucPtr const ControlledAC, FP TotalReaction, 
 		{
 			RollRes		= DamageRollRes;
 			CFriction	= 1000;
-	//DeadCode CSB 20/05/99			CStiffness	/= 10;
-	//DeadCode CSB 20/05/99			CDamping	*= 10;
 			_Miles.PlayOnce(FIL_SFX_METAL_SNAP,ControlledAC);					
 		}
 	}

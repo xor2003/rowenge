@@ -75,7 +75,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #define F_GRAFIX
 #include	"files.g"
 #include	"fileman.h"
-//DEADCODE JIM 30/11/99 #include	"node.h"
 #include "nodebob.h"
 #include	"makebf.h"
 #include	"bfnumber.h"
@@ -163,7 +162,6 @@ UniqueID	PackageList::ReorderNoCheck(UniqueID u)
 {
 	if (u>=SagBAND && u<RealAcBAND)
 	{
-//DeadCode JIM 16Sep00 		assert (ReorderLookup[u-SagBAND]<debugmaxcount);
 		return (ReorderLookup[u-SagBAND]);
 	}
 	else
@@ -175,11 +173,7 @@ UniqueID	PackageList::ReorderNoCheck(UniqueID u)
 // Decodes text header into a profile instance
 //[newline],wave,group,squad,flights=callname,takeofftime,arrivaltime,[numchars]
 //note wave/group screwup.
-//DEADCODE DAW 24/11/99 static const char* savegroupstringnew="\nW%iG%iS%iF%i=C%iT%iA%i:";
-//DEADCODE DAW 24/11/99 static const char* loadgroupstringold=  "G%iW%iS%iF%i=C%iT%iA%i:%n";
-//DEADCODE DAW 24/11/99 static const char* loadgroupstringnew=  "W%iG%iS%iF%i=C%iT%iA%i:%n";
 //
-//DEADCODE DAW 24/11/99 static const Profile::TargetDescript	emptydesc={UID_NULL};
 static const char* line1out=
 	"Package battlefield: Duty %i %i, Squads %i, Raids: %i, WPs %i, Takeoff,Target,Dogleg %05x,%05x,%05x, Times %09x,%09x\n";
 static const char* line1in=
@@ -198,7 +192,6 @@ int	Profile::DecodePackage(string packstr,bool decodeprimary)
 	int flights=0;
 	int	numraids;
 	int offset;
-//DeadCode JIM 20Oct00 	bool ptarg=false;
 
 	int argsused=sscanf(packstr,line1in,
 			results+0,results+7,results+1,results+2,results+3,
@@ -264,27 +257,6 @@ int	Profile::DecodePackage(string packstr,bool decodeprimary)
 
 		assert(*packstr=='\n');
 		packstr++;
-//DeadCode CRAIG 30Oct100 		int inst,sq,form,targ,tot,lwt,no,fights,diary,action,subact,status,fuel;
-//DeadCode CRAIG 30Oct100 		int params=sscanf(packstr,linesqin,
-//DeadCode CRAIG 30Oct100 					&inst,&sq,&form,&diary,&fights,&no,	&targ,&tot,&lwt,	&action,&subact,&status,&fuel,	&offset);
-//DeadCode CRAIG 30Oct100 		if (params!=12)
-//DeadCode CRAIG 30Oct100 			INT3;
-//DeadCode CRAIG 30Oct100 		Squad* squad=squadlist+=UniqueID(inst);
-//DeadCode CRAIG 30Oct100 		squad->fightperiods=fights;
-//DeadCode CRAIG 30Oct100 		squad->diaryentry=diary;
-//DeadCode CRAIG 30Oct100 		squad->squadnum=SquadNum(sq);
-//DeadCode CRAIG 30Oct100 		squad->formtype=(FormationTypeIndex)form;
-//DeadCode CRAIG 30Oct100 		squad->targetindex=targ;	//temporary...
-//DeadCode CRAIG 30Oct100 		squad->lastwptime=lwt;
-//DeadCode CRAIG 30Oct100 		squad->takeofftime=tot;
-//DeadCode CRAIG 30Oct100 		squad->numbers=no;
-//DeadCode CRAIG 30Oct100 		squad->method=AttackMethod(action);
-//DeadCode CRAIG 30Oct100 		squad->submethod=SubMethod(subact);
-//DeadCode CRAIG 30Oct100 		squad->status=PackageStatus(status);
-//DeadCode CRAIG 30Oct100 		squad->fuelleft=fuel;
-//DeadCode CRAIG 30Oct100 		packstr+=offset;
-//DeadCode CRAIG 30Oct100 		while (*packstr++!='\n')
-//DeadCode CRAIG 30Oct100 		{}
 	}
 	if (flights==1)
 	{
@@ -324,24 +296,6 @@ int	Profile::DecodePackage(string packstr,bool decodeprimary)
 
 		assert(*packstr=='\n');
 		packstr++;
-//DeadCode CRAIG 30Oct100 		int	rn,sst,det,dl,num,al;
-//DeadCode CRAIG 30Oct100 		int argsused=sscanf(packstr,linerin,&rn,&sst,&al,&det,&dl,&raidnumentries[r].firstsquaddiaryentry,
-//DeadCode CRAIG 30Oct100 		&raidnumentries[r].prevpositions[0].X,&raidnumentries[r].prevpositions[0].Y,&raidnumentries[r].prevpositions[0].Z,
-//DeadCode CRAIG 30Oct100 		&raidnumentries[r].prevpositions[1].X,&raidnumentries[r].prevpositions[1].Y,&raidnumentries[r].prevpositions[1].Z,
-//DeadCode CRAIG 30Oct100 		&raidnumentries[r].prevpositions[2].X,&raidnumentries[r].prevpositions[2].Y,&raidnumentries[r].prevpositions[2].Z,
-//DeadCode CRAIG 30Oct100 		&raidnumentries[r].prevpositions[3].X,&raidnumentries[r].prevpositions[3].Y,&raidnumentries[r].prevpositions[3].Z,
-//DeadCode CRAIG 30Oct100 		&num);
-//DeadCode CRAIG 30Oct100 		if (argsused!=17)
-//DeadCode CRAIG 30Oct100 			INT3;
-//DeadCode CRAIG 30Oct100 		raidnumentries[r].raidnum=rn;
-//DeadCode CRAIG 30Oct100 		raidnumentries[r].squadliststart=sst;
-//DeadCode CRAIG 30Oct100 		raidnumentries[r].detector=det;
-//DeadCode CRAIG 30Oct100 		raidnumentries[r].detectlatency=dl;
-//DeadCode CRAIG 30Oct100 		raidnumentries[r].alertlevel=al;
-//DeadCode CRAIG 30Oct100 		packstr+=num;
-//DeadCode CRAIG 30Oct100 		char* holdpoint=packstr;
-//DeadCode CRAIG 30Oct100 		while (*packstr++!='\n')
-//DeadCode CRAIG 30Oct100 		{}
 	}
 	if (raidnumentries)
 	{
@@ -413,7 +367,6 @@ void	Profile::SetTargetUIDs(bool	fixconvoys)
 	//load the takeoff/landing and target waypoint ids.
 	//Initially I can't load these as the items haven't been loaded yet.
 
-//DEADCODE RJS 16/11/99 	if (band!=RedTrainBAND && band!=RedTruckBAND)	   //never load these!
 	{for (int i=0;i<10;i++)										//JIM 30Nov99
 	{
 		Node_Data.CheckTargetLoaded(packagetarget[i].SGT);	//JIM 30Nov99
@@ -456,7 +409,6 @@ void	PackageList::SaveBin(Profile* profile,BOStream&file)
 		targets[9],subtargets[9]);
 
 
-//DeadCode JIM 20Oct00 	int loopcount=0;	//increase for any fixed fields....
 	int maxsq=profile->squadlist;
 	{
 	for (int i=0;i<maxsq;i++)
@@ -486,22 +438,6 @@ void	PackageList::SaveBin(Profile* profile,BOStream&file)
 			file<<packstr;
 		}
 		file<<'\n';
-//DeadCode CRAIG 30Oct100 		Profile::Squad& squad=profile->squadlist[i];
-//DeadCode CRAIG 30Oct100 		if (profile->packagestatus!=Profile::PS_COMPLETE)
-//DeadCode CRAIG 30Oct100 			file<<CSprintf(linesqout,
-//DeadCode CRAIG 30Oct100 				ReorderNoCheck(squad.instance), +squad.squadnum, +squad.formtype, squad.diaryentry, squad.numbers, squad.fightperiods,
-//DeadCode CRAIG 30Oct100 				+squad.targetindex, squad.takeofftime, squad.lastwptime,
-//DeadCode CRAIG 30Oct100 				+squad.method, +squad.submethod, +squad.status, squad.fuelleft
-//DeadCode CRAIG 30Oct100
-//DeadCode CRAIG 30Oct100 				);
-//DeadCode CRAIG 30Oct100 		else
-//DeadCode CRAIG 30Oct100 			file<<CSprintf(linesqout,
-//DeadCode CRAIG 30Oct100 				0, +squad.squadnum, +squad.formtype, squad.diaryentry, squad.numbers,
-//DeadCode CRAIG 30Oct100 				+squad.targetindex, squad.takeofftime, squad.lastwptime,
-//DeadCode CRAIG 30Oct100 				+squad.method, +squad.submethod, +squad.status, squad.fuelleft
-//DeadCode CRAIG 30Oct100
-//DeadCode CRAIG 30Oct100 				);
-//DeadCode CRAIG 30Oct100
 	}
 	}
 	if (maxsq==1)
@@ -531,12 +467,6 @@ void	PackageList::SaveBin(Profile* profile,BOStream&file)
 			file<<packstr;
 		}
 		file<<'\n';
-//DeadCode CRAIG 30Oct100 	file<<CSprintf(linerout,
-//DeadCode C		profile->raidnumentries[i].raidnum,	profile->raidnumentries[i].squadliststart,profile->raidnumentries[i].detector,profile->raidnumentries[i].alertlevel,profile->raidnumentries[i].detectlatency,profile->raidnumentries[i].firstsquaddiaryentry,
-//DeadCode CRAIG 30Oct100 		profile->raidnumentries[i].prevpositions[0].X,profile->raidnumentries[i].prevpositions[0].Y,profile->raidnumentries[i].prevpositions[0].Z,
-//DeadCode CRAIG 30Oct100 		profile->raidnumentries[i].prevpositions[1].X,profile->raidnumentries[i].prevpositions[1].Y,profile->raidnumentries[i].prevpositions[1].Z,
-//DeadCode CRAIG 30Oct100 		profile->raidnumentries[i].prevpositions[2].X,profile->raidnumentries[i].prevpositions[2].Y,profile->raidnumentries[i].prevpositions[2].Z,
-//DeadCode CRAIG 30Oct100 		profile->raidnumentries[i].prevpositions[3].X,profile->raidnumentries[i].prevpositions[3].Y,profile->raidnumentries[i].prevpositions[3].Z);
 	}
 	}
 	file<<C 26 <<C 0;
@@ -651,15 +581,6 @@ void	PackageList::SaveWaypointBin(info_waypoint* wp,BOStream&file)
 	if (wp->applygroup.Evaluate()!=GOT_UNDEFINED_VAL)
 		loopcount++;
 
-//DEADCODE CSB 07/06/00 	int timefields=0;
-//DEADCODE CSB 07/06/00 	if (wp->etah.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 07/06/00 		timefields++;
-//DEADCODE CSB 07/06/00 	if (wp->etam.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 07/06/00 		timefields++;
-//DEADCODE CSB 07/06/00 	if (wp->etas.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 07/06/00 		timefields++;
-//DEADCODE CSB 07/06/00 	if (timefields)
-//DEADCODE CSB 07/06/00 		loopcount++;
 
 	file <<C T_waypoint <<C T_linklist <<C loopcount;
 
@@ -667,16 +588,6 @@ void	PackageList::SaveWaypointBin(info_waypoint* wp,BOStream&file)
 	{	file <<C T_setUID;wp->uid.Save(file,NULL);	}
 	if (wp->vel.Evaluate()!=GOT_UNDEFINED_VAL)
 	{	file <<C T_vel;wp->vel.Save(file,NULL);	}
-//DEADCODE CSB 07/06/00 	if (timefields)
-//DEADCODE CSB 07/06/00 	{
-//DEADCODE CSB 07/06/00 		file <<C T_start <<C T_linklist <<C timefields;
-//DEADCODE CSB 07/06/00 		if (wp->etah.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 07/06/00 		{	file <<C T_hours;wp->etah.Save(file,NULL);	}
-//DEADCODE CSB 07/06/00 		if (wp->etam.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 07/06/00 		{	file <<C T_mins;wp->etam.Save(file,NULL);	}
-//DEADCODE CSB 07/06/00 		if (wp->etas.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 07/06/00 		{	file <<C T_secs;wp->etas.Save(file,NULL);	}
-//DEADCODE CSB 07/06/00 	}
 
 	if (wp->etas.Evaluate()!=GOT_UNDEFINED_VAL)
 	{	file <<C T_start <<C T_secs;wp->etas.Save(file,NULL);	}
@@ -717,7 +628,6 @@ void	Profile::SaveAirItemBin(Profile::Squad* squad,UniqueID route,BOStream&file)
 // T_form:
 // T_position:
 // T_waypoint:	numeric index into current route
-//DEADCODE DAW 21/02/00 	file <<C (T_inwing);a->inwing.Save(file,NULL);
 	file <<C (T_inform);
 	if (squad->status==Profile::PS_COMPLETE)
 		Expr::putint(0,file);
@@ -729,8 +639,6 @@ void	Profile::SaveAirItemBin(Profile::Squad* squad,UniqueID route,BOStream&file)
 		a->position.MakeRelWorldPos(Node_Data[squad->squadnum].homeairfield);	//RDH 18Sep00
 	}
 	file <<C (T_pos);a->position.Save(file,NULL);
-//DEADCODE JIM 14/01/00 	if (a->form.Evaluate()<SQUAD_FLATV)
-//DEADCODE JIM 14/01/00 		a->form=SQUAD_FLATV;
 	file <<C (T_form);a->form.Save(file,NULL);
 
 	int i=0;
@@ -776,9 +684,6 @@ void	Profile::SaveAirItemBin(Profile::Squad* squad,UniqueID route,BOStream&file)
 //			radiosilence,				//NEED TO SAVE
 
 	int total=9;
-//DEADCODE CSB 30/05/00 	if (a->attmethod.Evaluate()!=GOT_UNDEFINED_VAL)	total++;
-//DEADCODE CSB 30/05/00 	if (a->pattern.Evaluate()!=GOT_UNDEFINED_VAL)	total++;
-//DEADCODE CSB 30/05/00 	if (a->radiosilence.Evaluate()!=GOT_UNDEFINED_VAL)	total++;
 	if (a->movecode.Evaluate()!=GOT_UNDEFINED_VAL)	total++;
 	if (a->target.Evaluate()!=GOT_UNDEFINED_VAL && a->target.Evaluate()!=0)	total++;
 	if (a->attitude.complex)						total++;
@@ -845,12 +750,6 @@ void	Profile::SaveAirItemBin(Profile::Squad* squad,UniqueID route,BOStream&file)
 
 	if (a->target.Evaluate()!=GOT_UNDEFINED_VAL && a->target.Evaluate()!=0)
 	{	file <<C (T_target);Expr::putint(PackageList::Reorder(UniqueID(a->target.Evaluate())),file);	}
-//DEADCODE CSB 30/05/00 	if (a->attmethod.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 30/05/00 	{	file <<C (T_attmethod);a->attmethod.Save(file,NULL);	}
-//DEADCODE CSB 30/05/00 	if (a->pattern.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 30/05/00 	{	file <<C (T_pattern);a->pattern.Save(file,NULL);	}
-//DEADCODE CSB 30/05/00 	if (a->radiosilence.Evaluate()!=GOT_UNDEFINED_VAL)
-//DEADCODE CSB 30/05/00 	{	file <<C (T_radiosilence);a->radiosilence.Save(file,NULL);	}
 	if (a->movecode.Evaluate()!=GOT_UNDEFINED_VAL)
 	{	file <<C (T_move);a->movecode.Save(file,NULL);	}
 }
@@ -876,7 +775,6 @@ void GlobRefExpr::	Save( BOStream& f, char *, int, EnumListNames )
 void UIDExpr::		Save( BOStream& f, char *, int, EnumListNames )
 {
 	f <<C T_target;
-//DeadCode MS 26Sep00 	assert (val.complex);												//CSB 30Jul00
 	val.Save(f,NULL);													//MS 26Sep00
 }
 void RndExpr::		Save( BOStream& f, char *, int, EnumListNames )

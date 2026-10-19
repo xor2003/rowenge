@@ -124,7 +124,6 @@ extern	void	CheckE3();
 #include	"RCHATTER.H"
 #include "VIEWSEL.H"
 #include "WINMOVE.H"
-//DeadCode PD 6Nov97 #pragma dump_object_model AircraftAnimData;
 
 // RERUN start
 AaaParams	aaaguntypelist[] =
@@ -262,19 +261,9 @@ DES		AaaMainList::~AaaMainList()
 		tmp=tmp2;
 	}
 	while (tmp!=aaalist);
-//DeadCode JIM 06Oct96 	delete tmp;
 }
 
 
-//DEADCODE JIM 17/03/99 void	SleepList::AddItemEvents(EventRec* evlist)
-//DEADCODE JIM 17/03/99 {
-//DEADCODE JIM 17/03/99 	while (evlist)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		if (evlist->attitem && (evlist->attitem->MigStatus.LaunchFlags.size==ITEMSIZE || evlist->attitem->MigStatus.LaunchFlags.size==MOBILESIZE))
-//DEADCODE JIM 17/03/99 			operator+=(*evlist->attitem);
-//DEADCODE JIM 17/03/99 		evlist=evlist->eventlink;
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 }
 
 
 void	AaaMainList::operator	+=(ItemPtr i)
@@ -506,7 +495,6 @@ void	SleepList::Event()
 			guntype=a->guntype;
 			nat=a->nat;
 			range=a->flatrange+METRES2000;
-//DEADCODE DAW 26/05/99 		}
 			TrgListProc	tlp(guntype,nat,aaalist,Live_List.aaalist);
 		//for all ac/gmobiles/aaasites - depending on type of gun
 			//if on enemy side - depending on type
@@ -536,7 +524,6 @@ void	SleepList::Event()
 							if (weapanim)											//RJS 24Jun99
 								weapanim->LaunchTime=0;								//RJS 24Jun99
 
-//DeadCode DAW 25Jun99 							weapanim->LaunchTime=0;
 							if (d->lnchrtype==LT_RPUFF)
 								if (trg->MigStatus.LaunchFlags.size==AIRSTRUCSIZE)
 									if (!blockradio)
@@ -558,7 +545,6 @@ void	SleepList::Event()
 			}
 		}														//RJS 26May99
 //remove from live list if get here (nothing visible)
-//DeadCode JIM 15Nov96 	Live_List-=eye;
 	}
 }
 
@@ -580,7 +566,6 @@ inline void	WarnSmallBore(MobileItem*weapitem,AirStruc*trg)
 
 void	LiveList::Event()
 {
-//DeadCode JIM 06Jan97 	CheckE3();
 	if (++aaaind==SUBLISTSIZE)
 	{
 		aaaind=0;
@@ -594,7 +579,6 @@ void	LiveList::Event()
 //for each mobile launcher in item
 	if (aaalist[0][aaaind])
 	{
-//DeadCode JIM 06Jan97 	CheckE3();
 		ItemPtr		weapitem=aaalist[0][aaaind];
 		if (weapitem->World.Y==0)
 			weapitem->World.Y=Land_Scape.GetGroundLevel(weapitem);
@@ -603,7 +587,6 @@ void	LiveList::Event()
 		UWord			mvel,mdelay,mburst;						//RDH 31Jul98
 		bool	targetting=false;
 		WeapAnimData*	weapanim=SHAPE.GetWeaponLauncher(weapitem,weapnum,weapoff.X,weapoff.Y,weapoff.Z,mvel,mdelay,mburst,LT_MOVEGUN);//RDH 31Jul98
-//DeadCode JIM 06Jan97 	CheckE3();
 		if (weapanim)
 		{
 			if (!weapanim->target)
@@ -661,9 +644,6 @@ void	LiveList::Event()
 								int	vx=0;//tm->velx*(6+rnd&31);
 								int	vy=0;//tm->vely*(6+(rnd>>5)&31);
 								int	vz=0;//tm->velz*(6+(rnd>>10)&31);
-//DeadCode DAW 24Jun99 								int	vx=tm->velx*(6+rnd&31);
-//DeadCode DAW 24Jun99 								int	vy=tm->vely*(6+(rnd>>5)&31);
-//DeadCode DAW 24Jun99 								int	vz=tm->velz*(6+(rnd>>10)&31);
 								Math_Lib.HighIntercept(	trg->World.X+vx-weapoff.X,
 														trg->World.Y+vy-weapoff.Y,
 														trg->World.Z+vz-weapoff.Z,
@@ -1068,7 +1048,6 @@ void	LiveList::Event()
 					ItemPtr	trg=targlist.Next();
 					while (trg)
 					{
-//DEADCODE DAW 01/06/99 						if (!!(weapitem->World.Y<Land_Scape.CloudAlt())==!!(trg->World.Y<Land_Scape.CloudAlt()))
 						if (	weapitem->MigStatus.LaunchFlags.size==AIRSTRUCSIZE
 							|| trg->MigStatus.LaunchFlags.size!=AIRSTRUCSIZE
 							||	((AirStrucPtr)*trg)->AutoMoveInfo.movecode!=AUTO_COMBAT

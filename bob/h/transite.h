@@ -13,7 +13,6 @@
 #include "worldinc.h"
 #include	"AnimData.h"									//RJS 10Feb97
 
-//DEADCODE DAW 29/01/00 #include "display.h"						//PD 19Apr96
 #include "myvector.h"
 #include "3dinstr.h"												//RJS 06Aug96
 
@@ -49,44 +48,10 @@ const	SLong	LIFETIME_BOMB = 10000;			//Bomb			//RJS 16Aug96
 const	SLong	LIFETIME_VAPOUR = 60*100;						//RJS 27May97
 const	SLong	LIFETIME_ROCKET = 3000;
 
-//DeadCode RJS 20Nov98 const	ShapeNum	MiniExplosionShape	=	SMOKE;				//RJS 06Aug96
-//DeadCode RJS 20Nov98 const	ShapeNum	BigExplosionShape	=	EXPLO;				//PD 01May96
-//DeadCode RJS 20Nov98 const	ShapeNum	GunfireShape		=	BULLET;				//PD 29Apr96
-//DeadCode RJS 20Nov98 const	ShapeNum	SmokinShape			=	SMOKE;				//PD 30Apr96
-//DeadCode RJS 20Nov98 const	ShapeNum	BigSmokeShape		=	BSMKE;				//PD 09May96
-//DeadCode RJS 20Nov98 const	ShapeNum	InvisibleLauncher	=	EMPTY;				//PD 30Apr96
-//DeadCode RJS 20Nov98 const	ShapeNum	GroundExplosionShape=	EXPLO;				//PD 01May96
-//DeadCode RJS 20Nov98 const	ShapeNum	CraterShape			=	CRATER;				//RJS 02Jul96
-//DeadCode RJS 20Nov98 const	ShapeNum	SmallFireShape		=	SMLFIR;				//RJS 09Oct96
-//DeadCode RJS 20Nov98 const	ShapeNum	LargeFireShape		=	FIRE;				//RJS 09Oct96
-//DeadCode RJS 20Nov98 const	ShapeNum	FlakShape			=	SMOKE;				//RJS 02Jul96
-//DeadCode RJS 20Nov98 const	ShapeNum	SmallCraterShape	=	HOLE;				//RJS 10Jul96
-//DeadCode RJS 20Nov98 const	ShapeNum	HugeExplosionShape	=	BEXP;				//RJS 13Aug96
-//DeadCode RJS 20Nov98 const	ShapeNum	RicochetSmokeShape	=	RSMOKE;				//RJS 09Sep96
-//DeadCode RJS 20Nov98 const	ShapeNum	ShockwaveShape		=	EMPTY2;				//RJS 16Oct96
-//DeadCode RJS 20Nov98 const	ShapeNum	BoxShape			=	EMPTY;				//RJS 17Oct96
-//DeadCode RJS 20Nov98 const	ShapeNum	BirdShape			=	EMPTY;				//RJS 17Oct96
-//DeadCode RJS 20Nov98 const	ShapeNum	ChickenShape		=	EMPTY;				//RJS 17Oct96
-//DeadCode RJS 20Nov98 const	ShapeNum	DustShape			=	SDUST;				//RJS 31Oct96
-//DeadCode RJS 20Nov98 const	ShapeNum	GermFlakShape		=	EMPTY;				//RJS 06Nov96
-//DeadCode RJS 20Nov98 const	ShapeNum	BritFlakShape		=	EMPTY;				//RJS 06Nov96
-//DeadCode RJS 20Nov98 const	ShapeNum	TrenchShapeBrit		=	EMPTY;				//RJS 15Dec96
-//DeadCode RJS 20Nov98 const	ShapeNum	TroopLauncherShape	=	EMPTY;				//RJS 08Nov96
-//DeadCode RJS 20Nov98 const	ShapeNum	FuelBarrelShape		=	EMPTY;				//RJS 22Nov96
-//DeadCode RJS 20Nov98 const	ShapeNum	TinyFireShape		=	EMPTY;				//RJS 06Dec96
-//DeadCode RJS 20Nov98 const	ShapeNum	TrenchShapeGerm		=	EMPTY;				//RJS 15Dec96
-//DeadCode RJS 20Nov98 const	ShapeNum	VapourShape			=	VAPSHP;				//RJS 27May97
-//DeadCode RJS 20Nov98 const	ShapeNum	VapourStreamShape	=	HOLE;				//RJS 27May97
-//DeadCode RJS 20Nov98 const	ShapeNum	CloneShape			=	GCLONE;				//RJS 01Oct97
-//DeadCode RJS 20Nov98 const	ShapeNum	MigPuffShape		=	DUMMY2;				//RJS 09Jan98
-//DeadCode RJS 20Nov98 const	ShapeNum	NapalmShape			=	DUMY10;				//RJS 22Jan98
 
 const	SWord		TenMetresPerSec		=	103;
 
-//DeadCode RJS 22Dec99 const	SWord		OrdinaryDrag		=	100;
-//DeadCode RJS 22Dec99 const	SWord		RetardedDrag		=	500;
 
-//DEADCODE CSB 09/11/99 const	SWord		TerminalVelocity	=	0x07FFF;
 const	SLong		TerminalVelocity	=	0x7FFFFFFF;
 
 const	SWord		SmokeBaseVel			=	400;			//PD 01May96
@@ -99,25 +64,6 @@ const	SWord		SmokeLaunchDelay	=	10;			//0.10 secs//PD 30Apr96
 
 const	Angles		DeathAngleStep		=	ANGLES_2Deg;		//PD 02May96
 
-//DeadCode AMM 24Jul98 typedef struct _bul_packet BULPACKET;							//ARM 12Sep96
-//DeadCode AMM 24Jul98 typedef struct _bul_packet* LPBULPACKET;						//ARM 12Sep96
-//DeadCode AMM 24Jul98 struct _bul_packet {											//ARM 12Sep96
-//DeadCode AMM 24Jul98
-//DeadCode AMM 24Jul98 //DeadCode AMM 08Jun98 	Bool		got1sthalf;
-//DeadCode AMM 24Jul98 //DeadCode AMM 08Jun98 	UWord		PosX,PosY,PosZ;									//ARM 12Sep96
-//DeadCode AMM 24Jul98 //DeadCode AMM 08Jun98 	SWord		HorzVel;										//ARM 12Sep96
-//DeadCode AMM 24Jul98 //DeadCode AMM 08Jun98 	SWord		VertVel;										//ARM 12Sep96
-//DeadCode AMM 24Jul98 //DeadCode AMM 08Jun98 	SWord		Head;											//ARM 12Sep96
-//DeadCode AMM 24Jul98 //DeadCode AMM 08Jun98 	SLong		LaunchTime;										//ARM 12Sep96
-//DeadCode AMM 24Jul98 //DeadCode AMM 08Jun98 	ShapeNum	Shape;											//ARM 12Sep96
-//DeadCode AMM 24Jul98 	Bool		got1sthalf;
-//DeadCode AMM 24Jul98 	SLong		PosX,PosY,PosZ;
-//DeadCode AMM 24Jul98 	SWord		HorzVel;
-//DeadCode AMM 24Jul98 	SWord		VertVel;
-//DeadCode AMM 24Jul98 	ANGLES		Head;
-//DeadCode AMM 24Jul98 	SLong		LaunchTime;
-//DeadCode AMM 24Jul98 	ShapeNum	Shape;
-//DeadCode AMM 24Jul98 };
 
 struct	HitEffectRecord;	//RJS 18Jan99
 
@@ -214,7 +160,6 @@ TransObj(void );
 
 	void	SetViewPoint(MobileItem* vp,ViewPoint* vo);
 	void	PilotedACHit();										//PD 02Sep96
-//DeadCode AMM 28Apr99 	void	CommsACHit (AirStrucPtr, itemptr);					//AMM 17Mar97
 	void	GAndFriction(mobileitem*,SWord dragfactor,SWord dragfacy = 0);				//RJS 04Jul96
 	void	ControlKeybWeap(AirStrucPtr, WorldStuff&);			//PD 29Apr96
 	void	TestForItem2Kill(WorldStuff& );						//PD 07May96
@@ -224,10 +169,7 @@ TransObj(void );
 	void	LaunchExplosion(mobileitem*, WorldStuff&, int strength = 0);//RJS 22Jan98
 void LaunchDummyExplosion(mobileitem);									//MGA 29Feb96
 void LaunchDitchEffect(mobileitem, WorldStuff& );								//MGA 01Mar96
-//DeadCode AMM 01Jun98 void TransObj::LaunchCrater(mobileitem*, WorldStuff& );			//RJS 25Jun96
 void LaunchCrater(mobileitem*, WorldStuff&);									//RJS 19Nov98
-//DeadCode PD 26Apr96 void TransObj::LaunchBullet(mobileitem&, WorldStuff& );				//MGA 21Mar96
-//Old_Code PD 29Apr96 void TransObj::LaunchDeadACPart(AirStruc&,BitFlags,WorldStuff& );//PD 19Apr96
  	void	LaunchDeadACPart(AirStruc*,BitFlags,WorldStuff&,Bool blowup=FALSE );//RJS 20Feb97
 
 	void	LaunchBitsOffPart(ItemPtr,ShapeNum,animptr&,UByteP,WorldStuff&,UByte,UByteP,UWord blowup=0,Bool noFlash=FALSE);//RJS 14Jun00
@@ -253,7 +195,6 @@ void MobileParachute(TransientItemPtr, WorldStuff&);			//RJS 02Jul96
 void MobileBarage(TransientItemPtr, WorldStuff&);				//RJS 02Jul96
 void MobileDelayedExplosion(TransientItemPtr, WorldStuff&);		//RJS 02Jul96
 void MobileFlak(TransientItemPtr, WorldStuff&);					//RJS 02Jul96
-//DeadCode RJS 23Feb00 void MobileRicochet(TransientItemPtr, WorldStuff&);				//RJS 05Jul96
 void MobileEngineStart(TransientItemPtr, WorldStuff&);			//RJS 22Feb00
 void MobileGuidedBurning(TransientItemPtr, WorldStuff&);		//RJS 08Jul96
 void MobileGuidedFire(TransientItemPtr, WorldStuff&);			//RJS 09Jul96
@@ -305,7 +246,6 @@ void AddTransientItemToDeadList(TransientItemPtr, bool novapour=false);//DAW 19M
 	void	DirectAircraftDamage(AirStruc*,WorldStuff&,BitStates,BitFlags);//ARM 08Oct96
 
 	TransientItem*	LaunchOneGunBullet(mobileitem* ,SLong,ShapeNum,SLong, SLong, SLong, WorldStuff&,const SWord&,const SWord&);//RJS 26May98
-//DeadCode AMM 24Jul98 	TransientItem*	LaunchCommsBullet(AirStrucPtr, struct _bul_packet);//ARM 06Sep96
 	TransientItem*	LaunchRearGunBullet(mobileitem* ,ShapeNum,SLong, SLong, SLong, WorldStuff&);//RJS 11Oct96
 
 	SWord	DropOneBomb(mobileitem*,WorldStuff&);							//RDH 23Sep96
@@ -348,7 +288,6 @@ void AddTransientItemToDeadList(TransientItemPtr, bool novapour=false);//DAW 19M
 	Bool	LaunchVapourTransient(mobileitem*,SLong,SLong,SLong,int,int,WorldStuff&,ShapeNum);//RJS 03Dec97
 	TransientItem* LaunchRocket(mobileitem*,ShapeNum,SLong, SLong, SLong, WorldStuff&);//RJS 03Jun97
 	TransientItem* LaunchFuelDrop(mobileitem*,ShapeNum,WeapAnimData*,SLong,SLong,SLong,WorldStuff&);//RJS 11Jun97
-//DeadCode AMM 09Apr99 	void	LaunchWeapon(AirStrucPtr,WeapAnimData*,SLong,SLong,SLong,WorldStuff&,SLong,SLong,Bool unarmed=FALSE);//RJS 23Jul98
 	SLong	LaunchWeapon(bool received,AirStrucPtr,WeapAnimData*,ULong,SLong,SLong,SLong,WorldStuff&,SLong,SLong,Bool unarmed=FALSE);//RJS 15Nov99
 	SLong	ActivateStation(AirStrucPtr,UWord&,UWord&,WorldStuff&);//RJS 17Jun99
 	void	WeaponSearch(AirStrucPtr, WeapSearchType direction=Go_Instant, Bool wrap = FALSE);//RJS 13May99
@@ -359,14 +298,11 @@ void AddTransientItemToDeadList(TransientItemPtr, bool novapour=false);//DAW 19M
 	void	LaunchTrailTail(mobileitem*,SLong,SLong,SLong,ShapeNum,WorldStuff&);//RJS 16Jun97
 	void	LaunchClouds();										//RJS 09Jul97
 	void	LaunchCloneGun(mobileitem*,mobileitem*,Nationality,SWord,SWord,SWord,SWord,SWord,WorldStuff&);//RJS 08Sep98
-//DeadCode RJS 19Feb98 	void	LaunchGroundScatter();								//RJS 21Oct97
 	void	LaunchGunPuff(mobileitem*,SLong,SLong,SLong,WorldStuff&);//RJS 05Jan98
 	void	LaunchDustTrail2(mobileitem*, WorldStuff&);			//RJS 08Jan98
 	void	LaunchNapalmStrike(mobileitem*, WorldStuff&);		//RJS 22Jan98
 	void	LaunchCanopyEject(mobileitem*, WorldStuff&);		//RJS 19Feb98
-//DeadCode AMM 05Jul99 	void	LaunchGroupThug(item*,ShapeNum,int,int,int,Coords3D,Coords3D,UWord,UWord);//RJS 17Nov98
 	void	LaunchGroupThug(item*,ShapeNum,int,int,int,Coords3D,Coords3D,UWord,UWord,ItemPtr);//AMM 05Jul99
-//DeadCode RJS 03Dec98 	void	LaunchTrackedBullet(mobileitem*, WorldStuff&);		//RJS 21Apr98
 	void	LaunchSmokeCloud(mobileitem*,ShapeNum,Coords3D,WorldStuff&);//RJS 03Jul98
 	TransientItem*	LaunchManyGunBullets(mobileitem*,SLong,SWord,SWord,SWord,SWord,ShapeNum,SLong,SLong,SLong,WorldStuff&,SWord,SLong,Bool isArmed=TRUE);//RJS 27May99
 	void	LaunchDirtSmall(mobileitem*, WorldStuff&,bool dosound=true);//RJS 21Aug98
@@ -437,8 +373,6 @@ void AddTransientItemToDeadList(TransientItemPtr, bool novapour=false);//DAW 19M
 									AutoMoveCodeTypeSelect	movecode,
 									Coords3D	&xyz,
 									ANGLES		hdg, ANGLES		pitch,
-//DEADCODE CSB 09/11/99 									SWord		velx,SWord		vely,SWord		velz,
-//DEADCODE CSB 09/11/99 									SWord		velh,SWord		vel,
 									SLong		velx,SLong		vely,SLong		velz,	//CSB 09/11/99
 									SLong		vel,									//CSB 09/11/99
 									Nationality nat
@@ -450,8 +384,6 @@ void AddTransientItemToDeadList(TransientItemPtr, bool novapour=false);//DAW 19M
 									AutoMoveCodeTypeSelect,
 									Coords3D&,
 									ANGLES, ANGLES,
-//DEADCODE CSB 09/11/99 									SWord,SWord,SWord,
-//DEADCODE CSB 09/11/99 									SWord,SWord,
 									SLong, SLong, SLong,
 									SLong,
 									Nationality,

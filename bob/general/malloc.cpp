@@ -76,7 +76,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	<string.h>
 #include	<dosdefs.h>
 //TEMPCODE DAW 13/04/00 #include	<rad.h>												//DAW 31Jan96
-//DeadCode ARM 18Jul96 #include	"smack.h"
 #include	"myerror.h"
 
 struct meminfo {
@@ -96,80 +95,14 @@ struct meminfo {
 
 void MemoryTest(char * poo)
 {
-//DeadCode ARM 04Jun96 	unsigned int	start=0x1000000;
-//DeadCode ARM 04Jun96 	char*		next=NULL;
-//DeadCode ARM 04Jun96 	char*		fiss=NULL;
-//DeadCode ARM 04Jun96 	int			count=1;
-//DeadCode ARM 04Jun96 
-//DeadCode ARM 04Jun96 	INT3();
-//DeadCode ARM 04Jun96 	fprintf(stderr,"About to Start %s\n",poo);
-//DeadCode ARM 04Jun96 	while (start>4096)
-//DeadCode ARM 04Jun96 	{
-//DeadCode ARM 04Jun96 		fiss=new char[start];
-//DeadCode ARM 04Jun96 		if (fiss)
-//DeadCode ARM 04Jun96 		{
-//DeadCode ARM 04Jun96 			fprintf(stderr,"Size alloced:\t%i\n",start);
-//DeadCode ARM 04Jun96 			*((char **)fiss)=next;
-//DeadCode ARM 04Jun96 			next=fiss;
-//DeadCode ARM 04Jun96 			count++;
-//DeadCode ARM 04Jun96 		}
-//DeadCode ARM 04Jun96 		else
-//DeadCode ARM 04Jun96 			start=(start-start/10);
-//DeadCode ARM 04Jun96 	}
-//DeadCode ARM 04Jun96 	while (next)
-//DeadCode ARM 04Jun96 	{
-//DeadCode ARM 04Jun96 		fiss=*((char **)next);
-//DeadCode ARM 04Jun96 		delete[]next;
-//DeadCode ARM 04Jun96 		next=fiss;
-//DeadCode ARM 04Jun96 	}
-//DeadCode ARM 04Jun96 
 }
 
 
 
 void memory()
 {
-//DeadCode ARM 04Jun96     union REGS regs;
-//DeadCode ARM 04Jun96     struct SREGS sregs;
-//DeadCode ARM 04Jun96 
-//DeadCode ARM 04Jun96     regs.x.eax = 0x00000500;
-//DeadCode ARM 04Jun96     memset( &sregs, 0, sizeof(sregs) );
-//DeadCode ARM 04Jun96     sregs.es = FP_SEG( &MemInfo );
-//DeadCode ARM 04Jun96     regs.x.edi = FP_OFF( &MemInfo );
-//DeadCode ARM 04Jun96 
-//DeadCode ARM 04Jun96     int386x( DPMI_INT, &regs, &regs, &sregs );
-//DeadCode ARM 04Jun96 
-//DeadCode ARM 04Jun96 	printf("%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\n",
-//DeadCode ARM 04Jun96 		MemInfo.LargestBlockAvail,
-//DeadCode ARM 04Jun96 		MemInfo.MaxUnlockedPage,
-//DeadCode ARM 04Jun96 		MemInfo.LargestLockablePage,
-//DeadCode ARM 04Jun96 		MemInfo.LinAddrSpace,
-//DeadCode ARM 04Jun96 		MemInfo.NumFreePagesAvail,
-//DeadCode ARM 04Jun96 		MemInfo.NumPhysicalPagesFree,
-//DeadCode ARM 04Jun96 		MemInfo.TotalPhysicalPages,
-//DeadCode ARM 04Jun96 		MemInfo.FreeLinAddrSpace);
 }
 
-//DeadCode DAW 11Aug00 void*	ailmalloc(size_t numbytes)
-//DeadCode DAW 11Aug00 {
-//DeadCode DAW 11Aug00   void * temp=0;
-//DeadCode DAW 11Aug00 	if (numbytes==0)
-//DeadCode DAW 11Aug00 		return(NULL);
-//DeadCode DAW 11Aug00 	if (numbytes!=0xffffffff)
-//DeadCode DAW 11Aug00 		temp=new char[numbytes];
-//DeadCode DAW 11Aug00 	
-//DeadCode DAW 11Aug00 	if (!temp)
-//DeadCode DAW 11Aug00 	{
-//DeadCode DAW 11Aug00 #ifdef __WATCOMC__
-//DeadCode DAW 11Aug00 		INT3();													//JIM 19Jun97
-//DeadCode DAW 11Aug00 #endif
-//DeadCode DAW 11Aug00 #ifdef __MSVC__
-//DeadCode DAW 11Aug00 		INT3;
-//DeadCode DAW 11Aug00 #endif
-//DeadCode DAW 11Aug00 		_Error.EmitSysErr("Smacker/Miles alloc Failed for %i.\n",numbytes);
-//DeadCode DAW 11Aug00 	}
-//DeadCode DAW 11Aug00 	return(temp);
-//DeadCode DAW 11Aug00 }
 
 /*
 RCFUNC void PTR4* RADLINK radmalloc(u32 numbytes)

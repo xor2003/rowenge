@@ -12,7 +12,6 @@
 
 #define	DEFAULT_MESSENGN 0
 
-//DeadCode RJS 29Sep00 #include	"palette.h"
 
 
 class	MESSAGE_STRUC;
@@ -45,7 +44,6 @@ public:
 	void					InitMessageWindow();
 	Bool					IncMessageWindow();
 	Bool					DecMessageWindow();
-//DeadCode RJS 29Sep00 	Colour					MessageColour(SLong);
 	CString					Callsign(SLong);
 	CString					MessageBody(SLong);
 	void					MessageParticipants(SLong,AirStrucPtr&,AirStrucPtr&,itemptr&);
@@ -94,7 +92,6 @@ private:
 	SLong			RemoveGaps(MESSAGE_STRUC*,SLong&,SLong);
 	void			BufferInit();								//RDH 01Apr99
 
-//DeadCode RJS 12Feb99 	static ULong	PhraseToIDS[];
 
 };
 

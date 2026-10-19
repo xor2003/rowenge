@@ -40,44 +40,6 @@ const double FANGLE_330	= 5.759586532;
 
 typedef float FP, *PFP;
 
-//DeadCode AMM 01Jul98 struct	CleverFP
-//DeadCode AMM 01Jul98 {
-//DeadCode AMM 01Jul98 	static CleverFP* FPLISTER;
-//DeadCode AMM 01Jul98 	static int count;
-//DeadCode AMM 01Jul98 	CleverFP* next;
-//DeadCode AMM 01Jul98 	union
-//DeadCode AMM 01Jul98 	{
-//DeadCode AMM 01Jul98 		struct
-//DeadCode AMM 01Jul98 		{
-//DeadCode AMM 01Jul98 			const char* s;
-//DeadCode AMM 01Jul98 			int i1;
-//DeadCode AMM 01Jul98 		};
-//DeadCode AMM 01Jul98 		FP v[1];
-//DeadCode AMM 01Jul98 	};
-//DeadCode AMM 01Jul98 	CleverFP()
-//DeadCode AMM 01Jul98 		{	next=FPLISTER;
-//DeadCode AMM 01Jul98 			FPLISTER=this;
-//DeadCode AMM 01Jul98 			if (count++==0x12345678)
-//DeadCode AMM 01Jul98 				count=count;
-//DeadCode AMM 01Jul98 		}
-//DeadCode AMM 01Jul98 	void operator = (FP f)	{v[0]=f;}
-//DeadCode AMM 01Jul98 	void operator += (double f)	{v[0]+=f;}
-//DeadCode AMM 01Jul98 //	void operator += (long double f)	{v+=f;}
-//DeadCode AMM 01Jul98 //	void operator *= (double f)	{v*=f;}
-//DeadCode AMM 01Jul98 //	void operator -= (double f)	{v-=f;}
-//DeadCode AMM 01Jul98 //	void operator = (long double f)	{v=f;}
-//DeadCode AMM 01Jul98 //	void operator = (int f)	{v=f;}
-//DeadCode AMM 01Jul98 //#ifdef	RANGES_Included
-//DeadCode AMM 01Jul98 //	bool operator < (ranges	 f)	{return (v<f);}
-//DeadCode AMM 01Jul98 //#endif
-//DeadCode AMM 01Jul98 //	bool operator > (int	 f)	{return (v>f);}
-//DeadCode AMM 01Jul98 	void	setstring(const char* st,int flag=0xffffffff) {i1=flag;s=st;}
-//DeadCode AMM 01Jul98 	operator FP() {return v[0];}
-//DeadCode AMM 01Jul98 //	operator int () {return (int)v;}
-//DeadCode AMM 01Jul98 //	operator long () {return (int)v;}
-//DeadCode AMM 01Jul98 //	operator FP& () {return v;}
-//DeadCode AMM 01Jul98 };
-//DeadCode AMM 01Jul98 //inline void	operator=(FP& f,CleverFP& v) {f=v.v;}
 
 typedef struct _fcrd {
 			FP	x,y,z;
@@ -86,60 +48,14 @@ typedef struct _fcrd {
 typedef struct _fcrdlong {
 			Float x,y,z;
 } FCRDlong, *PFCRDlong;
-//DeadCode AMM 01Jul98 typedef FP& FPrefbad;
-//DeadCode AMM 01Jul98 struct Clever_fcrd {
-//DeadCode AMM 01Jul98 			CleverFP me;
-//DeadCode AMM 01Jul98 			_fcrd f;
-//DeadCode AMM 01Jul98 			FPrefbad	x,y,z;
-//DeadCode AMM 01Jul98 			Clever_fcrd(): x(f.x),y(f.y),z(f.z)
-//DeadCode AMM 01Jul98 			{me.setstring("V",0xfffffffE);}
-//DeadCode AMM 01Jul98 			Clever_fcrd& operator=(_fcrd& s) {f=s;return *this;}
-//DeadCode AMM 01Jul98 			operator _fcrd& () {return f;}
-//DeadCode AMM 01Jul98 			void	setstring(const char*s) {me.setstring(s,0xfffffffe);}
-//DeadCode AMM 01Jul98 };
 
 typedef struct _fori {
 	_fcrd x,y,z;
 } FORI, *PFORI;
 
-//DeadCode AMM 01Jul98 typedef _fcrd&	fcrdrefbad;
-//DeadCode AMM 01Jul98 struct Clever_fori {
-//DeadCode AMM 01Jul98 	CleverFP me;
-//DeadCode AMM 01Jul98 	_fori f;
-//DeadCode AMM 01Jul98 	fcrdrefbad x,y,z;
-//DeadCode AMM 01Jul98 	Clever_fori():x(f.x),y(f.y),z(f.z)	{me.setstring("O",0xfffffffd);}
-//DeadCode AMM 01Jul98 	operator _fori& () {return f;}
-//DeadCode AMM 01Jul98 	void	setstring(const char*s) {me.setstring(s,0xfffffffd);}
-//DeadCode AMM 01Jul98 };
 
 
 
-//DeadCode AMM 01Jul98 #define	VARSCLASSDERIVED(name,name2)
-//DeadCode AMM 01Jul98 class	name##vars1:public name2
-//DeadCode AMM 01Jul98 {
-//DeadCode AMM 01Jul98 	typedef	CleverFP FP;
-//DeadCode AMM 01Jul98 	typedef	Clever_fcrd	  FCRD, *PFCRD;
-//DeadCode AMM 01Jul98 	typedef	Clever_fori   FORI, *PFORI;
-//DeadCode AMM 01Jul98 };
-//DeadCode AMM 01Jul98 class	name##vars:public name##vars1
-//DeadCode AMM 01Jul98
-//DeadCode AMM 01Jul98 #define	VARSCLASS(name)
-//DeadCode AMM 01Jul98 class	name##vars1
-//DeadCode AMM 01Jul98 {
-//DeadCode AMM 01Jul98 	typedef	CleverFP FP;
-//DeadCode AMM 01Jul98 	typedef	Clever_fcrd	  FCRD, *PFCRD;
-//DeadCode AMM 01Jul98 	typedef	Clever_fori   FORI, *PFORI;
-//DeadCode AMM 01Jul98 };
-//DeadCode AMM 01Jul98 class	name##vars:public name##vars1
-//DeadCode AMM 01Jul98
-//DeadCode AMM 01Jul98 #define	PROCCLASS(name)
-//DeadCode AMM 01Jul98 class	name##proc:public name##vars
-//DeadCode AMM 01Jul98 {
-//DeadCode AMM 01Jul98 	typedef	Float	FP;
-//DeadCode AMM 01Jul98 	typedef	_fcrd	  FCRD, *PFCRD;
-//DeadCode AMM 01Jul98 	typedef	_fori   FORI, *PFORI;
-//DeadCode AMM 01Jul98 };
-//DeadCode AMM 01Jul98 class	name:public name##proc
 
 
 // General conversion macros

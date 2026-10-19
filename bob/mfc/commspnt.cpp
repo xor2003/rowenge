@@ -152,8 +152,6 @@ void	CCommsPaint::OnClickedButtonID(int id)
 	int butnum=id-IDC_NOSEART0;
 	assert(butnum>=0 && butnum<32);
   
-//DEADCODE AMM 17/01/00 	DPlay::H2H_Player[_DPlay.mySlot].decal = butnum;
-//DeadCode JIM 12Jan99 	RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
 	FullPanel()->LaunchDial(new CCurrEmblem,1);
 
 }
@@ -186,8 +184,6 @@ BOOL CCommsPaint::OnInitDialog()
 
 	paintshop_timer=SetTimer(DPlay::TIMER_PAINTSHOP,0,NULL); 
 
-//DeadCode AMM 16Nov99 	_DPlay.UISendInPaintShopMessage();
-//DeadCode AMM 16Nov99 	DPlay::H2H_Player[_DPlay.mySlot].status=CPS_PAINTSHOP;
 	_DPlay.SendStatusChange(DPlay::CPS_PAINTSHOP);
 	
 	return TRUE;  // return TRUE unless you set the focus to a control

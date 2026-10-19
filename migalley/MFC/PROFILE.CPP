@@ -705,7 +705,6 @@ void	CProfile::ChildDialClosed(int wave,RDialog* r,int code)
 		tasktabs=NULL;
 	else if (wave == 1)
 		wavetabs=NULL;
-//DeadCode RDH 23Dec98 	FillWaveRow(wavegroup);
 }
 void	CProfile::RefreshData(int child)
 {

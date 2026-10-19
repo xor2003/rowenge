@@ -216,9 +216,6 @@ void ControlFly::RefreshSquadron()
 				combo->AddString(RESSTRING(L_ANY));
 			}
 		}
-//DEADCODE RDH 19/04/00 		if	(MMC.favgroup < maxsquads) 
-//DEADCODE RDH 19/04/00 			combo->SetIndex(MMC.favsquadron);
-//DEADCODE RDH 19/04/00 		else
 		if (!indexset)
 		{
 			combo->SetIndex(0);
@@ -339,7 +336,6 @@ void ControlFly::RefreshCombos()
 		s = GETDLGITEM(IDC_RSTATICCTRL_1);
 		s->SetString(RESSTRING(AIRCRAFT));
 		s = GETDLGITEM(IDC_RSTATICCTRL_2);
-//DEADCODE RDH 25/04/00 		s->SetString(RESSTRING(SECTOR));
 		s->ShowWindow(false);
 		combo=GETDLGITEM(IDC_RCOMBOSECTOR);
 		combo->ShowWindow(false);

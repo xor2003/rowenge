@@ -160,7 +160,6 @@ BOOL CSQuickLine::OnInitDialog() 		//FP
 
 
 	CRButton* currfl=GETDLGITEM(IDC_PILOTEDFLAG);
-//DeadCode AMM 14Oct98 	if (_DPlay.CurrPlayers == 0)
 	if (!RFullPanelDial::incomms)								//AMM 14Oct98
 	{
 		currfl->ShowWindow(SW_SHOW);
@@ -196,7 +195,7 @@ void CSQuickLine::SetVariableBits(bool Icanbeplayer)
 {	//the input flag set false forces redrawing with player deselected rather than selected
 	CRCombo* combo=GETDLGITEM(IDC_TYPE);
 	combo->Clear();
-	int sqstart,sqcount;
+	int sqstart=0,sqcount=0;
 	bool Iamplayer=(	Icanbeplayer 
 		&&	packnum==CSQuick1::quickdef.plside
 		&&	wavenum==CSQuick1::quickdef.plwave

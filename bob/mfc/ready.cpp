@@ -131,7 +131,6 @@ void CReadyRoom::RedrawRadioButtons()
 {
 	CRRadio* pradio;
 	pradio=GETDLGITEM(IDC_RRADIO_DETAILS);
-//DeadCode JIM 20Oct00 	CRStatic* s = GETDLGITEM(IDC_RSTATICCTRL3);
 	
 	if (_DPlay.sendtowho==0 || _DPlay.GameType==DPlay::DEATHMATCH)
 	{
@@ -207,18 +206,12 @@ BOOL CReadyRoom::OnInitDialog()
 	{
 		_DPlay.GameIndex=CSQuick1::currquickmiss;
 
-//DeadCode AMM 25Aug00 		if (CSQuick1::quickdef.plside)
 		if (!_DPlay.Side)
 			RFullPanelDial::gameside = RFullPanelDial::SIDE_LW;
 		else
 			RFullPanelDial::gameside = RFullPanelDial::SIDE_RAF;
 	}
 
-//DEADCODE RDH 06/12/99 	rlistbox=GETDLGITEM(IDC_RLIST_INCOMING_CHAT);
-//DEADCODE RDH 06/12/99 	rlistbox->Clear();
-//DEADCODE RDH 06/12/99 	rlistbox->AddColumn(120);
-//DEADCODE RDH 06/12/99 	rlistbox->AddColumn(30);
-//DEADCODE RDH 06/12/99 
 
 	CRRadio* pradio;
 	pradio=GETDLGITEM(IDC_RRADIO_DETAILS);
@@ -251,10 +244,6 @@ BOOL CReadyRoom::OnInitDialog()
 // when host enters ready room reset pilots to NOTFLYING because this will 
 // be a new game
 
-//DEADCODE DAW 24/11/99 			for (int p=0;p<PILOTS_PER_CAMPAIGN;p++)
-//DEADCODE DAW 24/11/99 			{
-//DEADCODE DAW 24/11/99 				MMC.Active_Pilots[p]=MMC.Active_Pilots_Init[p];
-//DEADCODE DAW 24/11/99 			}
 			_DPlay.ClearDeadPilots();
 		}
 		_DPlay.SendPilotsStatus(false);
@@ -286,53 +275,6 @@ END_EVENTSINK_MAP()
 
 void CReadyRoom::OnReturnPressedPlayerchat(LPCTSTR text) 
 {
-//DEADCODE RDH 06/12/99 	if (text[0])
-//DEADCODE RDH 06/12/99 	{
-//DEADCODE RDH 06/12/99 		CRListBox* rlistbox;
-//DEADCODE RDH 06/12/99 		CREdit* poo;
-//DEADCODE RDH 06/12/99 
-//DEADCODE RDH 06/12/99 		rlistbox=GETDLGITEM(IDC_RLIST_INCOMING_CHAT);
-//DEADCODE RDH 06/12/99 		if (!strcmp(text,"megashootcheaton"))
-//DEADCODE RDH 06/12/99 		{
-//DEADCODE RDH 06/12/99 			_DPlay.megashootcheat=true;
-//DEADCODE RDH 06/12/99 		}
-//DEADCODE RDH 06/12/99 		else if (!strcmp(text,"megashootcheatoff"))
-//DEADCODE RDH 06/12/99 		{
-//DEADCODE RDH 06/12/99 			_DPlay.megashootcheat=false;
-//DEADCODE RDH 06/12/99 		}
-//DEADCODE RDH 06/12/99 		else if (!strcmp(text,"invulnerablecheaton"))
-//DEADCODE RDH 06/12/99 		{
-//DEADCODE RDH 06/12/99 			_DPlay.megashootcheat=false;
-//DEADCODE RDH 06/12/99 		}
-//DEADCODE RDH 06/12/99 		else if (!strcmp(text,"invulnerablecheatoff"))
-//DEADCODE RDH 06/12/99 		{
-//DEADCODE RDH 06/12/99 			_DPlay.megashootcheat=false;
-//DEADCODE RDH 06/12/99 		}
-//DEADCODE RDH 06/12/99 		else if (!strcmp(text,"liftcheaton"))
-//DEADCODE RDH 06/12/99 		{
-//DEADCODE RDH 06/12/99 			_DPlay.liftcheat=true;
-//DEADCODE RDH 06/12/99 		}
-//DEADCODE RDH 06/12/99 		else if (!strcmp(text,"liftcheatoff"))
-//DEADCODE RDH 06/12/99 		{
-//DEADCODE RDH 06/12/99 			_DPlay.liftcheat=false;
-//DEADCODE RDH 06/12/99 		}
-//DEADCODE RDH 06/12/99 		else
-//DEADCODE RDH 06/12/99 		{
-//DEADCODE RDH 06/12/99 //DeadCode AMM 16Nov99 			rlistbox=GETDLGITEM(IDC_RLIST_INCOMING_CHAT);
-//DEADCODE RDH 06/12/99 
-//DEADCODE RDH 06/12/99 	//DeadCode AMM 05Aug98 	rlistbox->AddString(&_DPlay.PlayerName[0],0);
-//DEADCODE RDH 06/12/99 			rlistbox->AddString((DPlay::H2H_Player+_DPlay.mySlot)->name,0);
-//DEADCODE RDH 06/12/99 			rlistbox->AddString(text,1);
-//DEADCODE RDH 06/12/99 	//	_DPlay.UISendDialogue((DPlay::H2H_Player+_DPlay.mySlot),(char*)text);
-//DEADCODE RDH 06/12/99 			_DPlay.UISendDialogue((char*)text);
-//DEADCODE RDH 06/12/99 			_DPlay.AddChatMessageToBuffer((DPlay::H2H_Player+_DPlay.mySlot)->name,(char*)text);
-//DEADCODE RDH 06/12/99 		}
-//DEADCODE RDH 06/12/99 		rlistbox->SetHilightRow(-1) ;							//AMM 10Jul99
-//DEADCODE RDH 06/12/99 		poo=GETDLGITEM(IDC_PLAYERCHAT);
-//DEADCODE RDH 06/12/99 		poo->SetCaption("");										  //AMM 06/07/99
-//DEADCODE RDH 06/12/99 
-//DEADCODE RDH 06/12/99 //DeadCode AMM 07Jul99 		poo->SetWindowText("");
-//DEADCODE RDH 06/12/99 	}
 }
 
 void CReadyRoom::OnTimer(UINT nIDEvent) 
@@ -388,20 +330,6 @@ void CReadyRoom::OnClose()
 	CDialog::OnClose();
 }
 
-//DEADCODE AMM 11/01/00 void	DPlay::DisplayReadyDialogue(char* name, char* text)
-//DEADCODE AMM 11/01/00 {
-//DEADCODE AMM 11/01/00  	CRListBox* rlistbox;
-//DEADCODE AMM 11/01/00 
-//DEADCODE AMM 11/01/00 	rlistbox=(CRListBox*)_DPlay.listptr;
-//DEADCODE AMM 11/01/00 //DeadCode AMM 11Jan00  	rlistbox=(CRListBox*)RDialog::m_pView->m_pfullpane->pdial[0]->GetDlgItem(IDC_RLIST_INCOMING_CHAT);
-//DEADCODE AMM 11/01/00  	if (rlistbox)
-//DEADCODE AMM 11/01/00  	{
-//DEADCODE AMM 11/01/00  	 	rlistbox->AddString(name,0);
-//DEADCODE AMM 11/01/00   		rlistbox->AddString(text,1);
-//DEADCODE AMM 11/01/00  	}
-//DEADCODE AMM 11/01/00 //DEADCODE AMM 11/01/00 	rlistbox->SetHilightRow(-1) ;								//AMM 10Jul99
-//DEADCODE AMM 11/01/00 	//delete rlistbox;
-//DEADCODE AMM 11/01/00 }
 
 void	DPlay::DisplayChatDialogue(char* name, char* text)
 {
@@ -431,14 +359,6 @@ void	DPlay::DisplayPlayerInfo()
 
 	rlistbox=(CRListBox*)RDialog::m_pView->m_pfullpane->pdial[0]->GetDlgItem(IDC_RLIST_UN_PLAYER);
 	rlistbox->Clear();
-//DeadCode RDH 30Nov00 	rlistbox->AddColumn(40);
-//DeadCode RDH 30Nov00 	rlistbox->AddColumn(120);
-//DeadCode RDH 30Nov00 	rlistbox->AddColumn(65);
-//DeadCode RDH 30Nov00 	rlistbox->AddColumn(60);
-//DeadCode RDH 30Nov00 	rlistbox->AddColumn(30);
-//DeadCode RDH 30Nov00 	rlistbox->AddColumn(25);
-//DeadCode RDH 30Nov00 	rlistbox->AddColumn(55);
-//DeadCode RDH 30Nov00 	rlistbox->AddColumn(30);
 
 	rlistbox->AddString("",0);
 
@@ -456,14 +376,12 @@ void	DPlay::DisplayPlayerInfo()
 
 	string.LoadString(IDS_KILLS);
 	rlistbox->AddString(string,5);
-//DeadCode AMM 11Oct00 	rlistbox->AddString(string,4);
 
 	string.LoadString(IDS_DAMAGESTAT_REPAIR);
 	rlistbox->AddString(string,6);										//AMM 11Oct00
 
 	string.LoadString(IDS_LOSSES);
 	rlistbox->AddString(string,7);										//AMM 11Oct00
-//DeadCode AMM 11Oct00 	rlistbox->AddString(string,5);
 
 	t=1;
 	char num[8],num2[8];
@@ -479,23 +397,12 @@ void	DPlay::DisplayPlayerInfo()
 			}
 			else
 			{
-//DEADCODE RDH 25/11/99 				_itoa(t++,num,10);
-//DEADCODE RDH 25/11/99 				strcpy(score,"UN ");
-//DEADCODE RDH 25/11/99 				strcat(score,num);
 				_itoa(t++,num,10);
 
-				strcpy(score,"RAF ");
-				strcat(score,num);	
+				snprintf(score,sizeof(score),"RAF %s",num);	
 			}
 			rlistbox->AddString(score,0);
 
-//DEADCODE AMM 10/01/00 			if (H2H_Player[n].Controller && _DPlay.GameType>TEAMPLAY)
-//DEADCODE AMM 10/01/00 			{
-//DEADCODE AMM 10/01/00 				strcpy(score,H2H_Player[n].name);
-//DEADCODE AMM 10/01/00 				strcat(score," (C)");
-//DEADCODE AMM 10/01/00 				rlistbox->AddString(score,1);
-//DEADCODE AMM 10/01/00 			}
-//DEADCODE AMM 10/01/00 			else
 			{
 				rlistbox->AddString(H2H_Player[n].name,1);
 			}
@@ -543,7 +450,7 @@ void	DPlay::DisplayPlayerInfo()
 				{
 					_itoa(EnemyTeamKills,num2,10);
 				}
-				strcpy(score,num);
+				snprintf(score,sizeof(score),"%s",num);
 				strcat(score,"/");
 				strcat(score,num2);
 				rlistbox->AddString(score,5);
@@ -560,7 +467,7 @@ void	DPlay::DisplayPlayerInfo()
 				{
 					_itoa(EnemyTeamDeaths,num2,10);
 				}
-				strcpy(score,num);
+				snprintf(score,sizeof(score),"%s",num);
 				strcat(score,"/");
 				strcat(score,num2);
 				rlistbox->AddString(score,7);
@@ -583,18 +490,10 @@ void	DPlay::DisplayPlayerInfo()
 			else
 			{
 				_itoa(t++,num,10);
-				strcpy(score,"LW ");
-				strcat(score,num);
+				snprintf(score,sizeof(score),"LW %s",num);
 			}
 			rlistbox->AddString(score,0);
 
-//DEADCODE AMM 10/01/00 			if (H2H_Player[n].Controller && _DPlay.GameType>TEAMPLAY)
-//DEADCODE AMM 10/01/00 			{
-//DEADCODE AMM 10/01/00 				strcpy(score,H2H_Player[n].name);
-//DEADCODE AMM 10/01/00 				strcat(score," (C)");
-//DEADCODE AMM 10/01/00 				rlistbox->AddString(score,1);
-//DEADCODE AMM 10/01/00 			}
-//DEADCODE AMM 10/01/00 			else
 			{
 				rlistbox->AddString(H2H_Player[n].name,1);
 			}
@@ -627,10 +526,6 @@ void	DPlay::DisplayPlayerInfo()
 				_itoa((H2H_Player+n)->deaths,num,10);
 				rlistbox->AddString(num,7);
 
-//DeadCode AMM 11Oct00 				_itoa((H2H_Player+n)->kills,num,10);
-//DeadCode AMM 11Oct00 				rlistbox->AddString(num,4);
-//DeadCode AMM 11Oct00 				_itoa((H2H_Player+n)->deaths,num,10);
-//DeadCode AMM 11Oct00 				rlistbox->AddString(num,5);
 			}
 			else
 			{
@@ -648,7 +543,7 @@ void	DPlay::DisplayPlayerInfo()
 				{
 					_itoa(EnemyTeamKills,num2,10);
 				}
-				strcpy(score,num);
+				snprintf(score,sizeof(score),"%s",num);
 				strcat(score,"/");
 				strcat(score,num2);
 				rlistbox->AddString(score,5);
@@ -665,7 +560,7 @@ void	DPlay::DisplayPlayerInfo()
 				{
 					_itoa(EnemyTeamDeaths,num2,10);
 				}
-				strcpy(score,num);
+				snprintf(score,sizeof(score),"%s",num);
 				strcat(score,"/");
 				strcat(score,num2);
 				rlistbox->AddString(score,7);			

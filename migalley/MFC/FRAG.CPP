@@ -168,7 +168,6 @@ bool CFrag::PositionValid(int pilot,CFrag::OneFragDef* params, int numopts)
 					(
 			 				(MMC.playersquadron == squadnum)
 						&&	(MMC.playeracnum == pos)
-//DeadCode AMM 14Oct98 						&&	(_DPlay.CurrPlayers == 0)
 						&&	(!RFullPanelDial::incomms)			//AMM 14Oct98
 					)
 				)
@@ -491,7 +490,6 @@ BOOL CFrag::OnInitDialog()
 	
 	
 
-//DeadCode AMM 14Oct98 	if  (		(_DPlay.CurrPlayers != 0)
 	if  (		(RFullPanelDial::incomms)						//AMM 14Oct98
 		&&	(_DPlay.GameType == COMMSCAMPAIGN)
 		&&	(_DPlay.Side == FALSE)
@@ -561,23 +559,14 @@ BOOL CFrag::OnInitDialog()
 			combo->ShowWindow(SW_SHOW);
 			for (int i=0;i< CFrag::MAXCOMBOENTRIES;i++)
 			{
-//DeadCode AMM 14Oct98 				if (_DPlay.CurrPlayers == 0)
 				if (!RFullPanelDial::incomms || _DPlay.GameType==COMMSCAMPAIGN)					//AMM 14Oct98
 				{
-//DEADCODE DAW 06/06/99 					name=CSprintf("%s: %s",
-//DEADCODE DAW 06/06/99 						Todays_Packages.pack[comboparams[i].pack].packname,
-//DEADCODE DAW 06/06/99 						GetTargName(Todays_Packages[comboparams[i].pack].packagetarget));
 					name=CSprintf("%i: %s",
 						comboparams[i].pack+1,
 						GetTargName(Todays_Packages[comboparams[i].pack].packagetarget));
 						//Todays_Packages.pack[comboparams[i].pack].packname);
 				}else
 				{
-//DEADCODE JIM 19/01/99 					switch (_DPlay.GameType)
-//DEADCODE JIM 19/01/99 					{
-//DEADCODE JIM 19/01/99 						case TEAMPLAY:
-//DEADCODE JIM 19/01/99 						case DEATHMATCH:
-//DEADCODE JIM 19/01/99 						case COMMSQUICKMISSION:
 						{
 
 							if (comboparams[i].pack == 0)
@@ -586,16 +575,8 @@ BOOL CFrag::OnInitDialog()
 								name=RESSTRING(RED);
 
 // hey, if you comment out switches, remove the breaks as well!
-//DeadCode AMM 11Feb99 							break;
 						
 						}
-//DEADCODE JIM 19/01/99 						case COMMSCAMPAIGN:
-//DEADCODE JIM 19/01/99 						{
-//DEADCODE JIM 19/01/99 							name=Todays_Packages.pack[comboparams[i].pack].packname;
-//DEADCODE JIM 19/01/99 							break;
-//DEADCODE JIM 19/01/99 						}
-//DEADCODE JIM 19/01/99 
-//DEADCODE JIM 19/01/99 					}
 				}
 				//RERUN _itoa((CFrag::comboparams[i].wave + 1),wavenum,10);
 				snprintf(wavenum, sizeof(wavenum), "%d", CFrag::comboparams[i].wave + 1); //RERUN
@@ -646,7 +627,7 @@ BOOL CFrag::OnInitDialog()
 			{
 				if (pack == CFrag::comboparams[comboindex].pack)
 					playeronview = true;
-					break;
+				break;
 			}
 			case  CFrag::WAVE:
 			{
@@ -688,7 +669,6 @@ BOOL CFrag::OnInitDialog()
 	rtp=GETDLGITEM(IDC_UNASSIGN);
 	b=GETDLGITEM(IDC_UNASSIGNFLAG);
 
-//DeadCode AMM 14Oct98 	if (_DPlay.CurrPlayers == 0)
 	if (!RFullPanelDial::incomms)								//AMM 14Oct98
 	{
 		rtp->ShowWindow(SW_HIDE);
@@ -711,7 +691,6 @@ BOOL CFrag::OnInitDialog()
 			rlistbox->AddColumn(300);
 		}
 	}
-//DeadCode AMM 17Nov98 	DPlay::H2H_Player[_DPlay.mySlot].status=CPS_FRAG;
 
 	frag_timer=SetTimer(TIMER_FRAG,0,NULL);
 	fragfirsttime=true;
@@ -759,7 +738,6 @@ void CFrag::RedrawScreen()
 	DestroyPanel();
 	//##need to choose commsfrag if in comms
 //	fullscreen->SelectReadyRoom
-//DeadCode AMM 14Oct98 	if (_DPlay.CurrPlayers == 0)
 	if (!RFullPanelDial::incomms)								//AMM 14Oct98
 		FullPanel()->LaunchScreen(&RFullPanelDial::singlefrag);
 	else
@@ -833,7 +811,6 @@ void CFrag::OnClickedPilotedflag()
 void CFrag::OnClickedUnassignflag() 
 {
 	int i = 0;
-//DeadCode AMM 17Nov98 	while	(		(i < _DPlay.CurrPlayers)
 	while	(		(i < MAXPLAYERS)					//AMM 04Nov98
 			)
 	{
@@ -871,7 +848,6 @@ void CFrag::OnReturnPressedPlayerchat(LPCTSTR text)
 
 		rlistbox=GETDLGITEM(IDC_RLIST_INCOMING_CHAT);
 
-	//DeadCode AMM 05Aug98 	rlistbox->AddString(&_DPlay.PlayerName[0],0);
 		rlistbox->AddString((DPlay::H2H_Player+_DPlay.mySlot)->name,0);
 		rlistbox->AddString(text,1);
 		rlistbox->SetHilightRow(-1) ;							//AMM 10Jul99
@@ -884,7 +860,6 @@ void CFrag::OnReturnPressedPlayerchat(LPCTSTR text)
 		poo->SetCaption("");										  //AMM 06/07/99
 
 
-//DeadCode AMM 07Jul99 		poo->SetWindowText("");
 	}
 }
 void CFrag::OnReturnPressed()
@@ -898,7 +873,6 @@ void CFrag::OnReturnPressed()
 
 		rlistbox=GETDLGITEM(IDC_RLIST_INCOMING_CHAT);
 
-	//DeadCode AMM 05Aug98 	rlistbox->AddString(&_DPlay.PlayerName[0],0);
 		rlistbox->AddString((DPlay::H2H_Player+_DPlay.mySlot)->name,0);
 		rlistbox->AddString(text,1);
 		rlistbox->SetHilightRow(-1) ;							//AMM 10Jul99

@@ -98,10 +98,8 @@ AircraftUnit::AircraftUnit(int oldunit, TypesToList typestolist, int tab, int am
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	this->oldunit = oldunit;
-//DeadCode JIM 14Nov00 	acisfighter = fighter;
 	currtab = tab;
 	attackmethod = am;
-//DeadCode JIM 14Nov00 	me110isbomber = me110bomber;
 	udisplayl = unitdisplaylevel;
 	this->typestolist=typestolist;
 }
@@ -201,7 +199,6 @@ BOOL AircraftUnit::OnInitDialog()
 
 
 
-//DeadCode JIM 20Oct00 		int acavail = 0;
 	int j = 0;
 	while (Node_Data.gruppe[j].squadron != SQ_ZERO)
 	{
@@ -272,7 +269,6 @@ void AircraftUnit::OnOK()
 			{//add group, we always add in groups, don't get here for other cases
 				Profile::BetterRule	br = Profile::BR_WIDESTPOSSIBLE;
 				pk.AddNumerousSquadrons(-3,(Profile::AttackMethod)attackmethod,(SquadNum)j,br);
-	//DEADCODE RDH 04/04/00 			pk.AddSquadron(-3, (Profile::AttackMethod)attackmethod,pk.packagetarget[0].currentid,(SquadNum)j);
 			}else
 			{//		replace oldunit with new
 
@@ -296,7 +292,7 @@ void AircraftUnit::OnOK()
 
 
 						int i = pk.squadlist - 1;
-						int numstaffel = 0;int oldindex;
+						int numstaffel = 0;int oldindex=0;
 						Profile::AttackMethod	am;
 						while (i >= 0)
 						{
@@ -318,7 +314,6 @@ void AircraftUnit::OnOK()
 
 
 			}
-			//DeadCode JIM 7Nov00 		pk.ReShareSecondaries();								//JIM 28Aug00
 			typedef	Profile::AttackMethod	AttackMethod;
 			MAKEFIELD(AttackMethod,Profile::AM_FIELD_MIN,Profile::AM_FIELD_MAX);
 			AttackMethodField	am=pk.ScanAttackMethods();

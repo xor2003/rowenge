@@ -229,7 +229,6 @@ bool CFragPilot::CommsPlayer(int pos, int& i)
 	if (!RFullPanelDial::incomms)									  //JIM 19/05/99
 		return false;												  //JIM 19/05/99
 	i = 0;
-//DeadCode AMM 17Nov98 	while	(		(i < _DPlay.CurrPlayers)
 	while	(		(i < MAXPLAYERS)					//AMM 04Nov98
 			)
 	{
@@ -309,7 +308,6 @@ BOOL CFragPilot::OnInitDialog()
 	s=GETDLGITEM(IDC_FRAG_ID);
 	if (!CFrag::packmode)
 	{
-//DeadCode AMM 14Oct98 		if  (		(_DPlay.CurrPlayers != 0)
 		if ((RFullPanelDial::incomms)							//AMM 14Oct98
 				&&	(_DPlay.GameType != COMMSCAMPAIGN)
 			)
@@ -332,7 +330,6 @@ BOOL CFragPilot::OnInitDialog()
 	s->SetString(text);
 
 	s=GETDLGITEM(IDC_FRAG_ROLE);
-//DeadCode AMM 14Oct98 	if  (		(_DPlay.CurrPlayers != 0)
 	if  (		(RFullPanelDial::incomms)						//AMM 14Oct98
 			&&	(_DPlay.GameType != COMMSCAMPAIGN)
 		)
@@ -341,7 +338,6 @@ BOOL CFragPilot::OnInitDialog()
 		//s->SetString(LoadResString(IDS_ATTACK + groupnum));
 	}else
 	{
-//DEADCODE JIM 10/04/99 		s->SetString(LoadResString(IDS_ATTACK + groupnum));
 		info_airgrp* g=
 		*Persons2::ConvertPtrUID(Todays_Packages[packnum][wavenum][groupnum].uid);
 

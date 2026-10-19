@@ -344,12 +344,6 @@ KeyName(322,FK_MAGS1)
 KeyName(323,FK_MAGS2)
 
 KeyName(324,RPM_ZERO)
-//DeadCode CSB 03/12/99	KeyName(322,FK_MAG03)
-//DeadCode CSB 03/12/99	KeyName(323,FK_MAG04)
-//DeadCode CSB 03/12/99	KeyName(324,FK_MAG11)
-//DeadCode CSB 03/12/99	KeyName(325,FK_MAG12)
-//DeadCode CSB 03/12/99	KeyName(326,FK_MAG13)
-//DeadCode CSB 03/12/99	KeyName(327,FK_MAG14)
 
 KeyName(325,KEY_TOGGLE_DESC_TEXT)										//JON 17Oct00
 
@@ -491,7 +485,6 @@ KeyName(655,OVERLAY_PLUS)
 KeyName(655,OVERLAY_SPACE)
 
 KeyName(768,TOTALKEYBITFLAGS2)
-//DeadCode JIM 22Nov96 };
 #undef	KeyName
 //------------------------------------------------------------------------------
 // Place new 3d key press equate definitions in the list ABOVE

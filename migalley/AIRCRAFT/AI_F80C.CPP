@@ -73,7 +73,6 @@ questions about this file may be asked at http://www.simhq.com/
 #include "WORLDINC.H"
 #include "MODVEC.H"
 #include "MODEL.H"
-//DeadCode RJS 02Dec97 #include "3dcom.h"
 
 void F80C_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 {
@@ -92,7 +91,6 @@ void F80C_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 	ACM.DeltaPitchForMaxElevator = 0.5;//	= 1.0472;
 
 	ACM.pitchmodifier = 0.25;
-//DeadCode CSB 08/03/99		ACM.pitchratemodifier = 0;//100000;
 	ACM.pitchintmodifier = 0;//1.5;
 	ACM.IntPitchForMaxElevator	= 0.1;//1000;
 
@@ -145,8 +143,6 @@ void F80C_SetupAI (AirStrucPtr const ControlledAC, ULong Version)
 //	ACM.PitchRate_Elevator_Offset_Power = 2048;
 //	ACM.PitchRate_Elevator_Damping_Power = 262144;
 
-//DeadCode RDH 17Apr98 	ACM.Pitch_Elevator_Offset_Power = 2048;
-//DeadCode RDH 17Apr98 	ACM.Pitch_Elevator_Damping_Power = 262144;
 
 	ACM.DeltaPitchForMaxElevator	= 1.0472;
 	ACM.MaxElevatorForTightTurn	= 25000;

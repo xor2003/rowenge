@@ -3481,6 +3481,8 @@ void Graphic::RegisterPalette(UByte *src, SLong length)
 	int		i;
 	UByte	*dest;
 
+	if (!src || length<=0)									//RERUN: NULL/empty palette
+		return;
 	if(Palette == NULL)
 		Palette = new PAL;
 
@@ -3905,7 +3907,7 @@ ULong Graphic::TranslateColour(Colour C)
 Colour Graphic::PlotPixel(SWord X, SWord Y,Colour colour)
 {
 	SWord		MinX,MaxX,MinY,MaxY;
-	Colour		ret_val;
+	Colour		ret_val=BLACK;								//RERUN: uninit when pixel off-screen
 	LogicalPtr	screenaddr;
 	SLong		yoffset,xoffset;
 
@@ -3965,7 +3967,7 @@ Colour Graphic::PlotPixel(SWord X, SWord Y,Colour colour)
 Colour Graphic::PlotPixel(SWord X, SWord Y)
 {
 	SWord		MinX,MaxX,MinY,MaxY;
-	Colour		ret_val;
+	Colour		ret_val=BLACK;								//RERUN: uninit when pixel off-screen
 	LogicalPtr	screenaddr;
 	SLong		yoffset,xoffset;
 

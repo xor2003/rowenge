@@ -86,7 +86,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "monotxt.h"
 #include "savegame.h"
 
-//DeadCode RJS 02Dec97 #include "3dcom.h"
 
 
 
@@ -233,9 +232,7 @@ void Engine::ProcessPistonEngine (AirStrucPtr const ControlledAC)
 		MaxSpeed = 0;
 	FP fDamage = 1.0 - FP(iDamage) * (1.0 / 255.0);
 		
-//DEADCODE CB 04/11/99 	FP MinSpeed =     Rpm0   * 0.001047197;	//RPM 2 Rads/cs
 
-//DEADCODE CB 04/11/99 	if (Speed < MinSpeed) Speed = MinSpeed;	
 	if (Speed > MaxSpeed) Speed = MaxSpeed;	
 
 	FP EngRPM    = Speed * 954.9296586;
@@ -276,8 +273,6 @@ void Engine::ProcessPistonEngine (AirStrucPtr const ControlledAC)
 					PropSetting = 0;
 				else
 					PropSetting = (ThrottleSetting - 75.0) / 25.0;
-//DEADCODE CSB 31/01/00 				PropSetting = FP(ThrottleSetting) * 0.01;
-//DEADCODE CSB 31/01/00 				PropSetting = PropSetting * PropSetting * PropSetting;
 				break;
 		}
 	}
@@ -341,7 +336,6 @@ void Engine::ProcessPistonEngine (AirStrucPtr const ControlledAC)
 	FP BladeSpeed = FSqrt(PropAirVel * PropAirVel + PropVel * PropVel);
 	FP BladeQS  =  0.5 * pModel->AmbDensity * BladeSpeed * BladeArea;
 	
-//DeadCode AMM 29Jun99 	J = PropVel / ((PropSpeed - PropSwirl) * 0.75 * BladeRadius);	//Only Used for Text Screen
 
 	FP BladeL = 4.53 * (PropInc - InflowAng);
 	FP BladeD = 0.005 + (0.071 * BladeL * BladeL);	
@@ -384,12 +378,7 @@ void Engine::ProcessPistonEngine (AirStrucPtr const ControlledAC)
 
 //#define ENGINE_DATA
 #ifdef ENGINE_DATA
-//DeadCode CSB 27/10/99	/* TEST CODE CSB 27/10/99 */if(pModel->bACM)
 /* TEST CODE CSB 27/10/99 */{
-//DEADCODE CSB 11/01/00 /* TEST CODE CSB 29/09/99 */	PrintVar(40, 15, "Gravity  %.3f ", FP(pModel->Inst.I_NormalAcc));
-//DEADCODE CSB 11/01/00 /* TEST CODE CSB 29/09/99 */	PrintVar(40, 16, "IAS      %.2f ", FP(pModel->Speed * FSqrt (pModel->AmbDensity / 0.0001225)));
-//DEADCODE CSB 11/01/00 /* TEST CODE CSB 29/09/99 */	PrintVar(40, 17, "Vel      %.2f ", FP(ControlledAC->vel_ * 0.0001));
-//DEADCODE CSB 11/01/00 /* TEST CODE CSB 29/09/99 */	PrintVar(40, 18, "DesRpm   %.2f ", FP(pModel->ModelPropSetting));
 /* TEST CODE CSB 29/09/99 */	PrintVar(20, 15, "Power    %.0f ", FP(Power / 745.7));
 /* TEST CODE CSB 29/09/99 */	PrintVar(20, 16, "RPM      %.0f ", FP(EngRPM));
 /* TEST CODE CSB 29/09/99 */	PrintVar(20, 17, "Prop Inc %.2f ", FP(Rads2Degs(PropInc)));
@@ -432,16 +421,12 @@ void Engine::ProcessPistonEngine (AirStrucPtr const ControlledAC)
 // calc engine speed
 	FP EngRotAcc = (EngTorque - Torque * GearRatio) / MoI;
 
-//DeadCode CSB 27/10/99		if (!Save_Data.flightdifficulty [FD_THRUSTPOWERCONTROL])
-//DeadCode CSB 27/10/99			EngRotAcc *= 2;												//Fast Spooling
 
-//DEADCODE AMM 24/11/99 	Speed += pModel->MODEL_DT * EngRotAcc;
 	Speed += MODEL_ENGINE_DT * EngRotAcc; //AMM 24/11/99
 
 
 	if(Speed < 0) Speed = 0;
 	
-//DEADCODE CB 04/11/99 	if (Speed < MinSpeed) Speed = MinSpeed;		
 	if (Speed > MaxSpeed) Speed = MaxSpeed;		
 				
 
@@ -506,7 +491,6 @@ void Engine::ComplexEngineProcess(AirStrucPtr const ControlledAC, FP fDamage, FP
 				fPower = 0;
 	}
 
-//DeadCode CSB 3Jul00 	fPower *= fDamage;
 	if(fDamage < 1.0)
 	{
 		if(ThrottleSetting > -100.0 + 200.0 * fDamage)
@@ -555,11 +539,8 @@ void Engine::ComplexEngineProcess(AirStrucPtr const ControlledAC, FP fDamage, FP
 			FP temp = 0.4 - 0.0025 * Temperature;
 			if(Priming > 0) 
 				temp = 0.15;
-//DEADCODE CSB 18/01/00 PrintVar(40, 18, "MinRpm  %.0f ", FP(temp * Rpm100));
 			if(frpm < temp)
 				fPower = 0;
-//DEADCODE CSB 11/01/00 			else
-//DEADCODE CSB 11/01/00 				fPower *= 1 - 0.00005 * (100.0 - Temperature) * (100.0 - Temperature);
 		}
 		Priming -= frpm * MODEL_ENGINE_DT * 0.0075;
 		if(Priming < 0)
@@ -645,7 +626,6 @@ void Engine::ProcessJetEngine (AirStrucPtr const ControlledAC)
 //JET_Code CSB 22/09/99	
 //JET_Code CSB 22/09/99		if( (Save_Data.flightdifficulty [FD_JETFLAMEOUT]) && (Manual_Pilot.ControlledAC2 == ControlledAC) )
 //JET_Code CSB 22/09/99			if( (pModel->AirSpeed > 15) && (pModel->AirSpeed > -2.0 * pModel->AirVel.z) )	//60 deg cone
-//JET_Code CSB 22/09/99	//DeadCode CSB 03/03/99			if ((pModel->AirVel.z > 10) )//&& (pModel->AirSpeed < 20))
 //JET_Code CSB 22/09/99				if(!EngineOut)
 //JET_Code CSB 22/09/99				{
 //JET_Code CSB 22/09/99					AirStrucPtr buddy = ControlledAC->FindBuddy();
@@ -679,7 +659,6 @@ void Engine::ProcessJetEngine (AirStrucPtr const ControlledAC)
 //JET_Code CSB 22/09/99		if(VeryMinRpm < MinVal) VeryMinRpm = MinVal;
 //JET_Code CSB 22/09/99		if(SpeedRpm < VeryMinRpm) SpeedRpm = VeryMinRpm;
 //JET_Code CSB 22/09/99	
-//JET_Code CSB 22/09/99	//DeadCode CSB 19/11/98		FP RelPres	 = pModel->AmbPres / 10.13;
 //JET_Code CSB 22/09/99		FP RelDens	 = pModel->AmbDensity / 0.0001225;
 //JET_Code CSB 22/09/99		FP RelTemp	 = pModel->AmbTemp / 288.15;
 //JET_Code CSB 22/09/99		
@@ -711,15 +690,7 @@ void Engine::ProcessJetEngine (AirStrucPtr const ControlledAC)
 //JET_Code CSB 22/09/99		FP DeltaRpm0   = (1 - ThrottleFactor) * (IdleRpm - SpeedRpm);
 //JET_Code CSB 22/09/99		FP DeltaRpm    = DeltaRpm100 + DeltaRpm0;
 //JET_Code CSB 22/09/99		
-//JET_Code CSB 22/09/99	//DeadCode CSB 11/12/98		if(Manual_Pilot.ControlledAC2 != ControlledAC)
-//JET_Code CSB 22/09/99	//DeadCode CSB 11/12/98		{
-//JET_Code CSB 22/09/99	//DeadCode CSB 11/12/98			FP FightingFactor = (FP)ControlledAC->FlyingFactor();
-//JET_Code CSB 22/09/99	//DeadCode CSB 11/12/98			FP ThrustInc = (FightingFactor - 128)/256;
-//JET_Code CSB 22/09/99	//DeadCode CSB 11/12/98			Thrust *= (1 + ThrustInc);
-//JET_Code CSB 22/09/99	//DeadCode CSB 11/12/98		}
 //JET_Code CSB 22/09/99	
-//JET_Code CSB 22/09/99	//DeadCode CSB 30/11/98		if( (Save_Data.flightdifficulty [FD_POWERBOOST]) && (pModel->Controlled) )
-//JET_Code CSB 22/09/99	//DeadCode CSB 30/11/98			Thrust *= pModel->PowerBoost;
 //JET_Code CSB 22/09/99	
 //JET_Code CSB 22/09/99		if( (!Save_Data.flightdifficulty [FD_THRUSTPOWERCONTROL]) || (Manual_Pilot.ControlledAC2 != ControlledAC) )//(pModel->ACM) )
 //JET_Code CSB 22/09/99			DeltaRpm *= 8;//Fast Spooling
@@ -732,14 +703,11 @@ void Engine::ProcessJetEngine (AirStrucPtr const ControlledAC)
 //JET_Code CSB 22/09/99				if(Math_Lib.rnd(256) < pModel->Inst.ExhaustTemp - 225) 
 //JET_Code CSB 22/09/99					if(adptr->ENGINELEFTIN < 255)
 //JET_Code CSB 22/09/99						adptr->ENGINELEFTIN += 1;
-//JET_Code CSB 22/09/99	//DeadCode CSB 28/04/99				PrintVar(60, 1, "EGT %.0f ", (FP)pModel->Inst.ExhaustTemp);
-//JET_Code CSB 22/09/99	//DeadCode CSB 28/04/99				PrintVar(60, 2, "ENG %.0f ", (FP)adptr->ENGINELEFTIN);
 //JET_Code CSB 22/09/99			}
 //JET_Code CSB 22/09/99		
 //JET_Code CSB 22/09/99		SpeedRpm += T100 * DeltaRpm * pModel->MODEL_DT * OneOverMoI;
 //JET_Code CSB 22/09/99	
 //JET_Code CSB 22/09/99		if( (pModel->Speed < 10) && (Thrust < 0) ) Thrust = 0;
 //JET_Code CSB 22/09/99	
-//JET_Code CSB 22/09/99	//DeadCode CSB 28/04/99		PrintVar(60, 0, "RPM %.0f ", (FP)SpeedRpm);
 }
 

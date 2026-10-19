@@ -127,15 +127,7 @@ BOOL CViewQList::OnInitDialog()
 	s->SetString(RESLIST(SPIT_A,fields->actype));
 
 	s=GETDLGITEM(IDC_FLIGHTS);
-//DeadCode AMM 10Aug00 	if (	fields->Duty()==QuickFields::QFD_FIXED_NUM_PLAYER 
-//DeadCode AMM 10Aug00 		||	fields->Duty()==QuickFields::QFD_FIXED_NUM_AUTO
-//DeadCode AMM 10Aug00 		)
-//DeadCode AMM 10Aug00 		s->SetString(CSprintf("%i", fields->flights));
-//DeadCode AMM 10Aug00 	else
-//DeadCode AMM 10Aug00 		if (fields->AllowZero()) 
 			s->SetString(CSprintf("%i", fields->flights));
-//DeadCode AMM 10Aug00 		else
-//DeadCode AMM 10Aug00 			s->SetString(CSprintf("%i", fields->flights-1));
 
 //	int altind=fields->alt*10/(Save_Data.alt.mediummm*Save_Data.alt.mediumstepsize)-Save_Data.alt.minstepcount;
 
@@ -145,7 +137,6 @@ BOOL CViewQList::OnInitDialog()
 	alt*=1000;
 	s->SetString(CSprintf("%i", alt));
 	s=GETDLGITEM(IDC_SKILL);
-//DeadCode AMM 7Aug00 	s->SetString(RESLIST(SKILL_NOVICE,fields->skill/3));
 	s->SetString(RESLIST(SKILL_NOVICE,fields->skill/SKILL_STAGE));		//AMM 7Aug00
 	
 	return TRUE;  // return TRUE unless you set the focus to a control

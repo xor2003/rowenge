@@ -54,13 +54,6 @@ KeyVal3D	const	keyname=(KeyVal3D)(keynum*2);
 KeyName(00,ReservedKeyMapping)
 
 //keys 01..07 now reserved for shifts:
-//DEADCODE AMM 09/12/99 KeyName(01,KeySrc_BN_extsh)		/*(Extended Shift)*/
-//DEADCODE AMM 09/12/99 KeyName(02,KeySrc_BN_AltL)		/*(Left Alt)*/
-//DEADCODE AMM 09/12/99 KeyName(03,KeySrc_BN_AltGR)		/*(AltGr)*/
-//DEADCODE AMM 09/12/99 KeyName(04,KeySrc_BN_CtrlL)
-//DEADCODE AMM 09/12/99 KeyName(05,KeySrc_BN_CtrlR)
-//DEADCODE AMM 09/12/99 KeyName(06,KeySrc_BN_ShiftL)
-//DEADCODE AMM 09/12/99 KeyName(07,KeySrc_BN_ShiftR)
 
 
 KeyName(01,KeySrc_BN_extsh)
@@ -71,14 +64,6 @@ KeyName(05,KeySrc_BN_Msg)
 KeyName(06,KeySrc_BN_ShMsg)
 KeyName(07,KeySrc_BN_Overlay)
 
-//DeadCode AMM 07Dec99 KeyName(8,ELEVATOR_BACK)		/*Elevator Back*/
-//DeadCode AMM 07Dec99 KeyName(9,ELEVATOR_FORWARD)	/*Elevator Forward*/
-//DeadCode AMM 07Dec99 KeyName(10,AILERON_RIGHT)		/*Aieron Right*/
-//DeadCode AMM 07Dec99 KeyName(11,AILERON_LEFT)		/*Aileron Left*/
-//DeadCode AMM 07Dec99 KeyName(12,RUDDER_LEFT)			/*Rudder Left*/
-//DeadCode AMM 07Dec99 KeyName(13,RUDDER_RIGHT)		/*Rudder Right*/
-//DeadCode AMM 07Dec99 KeyName(14,SENS_UP)				/*Increase Keyboard Sensitivity*/
-//DeadCode AMM 07Dec99 KeyName(15,SENS_DOWN)			/*Decrease Keyboard Sensitivity*/
 
 KeyName(8,KeySrc_BN_NormLock)
 KeyName(9,KeySrc_BN_SpareLock)
@@ -351,7 +336,6 @@ KeyName(268,RUDDER_RIGHT)		/*Rudder Right*/
 KeyName(269,SENS_UP)				/*Increase Keyboard Sensitivity*/
 KeyName(270,SENS_DOWN)			/*Decrease Keyboard Sensitivity*/
 KeyName(271,MOUSEMODETOGGLE)
-//DeadCode JIM 31Aug00 KeyName(272,JOYSTICKMODETOGGLE)
 
 // Cockpit keys...
 KeyName(300,FK_THROTTLE0)										//RJS 14Dec99
@@ -361,7 +345,6 @@ KeyName(303,FK_PROPPITCH1)
 KeyName(304,FK_ELEVATORTRIM)
 KeyName(305,FK_RUDDERTRIM)
 KeyName(306,FK_EMERGENCYUC)
-//DEADCODE CSB 20/01/00 KeyName(307,FK_FUELTANKSELECT)
 KeyName(308,FK_ARMED)
 KeyName(309,FK_LANDING)
 KeyName(310,FK_GUNCAM)
@@ -381,12 +364,6 @@ KeyName(322,FK_MAGS1)
 KeyName(323,FK_MAGS2)
 
 KeyName(324,RPM_ZERO)
-//DeadCode CSB 03/12/99	KeyName(322,FK_MAG03)
-//DeadCode CSB 03/12/99	KeyName(323,FK_MAG04)
-//DeadCode CSB 03/12/99	KeyName(324,FK_MAG11)
-//DeadCode CSB 03/12/99	KeyName(325,FK_MAG12)
-//DeadCode CSB 03/12/99	KeyName(326,FK_MAG13)
-//DeadCode CSB 03/12/99	KeyName(327,FK_MAG14)
 
 KeyName(325,KEY_TOGGLE_DESC_TEXT)										//JON 17Oct00
 
@@ -536,7 +513,6 @@ KeyName(655,OVERLAY_SPACE)
 
 
 KeyName(768,TOTALKEYBITFLAGS2)
-//DeadCode JIM 22Nov96 };
 #undef	KeyName
 //------------------------------------------------------------------------------
 // Place new 3d key press equate definitions in the list ABOVE
@@ -870,15 +846,6 @@ enum Raw_Keys	{
 #define	KeyMap(keyname,rawname,rawshift)	\
 		{Raw_##rawname,KEYSH_BN_##rawshift,keyname},
 
-//DeadCode AMM 07Dec99 #define	KeyAll(keyname,rawname)	\
-//DeadCode AMM 07Dec99 		{Raw_##rawname,KEYSH_BN_norm	,keyname},	\
-//DeadCode AMM 07Dec99 		{Raw_##rawname,KEYSH_BN_extsh	,keyname},	\
-//DeadCode AMM 07Dec99 		{Raw_##rawname,KEYSH_BN_AltL	,keyname},	\
-//DeadCode AMM 07Dec99 		{Raw_##rawname,KEYSH_BN_AltGR	,keyname},	\
-//DeadCode AMM 07Dec99 		{Raw_##rawname,KEYSH_BN_CtrlL	,keyname},	\
-//DeadCode AMM 07Dec99 		{Raw_##rawname,KEYSH_BN_CtrlR	,keyname},	\
-//DeadCode AMM 07Dec99 		{Raw_##rawname,KEYSH_BN_ShiftL	,keyname},	\
-//DeadCode AMM 07Dec99 		{Raw_##rawname,KEYSH_BN_ShiftR	,keyname},
 
 
 #define	KeyAll(keyname,rawname)	\
@@ -922,7 +889,6 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 //------------------------------------------------------------------------------
 
 //shift keys mapped to generate shifts...
-//DeadCode AMM 08Dec99 	KeyAll(KeySrc_BN_extsh,lockcap)
 
 	KeyAll(KeySrc_BN_MsgLock,lockcap)
 
@@ -950,39 +916,28 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 
 		KeyMap(ENEMYVIEW,		f1,		norm)
 		KeyMap(RESETENEMYVIEW,	f1,		CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(RESETENEMYVIEW,	f1,		CtrlR)
 		KeyMap(PREVENEMYVIEW,	f1,		ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(PREVENEMYVIEW,	f1,		ShiftR)
 		KeyMap(AIUNFRIENDLYVIEW,	f1,		AltL)
-//DeadCode AMM 07Dec99 		KeyMap(AIUNFRIENDLYVIEW,	f1,		AltGR)
 
 		KeyMap(FRNDVIEW,		f2,		norm)
 		KeyMap(RESETFRNDVIEW,	f2,		CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(RESETFRNDVIEW,	f2,		CtrlR)
 		KeyMap(PREVFRNDVIEW,	f2,		ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(PREVFRNDVIEW,	f2,		ShiftR)
 		KeyMap(ESCORTEEVIEW,	f2,		AltL)
-//DeadCode AMM 07Dec99 		KeyMap(ESCORTEEVIEW,	f2,		AltGR)
 
 
 		KeyMap(GRNDTVIEW,		f3,		norm)
 		KeyMap(RESETGRNDTVIEW,	f3,		CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(RESETGRNDTVIEW,	f3,		CtrlR)
 		KeyMap(PREVGRNDTVIEW,	f3,		ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(PREVGRNDTVIEW,	f3,		ShiftR)
 
 		KeyMap(WAYPTVIEW,		f4,		norm)
 		KeyMap(RESETWAYPTVIEW,	f4,		CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(RESETWAYPTVIEW,	f4,		CtrlR)
 		KeyMap(PREVWAYPTVIEW,	f4,		ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(PREVWAYPTVIEW,	f4,		ShiftR)
 
 		KeyMap(MSGVIEW,			f5,		norm)
 
 		KeyMap(OUTREVLOCKTOG,	f6,		AltL)
 		KeyMap(OUTSIDETOG,		f6,		norm)
 		KeyMap(TOGGLEWOBBLEVIEW,	f6,			ShiftL)				  //RDH 02/06/99
-//DeadCode AMM 07Dec99 		KeyMap(TOGGLEWOBBLEVIEW,	f6,			ShiftR)				  //RDH 02/06/99
 
 		KeyMap(INSIDETOG,		f7,		norm)
 		KeyMap(CHEATTOG,		f8,		norm)
@@ -1014,20 +969,12 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 		KeyMap(RPM_90,			n9,			norm)
 		KeyMap(RPM_00,			n0,			norm)
 
-//DeadCode DAW 19Jun99 #if	defined(NDEBUG)
 		KeyMap(GROUPINFOMSG,	n1,			ShiftL)
 		KeyMap(PRECOMBATMSG,	n2,			ShiftL)
 		KeyMap(COMBATMSG,		n3,			ShiftL)
 		KeyMap(POSTCOMBATMSG,	n4,			ShiftL)
 		KeyMap(TOWERMSG,		n5,			ShiftL)
 		KeyMap(FACMSG,			n6,			ShiftL)
-//DeadCode DAW 19Jun99 #endif
-//DeadCode AMM 07Dec99 		KeyMap(GROUPINFOMSG,	n1,			ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(PRECOMBATMSG,	n2,			ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(COMBATMSG,		n3,			ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(POSTCOMBATMSG,	n4,			ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(TOWERMSG,		n5,			ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(FACMSG,			n6,			ShiftR)
 
 		KeyMap(AROTDNLEFT,		n1,			AltL)
 		KeyMap(AROTDOWN,		n2,			AltL)
@@ -1070,9 +1017,7 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 		KeyMap(ALOOKNE,			n9,			CtrlL)
 
 		KeyMap(MAXPROPPITCH,	n9,			ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(MAXPROPPITCH,	n9,			ShiftR)
 		KeyMap(MINPROPPITCH,	n0,			ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(MINPROPPITCH,	n0,			ShiftR)
 
 //------------------------------------------------------------------------------
 //letters
@@ -1083,25 +1028,19 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 
 		KeyMap(RECORDTOGGLE,		c,			norm)
 		KeyMap(SHAPECHEATTOG,		c,			CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(SHAPECHEATTOG,		c,			CtrlR)
 
 		KeyMap(SPEEDBRAKE,		 	d,			norm)
 		KeyMap(DETAILDN,		 	d,			ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(DETAILDN,		 	d,			ShiftR)
 		KeyMap(DETAILUP,			d,			CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(DETAILUP,			d,			CtrlR)
 
 		KeyMap(CYCLEENGINES,		e,			norm)
 		KeyMap(EJECTPILOT,			e,			CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(EJECTPILOT,			e,			CtrlR)
 
 		KeyMap(FLAPSUP,				f,			norm)				//RJS 23May00
 		KeyMap(FUELGUAGESELECTOR,	f,			CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(FUELGUAGESELECTOR,	f,			CtrlR)
 
 		KeyMap(GEARUPDOWN,			g,			norm)
 		KeyMap(EMERGENCYGEAR,		g,			CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(EMERGENCYGEAR,		g,			CtrlR)
 
 		KeyMap(HUDTOGGLE,			h,			norm)
 
@@ -1111,15 +1050,12 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 
 		KeyMap(SENS_UP,				k,			norm)
 		KeyMap(SENS_DOWN,			k,			ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(SENS_DOWN,			k,			ShiftR)
 
 		KeyMap(FLOORVIEW,			l,			norm)
 
 		KeyMap(GOTOMAPKEY,			m,			norm)
 		KeyMap(TOGGLEMESSAGES,		m,			ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(TOGGLEMESSAGES,		m,			ShiftR)
 		KeyMap(SEEMIGS,				m,			CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(SEEMIGS,				m,			CtrlR)
 
 		KeyMap(CYCLETHROUGHWEAPONS,	n,			norm)
 
@@ -1127,13 +1063,11 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 
 		KeyAll(PAUSEKEY,			p)
 		KeyMap(SCREENSHOT,			p,			CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(SCREENSHOT,			p,			CtrlR)
 
 		KeyMap(HEADOUTVIEWL,		q,			norm)
 
 		KeyMap(RADIOCOMMS,			r,			norm)
 		KeyMap(RELOADWEAPON,		r,			CtrlL)				  //RDH 16/04/99
-//DeadCode AMM 07Dec99 		KeyMap(RELOADWEAPON,		r,			CtrlR)				  //RDH 16/04/99
 
 		KeyMap(SUICIDE,				s,			norm)
 		KeyMap(SPINRECOVERY,		s,			ShiftL)
@@ -1145,16 +1079,13 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 
 		KeyMap(FLAPSDOWN,			v,			norm)				//RJS 23May00
 		KeyMap(VOICETOGGLE,			v,			CtrlL)
-//DeadCode AMM 07Dec99 		KeyMap(VOICETOGGLE,			v,			CtrlR)
 
 		KeyMap(HEADOUTVIEWR,		w,			norm)
 		KeyMap(DUMPWEAPONS,			w,			CtrlL)					  //RDH 16/04/99
-//DeadCode AMM 07Dec99 		KeyMap(DUMPWEAPONS,			w,			CtrlR)					  //RDH 16/04/99
 //use x for video reset
 		KeyMap(RESETRECORD,			x,			norm)
 		KeyMap(EXITKEY,				x,			AltL)
 
-//DeadCode JIM 31Aug00 		KeyMap(JOYSTICKMODETOGGLE,	y,			norm)
 
 		KeyMap(BREAK,				z,			norm)
 
@@ -1164,19 +1095,14 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 
 		KeyMap(ACCELKEY,			tab,		norm)
 		KeyMap(ACCELKEY2,			tab,		ShiftL)
-//DeadCode AMM 07Dec99 		KeyMap(ACCELKEY2,			tab,		ShiftR)
 
 		KeyMap(RPM_DOWN,			minus,		norm)
 		KeyMap(PROPPITCHUP,			minus,		ShiftL)	//CSB 05/10/99
-//DeadCode AMM 07Dec99 		KeyMap(PROPPITCHUP,			minus,		ShiftR)	//CSB 05/10/99
 		KeyMap(APANLEFT,			minus,		AltL)
-//DeadCode AMM 07Dec99 		KeyMap(APANLEFT,			minus,		AltGR)
 
 		KeyMap(RPM_UP,				equal,		norm)
 		KeyMap(PROPPITCHDOWN,		equal,		ShiftL)	//CSB 05/10/99
-//DeadCode AMM 07Dec99 		KeyMap(PROPPITCHDOWN,		equal,		ShiftR)	//CSB 05/10/99
 		KeyMap(APANRIGHT,			equal,		AltL)
-//DeadCode AMM 07Dec99 		KeyMap(APANRIGHT,			equal,		AltGR)
 
 		KeyMap(INOUTTOG,			backspc,	norm)
 
@@ -1225,23 +1151,10 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 		KeyMap(BIGZOOMIN,	 		numminus,		ShiftL)
 		KeyMap(ROTRESET,			movefive,		ShiftL)
 
-//DeadCode AMM 07Dec99 		KeyMap(BIGROTDOWN,	 		movedown,	 	ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGROTUP,	 		moveup,		 	ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGROTRIGHT,	 		moveright,	 	ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGROTLEFT,	 		moveleft, 	 	ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGROTDNLEFT, 		moveend,  		ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGROTDNRIGHT,		pagedown, 		ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGROTUPLEFT, 		movehome, 		ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGROTUPRIGHT,		pageup,	  		ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGZOOMOUT,	 		numplus,  		ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(BIGZOOMIN,	 		numminus, 		ShiftR)
-//DeadCode AMM 07Dec99 		KeyMap(ROTRESET2,			movefive,		ShiftR)
 
 		KeyMap(NEXTSHAPEUP,			numplus,		CtrlL)
 		KeyMap(NEXTSHAPEDN,			numminus,		CtrlL)
 
-//DeadCode AMM 07Dec99 		KeyMap(NEXTSHAPEDN,			numminus,		CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(NEXTSHAPEUP,			numplus,		CtrlR)
 
 //Gunner
 //		KeyMap(NOSEGUNNER,			moveup,			norm)
@@ -1274,20 +1187,11 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 		KeyMap(RUDTRIMDOWN,		J_delete,			CtrlL)
 		KeyMap(RUDTRIMUP,		J_pagedown,			CtrlL)
 
-//DeadCode AMM 07Dec99 		KeyMap(ELEVTRIMDOWN,	J_moveend,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(ELEVTRIMUP,		J_movehome,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(AILTRIMDOWN,		J_insert,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(AILTRIMUP,		J_pageup,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(RUDTRIMDOWN,		J_delete,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(RUDTRIMUP,		J_pagedown,			CtrlR)
 
 		KeyMap(RESETALLTRIM,	J_moveend,			AltL)
-//DeadCode AMM 07Dec99 		KeyMap(RESETALLTRIM,	J_moveend,			AltGR)
 
 		KeyMap(LOOKE,			moveright,			AltL)
 		KeyMap(LOOKW,			moveleft,			AltL)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKE,			moveright,			AltGR)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKW,			moveleft,			AltGR)
 
 
 		KeyMap(LOOKUPNE,		pageup,				CtrlL)
@@ -1425,23 +1329,7 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 
 
 
-//DeadCode AMM 07Dec99 		KeyMap(LOOKUPNE,		pageup,				CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKUPE,			moveright,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKUPSE,		pagedown,		 	CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKUPS,			movedown,		  	CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKUPSW,		moveend,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKUPW,			moveleft,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKUPNW,		movehome,			CtrlR)
-//DeadCode AMM 07Dec99 		KeyMap(LOOKUPN,			moveup,				CtrlR)
 
-//DeadCode AMM 07Dec99 //DEAD		KeyMap(ROOKUPNE,		pageup,				CtrlR)
-//DeadCode AMM 07Dec99 //DEAD		KeyMap(ROOKUPE,			moveright,			CtrlR)
-//DeadCode AMM 07Dec99 //DEAD		KeyMap(ROOKUPSE,		pagedown,		 	CtrlR)
-//DeadCode AMM 07Dec99 //DEAD		KeyMap(ROOKUPS,			movedown,		  	CtrlR)
-//DeadCode AMM 07Dec99 //DEAD		KeyMap(ROOKUPSW,		moveend,			CtrlR)
-//DeadCode AMM 07Dec99 //DEAD		KeyMap(ROOKUPW,			moveleft,			CtrlR)
-//DeadCode AMM 07Dec99 //DEAD		KeyMap(ROOKUPNW,		movehome,			CtrlR)
-//DeadCode AMM 07Dec99 //DEAD		KeyMap(ROOKUPN,			moveup,				CtrlR)
 
 //------------------------------------------------------------------------------
 //Joystick keys:
@@ -1468,23 +1356,13 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 
 		KeyAll(LOOKN,		H2_N)					//third 8 are reserved for 2nd hat
 		KeyAll(LOOKNE ,		H2_NE)
-//DeadCode AMM 2Aug00 		KeyAll(LOOKW,		H2_E)
 		KeyAll(LOOKE,		H2_E)
-//DeadCode AMM 2Aug00 		KeyAll(LOOKSW,		H2_SE)
 		KeyAll(LOOKSE,		H2_SE)
 		KeyAll(LOOKS,		H2_S)
 		KeyAll(LOOKSW,		H2_SW)
 		KeyAll(LOOKW,		H2_W)
 		KeyAll(LOOKNW,		H2_NW)
 
-//DeadCode AMM 2Aug00 		KeyAll(GROUPINFOMSG,	H3_N)					//4th 8 are reserved for 3rd hat
-//DeadCode AMM 2Aug00 		KeyAll(PRECOMBATMSG,	H3_NE)
-//DeadCode AMM 2Aug00 		KeyAll(COMBATMSG,		H3_E)
-//DeadCode AMM 2Aug00 		KeyAll(POSTCOMBATMSG,	H3_SE)
-//DeadCode AMM 2Aug00 		KeyAll(TOWERMSG,		H3_S)
-//DeadCode AMM 2Aug00 		KeyAll(FACMSG,			H3_SW)
-//DeadCode AMM 2Aug00 		KeyAll(GOTOMAPKEY,		H3_W)
-//DeadCode AMM 2Aug00 		KeyAll(KEY_CONFIGMENU,	H3_NW)
 
 		KeyAll(FLAPSUP,			H3_N)					//4th 8 are reserved for 3rd hat
 		KeyAll(NEXTWEAPON,		H3_NE)
@@ -1499,9 +1377,6 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 		KeyAll(MENUSELECT,		A2_Fire)			//Joystick key codes
 		KeyAll(MOUSEMODETOGGLE,	A2_b1)
 		KeyAll(ROTRESET2,		A2_b2)
-//DEADCODE  01/11/99 		KeyAll(WINGSPANDOWN,A2_b1)						//First 8 are reserved for buttons
-//DEADCODE  01/11/99 		KeyMap(WINGSPANUP,	A2_b1,ShiftL)
-//DEADCODE AMM 13/12/99 		KeyAll(SUICIDE,		A2_b2)
 
 //Third analogue input device										  //JIM 13/05/99
 		KeyAll(SHOOT,			A3_Fire)			//Joystick key codes
@@ -1514,12 +1389,6 @@ static	KeyMapping	ThisKeyMapping[]	=	{
 		KeyAll(DROPBOMB,		A1_b7)
 		KeyAll(SPEEDBRAKE,		A3_b8)
 		KeyAll(RESETALLTRIM,	A3_b9)
-//DeadCode JIM 15Oct00 		KeyAll(SHOOT,			A3_Fire)			//Joystick key codes
-//DeadCode JIM 15Oct00 		KeyAll(ROTRESET,		A3_b1)						//First 8 are reserved for buttons
-//DeadCode JIM 15Oct00 		KeyAll(PADLOCKTOG,		A3_b2)
-//DeadCode JIM 15Oct00 		KeyAll(INOUTTOG,		A3_b3)
-//DEADCODE  01/11/99 		KeyAll(ELEVTRIMFWD,		A3_b4)
-//DEADCODE  01/11/99 		KeyAll(GUNRANGEUP,		A3_b5)
 
 
 //------------------------------------------------------------------------------

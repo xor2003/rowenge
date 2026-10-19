@@ -848,7 +848,6 @@ inline	sdlong& sdlong::operator/=(sdlong x)
 	{	//this don't work if div_this=O(2G), 'cos temp <0
 		if (div_this < temp)	break;
 
-//DeadCode JIM 06Aug96 		by_this = temp;		//use BSR to speed this up
 
 		temp += temp;
 
@@ -864,9 +863,6 @@ inline	sdlong& sdlong::operator/=(sdlong x)
 			result ++;
 		}
 
-//DeadCode JIM 06Aug96 		div_this += by_this;
-//DeadCode JIM 06Aug96
-//DeadCode JIM 06Aug96 		result--;
 
 		div_this<<=(SLong )1;
 

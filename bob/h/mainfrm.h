@@ -7,16 +7,13 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-//DEADCODE DAW 24/11/99 #include "RDlgBar.h"
 #include "SysBox.h"	// Added by ClassView
-//DEADCODE DAW 24/11/99 #include "ButonBar.h"
 #include <afxtempl.h>
 //#include "rtoolbar.h"
 #include "scalebar.h"
 #include "maintbar.h"
 #include "mapfltrs.h"
 #include "msctlbr.h"
-//DEADCODE DAW 24/11/99 #include "dbrftlbr.h"
 #include "statbar.h"
 #include "teletype.h"
 
@@ -57,7 +54,6 @@ public:
 	void ShowToolbars(bool firsttime);
 	void HideToolbars();
 	BOOL m_bHideToolbars;
-//DeadCode AMM 7Aug00 	Bool m_oldindebrief;
 	typedef CList<CRToolBar*,CRToolBar*> ToolBarList;
 	ToolBarList m_left;
 	ToolBarList m_top;
@@ -81,7 +77,6 @@ public:
 	void	CloseToolChildren(RDialog* skipthis=NULL);
 	void	UpdateToolbars(bool	hideall);
 
-//DeadCode RJS 27Jul00 	void WinHelp(DWORD dwData, UINT nCmd);
 
 	CSystemBox* m_wndSystemBox;
 #endif
@@ -89,8 +84,6 @@ public:
 	void WinHelp(DWORD dwData, UINT nCmd);
 
 	int m_doIExist;
-//DEADCODE DAW 07/05/99 	CResizableDlgBar m_wndDialogBar;
-//DeadCode RDH 11Jul99 	CSystemBox* m_wndSystemBox;
 	virtual ~CMainFrame();
 
 #ifdef _DEBUG
@@ -153,11 +146,6 @@ inline CMainToolbar&	MainToolBar()
 	CMainFrame* pmainwnd=(CMainFrame*)AfxGetMainWnd();
 	return pmainwnd->m_toolbar2;
 }
-//DEADCODE RDH 08/11/99 inline CDebriefToolbar&	DebriefToolBar()
-//DEADCODE RDH 08/11/99 {
-//DEADCODE RDH 08/11/99 	CMainFrame* pmainwnd=(CMainFrame*)AfxGetMainWnd();
-//DEADCODE RDH 08/11/99 	return pmainwnd->m_toolbar5;
-//DEADCODE RDH 08/11/99 }
 inline	CMiscToolbar& MiscToolBar()
 {
 	CMainFrame* pmainwnd=(CMainFrame*)AfxGetMainWnd();

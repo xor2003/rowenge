@@ -115,7 +115,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //-----------------------------------------------------------------------------
 VOID GetDXVersion( DWORD* pdwDXVersion, DWORD* pdwDXPlatform )
 {
-//DEADCODE RDH 26/04/00     HRESULT              hr;
 
 
         (*pdwDXPlatform) = VER_PLATFORM_WIN32_NT;

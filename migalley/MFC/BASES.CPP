@@ -310,13 +310,6 @@ void CBases::UpdateSquadronMovement(int srcline, int destline)
 	{
 		MMC.squad[-afuses[srcline]-1].movetoairfieldindex = afuses[destline];
 		DisplaySquadronMovement(srcline, (-afuses[srcline]-1));
-//DEADCODE RDH 06/06/99 		UpdateAirfieldDisplay(destline, afuses[destline]);
-//DEADCODE RDH 06/06/99 		while	(		(srcline >= 0)
-//DEADCODE RDH 06/06/99 				&&	(afuses[srcline] < 0)		//ie squadron
-//DEADCODE RDH 06/06/99 			)
-//DEADCODE RDH 06/06/99 			srcline--;
-//DEADCODE RDH 06/06/99 		if (srcline >= 0)
-//DEADCODE RDH 06/06/99 			UpdateAirfieldDisplay(srcline, afuses[srcline]);
 
 
 		for (int i = 0; i < maxlines;i++)

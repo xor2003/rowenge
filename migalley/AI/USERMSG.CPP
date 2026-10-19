@@ -123,7 +123,6 @@ OPTIONAI(CallFuel,ItemPtr);
 OPTIONAI(CallStatus,ItemPtr);
 OPTIONAI(SendEveryOneHome,ItemPtr);
 OPTIONAI(SendHome,ItemPtr);
-//DEADCODE RDH 05/03/99 OPTIONAI(SendHomeUrgent,ItemPtr);
 
 
 DECISIONAI(CombatMsg,ItemPtr);
@@ -190,20 +189,6 @@ OPTIONAI(SecretStartTrucks,ItemPtr);
 ////////////////////////////////////////////////////////////////////////
 
 //Jim wants Paul to do this using his system
-//DeadCode RDH 22Feb99 TABLEAI(SendMsg,ItemPtr)
-//DeadCode RDH 22Feb99 {
-//DeadCode RDH 22Feb99 	{GROUPINFO,	&GroupInfoMsg},
-//DeadCode RDH 22Feb99 	{PRECOMBAT,	&PreCombatMsg}, 
-//DeadCode RDH 22Feb99 	{COMBAT,	&CombatMsg}, 
-//DeadCode RDH 22Feb99 	{POSTCOMBAT,&PostCombatMsg}, 
-//DeadCode RDH 22Feb99 	{TOWER,		&TowerMsg},	
-//DeadCode RDH 22Feb99 	{FAC,		&FACMsg},
-//DeadCode RDH 22Feb99 	{COMMSPLAYER,&CommsPlyrMsg},
-//DeadCode RDH 22Feb99 	{COMMSMSG,	&CommsMsgMsg}
-//DeadCode RDH 22Feb99 
-//DeadCode RDH 22Feb99 };
-//DeadCode RDH 22Feb99 INSTANCEAI(SendMsg,ItemPtr)	{return false;}
-//DeadCode RDH 22Feb99 
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -222,9 +207,6 @@ TABLEAI(GroupInfoMsg,ItemPtr)
 	{PHRASE_CALLPOSN,		&CallPosition,	 	SCRIPT_CALLPOSN},
 	{PHRASE_CALLFUEL,		&CallFuel,			SCRIPT_CALLFUEL},
 	{PHRASE_CALLSTATUS,		&CallStatus,		SCRIPT_CALLSTATUS},
-//DEADCODE RDH 08/03/99 	{PHRASE_SENDALLHOME,	&SendEveryOneHome, 	SCRIPT_ALLGOHOME},	
-//DEADCODE RDH 08/03/99 	{PHRASE_SENDHOME,		&SendHome,	 		SCRIPT_SENDHOME},	
-//DEADCODE RDH 05/03/99 can't see this working 	{PHRASE_URGHOME0,		&SendHomeUrgent, 	SCRIPT_CALLEE_URGGOHOME}
 	{PHRASE_PARTS_S}, 
 	{PHRASE_PARTS_S}
 
@@ -356,8 +338,6 @@ INSTANCEAI(CallStatus,ItemPtr)
 					{
 						for(;;)
 						{
-//DeadCode CSB 07/07/99								if (eltwing->AcIsPlayer())				//RJS 25May99
-//DeadCode CSB 07/07/99									break;
 							AirStrucPtr trg = AirStrucPtr(eltwing->ai.unfriendly);
 							eltwing->Range = eltwing->Distance3D(&trg->World);
 
@@ -371,7 +351,6 @@ INSTANCEAI(CallStatus,ItemPtr)
 										 + (eltwing->World.Z - trg->World.Z) * trg->velz;
 							fChased      /= FP(trg->vel * eltwing->Range);
 
-//DeadCode CSB 09/07/99								if( (eltwing->SubjectOnTargetTail(ANGLES_90Deg)) && (eltwing->SubjectFacingTarget(ANGLES_45Deg)) )
 							if((fChasing > 0.5) && (fChased < 0.5))	//60 deg cone
 							{
 								//RERUN if ( (AirStrucPtr(eltwing->ai.unfriendly))->classtype->phrasename == PHRASE_MIGS )
@@ -382,7 +361,6 @@ INSTANCEAI(CallStatus,ItemPtr)
 
 								break;
 							}
-//DeadCode CSB 09/07/99								if( (eltwing->TargetOnSubjectTail(ANGLES_90Deg)) && (eltwing->TargetFacingSubject(ANGLES_45Deg)) )
 							if((fChased > 0.5) && (fChasing < 0.5))	//60 deg cone
 							{
 								script = SCRIPT_STATUSATTACKED;
@@ -410,22 +388,6 @@ INSTANCEAI(CallStatus,ItemPtr)
 	return true;
 }
 
-//DEADCODE RDH 08/03/99 INSTANCEAI(SendHomeUrgent,ItemPtr)
-//DEADCODE RDH 08/03/99 {
-//DEADCODE RDH 08/03/99 	bool retval = false;
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 	if prioritymsg 
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 	{
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 		callee = AcShouldGoHome();
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 		if (!callee)
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 		{
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 			prioritymsg->scriptno  = SCRIPT_ALLHEALTHY;
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 		}else
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 		{
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 			script = SCRIPT_CALLEE_GOHOME;
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 		}
-//DEADCODE RDH 08/03/99 //TempCode RDH 22Feb99 	}
-//DEADCODE RDH 08/03/99 	return false;
-//DEADCODE RDH 08/03/99 }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -651,7 +613,6 @@ TABLEAI(CombatMsg,ItemPtr)
 	{PHRASE_GIVEFREEDOM,		&AutovectoringOn,	SCRIPT_PICKOWNTARGETS},
 	{PHRASE_TAKECOMMAND,		&AutovectoringOff,	SCRIPT_WAITFORORDER},
 	{PHRASE_SIGHTINGREQUEST,	&SightingRequest,	SCRIPT_WHEREISMIG},	
-//DEADCODE RDH 05/03/99 can't see this one working	{PHRASE_REPORTMIGS,			&CallSpotted,	 	SCRIPT_REPORTMIGS},
 	{PHRASE_BREAK,				&CallBreak,			SCRIPT_BRKBAD},			//RJS 11May99
 	{PHRASE_PADLOCKED,			&Padlocked,			SCRIPT_PADLOCKED},
 	{PHRASE_SIXCLR,				&SixClr,			SCRIPT_YOUCLEAR},
@@ -756,7 +717,6 @@ INSTANCEAI(CallBreak,ItemPtr)
 				prioritymessage->target = unf;
 				prioritymessage->scriptno = BreakCall((AirStruc*)prioritymessage->caller, onright);
 				caller->BreakCallReaction(victim, unf);
-//DEADCODE RDH 27/06/99 				victimfound = true;
 			}
 	}else if (unf)
 	{
@@ -932,7 +892,6 @@ INSTANCEAI(SendHome,ItemPtr)
 		callee = caller->AcShouldGoHome();
 		if (!callee)
 		{
-//DEADCODE RDH 11/05/99 				prioritymessage->caller  = NULL;
 				prioritymessage->scriptno = SCRIPT_ALLHEALTHY;
 				prioritymessage->SetVoice(VOICE_REST);
 
@@ -1187,7 +1146,6 @@ INSTANCEAI(NearLandClear,ItemPtr)
 ////////////////////////////////////////////////////////////////////////
 TABLEAI(FACMsg,ItemPtr)
 {
-//DEADCODE DAW 23/02/99 	{PHRASE_INITIATECONTACT,	&InitiateContact, SCRIPT_MAKECONTACTWITHFAC},	
 	{PHRASE_BEGINYOURRUN,	&BeginRun,		SCRIPT_STARTAPPROACH_L},
 	{PHRASE_LOSTSIGHTSHORT,	&LostSight, 	SCRIPT_LOSTSIGHTOFFAC},	
 	{PHRASE_REMARKTARGETSHORT,	&RemarkTarget, 	SCRIPT_REMARKTARGET},
@@ -1204,7 +1162,6 @@ TABLEAI(FACMsg,ItemPtr)
 
 TABLEAI(BombMsg,ItemPtr)
 {
-//DEADCODE DAW 23/02/99 	{PHRASE_INITIATECONTACT,	&InitiateContact, SCRIPT_MAKECONTACTWITHFAC},	
 	{PHRASE_BEGINYOURRUN,	&BeginRun,		SCRIPT_STARTAPPROACH_L},
 	{PHRASE_LEAVEAREA,			&LeaveArea,		SCRIPT_LEAVEAREA},
 #ifndef NDEBUG
@@ -1256,9 +1213,6 @@ INSTANCEAI(BeginRun,ItemPtr)
 									{
 										w->ai.unfriendly=*target;
 										w->ai.PilotSkills.ManStep=2;
-//DEADCODE JIM 21/05/99 										if ((w->FormationInfo.duty&ACTIONSUBCODE)<=DA_SINGLEFILE)
-//DEADCODE JIM 21/05/99 											skip=1;
-//DEADCODE JIM 21/05/99 										else
 											skip=0;
 									}
 									else
@@ -1349,10 +1303,6 @@ INSTANCEAI(BeginRun,ItemPtr)
 		if (grplead)
 			_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_TARGETNOTIDENTIFIED, MSG_CLEAR_RPT , grplead, NULL, callee));
 
-//DEADCODE DAW 17/05/99 		if (prioritymessage)
-//DEADCODE DAW 17/05/99 		{
-//DEADCODE DAW 17/05/99 			prioritymessage->caller=grplead;
-//DEADCODE DAW 17/05/99 		}
 		retval=true;
 	}
 	return retval;
@@ -1399,8 +1349,6 @@ INSTANCEAI(LeaveArea,ItemPtr)
 		caller=caller->fly.leadflight;
 	if (caller->AutoMoveInfo.movecode!=AUTO_FOLLOWWP)
 	{
-//DeadCode jim 01Jul99 		if (caller==Persons2::PlayerSeenAC)
-//DeadCode jim 01Jul99 			caller=Persons2::PlayerGhostAC;
 		if ((caller->FormationInfo.duty&ACTIONCODE)!=DA_CAP)
 			if ((caller->FormationInfo.duty&DUTYMASK)==DC_CAS)
 			{
@@ -1415,8 +1363,6 @@ INSTANCEAI(LeaveArea,ItemPtr)
 					fac->ai.PilotSkills.ManStep=FAC_EXTRAS;
 				}
 			}
-//DeadCode jim 01Jul99 		if (caller->formpos)
-//DeadCode jim 01Jul99 			caller=caller->fly.leadflight;
 		WayPointPtr wp=caller->waypoint,
 					oldwp=wp;
 		wp=wp->FindWP(WPNAME_Regroup);
@@ -1430,8 +1376,6 @@ INSTANCEAI(LeaveArea,ItemPtr)
 					w->manoeuvretime=0;
 					if (w->waypoint && w->waypoint->wpname==WPNAME_Target) //DAW 28/09/99
 						w->waypoint=wp;
-//DeadCode jim 01Jul99 				if (w->waypoint==oldwp)
-//DeadCode jim 01Jul99 					w->waypoint=wp;
 				}
 			callee->waypoint=wp;
 		}
@@ -1545,7 +1489,6 @@ INSTANCEAI(MoreTargets,ItemPtr)
 					{
 						follower->ai.unfriendly=NULL;
 					}
-//DeadCode CJ 04Jul99 			caller->ai.unfriendly=fac->ai.unfriendly;
 		}
 	else
 		if ((caller->FormationInfo.duty&DUTYMASK)==DC_AR || (caller->FormationInfo.duty&DUTYMASK)==DC_WW)
@@ -1600,7 +1543,6 @@ INSTANCEAI(MoreTargets,ItemPtr)
 //////////////////////////////////////////////////////////////////////
 TABLEAI(SecretMessages,ItemPtr)
 {
-//DEADCODE DAW 23/02/99 	{PHRASE_INITIATECONTACT,	&InitiateContact, SCRIPT_MAKECONTACTWITHFAC},	
 	{PHRASE_PARTS_S,	&SecretStartTrucks,		PHRASE_PARTS_S},
 	{PHRASE_PARTS_S},
 	{PHRASE_PARTS_S}
@@ -1724,7 +1666,6 @@ void	ArtInt::DisEngageAll(AirStruc* caller, MESSAGE_STRUC* prioritymessage)
 					{
 						if (	(foll->AutoMoveInfo.movecode == AUTO_COMBAT)	||	(foll->AutoMoveInfo.movecode == AUTO_PRECOMBAT))
 						{
-	//DEADCODE RDH 17/05/99 						_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLER_DISENGAGING, MSG_DISENGAGE_DELAY_LP_RPT , foll, NULL, caller));
 	//we don't have disengaging in the other script so it is silent.
 	//solution is to say: roger
 							_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLER_ROGER, (MsgType)(MSG_DISENGAGE_DELAY_LP_RPT+MSG_BLOCKCHATTER) , foll, NULL, caller));//RJS 06Jul99

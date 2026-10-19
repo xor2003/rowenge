@@ -125,7 +125,6 @@ Bool SndFonts::SF_SendRouterCommand(ULong sfRouterID, CSFRouterData *pRoute)
 {
 	char 	sfRouteCommand[20], Text[200];
 	ULong 	bufLength = 0;
-//DeadCode RJS 20Oct00 	UWord	numDevs=0;
 	MIDIHDR	sysExMessage;
 	SWord	status;
 	Bool	bOK=TRUE;

@@ -28,11 +28,9 @@ public:
 	AircraftUnit(int oldunit, TypesToList typestolist, int tab, int am, int unitdisplaylevel, CWnd* pParent = NULL);   // standard constructor
 	int oldunit;
 	TypesToList	typestolist	;
-//DeadCode JIM 14Nov00 	bool acisfighter;
 	int newunit;
 	int currtab;
 	int attackmethod;
-//DeadCode JIM 14Nov00 	bool me110isbomber;
 	int udisplayl;
 // Dialog Data
 	//{{AFX_DATA(AircraftUnit)

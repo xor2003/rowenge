@@ -92,7 +92,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	<vcl\clipbrd.hpp>
 #include	"loadsave.h"
 #pragma hdrstop
-//DEADCODE JIM 09/02/00 #include "text.h"
 //#include "bstream.h"
 #include	"shapenum.g"
 
@@ -507,51 +506,6 @@ int  __fastcall TMissionEditor::IncMobileCounters(UniqueIDBand  uidband,int cnt)
    DisableWPUsageifnecessary();	//rdh22
  }
 //---------------------------------------------------------------------------
-//DeadCode JIM 31May98 void __fastcall TMissionEditor_was_NewWorld()		//FileNum	file,int region)
-//DeadCode JIM 31May98 {
-//DeadCode JIM 31May98 //need to delete old world even if using same world as last time
-//DeadCode JIM 31May98 //	if (WorldFile != file)
-//DeadCode JIM 31May98 //	{
-//DeadCode JIM 31May98 //	scrnconvert = 5803;
-//DeadCode JIM 31May98 //		if (WorldFile != FIL_NULL)
-//DeadCode JIM 31May98 //			DeleteWorld();
-//DeadCode JIM 31May98 		FileNum	file=FIL_MainWorld;
-//DeadCode JIM 31May98 //        int region
-//DeadCode JIM 31May98 
-//DeadCode JIM 31May98         Persons2	Persons_2(NULL,NULL);
-//DeadCode JIM 31May98 		Persons_2.currbfindex=0;
-//DeadCode JIM 31May98 		Persons_2.LoadSetPiece(NULL,file);
-//DeadCode JIM 31May98 		Persons_2.currbfindex=1;
-//DeadCode JIM 31May98 
-//DeadCode JIM 31May98 //			MapOriginX = SOMMEMAPORIGINX * 100;					//RDH 12Feb98
-//DeadCode JIM 31May98   //			MapOriginY = SOMMEMAPORIGINY * 100;
-//DeadCode JIM 31May98 //DeadCode RDH 12Feb98 			MapWidth = SOMMEMAPWIDTH;
-//DeadCode JIM 31May98 //			MapHeight = SOMMEMAPHEIGHT * (int)CONVERTTOSCRN_DIV;
-//DeadCode JIM 31May98   //			MapHeight = MapHeight / scrnconvert;
-//DeadCode JIM 31May98 	//		MapHeight = MapHeight * 100;
-//DeadCode JIM 31May98 	  //		MapOriginY = MapOriginY + MapHeight;
-//DeadCode JIM 31May98 //camp			if ((int)ActiveCampaign.mission[currmission].PlayerNationality == (int)NAT_BLUE)
-//DeadCode JIM 31May98 //			{
-//DeadCode JIM 31May98 //				ActiveCampaign.mission[currmission].PlayerHomeBase = UID_ToAlBoiryStMartin;
-//DeadCode JIM 31May98 //				ActiveCampaign.mission[currmission].EnemyHomeBase =  UID_ToCpRoucourt;
-//DeadCode JIM 31May98 //			}
-//DeadCode JIM 31May98 //			else
-//DeadCode JIM 31May98 //			{
-//DeadCode JIM 31May98 //				ActiveCampaign.mission[currmission].EnemyHomeBase = UID_ToAlBoiryStMartin;
-//DeadCode JIM 31May98 //				ActiveCampaign.mission[currmission].PlayerHomeBase =  UID_ToCpRoucourt;
-//DeadCode JIM 31May98 //			}
-//DeadCode JIM 31May98 //		if (Visible)
-//DeadCode JIM 31May98   //			SetScrollBars();
-//DeadCode JIM 31May98 //		maptopx = 0;
-//DeadCode JIM 31May98  //		maptopy = MapHeight;
-//DeadCode JIM 31May98 //		WorldFile = file;
-//DeadCode JIM 31May98    //		CheckHomeBase ();
-//DeadCode JIM 31May98 	   //AcSpdButtonState();
-//DeadCode JIM 31May98 	   //MobileSpdButtonState();
-//DeadCode JIM 31May98 	 //	DisableWPUsageifnecessary();	//rdh
-//DeadCode JIM 31May98 
-//DeadCode JIM 31May98 //	}
-//DeadCode JIM 31May98 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //void	TMissionEditor::OpenMission(AnsiString name,int bfindex)
@@ -571,7 +525,6 @@ int  __fastcall TMissionEditor::IncMobileCounters(UniqueIDBand  uidband,int cnt)
 //	Persons_2.currbfindex=bfindex;
 //	Persons_2.LoadSubPiece(NULL,f);
 //	Persons_2.justscanning=Persons2::LOAD;
-////DeadCode DAW 06Sep97 	ActiveCampaign.mission[currmission].era=ActiveCampaign.nextera;
 //
 ////camp	ActiveCampaign.mission[currmission].region=ActiveCampaign.nextregion;
 ////	strcpy(MissionEditor->ActiveCampaign.mission[MissionEditor->currmission].title,
@@ -658,48 +611,6 @@ int  __fastcall TMissionEditor::IncMobileCounters(UniqueIDBand  uidband,int cnt)
 //---------------------------------------------------------------------------
 void	TMissionEditor::QuickDisassemble(char* line)
 {
-//DeadCode JIM 31May98 			char* name=line+strlen(line);
-//DeadCode JIM 31May98 			while (*name!='\\')
-//DeadCode JIM 31May98 				name--;
-//DeadCode JIM 31May98 			*name++=0;
-//DeadCode JIM 31May98 			char* path=FILEMAN.namenumberedfile(FILEMAN.fakefile(DIR_USEROBJ,""));
-//DeadCode JIM 31May98 			strcat(path,line);
-//DeadCode JIM 31May98 			FILEMAN.fakedir(FIL_USERMISSION1,path);
-//DeadCode JIM 31May98 			FileNum f=FILEMAN.fakefile(FIL_USERMISSION1,name);
-//DeadCode JIM 31May98 		Persons2	Persons_2(NULL,NULL);
-//DeadCode JIM 31May98 		(UWord&)Persons_2.bfdesc->description[0]=0;
-//DeadCode JIM 31May98         Persons_2.currbfindex=0;
-//DeadCode JIM 31May98 		Persons_2.justscanning=Persons2::SCANNAMES;
-//DeadCode JIM 31May98 		Persons_2.LoadSubPiece(NULL,f);
-//DeadCode JIM 31May98 		Persons_2.justscanning=Persons2::LOAD;
-//DeadCode JIM 31May98 //DeadCode DAW 06Sep97 	ActiveCampaign.mission[currmission].era=ActiveCampaign.nextera;
-//DeadCode JIM 31May98 //camp		ActiveCampaign.mission[currmission].region=ActiveCampaign.nextregion;
-//DeadCode JIM 31May98 //		strcpy(MissionEditor->ActiveCampaign.mission[0].title,
-//DeadCode JIM 31May98 //				Persons_2.bfdesc->title);
-//DeadCode JIM 31May98 //		strcpy(MissionEditor->ActiveCampaign.mission[0].missiontext,
-//DeadCode JIM 31May98 //				Persons_2.bfdesc->description);
-//DeadCode JIM 31May98 //		strcpy(MissionEditor->ActiveCampaign.mission[0].newstext,
-//DeadCode JIM 31May98 //				Persons_2.bfdesc->news);
-//DeadCode JIM 31May98 //		FindWorldTemplateFiles(ActiveCampaign.mission[0].region);
-//DeadCode JIM 31May98 //		ActiveCampaign.mission[0].era=0;//ConvertFileToEra(ActiveCampaign.nextera);//DAW 06Sep97
-//DeadCode JIM 31May98 //		MissionEditor->NewWorld();
-//DeadCode JIM 31May98 //				ChooseBfForm->BFields[ChooseBfForm->AvailBf[ActiveCampaign.mission[currmission].era]].file,
-//DeadCode JIM 31May98   //				ActiveCampaign.mission[currmission].region);
-//DeadCode JIM 31May98 		Persons_2.LoadSubPiece(NULL,f);
-//DeadCode JIM 31May98 		path=name;
-//DeadCode JIM 31May98 		while (*path!='.')
-//DeadCode JIM 31May98 			path++;
-//DeadCode JIM 31May98 		*path=0;
-//DeadCode JIM 31May98 //camp		strcpy(MissionEditor->ActiveCampaign.mission[0].name,name);
-//DeadCode JIM 31May98 		AccumulateLoadedCount();
-//DeadCode JIM 31May98 		CheckObjectives();
-//DeadCode JIM 31May98 //			Persons_2.loadingmainworld=FALSE;
-//DeadCode JIM 31May98 
-//DeadCode JIM 31May98 //			Persons_2.SaveBF(line,
-//DeadCode JIM 31May98   //								name,
-//DeadCode JIM 31May98 	//							ActiveCampaign.mission[currmission].title,
-//DeadCode JIM 31May98 	  //							ActiveCampaign.mission[currmission].missiontext,
-//DeadCode JIM 31May98 		//						ActiveCampaign.mission[currmission].newstext);
 }
 //---------------------------------------------------------------------------
 //void	TMissionEditor::NewMissGrp(AnsiString name,AnsiString Title)
@@ -1512,11 +1423,6 @@ void	TMissionEditor::InitPaintGrid()
 //	gmem=GlobalAlloc(GMEM_MOVEABLE+GMEM_DDESHARE,8);
 //    char* str=(char*)GlobalLock(gmem);
 
-//DeadCode JIM 22Oct99 //MIG ALLEY SCALING: 10m per pixel and up
-//DeadCode JIM 22Oct99     leveldrop[0].minscale=65536;leveldrop[0].blblk=8311;
-//DeadCode JIM 22Oct99     leveldrop[1].minscale=16384;leveldrop[1].blblk=8411;
-//DeadCode JIM 22Oct99     leveldrop[2].minscale= 4096;leveldrop[2].blblk=7511;
-//DeadCode JIM 22Oct99     leveldrop[3].minscale= 1024;leveldrop[3].blblk=1111;
 
 //BATTLE OF BRITAIN SCALING: 5m per pixel and up
     leveldrop[0].minscale=32768;leveldrop[0].blblk=641111;

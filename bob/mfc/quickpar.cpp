@@ -287,14 +287,6 @@ void QuickParameters::SetWeather(int index)
 										0,0,0);
 			break;
 		}
-//DeadCode RDH 9Aug00 		case	4:
-//DeadCode RDH 9Aug00 		{
-//DeadCode RDH 9Aug00 			MMC.Sky.SetMissionClouds(	FT_15000,FT_16000,128,
-//DeadCode RDH 9Aug00 										0,0,0,
-//DeadCode RDH 9Aug00 										0,0,0,
-//DeadCode RDH 9Aug00 										0,0,0);
-//DeadCode RDH 9Aug00 			break;
-//DeadCode RDH 9Aug00 		}
 	}
 	
 }

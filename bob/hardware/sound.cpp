@@ -209,8 +209,8 @@ int	NCIndex(char*	s,char*	t)
 	for(i=0;s[i]!='\0';i++)
 	{
 		for(j=i,k=0;t[k]!='\0' && toupper(s[j])==toupper(t[k]);j++,k++);
-			if(t[k]=='\0')
-				return(i);
+		if(t[k]=='\0')
+			return(i);
 	}
 	return(-1);
 }
@@ -411,7 +411,8 @@ void	Sound::StartUpSound(intptr_t	thiswin)					//RJS 19May98
 
 //Temp...
 #ifndef	BOB_DEMO_VER
-	if (FILEMAN.getTotalMem() >= SFX_MEMORY_MIN)
+	if (FILEMAN.getTotalMem() >= SFX_MEMORY_MIN
+		&& FILEMAN.existnumberedfile(FileNum(FIL_SFX_WIND_COCKPIT_LOOP - FIL_DIR_SFX + FIL_DIR_SFX_HI)))
 	{	//Forced this to LOW for debugging...	//JIM 2/10/00
 		Save_Data.hardwareconfig |= HW_SFXQUALITY;
 		hiResSFXAvailable = true;
@@ -711,7 +712,6 @@ Bool	Sound::StartMain(SLong	vol)
  	int		tuneno;
  	int		nosequences;
  	ULong	status, channelno;									//RJS 30Sep96
-//DeadCode RJS 20Oct00  	int		combatbase = GetIndex(FIL_MUSIC_MAIN);				//RJS 02Jul98
 
  	if ((Save_Data.vol.music != 0) && !incombat)					//RJS 25Jun98
  	{
@@ -862,12 +862,10 @@ TuneStrucP	Sound::LoadTune(FileNum	thefile)
 	void		*tmpptr;
 	SLong		*headptr;
 	int			count;
-//DeadCode RJS 20Oct00 	UWord		noforms = 0;
 	SLong		header;
 	fileblock	*theblock;
 	int			tuneno = GetIndex(thefile);
 	TuneType	ttype;
-//DeadCode RJS 20Oct00 	HSEQUENCE	tmphandle = NULL;
 																//RJS 26Feb98
 	if (Save_Data.vol.music && TuneInRange(tuneno))				//RJS 26Feb98
 	{															//RJS 26Feb98
@@ -986,7 +984,6 @@ void	Sound::ProcessSpot(ViewPoint*	viewobject)
 
 			if (Save_Data.vol.music != 0)
 			{
-//DeadCode RJS 20Oct00 				TuneStrucP	BaseTunePtr = &tune[GetIndex(FIL_MUSIC_MAIN)];//RJS 18May98
 				HSEQUENCE	thishandle;
 
 				//This will catch music not caught by the interrrupt...
@@ -1082,8 +1079,7 @@ void	Sound::ProcessSpot(ViewPoint*	viewobject)
 				else
 					delayedsounds.isSet = FALSE;
 
-//DeadCode RJS 9Jun00 				if (EngineSound.CockpitWind)
-					PlayWind();
+				PlayWind();
 
 				if (soundtoplay.thesample != FIL_NULL)
 				{
@@ -1234,7 +1230,6 @@ Bool	Sound::StartSeqMain(TuneStrucP	TunePtr, SLong	vol,SLong fadeval)
 		&& !request.killnow)										//RJS 18Jun99
 	{
 		Bool	doInt = TRUE;
-//DeadCode RJS 20Oct00 		int		tuneno = 1;
 
 		SLong	volmoodscale = Mood;
 		if (volmoodscale < 0)	volmoodscale = -volmoodscale;
@@ -1569,6 +1564,7 @@ SampleRec*	Sound::LoadSample(FileNum	thefile, Bool inUI)
 	int			spos = GetIndex(thefile);
 	SampleRec*	SamplePtr = NULL;
 
+	if (getenv("ROWAN_DEBUG_SOUND")) fprintf(stderr,"[snd] LoadSample f=%lx spos=%d sfxvol=%d inUI=%d range=%d\n",(long)thefile,spos,(int)Save_Data.vol.sfx,(int)inUI,(int)SampleInRange(spos));
 	if ((Save_Data.vol.sfx || inUI) && SampleInRange(spos))
 	{
 		SamplePtr = &thesample[spos];
@@ -1594,7 +1590,14 @@ SampleRec*	Sound::LoadSample(FileNum	thefile, Bool inUI)
 
 				tmpaddress = getdata(theblock);
 				size = getsize(theblock);
-				if (!size) return(NULL);
+				if (!size && directoryOffset)
+				{
+					delete theblock;
+					theblock = new fileblock (thefile);
+					tmpaddress = getdata(theblock);
+					size = getsize(theblock);
+				}
+				if (!size) { if (getenv("ROWAN_DEBUG_SOUND")) fprintf(stderr,"[snd] LoadSample f=%lx size0 name=%s\n",(long)thefile,FILEMAN.fileman::namenumberedfile(thefile)); return(NULL); }
 				// Make sure the sample in memory is secure...
 				#ifdef __DOS__
 				result = VMM_lock(tmpaddress, size);
@@ -1791,7 +1794,6 @@ SQueuePtr	Sound::FindFreeHandlerOnce(SampleRec* SamplePtr, ItemBasePtr	sampleite
 	ChannelPtr = &soundqueue[freechannelstart];
 	for (count = freechannelstart; count < status.nohandlers; count ++)
 	{
-//DeadCode RJS 22Sep00 		ChannelPtr = &soundqueue[count];
 		if (!ChannelPtr->isRadio)
 		{
 			UpdatePriority(ChannelPtr,count,lowest,lowpos);				//RJS 22Sep00
@@ -1916,7 +1918,6 @@ SQueuePtr	Sound::FindFreeHandlerUI(SampleRec* SamplePtr)
 	ChannelPtr = soundqueue;											//RJS 29Sep00
 	for (count = 0; count < status.nohandlers; count ++)
 	{
-//DeadCode RJS 22Sep00 		ChannelPtr = &soundqueue[count];
 		if (!ChannelPtr->isRadio)
 		{
 			UpdatePriority(ChannelPtr,count,lowest,lowpos);				//RJS 22Sep00
@@ -1995,7 +1996,6 @@ SQueuePtr	Sound::FindFreeHandlerRestart(SampleRec* SamplePtr, ItemBasePtr	sample
 	ChannelPtr = &soundqueue[freechannelstart];
 	for (count = freechannelstart; count < status.nohandlers; count ++)
 	{
-//DeadCode RJS 22Sep00 		ChannelPtr = &soundqueue[count];
 		if (!ChannelPtr->isRadio)
 		{
 			UpdatePriority(ChannelPtr,count,lowest,lowpos);
@@ -2191,7 +2191,6 @@ void	Sound::Update3d()
 	SampleRec*	thissamp;
 	Bool	isused = FALSE;
 	ULong	TimeDiff;
-//DeadCode RJS 12Jan00 	SLong	distance;
 	SQueuePtr	ChannelPtr = soundqueue;
 	float		vx,vy,vz;
 	mobileitem*	mitem;
@@ -2478,7 +2477,6 @@ void 	Sound::PlaySample(FileNum	thefile, ItemBasePtr	sampleitem, SLong	vol)
 	SQueuePtr	OldChannelPtr;
 	SLong	thevol;
 	int		thepan;
-//DeadCode RJS 12Jan00 	SLong	distance;
 	SampleRec*	SamplePtr;
 
 	if (allowedsamples)
@@ -2731,9 +2729,6 @@ void	Sound::UpdateEngine()
 				SLong	thewindvol = EngineSound.WindVolume >> VOL_SCALE_SHIFT;	//RJS 14Sep00
 				SLong	themainvol = EngineSound.SubHarmonicVolume >> VOL_SCALE_SHIFT;	//RJS 14Sep00
 				SLong	therumblevol = EngineSound.RumbleVolume >> VOL_SCALE_SHIFT;	//RJS 14Sep00
-//DeadCode RJS 15Sep00 				float	vel_x = float(eyeVelocity.X)*VEL_SCALE;
-//DeadCode RJS 15Sep00 				float	vel_y = float(eyeVelocity.Y)*VEL_SCALE;
-//DeadCode RJS 15Sep00 				float	vel_z = float(eyeVelocity.Z)*VEL_SCALE;
 
 				if (EngineSound.Playing)
 				{
@@ -2749,29 +2744,14 @@ void	Sound::UpdateEngine()
 					ClipVolume(themainvol);								//RJS 14Sep00
 
 					EngineSound.SubChanPtr->handler->SetVolume(themainvol);
-//DeadCode RJS 15Sep00 					EngineSound.SubChanPtr->handler->Set3DSource(SubjectStruc(	eyeWorld,
-//DeadCode RJS 15Sep00 																				vel_x, vel_y, vel_z,
-//DeadCode RJS 15Sep00 																				themainvol,
-//DeadCode RJS 15Sep00 																				1000,
-//DeadCode RJS 15Sep00 																				5000000	)	);
 
 					EngineSound.ChanPtr->handler->SetVolume(therumblevol);
-//DeadCode RJS 15Sep00 					EngineSound.ChanPtr->handler->Set3DSource(SubjectStruc(	eyeWorld,
-//DeadCode RJS 15Sep00 																			vel_x, vel_y, vel_z,
-//DeadCode RJS 15Sep00 																			therumblevol,
-//DeadCode RJS 15Sep00 																			1000,
-//DeadCode RJS 15Sep00 																			5000000	)	);
 				}
 				else
 				{
 					ClipVolume(thewindvol);
 
 					EngineSound.ChanPtr->handler->SetVolume(thewindvol);
-//DeadCode RJS 15Sep00 					EngineSound.ChanPtr->handler->Set3DSource(SubjectStruc(	eyeWorld,
-//DeadCode RJS 15Sep00 																			vel_x, vel_y, vel_z,
-//DeadCode RJS 15Sep00 																			thewindvol,
-//DeadCode RJS 15Sep00 																			1000,
-//DeadCode RJS 15Sep00 																			5000000	)	);
 				}
 			}
 			else
@@ -2838,8 +2818,6 @@ void	Sound::PlayEngine(AirStrucPtr	ac, EngineInfo&	leftengine,EngineInfo&	righte
 #ifndef	_NOSOUNDIN3D_
 	if (Save_Data.vol.sfx && EngineSound.Volume)
 	{
-//DeadCode RJS 25Oct00 		SLong	revgap;
-//DeadCode RJS 25Oct00 		SLong	revlimit;
 		SLong	Maxvol = EngineSound.Volume;
 		SLong	RumbleVol;
 		SLong	wvol;
@@ -2933,8 +2911,6 @@ void	Sound::PlayEngine(AirStrucPtr	ac, EngineInfo&	leftengine,EngineInfo&	righte
 			if (thrustp < 0)	thrustp = 0;
 			if (thrustp >= 255)	thrustp = 256;
 
-//DeadCode RJS 13Jun00 			if (rpm < rpm_min)
-//DeadCode RJS 13Jun00 				EngineSound.engineStarted = false;
 
 			if (EngineSound.IsJet)
 			{
@@ -2967,7 +2943,6 @@ void	Sound::PlayEngine(AirStrucPtr	ac, EngineInfo&	leftengine,EngineInfo&	righte
 				{
 					EngineSound.engineStarted = false;
 					EngineSound.SubHarmonicVolume = (mainvol*rpm)/rpm_min;
-//DeadCode RJS 13Sep00 					rumblevol = (rumblevol*rpm)/rpm_min;
 				}
 				else
 					EngineSound.SubHarmonicVolume = mainvol;
@@ -3222,7 +3197,6 @@ void	Sound::PlayLanded(ItemBasePtr	sampleitem, SLong	velocity, Bool skid)
 			SamplePtr = LoadSample(FIL_SFX_LANDING_GRASS_LOOP);
 			if (SamplePtr)
 			{
-//DeadCode RJS 30Aug00 				AircraftAnimData*	adptr = (AircraftAnimData*) ((mobileitem*)sampleitem)->Anim;
 				SLong	legtally = 0;
 				SLong	maxvol = SamplePtr->samplevolume;
 				SLong	thisvol = SamplePtr->samplevolume;
@@ -3340,7 +3314,6 @@ void	Sound::PlayOnce(FileNum	thefile, ItemBasePtr	sampleitem, SLong	vol, FileNum
 	int	endblock = 0;
 	SLong	thevol;
 	int	thepan;
-//DeadCode RJS 12Jan00 	SLong	distance;
 
 	SamplePtr = LoadSample(thefile);
 	if (SamplePtr)
@@ -3419,7 +3392,6 @@ void	Sound::PlayOnce(FileNum	thefile, int	vol, SLong thepan)
 
 		SoundInWorld(ItemPtr(NULL),thevol);									//RJS 12Jun00
 
-//DeadCode RJS 12Jun00 		thevol >>= 8;
 
 		stblock = spos - 1;
 		endblock = spos + 1;
@@ -3784,8 +3756,6 @@ Bool	Sound::InitUI(intptr_t	wind)
 
  	if (NewDigitalDriver(NOM_SAMP_VAL,4,TRUE,false))
  	{
-//DeadCode RJS 18Oct00 		HWND	thiswin = (HWND) wind;
-//DeadCode RJS 18Oct00
 //UpdateMilesCode RJS 08Nov99		SmackSoundUseMSS (dig);
 //UpdateMilesCode RJS 08Nov99 		AIL_set_DirectSound_HWND(dig,thiswin);
  		theresult = TRUE;
@@ -3920,10 +3890,10 @@ void	Sound::GetSampleVolumes()
 	int			count;											//RJS 23Feb99
 	SLongP		volptr;											//RJS 23Feb99
 																//RJS 23Feb99
-	fileblock*	theblock = new fileblock (FIL_SFX_VOLUMES);					//RJS 23Feb99
-	if (theblock)												//RJS 23Feb99
+	fileblock	theblock(FIL_SFX_VOLUMES);					//RJS 23Feb99
+	if (theblock.getdata())												//RJS 23Feb99
 	{															//RJS 23Feb99
-		volptr = (SLongP) getdata(theblock);					//RJS 23Feb99
+		volptr = (SLongP) theblock.getdata();					//RJS 23Feb99
 																//RJS 23Feb99
 		novolumes = *volptr;									//RJS 23Feb99
 		volptr++;												//RJS 23Feb99
@@ -3955,7 +3925,6 @@ void	Sound::GetSampleVolumes()
 		else													//RJS 23Feb99
 			Save_Data.vol.sfx = 0;								//RJS 23Feb99
 																//RJS 23Feb99
-		delete theblock;										//RJS 23Feb99
 	}															//RJS 23Feb99
 	else														//RJS 23Feb99
 		Save_Data.vol.sfx = 0;									//RJS 23Feb99
@@ -3977,7 +3946,6 @@ void	Sound::SetDirectSoundWindow(ULong	newwin)
 {
 	if (dig)
 	{
-//DeadCode RJS 20Oct00 		HWND	thiswin = (HWND) newwin;
 
 //UpdateMilesCode RJS 08Nov99 		AIL_set_DirectSound_HWND(dig,thiswin);
 	}
@@ -4055,57 +4023,17 @@ void	Sound::SetUncompressedDLS(TuneStrucP TunePtr, void* ptr, SLong	size)
 //------------------------------------------------------------------------------
 void	Sound::SetXMidi(TuneStrucP	TunePtr)
 {
-//DeadCode RJS 09Nov99 	if (TunePtr->xmiPtr)
-//DeadCode RJS 09Nov99 	{
-//DeadCode RJS 09Nov99 		SLong		result, size;
-//DeadCode RJS 09Nov99 		void		*tmpptr;
-//DeadCode RJS 09Nov99 		SLong		*headptr;
-//DeadCode RJS 09Nov99 		int			count;
-//DeadCode RJS 09Nov99 		UWord		noforms = 0;
-//DeadCode RJS 09Nov99 		SLong		header;
-//DeadCode RJS 09Nov99 		HSEQUENCE	tmphandle = NULL;
-//DeadCode RJS 09Nov99
-//DeadCode RJS 09Nov99 		// Get IFF_ number of sequences information from header...
-//DeadCode RJS 09Nov99 		headptr = (SLongP) TunePtr->xmiPtr;
-//DeadCode RJS 09Nov99
-//DeadCode RJS 09Nov99 		for (count = 0; count < 5; count ++)
-//DeadCode RJS 09Nov99 			header = *headptr++;
-//DeadCode RJS 09Nov99
-//DeadCode RJS 09Nov99 		noforms = (UWord) *headptr;
-//DeadCode RJS 09Nov99
-//DeadCode RJS 09Nov99 		TunePtr->nosequences = noforms;
-//DeadCode RJS 09Nov99 		if (	(TunePtr->ttype == T_independent)				//RJS 06May99
-//DeadCode RJS 09Nov99 			||	(TunePtr->ttype == T_independent_pri)	)		//RJS 06May99
-//DeadCode RJS 09Nov99 		{
-//DeadCode RJS 09Nov99 			tmphandle = tune[GetIndex(FIL_MUSIC_MAIN)].sequence[0];
-//DeadCode RJS 09Nov99 			if (tmphandle == NULL)
-//DeadCode RJS 09Nov99 				LoadTune(FIL_MUSIC_MAIN);
-//DeadCode RJS 09Nov99 			tmphandle = tune[GetIndex(FIL_MUSIC_MAIN)].sequence[0];
-//DeadCode RJS 09Nov99 		}
-//DeadCode RJS 09Nov99 		else
-//DeadCode RJS 09Nov99 		{
 //UpdateMilesCode RJS 08Nov99 			if (TunePtr->sequence[0] == NULL)
 //UpdateMilesCode RJS 08Nov99 				tmphandle = AIL_allocate_sequence_handle(mdi);
 //UpdateMilesCode RJS 08Nov99 			else
 //UpdateMilesCode RJS 08Nov99 				tmphandle = TunePtr->sequence[0];
-//DeadCode RJS 09Nov99 		}
-//DeadCode RJS 09Nov99
-//DeadCode RJS 09Nov99 		for (count = 0; count < TunePtr->nosequences; count ++)
-//DeadCode RJS 09Nov99 		{
-//DeadCode RJS 09Nov99 			TunePtr->sequence[count] = tmphandle;
 //UpdateMilesCode RJS 08Nov99 			if (TunePtr->sequence[count] == NULL)
 //UpdateMilesCode RJS 08Nov99 			{
 //UpdateMilesCode RJS 08Nov99 				AIL_shutdown();
 //UpdateMilesCode RJS 08Nov99
 //UpdateMilesCode RJS 08Nov99 				_Error.EmitSysErr(AIL_last_error());
 //UpdateMilesCode RJS 08Nov99 			}
-//DeadCode RJS 09Nov99 		}
-//DeadCode RJS 09Nov99 	}
-//DeadCode RJS 09Nov99 	else
-//DeadCode RJS 09Nov99 	{
 //UpdateMilesCode RJS 08Nov99 		AIL_shutdown();
-//DeadCode RJS 09Nov99 		_Error.EmitSysErr("Not an XMIDI file!");
-//DeadCode RJS 09Nov99 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -4451,8 +4379,6 @@ void	Sound::KillAll()
 void	Sound::SetVolumes(Bool goinginto3d)
 {
 //Temp
-//DeadCode RJS 31May00 	Save_Data.vol.sfx = 32;
-//DeadCode RJS 31May00 	Save_Data.vol.uisfx = 32;
 	int	FreeChannelStartWithRadio = 1;							//RJS 25Oct00
 	int	FreeChannelRadio = 0;
 
@@ -4475,12 +4401,10 @@ void	Sound::SetVolumes(Bool goinginto3d)
 				if (!PreLoadRadioChatter())
 				{
 					Save_Data.vol.rchat = 0;
-//DeadCode RJS 06Oct100 					rchatter_allowed = false;									//RJS 16Aug99
 				}
 				else
 				{
 					donePreLoadRadio_3D = true;
-//DeadCode RJS 06Oct100 					rchatter_allowed = true;
 				}
 			}
 		}
@@ -4495,26 +4419,10 @@ void	Sound::SetVolumes(Bool goinginto3d)
 	}
 	else
 	{
-//DeadCode RJS 6Oct00 #ifndef	_NO_RADIOCHATTER_
-//DeadCode RJS 6Oct00 		if (!donePreLoadRadio_2D)
-//DeadCode RJS 6Oct00 		{
-//DeadCode RJS 6Oct00 			donePreLoadRadio_2D = true;
 
 //			PreLoadChatChunk(FIL_DIR_RCHAT_GROUND-FIL_DIR_RCHAT_RAFPLAYR);
 //			PreLoadChatChunk(FIL_DIR_RCHAT_FEMALE-FIL_DIR_RCHAT_RAFPLAYR);
 
-//DeadCode RJS 14Aug00 			if (!PreLoadRadioChatter())
-//DeadCode RJS 14Aug00 			{
-//DeadCode RJS 14Aug00 				Save_Data.vol.rchat = 0;
-//DeadCode RJS 14Aug00 				rchatter_allowed = false;
-//DeadCode RJS 14Aug00 			}
-//DeadCode RJS 14Aug00 			else
-//DeadCode RJS 14Aug00 				rchatter_allowed = true;
-//DeadCode RJS 6Oct00 		}
-//DeadCode RJS 6Oct00 #else
-//DeadCode RJS 6Oct00 		Save_Data.vol.rchat = 0;
-//DeadCode RJS 6Oct00 		rchatter_allowed = false;
-//DeadCode RJS 6Oct00 #endif
 		// Set User Interface volume...
 		if (Save_Data.vol.uisfx || Save_Data.vol.rchat)			//RJS 05Apr00
  			dig->SetMasterVolume(VOL_TOP_CLIP);							//RJS 14Sep00
@@ -4736,7 +4644,6 @@ void	Sound::PlayBuffet(SLong vol, SLong thepan)
 			SQueuePtr	ChannelPtr;
 			SQueuePtr	OldChannelPtr;
 			SLong		thevol,audiblevol;
-//DeadCode RJS 12Jan00 			SLong		distance;
 			Bool		dothis = FALSE;
 
 
@@ -4897,7 +4804,6 @@ void	Sound::UIPlaySample(FileNum	thefile,SLong vol)
 			SamplePtr = LoadSample(thefile,TRUE);
 			if (SamplePtr)
 			{
-//DeadCode RJS 20Oct00 				SLong	spos = GetIndex(thefile);
 				SLong	thepan = 0;
 				SLong	thevol = (SamplePtr->samplevolume * vol) >> 7;
 				vol = thevol;
@@ -4948,13 +4854,11 @@ void	Sound::PreLoadSFX()
 {
 	if (Save_Data.vol.sfx)
 	{
-//DeadCode RJS 6Oct00 		FreeSamples();
 
 		SLong	thefile = FIL_SFX_COLLISION_BUILDING+directoryOffset;//RJS 30Aug00
 		SLong	lastsnd = FIL_SFX_AMB_FIREENGINE+directoryOffset;		//RJS 14Jun00
 		SLong	index;
 
-//DeadCode RJS 25Sep00 		thefile++;
 		for (index=thefile; index < lastsnd; index++)
 		{
 			FileNum	realname = FileNum(index-directoryOffset);			//RJS 14Jun00
@@ -5099,7 +5003,6 @@ SLong	Sound::SmackerOn(int	wind)
 
 	status.nohandlers = 0;
 
-	//DeadCode JON 10Nov00 	MCIWndSetVolume(HWND(wind),(Save_Data.vol.anim*800)/125);
 
 	usingSmacker = true;												//RJS 20Oct00
 
@@ -5135,8 +5038,6 @@ void	Sound::StopShooting()
 		Trans_Obj.ClearWeaponChain(Manual_Pilot.ControlledAC2);			//RJS 15Nov99
 		if (!shootTimer)
 		{
-//DeadCode AMM 21Feb100 			if(Save_Data.flightdifficulty[FD_FF_GUN])	//CSB 05/07/99
-//DeadCode CSB 17Aug00 			if(Save_Data.hardwareconfig[HW_FF_GUN])	 //AMM 07/02/00
 			if((_Analogue.FFdevice) && (_Analogue.FF_gun))
 				_Analogue.FFshake.SetX(0,0,false);
 
@@ -5161,8 +5062,6 @@ Bool	Sound::StartShooting(FileNum	theSample,SLong shoottime,SLong	gunfreq)
 	Bool	shootnow = FALSE;
 	if (!playerShooting)
 	{
-//DeadCode AMM 21Feb100 		if(Save_Data.flightdifficulty[FD_FF_GUN])	//CSB 05/07/99
-//DeadCode CSB 17Aug00 		if(_Analogue.FFdevice)	 //AMM 07/02/00
 		if((_Analogue.FFdevice) && (_Analogue.FF_gun))
 		{
 			int strength = (10000 * _Analogue.FF_gun) / 5;				//CSB 17Aug00
@@ -5481,10 +5380,6 @@ void	Sound::PlayWindyMiller(AirStrucPtr	ac)
 //Returns
 //
 //------------------------------------------------------------------------------
-//DEADCODE AMM 14/01/00 ULong		Sound::GetSysTime()
-//DEADCODE AMM 14/01/00 {
-//DEADCODE AMM 14/01/00 	return timeGetTime();
-//DEADCODE AMM 14/01/00 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		PlayDelayed
@@ -5504,16 +5399,6 @@ void	Sound::PlayDelayed(FileNum	thefile, ItemPtr	theitm,SLong vol,Bool looped,Fi
 #ifndef	_NOSOUNDIN3D_
 	if (Save_Data.vol.sfx && thefile != FIL_NULL)						//RJS 9Jun00
 	{
-//DeadCode RJS 16Oct00 		int	spos = GetIndex(thefile);
-//DeadCode RJS 16Oct00
-//DeadCode RJS 16Oct00 		SampleRec*	SamplePtr = &thesample[spos];
-//DeadCode RJS 16Oct00
-//DeadCode RJS 16Oct00 		for (int count = freechannelstart; count < status.nohandlers; count ++)
-//DeadCode RJS 16Oct00 		{
-//DeadCode RJS 16Oct00 			if (	(soundqueue[count].sampleindex == SamplePtr)
-//DeadCode RJS 16Oct00 				&&	(soundqueue[count].worlditem == theitm)	)
-//DeadCode RJS 16Oct00 				return;
-//DeadCode RJS 16Oct00 		}
 
 		delayedsounds.Add(thefile,theitm,vol,looped,stsam,endsam,true);
 	}
@@ -5862,7 +5747,6 @@ void	Sound::UIProcessAmbience()
 					vol = thevol;
 					thevol >>= VOL_SCALE_SHIFT;							//RJS 14Sep00
 
-//DeadCode RJS 20Jun00 					ChannelPtr = FindFreeHandlerUI(SamplePtr);
 					ChannelPtr = FindFreeHandlerOnce(SamplePtr,NULL,OldChannelPtr,stblock,endblock);
 					if (ChannelPtr)
 					{
@@ -5982,15 +5866,6 @@ void	Sound::PreLoadChatChunk(SLong	diroffset, bool preLoadRAF, bool preLoadLW)
 			PreLoadFile(diroffset+FIL_RCHAT_VOICE2);
 		else
 		{
-//DeadCode RJS 6Oct00 			bool	preLoadRAF = true;							//RJS 30Aug00
-//DeadCode RJS 6Oct00 			bool	preLoadLW = true;							//RJS 30Aug00
-//DeadCode RJS 6Oct00 			if (Manual_Pilot.ControlledAC2)
-//DeadCode RJS 6Oct00 			{
-//DeadCode RJS 6Oct00 				if (Manual_Pilot.ControlledAC2->nationality == NAT_RAF)
-//DeadCode RJS 6Oct00 					preLoadLW = false;
-//DeadCode RJS 6Oct00 				else
-//DeadCode RJS 6Oct00 					preLoadRAF = false;
-//DeadCode RJS 6Oct00 			}
 
 			if (preLoadLW)
 			{
@@ -6016,14 +5891,6 @@ void	Sound::PreLoadChatChunk(SLong	diroffset, bool preLoadRAF, bool preLoadLW)
 
 // These are silent, so no preload...
 
-//DeadCode RJS 30Aug00 			PreLoadFile(diroffset+FIL_RCHAT_GESCHWADERTYPE);
-//DeadCode RJS 30Aug00 			PreLoadFile(diroffset+FIL_RCHAT_GESCHWADERTYPEABBREV);
-//DeadCode RJS 30Aug00 			PreLoadFile(diroffset+FIL_RCHAT_GESCHWADERNUMBERSHORT);
-//DeadCode RJS 30Aug00 			PreLoadFile(diroffset+FIL_RCHAT_ROMANNUMBERS);
-//DeadCode RJS 30Aug00 			PreLoadFile(diroffset+FIL_RCHAT_BRITHISTORICBAND);
-//DeadCode RJS 30Aug00 			PreLoadFile(diroffset+FIL_RCHAT_P_SILENT);
-//DeadCode RJS 30Aug00 			PreLoadFile(diroffset+FIL_RCHAT_P_SLNTARCHIVE);
-//DeadCode RJS 30Aug00 			PreLoadFile(diroffset+FIL_RCHAT_P_SLNTBITMAP);
 
 			if (theDir == FIL_DIR_RCHAT_GROUND)
 			{
@@ -6073,9 +5940,6 @@ void	Sound::PreLoadChatChunk(SLong	diroffset, bool preLoadRAF, bool preLoadLW)
 			PreLoadFile(diroffset+FIL_RCHAT_FIFTIES);
 			PreLoadFile(diroffset+FIL_RCHAT_HDGOCLOCK);
 			PreLoadFile(diroffset+FIL_RCHAT_RELPOSITION);
-//DeadCode RJS 6Oct00 			PreLoadFile(diroffset+FIL_RCHAT_LUF_FIGHTERLF2BAND);
-//DeadCode RJS 6Oct00 			PreLoadFile(diroffset+FIL_RCHAT_RAF_FIGHTERAFBAND);
-//DeadCode RJS 6Oct00 			PreLoadFile(diroffset+FIL_RCHAT_RAF_BOMBERAFBAND);
 			PreLoadFile(diroffset+FIL_RCHAT_GROUNDCONTROLLERLW);
 			PreLoadFile(diroffset+FIL_RCHAT_GROUNDCONTROLLERRAF);
 			PreLoadFile(diroffset+FIL_RCHAT_ONE_AIRCRAFT);
@@ -6091,7 +5955,6 @@ void	Sound::PreLoadChatChunk(SLong	diroffset, bool preLoadRAF, bool preLoadLW)
 			PreLoadFile(diroffset+FIL_RCHAT_EXCITED_OTHER);
 			PreLoadFile(diroffset+FIL_RCHAT_PILOT);
 			PreLoadFile(diroffset+FIL_RCHAT_EXCITED);
-//DeadCode RJS 6Oct00 			PreLoadFile(diroffset+FIL_RCHAT_LWTOTALPILOT);
 			PreLoadFile(diroffset+FIL_RCHAT_TOTALPILOT);
 			PreLoadFile(diroffset+FIL_RCHAT_OTHER);
 			PreLoadFile(diroffset+FIL_RCHAT_ALLBUT_TVFGC);

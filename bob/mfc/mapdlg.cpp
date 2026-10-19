@@ -126,7 +126,6 @@ BEGIN_MESSAGE_MAP(CMapDlg, CDialog)
 	ON_WM_LBUTTONUP()
 	ON_WM_TIMER()
 	ON_WM_DESTROY()
-//DeadCode JIM 28Aug00 	ON_WM_SETCURSOR()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -144,15 +143,9 @@ void CMapDlg::OnClickItem(int m_buttonid)
 	typedef	HideEdgeControl::EdgeCtrl	Edge;
 	typedef	HideEdgeControl	EDGE;
 	_Miles.UIPlaySample(FIL_SFX_OFFICE_PAPER3);					//RDH 12Apr99
-//DeadCode RJS 12Mar99 	_Miles.ProcessInterfaceSpot();		//RJS 17Nov98				  //RDH 03/03/99
 
 	if (TargetSelectSink)
 	{
-//DeadCode JIM 20Oct00 		CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
-//DEADCODE RDH 13/03/00 		Save_Data.mapfilters |= FILT_MAINWP;
-//DEADCODE RDH 13/03/00 		Save_Data.mapfilters |= FILT_SUBWP;
-//DEADCODE RDH 17/05/00 		main->m_toolbar1.SetFiltersFromSaveGame();
-//DeadCode JIM 26Sep00 		Invalidate();
 		switch (TargetSelectMode)
 		{
 		case	STM_LWAC:
@@ -178,35 +171,13 @@ void CMapDlg::OnClickItem(int m_buttonid)
 				TargetSelectSink->RefreshData(m_buttonid);
 		break;
 		}
-//DeadCode JIM 26Sep00 		if (m_buttonid<WayPointBAND || m_buttonid>WayPointBANDEND)
-//DeadCode JIM 26Sep00 			TargetSelectSink->RefreshData(m_buttonid);
 	}
 	else
 	if (m_buttonid>=WayPointBAND && m_buttonid<WayPointBANDEND)
 	{
-//DEADCODE DAW 19/11/99 		int pack, wave, g;
-//DEADCODE DAW 19/11/99 		if (Profile::GetPackageFromWP((UniqueID)m_buttonid, pack, wave, g))
-//DEADCODE DAW 19/11/99 		{
-//DEADCODE DAW 19/11/99 //DEADCODE RDH 19/03/99 			RDialog::m_pView->SetHiLightInfo(pack,  wave, g, (UniqueID)m_buttonid);
-//DEADCODE DAW 19/11/99 
-//DEADCODE DAW 19/11/99 			//we need to reset the highlight before opening dialogue
-//DEADCODE DAW 19/11/99 			//so that correct wp info is shown
-//DEADCODE DAW 19/11/99 			if (!MMC.indebrief)										  //RDH 24/06/99
-//DEADCODE DAW 19/11/99 			{
-//DEADCODE DAW 19/11/99 				RDialog::m_pView->SetHiLightInfo(pack,  wave, g, (UniqueID)m_buttonid); //RDH 25/03/99
-//DEADCODE DAW 19/11/99 				CMissionFolder::Make();
-//DEADCODE DAW 19/11/99 				CMissionFolder::OpenOneProfile(pack);
-//DEADCODE DAW 19/11/99 			}
-//DEADCODE DAW 19/11/99 //DEADCODE RDH 25/03/99 			RDialog::m_pView->SetHiLightInfo(pack,  wave, g, (UniqueID)m_buttonid); //RDH 19/03/99
-//DEADCODE DAW 19/11/99 //			CProfile* p;
-//DEADCODE DAW 19/11/99 //			RDialog::MakeTopDialog(CRect(50,450,0,0),
-//DEADCODE DAW 19/11/99 //				DialBox(FIL_MAP_PROFILE,p=new CProfile(true, pack))//,Edges(EDGE::ALIGN_MIN + EDGE::ACTIONS_SPLITTER,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE))
-//DEADCODE DAW 19/11/99 //				);
-//DEADCODE DAW 19/11/99 //			p->SetWaveTabs(wave, true, -1);
-//DEADCODE DAW 19/11/99 		}
 
 		int pack,squad,target;
-		if (Profile::GetPackageFromWP((UniqueID)m_buttonid, pack,squad,target))
+		if (Profile::GetPackageFromWP((UniqueID)m_buttonid, pack,&squad,&target))
 		{
 			if (squad<0)
 				squad=0;
@@ -229,7 +200,7 @@ void CMapDlg::OnClickItem(int m_buttonid)
 	{
 		//££need to get pack and set as hilight
 		int packnum,sqline;
-		if (Todays_Packages.GetACSquadEntry((UniqueID)m_buttonid,packnum,sqline))
+		if (Todays_Packages.GetACSquadEntry((UniqueID)m_buttonid,packnum,&sqline))
 		{
 			RDialog::m_pView->SetHiLightInfo(packnum, sqline,UID_Null);
 			Invalidate();
@@ -286,7 +257,7 @@ void CMapDlg::OnFailClickItem(int m_buttonid)
  	if (m_buttonid>=WayPointBAND && m_buttonid<WayPointBANDEND)
 	{
 		int pack,squad,target;
-		if (Profile::GetPackageFromWP((UniqueID)m_buttonid, pack,squad,target))
+		if (Profile::GetPackageFromWP((UniqueID)m_buttonid, pack,&squad,&target))
 		{
 			if (squad<0)
 				squad=0;
@@ -299,7 +270,7 @@ void CMapDlg::OnFailClickItem(int m_buttonid)
 	{
 		//££need to get pack and set as hilight
 		int packnum,sqline;
-		if (Todays_Packages.GetACSquadEntry((UniqueID)m_buttonid,packnum,sqline))
+		if (Todays_Packages.GetACSquadEntry((UniqueID)m_buttonid,packnum,&sqline))
 		{
 			RDialog::m_pView->SetHiLightInfo(packnum, sqline,UID_Null);
 			Invalidate();
@@ -337,17 +308,12 @@ void CMapDlg::OnDragItem(int m_buttonid)
 				Coords3D c=w->World;
 				Todays_Packages[pack].SetTargetGlobrefs();			  //JIM 16/03/99
 				Todays_Packages[pack].RecalcPrimaryPositions();		  //JIM 16/03/99
-//DEADCODE DAW 26/11/99 				if (wave)
-//DEADCODE DAW 26/11/99 					Todays_Packages[pack].RecalcSecondaryPositions(wave);
 				if (w->target.Evaluate()!=ENABLE_COMPLEX_VAL)
 					c-=Persons2::ConvertPtrUID(UniqueID(w->target.Evaluate()));
 				Todays_Packages[pack].SetTargetGlobrefs();
 				Todays_Packages[pack].RecalcPrimaryPositions();
 				w->position.RecalcDeltasToMatch(c);
-//DEADCODE DAW 26/11/99 				if (!wave)
 					Todays_Packages[pack].RecalcRoutePositionsAndTime();
-//DEADCODE DAW 26/11/99 				else
-//DEADCODE DAW 26/11/99 					Todays_Packages[pack].RecalcSecondaryPositions(wave);
 				int fuel;
 				Invalidate();										  //JIM 16/03/99
 
@@ -359,31 +325,12 @@ void CMapDlg::OnDragItem(int m_buttonid)
 				}
 				SquadNum sq;
 				if ((sq=Todays_Packages[pack].CalcFuel(UID_NULL, fuel, fuel))!=SQ_ZERO)
-//DeadCode RDH 20Jun00 				if (!(Todays_Packages[pack].CalcFuel(0,UID_NULL, fuel)))
 				{
 					Todays_Packages.MessageBoxFuelWarning(sq);
-//DeadCode JIM 16Oct00 					Squadron* s=Node_Data[sq];
-//DeadCode JIM 16Oct00 					CString message=s->FullName()+" ("+GetTargName(s->homeairfield)+")\n"+LoadResString(IDS_BINGOWARNING);
-//DeadCode JIM 16Oct00 						RDialog::RMessageBox(LoadResString(IDS_BINGOWARNINGTITLE),message ,NULL,IDS_OK);
 				}
 				if (w->applygroup==ENABLE_COMPLEX_VAL)
 				{
-//DEADCODE DAW 26/11/99 					for (g = 0; g < 3; g++)
-//DEADCODE DAW 26/11/99 					{
-//DEADCODE DAW 26/11/99 						info_airgrp* ag;
-//DEADCODE DAW 26/11/99 						ag=*Persons2::ConvertPtrUID(Todays_Packages[pack][wave][g].uid);
-//DEADCODE DAW 26/11/99 						if (ag)
-//DEADCODE DAW 26/11/99 							if (!(Todays_Packages[pack].CalcFuel(wave,g,UID_NULL, fuel)))
-//DEADCODE DAW 26/11/99 								RDialog::RMessageBox(IDS_BINGOWARNINGTITLE, IDS_BINGOWARNING,NULL,IDS_OK);
-//DEADCODE DAW 26/11/99 					}
-//DEADCODE DAW 26/11/99 				}else if (!(Todays_Packages[pack].CalcFuel(wave,w->applygroup,UID_NULL, fuel)))
-//DEADCODE DAW 26/11/99 								RDialog::RMessageBox(IDS_BINGOWARNINGTITLE, IDS_BINGOWARNING,NULL,IDS_OK);
 
-//DEADCODE DAW 19/11/99 				if (CProfile::wavetabs)
-//DEADCODE DAW 19/11/99 				{
-//DEADCODE DAW 19/11/99 					CMissionFolder::Make();
-//DEADCODE DAW 19/11/99 					CMissionFolder::OpenOneProfile(pack);
-//DEADCODE DAW 19/11/99 				}
 				}
 				Campaign::GlobalRefreshData();
 			}
@@ -473,7 +420,6 @@ BOOL CMapDlg::OnEraseBkgnd(CDC* pDC)
 int	inside_move=0;
 void CMapDlg::OnPaint() 
 {
-//DeadCode JIM 26Sep00 	::AfxTrace("Begin refresh\n");
 	PAINTSTRUCT paintstruct;
 	inside_move=10;
 	CDC* pDC;
@@ -483,18 +429,14 @@ void CMapDlg::OnPaint()
 	if (mapdlgDbg)
 		fprintf(stderr,"[mapdlg] OnPaint bounds=%ld,%ld-%ld,%ld view=%p\n",
 			(long)bounds.left,(long)bounds.top,(long)bounds.right,(long)bounds.bottom,(void*)RDialog::m_pView);
-//DEADCODE RDH 22/05/00 	::AfxTrace("Refresh area (%i,%i),(%i,%i)\n",bounds.left,bounds.top,bounds.right,bounds.bottom);
 	inside_move=11;
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("Draw{"));
 
 	RDialog::m_pView->UpdateBitmaps(pDC,bounds);
 
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("}Draw"));
 	inside_move=12;
 	this->EndPaint(&paintstruct);
 	inside_move=13;
 //TempCode JIM 9Nov00 	InvalidateAnotherItem();
-//DeadCode JIM 26Sep00 	::AfxTrace("End refresh\n");
 	inside_move=0;
 
 }
@@ -512,13 +454,6 @@ void	CMapDlg::InvalidateIcon(ItemBasePtr p)
 	}
 }
 
-//DEADCODE JIM 21/01/00 MOVED THIS TO MigView.CPP next to DrawIcon()
-//DEADCODE JIM 21/01/00 void	CMapDlg::InvalidateIcon(int px,int py,IconsUI i)
-//DEADCODE JIM 21/01/00 {
-//DEADCODE JIM 21/01/00 		CPoint iconsize=IconDescUI(i).WH();
-//DEADCODE JIM 21/01/00 		int dx=iconsize.x/2,dy=iconsize.y/2;
-//DEADCODE JIM 21/01/00 		InvalidateRect(CRect(px-dx-1,py-dy-1,px+dx+1,py+dy+1));
-//DEADCODE JIM 21/01/00 }
 
 
 //////////////////////////////////////////////////////////////////////
@@ -548,46 +483,10 @@ int	CMapDlg::FindMapItem(CPoint point)
 	int	mwr=mwx+worldicon;
 	int	mwt=mwy+worldicon;
 	int	mwb=mwy-worldicon;
-//DEADCODE JIM 14/03/00 	UniqueIDField redUIDs;
-//DEADCODE JIM 16/11/99 	SupplyTree::FillNatForUID(redUIDs);
 	FileNum  FL_Icon[100];//AmberBattleNodeBANDEND-AmberBattleNodeBAND];
-//DEADCODE JIM 16/11/99 	SupplyTree::FillFLS_Icons(FL_Icon);
 
 	ItemBasePtr p;
 	FileNum  f;
-//DEADCODE JIM 21/01/00 	for (int i=UID_Null;i<WayPointBAND;i++)
-//DEADCODE JIM 21/01/00 	{
-//DEADCODE JIM 21/01/00 		p=Persons2::ConvertPtrUID(UniqueID(i));
-//DEADCODE JIM 21/01/00 		if (p)
-//DEADCODE JIM 21/01/00 		{
-//DEADCODE JIM 21/01/00 			f = RDialog::m_pView->DrawIconTest(p, UniqueID(i), false);//,redUIDs,FL_Icon);
-//DEADCODE JIM 21/01/00 			if (f)
-//DEADCODE JIM 21/01/00 				if (	p->World.X>mwl && p->World.X<mwr &&	p->World.Z>mwb && p->World.Z<mwt )
-//DEADCODE JIM 21/01/00 					if (InsideIcon(IconsUI(f),p,point))
-//DEADCODE JIM 21/01/00 						m_hintid=i;
-//DEADCODE JIM 21/01/00 		}
-//DEADCODE JIM 21/01/00 	}
-//DEADCODE JIM 21/01/00 	for (i=WayPointBAND;i<WayPointBANDEND;i++)
-//DEADCODE JIM 21/01/00 	{
-//DEADCODE JIM 21/01/00 		p=Persons2::ConvertPtrUID(UniqueID(i));
-//DEADCODE JIM 21/01/00 		if (p)
-//DEADCODE JIM 21/01/00 		{
-//DEADCODE JIM 21/01/00 			f = RDialog::m_pView->DrawIconTest(p, UniqueID(i), false);//,redUIDs,FL_Icon);
-//DEADCODE JIM 21/01/00 			if (f)
-//DEADCODE JIM 21/01/00 			{
-//DEADCODE JIM 21/01/00 				int wx=p->World.X;
-//DEADCODE JIM 21/01/00 				int wz=p->World.Z;
-//DEADCODE JIM 21/01/00 				Float s,c;											  //JIM 10/12/99
-//DEADCODE JIM 21/01/00 				UWord ang=(i-WayPointBAND)*ANGLES_50Deg;
-//DEADCODE JIM 21/01/00 //DEADCODE JIM 15/12/99 				Math_Lib.high_sin_cos((Angles)ang,s,c);
-//DEADCODE JIM 21/01/00 //DEADCODE JIM 15/12/99 				wx+=s*worldicon;									  //JIM 10/12/99
-//DEADCODE JIM 21/01/00 //DEADCODE JIM 15/12/99 				wz-=c*worldicon;									  //JIM 10/12/99
-//DEADCODE JIM 21/01/00 				if (	wx>mwl && wx<mwr &&	wz>mwb && wz<mwt )
-//DEADCODE JIM 21/01/00 					if (InsideIcon(IconsUI(f),p,point))
-//DEADCODE JIM 21/01/00 						m_hintid=i;
-//DEADCODE JIM 21/01/00 			}
-//DEADCODE JIM 21/01/00 		}
-//DEADCODE JIM 21/01/00 	}
 
 	//Search for standard icon
 	for	(int standardbandloop=0;standardiconbands[standardbandloop][1];standardbandloop++)
@@ -684,8 +583,6 @@ void CMapDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	int oldbuttonid=m_buttonid;
 	m_buttonid=NULL;
 	m_buttonid=FindMapItem(point);
-//DEADCODE DAW 18/02/00 	if (m_buttonid == NULL)										//RDH 17Jun99
-//DEADCODE DAW 18/02/00 		m_buttonid = oldbuttonid;								//RDH 17Jun99
 	RedrawIcon(oldbuttonid);
 	CDialog::OnLButtonDown(nFlags, point);
 }
@@ -724,14 +621,11 @@ void CMapDlg::OnMouseMove(UINT nFlags, CPoint point)
 		ItemBasePtr p=Persons2::ConvertPtrUID(UniqueID(m_buttonid));
 		if (p)
 		{
-//DEADCODE JIM 16/02/99 		RDialog::m_pView->ScreenXY(p,px,py,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
 			InvalidateRoutes(UniqueID(m_buttonid));
  			InvalidateDraggingRoutes(UniqueID(m_buttonid));
 
 			RDialog::m_pView->WorldXY(p->World,point.x,point.y); //JIM 16/02/99
 
-//DEADCODE JIM 16/02/99 		p->World.X=(65536*(point.x+RDialog::m_pView->m_scrollpoint.x+(384*RDialog::m_pView->m_zoom)))/RDialog::m_pView->m_zoom;
-//DEADCODE JIM 16/02/99  		p->World.Z=-65536*(point.y+RDialog::m_pView->m_scrollpoint.y-(1792*RDialog::m_pView->m_zoom))/RDialog::m_pView->m_zoom;
 			InvalidateDragIcon(m_point.x,m_point.y,point.x,point.y, ICON_MAPFILTERS);
 			m_oldpoint=m_point;
 
@@ -803,7 +697,6 @@ void CMapDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			m_point=point;
 			RDialog::m_pView->m_mapdlg.ScrollWindow(oldscrollpoint.x-RDialog::m_pView->m_scrollpoint.x,oldscrollpoint.y-RDialog::m_pView->m_scrollpoint.y);
 
-//DeadCode JIM 8Nov00 			Invalidate();
 		}
 	}
 	::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
@@ -966,40 +859,6 @@ void CMapDlg::InvalidateRoutes(UniqueID onlythrough)
 	*/
 }
 
-//DEADCODE DAW 26/11/99 void CMapDlg::InvalidateRoute(int	pack, int wave, int	group)
-//DEADCODE DAW 26/11/99 {
-//DEADCODE DAW 26/11/99 	UniqueID start=Todays_Packages[pack][wave][group].takeoffAF;
-//DEADCODE DAW 26/11/99 	bool	seesubwp = true;
-//DEADCODE DAW 26/11/99 	if (start)
-//DEADCODE DAW 26/11/99 	{
-//DEADCODE DAW 26/11/99 		UniqueID nextwp=Todays_Packages[pack].route;
-//DEADCODE DAW 26/11/99 		InvalidateLine(start,nextwp);
-//DEADCODE DAW 26/11/99 		info_waypoint* wp=*Persons2::ConvertPtrUID(nextwp);
-//DEADCODE DAW 26/11/99 		UniqueID oldwp = nextwp;
-//DEADCODE DAW 26/11/99 		while ((nextwp=wp->nextwp)!=NULL)
-//DEADCODE DAW 26/11/99 		{
-//DEADCODE DAW 26/11/99 			wp=*Persons2::ConvertPtrUID(nextwp);
-//DEADCODE DAW 26/11/99 			if  (		
-//DEADCODE DAW 26/11/99 					(wp->uid !=ENABLE_COMPLEX_VAL) ||
-//DEADCODE DAW 26/11/99 					(wp->applygroup==ENABLE_COMPLEX_VAL) ||
-//DEADCODE DAW 26/11/99 					(		
-//DEADCODE DAW 26/11/99 						(seesubwp) &&
-//DEADCODE DAW 26/11/99 						(wp->applygroup == Todays_Packages.higroup)
-//DEADCODE DAW 26/11/99 					)
-//DEADCODE DAW 26/11/99 				)
-//DEADCODE DAW 26/11/99 			{
-//DEADCODE DAW 26/11/99 				//display subgroup wps as spurs
-//DEADCODE DAW 26/11/99 				InvalidateLine(oldwp,nextwp);
-//DEADCODE DAW 26/11/99 				if  (wp->applyflight==ENABLE_COMPLEX_VAL)
-//DEADCODE DAW 26/11/99 				{
-//DEADCODE DAW 26/11/99 					oldwp=nextwp;
-//DEADCODE DAW 26/11/99 				}
-//DEADCODE DAW 26/11/99 			}
-//DEADCODE DAW 26/11/99 		}
-//DEADCODE DAW 26/11/99 		InvalidateLine(nextwp,start);
-//DEADCODE DAW 26/11/99 	}
-//DEADCODE DAW 26/11/99 }
-//DEADCODE DAW 26/11/99 
 void CMapDlg::InvalidateLine(UniqueID thiswp,UniqueID nextwp)
 {
 	ItemBasePtr pt1,pt2;
@@ -1022,13 +881,7 @@ void CMapDlg::InvalidateLine(UniqueID thiswp,UniqueID nextwp)
 	}
 
 	int px1,py1,px2,py2;
-//DEADCODE RDH 18/04/99 	if (thiswp==UID_Japan)
-//DEADCODE RDH 18/04/99 		RDialog::m_pView->ScreenXY(pt1->World.X + 40000000,pt1->World.Z - 20000000,px1,py1,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE RDH 18/04/99 	else
 		RDialog::m_pView->ScreenXY(pt1,px1,py1,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE RDH 18/04/99 	if (nextwp==UID_Japan)
-//DEADCODE RDH 18/04/99 		RDialog::m_pView->ScreenXY(pt2->World.X + 40000000,pt2->World.Z - 20000000,px2,py2,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE RDH 18/04/99 	else
 		RDialog::m_pView->ScreenXY(pt2,px2,py2,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
 	InvalidateLine(CPoint(px1,py1),CPoint(px2,py2));
 	int f = RDialog::m_pView->DrawIconTest(pt1, thiswp, false,true);//,redUIDs,FL_Icon);
@@ -1036,28 +889,6 @@ void CMapDlg::InvalidateLine(UniqueID thiswp,UniqueID nextwp)
 		InvalidateIcon(px1,py1,IconsUI(f));										  //JIM 02/06/99
 }
 
-//DEADCODE JIM 16/03/99 void CMapDlg::InvalidateMovedLine(UniqueID thiswp,UniqueID nextwp,BOOL japanwp)
-//DEADCODE JIM 16/03/99 {
-//DEADCODE JIM 16/03/99 
-//DEADCODE JIM 16/03/99 	if (thiswp!=m_buttonid && nextwp!=m_buttonid)
-//DEADCODE JIM 16/03/99 		return;
-//DEADCODE JIM 16/03/99 	if (thiswp!=m_buttonid)
-//DEADCODE JIM 16/03/99 	{
-//DEADCODE JIM 16/03/99 		UniqueID swap;
-//DEADCODE JIM 16/03/99 		swap=thiswp;
-//DEADCODE JIM 16/03/99 		thiswp=nextwp;
-//DEADCODE JIM 16/03/99 		nextwp=swap;
-//DEADCODE JIM 16/03/99 	}
-//DEADCODE JIM 16/03/99 	int px2,py2;
-//DEADCODE JIM 16/03/99 	ItemBasePtr pt2;
-//DEADCODE JIM 16/03/99 	pt2=Persons2::ConvertPtrUID(UniqueID(nextwp));
-//DEADCODE JIM 16/03/99 	if (japanwp)
-//DEADCODE JIM 16/03/99 		RDialog::m_pView->ScreenXY(pt2->World.X + 40000000,pt2->World.Z - 20000000,px2,py2,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE JIM 16/03/99 	else
-//DEADCODE JIM 16/03/99 		RDialog::m_pView->ScreenXY(pt2,px2,py2,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DEADCODE JIM 16/03/99 	InvalidateLine(m_point,CPoint(px2,py2));
-//DEADCODE JIM 16/03/99 	InvalidateLine(m_oldpoint,CPoint(px2,py2));
-//DEADCODE JIM 16/03/99 }
 
 #ifndef	NDEBUG
 
@@ -1144,23 +975,9 @@ void CMapDlg::InvalidateMobiles(bool isnewposition,bool clocking)
 		 	IconsUI icon =IconsUI( RDialog::m_pView->DrawIconTest( NULL, UniqueID(i), false,true));
 			if (p)
 			{
-//DeadCode JIM 8Nov00 				p->knownposition=p->World;
-//DeadCode JIM 8Nov00 				p->knownhdg=Angles(p->hdg.Evaluate());
 				p->knownicon=icon;
-//DeadCode JIM 8Nov00 				p->knowntime=MMC.currtime;
 			}
 
-//DeadCode JIM 8Nov00 				itemrefreshrequests[j]=p->knownposition;
-//DeadCode JIM 8Nov00 			else
-//DeadCode JIM 8Nov00 				itemrefreshrequests[j].X=ENABLE_COMPLEX_VAL;
-//DeadCode JIM 8Nov00 			itemrefreshrequests[j].Y=0;
-//DeadCode JIM 8Nov00 			if (p && i==m_hintid)
-//DeadCode JIM 8Nov00 			{
-//DeadCode JIM 8Nov00 				int	px,py;
-//DeadCode JIM 8Nov00 				CDC* pDC=GetDC();
-//DeadCode JIM 8Nov00 				RDialog::m_pView->ScreenXY(p,px,py,-RDialog::m_pView->m_scrollpoint.x,-RDialog::m_pView->m_scrollpoint.y);
-//DeadCode JIM 8Nov00 				InvalidateIconText(pDC,px,py,UniqueID(m_hintid));
-//DeadCode JIM 8Nov00 			}
 		}
 	else
 	{
@@ -1226,7 +1043,6 @@ bool	CMapDlg::InvalidateAnotherItem()
 			return true;
 		}
 	}
-//DeadCode JIM 9Nov00 	Mono_Text.Print(UByteP("N"));
 	return false;
 }
 
@@ -1331,7 +1147,6 @@ void	CMapDlg::RefreshTargettingWaypoints(UniqueID trg)
 						substep++;
 							wp->position.EvalW(wp->World);
 						substep++;
-//DEADCODE JIM 14/03/00 							wp->World+=trgptr->World;
 							InvalidateLine(redraw0,redraw1);
 						substep++;
 							InvalidateLine(redraw2,redraw1);
@@ -1493,17 +1308,6 @@ void CMapDlg::InvalidateLine(CPoint point1,CPoint point2)
 
 
 
-//DeadCode DAW 10Aug00 static	void	MemoryDiagnostics()
-//DeadCode DAW 10Aug00 {
-//DeadCode DAW 10Aug00 	static BOOL	f1=AllocConsole();
-//DeadCode DAW 10Aug00 	static int f2=_CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_FILE );
-//DeadCode DAW 10Aug00 	static _HFILE f3=_CrtSetReportFile( _CRT_ASSERT, _CRTDBG_FILE_STDERR );
-//DeadCode DAW 10Aug00 
-//DeadCode DAW 10Aug00 
-//DeadCode DAW 10Aug00 
-//DeadCode DAW 10Aug00 
-//DeadCode DAW 10Aug00 
-//DeadCode DAW 10Aug00 }
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1518,8 +1322,6 @@ extern	int	Icon_Select_Add;
 void CMapDlg::OnTimer(UINT nIDEvent) 
 {
 #ifndef	BOB_DEMO_VER
-//DeadCode DAW 10Aug00 	MemoryDiagnostics();
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP("Timer("));
 
 	if (m_view->m_currentpage==0)
 	{
@@ -1549,43 +1351,25 @@ void CMapDlg::OnTimer(UINT nIDEvent)
 				MMC.accumulator+=MMC.curraccelrate;
 				if (MMC.accumulator>=0)
 				{  
-//DeadCode JIM 24Sep00 	Mono_Text.Print(UByteP("1"));
-//DeadCode JIM 26Sep00 					::AfxTrace("Hickory... ");
-//DeadCode RDH 12Nov100 #pragma warnmsg("Icon select stepping");
-//DeadCode RDH 12Nov100 					Icon_Select_Add+=ICON_SELECT_1;
-//DeadCode RDH 12Nov100 					if (Icon_Select_Add==ICON_SELECT_1*6)
-//DeadCode RDH 12Nov100 						Icon_Select_Add=0;
 					InvalidateMobiles(false,false);
-//DeadCode JIM 24Sep00 	Mono_Text.Print(UByteP("2"));
 					int	oldcolour=MMC.TimeColour();
-//DeadCode JIM 24Sep00 	Mono_Text.Print(UByteP("3"));
 					int nextperiod=Node_Data.PerformMoveCycle();
-//DeadCode JIM 24Sep00 	Mono_Text.Print(UByteP("4"));
 					Node_Data.PerformNextPeriod(nextperiod);
-//DeadCode JIM 24Sep00 	Mono_Text.Print(UByteP("5"));
 					InvalidateMobiles(true,oldcolour!=MMC.TimeColour());
-//DeadCode JIM 24Sep00 	Mono_Text.Print(UByteP("6"));
 
 					Campaign::GlobalRefreshData();
-//DeadCode JIM 24Sep00 	Mono_Text.Print(UByteP("7"));
 
 					CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
 					main->m_titlebar.Redraw();
 					main->m_reportbar.Refresh();
-//DeadCode JIM 24Sep00 	Mono_Text.Print(UByteP("8"));
 					if (main->m_titlebar.LoggedChild(main->m_titlebar.CLOCK))
 						main->m_titlebar.LoggedChild(main->m_titlebar.CLOCK)->fchild->RefreshData(-2);
-//DeadCode JIM 26Sep00 					::AfxTrace("Dickory... ");
 			
 
-		//DEADCODE RJS 5/8/00 			if (_Radio.MessageFinished())				//RJS 28Mar00
-		//DEADCODE RJS 5/8/00 				Node_Data.intel.SayNextMessage();		//RJS 28Mar00
-		//DEADCODE RJS 5/8/00 			::AfxTrace("Tock\n");
 				}
 
 				if (_Radio.MessageFinished())				//RJS 28Mar00
 					Node_Data.intel.SayNextMessage();		//RJS 28Mar00
-//DeadCode JIM 24Sep00 				::AfxTrace("Dock\n");
 			}
 // Random ambience...
 		if (Math_Lib.rnd() > 45000)										//RJS 25Oct00
@@ -1597,18 +1381,12 @@ void CMapDlg::OnTimer(UINT nIDEvent)
 	{
 		if (DPlay::H2H_Player[_DPlay.mySlot].status==DPlay::CPS_MAP)
 		{
-//DeadCode AMM 03Mar99 			if (timeGetTime()>nextsendtime && _DPlay.Host)
-//DeadCode AMM 03Mar99 			{
-//DeadCode AMM 03Mar99 				nextsendtime=timeGetTime()+20000;
-//DeadCode AMM 03Mar99 				_DPlay.SendSaveGame();
-//DeadCode AMM 03Mar99 			}
 
 			_DPlay.UIUpdateMainSheet();
 		}
 	}
 #endif
 	CDialog::OnTimer(nIDEvent);
-//DeadCode CSB 11Sep00 	Mono_Text.Print(UByteP(")Timer"));
 }
 
 void	NodeData::PerformNextPeriod(int periodnum)
@@ -1699,12 +1477,6 @@ void CMapDlg::OnDestroy()
 	
 }
 
-//DEADCODE JIM 29/05/99 BOOL CMapDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) 
-//DEADCODE JIM 29/05/99 {
-//DEADCODE JIM 29/05/99 	// TODO: Add your message handler code here and/or call default
-//DEADCODE JIM 29/05/99 	
-//DEADCODE JIM 29/05/99 	return CDialog::OnMouseWheel(nFlags, zDelta, pt);
-//DEADCODE JIM 29/05/99 }
 
 
 LRESULT CMapDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam) 

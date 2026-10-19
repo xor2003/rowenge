@@ -72,7 +72,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "package.h"
 #include "persons2.h"
 #include "mytime.h"
-//DeadCode JIM 14Nov00 #define ENABLE_MONO_TEXT
 #include "monotxt.h"
 
 #ifdef _DEBUG
@@ -108,7 +107,6 @@ WayPointDialog::WayPointDialog( CWnd* pParent /*=NULL*/)
 	t = Todays_Packages[Todays_Packages.hipack].primarytargetETA;
 	earliestgoodeta=t;
 	earliesttrgeta =MMC.currtime;//t;//Todays_Packages[Todays_Packages.hipack].FindEarliestPrimaryTargetETA(t);
-//DeadCode MS 28Oct100 	earliesttrgeta = Todays_Packages[Todays_Packages.hipack].FindEarliestPrimaryTargetETA(t);
 	acnum=Todays_Packages.hiwp;
 	
 }
@@ -159,12 +157,6 @@ void WayPointDialog::Refresh(bool remakespin)
 	CRButton* title;
 	title = GETDLGITEM(IDJ_TITLE);
 
-//DEADCODE RDH 06/01/00 	if (wp->target.Evaluate())
-//DEADCODE RDH 06/01/00 	{
-//DEADCODE RDH 06/01/00 		CString string;
-//DEADCODE RDH 06/01/00 		string = GetTargName((UniqueID)wp->target.Evaluate());
-//DEADCODE RDH 06/01/00 			title->SetString(string);
-//DEADCODE RDH 06/01/00 	} 
 	if (wp)
 		if (wp->applywave==-2)
 		{
@@ -300,35 +292,6 @@ void WayPointDialog::Refresh(bool remakespin)
 
 				if (remakespin)
 					MakeTimeEntries(Todays_Packages[Todays_Packages.hipack].primarytargetETA);
-//DeadCode MS 28Oct100 				t = Todays_Packages[Todays_Packages.hipack].primarytargetETA/60;
-//DeadCode MS 28Oct100 		//		startperiod =  Profile::FindEarliestPrimaryTargetETA();
-//DeadCode MS 28Oct100 				startperiod = t -60;
-//DeadCode MS 28Oct100 				if (startperiod < earliesttrgeta/60)
-//DeadCode MS 28Oct100 					startperiod = earliesttrgeta/60;
-//DeadCode MS 28Oct100 				spinbut->Clear();
-//DeadCode MS 28Oct100 				int h =  startperiod;
-//DeadCode MS 28Oct100 				steps = 32;
-//DeadCode MS 28Oct100 				int m = 0;
-//DeadCode MS 28Oct100 				m = h % 60;
-//DeadCode MS 28Oct100 				h = h/60;
-//DeadCode MS 28Oct100 				int index = (t - startperiod )/stepsize;
-//DeadCode MS 28Oct100 				if (index < 0)
-//DeadCode MS 28Oct100 					index = 0;
-//DeadCode MS 28Oct100 				if (index >= steps)
-//DeadCode MS 28Oct100 					index = steps-1;
-//DeadCode MS 28Oct100 
-//DeadCode MS 28Oct100 				while(steps--)
-//DeadCode MS 28Oct100 				{
-//DeadCode MS 28Oct100 					char buffer[10];
-//DeadCode MS 28Oct100 					spinbut->AddString(CSprintf("%02i.%02i",h,m));
-//DeadCode MS 28Oct100 					m+=stepsize;
-//DeadCode MS 28Oct100 					if (m >= 60)
-//DeadCode MS 28Oct100 					{
-//DeadCode MS 28Oct100 						m = m - 60;
-//DeadCode MS 28Oct100 						h++;
-//DeadCode MS 28Oct100 					}
-//DeadCode MS 28Oct100 				}
-//DeadCode MS 28Oct100 				spinbut->SetIndex(index);
 			}else
 			{
 				spinbut->ShowWindow(SW_HIDE);
@@ -344,44 +307,10 @@ BOOL WayPointDialog::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	
-//DEADCODE RDH 04/01/00 	CRButton* title;
-//DEADCODE RDH 04/01/00 	title = GETDLGITEM(IDJ_TITLE);
-//DEADCODE RDH 04/01/00 
-//DEADCODE RDH 04/01/00 	title->SetString("Biggin Hill");
-//DEADCODE RDH 04/01/00 
-//DEADCODE RDH 04/01/00 
-//DEADCODE RDH 04/01/00 	CRStatic*   s;
-//DEADCODE RDH 04/01/00 
-//DEADCODE RDH 04/01/00 	s=GETDLGITEM(IDC_RSTATICRNGFROM);
-//DEADCODE RDH 04/01/00 	s->SetString("10 miles");
-//DEADCODE RDH 04/01/00 	s=GETDLGITEM(IDC_RSTATICRELTOT);
-//DEADCODE RDH 04/01/00 	s->SetString("-1:00");
-//DEADCODE RDH 04/01/00 	s=GETDLGITEM(IDC_RSTATICFUEL);
-//DEADCODE RDH 04/01/00 	s->SetString("600 gallons");
-//DEADCODE RDH 04/01/00 	s=GETDLGITEM(IDC_RSTATICETA);
-//DEADCODE RDH 04/01/00 	s->SetString("14:00");
-//DEADCODE RDH 04/01/00 	s=GETDLGITEM(IDC_RSTATICESCORTFUEL);
-//DEADCODE RDH 04/01/00 	s->SetString("600 gallons");
-//DEADCODE RDH 04/01/00 	s=GETDLGITEM(IDC_RSTATICBRGFROM);
-//DEADCODE RDH 04/01/00 	s->SetString("124 deg");
 
 	Refresh();
 
-//DEADCODE RDH 04/01/00 	CRCombo* combo=GETDLGITEM(IDC_RCOMBOALT);
-//DEADCODE RDH 04/01/00 	combo->Clear();
 	
-//DEADCODE RDH 19/11/99 	int altind=(w->World.Y*10+ (Save_Data.alt.mediummm*Save_Data.alt.mediumstepsize)/2)/(Save_Data.alt.mediummm*Save_Data.alt.mediumstepsize)-Save_Data.alt.minstepcount;
-//DEADCODE RDH 19/11/99 	if (altind <0)
-//DEADCODE RDH 19/11/99 		altind = 0;
-//DEADCODE RDH 04/01/00 	int altind = (3,000,000+ (Save_Data.alt.mediummm*Save_Data.alt.mediumstepsize)/2)/(Save_Data.alt.mediummm*Save_Data.alt.mediumstepsize)-Save_Data.alt.minstepcount;
-//DEADCODE RDH 04/01/00 	if (altind <0)
-//DEADCODE RDH 04/01/00 		altind = 0;
-//DEADCODE RDH 04/01/00 	if (altind >= (Save_Data.alt.maxstepcount - Save_Data.alt.minstepcount))
-//DEADCODE RDH 04/01/00 	altind = Save_Data.alt.maxstepcount - Save_Data.alt.minstepcount - 1;
-//DEADCODE RDH 04/01/00 	combo->MakeNumList(Save_Data.alt.maxstepcount-Save_Data.alt.minstepcount,
-//DEADCODE RDH 04/01/00 				Save_Data.alt.minstepcount*Save_Data.alt.mediumstepsize,
-//DEADCODE RDH 04/01/00 				Save_Data.alt.mediumstepsize
-//DEADCODE RDH 04/01/00 					)->SetIndex(altind);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -438,8 +367,6 @@ void WayPointDialog::OnClickedRbuttoninsert()
 	RDialog*	routedial = MainToolBar().LoggedChild(CMainToolbar::ROUTE);
 	if (routedial)
 	{
-//DeadCode JIM 13Oct00 		CRTabs* tab=(CRTabs*)routedial->fchild->fchild->GetDlgItem(IDJ_TABCTRL);
-//DeadCode JIM 13Oct00 		tab->SelectTab(1);
 		routedial->GlobalRefreshData();
 	}
 
@@ -474,8 +401,6 @@ void WayPointDialog::ClickedOnInsert()
 		{
 			if (wp->NextWP(-1,i)!=wp->NextWP(-10,-10))
 			{
-//DeadCode JIM 12Sep00 				int trgline = wp->applywave.Evaluate();
-//DeadCode JIM 12Sep00 				int squadline = wp->applygroup.Evaluate();
 				newwp=InsertWaypoint(Todays_Packages.hipack,Todays_Packages.hiwp, ENABLE_COMPLEX_VAL, i);
 			}
 		}
@@ -503,8 +428,6 @@ void WayPointDialog::OnClickedRbuttondelete()
 	RDialog*	routedial = MainToolBar().LoggedChild(CMainToolbar::ROUTE);
 	if (routedial)
 	{
-//DeadCode JIM 13Oct00 		CRTabs* tab=(CRTabs*)routedial->fchild->fchild->GetDlgItem(IDJ_TABCTRL);
-//DeadCode JIM 13Oct00 		tab->SelectTab(1);
 		routedial->GlobalRefreshData();
 	}
 
@@ -587,16 +510,6 @@ void WayPointDialog::OnTextChangedRcomboalt(LPCTSTR Caption, short index)
 	
 
 
-//DeadCode RDH 28Jun00 	if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DeadCode RDH 28Jun00 	{
-//DeadCode RDH 28Jun00 		Directives::LW::MissTypes misstype = LWDirectivesResults::LWMissType();
-//DeadCode RDH 28Jun00 		MMC.directives.lw.userprofiles[misstype].mainalt = wp->World.Y;
-//DeadCode RDH 28Jun00 	}else
-//DeadCode RDH 28Jun00 	{
-//DeadCode RDH 28Jun00 		Directives::RAF::MissTypes misstype = RAFDirectivesResults::RAFMissType();
-//DeadCode RDH 28Jun00 		MMC.directives.raf.userprofiles[misstype].mainalt = wp->World.Y;
-//DeadCode RDH 28Jun00 	}
-//DeadCode RDH 28Jun00 
 
     while (!Todays_Packages[Todays_Packages.hipack].CalcWPTimes())
 		Todays_Packages[Todays_Packages.hipack].primarytargetETA+=5;
@@ -605,8 +518,6 @@ void WayPointDialog::OnTextChangedRcomboalt(LPCTSTR Caption, short index)
 	if (routedial)
 	{
 		routedial->GlobalRefreshData();
-//DeadCode JIM 13Oct00 		CRTabs* tab=(CRTabs*)routedial->fchild->fchild->GetDlgItem(IDJ_TABCTRL);
-//DeadCode JIM 13Oct00 		tab->SelectTab(1);
 	}
 
 #endif	
@@ -714,14 +625,6 @@ void	WayPointDialog::MakeTimeEntries(int ETA)
 			spinbut->AddString(CSprintf("%02i:%02i:%02i",starttimeentries[i]/3600,(starttimeentries[i]/60)%60,(starttimeentries[i])%60));
 		else
 			spinbut->AddString(CSprintf("%02i:%02i",starttimeentries[i]/3600,(starttimeentries[i]/60)%60));
-//DeadCode JIM 14Nov00 	Mono_Text.Print(fillpoint,(UByteP)"Fillpoint +");
-//DeadCode JIM 14Nov00 	Mono_Text.Print(ETA,(UByte*)"req time");
-//DeadCode JIM 14Nov00 	Mono_Text.Print(mintime,(UByte*)"min time");
-//DeadCode JIM 14Nov00 	Mono_Text.Print(maxtime,(UByte*)"max time");
-//DeadCode JIM 14Nov00 	Mono_Text.Print(starttimeentries[timeentries+CURRENTRY-starttimeentries],(UByte*)"disp time");
-//DeadCode JIM 14Nov00 
-//DeadCode JIM 14Nov00 	Mono_Text.Print(i,(UByte*)"Lines added");
-//DeadCode JIM 14Nov00 	Mono_Text.Print(timeentries+CURRENTRY-starttimeentries,(UByte*)"Line indexed");
 
 	spinbut->SetIndex(timeentries+CURRENTRY-starttimeentries);
 }
@@ -732,12 +635,7 @@ void WayPointDialog::OnTextChangedRspineta(LPCTSTR caption, short Index)
 
 		int time =starttimeentries[Index];
 
-//DeadCode MS 28Oct100         CRSpinBut* spinbut;
-//DeadCode MS 28Oct100         spinbut=GETDLGITEM(IDC_RSPINETA);
-//DeadCode MS 28Oct100         int index = spinbut->GetIndex();
 		Profile&pk=	Todays_Packages[Todays_Packages.hipack];
-//DeadCode JIM 20Oct00 		int oldeta=	pk.primarytargetETA;
-//DeadCode MS 28Oct100 		int time = (stepsize * index + startperiod) * 60;
 		bool targetmobile=false;
 
 		int oldeta=	pk.primarytargetETA;
@@ -777,12 +675,6 @@ void WayPointDialog::OnTextChangedRspineta(LPCTSTR caption, short Index)
 		}
 		if (targetmobile)
 			Todays_Packages.InvalidateRoute(&pk,true);
-//DeadCode JIM 13Oct00         Todays_Packages[Todays_Packages.hipack].primarytargetETA= time;
-//DeadCode JIM 13Oct00 		while (!Todays_Packages[Todays_Packages.hipack].CalcWPTimes())
-//DeadCode JIM 13Oct00 			if (oldeta>time)
-//DeadCode JIM 13Oct00 				Todays_Packages[Todays_Packages.hipack].primarytargetETA+=(oldeta-time)/20;
-//DeadCode JIM 13Oct00 			else
-//DeadCode JIM 13Oct00 				Todays_Packages[Todays_Packages.hipack].primarytargetETA+=60;
 
 
 		Refresh(false);
@@ -790,8 +682,6 @@ void WayPointDialog::OnTextChangedRspineta(LPCTSTR caption, short Index)
 	if (routedial)
 	{
 		routedial->GlobalRefreshData();
-//DeadCode JIM 13Oct00 		CRTabs* tab=(CRTabs*)routedial->fchild->fchild->GetDlgItem(IDJ_TABCTRL);
-//DeadCode JIM 13Oct00 		tab->SelectTab(1);
 	}
 
 #endif	
@@ -856,12 +746,6 @@ UniqueID WayPointDialog::InsertWaypoint(int packnum,UniqueID insertafter,int squ
 		info_waypoint *t=
 			prev=
 				*Persons2::ConvertPtrUID(u);
-//DEADCODE DAW 20/03/00 		if (prev->uid==-SGR_WPP_Target || prev->uid==-SGR_WPC_Target)
-//DEADCODE DAW 20/03/00 		{
-//DEADCODE DAW 20/03/00 			//switch tabs to attack group tab
-//DEADCODE DAW 20/03/00 			CProfile::wavetabs->SelectTab(0);
-//DEADCODE DAW 20/03/00 			return;
-//DEADCODE DAW 20/03/00 		}
 		u=t->nextwp;
 		do{
 			if (t->applygroup.Evaluate()==ENABLE_COMPLEX_VAL || t->applygroup.Evaluate()==squadline)
@@ -918,15 +802,6 @@ UniqueID WayPointDialog::InsertWaypoint(int packnum,UniqueID insertafter,int squ
 	if (!(posfrom&&posto&&relfrom&&relto))
 	{
 		_Error.EmitSysErr("Unexpected wp insert problem");
-//DEADCODE DAW 20/03/00 		COORDS3D* p=&Persons2::ConvertPtrUID(Todays_Packages[packnum][0].takeoffAF)->World;
-//DEADCODE DAW 20/03/00 		if (!posfrom)
-//DEADCODE DAW 20/03/00 			posfrom=p;
-//DEADCODE DAW 20/03/00 		if (!posto)
-//DEADCODE DAW 20/03/00 			posto=p;
-//DEADCODE DAW 20/03/00 		if (!relfrom)
-//DEADCODE DAW 20/03/00 			relfrom=p;
-//DEADCODE DAW 20/03/00 		if (!relto)
-//DEADCODE DAW 20/03/00 			relto=p;
 	}
 //Ok.. make a waypoint. 
 //Set its position to midway between posfrom and posto

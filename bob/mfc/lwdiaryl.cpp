@@ -204,21 +204,6 @@ void LWDiaryList::Refresh()
 
 
 
-//DeadCode RDH 11Feb00 	rlistbox->AddString("10 July 1940",0);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("100",1);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("40",2);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("13:00",3);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("Strike",4);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("Biggin Hill",5);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("0/4",6);
-//DeadCode RDH 11Feb00 
-//DeadCode RDH 11Feb00 	rlistbox->AddString("10 July 1940",0);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("100",1);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("40",2);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("13:00",3);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("Strike",4);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("Biggin Hill",5);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("0/4",6);
 
 }
 BOOL LWDiaryList::OnInitDialog() 
@@ -227,48 +212,6 @@ BOOL LWDiaryList::OnInitDialog()
 	
 	Refresh();
 
-//DeadCode RDH 11Feb00 	CRRadio* pradio;
-//DeadCode RDH 11Feb00 
-//DeadCode RDH 11Feb00 	pradio=GETDLGITEM(IDC_RRADIODISPLAY);
-//DeadCode RDH 11Feb00 	pradio->AddButton(RESSTRING(VIEWSINGLE));
-//DeadCode RDH 11Feb00 	pradio->AddButton(RESSTRING(ALL));
-//DeadCode RDH 11Feb00   	pradio->SetCurrentSelection(1);
-//DeadCode RDH 11Feb00 
-//DeadCode RDH 11Feb00 
-//DeadCode RDH 11Feb00 	CRListBox* rlistbox;
-//DeadCode RDH 11Feb00 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 11Feb00 	rlistbox->Clear();
-//DeadCode RDH 11Feb00 	rlistbox->AddColumn(100);
-//DeadCode RDH 11Feb00 	rlistbox->AddColumn(60);
-//DeadCode RDH 11Feb00 	rlistbox->AddColumn(60);
-//DeadCode RDH 11Feb00 	rlistbox->AddColumn(60);
-//DeadCode RDH 11Feb00 	rlistbox->AddColumn(70);
-//DeadCode RDH 11Feb00 	rlistbox->AddColumn(TARGETFIELDWIDTH);										  //RDH 02/06/99
-//DeadCode RDH 11Feb00 	rlistbox->AddColumn(60);
-//DeadCode RDH 11Feb00 
-//DeadCode RDH 11Feb00 	rlistbox->AddString(RESSTRING(DATE),0);
-//DeadCode RDH 11Feb00 	rlistbox->AddString(RESSTRING(RAID),1);
-//DeadCode RDH 11Feb00 	rlistbox->AddString(RESSTRING(SIZE),2);
-//DeadCode RDH 11Feb00 	rlistbox->AddString(RESSTRING(TO),3);
-//DeadCode RDH 11Feb00 	rlistbox->AddString(RESSTRING(MISSION),4);
-//DeadCode RDH 11Feb00 	rlistbox->AddString(RESSTRING(TARGET),5);
-//DeadCode RDH 11Feb00 	rlistbox->AddString(RESSTRING(TALLY),6);
-//DeadCode RDH 11Feb00 
-//DeadCode RDH 11Feb00 	rlistbox->AddString("10 July 1940",0);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("100",1);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("40",2);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("13:00",3);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("Strike",4);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("Biggin Hill",5);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("0/4",6);
-//DeadCode RDH 11Feb00 
-//DeadCode RDH 11Feb00 	rlistbox->AddString("10 July 1940",0);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("100",1);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("40",2);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("13:00",3);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("Strike",4);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("Biggin Hill",5);
-//DeadCode RDH 11Feb00 	rlistbox->AddString("0/4",6);
 
 
 	

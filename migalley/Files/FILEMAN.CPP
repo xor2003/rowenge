@@ -451,8 +451,11 @@ void	fileman::makerootdirlist()
 	nestcount--;	//FORCES LOADING OF REAL FILE_LIST
 
 //fixy stuff:
-	filrootblock->link->datasize=0;
-	filrootblock->link->fileblockdata=NULL;
+	if (filrootblock->link)
+	{
+		filrootblock->link->datasize=0;
+		filrootblock->link->fileblockdata=NULL;
+	}
 	dirrootblock=filrootblock->fileblockdata;								//JIM 01Apr96
 	delete filrootblock;
 
@@ -884,7 +887,6 @@ string	srcchar=(string)	srcdata;
 	assert 	((srcsize) && ("=0=wildcard - not implemented"));
 //If first byte is zero then it is a concatenated directory
 	//else
-//Old_Code DAW 24Feb97 	assert	((srcchar[0])&&("=0=concatenated - not implemented"));
 	if (srcchar[0]==0)			//Concatinated Dir.dir files
 	{							//Don't do anything yet
 ////		INT3;
@@ -1164,7 +1166,7 @@ Bool	fileman::existnumberedfile(FileNum	MyFile)
 		)
 		if (search _->filenum==MyFile)
 			return TRUE;
-		string	name=namenumberedfilelessfail(MyFile);
+	string	name=namenumberedfilelessfail(MyFile);
 		if (name==NULL || name[0]==0 || name[1]==0)
 			return(FALSE);
 		//else
@@ -1187,27 +1189,6 @@ ULong 	oldpos=(ULong)	ftell(filehandle);
 ULong 	returnval=(ULong)	ftell(filehandle);
 		fseek(filehandle,oldpos,SEEK_SET);
 		return(returnval);
-//Old_Code PD 19Sep96 		DPMIregs	regs;
-//Old_Code PD 19Sep96 
-//Old_Code PD 19Sep96 		regs.w.ax=0x4201;
-//Old_Code PD 19Sep96 		regs.w.bx=filehandle->_handle;
-//Old_Code PD 19Sep96 		regs.w.cx=0;
-//Old_Code PD 19Sep96 		regs.w.dx=0;
-//Old_Code PD 19Sep96 		ASM_DOSvia31(0x21,&regs);
-//Old_Code PD 19Sep96 ULong	oldposl=regs.w.ax;
-//Old_Code PD 19Sep96 ULong	oldposh=regs.w.dx;
-//Old_Code PD 19Sep96 		regs.w.ax=0x4202;
-//Old_Code PD 19Sep96 		regs.w.bx=filehandle->_handle;
-//Old_Code PD 19Sep96 		regs.w.cx=0;
-//Old_Code PD 19Sep96 		regs.w.dx=0;
-//Old_Code PD 19Sep96 		ASM_DOSvia31(0x21,&regs);
-//Old_Code PD 19Sep96 ULong	returnval=regs.w.ax+(regs.w.dx<<16);
-//Old_Code PD 19Sep96 		regs.w.ax=0x4200;
-//Old_Code PD 19Sep96 		regs.w.bx=filehandle->_handle;
-//Old_Code PD 19Sep96 		regs.w.cx=oldposh;
-//Old_Code PD 19Sep96 		regs.w.dx=oldposl;
-//Old_Code PD 19Sep96 		ASM_DOSvia31(0x21,&regs);
-//Old_Code PD 19Sep96 		return(returnval);
 };
 //////////////////////////////////////////////////////////////////////
 ULong	fileman::seekfilepos(FILE*	filehandle,ULong	offset)
@@ -1216,15 +1197,6 @@ ULong	fileman::seekfilepos(FILE*	filehandle,ULong	offset)
 	fseek(filehandle,offset,SEEK_SET);
 //	(ULONG&)(((UWord*)0xb0000)[stuffed+=1])=0x700+')';
 	return((ULong) ftell(filehandle));
-//Old_Code PD 19Sep96 		DPMIregs	regs;
-//Old_Code PD 19Sep96 
-//Old_Code PD 19Sep96 		regs.w.ax=0x4200;
-//Old_Code PD 19Sep96 		regs.w.bx=filehandle->_handle;
-//Old_Code PD 19Sep96 		regs.w.cx=offset >>16;
-//Old_Code PD 19Sep96 		regs.w.dx=offset;
-//Old_Code PD 19Sep96 		ASM_DOSvia31(0x21,&regs);
-//Old_Code PD 19Sep96 ULong	returnval=regs.w.ax+(regs.w.dx<<16);
-//Old_Code PD 19Sep96 		return(returnval);
 };
 //////////////////////////////////////////////////////////////////////
 ULong	fileman::readfileblock(

@@ -140,8 +140,6 @@ AnimControl::AnimControl()
  		animP = GetAnimControl(ANIMATION_WALK);
  		animP->SetAnim(BLOKE_WALK);
 
-//DeadCode RJS 22Dec99 		animP = GetAnimControl(ANIMATION_JOG);
-//DeadCode RJS 22Dec99   		animP->SetAnim(BLOKE_JOG);
  		
   		animP = GetAnimControl(ANIMATION_RUN);					//RJS 22Dec99
   		animP->SetAnim(BLOKE_RUN);
@@ -189,8 +187,6 @@ AnimControl::AnimControl()
   		animP->SetAnim(BLOKE_TALK2);
   		animP->SetAnim(BLOKE_TALK1);									//RJS 30Oct00
   		animP->SetAnim(BLOKE_TALK2);									//RJS 30Oct00
-//DeadCode RJS 30Oct00 		animP->SetAnim(BLOKE_TALK3);
-//DeadCode RJS 30Oct00   		animP->SetAnim(BLOKE_TALK4);
 
 /*		animP = GetAnimControl(ANIMATION_SHOT);
   		animP->SetAnim(BLOKE_SHOT);*/
@@ -275,7 +271,6 @@ bool	AnimControl::SetPlayerAnim(ItemPtr	item, UWord	newanim)
 		if (	(adptr->animCtrl_new != newanim)
 			||	(animlist[newanim].acnt > 1)		)
 		{
-//DeadCode RJS 20Oct00 			AnimMoves		transAnim = BLOKE_NULL;
 
 			adptr->animCtrl_prev = adptr->animCtrl_new;
 			adptr->animCtrl_new = newanim;

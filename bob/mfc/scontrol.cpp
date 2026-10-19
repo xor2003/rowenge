@@ -118,7 +118,6 @@ struct	devdesc
 			ismouse,
 			supportsff;
 	GUID	devid;
-//DEADCODE AMM 04/02/00 	bool	allowshiftmode;
 };
 
 devdesc			connecteddevices[20];
@@ -180,7 +179,6 @@ static	BOOL CALLBACK DIEnumDeviceObjectsProc(LPCDIDEVICEOBJECTINSTANCE ddoi,LPVO
 			connectedaxes[usedaxes].xtype=true;
 			connectedaxes[usedaxes].firstofpair=true;
 		}
-//DEADCODE JIM 09/02/00 		else if (ddoi->guidType==GUID_RyAxis || ddoi->guidType==GUID_RzAxis)
 		else if (ddoi->guidType!=GUID_YAxis)
 		{
 			connectedaxes[usedaxes].xtype=true;
@@ -197,65 +195,6 @@ static	BOOL CALLBACK DIEnumDeviceObjectsProc(LPCDIDEVICEOBJECTINSTANCE ddoi,LPVO
 
 // master mouse - create extra axes
 
-//DeadCode JIM 4Sep00 I have had enough of shifted axes!
-//DeadCode JIM 4Sep00 			if (!connectedaxes[usedaxes].firstofpair)
-//DeadCode JIM 4Sep00 			{
-//DeadCode JIM 4Sep00 				bool addshifted=false;
-//DeadCode JIM 4Sep00 				if (shiftedaxisvalid)
-//DeadCode JIM 4Sep00 				{
-//DeadCode JIM 4Sep00 					usedaxes++;
-//DeadCode JIM 4Sep00 					shiftedaxisvalid=false;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].name=shiftedaxis.name;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].devnum=shiftedaxis.devnum;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].ishat=shiftedaxis.ishat;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].axisnum=currdevaxiscount++;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].assignedtask=AU_UNASSIGNED;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].xtype=shiftedaxis.xtype;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].firstofpair=shiftedaxis.firstofpair;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].ismouse=shiftedaxis.ismouse;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 					usedaxes++;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 //DeadCode JIM 31Aug00 					addshifted=true;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 					UByte offset;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 //DeadCode JIM 31Aug00 					if (addshifted)
-//DeadCode JIM 4Sep00 						offset=2;
-//DeadCode JIM 4Sep00 //DeadCode JIM 31Aug00 					else
-//DeadCode JIM 4Sep00 //DeadCode JIM 31Aug00 						offset=1;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 					CString s;
-//DeadCode JIM 4Sep00 					s.LoadString(IDS_SHIFTEDINPUT);
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].name=s+connectedaxes[usedaxes-offset].name;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].devnum=connectedaxes[usedaxes-offset].devnum;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].ishat=false;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].axisnum=currdevaxiscount++;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].assignedtask=AU_UNASSIGNED;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].xtype=connectedaxes[usedaxes-offset].xtype;
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].firstofpair=false;
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 					connectedaxes[usedaxes].ismouse=connectedaxes[usedaxes-offset].ismouse;;
-//DeadCode JIM 4Sep00 				}
-//DeadCode JIM 4Sep00 			}
-//DeadCode JIM 4Sep00 			else
-//DeadCode JIM 4Sep00 			{
-//DeadCode JIM 4Sep00 				CString s;
-//DeadCode JIM 4Sep00 				s.LoadString(IDS_SHIFTEDINPUT);
-//DeadCode JIM 4Sep00 				shiftedaxisvalid=true;
-//DeadCode JIM 4Sep00 				shiftedaxis.name=s+connectedaxes[usedaxes].name;
-//DeadCode JIM 4Sep00 				shiftedaxis.devnum=connectedaxes[usedaxes].devnum;
-//DeadCode JIM 4Sep00 				shiftedaxis.ishat=false;
-//DeadCode JIM 4Sep00 	//				shiftedaxis.axisnum=currdevaxiscount++;
-//DeadCode JIM 4Sep00 				shiftedaxis.assignedtask=AU_UNASSIGNED;
-//DeadCode JIM 4Sep00 				shiftedaxis.xtype=connectedaxes[usedaxes].xtype;
-//DeadCode JIM 4Sep00 				shiftedaxis.firstofpair=connectedaxes[usedaxes].firstofpair;
-//DeadCode JIM 4Sep00 				shiftedaxis.ismouse=connectedaxes[usedaxes].ismouse;;
-//DeadCode JIM 4Sep00 			}
 		}
 	}
 	usedaxes++;
@@ -316,12 +255,6 @@ static BOOL CALLBACK DIEnumDevicesProc(const DIDEVICEINSTANCE *ddi,LPVOID pvRef)
 			usedaxes++;
 		}
 
-//DEADCODE AMM 04/02/00 		connecteddevices[useddevices].allowshiftmode=false;
-//DEADCODE AMM 04/02/00 
-//DEADCODE AMM 04/02/00 		if (connecteddevices[useddevices].ismouse)
-//DEADCODE AMM 04/02/00 		{
-//DEADCODE AMM 04/02/00 			connecteddevices[useddevices].allowshiftmode=true;
-//DEADCODE AMM 04/02/00 		}
 
 		useddevices++;
 	}
@@ -494,13 +427,6 @@ void	SController::BuildEnumerationTables()
 }
 /////////////////////////////////////////////////////////////////////////////
 // SController dialog
-//DEADCODE RDH 29/11/99 #define OPTIONS	\
-//DEADCODE RDH 29/11/99 	SETFIELD(BIT(flightdifficulty,FD_FF_GUN),			IDC_CBO_FF_GUNRATTLE,RESCOMBO(OFF,2),			NOLEVEL)	\
-//DEADCODE RDH 29/11/99 	SETFIELD(BIT(flightdifficulty,FD_FF_BUFFET),		IDC_CBO_FF_BUFFET,RESCOMBO(OFF,2),				NOLEVEL)	\
-//DEADCODE RDH 29/11/99 	SETFIELD(BIT(flightdifficulty,FD_FF_AERODYNAMIC),	IDC_CBO_FF_AERODYNAMIC,RESCOMBO(OFF,2),			NOLEVEL)	\
-//DEADCODE RDH 29/11/99 	SETFIELD(BIT(flightdifficulty,FD_FF_AIRFRAME),		IDC_CBO_FF_AIRFRAME,RESCOMBO(OFF,2),			NOLEVEL)	\
-
-
 SController::SController(CWnd* pParent /*=NULL*/)
 	: RowanDialog(SController::IDD, pParent)
 {
@@ -569,22 +495,6 @@ void SController::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 #define	SG2C_DISPLAY setlevel
 #include "sg2combo.h"
-//DEADCODE RDH 29/11/99 	OPTIONS	
-//DEADCODE RDH 29/11/99 	m_IDC_DEVLIST.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_STICKDEV.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_THROTDEV.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_RUDDEV.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_PANDEV.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_PITCHDEV.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_ZOOMDEV.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_MOUSEDEV.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_CBO_FF_GUNRATTLE.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_CBO_FF_STALL.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_CBO_FF_HIGHSPEED.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_CBO_FF_AIRFRAME.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_CBO_CONTROLCOLDEADZONE.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 	m_IDC_CBO_RUDDERDEADZONE.SetCircularStyle(TRUE);
-//DEADCODE RDH 29/11/99 
 	AfxGetMainWnd()->ModifyStyleEx(WS_EX_TOPMOST,0);
 	AfxGetMainWnd()->ShowWindow(SW_SHOWMAXIMIZED);
 
@@ -597,8 +507,6 @@ void SController::PreDestroyPanel()
 {
 #define	SG2C_WRITEBACK setlevel
 #include "sg2combo.h"
-//DEADCODE RDH 29/11/99 	OPTIONS	
-//DeadCode AMM 21Feb100 	SetAxisConfig();
 	SetAxisConfig(false,false);
 
 	AfxGetMainWnd()->ModifyStyleEx(0,WS_EX_TOPMOST);
@@ -620,7 +528,6 @@ BEGIN_EVENTSINK_MAP(SController, CDialog)
 	ON_EVENT(SController, IDC_DEVLIST, 1 /* TextChanged */, OnTextChangedDevlist, VTS_BSTR VTS_I2)
 	ON_EVENT(SController, IDC_MOUSEDEV, 1 /* TextChanged */, OnTextChangedMousedev, VTS_BSTR VTS_I2)
 	ON_EVENT(SController, IDC_PANDEV, 1 /* TextChanged */, OnTextChangedPandev, VTS_BSTR VTS_I2)
-//DeadCode JIM 4Sep00 	ON_EVENT(SController, IDC_PITCHDEV, 1 /* TextChanged */, OnTextChangedPitchdev, VTS_BSTR VTS_I2)
 	ON_EVENT(SController, IDC_RUDDEV, 1 /* TextChanged */, OnTextChangedRuddev, VTS_BSTR VTS_I2)
 	ON_EVENT(SController, IDC_SELFF, 1 /* Clicked */, OnClickedSelff, VTS_NONE)
 	ON_EVENT(SController, IDC_SELPOLL, 1 /* Clicked */, OnClickedSelpoll, VTS_NONE)
@@ -682,7 +589,6 @@ bool	SController::GetAxisConfig(bool setff)	//convert runtime device list to ui 
 			int ra=0;
 			int rh=0;
 			int sra=0;
-//DeadCode JIM 20Oct00 			int srh=0;
 
 			for (int va=firstaxes;va<usedaxes;va++)
 				if (connectedaxes[va].devnum==setdev)
@@ -714,96 +620,13 @@ bool	SController::GetAxisConfig(bool setff)	//convert runtime device list to ui 
 	}
 
 	return backup;
-//DeadCode AMM 3Aug00 	if (!donesome)
-//DeadCode AMM 3Aug00 	{								//ASSUME default stick is 
-//DeadCode AMM 3Aug00 		if (connecteddevices[0].supportsff && setff)
-//DeadCode AMM 3Aug00 			connecteddevices[0].useff=true;
-//DeadCode AMM 3Aug00 		int ra=0;
-//DeadCode AMM 3Aug00 		int rh=0;	connecteddevices[0].enablepoll=true;
-//DeadCode AMM 3Aug00 		int rm=0;	connecteddevices[1].enablepoll=true;
-//DeadCode AMM 3Aug00 		bool donestick=false,donethr=false,doneped=false;
-//DeadCode AMM 3Aug00 		for (int va=firstaxes;va<usedaxes;va++)
-//DeadCode AMM 3Aug00 			if (connectedaxes[va].devnum==0)
-//DeadCode AMM 3Aug00 				if (connectedaxes[va].ishat)
-//DeadCode AMM 3Aug00 					;////	{if (!rh++)	connectedaxes[va].assignedtask=AU_VIEWH;}
-//DeadCode AMM 3Aug00 				else
-//DeadCode AMM 3Aug00 				{
-//DeadCode AMM 3Aug00 					if (connectedaxes[va].assignedtask==AU_UNASSIGNED)
-//DeadCode AMM 3Aug00 					{
-//DeadCode AMM 3Aug00 // dont really want to use shifted axes etc as defaults
-//DeadCode AMM 3Aug00 
-//DeadCode AMM 3Aug00 						CString s;
-//DeadCode AMM 3Aug00 						s.LoadString(IDS_SHIFTEDINPUT);
-//DeadCode AMM 3Aug00 
-//DeadCode AMM 3Aug00 						if (connectedaxes[va].name.Find(s)==-1)
-//DeadCode AMM 3Aug00 						{
-//DeadCode AMM 3Aug00 							if (connectedaxes[va].firstofpair && !donestick)
-//DeadCode AMM 3Aug00 							{
-//DeadCode AMM 3Aug00 								connectedaxes[va].assignedtask=AU_AILERON;
-//DeadCode AMM 3Aug00 								connectedaxes[va+1].assignedtask=AU_ELEVATOR;
-//DeadCode AMM 3Aug00 								donestick=true;
-//DeadCode AMM 3Aug00 							}
-//DeadCode AMM 3Aug00 							else
-//DeadCode AMM 3Aug00 // more likely to want throttle control first than rudder
-//DeadCode AMM 3Aug00 
-//DeadCode AMM 3Aug00 							if (!donethr)
-//DeadCode AMM 3Aug00 							{
-//DeadCode AMM 3Aug00 								connectedaxes[va].assignedtask=AU_THROTTLE;
-//DeadCode AMM 3Aug00 								donethr=true;
-//DeadCode AMM 3Aug00 							}
-//DeadCode AMM 3Aug00 							else
-//DeadCode AMM 3Aug00 							if (connectedaxes[va].xtype && !doneped)
-//DeadCode AMM 3Aug00 							{
-//DeadCode AMM 3Aug00 								connectedaxes[va].assignedtask=AU_RUDDER;
-//DeadCode AMM 3Aug00 								doneped=true;
-//DeadCode AMM 3Aug00 							}
-//DeadCode AMM 3Aug00 //DEADCODE AMM 19/05/00 							else
-//DeadCode AMM 3Aug00 //DEADCODE AMM 19/05/00 							if (!donethr)
-//DeadCode AMM 3Aug00 //DEADCODE AMM 19/05/00 							{
-//DeadCode AMM 3Aug00 //DEADCODE AMM 19/05/00 								connectedaxes[va].assignedtask=AU_THROTTLE;
-//DeadCode AMM 3Aug00 //DEADCODE AMM 19/05/00 								donethr=true;
-//DeadCode AMM 3Aug00 //DEADCODE AMM 19/05/00 							}
-//DeadCode AMM 3Aug00 						}
-//DeadCode AMM 3Aug00 					}
-//DeadCode AMM 3Aug00 				}
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 			else
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 			{
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 // dont really want to use shifted axes etc as defaults
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 				CString s;
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 				s.LoadString(IDS_SHIFTEDINPUT);
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 				if (connectedaxes[va].name.Find(s)==-1)
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 				{
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 					if (connectedaxes[va].devnum==1)
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 					{
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 						if (!connectedaxes[va].ishat)
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 						{
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 							if (connectedaxes[va].firstofpair)
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 							{
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 //DEADCODE AMM 21/03/00 								connectedaxes[va].assignedtask=AU_UI_X;
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 //DEADCODE AMM 21/03/00 								connectedaxes[va+1].assignedtask=AU_UI_Y;
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 //DEADCODE AMM 19/05/00 								connectedaxes[va].assignedtask=AU_VIEWH;
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 //DEADCODE AMM 19/05/00 								connectedaxes[va+1].assignedtask=AU_VIEWP;
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00  								connectedaxes[va].assignedtask=AU_UI_X;
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 								connectedaxes[va+1].assignedtask=AU_UI_Y;
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 							}
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 						}
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 					}
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 				}
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 
-//DeadCode AMM 3Aug00 //DEADCODE RDH 25/05/00 			}
-//DeadCode AMM 3Aug00 	}
 }
 
 void	SController::SetDefaultStickSettings(bool setff)
 {
 	if (connecteddevices[0].supportsff && setff)
 		connecteddevices[0].useff=true;
-//DeadCode JIM 20Oct00 	int ra=0;
-//DeadCode JIM 20Oct00 	int rh=0;	
 	connecteddevices[0].enablepoll=true;
-//DeadCode JIM 20Oct00 	int rm=0;	
 	connecteddevices[1].enablepoll=true;
 	bool donestick=false,donethr=false,doneped=false,donecock=false;
 	for (int va=firstaxes;va<usedaxes;va++)
@@ -872,7 +695,6 @@ void	SController::SetDefaultStickSettings(bool setff)
 }
 
 
-//DeadCode AMM 21Feb100 void	SController::SetAxisConfig()	//set runtime device config from ui axis list
 void	SController::SetAxisConfig(bool mouseshift, bool joyshift)	//set runtime device config from ui axis list
 {
 	int rtdev=0;
@@ -891,8 +713,6 @@ void	SController::SetAxisConfig(bool mouseshift, bool joyshift)	//set runtime de
 			_Analogue.runtimedevices[rtdev].ismouse=connecteddevices[setdev].ismouse;
 			int ra=0;
 			int rh=0;
-//DeadCode JIM 20Oct00 			int sra=0;
-//DeadCode JIM 20Oct00 			int srh=0;
 
 			for (int va=firstaxes;va<usedaxes;va++)
 			{
@@ -903,55 +723,14 @@ void	SController::SetAxisConfig(bool mouseshift, bool joyshift)	//set runtime de
 						_Analogue.runtimedevices[rtdev].hatmaps[rh++]=connectedaxes[va].assignedtask;
 					}	
 					else
-//DeadCode AMM 21Feb100 						_Analogue.runtimedevices[rtdev].axismaps[ra++]=connectedaxes[va].assignedtask;
 					{
-//DeadCode JIM 4Sep00 						if (connectedaxes[va].ismouse && mouseshift)
-//DeadCode JIM 4Sep00 						{
-//DeadCode JIM 4Sep00 // find axis with shifted name
-//DeadCode JIM 4Sep00 
-//DeadCode JIM 4Sep00 							int find;
-//DeadCode JIM 4Sep00 							for (find=firstaxes;find<usedaxes;find++)
-//DeadCode JIM 4Sep00 							{
-//DeadCode JIM 4Sep00 								CString s;
-//DeadCode JIM 4Sep00 								s.LoadString(IDS_SHIFTEDINPUT);
-//DeadCode JIM 4Sep00 								if ((s+connectedaxes[va].name)==connectedaxes[find].name)
-//DeadCode JIM 4Sep00 								{
-//DeadCode JIM 4Sep00 									_Analogue.runtimedevices[rtdev].axismaps[ra++]=connectedaxes[find].assignedtask;
-//DeadCode JIM 4Sep00 									break;
-//DeadCode JIM 4Sep00 								}
-//DeadCode JIM 4Sep00 							}
-//DeadCode JIM 4Sep00 						}
-//DeadCode JIM 31Aug00 						else if (!connectedaxes[va].ismouse && joyshift)
-//DeadCode JIM 31Aug00 						{
-//DeadCode JIM 31Aug00 // find axis with shifted name
-//DeadCode JIM 31Aug00 
-//DeadCode JIM 31Aug00 							int find;
-//DeadCode JIM 31Aug00 							for (find=firstaxes;find<usedaxes;find++)
-//DeadCode JIM 31Aug00 							{
-//DeadCode JIM 31Aug00 								CString s;
-//DeadCode JIM 31Aug00 								s.LoadString(IDS_SHIFTEDINPUT);
-//DeadCode JIM 31Aug00 								if ((s+connectedaxes[va].name)==connectedaxes[find].name)
-//DeadCode JIM 31Aug00 								{
-//DeadCode JIM 31Aug00 									_Analogue.runtimedevices[rtdev].axismaps[ra++]=connectedaxes[find].assignedtask;
-//DeadCode JIM 31Aug00 									break;
-//DeadCode JIM 31Aug00 								}
-//DeadCode JIM 31Aug00 							}
-//DeadCode JIM 31Aug00 						}
-//DeadCode JIM 4Sep00 						else
 						{
-//DeadCode JIM 4Sep00 							if (!strncmp("SH_",connectedaxes[va].name,3))
-//DeadCode JIM 4Sep00 								_Analogue.runtimedevices[rtdev].sh_axismaps[sra++]=connectedaxes[va].assignedtask;
-//DeadCode JIM 4Sep00 							else
 								_Analogue.runtimedevices[rtdev].axismaps[ra++]=connectedaxes[va].assignedtask;
 						}
 					}
 				}
 			}
 
-//DeadCode AMM 21Feb100 			while (rh<RunTimeDevDesc::MAXMAPS)
-//DeadCode AMM 21Feb100 				_Analogue.runtimedevices[rtdev].hatmaps[rh++]=AU_UNASSIGNED;
-//DeadCode AMM 21Feb100 			while (ra<RunTimeDevDesc::MAXMAPS)
-//DeadCode AMM 21Feb100 				_Analogue.runtimedevices[rtdev].axismaps[ra++]=AU_UNASSIGNED;
 			rtdev++;
 		}
 	}
@@ -966,7 +745,6 @@ void	SController::RemakeDisplay()
 	CString currdevname;
 	currdevname=combo->GetCaption();
 
-//DeadCode AMM 22Aug00 	if (index==-1) index=0;
 
 	combo->Clear();
 	for (int i=0;i<useddevices;i++)
@@ -1007,34 +785,6 @@ void	SController::RemakeDisplay()
 }
 void	SController::RemakeAxes()
 {
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_STICKDEV,AU_AILERON,true,true,true);
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_THROTDEV,AU_THROTTLE,false,true,false);
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_THROTDEV_2,AU_THROTTLE,false,true,false);
-//DeadCode AMM 21Feb100 //DeadCode AMM 13Dec99 	SetAxesCombo(m_IDC_THROTDEV_2,AU_THROTTLE,false,true,false);
-//DeadCode AMM 21Feb100 //DEADCODE AMM 28/01/00 	SetAxesCombo(m_IDC_THROTDEV_2,AU_THROTTLE2,false,true,false);
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_RUDDEV,AU_RUDDER,true,true,false);
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_PROPPITCH,AU_PROPPITCH,false,true,false);
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_PROPPITCH2,AU_PROPPITCH,false,true,false);
-//DeadCode AMM 21Feb100 //DEADCODE AMM 28/01/00 	SetAxesCombo(m_IDC_PROPPITCH2,AU_PROPPITCH2,false,true,false);
-//DeadCode AMM 21Feb100 
-//DeadCode AMM 21Feb100 //DEADCODE AMM 28/01/00 	SetAxesCombo(m_IDC_INTERACTIVECPIT,AU_COCKPIT,false,true,false);
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_INTERACTIVECPIT,AU_COCKPIT,true,false,true);
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_GUNNER,AU_GUNP,false,true,false);
-//DeadCode AMM 21Feb100 
-//DeadCode AMM 21Feb100 
-//DeadCode AMM 21Feb100 	
-//DeadCode AMM 21Feb100 	if (SetAxesCombo(m_IDC_PANDEV,AU_VIEWH,true,false,false))
-//DeadCode AMM 21Feb100 	{
-//DeadCode AMM 21Feb100 		CRCombo* h=GETDLGITEM(IDC_PANDEV);
-//DeadCode AMM 21Feb100 		CRCombo* p=GETDLGITEM(IDC_PITCHDEV);
-//DeadCode AMM 21Feb100 		p->Clear();
-//DeadCode AMM 21Feb100 		p->SetCaption(h->GetCaption());
-//DeadCode AMM 21Feb100 			
-//DeadCode AMM 21Feb100 	}
-//DeadCode AMM 21Feb100 //DEADCODE RDH 29/11/99 	else
-//DeadCode AMM 21Feb100 //DEADCODE RDH 29/11/99 		SetAxesCombo(m_IDC_PITCHDEV,AU_VIEWP,false,true,false);
-//DeadCode AMM 21Feb100 	SetAxesCombo(m_IDC_ZOOMDEV,AU_VIEWZ,false,true,false);
-//DeadCode AMM 21Feb100 //DEADCODE RDH 29/11/99 	SetAxesCombo(m_IDC_MOUSEDEV,AU_UI_X,true,false,true);
 
 //  xonly, analogonly, paironly, notstick, notmouse, allowshifted
 
@@ -1045,7 +795,6 @@ void	SController::RemakeAxes()
 	SetAxesCombo(m_IDC_THROTDEV_2,AU_THROTTLE2,	false,true,false,false,false,false,true,AA_THROTTLE2_PROP1);
 	SetAxesCombo(m_IDC_PROPPITCH2,AU_PROPPITCH2,false,true,false,false,false,false,true);
 
-//DeadCode AMM 27Jul00 	SetAxesCombo(m_IDC_INTERACTIVECPIT,AU_COCKPIT,true,false,true,true,false,true);
 	SetAxesCombo(m_IDC_PANDEV,AU_VIEWH,false,false,true,false,false,true,true,AA_AA_SETUP);
 	SetAxesCombo(m_IDC_INTERACTIVECPIT,AU_COCKPIT,true,false,true,true,false,true,true,AA_UI_PAN);
 	SetAxesCombo(m_IDC_GUNNER,AU_GUNH,false,true,true,false,false,true,true,AA_GUNNER_JOYVIEW);
@@ -1053,7 +802,6 @@ void	SController::RemakeAxes()
 	SetAxesCombo(m_IDC_ZOOMDEV,AU_VIEWZ,false,true,false,true,false,false,true);
 }
 
-//DeadCode AMM 21Feb100 int	SController::ChangedAxesCombo(CRCombo& m_ID,AxisUses task,bool xonly,bool analogonly,bool paironly)
 int	SController::ChangedAxesCombo(CRCombo& m_ID,AxisUses task,bool xonly,bool analogonly,bool paironly,bool notstick, bool notmouse, bool allowshifted, bool allownormal,AllowAliasing allowaliasing)
 {
 	int newindex;
@@ -1101,14 +849,12 @@ int	SController::ChangedAxesCombo(CRCombo& m_ID,AxisUses task,bool xonly,bool an
 			if (connectedaxes[i].name.Find(s)!=-1)
 				continue;
 		}
-//DeadCode AMM 27Jul00 		else
 
 		if (!allownormal)
 		{
 		 	CString s;
 		 	s.LoadString(IDS_SHIFTEDINPUT);
 
-//DeadCode AMM 27Jul00 			if (connectedaxes[i].name.Find(s)==-1)
 			if (connectedaxes[i].name.Find(s)==-1)
 				continue;
 		}
@@ -1162,12 +908,10 @@ void	SController::ChangedAxesValue(int newind,AxisUses task)
 		connectedaxes[newind].assignedtask=task;
 }
 
-//DeadCode AMM 21Feb100 bool	SController::SetAxesCombo(CRCombo& m_ID,AxisUses task,bool xonly,bool analogonly,bool paironly)
 bool	SController::SetAxesCombo(CRCombo& m_ID,AxisUses task,bool xonly,bool analogonly,bool paironly,bool notstick, bool notmouse, bool allowshifted, bool allownormal,AllowAliasing allowaliassing)
 {
 	CRCombo* combo=GETDLGITEM(ID);
 	combo->Clear();
-//DeadCode AMM 13Dec99 	combo->AddString(RESSTRING(KEYBOARD));
 	int currindex=1;
 	int selindex=0;
 	bool	rv=false;
@@ -1200,13 +944,11 @@ bool	SController::SetAxesCombo(CRCombo& m_ID,AxisUses task,bool xonly,bool analo
 				if (connectedaxes[i].name.Find(s)!=-1)
 					continue;
 			}
-//DeadCode AMM 27Jul00 			else
 			if (!allownormal)
 			{
 		 		CString s;
 		 		s.LoadString(IDS_SHIFTEDINPUT);
 
-//DeadCode AMM 27Jul00 				if (connectedaxes[i].name.Find(s)==-1)
 				if (connectedaxes[i].name.Find(s)==-1)
 					continue;
 			}
@@ -1233,9 +975,8 @@ bool	SController::SetAxesCombo(CRCombo& m_ID,AxisUses task,bool xonly,bool analo
 										connectedaxes[i].name			));
 			currindex++;
 		}
-		if (allowaliassing)
-			if (allowaliassing<AA_AA_SETUP)
-			{	//this axis can alias on another axis
+		if (allowaliassing && allowaliassing<AA_AA_SETUP)
+		{	//this axis can alias on another axis
 				 for (Analogue::AliassingOption* ao=Analogue::Aliassing_Table[allowaliassing];ao->gamereason;ao++)
 				 {
 					 if (ao->aliassedtaskgotanalogueinput)
@@ -1258,7 +999,6 @@ bool	SController::SetAxesCombo(CRCombo& m_ID,AxisUses task,bool xonly,bool analo
 				 for (ao=Analogue::Aliassing_List;ao->aliasedtask!=AU_ILLEGAL;ao++)
 					 if(ao->gamereason && ao->aliasedtask==task)
 					 {	//there is another input that can alias this input
-//DeadCode JIM 20Oct00 						 AllowAliasing allowaliasingaxis=AllowAliasing(allowaliassing-AA_AA_SETUP);
 						 if (selindex>0)
 						 {	//this input is analogue enabled, so other input can be aliassed to this
 							 ao->aliassedtaskgotanalogueinput=true;
@@ -1303,7 +1043,6 @@ void SController::OnClickedCalib()
 		DIdev->RunControlPanel(Master_3d.winst,0);
 //OLD_CODE		DIdev->RunControlPanel(m_hWnd,0);
 	DIdev->Release();
-//DeadCode AMM 21Feb100 	SetAxisConfig();
 	SetAxisConfig(false,false);
 	BuildEnumerationTables();
 	GetAxisConfig();
@@ -1324,7 +1063,6 @@ void SController::OnClickedCalib()
 void SController::OnTextChangedDevlist(LPCTSTR text, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 21Feb100 	SetAxisConfig();
 	SetAxisConfig(false,false);
 	BuildEnumerationTables();
 	GetAxisConfig();
@@ -1410,7 +1148,6 @@ void SController::OnClickedSelpoll()
 void SController::OnTextChangedMousedev(LPCTSTR text, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_MOUSEDEV,AU_UI_X,true,false,true);
 	int newaxis=ChangedAxesCombo(m_IDC_MOUSEDEV,AU_UI_X,true,false,true,false,false,false,true);
 	if (newaxis>=0 && !connectedaxes[newaxis].ishat)
 		ChangedAxesValue(newaxis+1,AU_UI_Y);
@@ -1435,7 +1172,6 @@ void	SController::SetEnabled(int newaxis)
 void SController::OnTextChangedPandev(LPCTSTR text, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_PANDEV,AU_VIEWH,true,false,false);
 	int newaxis=ChangedAxesCombo(m_IDC_PANDEV,AU_VIEWH,false,false,true,false,false,true,true);
 	if (newaxis>=0)
 	{
@@ -1453,19 +1189,10 @@ void SController::OnTextChangedPandev(LPCTSTR text, short index)
 	SetEnabled(newaxis);
 }
 
-//DeadCode JIM 4Sep00 void SController::OnTextChangedPitchdev(LPCTSTR text, short index) 
-//DeadCode JIM 4Sep00 {
-//DeadCode JIM 4Sep00 	// TODO: Add your control notification handler code here
-//DeadCode JIM 4Sep00 //DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_PITCHDEV,AU_VIEWP,false,false,false);	
-//DeadCode JIM 4Sep00 	int newaxis=ChangedAxesCombo(m_IDC_PITCHDEV,AU_VIEWP,false,false,true,true,false,false,true);	
-//DeadCode JIM 4Sep00 	SetEnabled(newaxis);
-//DeadCode JIM 4Sep00 	RemakeAxes();
-//DeadCode JIM 4Sep00 }
 
 void SController::OnTextChangedRuddev(LPCTSTR text, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_RUDDEV,AU_RUDDER,true,true,false);	
 	int newaxis=ChangedAxesCombo(m_IDC_RUDDEV,AU_RUDDER,false,true,false,false,true,false,true);	
 	SetEnabled(newaxis);
 	RemakeAxes();
@@ -1475,7 +1202,6 @@ void SController::OnTextChangedRuddev(LPCTSTR text, short index)
 void SController::OnTextChangedStickdev(LPCTSTR text, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_STICKDEV,AU_AILERON,true,true,true);	
 	int newaxis=ChangedAxesCombo(m_IDC_STICKDEV,AU_AILERON,true,true,true,false,true,false,true);
 	ChangedAxesValue(newaxis+1,AU_ELEVATOR);
 	SetEnabled(newaxis);
@@ -1485,7 +1211,6 @@ void SController::OnTextChangedStickdev(LPCTSTR text, short index)
 void SController::OnTextChangedThrotdev(LPCTSTR text, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_THROTDEV,AU_THROTTLE,false,true,false);	
 	int newaxis=ChangedAxesCombo(m_IDC_THROTDEV,AU_THROTTLE,false,true,false,false,false,false,true);	
 	SetEnabled(newaxis);
 	RemakeAxes();
@@ -1494,7 +1219,6 @@ void SController::OnTextChangedThrotdev(LPCTSTR text, short index)
 void SController::OnTextChangedZoomdev(LPCTSTR text, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_ZOOMDEV,AU_VIEWZ,false,true,false);	
 	int newaxis=ChangedAxesCombo(m_IDC_ZOOMDEV,AU_VIEWZ,false,true,false,true,false,false,true);	
 	SetEnabled(newaxis);
 	RemakeAxes();
@@ -1512,9 +1236,6 @@ void SController::OnTimer(UINT nIDEvent)
 // check for devices every second in case a device is removed via calibration, 
 // unplugged or whatever
 
-//DeadCode JIM 2Nov00 	if (timeGetTime()>con_time)
-//DeadCode JIM 2Nov00 	{
-//DeadCode JIM 2Nov00 		con_time=timeGetTime()+3000;
 		if (!GotSameDevices())
 		{
 			SetAxisConfig(false,false);
@@ -1522,7 +1243,6 @@ void SController::OnTimer(UINT nIDEvent)
 			GetAxisConfig();
 			RemakeDisplay();
 		}
-//DeadCode JIM 2Nov00 	}
 
 	CDialog::OnTimer(nIDEvent);
 }
@@ -1535,81 +1255,18 @@ void SController::OnDestroy()
 
 }
 
-//DEADCODE RDH 29/11/99 void SController::OnTextChangedCboControlcoldeadzone(LPCTSTR text, short Xindex) 
-//DEADCODE RDH 29/11/99 {
-//DEADCODE RDH 29/11/99   	CRCombo* combo;
-//DEADCODE RDH 29/11/99 	combo=GETDLGITEM(IDC_CBO_CONTROLCOLDEADZONE);
-//DEADCODE RDH 29/11/99 	int index = combo->GetIndex();	
-//DEADCODE RDH 29/11/99 
-//DEADCODE RDH 29/11/99 	switch (index)
-//DEADCODE RDH 29/11/99 	{
-//DEADCODE RDH 29/11/99 		case 0:	
-//DEADCODE RDH 29/11/99 		{
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_AILERON] = DZ_SMALL;
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_ELEVATOR] = DZ_SMALL;
-//DEADCODE RDH 29/11/99 			break;
-//DEADCODE RDH 29/11/99 		}
-//DEADCODE RDH 29/11/99 		case 1:	
-//DEADCODE RDH 29/11/99 		{
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_AILERON] = DZ_MEDIUM;
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_ELEVATOR] = DZ_MEDIUM;
-//DEADCODE RDH 29/11/99 			break;
-//DEADCODE RDH 29/11/99 		}
-//DEADCODE RDH 29/11/99 		case 2:	
-//DEADCODE RDH 29/11/99 		{
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_AILERON] = DZ_LARGE;
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_ELEVATOR] = DZ_LARGE;
-//DEADCODE RDH 29/11/99 			break;
-//DEADCODE RDH 29/11/99 		}
-//DEADCODE RDH 29/11/99 	}
-//DEADCODE RDH 29/11/99 	
-//DEADCODE RDH 29/11/99 }
 
-//DEADCODE RDH 29/11/99 void SController::OnTextChangedCboRudderdeadzone(LPCTSTR text, short Xindex) 
-//DEADCODE RDH 29/11/99 {
-//DEADCODE RDH 29/11/99   	CRCombo* combo;
-//DEADCODE RDH 29/11/99 	combo=GETDLGITEM(IDC_CBO_RUDDERDEADZONE);
-//DEADCODE RDH 29/11/99 	int index = combo->GetIndex();	
-//DEADCODE RDH 29/11/99 
-//DEADCODE RDH 29/11/99 	switch (index)
-//DEADCODE RDH 29/11/99 	{
-//DEADCODE RDH 29/11/99 		case 0:	
-//DEADCODE RDH 29/11/99 		{
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_RUDDER] = DZ_SMALL;
-//DEADCODE RDH 29/11/99 			break;
-//DEADCODE RDH 29/11/99 		}
-//DEADCODE RDH 29/11/99 		case 1:	
-//DEADCODE RDH 29/11/99 		{
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_RUDDER] = DZ_MEDIUM;
-//DEADCODE RDH 29/11/99 			break;
-//DEADCODE RDH 29/11/99 		}
-//DEADCODE RDH 29/11/99 		case 2:	
-//DEADCODE RDH 29/11/99 		{
-//DEADCODE RDH 29/11/99 			_Analogue.deadzones[AU_RUDDER] = DZ_LARGE;
-//DEADCODE RDH 29/11/99 			break;
-//DEADCODE RDH 29/11/99 		}
-//DEADCODE RDH 29/11/99 	}
-//DEADCODE RDH 29/11/99 }
 
-//DeadCode DAW 22Dec98 BOOL SController::OnInitDialog() 
-//DeadCode DAW 22Dec98 {
-//DeadCode DAW 22Dec98 	CDialog::OnInitDialog();
-//DeadCode DAW 22Dec98 
-//DeadCode DAW 22Dec98 	ControlsPref_Timer=SetTimer(TIMER_PREFSCONTROLS,0,NULL);
-//DeadCode DAW 22Dec98 	
-//DeadCode DAW 22Dec98 	// TODO: Add extra initialization here
-//DeadCode DAW 22Dec98 	
-//DeadCode DAW 22Dec98 	return TRUE;  // return TRUE unless you set the focus to a control
-//DeadCode DAW 22Dec98 	              // EXCEPTION: OCX Property Pages should return FALSE
-//DeadCode DAW 22Dec98 }
 static void SetDZCombo(SController::CRCombo* combo,int level,int midlevel)
 {
 	int index=0;
 	if (level>=midlevel)
+	{
 		if (level==midlevel)
 			index=1;
 		else
 			index=2;
+	}
 		combo->RESCOMBO(SMALL,3)->SetIndex(index);
 
 }
@@ -1628,8 +1285,6 @@ BOOL SController::OnInitDialog()
 	
 	if (_DPlay.PlayerCreated)									//AMM 12Jul99
 	{															//AMM 12Jul99
-//DeadCode AMM 16Nov99 		_DPlay.UISendInPrefsMessage();							//AMM 12Jul99
-//DeadCode AMM 16Nov99 		DPlay::H2H_Player[_DPlay.mySlot].status=CPS_PREFS;		//AMM 12Jul99
 		_DPlay.SendStatusChange(DPlay::CPS_PREFS);
 	}															//AMM 12Jul99
 
@@ -1693,18 +1348,6 @@ BOOL SController::OnInitDialog()
 
 
 //Force Feedback
-//DeadCode CSB 17Aug00 	combo=GETDLGITEM(IDC_CBO_FF_GUNRATTLE);
-//DeadCode CSB 17Aug00 	index = _Analogue.FFpush.level;
-//DeadCode CSB 17Aug00 	combo->RESCOMBO(OBLMHT_OFF,6)->SetIndex(index);
-//DeadCode CSB 17Aug00 	combo=GETDLGITEM(IDC_CBO_FF_BUFF);
-//DeadCode CSB 17Aug00 	index = _Analogue.FFshake.level;
-//DeadCode CSB 17Aug00 	combo->RESCOMBO(OBLMHT_OFF,6)->SetIndex(index);
-//DeadCode CSB 17Aug00 	combo=GETDLGITEM(IDC_CBO_FF_AERO);
-//DeadCode CSB 17Aug00 	index = _Analogue.FFstiff.level;//FF_aerodynamic;
-//DeadCode CSB 17Aug00 	combo->RESCOMBO(OBLMHT_OFF,6)->SetIndex(index);
-//DeadCode CSB 17Aug00 	combo=GETDLGITEM(IDC_CBO_FF_AIRFRAME);
-//DeadCode CSB 17Aug00 	index = _Analogue.FFdamp.level;//FF_airframe;
-//DeadCode CSB 17Aug00 	combo->RESCOMBO(OBLMHT_OFF,6)->SetIndex(index);
 	combo=GETDLGITEM(IDC_CBO_FF_GUNRATTLE);								//CSB 17Aug00
 	index = _Analogue.FF_gun;											//CSB 17Aug00
 	combo->RESCOMBO(OBLMHT_OFF,6)->SetIndex(index);						//CSB 17Aug00
@@ -1726,9 +1369,6 @@ BOOL SController::OnInitDialog()
 
 void SController::OnTextChangedCboStickdz(LPCTSTR Caption, short index) 
 {
-//DEADCODE RDH 29/11/99   	CRCombo* combo;
-//DEADCODE RDH 29/11/99 	combo=GETDLGITEM(IDC_CBO_STICKDZ);
-//DEADCODE RDH 29/11/99 	int index = combo->GetIndex();	
 
 	switch (index)
 	{
@@ -1756,10 +1396,6 @@ void SController::OnTextChangedCboStickdz(LPCTSTR Caption, short index)
 
 void SController::OnTextChangedCboStickdmode(LPCTSTR Caption, short index) 
 {
-//DEADCODE RDH 29/11/99  	CRCombo* combo;
-//DEADCODE RDH 29/11/99 	combo=GETDLGITEM(IDC_CBO_RUDDZ);
-//DEADCODE RDH 29/11/99 	int index = combo->GetIndex();	
-//DEADCODE RDH 29/11/99 
 	_Analogue.tune[AU_AILERON].mode = index;
 	_Analogue.tune[AU_ELEVATOR].mode = index;
 	
@@ -1768,8 +1404,6 @@ void SController::OnTextChangedCboStickdmode(LPCTSTR Caption, short index)
 void SController::OnTextChangedThrotdev2(LPCTSTR Caption, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 13Dec99 	_Analogue.tune[AU_ELEVATOR].mode = index;
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_THROTDEV_2,AU_THROTTLE2,false,true,false);
 	int newaxis=ChangedAxesCombo(m_IDC_THROTDEV_2,AU_THROTTLE2,false,true,false,false,false,false,true,AA_THROTTLE2_PROP1);
 	SetEnabled(newaxis);
 	RemakeAxes();
@@ -1781,8 +1415,6 @@ void SController::OnTextChangedProppitch2(LPCTSTR Caption, short index)
 	// TODO: Add your control notification handler code here
 
 	
-//DEADCODE AMM 28/01/00 	int newaxis=ChangedAxesCombo(m_IDC_PROPPITCH,AU_PROPPITCH,false,true,false);
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_PROPPITCH2,AU_PROPPITCH2,false,true,false);
 	int newaxis=ChangedAxesCombo(m_IDC_PROPPITCH2,AU_PROPPITCH2,false,true,false,false,false,false,true);
 	SetEnabled(newaxis);
 	RemakeAxes();
@@ -1792,8 +1424,6 @@ void SController::OnTextChangedProppitch(LPCTSTR Caption, short index)
 {
 	// TODO: Add your control notification handler code here
 	
-//DEADCODE AMM 28/01/00 	int newaxis=ChangedAxesCombo(m_IDC_PROPPITCH2,AU_PROPPITCH2,false,true,false);
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_PROPPITCH,AU_PROPPITCH,false,true,false);
 	int newaxis=ChangedAxesCombo(m_IDC_PROPPITCH,AU_PROPPITCH,false,true,false,false,false,false,true);
 	SetEnabled(newaxis);
 	RemakeAxes();
@@ -1802,8 +1432,6 @@ void SController::OnTextChangedProppitch(LPCTSTR Caption, short index)
 void SController::OnTextChangedInteractivecockpit(LPCTSTR Caption, short index) 
 {
 	// TODO: Add your control notification handler code here
-//DeadCode AMM 28Jan00 	int newaxis=ChangedAxesCombo(m_IDC_INTERACTIVECPIT,AU_COCKPIT,false,true,false);
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_INTERACTIVECPIT,AU_COCKPIT,true,true,true);
 	int newaxis=ChangedAxesCombo(m_IDC_INTERACTIVECPIT,AU_COCKPIT,true,false,true,true,false,true,true,AA_UI_PAN);
 	ChangedAxesValue(newaxis+1,(AxisUses)(AU_COCKPIT+1));
 	SetEnabled(newaxis);
@@ -1815,9 +1443,7 @@ void SController::OnTextChangedGunner(LPCTSTR Caption, short index)
 {
 	// TODO: Add your control notification handler code here
 	
-//DeadCode AMM 21Feb100 	int newaxis=ChangedAxesCombo(m_IDC_GUNNER,AU_GUNH,true,true,true);
 	int newaxis=ChangedAxesCombo(m_IDC_GUNNER,AU_GUNH,false,true,true,false,false,true,true,AA_GUNNER_JOYVIEW);
-//DeadCode AMM 21Feb100 	ChangedAxesValue(newaxis+1,AU_GUNP);
 	ChangedAxesValue(newaxis+1,AU_GUNP);
 	SetEnabled(newaxis);
 	RemakeAxes();
@@ -1830,34 +1456,7 @@ void SController::OnTextChangedCboZoommode(LPCTSTR Caption, short index)
 	
 }
 
-//DeadCode AMM 28Jul00 void SController::OnTextChangedCboZoomdz(LPCTSTR Caption, short index) 
-//DeadCode AMM 28Jul00 {
-//DeadCode AMM 28Jul00 	switch (index)
-//DeadCode AMM 28Jul00 	{
-//DeadCode AMM 28Jul00 		case 0:	
-//DeadCode AMM 28Jul00 		{
-//DeadCode AMM 28Jul00 			_Analogue.tune[AU_VIEWZ].deadzones = DZ_SMALL;
-//DeadCode AMM 28Jul00 			break;
-//DeadCode AMM 28Jul00 		}
-//DeadCode AMM 28Jul00 		case 1:	
-//DeadCode AMM 28Jul00 		{
-//DeadCode AMM 28Jul00 			_Analogue.tune[AU_VIEWZ].deadzones = DZ_MEDIUM;
-//DeadCode AMM 28Jul00 			break;
-//DeadCode AMM 28Jul00 		}
-//DeadCode AMM 28Jul00 		case 2:	
-//DeadCode AMM 28Jul00 		{
-//DeadCode AMM 28Jul00 			_Analogue.tune[AU_VIEWZ].deadzones = DZ_LARGE;
-//DeadCode AMM 28Jul00 			break;
-//DeadCode AMM 28Jul00 		}
-//DeadCode AMM 28Jul00 	}
-//DeadCode AMM 28Jul00 	
-//DeadCode AMM 28Jul00 }
 
-//DeadCode AMM 2Aug00 void SController::OnTextChangedCboThrotmode(LPCTSTR Caption, short index) 
-//DeadCode AMM 2Aug00 {
-//DeadCode AMM 2Aug00 	_Analogue.tune[AU_THROTTLE].mode = index;
-//DeadCode AMM 2Aug00 	
-//DeadCode AMM 2Aug00 }
 
 void SController::OnTextChangedCboThrotdz(LPCTSTR Caption, short index) 
 {
@@ -1882,11 +1481,6 @@ void SController::OnTextChangedCboThrotdz(LPCTSTR Caption, short index)
 	
 }
 
-//DeadCode AMM 2Aug00 void SController::OnTextChangedCboThrot2mode(LPCTSTR Caption, short index) 
-//DeadCode AMM 2Aug00 {
-//DeadCode AMM 2Aug00 	_Analogue.tune[AU_THROTTLE2].mode = index;
-//DeadCode AMM 2Aug00 	
-//DeadCode AMM 2Aug00 }
 
 void SController::OnTextChangedCboThrot2dz(LPCTSTR Caption, short index) 
 {
@@ -1940,11 +1534,6 @@ void SController::OnTextChangedCboRuddz(LPCTSTR Caption, short index)
 	
 }
 
-//DeadCode AMM 2Aug00 void SController::OnTextChangedCboPpmode(LPCTSTR Caption, short index) 
-//DeadCode AMM 2Aug00 {
-//DeadCode AMM 2Aug00 	_Analogue.tune[AU_PROPPITCH].mode = index;
-//DeadCode AMM 2Aug00 	
-//DeadCode AMM 2Aug00 }
 
 void SController::OnTextChangedCboPpdz(LPCTSTR Caption, short index) 
 {
@@ -1969,11 +1558,6 @@ void SController::OnTextChangedCboPpdz(LPCTSTR Caption, short index)
 	
 }
 
-//DeadCode AMM 2Aug00 void SController::OnTextChangedCboPp2mode(LPCTSTR Caption, short index) 
-//DeadCode AMM 2Aug00 {
-//DeadCode AMM 2Aug00 	_Analogue.tune[AU_PROPPITCH2].mode = index;
-//DeadCode AMM 2Aug00 	
-//DeadCode AMM 2Aug00 }
 
 void SController::OnTextChangedCboPp2dz(LPCTSTR Caption, short index) 
 {
@@ -2069,60 +1653,44 @@ void SController::OnTextChangedCboCockpitmode(LPCTSTR Caption, short index)
 
 void SController::OnTextChangedCboFfGunrattle(LPCTSTR Caption, short index) 
 {
-//DeadCode CSB 17Aug00 	_Analogue.FFpush.level = index;
 	_Analogue.FF_gun = index;											//CSB 17Aug00
 }
 
 void SController::OnTextChangedCboFfBuff(LPCTSTR Caption, short index) 
 {
-//DeadCode CSB 17Aug00 	_Analogue.FFshake.level = index;
 	_Analogue.FF_buffet = index;										//CSB 17Aug00
 }
 
 void SController::OnTextChangedCboFfAirframe(LPCTSTR Caption, short index) 
 {
-//DeadCode CSB 17Aug00 	_Analogue.FFdamp.level = index;
 	_Analogue.FF_airframe = index;										//CSB 17Aug00
 }
 
 void SController::OnTextChangedCboFfAero(LPCTSTR Caption, short index) 
 {
-//DeadCode CSB 17Aug00 	_Analogue.FFstiff.level = index;
 	_Analogue.FF_aerodynamic = index;									//CSB 17Aug00
 }
 
 void SController::OnClickedFlipCockpit() 
 {
-//DeadCode JIM 4Sep00 	if	(_Analogue.tune[AU_UI_Y].aliased[AA_TT_REVERSE])
 	   _Analogue.tune[AU_UI_Y].aliased^=AA_TT_REVERSE;
-//DeadCode JIM 4Sep00 	else
-//DeadCode JIM 4Sep00 	   _Analogue.tune[AU_UI_Y].reverse = true;
 	
 }
 
 void SController::OnClickedFlipGunner() 
 {
-//DeadCode JIM 4Sep00 	if	(_Analogue.tune[AU_GUNP].reverse)
 	   _Analogue.tune[AU_GUNP].aliased^=AA_TT_REVERSE;	//reverse = false;
-//DeadCode JIM 4Sep00 	else
-//DeadCode JIM 4Sep00 	   _Analogue.tune[AU_GUNP].reverse = true;
 	
 }
 
 void SController::OnClickedFlipPan() 
 {
-//DeadCode JIM 4Sep00 	if	(_Analogue.tune[AU_VIEWP].reverse)
 	   _Analogue.tune[AU_VIEWP].aliased^=AA_TT_REVERSE;	//reverse = false;
-//DeadCode JIM 4Sep00 	else
-//DeadCode JIM 4Sep00 	   _Analogue.tune[AU_VIEWP].reverse = true;
 	
 }
 
 void SController::OnClickedFlipPanhori() 
 {
-//DeadCode JIM 4Sep00 	if	(_Analogue.tune[AU_VIEWH].reverse)
 	   _Analogue.tune[AU_VIEWH].aliased^=AA_TT_REVERSE;	//reverse = false;
-//DeadCode JIM 4Sep00 	else
-//DeadCode JIM 4Sep00 	   _Analogue.tune[AU_VIEWH].reverse = true;
 	
 }

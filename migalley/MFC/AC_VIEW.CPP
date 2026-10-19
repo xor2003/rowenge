@@ -205,8 +205,6 @@ void CAC_view::ReDrawHeadings()
 	rlistbox->AddString(string,0);
 	string.LoadString(IDS_AAA);
 	rlistbox->AddString(string,0);
-//DEADCODE JIM 13/07/99 	string.LoadString(IDS_ALL);
-//DEADCODE JIM 13/07/99 	rlistbox->AddString(string,0);
 
 	string.LoadString(IDS_L_SQ_BF_F86A);
 	rlistbox->AddString(string,1);
@@ -255,8 +253,6 @@ void CAC_view::ReDrawHeadings()
 	rlistbox->AddString(string,0);
 	string.LoadString(IDS_OTHER);
 	rlistbox->AddString(string,0);
-//DEADCODE JIM 13/07/99 	string.LoadString(IDS_ALL);
-//DEADCODE JIM 13/07/99 	rlistbox->AddString(string,0);
 
 	string.LoadString(IDS_L_SQ_BF_F86A);
 	rlistbox->AddString(string,1);

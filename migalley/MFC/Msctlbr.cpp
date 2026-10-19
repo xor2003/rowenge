@@ -156,12 +156,10 @@ void CMiscToolbar::OnClickedReplay()
 			_Replay.MapPlayback=true;
 			RDialog::m_pView->LaunchFullPane(&RFullPanelDial::replaysave);
 		}
-//DeadCode AMM 10Mar99 		RDialog::m_pView->LaunchFullPane(&RFullPanelDial::replaysave);
 	}
 	else
 	{
 		_Replay.MapPlayback=true;
-//DeadCode AMM 26Feb99 		Todays_Packages.SaveBin();
 //	if (!RFullPanelDial::incomms)								//rdh 10/1/99
 		RDialog::m_pView->LaunchFullPane(&RFullPanelDial::replayload);
 //	else
@@ -294,21 +292,6 @@ void CMiscToolbar::OpenSaveOnly(bool quitafter)
 void CMiscToolbar::OnShowWindow(BOOL bShow, UINT nStatus) 
 {
 	CRToolBar::OnShowWindow(bShow, nStatus);
-//DEADCODE RDH 19/03/99 	if (!RFullPanelDial::incomms)								//rdh 10/1/99
-//DEADCODE RDH 19/03/99 	{
-//DEADCODE RDH 19/03/99 		CRButton*   b;
-//DEADCODE RDH 19/03/99 		b=GETDLGITEM(IDC_REPLAY);
-//DEADCODE RDH 19/03/99 		b->ShowWindow(SW_SHOW);
-//DEADCODE RDH 19/03/99 		b=GETDLGITEM(IDC_READYROOM);
-//DEADCODE RDH 19/03/99 		b->ShowWindow(SW_HIDE);
-//DEADCODE RDH 19/03/99 	}else
-//DEADCODE RDH 19/03/99 	{
-//DEADCODE RDH 19/03/99 		CRButton*   b;
-//DEADCODE RDH 19/03/99 		b=GETDLGITEM(IDC_REPLAY);
-//DEADCODE RDH 19/03/99 		b->ShowWindow(SW_HIDE);
-//DEADCODE RDH 19/03/99 		b=GETDLGITEM(IDC_READYROOM);
-//DEADCODE RDH 19/03/99 		b->ShowWindow(SW_SHOW);
-//DEADCODE RDH 19/03/99 	}
 
 	CRButton*	but = GETDLGITEM(IDC_REPLAY);
 	but->SetPressed(FALSE);		//always lift replay button, might have been pressed

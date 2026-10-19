@@ -140,8 +140,6 @@ void CBattleDetail::FillBtmBox()
 	TeamDef* topteam = &node->supplyline->groundbattle.teamlist[teams[currrow]];
 	if (teams[currrow] != -1)
 	{
-//DeadCode RDH 14Jun99 		CRListBox* rlistbox;
-//DeadCode RDH 14Jun99 		rlistbox=GETDLGITEM(IDC_RLISTBOXBTM);
 		for (int i=0;i<node->supplyline->groundbattle.usedteams;i++)
 		{
 			if (node->supplyline->groundbattle.teamlist[i].team!=blueforce)
@@ -166,7 +164,6 @@ void CBattleDetail::FillBtmBox()
 						string2 = string;
 						string2.MakeUpper();
 						string.SetAt(0, string2.GetAt(0));
-	//DEADCODE RDH 03/04/99 					rlistbox->AddString(LoadResString(node->supplyline->groundbattle.teamlist[i].node->mainids),3);
 						rlistbox->AddString(string,3);
 					}				
 				}
@@ -203,7 +200,6 @@ void CBattleDetail::FillTopBox()
 					string.SetAt(0, string2.GetAt(0));
 
 					
-	//DEADCODE RDH 03/04/99 				rlistbox->AddString(LoadResString(node->supplyline->groundbattle.teamlist[i].node->mainids),3);
 					rlistbox->AddString(string,3);
 				}
 			}
@@ -235,17 +231,6 @@ BOOL CBattleDetail::OnInitDialog()
 	rlistbox->AddString(RESSTRING(LOCATION),3);
 
 
-//DeadCode RDH 14Jun99 	rlistbox=GETDLGITEM(IDC_RLISTBOXBTM);
-//DeadCode RDH 14Jun99 	rlistbox->Clear();
-//DeadCode RDH 14Jun99 	rlistbox->AddColumn(120);
-//DeadCode RDH 14Jun99 	rlistbox->AddColumn(40);
-//DeadCode RDH 14Jun99 	rlistbox->AddColumn(64);
-//DeadCode RDH 14Jun99 	rlistbox->AddColumn(100);
-//DeadCode RDH 14Jun99 
-//DeadCode RDH 14Jun99 	rlistbox->AddString(RESSTRING(UNIT),0);
-//DeadCode RDH 14Jun99 	rlistbox->AddString(RESSTRING(SIZE),1);
-//DeadCode RDH 14Jun99 	rlistbox->AddString(RESSTRING(STATUS),2);
-//DeadCode RDH 14Jun99 	rlistbox->AddString(RESSTRING(LOCATION),3);
 
 	
 	CRStatic*   s0=GETDLGITEM(IDC_RSTATICCTRL2);

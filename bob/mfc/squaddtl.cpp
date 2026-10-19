@@ -276,9 +276,6 @@ BOOL SquadronDetails::OnInitDialog()
 	s->SetString(RESLIST(SPIT_A, actype));
 
 
-//DEADCODE RDH 05/01/00 	int ac = 16;
-//DEADCODE RDH 05/01/00 	s=GETDLGITEM(IDC_RSTATICACTOTAL);
-//DEADCODE RDH 05/01/00 	s->SetString(CSprintf("%i", sq->acavail + sq->acquickrepairable + sq->acslowrepairable));
 
 	s=GETDLGITEM(IDC_RSTATICACAVAIL);
 	s->SetString(CSprintf("%i (%i)", sq->acavail, sq->acavail + sq->acquickrepairable + sq->acslowrepairable));
@@ -471,8 +468,6 @@ void SquadronDetails::Refresh()
 {
 	CRStatic*   s;
 
-//DeadCode RDH 16Sep00 	if (	(!movedalready)
-//DeadCode RDH 16Sep00 		)
 	if (sqnum<SQ_LW_START)
 	{
 		CRCombo* combo;
@@ -516,19 +511,6 @@ void SquadronDetails::Refresh()
 		 s=GETDLGITEM(IDC_RSTATICMOVETO);
 		 s->ShowWindow(SW_SHOW);
  	}
-//DeadCode JIM 19Sep00 else
-//DeadCode RDH 16Sep00 	{
-//DeadCode RDH 16Sep00 		CRCombo* combo;
-//DeadCode RDH 16Sep00  		combo=GETDLGITEM(IDC_RCOMBOGROUP);
-//DeadCode RDH 16Sep00 		combo->ShowWindow(false);
-//DeadCode RDH 16Sep00  		combo=GETDLGITEM(IDC_RCOMBOAIRFIELD);
-//DeadCode RDH 16Sep00 		combo->ShowWindow(false);
-//DeadCode RDH 16Sep00 		 s=GETDLGITEM(IDC_RSTATICMOVETO);
-//DeadCode RDH 16Sep00 		 s->ShowWindow(SW_HIDE);
-//DeadCode RDH 16Sep00 		
-//DeadCode RDH 16Sep00 
-//DeadCode RDH 16Sep00 	}
-//DeadCode RDH 16Sep00 
 
 }
 
@@ -692,7 +674,6 @@ void NodeData::SetRAFReadiness()
 				&&  TargetFighterFieldPtr(Node_Data[Node_Data.squadron[i].homeairfield])->subdamagelevels[TargetFighterField::SDL_RUNWAY]<Target::TS_NEARLYDESTROYED
 				) 
 			{
-//DeadCode JIM 4Oct00 			if (Todays_Packages.britishisauto)		 //Mark asked for this...
 				Node_Data.squadron[i].totestatus = Profile::PS_ORDER_5;
 				Node_Data.squadron[i].totetimer = 60;	//All at same time to shut up woman!
 			}
@@ -703,10 +684,6 @@ void NodeData::SetRAFReadiness()
 }
 void NodeData::SetRAFReadiness(Profile::PackageStatus ps)
 {
-//DEADCODE RDH 31/05/00 	if (Todays_Packages.britishisauto)
-//DEADCODE RDH 11/04/00  	if (		(RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DEADCODE RDH 11/04/00 			||	(RFullPanelDial::gamestate == RFullPanelDial::PILOT)
-//DEADCODE RDH 11/04/00 		)								  britishisauto
 	{
 		int i = 0;
 		while (		(Node_Data.squadron[i].squadron != SQ_ZERO)

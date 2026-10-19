@@ -111,7 +111,6 @@ void CMainToolbar::DoDataExchange(CDataExchange* pDX)
 	CRToolBar::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CMainToolbar)
 		// NOTE: the ClassWizard will add DDX and DDV calls here
-//DEADCODE DAW 23/11/99 			DDX_Control(pDX,IDC_FRAG2,m_IDC_FRAG2);
 
 	//}}AFX_DATA_MAP
 	for (int id=0;id<MAX_ID;id++)
@@ -134,19 +133,8 @@ END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CMainToolbar, CRToolBar)
     //{{AFX_EVENTSINK_MAP(CMainToolbar)
-//DEADCODE DAW 23/11/99 	ON_EVENT(CMainToolbar, IDC_CHANGE_TO_TITLE, 1 /* Clicked */, OnClickedChangeToTitle, VTS_NONE)
-//DEADCODE JIM 16/12/99 	ON_EVENT(CMainToolbar, IDC_AUTHORISE, 1 /* Clicked */, OnClickedAuthorise, VTS_NONE)
 	ON_EVENT(CMainToolbar, IDC_BASES, 1 /* Clicked */, OnClickedBases, VTS_NONE)
-//DEADCODE DAW 23/11/99 	ON_EVENT(CMainToolbar, IDC_DIRECTIVES, 1 /* Clicked */, OnClickedDirectives, VTS_NONE)
-//DEADCODE JIM 30/11/99 	ON_EVENT(CMainToolbar, IDC_MISSIONRESULTS, 1 /* Clicked */, OnClickedMissionresults, VTS_NONE)
-//DEADCODE RDH 06/01/00 	ON_EVENT(CMainToolbar, IDC_OVERVIEW, 1 /* Clicked */, OnClickedOverview, VTS_NONE)
-//DEADCODE RDH 06/01/00 	ON_EVENT(CMainToolbar, IDC_PLAYERLOG, 1 /* Clicked */, OnClickedPlayerlog, VTS_NONE)
-//DEADCODE RDH 11/11/99 	ON_EVENT(CMainToolbar, IDC_SQUADS, 1 /* Clicked */, OnClickedSquads, VTS_NONE)
 	ON_EVENT(CMainToolbar, IDC_WEATHER, 1 /* Clicked */, OnClickedWeather, VTS_NONE)
-//DEADCODE JIM 30/11/99 	ON_EVENT(CMainToolbar, IDC_DIS, 1 /* Clicked */, OnClickedDis, VTS_NONE)
-//DEADCODE DAW 23/11/99 	ON_EVENT(CMainToolbar, IDC_MISSION_FOLDER, 1 /* Clicked */, OnClickedMissionFolder, VTS_NONE)
-//DEADCODE DAW 23/11/99 	ON_EVENT(CMainToolbar, IDC_AUTHORISE11, 1 /* Clicked */, OnClickedAuthorise11, VTS_NONE)
-//DEADCODE DAW 23/11/99 	ON_EVENT(CMainToolbar, IDC_FRAG2, 1 /* Clicked */, OnClickedFrag2, VTS_NONE)
 	ON_EVENT(CMainToolbar, IDC_AIRCRAFTALLOC, 1 /* Clicked */, OnClickedAircraftalloc, VTS_NONE)
 	ON_EVENT(CMainToolbar, IDC_SQUARONLIST, 1 /* Clicked */, OnClickedSquaronlist, VTS_NONE)
 	ON_EVENT(CMainToolbar, IDC_REVIEW, 1 /* Clicked */, OnClickedReview, VTS_NONE)
@@ -214,8 +202,6 @@ void CMainToolbar::OnClickedWeather()
 
 	int f;
 	f = FIL_D_WEATHER;
-//DEADCODE RDH 09/11/99 	if (MMC.Sky.MaxMagnitude > 0)
-//DEADCODE RDH 09/11/99 		f++;
 	if (!LoggedChild(WEATHER))
 		LogChild(WEATHER,
 			RDialog::MakeTopDialog(Place(POSN_CENTRE,POSN_CENTRE),
@@ -542,7 +528,6 @@ void CMainToolbar::FindSomethingToReview()
 bool CMainToolbar::EndofWar()
 {
 	int latest  = Node_Data.review.latest;
-//DeadCode JIM 20Oct00 	int viewed = Node_Data.review.B[IntelBuffer::Bviewedupto];
 
 
 	Node_Data.FillRAFStrengthInfo(false);
@@ -628,10 +613,6 @@ void CMainToolbar::OnClickedFrag2()
 	if	(false)//!Todays_Packages.FlyableAircraftAvailable())
 	{
 		int rv;
-//DEADCODE DAW 23/11/99 		if (!Todays_Packages.pack[0][0][0].uid)
-//DEADCODE RDH 09/05/00 			rv = RDialog::RMessageBox(IDS_NOMISSIONS, IDS_SETMISSIONS,NULL,IDS_NEXT_PERIOD,IDS_CONTINUE);
-//DEADCODE DAW 23/11/99 		else														  //RDH 14/06/99
-//DEADCODE DAW 23/11/99 			rv = RDialog::RMessageBox(IDS_MISSIONINVALID, IDS_NOTCLEARED,NULL,IDS_NEXT_PERIOD,IDS_CONTINUE); //RDH 14/06/99
 		rv = 1;															//RDH 09/05/00
 		if (rv < 2)	
 		{
@@ -639,22 +620,12 @@ void CMainToolbar::OnClickedFrag2()
 			CMainFrame* main=(CMainFrame*)AfxGetMainWnd();
 
 			main->CloseToolChildren();
-//DeadCode JIM 18Oct00 			main->m_toolbar1.CloseLoggedChildren();
-//DeadCode JIM 18Oct00 			main->m_toolbar2.CloseLoggedChildren();
-//DeadCode JIM 18Oct00 			main->m_toolbar3.CloseLoggedChildren();
-//DeadCode JIM 18Oct00 			main->m_toolbar4.CloseLoggedChildren();
-//DEADCODE RDH 08/11/99 			main->m_toolbar5.CloseLoggedChildren();
 
-//DEADCODE DAW 29/01/00 			MMC.UpdateAllDis();											  //RDH 19/06/99
-//DEADCODE DAW 29/01/00 		  	MMC.ZeroDisDay();
 			MMC.msgwithsmacker = 0;										  //RDH 26/06/99
 			MMC.smacker = FIL_NULL;
 
 
 			MMC.NextMission();
-//DEADCODE JIM 16/11/99 			SupplyTree::ProcessAirFields();
-//DeadCode JIM 18Oct00 			CMainFrame* pmainwnd=(CMainFrame*)AfxGetMainWnd();
-//DEADCODE RDH 08/11/99 			pmainwnd->m_toolbar5.OnClickedNextPeriod(); 
  		}
 	}
 	else
@@ -665,9 +636,7 @@ void CMainToolbar::OnClickedFrag2()
 		Todays_Packages.HandleLaterEvents();
 
 		Todays_Packages.SaveBin();
-//DeadCode JIM 20Oct00 		RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
 		FullScreen* fs;
-//DeadCode AMM 21Aug00 		fullscreen->SetDefaultPilotPositions();
 
 		if (Save_Data.minsbetweensavegame)
 			CFiling::SaveTimedGame();
@@ -686,16 +655,11 @@ void CMainToolbar::OnClickedFrag2()
 				Todays_Packages.SaveGame(bos);
 		}
 		//manage stores_destroyed									  //RDH 25/05/99
-//DEADCODE JIM 16/11/99 		SupplyTree::ProcessStoresDestroyed ();
 
-	//DeadCode AMM 27Nov98 	RDialog::m_pView->LaunchFullPane(&RFullPanelDial::singlefrag);	
 //	RFullPanelDial* fullscreen=(RFullPanelDial*)GetParent();
-//DeadCode AMM 21Aug00 	RFullPanelDial::SetDefaultPilotPositions();
-//DeadCode AMM 27Nov98 	RDialog::m_pView->LaunchFullPane(&RFullPanelDial::singlefrag);	
 
 		if (_DPlay.PlayerCreated && _DPlay.Host)
 		{
-//DeadCode PD 23May99 			_DPlay.SendSaveGame();
 			_DPlay.SendSaveGame(false,false);
 		}
 
@@ -705,7 +669,6 @@ void CMainToolbar::OnClickedFrag2()
 		}
 		else														//AMM 27Nov98
 		{
-//DEADCODE rdh 23/04/99 			RDialog::m_pView->LaunchFullPane(&RFullPanelDial::commsfrag);	//AMM 27Nov98
 			if	(_DPlay.Side)
 					if (_DPlay.UIPlayerType == DPlay::PLAYER_HOST)
 						RDialog::m_pView->LaunchFullPane(&RFullPanelDial::readyroomhostcampaign,SaveData::UIR_FRAG);	
@@ -720,8 +683,6 @@ void CMainToolbar::OnClickedFrag2()
 
 void CMainToolbar::OpenACDossier(int item, int gruppe) 
 {
-//DEADCODE  09/02/00 	if (Todays_Packages[Todays_Packages.hipack].attackmethod >= Profile::AM_LWPACKS) 
-//DeadCode AM 10Oct00    	if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
 	if (item<Squadron::WN_LAST)
 	{	//LW:	item is wadernum(0-3 or 1-4). Gruppe is gruppennum
 
@@ -754,7 +715,6 @@ void CMainToolbar::OpenInterceptOffered(int pack,int raid)
 		//dialog open so just set up intercept
 		LoggedChild(INTERCEPTOFFERED)->fchild->RefreshData((pack<<16)+raid);
 
-//DeadCode JIM 18Aug00 		RAFDirectivesResults::InterceptSanctioned(pack,0);
 
 //	else
 //		CloseLoggedChild(INTERCEPTOFFERED);
@@ -985,11 +945,11 @@ void CMainToolbar::OnClickedPilotdata()
 	if (RDialog::m_pView->m_currentpage != 0)							//RJS 29Oct00
  		return;															//RJS 29Oct00
 
- 		if (!LoggedChild(PILOTDATA))
-			LogChild(PILOTDATA,PilotLogBook::Make()
-								);
-		else
-			CloseLoggedChild(PILOTDATA);
+	if (!LoggedChild(PILOTDATA))
+		LogChild(PILOTDATA,PilotLogBook::Make()
+					);
+	else
+		CloseLoggedChild(PILOTDATA);
 
 	
 }
@@ -1069,10 +1029,6 @@ void CMainToolbar::OpenHostileslist()
 //RDH 2Aug00
 //I don't know why we had these extra conditions. I've removed them
 //because they cause problems with opening and closing the book
-//DeadCode RDH 2Aug00 		if (		(Todays_Packages.hipack == Todays_Packages.oldhipack) 
-//DeadCode RDH 2Aug00 				&&	(Todays_Packages.hisquad == Todays_Packages.oldhisquad) 
-//DeadCode RDH 2Aug00 				&&	(LoggedChild(HOSTILESLIST))
-//DeadCode RDH 2Aug00 			)
 		if	(LoggedChild(HOSTILESLIST))
 		{
 			CloseLoggedChild(HOSTILESLIST);

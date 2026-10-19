@@ -197,30 +197,6 @@ substruct	(CampaignPilots,CampaignPackages)
 endstruct(CampaignPilots);
 //////////////////////////
 //DEADsubstruct	(CampaignFiles,CampaignPilotsOnly)
-//DEAD//DeadCode RDH 18Feb97 
-//DEAD//DeadCode RDH 18Feb97 	FileNum	introsheetart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	intropadart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	introiconart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	cr_iconart;
-//DEAD//DeadCode RDH 18Feb97  	FileNum	lc_iconart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	historyart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	personnelart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	junctionart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	squadart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	saveart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	savedialogue;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	quitart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	padart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	mainiconart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	flightart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	newstextart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	newsgraphicart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	flightgraphicart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	acsmallart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	acmedart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	aclargeart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	paintshopart;
-//DEAD//DeadCode RDH 18Feb97 	FileNum	introtextart;
 //DEAD
 //DEAD	TextSnip0	objecttext;
 //DEAD	TextSnip0	introtext;
@@ -231,14 +207,11 @@ endstruct(CampaignPilots);
 //////////////////////////
 //DEADsubstruct	(CampaignPilots,CampaignFiles)
 //DEAD	PilotType	Reserve_Pilots[PILOTS_IN_RESERVE];
-//DEAD//DeadCode RDH 27Mar97 	PilotType	aces[ACESLIST];
 //DEADendstruct(CampaignPilots);
 //DEAD//////////////////////////
 //DEADsubstruct	(CampaignTank,CampaignPilots)
 //DEAD	SLong		Tank_timer;
 //DEAD	SLong		Truck_timer;
-//DEAD//DeadCode RDH 24Feb97 	UniqueID	routesstartuids[MAXROUTES];
-//DEAD//DeadCode RDH 24Feb97 	UniqueID	routesenduids[MAXROUTES];
 //DEADendstruct(CampaignTank);
 //DEAD//////////////////////////
 //DEADsubstruct	(CampaignTankZero,CampaignTank)

@@ -318,7 +318,6 @@ class direct_draw
 
 	LPDIRECTDRAW2	lpDD2;
 
-//DEADCODE	int	EightBitOnly;
 
 	bool fullScreenRequired;
 
@@ -1267,7 +1266,6 @@ class direct_3d
 	void FreeTextures();
 	HTEXT AllocateTexture(UByte);
 	void GetTextureScales(SLong&,SLong&,SLong&,SLong&,SLong&,SLong&);
-//DeadCode PD 20Apr99 	void GetSurfaceDimensions(struct _DirectDraw*,SLong&,SLong&);
 	void PutC(struct _DirectDraw*,ImageMapDesc*,DoPointStruc*,bool fRefresh=false);
 	void PutA(struct _DirectDraw*,ImageMapDesc*,DoPointStruc*);
 	void PutLine(struct _DirectDraw*,SWord,SWord,SWord,SWord,Colour);

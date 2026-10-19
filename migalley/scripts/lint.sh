@@ -6,10 +6,16 @@
 #   scripts/lint.sh FILE [...]   only the given source files
 #   scripts/lint.sh -c FILE      clang-check (syntax/AST parse) only
 #   scripts/lint.sh -p FILE      cppcheck only
+#   scripts/lint.sh -t FILE      clang-tidy only (bug-finding check set
+#                                from the repo-root .clang-tidy; no
+#                                style/modernize checks — tidy rewrites
+#                                would make diffing against the original
+#                                1998 source harder)
 #
-# Deliberately clang-check + cppcheck only — NO clang-tidy anywhere:
-# tidy rewrites encourage modernisation and make diffing against the
-# original 1998 source harder.
+# clang-tidy runs per changed file in the default 'all' mode as well as
+# standalone via -t. Its warnings print but do not fail the run — same
+# policy as cppcheck — so legacy-noise stays informational while new
+# errors still gate in CI.
 #
 # Dead-code coverage: clang's alpha.deadcode.UnreachableCode analyzer
 # checker plus DeadStores (default on) catch unreachable statements and
@@ -35,6 +41,7 @@ MODE=all
 case "${1:-}" in
     -c) MODE=check; shift ;;
     -p) MODE=cpp;   shift ;;
+    -t) MODE=tidy;  shift ;;
 esac
 
 WHOLE=0
@@ -85,6 +92,17 @@ for f in "${FILES[@]}"; do
             -extra-arg=-Xclang \
             -extra-arg=-analyzer-checker=alpha.deadcode.UnreachableCode \
             "$f"
+    fi
+    if [ "$MODE" = tidy ] || [ "$MODE" = all ]; then
+        echo "== $f (tidy)"
+        # -quiet keeps per-file system-header spam out; the check set comes
+        # from the repo-root .clang-tidy. tidy must exist but is allowed to
+        # be absent on minimal setups — a missing binary skips, not fails.
+        if command -v clang-tidy >/dev/null; then
+            run_tool clang-tidy clang-tidy -p "$BUILD" --quiet $EXTRA "$f"
+        else
+            echo "== $f (tidy skipped: no clang-tidy)"
+        fi
     fi
 done
 

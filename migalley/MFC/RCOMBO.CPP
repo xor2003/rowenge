@@ -251,7 +251,7 @@ void CRCombo::AddString(LPCTSTR text)
     if (RowanDbgBmp())
         fprintf(stderr, "[combo-add] ctl=%d this=%p text='%s'\n",
             GetDlgCtrlID(), (void*)this, text ? text : "(null)");
-    m_items.push_back(text);
+    m_items.push_back(text ? text : "");
 }
 
 long CRCombo::GetListbox()

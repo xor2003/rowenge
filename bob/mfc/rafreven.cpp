@@ -123,7 +123,6 @@ BOOL RAFReviewEnemy::OnInitDialog()
 	
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(120);          //MIKE
 	//rlistbox->AddColumn(60);										  //RDH 02/06/99

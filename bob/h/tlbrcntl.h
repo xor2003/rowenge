@@ -30,11 +30,9 @@ public:
 	//{{AFX_DATA(ToolBarControl)
 	enum { IDD = IDD_TOOLBARCONTROL };
 	CRButton	m_IDC_TB_TITLE;
-//DEADCODE RDH 06/01/00 	CRButton	m_IDC_TB_COMMS;
 	CRButton	m_IDC_TB_MAIN;
 	CRButton	m_IDC_TB_MAPTOOLS;
 	CRButton	m_IDC_TB_MESSAGES;
-//DEADCODE RDH 06/01/00 	CRButton	m_IDC_TB_OVERVIEW;
 	CRButton	m_IDC_TB_MAPSCALE;
 	CRButton	m_IDC_TB_ALL;
 	//}}AFX_DATA
@@ -54,11 +52,9 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(ToolBarControl)
 	virtual BOOL OnInitDialog();
-//DEADCODE RDH 06/01/00 	afx_msg void OnClickedTbComms();
 	afx_msg void OnClickedTbMain();
 	afx_msg void OnClickedTbMaptools();
 	afx_msg void OnClickedTbMessages();
-//DEADCODE RDH 06/01/00 	afx_msg void OnClickedTbOverview();
 	afx_msg void OnClickedTbTitle();
 	afx_msg void OnClickedTbMapscale();
 	afx_msg void OnClickedTbAll();

@@ -284,8 +284,6 @@ void	HostilesList::FindPackages()
 
 						if (i!=pk.squadlist)
 							raidline = pk.GetRaidIndFromSquadEntry(i);
-	//DeadCode JIM 8Aug00 					else
-	//DeadCode JIM 8Aug00 						raidline=0;
 						oldraidline=raidline;
 
 					}
@@ -351,17 +349,13 @@ void HostilesList::FillPackList(UWord	pack, UWord raidline, UniqueID	target, UBy
 			packlist[i]=packlist[i+WRAPTHROW];
 		currpacklist-=WRAPTHROW;
 	}
-//DeadCode JIM 2Oct00 	if (currpacklist < MAX_PACKLIST)
-//DeadCode JIM 2Oct00 	{
 		packlist[currpacklist].pack = pack;
 		packlist[currpacklist].raidline = raidline;
 		packlist[currpacklist].target = target;
 		packlist[currpacklist].method = method;
-//DEADCODE RDH 06/04/00 		packlist[currpacklist].takeofftime = takeofftime;
 		packlist[currpacklist].strikegruppe = strikegruppe;
 		packlist[currpacklist].escortgruppe = escortgruppe;
 		packlist[currpacklist++].numofac = numofac;
-//DeadCode JIM 2Oct00 	}
 }
 
 
@@ -567,19 +561,6 @@ void	HostilesList::RefreshList()
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
 
 	rlistbox->Clear();
-//DeadCode RDH 27Oct00 	rlistbox->AddColumn(30); //46
-//DeadCode RDH 27Oct00 	rlistbox->AddColumn(28);										  //RDH 02/06/99
-//DeadCode RDH 27Oct00 	rlistbox->AddColumn(42);	//50										  //RDH 02/06/99
-//DeadCode RDH 27Oct00 	rlistbox->AddColumn(48);		//60										  //RDH 02/06/99
-//DeadCode RDH 27Oct00 	rlistbox->AddColumn(46);										  //RDH 02/06/99
-//DeadCode RDH 27Oct00 	rlistbox->AddColumn(80);
-//DeadCode RDH 27Oct00 	rlistbox->AddIconColumn(28);										  //RDH 02/06/99
-//DeadCode RDH 27Oct00 	rlistbox->AddColumn(TARGETFIELDWIDTH);										  //RDH 02/06/99
-//DeadCode RDH 27Oct00 	rlistbox->AddColumn(24);										  //RDH 02/06/99
-//DeadCode JIM 11Nov00 //DeadCode RDH 31Oct00 	rlistbox->AddColumn(32);										  //RDH 02/06/99
-//DeadCode JIM 11Nov00 //DeadCode RDH 31Oct00 	rlistbox->AddColumn(20);										  //RDH 02/06/99
-//DeadCode JIM 11Nov00 //DeadCode RDH 31Oct00 	rlistbox->AddColumn(2);
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(50);										  //RDH 02/06/99
 	rlistbox->AddString(RESSTRING(RAID),0);
 	rlistbox->AddString(RESSTRING(HL_SIZE),1);
 	rlistbox->AddString(RESSTRING(TYPE),2);
@@ -593,9 +574,6 @@ void	HostilesList::RefreshList()
 	rlistbox->AddString(RESSTRING(CMBT),9);
 	rlistbox->AddString(RESSTRING(IN),10);
 
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_STATUS),6);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_RESPONSE),6);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_INTERCEPT),8);
 	rlistbox->AddString(RESSTRING(HL_TALLY),11);
 
 
@@ -607,7 +585,6 @@ void	HostilesList::RefreshList()
 		Profile& pk = Todays_Packages.pack[packlist[p].pack];
 		if (packlist[p].method < Profile::AM_DETACHED)
 		{
-//DEADCODE RDH 12/04/00 			rlistbox->AddString(CSprintf("R%03i", pk.raidnumentries[packlist[p].raidline].raidnum),0);
 
 
 			char* raidletter = Todays_Packages.RaidFormatString(packlist[p].pack,packlist[p].raidline);
@@ -616,7 +593,6 @@ void	HostilesList::RefreshList()
 
 
 
-//DEADCODE RDH 12/04/00  			rlistbox->AddString(CSprintf("R%03i", packlist[p].raidline),0);
 			rlistbox->AddString(CSprintf("%i", packlist[p].numofac),1);
 
 			Squadron* sq  = Node_Data[(SquadNum)packlist[p].strikegruppe];
@@ -640,17 +616,6 @@ void	HostilesList::RefreshList()
 				rlistbox->AddString(CSprintf("%i%s",alt,LoadResString(Save_Data.alt.mediumabbr)),4);
 			}else
 				rlistbox->AddString(" ",4);
-//DeadCode RJS 12Nov00 			info_airgrpPtr item = Persons2::ConvertPtrUID(pk[firstsq].instance);
-//DeadCode RJS 12Nov00 			if (item)
-//DeadCode RJS 12Nov00 			{
-//DeadCode RJS 12Nov00  				int alt = item->knownposition.Y;
-//DeadCode RJS 12Nov00 				if (alt < 0 )
-//DeadCode RJS 12Nov00 					alt = 0;
-//DeadCode RJS 12Nov00 				alt = alt*10/Save_Data.alt.mediummm;
-//DeadCode RJS 12Nov00 				alt = 100*((alt + 50)/100);
-//DeadCode RJS 12Nov00 				rlistbox->AddString(CSprintf("%i%s",alt,LoadResString(Save_Data.alt.mediumabbr)),4);
-//DeadCode RJS 12Nov00 			}else
-//DeadCode RJS 12Nov00 				rlistbox->AddString(" ",4);
 
 
 			
@@ -671,19 +636,9 @@ void	HostilesList::RefreshList()
 				elseif	(j>Target::TS_BADDAMAGE)				j=2;
 				elseif	(j>Target::TS_LIGHTDAMAGE)				j=1;
 				else											j=0;
-//DeadCode JON 4Sep00 				if (j >= 100)
-//DeadCode JON 4Sep00 					j = 3;
-//DeadCode JON 4Sep00 				else
-//DeadCode JON 4Sep00 				{
-//DeadCode JON 4Sep00 					j = j/4;
-//DeadCode JON 4Sep00 					if (j >= 3)
-//DeadCode JON 4Sep00 						j =2;
-//DeadCode JON 4Sep00 				}
 				FileNum filenum = GetIconFileNum(packlist[p].target);
 				rlistbox->AddIcon(filenum,6);
 
-//DEADCODE RDH 21/01/00 				rlistbox->AddIcon((FileNum)ICON_AF_FIGHTER,5);
-//DEADCODE RDH 20/01/00 				rlistbox->AddString(RESLIST(UNDAMAGED, j),5);
 			}
 			else
 				rlistbox->AddIcon(FIL_NULL,6);
@@ -899,7 +854,6 @@ void HostilesList::RefreshData(int childnum)
 
 void HostilesList::TotalRefresh()
 {
-//DeadCode JIM 8Nov00 	RefreshTickBoxes();
 	FindPackages();
 	RefreshList();
   	FindHiLight();
@@ -923,8 +877,6 @@ void HostilesList::TotalRefresh()
 	b = GETDLGITEM(IDC_RESPONSES);
 	b->SetPressed(!MMC.hostilefilters[HL_RESPONSES]);
 
-//DeadCode JIM 8Aug00 	b = GETDLGITEM(IDC_NOTENGAGED);
-//DeadCode JIM 8Aug00 	b->SetPressed(!MMC.hostilefilters[HL_ENEMYNOTSIGHTED]);
 
 	b = GETDLGITEM(IDC_OUTGOING);
 	b->SetPressed(!MMC.hostilefilters[HL_OUTGOING]);
@@ -969,53 +921,6 @@ BOOL HostilesList::OnInitDialog()
 
 
 	
-//DEADCODE RDH 20/01/00 	CRListBox* rlistbox;
-//DEADCODE RDH 20/01/00 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DEADCODE RDH 20/01/00 	rlistbox->Clear();
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(50);
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(30);										  //RDH 02/06/99
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(60);										  //RDH 02/06/99
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(60);										  //RDH 02/06/99
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(60);
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(TARGETFIELDWIDTH);										  //RDH 02/06/99
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(50);										  //RDH 02/06/99
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(40);										  //RDH 02/06/99
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(60);
-//DEADCODE RDH 20/01/00 	rlistbox->AddColumn(50);										  //RDH 02/06/99
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HOSTILE),0);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_SIZE),1);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_BOMBER),2);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_ESCORT),3);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_STATUS),4);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_TARGET),5);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_STATUS),6);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_RESPONSE),7);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_INTERCEPT),8);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString(RESSTRING(HL_TALLY),9);
-//DEADCODE RDH 20/01/00 
-//DEADCODE RDH 20/01/00 	
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("H100",0);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("200",1);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("Heinkels",2);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("109s",3);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("Incoming",4);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("Biggin Hill",5);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("OK",6);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("None",7);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("None",8);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("N/A",9);
-//DEADCODE RDH 20/01/00 
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("H101",0);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("30",1);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("Dorniers",2);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("109s",3);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("Out Going",4);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("Kenley",5);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("Damged",6);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("36",7);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("24/36",8);
-//DEADCODE RDH 20/01/00 	rlistbox->AddString("3/2",9);
-//DEADCODE RDH 20/01/00 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -1032,7 +937,6 @@ BEGIN_EVENTSINK_MAP(HostilesList, CDialog)
 	ON_EVENT(HostilesList, IDC_FORMING, 1 /* Clicked */, OnClickedForming, VTS_NONE)
 	ON_EVENT(HostilesList, IDC_INCOMING, 1 /* Clicked */, OnClickedIncoming, VTS_NONE)
 	ON_EVENT(HostilesList, IDC_NORESPONSE, 1 /* Clicked */, OnClickedNoresponse, VTS_NONE)
-//DeadCode JIM 8Aug00 	ON_EVENT(HostilesList, IDC_NOTENGAGED, 1 /* Clicked */, OnClickedNotengaged, VTS_NONE)
 	ON_EVENT(HostilesList, IDC_OUTGOING, 1 /* Clicked */, OnClickedOutgoing, VTS_NONE)
 	ON_EVENT(HostilesList, IDC_RESPONSES, 1 /* Clicked */, OnClickedResponses, VTS_NONE)
 	//}}AFX_EVENTSINK_MAP
@@ -1089,7 +993,6 @@ void HostilesList::OnClickedRbuttonauthorise()
 			Todays_Packages.InvalidateRoute(&Todays_Packages[packnum],true,true);
 		}
 	}
-//DEADCODE RDH 05/04/00 	MainToolBar().OnClickedHostileslist();
 #endif
 }
 
@@ -1098,7 +1001,6 @@ void HostilesList::OnClickedRbuttonintell()
 #ifndef	BOB_DEMO_VER
 
 	int pack = packlist[currpack].pack;
-//DeadCode JIM 20Oct00 	int raid = packlist[currpack].raidline;
 	if (pack  != 65535 && packlist[currpack].target)//>= 0)											//RDH 22Aug00
 	{
 		MainToolBar().OpenDossier(packlist[currpack].target);
@@ -1196,15 +1098,6 @@ void HostilesList::OnClickedNoresponse()
 	
 }
 
-//DeadCode JIM 8Aug00 void HostilesList::OnClickedNotengaged() 
-//DeadCode JIM 8Aug00 {
-//DeadCode JIM 8Aug00 	if	(MMC.hostilefilters[HL_ENEMYNOTSIGHTED])
-//DeadCode JIM 8Aug00 	   MMC.hostilefilters %= HL_ENEMYNOTSIGHTED;
-//DeadCode JIM 8Aug00 	else
-//DeadCode JIM 8Aug00 	   MMC.hostilefilters |= HL_ENEMYNOTSIGHTED;
-//DeadCode JIM 8Aug00 	TotalRefresh();
-//DeadCode JIM 8Aug00 	
-//DeadCode JIM 8Aug00 }
 
 void HostilesList::OnClickedOutgoing() 
 {

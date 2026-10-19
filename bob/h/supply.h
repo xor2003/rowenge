@@ -16,7 +16,6 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CSupply dialog
-//DEADCODE  08/02/00 struct	LWDirectivesResultsTargetList;
 class CSupply : public RowanDialog
 {
 // Construction
@@ -51,24 +50,12 @@ public:
 protected:
 //TEMPCODE JIM 07/02/00 	DirectivesResults::TargetList target[DirectivesResults::MAX_TARGETS];
 	LWDirectivesResults*		dr;
-//DEADCODE  08/02/00 	LWDirectivesResultsTargetList*	target;
 //	int	 FillPanel(LWDirectivesResults::TargetList* target, int panel);
 	int	 FillPanel(int panel);
 
-//DEADCODE JIM 16/12/99 	void SortSupplyNodes();
-//DEADCODE JIM 16/12/99 	void AddSupplyMission(int j, SupplyNode*  currnode);
-//DEADCODE JIM 16/12/99 	void SortChokes();
-//DEADCODE JIM 16/12/99 	void SortTraffic();
-//DEADCODE JIM 16/12/99 	void SortAirfields();
-//DEADCODE JIM 16/12/99 	void SortArmy();
-//DEADCODE JIM 16/12/99 	void SortIntell();
 	void ReDraw(int	numoftargets);
 //	int	InsertTarget(UniqueID uid, int currtrg);
 
-//DEADCODE JIM 16/12/99 	void AddChokeMission(int j, SupplyRoute*  currroute);
-//DEADCODE JIM 16/12/99 	void AddArmyMission(int j, SupplyNode*  currnode);
-//DEADCODE JIM 16/12/99 	void AddAirfieldsMission(int j, int af, int score);
-//DEADCODE JIM 16/12/99 	void AddTrafficMission(int j, SupplyRoute*  currroute);
 	void ReDrawButtons();
 
 

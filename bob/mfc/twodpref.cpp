@@ -393,8 +393,6 @@ void	SaveDataLoad::ChangeMode(ResUI modepoint)
     static long currmode=UIR_MAX;
 	if (ui_horizontalres[UIR_FIRST]==0)
 	{
-//DeadCode JIM 18Oct00 		if (modepoint==UIR_FIRST)
-//DeadCode JIM 18Oct00 			return;
 		DEVMODE	devmode;
 		devmode.dmSize=sizeof(DEVMODE);
 		devmode.dmDriverExtra=0;
@@ -437,7 +435,6 @@ void	SaveDataLoad::ChangeMode(ResUI modepoint)
 				{
 					ui_horizontalres[UIR_APPBARSIDES_TOP]+=r;
 					pabd.lParam=FALSE;
-//DeadCode JIM 18Oct00 					SetWindowPos(w,HWND_BOTTOM,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOREDRAW+SWP_NOACTIVATE);
 				}
 			}
 		}
@@ -465,7 +462,6 @@ void	SaveDataLoad::ChangeMode(ResUI modepoint)
 				);
 
 		if (modepoint!=UIR_FIRST || currmode!=UIR_MAX) 
-//DeadCode JON 27Oct00 			if (modepoint==UIR_FIRST || ui_horizontalres[currmode]==ui_horizontalres[modepoint])
 			if (modepoint==UIR_FIRST || ui_horizontalres[currmode]!=ui_horizontalres[modepoint])
 			{
 				if ((ui_colourdepth!=-1 && ui_horizontalres[modepoint]==0) || modepoint==UIR_FIRST)
@@ -570,7 +566,6 @@ void	SaveDataLoad::ChangeMode(ResUI modepoint)
 					{
 						pabd.hWnd=(HWND)SHAppBarMessage(ABM_GETAUTOHIDEBAR, &pabd);;
 						SetWindowPos(pabd.hWnd,HWND_BOTTOM,0,0,0,0,SWP_NOMOVE+SWP_NOSIZE+SWP_NOREDRAW+SWP_NOACTIVATE);
-			//DEADCODE JIM 05/04/00 				SHAppBarMessage(ABM_WINDOWPOSCHANGED,&pabd);
 					}
 				}
 

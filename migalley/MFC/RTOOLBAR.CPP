@@ -568,7 +568,7 @@ BOOL CRToolBar::OnEraseBkgnd(CDC* pDC)
 			if (yoffset>yskip)
 				pDC->FillSolidRect(yskip,xskip,rect.Width()-xskip,yoffset-yskip,rgb);
 			if (pInfo->bmiHeader.biHeight+yoffset<rect.Height())
-				if (pInfo->bmiHeader.biHeight+yoffset<<yskip)
+				if (pInfo->bmiHeader.biHeight+yoffset<yskip)
 					pDC->FillSolidRect(xskip,yskip,rect.Width()-xskip,rect.Height()-yskip,rgb);
 				else
 					pDC->FillSolidRect(xskip,pInfo->bmiHeader.biHeight+yoffset,rect.Width()-xskip,rect.Height()-yskip,rgb);
@@ -626,7 +626,6 @@ BYTE* CRToolBar::OnGetFile(int filenum)
 void CRToolBar::OnPlaySound(int filenum)
 {
 	_Miles.UIPlaySample((FileNum)filenum);						//RJS 12Mar99
-//DeadCode RJS 12Mar99 	_Miles.ProcessInterfaceSpot();		//RJS 17Nov98
 
 }
 
@@ -898,10 +897,6 @@ BOOL CRToolBar::OnInitDialog()
 		}
 	// xfactor seems to be slightly smaller than yfactor
 	// for some reason
-//DEADCODE JIM 18/08/99 	float yfactor=96.0f/RDialog::fontdpi;
-//DEADCODE JIM 18/08/99 	float xfactor=yfactor;
-//DEADCODE JIM 18/08/99 	if (xfactor!=1.0f)
-//DEADCODE JIM 18/08/99 		xfactor*=0.94f; // fiddle factor
 	CRect rect;
 	CRect parentrect;
 	CWnd* pControl;

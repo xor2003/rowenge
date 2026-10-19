@@ -187,7 +187,6 @@ class	Mast3d
 	int				uTimerID;
 	int				wTimerRes;
 	int				ticknum;
-//DEADCODE DAW 10/02/00 	int				loopticks;
 public:
 #if 1 //RERUN do not contaminate with SDL here. defined (__MSVC__)
 
@@ -363,7 +362,6 @@ public:
 
 	bool InThe3D()	{return Drawing();}
 
-//DeadCode AMM 06Oct98 	void	SkipCycles(ULong num);								//AMM 16Sep98
 
 	View3d(Inst3d* i,HWND,CWnd*); 	
 	~View3d();

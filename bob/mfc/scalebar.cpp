@@ -105,7 +105,6 @@ void CScaleBar::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CScaleBar, CRToolBar)
 	//{{AFX_MSG_MAP(CScaleBar)
-//DEADCODE JIM 28/01/00 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
@@ -119,19 +118,8 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CScaleBar message handlers
 enum	{SCALESTARTPIX=25,DRAWSTARTPIX=30,TEXTSTARTPIX=35,TEXTSTARTDELTA=1,MARGINSTARTPIX=5};
-//DEADCODE JIM 28/01/00 BOOL CScaleBar::OnEraseBkgnd(CDC* pDC) 
-//DEADCODE JIM 28/01/00 {
-//DEADCODE JIM 28/01/00 	return TRUE;
-//DEADCODE JIM 28/01/00 }
 FileNum  CScaleBar::OnGetArt()
 {
-//DEADCODE JIM 28/01/00 	if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DEADCODE JIM 28/01/00 	{
-//DEADCODE JIM 28/01/00 		if (m_bHorzAlign) 
-//DEADCODE JIM 28/01/00 			return FIL_TOOL_HORIZONTAL_LW;
-//DEADCODE JIM 28/01/00 		else
-//DEADCODE JIM 28/01/00 			return FIL_TOOL_VERTICAL_LW;
-//DEADCODE JIM 28/01/00 	}else
 	{
 		if (m_align&1) 
 			return FIL_TOOL_TOPRULE;
@@ -170,8 +158,6 @@ class	RPointBot:public RPoint
 
 //enum	RPointEntry{RP_SCALEEDGE,RP_SMALLSCALE,RP_MEDSCALE,RP_BIGSCALE,RP_NUMBER,RP_UNIT,RP_MAX};
 enum	{M_WIDTH=48};
-//DEADCODE RDH 13/04/00 RPoint::RPointPos	RPointTop::indexes=		{2,10,12,14,30,45};
-//DEADCODE RDH 13/04/00 RPoint::RPointPos	RPointBot::indexes=		{M_WIDTH-2,M_WIDTH-10,M_WIDTH-12,M_WIDTH-14,15,30};
 RPoint::RPointPos	RPointTop::indexes=		{2,8,10,14,25,40};
 RPoint::RPointPos	RPointBot::indexes=		{M_WIDTH-2,M_WIDTH-10,M_WIDTH-12,M_WIDTH-14,35,10};
 
@@ -188,9 +174,7 @@ class	RPointRight:public RPoint
 	{	return CPoint(indexes[across],along);	}
 } R_PointRight;
 
-//DEADCODE RDH 13/04/00 RPoint::RPointPos	RPointLeft::indexes=	{2,10,12,14,M_WIDTH-2,M_WIDTH-2};
 RPoint::RPointPos	RPointLeft::indexes=	{2,10,12,14,M_WIDTH-10,M_WIDTH-10};
-//DEADCODE RDH 13/04/00 RPoint::RPointPos	RPointRight::indexes=	{M_WIDTH-2,M_WIDTH-10,M_WIDTH-12,M_WIDTH-14,30,30};
 RPoint::RPointPos	RPointRight::indexes=	{M_WIDTH-2,M_WIDTH-10,M_WIDTH-12,M_WIDTH-14,40,40};
 
 
@@ -206,7 +190,6 @@ void CScaleBar::OnPaint()
 	CDC* pDC;
 	pDC=this->BeginPaint(&paintstruct);
     pDC->SetBkMode(TRANSPARENT);
-//DEADCODE RDH 13/04/00     pDC->SetTextColor(RGB(255,255,255));
     pDC->SetTextColor(RGB(0,0,0));
 	CPen* originalpen=(CPen*)pDC->SelectStockObject(BLACK_PEN);
 	CRect rect;
@@ -218,11 +201,10 @@ void CScaleBar::OnPaint()
 	char string[10];
 	#define zoom m_pView->m_zoom
 	// a nice black background
-//DEADCODE JIM 28/01/00 	pDC->FillRect(rect, CBrush::FromHandle((HBRUSH)GetStockObject(BLACK_BRUSH)));
 	float grad_10 = zoom * (Save_Data.dist.longcm/MAPSCALE) * 10 /65536;
 	float grad_1 = grad_10/10;
 	float grad_tenth = grad_10/ 100;
-	RPoint*	CP;
+	RPoint*	CP=&R_PointBot;
 	switch (m_align)
 	{
 	default_neverreferenced;
@@ -233,15 +215,7 @@ void CScaleBar::OnPaint()
 	}
 	RPoint&	CPoint=*CP;
 	pDC->SetTextAlign(TA_RIGHT | TA_BASELINE | TA_NOUPDATECP);
-//DEADCODE JIM 06/12/99 	switch (m_align)
-//DEADCODE JIM 06/12/99 	{
-//DEADCODE JIM 06/12/99 	case	1:
 		PointTextOut(pDC,CPoint(TEXTSTARTPIX+10,RP_UNIT),LoadResString(Save_Data.dist.longabbr));	
-//DEADCODE JIM 06/12/99 		break;
-//DEADCODE JIM 06/12/99 	case	3:	PointTextOut(pDC,CPoint(TEXTSTARTPIX+10,RP_UNIT),LoadResString(Save_Data.dist.longabbr));	break;
-//DEADCODE JIM 06/12/99 	case	2:	PointTextOut(pDC,CPoint(TEXTSTARTPIX+10,RP_UNIT),LoadResString(Save_Data.dist.longabbr));	break;
-//DEADCODE JIM 06/12/99 	case	4:	PointTextOut(pDC,CPoint(TEXTSTARTPIX+10,RP_UNIT),LoadResString(Save_Data.dist.longabbr));	break;
-//DEADCODE JIM 06/12/99 	}
 	pDC->MoveTo(CPoint(DRAWSTARTPIX,RP_SCALEEDGE));
 	pDC->LineTo(CPoint(CPoint.maxalong,RP_SCALEEDGE)); // line at top of scale
 	// first draw in 10 mile seperators these are always present
@@ -257,9 +231,6 @@ void CScaleBar::OnPaint()
 				|| (counter%10==0 && zoom>0.3)		//100
 				|| zoom>=1.1)						//50
 			{
-//DEADCODE DAW 07/05/99 					if (counter==0)
-//DEADCODE DAW 07/05/99 						sprintf(string,"0 %s",);
-//DEADCODE DAW 07/05/99 					else
 				PointTextOut(pDC,CPoint(x+TEXTSTARTDELTA,RP_NUMBER),CSprintf("%d",counter*10));	//HUNDREDS
 			}
 		}

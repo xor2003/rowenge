@@ -25,20 +25,15 @@
 #include	"myError.h"
 #include	"shapes.h"
 #include	"mymath.h"
-//DEADCODE MS 31/01/00 #include	"flymodel.h"									//PD 01Nov95
-//DEADCODE JIM 28/01/00 #include	"missman2.h"
 //MATHABLE	(ANGLES);
 
 #include	"bitfield.h"
-//DEADCODE MS 31/01/00 #include	"3dcom.h"
 #include	"Mytime.h"
 #include	"flymodel.h"
 
-//DEADCODE MS 31/01/00 #include	"ai.h"
 
 #include	"viewsel.h"											//PD 26Jun96
 
-//DEADCODE MS 31/01/00 #include	"landscap.h"
 
 #include	"savegame.h"
 #include	"aaa.h"

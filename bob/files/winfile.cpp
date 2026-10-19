@@ -464,7 +464,6 @@ void	fileman::CDseekreadfilepos(HANDLE winhandle,int index,void* buffer,int size
 	SetFilePointer(winhandle,index,NULL,FILE_BEGIN);
 	ReadFile(winhandle,readblockbuffer,size,&retsize,NULL);
 	retsize=GetLastError();
-//DeadCode PD 08Oct98 	memcpy(buffer,readblockbuffer,sizecopy);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

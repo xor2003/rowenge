@@ -943,6 +943,15 @@ Lib3D::Lib3D()
     textureBlending=HINT_TRILINEAR;
     flags=Flags(0);
     pDDS7LandZB=pDDS7MirrorZB=NULL;
+    memset(d3dl7Lights,0,sizeof(d3dl7Lights));
+    sunTX=sunTY=sunTZ=0;
+    fogMul=fogStart=fogEnd=0;
+    backProjectX=backProjectY=0;
+    projMatStackPos=viewMatStackPos=objMatStackPos=transMatPos=0;
+    gFontColour=0;
+    globAlpha=0;
+    hCurrentRenderTarget=NULL;
+    memset(&gLightingDesc,0,sizeof(gLightingDesc));
     paletteTable=NULL;
 //TempCode JON 13Oct00 	BuildSqrtTable();
     // fill the last vertex table with the dummy vertex.

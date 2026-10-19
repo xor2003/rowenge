@@ -73,10 +73,9 @@ static	int fwrite(void const * src,unsigned int recsize,unsigned int reccount,UF
 			char* btmp=new char [recsize*reccount];
 			ULong recsread=fread(btmp,recsize,reccount,ofile->f);
 			if (recsread!=reccount)
-    	        ofile->written=TRUE;
-	        else
-    	        if (memcmp(btmp,src,reccount*recsize)!=0)
-        	        ofile->written=TRUE;
+				ofile->written=TRUE;
+			else if (memcmp(btmp,src,reccount*recsize)!=0)
+					ofile->written=TRUE;
 			delete [] btmp;
 	        if (!ofile->written)
     	        return reccount;

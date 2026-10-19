@@ -204,7 +204,6 @@ void	GeschwaderList::RefreshList()
 
  	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00  	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(40);
 	//rlistbox->AddColumn(48);
@@ -307,9 +306,6 @@ BOOL GeschwaderList::OnInitDialog()
 		combo->Clear()->RESCOMBO(ANY_A,5)->
 					SetIndex(MMC.sl_geschwadertype);
 
-//DeadCode RDH 16Aug00       	combo=GETDLGITEM(IDC_RCOMBOREADINESS);
-//DeadCode RDH 16Aug00 	combo->Clear();
-//DeadCode RDH 16Aug00 
 
  	RefreshList();
 

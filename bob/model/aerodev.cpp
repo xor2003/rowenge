@@ -152,25 +152,9 @@ AeroDevice::AeroDevice (
 			new MODELANIM (ControlledAC, MA_AEROSURFACE, pModel, &Val, pAnimByte, minval, maxval, Scale, FALSE);//RJS 20Jul98	//CSB 29/02/00
 	}
 
-//DEADCODE CSB 21/02/00 	if (Type == DT_GEAR)
-//DEADCODE CSB 21/02/00 	{
-//DEADCODE CSB 21/02/00 // 		Val = 0;
-//DEADCODE CSB 21/02/00 //		OldAttractor = Attractor = 0;
-//DEADCODE CSB 21/02/00 
-//DEADCODE CSB 21/02/00  		Val = 0x4000;
-//DEADCODE CSB 21/02/00 		OldAttractor = Attractor = 0x4000;
-//DEADCODE CSB 21/02/00 		ReqVal = Stages - 1;
-//DEADCODE CSB 21/02/00 
-//DEADCODE CSB 21/02/00 
-//DEADCODE CSB 21/02/00 		AircraftAnimData* adptr = (AircraftAnimData* )ControlledAC->Anim;
-//DEADCODE CSB 21/02/00  		if (adptr)							//rdh
-//DEADCODE CSB 21/02/00  			adptr->animtoggle = 255;
-//DEADCODE CSB 21/02/00 
-//DEADCODE CSB 21/02/00 	}
 
 	// Aero dev should have unique count for comms
 	DeviceID = ControlledAC->fly.AeroDeviceCnt++;				//RJS 18Sep98
-//DeadCode AMM 29Jun99 	pModel->UniqueID = ControlledAC->uniqueID.count;			//RJS 18Sep98
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -289,11 +273,6 @@ void AeroDevice::Action (AirStrucPtr const ControlledAC, CONTROL_TYPE ctrl_type,
 	{
 		if(!ControlledAC->fly.pModel->FirstCycle)
 		{
-//DeadCode CSB 22Sep00 			FP ias2 = pModel->AirVel.z * pModel->AirVel.z * pModel->AmbDensity;
-//DeadCode CSB 22Sep00 
-//DeadCode CSB 22Sep00 			FP maxvel2 = BuffetVel * BuffetVel * 0.0001225;
-//DeadCode CSB 22Sep00 			
-//DeadCode CSB 22Sep00 			if(ias2 < maxvel2)
 
 			//Slats get opened when Angle of Attack exceeds 12 Deg
 			if((pModel->MainPlaneList->aoa[0][0] + pModel->MainPlaneList->aoa[1][0]) / 2 > Rowan2Rads(BuffetVel))
@@ -374,7 +353,6 @@ void AeroDevice::Action (AirStrucPtr const ControlledAC, CONTROL_TYPE ctrl_type,
 
 			// Can we send, and is it the piloted AC?
 			if (sendpacket && (pModel->Controlled == TRUE))
-//DEADCODE CB 29/10/99 				_DPlay.NewAeroDevAction(DeviceID,Attractor);
 				_DPlay.NewAeroDevAction(DeviceID,Attractor);
 			// Log UniqueID (14 bits), DeviceID (8 bits)
 		}
@@ -435,14 +413,12 @@ void AeroDevice::Action (AirStrucPtr const ControlledAC, CONTROL_TYPE ctrl_type,
 		FP delta = Rate * MODEL_DT * (255.0 - damage) / 255.0;
 		if (Val < Attractor)
 		{
-//DeadCode AMM 24Nov99 			Val += Rate * pModel->MODEL_DT;
 			Val += delta;
 			if (Val > Attractor) Val = Attractor;
 		}
 
 		if (Val > Attractor)
 		{
-//DeadCode AMM 24Nov99 			Val -= Rate * pModel->MODEL_DT;
 			Val -= delta;
 			if (Val < Attractor) Val = Attractor;
 		}
@@ -481,7 +457,6 @@ void Model::FlapsDown(AirStrucPtr const ControlledAC)
 			{
  				while (pModelAnim != NULL)
  				{
-//DEADCODE DAW 26/04/99 					pModelAnim->pAnim = (void*)(pModelAnim->pOffset + (ULong)(ControlledAC->Anim));
 					pModelAnim->pAnim = (void*)&ControlledAC->Anim[(int)pModelAnim->pOffset]; //DAW 26/04/99
  					if(pModelAnim->Type == MA_AEROSURFACE)
  						pModelAnim->ProcAnimSurface ();

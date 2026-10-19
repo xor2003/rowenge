@@ -19,7 +19,6 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // LWDirectives dialog
-//DeadCode RDH 08Feb00 struct	LWDirectivesResultsTargetList;
 class LWDirectives : public RowanDialog
 {
 // Construction
@@ -179,8 +178,6 @@ protected:
 	void RefreshReconn();
 	void FillSpins(CRSpinBut* spinbut, int actype, int trgtype, int indexgrp, int maxgrp);
 	void Refresh();
-//DeadCode RDH 08Feb00 	void FindAcAvail();
-//DeadCode RDH 08Feb00 		int LWAcAvail[PT_VEHICLES-PT_GER_FLYABLE];
 	bool ResetProportions(int actype, int line, int index);
 	void RefreshAcSplit();
 	void 	RefreshGruppe();
@@ -197,19 +194,7 @@ protected:
 //TEMPCODE JIM 07/02/00 	{
 //TEMPCODE JIM 07/02/00 		DirectivesResults::TargetList target[DirectivesResults::MAX_TARGETS];
 //TEMPCODE JIM 07/02/00 	};
-//DeadCode RDH 08Feb00 	struct	Targets;
-//DeadCode RDH 08Feb00 	Targets* trgarray;//[8];
-//DeadCode RDH 08Feb00 	Targets&	target;
-//DeadCode RDH 08Feb00 	void FillTargetLists();
 
-//DeadCode RDH 08Feb00 	struct FighterSplit
-//DeadCode RDH 08Feb00 	{
-//DeadCode RDH 08Feb00 		int ret;
-//DeadCode RDH 08Feb00 		int att;
-//DeadCode RDH 08Feb00 		int det;
-//DeadCode RDH 08Feb00 	};
-//DeadCode RDH 08Feb00 	FighterSplit	otherraids;
-//DeadCode RDH 08Feb00 	FighterSplit	firstraids;
 
 
 	// Generated message map functions

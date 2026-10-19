@@ -879,7 +879,7 @@ void	mobileitem::DoWayPointAction (AutoMoveCodeTypeSelect	oldmove,WayPointPtr	ol
 void	AirStruc::CheckManualCourse()
 {
 	ANGLES	currintercept,originalintercept;
-	SLong	range,dprange;
+	SLong	range=0,dprange=0;	//RERUN: all if-branches may be skipped - 1026 compared garbage
 
 	COORDS3D* dp = NULL;
 	if (Manual_Pilot.controlmode==Manual_Pilot.PILOTDEAD)

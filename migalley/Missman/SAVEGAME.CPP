@@ -396,7 +396,7 @@ static	BIStream& operator	>>	(BIStream& bis,Campaign& campaign)
 BOStream& operator	<<	(BOStream& bos,MissMan& miss_man)
 {
 
-	strcpy(miss_man.camp.CommsPassword,_DPlay.Password);
+	strncpy(miss_man.camp.CommsPassword,_DPlay.Password,PASSWORDNAMELEN-1); miss_man.camp.CommsPassword[PASSWORDNAMELEN-1]=0;
 	bos<<(SByte&) miss_man.currcampaignnum;
 	bos<<miss_man.camp;
 	SupplyTree::Save(bos);
@@ -417,7 +417,7 @@ BIStream& operator	>>	(BIStream& bis,MissMan& miss_man)
 	Persons4::ShutDownMapWorld();
 	bis>>(SByte&) miss_man.currcampaignnum;
 	bis>>miss_man.camp;
-	strcpy(_DPlay.Password,miss_man.camp.CommsPassword);
+	strncpy(_DPlay.Password,miss_man.camp.CommsPassword,PASSWORDNAMELEN-1); _DPlay.Password[PASSWORDNAMELEN-1]=0;
 	SupplyTree::Load(bis);
 	Persons4::StartUpMapWorld();
 	Todays_Packages.LoadGame(bis);	//must be last thing in savegame!!!
@@ -447,6 +447,9 @@ CON	DeadStream::DeadBlockItterator::DeadBlockItterator
 	(DeadBlockPtr& deadbase,UniqueID sgt)
 {
 	lastuniqueID=UID_NULL;
+	lastStatus=0;
+	lastshape=0;
+	lastnumelts=0;
 	base=&deadbase;
 	SGT=sgt;
 	newpage=false;
@@ -576,9 +579,19 @@ void	DeadStream::DeadBlockItterator::GetInfo(void* trg,int count)
 {
 	if (count+off>maxblocksize)
 	{
-		curr=curr->nextblock;
+		curr=curr?curr->nextblock:NULL;
+		if (!curr)
+		{
+			memset(trg,0,count);
+			return;
+		}
 		assert(SGT==curr->SGT);
 		off=0;
+	}
+	if (!curr)
+	{
+		memset(trg,0,count);
+		return;
 	}
 	memcpy(trg,curr->data+off,count);
 	off+=count;
@@ -589,7 +602,12 @@ int	DeadStream::DeadBlockItterator::SkipCountedInfo()
 	int count=GetWord();
 	if (count+off>maxblocksize)
 	{
-		curr=curr->nextblock;
+		curr=curr?curr->nextblock:NULL;
+		if (!curr)
+		{
+			off=maxblocksize;
+			return count;
+		}
 		assert(SGT==curr->SGT);
 		off=0;
 	}
@@ -609,9 +627,21 @@ void	DeadStream::DeadBlockItterator::NextDeadElt(UByte&di1b,int&diplc,char*&dipl
 		int count=GetWord();
 		if (count+off>maxblocksize)
 		{
-			curr=curr->nextblock;
+			curr=curr?curr->nextblock:NULL;
+			if (!curr)
+			{
+				diplc=0;
+				dipld=NULL;
+				return;
+			}
 			assert(SGT==curr->SGT);
 			off=0;
+		}
+		if (!curr)
+		{
+			diplc=0;
+			dipld=NULL;
+			return;
 		}
 		diplc=count;
 		dipld=curr->data+off;
@@ -629,7 +659,8 @@ void	DeadStream::DeadBlockItterator::NextEltClearDamage()
 {
 	char firstbyte=GetByte();
 	((MinAnimData&)firstbyte).itemstate=0;
-	curr->data[off-1]=firstbyte;
+	if (curr)
+		curr->data[off-1]=firstbyte;
 	if (((MinAnimData&)firstbyte).IsInvisible)
 		SkipCountedInfo();
 }
@@ -676,6 +707,12 @@ UniqueID	DeadStream::DeadBlockItterator::SkipItem()
 		lastStatus=GetWord();
 		lastshape=GetWord();
 		lastnumelts=GetByte();
+	}
+	else
+	{
+		lastStatus=0;
+		lastshape=0;
+		lastnumelts=0;
 	}
 	return (UniqueID)lastuniqueID;
 }
@@ -816,7 +853,7 @@ void	DeadStream::SetWorldDead(WorldStuff* world)
 		b.PutWord(0);
 	}
 	for (int sgt=0;sgt<WorldStuff::PITEMTABLESIZE;sgt++)
-		if (issgt[(UniqueID)sgt])
+	{	if (issgt[(UniqueID)sgt])
 		{
 			bool wrote=false;
 			int band=0,uidnum=0;
@@ -871,7 +908,8 @@ void	DeadStream::SetWorldDead(WorldStuff* world)
 			if (wrote)
 				b.PutWord(0);
 		}
-		{SWord	s;
+	}
+	{SWord	s;
 		for (DeadBlockItterator	b(firstblock,UID_NULL);(s=b.SkipItem())!=UID_NULL;)
 		{	ItemPtr p=*Persons2::ConvertPtrUID(UniqueID(s));
 			assert(p && (p->SGT==0 ||  MainWorldBand(UniqueID(s))));
@@ -911,7 +949,8 @@ void	DeadStream::GetWorldDead(WorldStuff* world)
 				b.NextDeadElt(first,datalen,src);
 				g.AnimDataByte()=first;
 				assert(g.PostLauncherDataSize()==datalen);
-				memcpy(g.PostLauncherDataLoc(),src,datalen);
+				if (src)
+					memcpy(g.PostLauncherDataLoc(),src,datalen);
 				assert(count--);
 			}while (g++);
 		}
@@ -987,7 +1026,8 @@ void	DeadStream::GetWorldDead(WorldStuff* world)
 						b.NextDeadElt(first,datalen,src);
 						g.AnimDataByte()=first;
 						assert(g.PostLauncherDataSize()==datalen);
-						memcpy(g.PostLauncherDataLoc(),src,datalen);
+						if (src)
+							memcpy(g.PostLauncherDataLoc(),src,datalen);
 						assert(count--);
 					}while (g++);
 					lastuid=p->uniqueID.bitfieldUid.count+1;
@@ -1261,9 +1301,7 @@ void	DeadStream::ReviveWorld(const int repairpointsinperiod,int repairbridgepoin
 							trg.PutWord(targuid);
 							trg.PutWord(status);
 							trg.PutWord(shape);
-						if (numelts==-1)
-							numelts=numelts;
-							trg.PutByte(numelts);
+						trg.PutByte(numelts);
 
 							while (numelts--)
 							{

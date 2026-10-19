@@ -427,14 +427,13 @@ void RAFDirectivesResults::MakeRAFPatrols(RAFDirectivesResults* dr)
 void RAFDirectivesResults::AutoRAFPatrols()
 {
 
-	RAFDirectivesResults*	dr = new RAFDirectivesResults;
+	RAFDirectivesResults	drc;
+	RAFDirectivesResults*	dr = &drc;
 	dr->tempdir = MMC.directives.raf.current;
 	FindSquadsAvail(dr);
 	SetDirectivesResults(dr);
 
 	MakeRAFPatrols(dr);
-	if (dr)
-		delete dr;
 
 }
 void RAFDirectivesResults::RaidAcNumbers(int pack,int raid, int& strike, int& detachedescort, int& attachedescort, int& returnescort)

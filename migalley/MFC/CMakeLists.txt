@@ -164,6 +164,10 @@ add_library(RowanMFC STATIC ${ROWAN_MFC_SOURCES})
 add_library(RowanAFX STATIC ${ROWAN_AFX_SOURCES})
 add_library(RowanSheets STATIC ${ROWAN_SHEETS_SOURCES})
 
+# MFC_stub.cpp's MakeX11WindowClickThrough calls XShapeCombineRectangles —
+# PUBLIC so every consumer (bob, MigAlley, test exes) links libXext.
+target_link_libraries(RowanMFC PUBLIC Xext)
+
 
 foreach(target RowanMFC RowanAFX RowanSheets)
     # Inherit common includes/defines

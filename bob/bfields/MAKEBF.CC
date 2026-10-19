@@ -72,19 +72,7 @@
 #include	"bfields\persons.cpp"
 	#include	<string>
 
-//DeadCode JIM 05Jun96 	#include	"dosdefs.h"
-//DeadCode JIM 05Jun96 	#include	<stdio.h>
-//DeadCode JIM 05Jun96 	#include	<io.h>
-//DeadCode JIM 05Jun96 //DeadCode JIM 12Feb96 typedef	FILE	*file;
-//DeadCode JIM 05Jun96 	#include	<stdarg.h>
-//DeadCode JIM 05Jun96 	#include	<stdlib.h>
-//DeadCode JIM 05Jun96 	#include	<string.h>
-//DeadCode JIM 05Jun96 	#include	"makebf.h"
-//DeadCode JIM 05Jun96 	#include	"uidband.h"
-//DeadCode JIM 05Jun96 	#include	"modfile.h"
 
-//DeadCode JIM 25Apr96 	#include	"double.h"
-//DeadCode JIM 25Apr96 static	SDouble	UDouble::ReturnValue(0);
 #define	MaxFileCount 32
 #define	MaxTotFileCount 50
 #define MaxFileBits	5
@@ -96,7 +84,6 @@ UWord	currsrcfline=0;
 UWord	filenestlevel=0;
 UWord	Current_Level=0;
 
-//DeadCode JIM 24Jun96 UFILE*	filelistfile;
 UFILE*	UIDlistfile=NULL;
 int		unshaped3ds=0;
 int		uidtable1[40], uidtable2[40];
@@ -407,18 +394,6 @@ TokenInit	fixedtokens[]=
 		//in later versions we might allow an init syntax that
 		//generates this information based on keywords
 
-//DeadCode JIM 27Nov95 		{"UsageType",U_enumequiv,T_form},
-//DeadCode JIM 27Nov95 		{"TokenCode",U_enumequiv,T_duty},
-//DeadCode JIM 27Nov95 		{"Defined",U_enumequiv,T_duty},
-//DeadCode JIM 05Dec95 		{"ANGLES",U_enumequiv,T_angle},
-//DeadCode JIM 05Dec95 		{"UniqueIDBand",U_enumequiv,T_UIDband},
-//DeadCode JIM 05Dec95 		{"ShapeNum",U_enumequiv,T_shape},
-//DeadCode JIM 05Dec95 		{"BFieldWaypointActions",U_enumequiv,T_wpact},
-//DeadCode JIM 05Dec95 		{"Nationality",U_enumequiv,T_nation},
-//DeadCode JIM 05Dec95 		{"PlaneTypeSelect",U_enumequiv,T_type},
-//DeadCode JIM 05Dec95 		{"DutyType",U_enumequiv,T_duty},
-//DeadCode JIM 05Dec95 		{"AutoMoveCodeTypeSelect",U_enumequiv,T_move},
-//DeadCode JIM 05Dec95 		{"SkillType",U_enumequiv,T_skill},
 
 //not done these yet...
 //			T_briefID
@@ -470,7 +445,6 @@ DataInst*	toplevel_form(file	ifile,TokenName	*value);
 DataInst*	toplevel_move(file	ifile,TokenName	*value);
 DataInst*	toplevel_wpact(file	ifile,TokenName	*value);
 DataInst*	toplevel_bearing(file	ifile,TokenName	*value);
-//DeadCode JIM 20Mar96 DataInst*	toplevel_hdg(file	ifile,TokenName	*value);
 DataInst*	toplevel_pitch(file	ifile,TokenName	*value);
 DataInst*	toplevel_roll(file	ifile,TokenName	*value);
 DataInst*	toplevel_fname(TokenName*&evalue,TokenName	*pvalue);
@@ -645,13 +619,6 @@ void	sayout(ufile	ofile,int	depth,char* rtype,TokenCode tokencode,int anytext,De
 {
 	if (defined==D_used)
 	{
-//DeadCode RDH 24Jun96 		TokenName*	tmptoken=NULL;
-//DeadCode RDH 24Jun96 		char*	anytext;
-//DeadCode RDH 24Jun96 		findspelling(anytext,tmptoken);
-//DeadCode RDH 24Jun96 		filenestlevel=1;
-//DeadCode RDH 24Jun96 		printf("Undefined: %s. From %s(%i) Type: %s\n",
-//DeadCode RDH 24Jun96 				anytext,names[tmptoken->srcfname],tmptoken->srcfline,getcodename(tokencode)
-//DeadCode RDH 24Jun96 				);
 	}
 	if (ofile)
 	{
@@ -797,7 +764,6 @@ DataInst&	operator=(DataInst &src)
 		 && (tokencode!=T_int)	)
 
 		if (	(tokencode == T_target)
-//DeadCode JIM 22Apr96 			||	(tokencode == T_leader)	//leader now has target field
 			)
 		{
 			DataInst	*tmpptr,*lookptr;						//JIM 28Mar96
@@ -1060,8 +1026,6 @@ void	FNameInst::PreSave2(ufile	/*ofile*/,int /*depth*/)
 				wordbuff[depth+1]=' ';
 				if (This->dataref)
 					This->dataref->SaveTxt(ofile,depth+1);
-//DeadCode RJS 31Jan96 			if (sibling)
-//DeadCode RJS 31Jan96 				sibling->SaveTxt(ofile,depth);
 			}while ((This=This->sibling)!=NULL);
 	}	}
 
@@ -1304,7 +1268,6 @@ UFILE*		FindFileNameInBF(LinkInst*	ref)
 	return(NULL);
 }
 
-//DeadCode DAW 08Apr96 ufile	writefile(char*	name,char mode);
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		ChainInst::SaveBin
 //Author		Jim Taylor
@@ -1350,17 +1313,8 @@ UFILE*		FindFileNameInBF(LinkInst*	ref)
 		elseif (tokencode==T_bfsave)
 		{	//need to find a filename entry
 			UFILE*		MyTmpFile=FindFileNameInBF((LinkInst*) dataref);
-//DeadCode JIM 04Apr96 string		filename=FindFileNameInBF((LinkInst*) dataref);
 			if (MyTmpFile)
 			{
-//DeadCode JIM 04Apr96 				if (	(filename[0]=='\"') || (filename[0]=='\'')	)
-//DeadCode JIM 04Apr96 				{	//remove quotes by skipping forward and truncating
-//DeadCode JIM 04Apr96 string				t2=filename++;
-//DeadCode JIM 04Apr96 					while ((*t2!='\"') && *(t2) && (*t2!='\''))	t2++;
-//DeadCode JIM 04Apr96 					t2[0]=0;
-//DeadCode JIM 04Apr96 				}
-//DeadCode JIM 04Apr96 
-//DeadCode JIM 04Apr96 ufile			MyTmpFile=writefile(filename,'b');
 				//save length info		
 					fprintf(MyTmpFile,"BATTLEFIELD %s\032\n",(string) (__DATE__));
 					fputc(0,MyTmpFile);
@@ -1658,7 +1612,6 @@ char	*targ=spellhunt->spelling[compchar]->tokentext;
 	}
 }
 
-//DeadCode JIM 04Dec95 char	wordbuff[80]={0};
 
 char*	safetext(char* oldtext)
 {
@@ -1868,8 +1821,6 @@ TokenName	*newtoken;
 	newtoken->usage=tokentoadd.usage;
 	newtoken->tokencode=tokentoadd.tokencode;
 	newtoken->defined=D_defined;
-//DeadCode JIM 27Nov95 	newtoken->srcfname=(UWord) currsrcfname;
-//DeadCode JIM 27Nov95 	newtoken->srcfline=(UWord) currsrcfline;
 	newtoken->instance=NULL;
 }
 
@@ -2031,7 +1982,6 @@ TokenName	*tokenname;
 //------------------------------------------------------------------------------
 void	GetTypeAndValue(file	ifile,TokenName* &type,TokenName* &newname,TokenName* &value,TokenName* &sep)
 {
-//DeadCode JIM 30Nov95 char*	nextword;
 	findspelling(ifile,type);
 	if (	(type->usage==U_value)
 		||	(type->usage==U_structrtn)	)
@@ -3228,7 +3178,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,Xinform=1,Xpos=2,Xroute=4,Xform=8,Xitem=16}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -3305,7 +3254,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,Xinform=1,Xpos=2,Xroute=4,Xform=8,Xitem=16,Xinwing=32,Xduty=64,Xhdg=128}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -3433,9 +3381,6 @@ ChainInst*
 					type->TokenText());
 			}
 
-//DeadCode JIM 15Feb96 			setupnewnamereference(newname,retval);
-//DeadCode JIM 15Feb96 			if (type->tokencode==T_waypoint)
-//DeadCode JIM 15Feb96 				list.Add(retval);
 		breakif (getlistseparator(ifile,sep));
 		}
 	return(list.Code(T_T,pvalue));
@@ -3498,7 +3443,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,XsetUID=1,Xpos=2,Xshape=4,Xband=8,Xbrief=16,Xhdg=32}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -3509,7 +3453,6 @@ enum		XClusive
 	if (pvalue->tokencode==T_3dsref)				//if simple reference
 	{	//I have SimpleItem	RendererID
 		//want to create sequence UIDband=simple, pos=renderID, shape=RenderID
-//DeadCode JIM 30Nov95 		EmitSysErr("not handling renderer IDs here properly yet!");
 		retval=new ChainInst(T_itemS);	Assert(retval&&"memory!");
 		((ChainInst*) retval)->dataref=((ChainInst*) pvalue->instance)->dataref;
 		return(retval);
@@ -3527,8 +3470,6 @@ enum		XClusive
 			switch (type->tokencode)
 			{
 			case T_event:
-//DeadCode DAW 05Nov96 				Xclusive=(XClusive)
-//DeadCode DAW 05Nov96 					repeattest(Xclusive,Xevent,0,"SimpleItem",type->TokenText());
 				retval=toplevel_event(ifile,value);
 			break;
 			case T_setUID:
@@ -3569,11 +3510,6 @@ enum		XClusive
 			}
 			break;
 
-//DeadCode JIM 28Nov95 			case T_briefID:
-//DeadCode JIM 28Nov95 				Xclusive=(XClusive)
-//DeadCode JIM 28Nov95 					repeattest(Xclusive,Xbrief,0,"SimpleItem",type->TokenText());
-//DeadCode JIM 28Nov95 				retval=toplevel_briefID(ifile,value);
-//DeadCode JIM 28Nov95 			break;
 			default:
 				EmitSysErr("Type of symbol not valid within SimpleItem: %s",
 					type->TokenText());
@@ -3612,7 +3548,6 @@ enum		XClusive
 			{Xzero=0,XsetUID=1,Xnat=2,Xshape=4,Xband=8,Xmove=16,Xform=32,Xattitude=64,
 			Xleader=128,Xevent=256,Xtype=512,Xvel=1024}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -3620,12 +3555,6 @@ enum		XClusive
 	if (pvalue->tokencode==T_T)				//if simple reference
 		return(pvalue->instance);
 	elser
-//DeadCode JIM 30Nov95 	if (pvalue->tokencode==T_3dsref)				//if simple reference
-//DeadCode JIM 30Nov95 	{	//I have SimpleItem	RendererID
-//DeadCode JIM 30Nov95 		//want to create sequence UIDband=simple, pos=renderID, shape=RenderID
-//DeadCode JIM 30Nov95 		EmitSysErr("not handling renderer IDs here properly yet!");
-//DeadCode JIM 30Nov95 	}
-//DeadCode JIM 30Nov95 	elser
 	if (pvalue->tokencode!=T_brktopen)
 		EmitSysErr("Argument must be GroundItem type, not %s",
 			pvalue->TokenText());
@@ -3680,8 +3609,6 @@ enum		XClusive
 				retval=toplevel_leader(ifile,value);
 			break;
 			case T_event:
-//DeadCode DAW 05Nov96 				Xclusive=(XClusive)
-//DeadCode DAW 05Nov96 					repeattest(Xclusive,Xevent,0,"AirItem",type->TokenText());
 				retval=toplevel_event(ifile,value);
 			break;
 			case T_type:
@@ -3842,7 +3769,6 @@ enum		XClusive
 			Xattacker=65536,Xvel=0x20000,Xsquad=0x40000,Xhome=0x80000,Xfollower=0x100000,Xbombs=0x200000
 			}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -3959,8 +3885,6 @@ enum		XClusive
 				retval=toplevel_att(ifile,value);
 			break;
 			case T_paintscheme:
-//DeadCode JIM 19Aug96 				Xclusive=(XClusive)
-//DeadCode JIM 19Aug96 					repeattest(Xclusive,Xpaint,0,"AirItem",type->TokenText());
 				retval=toplevel_paintscheme(ifile,value);
 			break;
 			case T_squadron:
@@ -4002,7 +3926,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,XsetUID=1,Xpos=2,Xaction=4,Xtarget=8,Xrange=16,Xevent=32,Xvel=64}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -4028,8 +3951,6 @@ enum		XClusive
 			switch (type->tokencode)
 			{
 			case T_event:
-//DeadCode MS 30May96 				Xclusive=(XClusive)
-//DeadCode MS 30May96 					repeattest(Xclusive,Xevent,0,"WayPoint",type->TokenText());
 				retval=toplevel_event(ifile,value);
 			break;
 			case T_start:
@@ -4107,7 +4028,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,XsetUID=1,Xpos=2,Xaction=4,Xtarget=8,Xrange=16,Xevent=32}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -4171,7 +4091,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,Xatt=4,X_x=8,X_y=16,X_z=32,Xabs=64,Xrel=128}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -4238,7 +4157,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,Xatt=4,X_x=8,X_y=16,X_z=32,Xabs=64,Xrel=128}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -4277,7 +4195,6 @@ ChainInst*	retval=new ChainInst(T_pos);	Assert(retval&&"memory!");
 
 		((ChainInst*) retval->dataref)->dataref= targptr;
 
-//DeadCode RJS 09Feb96 		((ChainInst*) retval->dataref)->dataref= pvalue->instance;
 		return(retval);
 	}
 	elser
@@ -4349,13 +4266,6 @@ ChainInst*	retval=new ChainInst(T_pos);	Assert(retval&&"memory!");
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode JIM 22Apr96 DataInst*	referenceonly_abs(file	ifile,TokenName	*pvalue)
-//DeadCode JIM 22Apr96 {
-//DeadCode JIM 22Apr96 	if (pvalue->tokencode==T_3dsref)
-//DeadCode JIM 22Apr96 		return ((LinkInst*) ((ChainInst*) pvalue->instance)->dataref)->sibling->dataref;
-//DeadCode JIM 22Apr96 	elser
-//DeadCode JIM 22Apr96 		return(toplevel_target(ifile,pvalue));
-//DeadCode JIM 22Apr96 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		toplevel_abs
 //Author		Jim Taylor
@@ -4377,7 +4287,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,Xabs=4,X_x=8,X_y=16,X_z=32}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -4412,7 +4321,6 @@ ChainInst*	retval=new ChainInst(T_pos);	Assert(retval&&"memory!");
 
 		((ChainInst*) retval->dataref)->dataref= targptr;
 		
-//DeadCode RJS 09Feb96 		((ChainInst*) retval->dataref)->dataref=pvalue->instance;
 		return(retval);
 	}
 	elser
@@ -4512,7 +4420,6 @@ const	TokenCode	T_T=T_icpt;
 TokenName	*type,*newname,*value,*sep;
 DataInst 	*retval;
 LPair	 	list;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -4581,7 +4488,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,Xhdg=1,Xpitch=2,Xrange=4,X_x=8,X_y=16,X_z=32,Xtarg=64}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -4710,7 +4616,6 @@ LPair	 	list;
 enum		XClusive
 			{Xzero=0,Xhdg=1,Xpitch=2,Xroll=4,Xtarg=8,Xrange=16}
 			Xclusive=Xzero;
-//DeadCode JIM 30Nov95 BITABLE		(XClusive);
 
 	if (pvalue->tokencode==T_unknown)			//if simple forward reference
 		return(initchainref(pvalue,T_T));
@@ -4768,10 +4673,6 @@ enum		XClusive
 			list.Add(retval);
 		breakif (getlistseparator(ifile,sep));
 		}
-//DeadCode DAW 08Apr96 	if (	Xclusive&(Xhdg|Xpitch)
-//DeadCode DAW 08Apr96 		 && !(Xclusive&(Xrange))
-//DeadCode DAW 08Apr96 		)
-//DeadCode DAW 08Apr96 		EmitSysErr("Rel statement contains bearing or asimuth, but no range!");
 	return(list.Code(T_T,pvalue));
 	}
 }
@@ -4843,10 +4744,6 @@ enum		XClusive
 			list.Add(retval);
 		breakif (getlistseparator(ifile,sep));
 		}
-//DeadCode DAW 08Apr96 	if (	Xclusive&(Xhdg|Xpitch)
-//DeadCode DAW 08Apr96 		 && !(Xclusive&(Xrange))
-//DeadCode DAW 08Apr96 		)
-//DeadCode DAW 08Apr96 		EmitSysErr("Rel statement contains bearing or asimuth, but no range!");
 	return(list.Code(T_T,pvalue));
 	}
 
@@ -4883,15 +4780,6 @@ DataInst*	toplevel_paintscheme(file	ifile,TokenName	*pvalue)
 //Returns	
 //
 //------------------------------------------------------------------------------
-//DeadCode JIM 31Jul96 DataInst*	toplevel_paintscheme(file	ifile,TokenName	*pvalue)
-//DeadCode JIM 31Jul96 {
-//DeadCode JIM 31Jul96 DataRef	tmpenumval=toplevel_enumval(ifile,pvalue,T_paintscheme);
-//DeadCode JIM 31Jul96 	if (tmpenumval->tokencode!=T_paintscheme)
-//DeadCode JIM 31Jul96 		EmitSysErr("Expecting PaintScheme enum, but got %s",
-//DeadCode JIM 31Jul96 			pvalue->TokenText());
-//DeadCode JIM 31Jul96 	elser
-//DeadCode JIM 31Jul96 		return(tmpenumval);
-//DeadCode JIM 31Jul96 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		toplevel_enumval
@@ -5357,22 +5245,6 @@ DataInst*	toplevel_range(file	ifile,TokenName	*pvalue)
 {
 	return(toplevel_enumorint(ifile,pvalue,T_range));
 }
-//DeadCode DAW 08Apr96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode DAW 08Apr96 //Procedure		toplevel_range
-//DeadCode DAW 08Apr96 //Author		Jim Taylor
-//DeadCode DAW 08Apr96 //Date			Thu 30 Nov 1995
-//DeadCode DAW 08Apr96 //
-//DeadCode DAW 08Apr96 //Description	
-//DeadCode DAW 08Apr96 //
-//DeadCode DAW 08Apr96 //Inputs		
-//DeadCode DAW 08Apr96 //
-//DeadCode DAW 08Apr96 //Returns	
-//DeadCode DAW 08Apr96 //
-//DeadCode DAW 08Apr96 //------------------------------------------------------------------------------
-//DeadCode DAW 08Apr96 DataInst*	toplevel_vel(file	ifile,TokenName	*pvalue)
-//DeadCode DAW 08Apr96 {
-//DeadCode DAW 08Apr96 	return(toplevel_enumorint(ifile,pvalue,T_vel));
-//DeadCode DAW 08Apr96 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		toplevel_range
 //Author		Jim Taylor
@@ -5707,23 +5579,6 @@ DataInst*	toplevel_bearing(file	ifile,TokenName	*pvalue)
 	return(toplevel_enumorangle(ifile,pvalue,T_bearing));
 }
 
-//DeadCode JIM 20Mar96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode JIM 20Mar96 //Procedure		toplevel_hdg
-//DeadCode JIM 20Mar96 //Author		Jim Taylor
-//DeadCode JIM 20Mar96 //Date			Mon 27 Nov 1995
-//DeadCode JIM 20Mar96 //
-//DeadCode JIM 20Mar96 //Description	
-//DeadCode JIM 20Mar96 //
-//DeadCode JIM 20Mar96 //Inputs		
-//DeadCode JIM 20Mar96 //
-//DeadCode JIM 20Mar96 //Returns	
-//DeadCode JIM 20Mar96 //
-//DeadCode JIM 20Mar96 //------------------------------------------------------------------------------
-//DeadCode JIM 20Mar96 DataInst*	toplevel_hdg(file	ifile,TokenName	*pvalue)
-//DeadCode JIM 20Mar96 {
-//DeadCode JIM 20Mar96 	return(toplevel_enumorangle(ifile,pvalue,T_hdg));
-//DeadCode JIM 20Mar96 }
-//DeadCode JIM 20Mar96 
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		toplevel_pitch
@@ -5859,28 +5714,6 @@ DataInst*	toplevel_fname(TokenName*&evalue,TokenName	*pvalue)
 	evalue=NULL;
 	return(pvalue->instance);
 }
-//DeadCode JIM 04Apr96 DataInst*	toplevel_fname(TokenName *evalue,TokenName	*pvalue)
-//DeadCode JIM 04Apr96 {
-//DeadCode JIM 04Apr96 	if (pvalue->tokencode==T_unknown)
-//DeadCode JIM 04Apr96 	{
-//DeadCode JIM 04Apr96 		FNameInst	*tmp;
-//DeadCode JIM 04Apr96 		pvalue->instance=
-//DeadCode JIM 04Apr96 			tmp=new FNameInst;	Assert(tmp&&"memory!");
-//DeadCode JIM 04Apr96 		tmp->tokentext=pvalue;
-//DeadCode JIM 04Apr96 		tmp->filenumtext=evalue;
-//DeadCode JIM 04Apr96 		tmp->tokencode=T_fname;
-//DeadCode JIM 04Apr96 		pvalue->tokencode=T_fname;
-//DeadCode JIM 04Apr96 		pvalue->usage=U_value;
-//DeadCode JIM 04Apr96 		pvalue->defined=D_defined;
-//DeadCode JIM 04Apr96 	}
-//DeadCode JIM 04Apr96 	else
-//DeadCode JIM 04Apr96 	if (pvalue->tokencode!=T_fname)
-//DeadCode JIM 04Apr96 		EmitSysErr("Expecting filename, but found %s",pvalue->tokentext);
-//DeadCode JIM 04Apr96 	else
-//DeadCode JIM 04Apr96 	if (pvalue->defined!=D_defined)
-//DeadCode JIM 04Apr96 		EmitSysErr("Same filename saved twice!! %s",pvalue->tokentext);
-//DeadCode JIM 04Apr96 	return(pvalue->instance);
-//DeadCode JIM 04Apr96 }
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		OpenDirFiles
 //Author		Jim Taylor
@@ -6727,7 +6560,6 @@ void	get3dsentry(file	ifile)
 	while (*material<='\"')	material++;
 	while (*material>'\"')	nexttext++[0]=material++[0];
 	nexttext[0]=0;
-//DeadCode JIM 26Mar96 	strcpy(name,getword(ifile));
 
 	finished = FALSE;
 
@@ -6815,7 +6647,6 @@ void	studiointerpreter(file	ifile)
 		EmitWarning("Total number of 3ds objects with no shape= %i",unshaped3ds);
 }
 
-//DeadCode JIM 28Oct96 extern "C" int	_amblksiz;
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		main
 //Author		Jim Taylor
@@ -6843,18 +6674,11 @@ int	main(int	argc,string	argv[])
 	addfixedspellings();
 	interpretresponse(argv[1]);
 	sortuidtable();
-//DeadCode DAW 08Apr96  	studiointerpreter(readfile("..\\world\\3ds\\franc.asc"));
 //TempCode RJS 02Feb96 	FirstSpell.SaveTxt(stdout,0);
 	processbfieldtext(argv[2]);
 	setwritefile(argv[3]);
-//DeadCode JIM 24Jun96 	filelistfile=fopen("bfields.fil",'t');
-//DeadCode JIM 24Jun96 	if (filelistfile==NULL)
-//DeadCode JIM 24Jun96 		EmitSysErr("Couldn't open 'bfields.fil' for writing!");
-//DeadCode JIM 24Jun96 	fprintf(filelistfile,"[files]\n110\tdir.dir\n");
 	ufile	outfile;
 	treeroot->SaveTxt(NULL,0);									//JIM 28Mar96
-//DeadCode JIM 28Mar96 	treeroot->SaveTxt(outfile=writefile("TextTree.err",'t'),0);
-//DeadCode JIM 28Mar96 	fclose(outfile);
 	if (filenestlevel)	EmitSysErr("There were undefined symbols. Please investigate.");
 	UFILE	StdOut;
 	StdOut.written=TRUE;

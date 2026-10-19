@@ -37,6 +37,7 @@
 
 #include <SDL.h>
 #include "SDL_syswm.h"
+#include <X11/extensions/shape.h>   // XShapeCombineRectangles (video overlay)
 #include <SDL_ttf.h>
 #include <nlohmann/json.hpp>
 
@@ -557,6 +558,11 @@ CWnd* AfxGetWndFromSDLWindow(SDL_Window* sdlWin)
 // --- Message Queue & Pump Implementation ---
 
 static std::deque<MSG> g_msgQueue;
+static std::recursive_mutex g_msgMutex;
+static inline void msgq_push(const MSG& m) { std::lock_guard<std::recursive_mutex> _lk(g_msgMutex); g_msgQueue.push_back(m); }
+static inline bool msgq_empty() { std::lock_guard<std::recursive_mutex> _lk(g_msgMutex); return g_msgQueue.empty(); }
+static inline MSG msgq_front() { std::lock_guard<std::recursive_mutex> _lk(g_msgMutex); return g_msgQueue.front(); }
+static inline void msgq_pop() { std::lock_guard<std::recursive_mutex> _lk(g_msgMutex); g_msgQueue.pop_front(); }
 static CWnd* g_pCaptureWnd = nullptr;
 
 std::deque<SdlKeyEvent> g_sdl_key_events;
@@ -578,6 +584,7 @@ void PumpTimers()
         if ((int32_t)(now - t.nextTime) >= 0) {
             // Avoid flooding the queue with timer messages for the same timer
             bool pending = false;
+            std::lock_guard<std::recursive_mutex> _timerScanLock(g_msgMutex);
             for (const auto& m : g_msgQueue) {
                 if (m.message == WM_TIMER && m.hwnd == t.hwnd && m.wParam == t.id) {
                     pending = true;
@@ -592,7 +599,7 @@ void PumpTimers()
                 msg.wParam = t.id;
                 msg.lParam = (LPARAM)t.callback;
                 msg.time = now;
-                g_msgQueue.push_back(msg);
+                msgq_push(msg);
             }
             t.nextTime = now + std::max(t.interval, (UINT)10);
         }
@@ -777,6 +784,90 @@ static void MigCheckMainWindowAlive()
     }
 }
 
+// BoB rowanvideo.cpp overlays a borderless always-on-top SDL window on the
+// game window for AVI playback; without this it eats the clicks that are
+// supposed to skip the intro. Empties the X11 input shape only — the window
+// still paints normally. SDL_SysWMinfo mirrors the padded-struct ABI used
+// by MigCheckMainWindowAlive (pack(1) shifts the real layout).
+void MakeX11WindowClickThrough(SDL_Window* w)
+{
+    if (!w) return;
+#pragma pack(push, 4)
+    struct {
+        SDL_version version;
+        int subsystem;
+        union { struct { Display* display; ::Window window; } x11;
+                char _pad[256]; } info;
+    } wmi;
+#pragma pack(pop)
+    SDL_VERSION(&wmi.version);
+    int ok = SDL_GetWindowWMInfo(w, (SDL_SysWMinfo*)&wmi);
+    fprintf(stderr, "[clickthrough] winfo ok=%d sub=%d xwin=0x%lx\n",
+            ok, wmi.subsystem,
+            ok && wmi.subsystem == SDL_SYSWM_X11 ? (unsigned long)wmi.info.x11.window : 0ul);
+    if (!ok || wmi.subsystem != SDL_SYSWM_X11)
+        return;
+    XShapeCombineRectangles(wmi.info.x11.display, wmi.info.x11.window,
+                            ShapeInput, 0, 0, nullptr, 0, ShapeSet, YXBanded);
+}
+
+// The video overlay must behave like DirectShow's WS_CHILD window: it
+// moves with the game window and is clipped to it. Top-level SDL windows
+// don't track their owner, so reparent it into the main window at the
+// client-relative position rowanvideo.cpp computed. Same padded wmi trick
+// as above.
+void MFC_ReparentOverlayToWindow(SDL_Window* child, SDL_Window* parent,
+                                 int x, int y)
+{
+    if (!child || !parent) return;
+#pragma pack(push, 4)
+    struct {
+        SDL_version version;
+        int subsystem;
+        union { struct { Display* display; ::Window window; } x11;
+                char _pad[256]; } info;
+    } wmi;
+#pragma pack(pop)
+    auto getx = [&](SDL_Window* w, Display** d, ::Window* xw) -> bool {
+        SDL_VERSION(&wmi.version);
+        if (!SDL_GetWindowWMInfo(w, (SDL_SysWMinfo*)&wmi)
+                || wmi.subsystem != SDL_SYSWM_X11)
+            return false;
+        *d = wmi.info.x11.display; *xw = wmi.info.x11.window;
+        return true;
+    };
+    Display* dpy; ::Window cx, px;
+    if (getx(child, &dpy, &cx) && getx(parent, &dpy, &px)) {
+        XReparentWindow(dpy, cx, px, x, y);
+        XRaiseWindow(dpy, cx);
+        XSync(dpy, False);
+        ::Window root, par; ::Window* kids = nullptr; unsigned n = 0;
+        XQueryTree(dpy, cx, &root, &par, &kids, &n);
+        if (kids) XFree(kids);
+        fprintf(stderr, "[reparent] child=0x%lx parent=0x%lx pos=%d,%d actual_par=0x%lx\n",
+                (unsigned long)cx, (unsigned long)px, x, y, (unsigned long)par);
+    } else
+        fprintf(stderr, "[reparent] skipped: child or parent not X11\n");
+}
+
+unsigned long MFC_X11WindowId(SDL_Window* w)
+{
+    if (!w) return 0;
+#pragma pack(push, 4)
+    struct {
+        SDL_version version;
+        int subsystem;
+        union { struct { Display* display; ::Window window; } x11;
+                char _pad[256]; } info;
+    } wmi;
+#pragma pack(pop)
+    SDL_VERSION(&wmi.version);
+    if (!SDL_GetWindowWMInfo(w, (SDL_SysWMinfo*)&wmi)
+            || wmi.subsystem != SDL_SYSWM_X11)
+        return 0;
+    return (unsigned long)wmi.info.x11.window;
+}
+
 // Helper to convert SDL events to Win32 MSG
 void PumpSDL()
 {
@@ -796,7 +887,7 @@ void PumpSDL()
         {
             case SDL_QUIT:
                 msg.message = WM_QUIT;
-                g_msgQueue.push_back(msg);
+                msgq_push(msg);
                 MigArmQuitTeardown();
                 break;
 
@@ -866,7 +957,7 @@ void PumpSDL()
                     msg.lParam = MAKELPARAM(x, y);
                     msg.wParam = (e.type == SDL_MOUSEBUTTONDOWN) ? 1 : 0; // MK_LBUTTON approx
 
-                    g_msgQueue.push_back(msg);
+                    msgq_push(msg);
                 }
                 else
                 {
@@ -926,7 +1017,7 @@ void PumpSDL()
                     if (e.motion.state & SDL_BUTTON_LMASK) msg.wParam |= MK_LBUTTON;
                     if (e.motion.state & SDL_BUTTON_RMASK) msg.wParam |= MK_RBUTTON;
                     msg.lParam = MAKELPARAM(x, y);
-                    g_msgQueue.push_back(msg);
+                    msgq_push(msg);
                 }
                 break;
             }
@@ -945,14 +1036,14 @@ void PumpSDL()
                         msg.message = WM_CHAR;
                         msg.wParam = 0x08; // VK_BACK
                         msg.time = SDL_GetTicks();
-                        g_msgQueue.push_back(msg);
+                        msgq_push(msg);
                     }
                     else if (e.key.keysym.sym == SDLK_RETURN || e.key.keysym.sym == SDLK_KP_ENTER) {
                         msg.hwnd = g_pFocusWnd->GetSafeHwnd();
                         msg.message = WM_CHAR;
                         msg.wParam = 0x0D; // VK_RETURN
                         msg.time = SDL_GetTicks();
-                        g_msgQueue.push_back(msg);
+                        msgq_push(msg);
                     }
                 }
 
@@ -972,7 +1063,7 @@ void PumpSDL()
                     msg.hwnd = target->GetSafeHwnd();
                     msg.message = (e.type == SDL_KEYDOWN) ? WM_KEYDOWN : WM_KEYUP;
                     msg.wParam = e.key.keysym.sym; 
-                    g_msgQueue.push_back(msg);
+                    msgq_push(msg);
                 }
                 break;
             }
@@ -985,7 +1076,7 @@ void PumpSDL()
                         msg.message = WM_CHAR;
                         msg.wParam = (unsigned char)e.text.text[i];
                         msg.time = SDL_GetTicks();
-                        g_msgQueue.push_back(msg);
+                        msgq_push(msg);
                     }
                 }
                 break;
@@ -1012,7 +1103,7 @@ void PumpSDL()
                     {
                         msg.hwnd = target->GetSafeHwnd();
                         msg.message = WM_CLOSE;
-                        g_msgQueue.push_back(msg);
+                        msgq_push(msg);
                     }
                 }
                 else if (wnd)
@@ -1046,10 +1137,10 @@ void PumpSDL()
                             sizeMsg.wParam = SIZE_RESTORED;
                             sizeMsg.lParam = MAKELPARAM(e.window.data1, e.window.data2);
                             sizeMsg.time = msg.time;
-                            g_msgQueue.push_back(sizeMsg);
+                            msgq_push(sizeMsg);
                         }
                         msg.message = WM_PAINT;
-                        g_msgQueue.push_back(msg);
+                        msgq_push(msg);
                     }
                 }
                 break;
@@ -1100,7 +1191,7 @@ void PumpSDL()
                     msg.pt_x = x;
                     msg.pt_y = y;
 
-                    g_msgQueue.push_back(msg);
+                    msgq_push(msg);
                 }
                 break;
             }
@@ -1113,7 +1204,7 @@ BOOL PeekMessage(MSG* msg, HWND hwnd, UINT min, UINT max, UINT remove)
     PumpSDL();
     PumpTimers();
 
-    if (g_msgQueue.empty())
+    if (msgq_empty())
     {
         // Check for dirty windows and synthesize WM_PAINT
         for (auto& pair : g_hwndRegistry) {
@@ -1131,7 +1222,7 @@ BOOL PeekMessage(MSG* msg, HWND hwnd, UINT min, UINT max, UINT remove)
                     paintMsg.hwnd = pair.first;
                     paintMsg.message = WM_PAINT;
                     paintMsg.time = SDL_GetTicks();
-                    g_msgQueue.push_back(paintMsg);
+                    msgq_push(paintMsg);
                     break; // Only generate one WM_PAINT at a time to respect priority
                 } else {
                     be.needsRepaint = false;
@@ -1140,7 +1231,7 @@ BOOL PeekMessage(MSG* msg, HWND hwnd, UINT min, UINT max, UINT remove)
         }
     }
 
-    if (g_msgQueue.empty())
+    if (msgq_empty())
     {
         // RERUN: Win32 keeps the quit state once PostQuitMessage fires —
         // every later GetMessage/PeekMessage returns WM_QUIT until the
@@ -1161,11 +1252,11 @@ BOOL PeekMessage(MSG* msg, HWND hwnd, UINT min, UINT max, UINT remove)
         return FALSE;
     }
     
-    *msg = g_msgQueue.front();
+    *msg = msgq_front();
     
     if (remove == PM_REMOVE)
     {
-        g_msgQueue.pop_front();
+        msgq_pop();
     }
 
     return TRUE;
@@ -1247,7 +1338,7 @@ void AfxPostQuitMessage(int /*nExitCode*/)
     MSG msg = {};
     msg.message = WM_QUIT;
     msg.time = SDL_GetTicks();
-    g_msgQueue.push_back(msg);
+    msgq_push(msg);
 }
 
 BOOL PumpMessage()
@@ -1373,7 +1464,7 @@ DWORD MsgWaitForMultipleObjects(
         {
             PumpSDL();
             PumpTimers();
-            if (!g_msgQueue.empty() || g_shouldQuit ||
+            if (!msgq_empty() || g_shouldQuit ||
                 AnyDirtyVisibleWindow())
                 return WAIT_OBJECT_0 + nCount;
             static int dumpDiv = 0;
@@ -1915,7 +2006,7 @@ CSize CDC::GetTextExtent(const CString& str) const
 
     if (font) {
         int w, h;
-        if (TTF_SizeText(font, str.c_str(), &w, &h) == 0) {
+        if (TTF_SizeUTF8(font, str.c_str(), &w, &h) == 0) {
             return CSize(w, h);
         }
     }
@@ -1940,7 +2031,7 @@ BOOL CDC::GetTextMetrics(TEXTMETRIC* pTM) const
     // GDI's tmAveCharWidth is a weighted lowercase average; the alphabet
     // mean is the closest approximation SDL_ttf can give us.
     int w = 0, h = 0;
-    if (TTF_SizeText(font, "abcdefghijklmnopqrstuvwxyz", &w, &h) == 0 && w > 0)
+    if (TTF_SizeUTF8(font, "abcdefghijklmnopqrstuvwxyz", &w, &h) == 0 && w > 0)
         pTM->tmAveCharWidth = (w + 13) / 26;
     else
         pTM->tmAveCharWidth = pTM->tmHeight / 2;
@@ -3249,7 +3340,7 @@ BOOL CWnd::PostMessage(UINT msg, WPARAM wParam, LPARAM lParam)
     message.pt_x = 0; // Not available here
     message.pt_y = 0;
 
-    g_msgQueue.push_back(message);
+    msgq_push(message);
 
     return TRUE;
 }
@@ -6274,6 +6365,7 @@ char* _i64toa(long long value, char* str, int base)
 
 // COM surface — DirectPlay is backed by our native LAN implementation
 // (dplay_net.cpp); other classes still report E_NOINTERFACE.
+extern "C" HRESULT RowanVideo_CreateGraph(void**) __attribute__((weak));
 HRESULT CoCreateInstance(REFCLSID clsid, LPUNKNOWN, DWORD, REFIID riid, LPVOID* ppv)
 {
     if (ppv) *ppv = nullptr;
@@ -6289,6 +6381,14 @@ HRESULT CoCreateInstance(REFCLSID clsid, LPUNKNOWN, DWORD, REFIID riid, LPVOID* 
         *ppv = RowanDPlay_CreateInstance();
         return S_OK;
     }
+    /* BoB frontend plays AVI clips through DirectShow; the player lives in
+       bob/mfc/rowanvideo.cpp (weak hook — absent in MiG). */
+    static const GUID CLSID_FG = {0xe436ebb3, 0x524f, 0x11ce, {0x9f,0x53,0x00,0x20,0xaf,0x0b,0xa7,0x70}};
+    if (clsid == CLSID_FG)
+        fprintf(stderr, "[cocreate] FilterGraph hook=%p ppv=%p\n",
+                (void*)&RowanVideo_CreateGraph, (void*)ppv);
+    if (ppv && clsid == CLSID_FG && &RowanVideo_CreateGraph)
+        return RowanVideo_CreateGraph(ppv);
     return E_NOINTERFACE;
 }
 

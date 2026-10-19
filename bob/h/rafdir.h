@@ -71,25 +71,7 @@ public:
 protected:
 //TEMPCODE JIM 07/02/00 		DirectivesResults::TargetList target[DirectivesResults::MAX_TARGETS];
 	void Refresh();
-//DeadCode RDH 08Feb00 	void	FindSquadsAvail();
 
-//DeadCode RDH 08Feb00 	struct	AvailSquads
-//DeadCode RDH 08Feb00 	{
-//DeadCode RDH 08Feb00 
-//DeadCode RDH 08Feb00 		int gr11radarpatrol;
-//DeadCode RDH 08Feb00 		int gr11convoypatrol;
-//DeadCode RDH 08Feb00 		int gr11coastalpatrol;
-//DeadCode RDH 08Feb00 		int gr11intercept;
-//DeadCode RDH 08Feb00 		int gr11total;
-//DeadCode RDH 08Feb00 
-//DeadCode RDH 08Feb00 		int gr1012afpat;
-//DeadCode RDH 08Feb00 		int	gr1012acfactpat;
-//DeadCode RDH 08Feb00 		int gr1012supfactpat;
-//DeadCode RDH 08Feb00 		int gr1012intercept;
-//DeadCode RDH 08Feb00 		int gr1012total;
-//DeadCode RDH 08Feb00 
-//DeadCode RDH 08Feb00 	};
-//DeadCode RDH 08Feb00 	AvailSquads	availsquads;
 
 	// Generated message map functions
 	//{{AFX_MSG(RAFDirectives)

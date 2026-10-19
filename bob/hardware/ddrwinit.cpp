@@ -70,7 +70,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //Description    Windows version of hardinit.cpp
 //------------------------------------------------------------------------------
 
-//DEADCODE PD 03/12/99 #define INITGUID
 #define WIN32_LEAN_AND_MEAN
 
 #include <dos.h>
@@ -589,7 +588,6 @@ void	Display::ChangeRes(ScreenRez& srez)
 //TEMP		window=(Window*)window->windowlink;
 //TEMP	}
 //TEMP
-//TEMP//DeadCode PD 09Jun97 	window=(Window*)windowlink;
 //TEMP
 //TEMP	WindowMoved (logicalscreenptr, (LogicalPtr)DD.lpddsd->lpSurface);
 //TEMP
@@ -636,7 +634,6 @@ void	Display::SetTextMode()
 	return;
 }
 
-//DEADCODE PD 03/12/99 SWord	winmode_w,winmode_h,winmode_bpp;
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		InitDirectDraw

@@ -517,11 +517,14 @@ void	PackageList::SaveAirItemBin(Profile::Group* group,BOStream&file)
 
 
 	if (a->attmethod.Evaluate()!=GOT_UNDEFINED_VAL)
-		file <<C (T_attmethod);a->attmethod.Save(file,NULL);
+		file <<C (T_attmethod);
+	a->attmethod.Save(file,NULL);
 	if (a->attpattern.Evaluate()!=GOT_UNDEFINED_VAL)
-		file <<C (T_attpattern);a->attpattern.Save(file,NULL);
+		file <<C (T_attpattern);
+	a->attpattern.Save(file,NULL);
 	if (a->radiosilence.Evaluate()!=GOT_UNDEFINED_VAL)
-		file <<C (T_radiosilence);a->radiosilence.Save(file,NULL);
+		file <<C (T_radiosilence);
+	a->radiosilence.Save(file,NULL);
 }
 void EventVal::Save(BOStream& f,char*,int,EnumListNames)
 {

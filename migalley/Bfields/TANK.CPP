@@ -159,7 +159,6 @@ questions about this file may be asked at http://www.simhq.com/
 #define F_SOUNDS
 #define F_COMMON
 
-//DeadCode JIM 19Aug96 	#include	"bfcommon.h"
 			#include	"DOSDEFS.H"
 			#include	"TEXT.H"
 			#include	"PERSONS2.H"
@@ -183,22 +182,13 @@ static unsigned long int GR_RequiredNationality = 180615406;
 
 MissMan	Miss_Man;
 #include "NODE.H" // RERUN
-//DeadCode JIM 19Aug96 	enum	BattlefieldType	{MAINWORLDBF = 0, BFMAXCOUNTER = 255,BFTYPE = 256,PLAYERBF = BFTYPE,
-//DeadCode JIM 19Aug96 							ROUTEBF = 2*BFTYPE,CONVOYBF = 3*BFTYPE,
-//DeadCode JIM 19Aug96 							AAABF =  4*BFTYPE,ENEMYACBF = 5*BFTYPE,
-//DeadCode JIM 19Aug96 							CONVOYCOUNT = 6*BFTYPE, AAACOUNT = 7*BFTYPE,
-//DeadCode JIM 19Aug96 							FINISHBF = 8*BFTYPE
-//DeadCode JIM 19Aug96 							};
-//DeadCode JIM 19Aug96 
 //extern	ULong GR_WP1;
 //extern	ULong GR_WP2;
 //extern	ULong GR_ConvoyCount;
 //extern	ULong GR_ConvoyUid;
-//DeadCode RDH 02Dec96 extern	ULong GR_GunSite;
 //extern	ULong GR_AAASite;
 //extern	ULong
 //
-////DeadCode RDH 08Oct96 					GR_bluestrength,
 //					GR_MainPosX,
 //					GR_MainPosY,
 //					GR_MainPosZ,
@@ -234,26 +224,17 @@ MATHABLE(Persons2::BattlefieldType);
 //DEAD		uidband = getbandfromUID((UniqueID)tmpitem->target->uniqueID.bitfieldUid.count);
 //DEAD		if (uidband == RedMilitaryBAND)
 //DEAD		{
-//DEAD//DeadCode RDH 22Oct96 			if (tmpitem->target->MigStatus.LaunchFlags.deadtime != 0)
-//DEAD//DeadCode RDH 22Oct96 			{
 //DEAD				if (Miss_Man.camp.playerbfield==FIL_NULL)
 //DEAD				{
 //DEAD					GR_WP2 = GR_WP1;
 //DEAD				}else
 //DEAD				{
-//DEAD//DeadCode RDH 05Dec96 					if (tmpitem->next==NULL)
-//DEAD//DeadCode RDH 05Dec96 						_Error.EmitSysErr("second waypoint null");
-//DEAD//DeadCode RDH 05Dec96 					GR_WP2 = tmpitem->next->uniqueID.bitfieldUid.count;
 //DEAD					if (tmpitem->next==NULL)					//RDH 05Dec96
 //DEAD						GR_WP2 = GR_WP1;						//RDH 05Dec96
 //DEAD					else										//RDH 05Dec96
 //DEAD						GR_WP2 = tmpitem->next->uniqueID.bitfieldUid.count;	//RDH 05Dec96
 //DEAD				}
 //DEAD
-//DEAD//DeadCode RDH 22Oct96 			}else
-//DEAD//DeadCode RDH 22Oct96 			{
-//DEAD//DeadCode RDH 22Oct96 				GR_WP2 = GR_WP1;
-//DEAD//DeadCode RDH 22Oct96 			}
 //DEAD		}else
 //DEAD		{
 //DEAD			if (tmpitem->target->MigStatus.LaunchFlags.deadtime != 0)
@@ -266,9 +247,6 @@ MATHABLE(Persons2::BattlefieldType);
 //DEAD					GR_WP2 = GR_WP1;
 //DEAD				}else
 //DEAD				{
-//DEAD//DeadCode RDH 05Dec96 					if (tmpitem->next==NULL)
-//DEAD//DeadCode RDH 05Dec96 						_Error.EmitSysErr("second waypoint null");
-//DEAD//DeadCode RDH 05Dec96 					GR_WP2 = tmpitem->next->uniqueID.bitfieldUid.count;
 //DEAD					if (tmpitem->next==NULL)					//RDH 05Dec96
 //DEAD						GR_WP2 = GR_WP1;						//RDH 05Dec96
 //DEAD					else										//RDH 05Dec96
@@ -511,8 +489,6 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 				GR_AAALevel64K=0;
 			}
 
-//DeadCode DAW 05Feb99 					rv=SupplyTree.airfieldinfo[MMC.squad[MMC.playersquadron].airfieldindex].BluePopulateBF;
-//DeadCode DAW 05Feb99 					GR_MainObjective=SupplyTree.airfieldinfo[MMC.squad[MMC.playersquadron].airfieldindex].airfield;
 			break;
 			case    TAKEOFFBLUEAF:
 			{
@@ -540,7 +516,6 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 					afindex=MMC.squad[MMC.playersquadron].airfieldindex;
 				else
 					afindex=25;//UID_Kunsan
-//DeadCode AMM 28Apr99 				rv=SupplyTree.airfieldinfo[afindex].HandBlueBF;
 				GR_MainObjective=SupplyTree::airfieldinfo[afindex].airfield;
 				GR_AAALevel64K=0;
 
@@ -567,19 +542,25 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 
 
 			case	TARGETBF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
+
 				GR_MainObjective=playernode->associated_item;
 				GR_AAALevel64K=playernode->attackstats.aaalevel<<8;
 				rv=playernode->populateBF;
 			break;
 			case	SECTARGBF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
+
 				GR_MainObjective=playernode->associated_item;
 				rv=FIL_NULL;
 			break;
 			case	ROUTE0BF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
+
 				{
 			//the question is... How do I know the convoy is active today?
 				for (SupplyRoute* s=playernode->forward;s;s=s->alternateroute)
-					if (s->redsupplyUID) //extra test to see if high pop.
+				if (s->redsupplyUID) //extra test to see if high pop.
 					{
 						GR_MainObjective=s->supplier->associated_item;
 						GR_SubObjective=s->suppliee->associated_item;
@@ -595,6 +576,8 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 			case	ROUTE1BF:
 			case	ROUTE2BF:
 			case	ROUTE3BF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
+
 			//the question is... How do I know the convoy is active today?
 				{
 				for (SupplyRoute* s=playernode->route[nextbftype-ROUTE1BF];s;s=s->alternateroute)
@@ -605,25 +588,12 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 						GR_WP1=s->redsupplyUID;
 						if (s->SetSupplySizeGR(GR_FormSize00,GR_FormSize01,GR_FormSize02))
 							rv=s->populateBF;
-//DEADCODE DAW 10/05/99 						int trucks=s->storeslaunched/s->storespermobile;	//trucks per period
-//DEADCODE DAW 10/05/99 						trucks-=10;
-//DEADCODE DAW 10/05/99 						if (trucks)//trucks at night
-//DEADCODE DAW 10/05/99 							if (trucks<10)										//too few to see
-//DEADCODE DAW 10/05/99 								if (Math_Lib.rnd(3))
-//DEADCODE DAW 10/05/99 									trucks=0;
-//DEADCODE DAW 10/05/99 								else
-//DEADCODE DAW 10/05/99 									trucks=trucks+5;							//make more visible
-//DEADCODE DAW 10/05/99 						GR_FormSize00=trucks;
-//DEADCODE DAW 10/05/99 						GR_FormSize01=trucks/2;
-//DEADCODE DAW 10/05/99 						GR_FormSize02=trucks/3;
-//DEADCODE DAW 10/05/99 ///					GR_WP1=playernode->forward->associated_brdg;
-//DEADCODE DAW 10/05/99 						if (trucks>0)
-//DEADCODE DAW 10/05/99 						rv=s->populateBF;
 						break;
 					}
 				}
 			break;
 			case	CHOKE0BF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
 				if (playernode->forward)
 				{
 					GR_WP1=playernode->forward->associated_brdg;
@@ -641,6 +611,8 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 			case	CHOKE1BF:
 			case	CHOKE2BF:
 			case	CHOKE3BF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
+
 				if (playernode->route[nextbftype-CHOKE1BF])
 				{
 					GR_WP1=playernode->route[nextbftype-CHOKE1BF]->associated_brdg;
@@ -655,6 +627,8 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 				break;
 
 			case	TOWN0BF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
+
 				if (playernode->forward && playernode->forward->suppliee)
 				{
 					GR_MainObjective=playernode->forward->suppliee->associated_item;
@@ -665,6 +639,8 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 			case	TOWN1BF:
 			case	TOWN2BF:
 			case	TOWN3BF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
+
 				if (playernode->route[nextbftype-TOWN1BF] && playernode->route[nextbftype-TOWN1BF]->supplier)
 				{
 					GR_MainObjective=playernode->route[nextbftype-TOWN1BF]->supplier->associated_item;
@@ -676,19 +652,25 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 			case	DEFENDAF0BF:
 			case	DEFENDAF1BF:
 			case	DEFENDAF2BF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
 				if ((GR_MainObjective=playernode->airfield[nextbftype-DEFENDAF0BF])!=UID_NULL)
 				{
 					AirFieldInfo*	af=SupplyTree::FindAirfieldForItem(UniqueID(GR_MainObjective));
-					GR_AAALevel64K=af->attackstats.aaalevel<<8;
-					rv=af->EmptyPopulateBF;
+					if (af)
+					{
+						GR_AAALevel64K=af->attackstats.aaalevel<<8;
+						rv=af->EmptyPopulateBF;
+					}
 				}
 			break;
 			case	DEFENDAF0RBF:
 			case	DEFENDAF1RBF:
 			case	DEFENDAF2RBF:
+				if (!playernode)	break;				//RERUN: playernode only valid after FindSupplyNodeForItem case
 				if ((GR_MainObjective=playernode->airfield[nextbftype-DEFENDAF0RBF])!=UID_NULL)
 				{
 					AirFieldInfo*	af=SupplyTree::FindAirfieldForItem(UniqueID(GR_MainObjective));
+					if (!af)	break;							//RERUN: FindAirfieldForItem may fail
 					GR_AAALevel64K=af->attackstats.aaalevel<<8;
 					if (af->nationality==NAT_RED)
 					rv=af->RedPopulateBF;
@@ -767,9 +749,10 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 				int lowprislot=0;
 				int found=0;
 				BattleStruct* bs2=bs;
+				if (!bs2)	break;								//RERUN: bs NULL until first GROUNDBF assignment
 				for (int teamnum=0;teamnum<BattleStruct::MAXTEAMS;teamnum++)
 				{
-					if (bs->teamlist[teamnum].strength)
+					if (bs->teamlist[teamnum].strength && playernode && playernode->supplyline)
 						if (	(playernode->supplyline->initiative==REDATTACKING)
 							==	(bs->teamlist[teamnum].team==TeamDef::AWAY)
 							)
@@ -790,16 +773,6 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 				}
 				if (found>NUMTARGETS)
 					found=NUMTARGETS;
-//DEADCODE DAW 15/06/99 				if (playernode->supplyline==&SupplyTree::WestRoute)
-//DEADCODE DAW 15/06/99 				{
-//DEADCODE DAW 15/06/99 					GR_MainObjective=UID_BNW_3a;
-//DEADCODE DAW 15/06/99 				}
-//DEADCODE DAW 15/06/99 				else
-//DEADCODE DAW 15/06/99 				if (playernode->supplyline==&SupplyTree::EastRoute)
-//DEADCODE DAW 15/06/99 					GR_MainObjective=UID_NULL;//UID_BNE_3a;
-//DEADCODE DAW 15/06/99 				else
-//DEADCODE DAW 15/06/99 					GR_MainObjective=UID_BNC_3a;
-//DEADCODE DAW 15/06/99 				if (!ConvertPtrUID(UniqueID(GR_MainObjective)))
 				GR_MainObjective=playernode->forward->suppliee->associated_item;
 
 				nextbftype=PLAYERBF;
@@ -834,6 +807,7 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 					playernode=SupplyTree::EastRoute.frontline;
 				else
 					playernode=SupplyTree::CentralRoute.frontline;
+				if (!playernode || !playernode->supplyline)	return FIL_NULL;	//RERUN: all three frontlines NULL / no supplyline
 				bs=&playernode->supplyline->groundbattle;
 				bsdebug=bs;
 				if (playernode->supplyline->initiative==REDATTACKING)
@@ -853,13 +827,14 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 			else
 			{
 				int teamnum=((nextbftype&63)-1);
-				if (teamnum<BattleStruct::MAXTEAMS)
+				if (bs && teamnum<BattleStruct::MAXTEAMS)					//RERUN: bs NULL until first GROUNDBF assignment
 				{
 
 					bs->BattleField(teamnum,
 						rv,(UniqueID&)GR_MainObjective ,(UniqueID&)GR_SubObjective,
 						(int&) GR_FormSize00,(int&) GR_FormSize01);
-					if (	(playernode->supplyline->initiative==REDATTACKING)
+					if (	playernode && playernode->supplyline
+						&&	(playernode->supplyline->initiative==REDATTACKING)
 						==	(bs->teamlist[teamnum].team==TeamDef::AWAY)
 						)
 						GR_RequiredNationality=NAT_RED;
@@ -875,7 +850,6 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 				}
 				else
 					nextbftype=BattlefieldType(int(GROUNDBF)+1);   //modify this to load all 3 or other tricks...
-//DeadCode DAW 23Dec98 						nextbftype=PLAYERBF;  //SayAndQuit
 			}
 			return rv;	//can repeat safely
 		}
@@ -898,7 +872,6 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 							GR_Scram_AC[glind]=0;
 			for(int w=0;w<8;w++)
 				GR_Pack_TakeTime[w][0]=GR_Pack_TakeTime[w][1]=GR_Pack_TakeTime[w][2]=0;
-//DeadCode AMM 02Jun99 			for(int sq=0;sq<5;sq++)
 			for (int sq=0;sq<=SQ_R_NONFLYABLE;sq++)				//AMM 02Jun99
 				GR_Pack_Sq_Used[sq]=0;
 			for (int squads=0;squads<SQ_B_NONFLYABLE;squads++)
@@ -908,8 +881,6 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 
 
 			GR_Pack_Target=CSQuick1::quickdef.target;
-//DeadCode AMM 17Nov98 				Pack_PlayerSquad=MMC.playersquadron;
-//DeadCode AMM 17Nov98 				Pack_PlayerPos=MMC.playeracnum;
 			nextbftype = FINISHBF;
 			GR_WaveNum=-1;	
 			return (FileNum)CSQuick1::quickdef.currmissnum;
@@ -928,8 +899,6 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 			{
 //					Pack_PlayerSquad=MMC.playersquadron;
 //					Pack_PlayerPos=MMC.playeracnum;
-//DEADCODE DAW 03/06/99 				Dead_Stream.GetWorldDead(myworld);				//RDH 02Oct96
-//DeadCode AMM 02Jun99 				for(int sq=0;sq<5;sq++)
 			for (int sq=0;sq<=SQ_R_NONFLYABLE;sq++)				//AMM 02Jun99
 					GR_Pack_Sq_Used[sq]=0;
 				int ac=0;
@@ -1165,7 +1134,8 @@ FileNum	Persons2::FindNextBf (BattlefieldType &nextbftype)
 						case 2:	migaf=UID_MIG_CHINA2;break;
 						case 3:	migaf=UID_MIG_CHINA3;break;
 						case 4:	if (SupplyTree::airfieldinfo[5].activeac==0)
-									migaf=UID_AfRdAntung;break;
+									migaf=UID_AfRdAntung;
+						break;
 						}
 					rv=LaunchMigPatrol(SQ_M15_0,0,migaf,migdaytype,migcaptime);
 					if (!GR_FormSize03)
@@ -1330,49 +1300,8 @@ Bool	Persons2::LaunchConvoy(FileNum bfield,SWord size)
 
 
 {
-//DeadCode RDH 24Feb97 	SWord i = 0,j,k=0;
 	Bool	repeatuid,retval = FALSE;
-//DeadCode RDH 24Feb97 	SWord	uidcount;
-//DeadCode RDH 24Feb97 
-//DeadCode RDH 24Feb97 //TempCode RDH 09Aug96 if (hq and relevant tanksite not dead) *****
-//DeadCode RDH 24Feb97 //TempCode RDH 09Aug96 {	
-//DeadCode RDH 24Feb97 	while (i < MAXCONVOYS)
-//DeadCode RDH 24Feb97 	{
-//DeadCode RDH 24Feb97 		breakif ( Miss_Man.camp.convoys[i].size == 0);
-//DeadCode RDH 24Feb97 		i++;
-//DeadCode RDH 24Feb97 	}
-//DeadCode RDH 24Feb97 	if (i != MAXCONVOYS)
-//DeadCode RDH 24Feb97 	{//set uid to first wp of a route
-//DeadCode RDH 24Feb97 			uidcount = 	Math_Lib.rnd(MAXROUTES);
-//DeadCode RDH 24Feb97 			uidcount--;
-//DeadCode RDH 24Feb97 			// avoid two convoys on same start	
-//DeadCode RDH 24Feb97 			do
-//DeadCode RDH 24Feb97 			{
-//DeadCode RDH 24Feb97 				repeatuid = FALSE;
-//DeadCode RDH 24Feb97 				uidcount++;
-//DeadCode RDH 24Feb97 				k++;
-//DeadCode RDH 24Feb97 				if (uidcount >= MAXROUTES)
-//DeadCode RDH 24Feb97 					uidcount =0;
-//DeadCode RDH 24Feb97 				j = 0;
-//DeadCode RDH 24Feb97 				while ((j < MAXCONVOYS) && (repeatuid == FALSE))
-//DeadCode RDH 24Feb97 				{
-//DeadCode RDH 24Feb97 					if ( Miss_Man.camp.routesstartuids[uidcount]
-//DeadCode RDH 24Feb97 							==	Miss_Man.camp.convoys[j].uid)
-//DeadCode RDH 24Feb97 						repeatuid = TRUE;
-//DeadCode RDH 24Feb97 					j++;
-//DeadCode RDH 24Feb97 				}
-//DeadCode RDH 24Feb97 			}while ((repeatuid == TRUE) && k <= MAXROUTES);
-//DeadCode RDH 24Feb97 
-//DeadCode RDH 24Feb97 			if (k <= MAXROUTES)
-//DeadCode RDH 24Feb97 			{
-//DeadCode RDH 24Feb97 				Miss_Man.camp.convoys[i].uid = Miss_Man.camp.routesstartuids[uidcount];
-//DeadCode RDH 24Feb97 				Miss_Man.camp.convoys[i].bfield = bfield;
-//DeadCode RDH 24Feb97 				Miss_Man.camp.convoys[i].size = size;
-//DeadCode RDH 24Feb97 				retval = TRUE;
-//DeadCode RDH 24Feb97 			}		
-//DeadCode RDH 24Feb97 	}
 	return (retval);
-//DeadCode RDH 24Feb97 //TempCode RDH 09Aug96 }
 }
 
 
@@ -1390,44 +1319,6 @@ Bool	Persons2::LaunchConvoy(FileNum bfield,SWord size)
 //------------------------------------------------------------------------------
 void	Persons2::LaunchTankConvoy ()
 {
-//DeadCode RDH 14Jan97 	SWord i = 0,j=0,k;
-//DeadCode RDH 14Jan97 	while (	(Miss_Man.camp.Tank_timer > 0)
-//DeadCode RDH 14Jan97 		&&	(j < MAXTANKCONVOYS)
-//DeadCode RDH 14Jan97 			)
-//DeadCode RDH 14Jan97 	{
-//DeadCode RDH 14Jan97 		i = 0;
-//DeadCode RDH 14Jan97 		while (i < MAXCONVOYS)
-//DeadCode RDH 14Jan97 		{
-//DeadCode RDH 14Jan97 			if (	( Miss_Man.camp.convoys[i].size != 0)
-//DeadCode RDH 14Jan97 			&&	(Miss_Man.camp.convoys[i].bfield == BFTANKSET)
-//DeadCode RDH 14Jan97 				)
-//DeadCode RDH 14Jan97 				j++;
-//DeadCode RDH 14Jan97 			i++;
-//DeadCode RDH 14Jan97 		}
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 		if (j < MAXTANKCONVOYS)
-//DeadCode RDH 14Jan97 		{
-//DeadCode RDH 14Jan97 			k=0;
-//DeadCode RDH 14Jan97 			if (Persons_2.ItemStatus(UID_AlTdHavrincourtWd).deadtime == 0)
-//DeadCode RDH 14Jan97 				k+=4;
-//DeadCode RDH 14Jan97 			if (Persons_2.ItemStatus(UID_AlTdTrescault).deadtime == 0)
-//DeadCode RDH 14Jan97 				k+=4;
-//DeadCode RDH 14Jan97 			if (	(k == 8)
-//DeadCode RDH 14Jan97 				||  (Math_Lib.rnd(k) > 2)
-//DeadCode RDH 14Jan97 				)
-//DeadCode RDH 14Jan97 			{
-//DeadCode RDH 14Jan97 //DeadCode RDH 11Dec96 				if (LaunchConvoy(BFTANKSET,4))
-//DeadCode RDH 14Jan97 //DeadCode RDH 11Dec96 				{
-//DeadCode RDH 14Jan97 //DeadCode RDH 11Dec96 					Miss_Man.camp.Tank_timer -= INTERVAL_BETWEEN_TANK_LAUNCHES;
-//DeadCode RDH 14Jan97 //DeadCode RDH 11Dec96 					Miss_Man.camp.Tank_timer -= Math_Lib.rnd(SECSPERHR/2);
-//DeadCode RDH 14Jan97 //DeadCode RDH 11Dec96 				}
-//DeadCode RDH 14Jan97 				LaunchConvoy(BFTANKSET,4);						//RDH 11Dec96
-//DeadCode RDH 14Jan97 			}													//RDH 11Dec96
-//DeadCode RDH 14Jan97 			Miss_Man.camp.Tank_timer -= INTERVAL_BETWEEN_TANK_LAUNCHES;//RDH 11Dec96
-//DeadCode RDH 14Jan97 			Miss_Man.camp.Tank_timer -= Math_Lib.rnd(SECSPERHR/2);//RDH 11Dec96
-//DeadCode RDH 14Jan97 		}
-//DeadCode RDH 14Jan97 	}
-//DeadCode RDH 14Jan97 
 }
 
 //------------------------------------------------------------------------------
@@ -1446,35 +1337,6 @@ void	Persons2::LaunchTankConvoy ()
 void	Persons2::LaunchTruckConvoyTest ()
 {
 
-//DeadCode RDH 24Feb97 	UniqueID	tmpUID,EndBand;
-//DeadCode RDH 24Feb97 	tmpUID  = RedMilitaryBAND;
-//DeadCode RDH 24Feb97 	ItemBasePtr		tmpitem;
-//DeadCode RDH 24Feb97 	EndBand = BlueMilitaryBAND;
-//DeadCode RDH 24Feb97 	Bool	Launchtruck = TRUE;
-//DeadCode RDH 24Feb97 
-//DeadCode RDH 24Feb97  while (	(Miss_Man.camp.Tank_timer > 0)
-//DeadCode RDH 24Feb97 			&& (Launchtruck == TRUE)
-//DeadCode RDH 24Feb97 		)
-//DeadCode RDH 24Feb97  { 
-//DeadCode RDH 24Feb97 	Launchtruck = FALSE;
-//DeadCode RDH 24Feb97 
-//DeadCode RDH 24Feb97 	while (	(tmpUID < EndBand)
-//DeadCode RDH 24Feb97 			&&	(Launchtruck == FALSE)
-//DeadCode RDH 24Feb97 				)
-//DeadCode RDH 24Feb97 	{
-//DeadCode RDH 24Feb97 		tmpitem=Persons_2.ConvertPtrUID(tmpUID);
-//DeadCode RDH 24Feb97 		if (	(tmpitem)
-//DeadCode RDH 24Feb97 			&&	(tmpitem->MigStatus.LaunchFlags.deadtime >= 7)		//temp
-//DeadCode RDH 24Feb97 			)
-//DeadCode RDH 24Feb97 			Launchtruck = TRUE;
-//DeadCode RDH 24Feb97 		tmpUID++;
-//DeadCode RDH 24Feb97 
-//DeadCode RDH 24Feb97 	}
-//DeadCode RDH 24Feb97 	if (	(Launchtruck)
-//DeadCode RDH 24Feb97 		&&(tmpUID < EndBand)									//RDH 16Dec96
-//DeadCode RDH 24Feb97 		)														//RDH 16Dec96
-//DeadCode RDH 24Feb97 			Launchtruck = Persons_2.LaunchTruckConvoy();		//RDH 16Dec96
-//DeadCode RDH 24Feb97  }
 }
 
 //------------------------------------------------------------------------------
@@ -1493,38 +1355,6 @@ Bool	Persons2::LaunchTruckConvoy ()
 {
 	SWord i = 0,j=0,k;
 	Bool	retval = FALSE;
-//DeadCode RDH 14Jan97 	if (Miss_Man.camp.Truck_timer > 0)
-//DeadCode RDH 14Jan97 	{
-//DeadCode RDH 14Jan97 		i = 0;
-//DeadCode RDH 14Jan97 		while (i < MAXCONVOYS)
-//DeadCode RDH 14Jan97 		{
-//DeadCode RDH 14Jan97 			if (	( Miss_Man.camp.convoys[i].size != 0)
-//DeadCode RDH 14Jan97 			&&	(Miss_Man.camp.convoys[i].bfield == BFTRUCKSET)
-//DeadCode RDH 14Jan97 				)
-//DeadCode RDH 14Jan97 				j++;
-//DeadCode RDH 14Jan97 			i++;
-//DeadCode RDH 14Jan97 		}
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 		if (j < MAXTRUCKCONVOYS)
-//DeadCode RDH 14Jan97 		{
-//DeadCode RDH 14Jan97 			k=0;
-//DeadCode RDH 14Jan97 			if (Persons_2.ItemStatus(UID_AlTdHavrincourtWd).deadtime == 0)
-//DeadCode RDH 14Jan97 				k+=4;
-//DeadCode RDH 14Jan97 			if (Persons_2.ItemStatus(UID_AlTdTrescault).deadtime == 0)
-//DeadCode RDH 14Jan97 				k+=4;
-//DeadCode RDH 14Jan97 			if (	(k == 8)
-//DeadCode RDH 14Jan97 				||  (Math_Lib.rnd(k) > 2)
-//DeadCode RDH 14Jan97 				)
-//DeadCode RDH 14Jan97 			{
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 				if (LaunchConvoy(BFTRUCKSET,1))
-//DeadCode RDH 14Jan97 				{
-//DeadCode RDH 14Jan97 					Miss_Man.camp.Truck_timer -= INTERVAL_BETWEEN_TRUCK_LAUNCHES;
-//DeadCode RDH 14Jan97 					Miss_Man.camp.Truck_timer -= Math_Lib.rnd(SECSPERHR);
-//DeadCode RDH 14Jan97 					retval = TRUE;
-//DeadCode RDH 14Jan97 				}
-//DeadCode RDH 14Jan97 			}
-//DeadCode RDH 14Jan97 	}	}
 	return (retval);
 
 }
@@ -1543,153 +1373,6 @@ Bool	Persons2::LaunchTruckConvoy ()
 //------------------------------------------------------------------------------
 void	Persons2::TankEndMission()
 {
-//DeadCode RDH 14Jan97 	SWord	i,j;
-//DeadCode RDH 14Jan97 	ItemBasePtr		tmpitem;
-//DeadCode RDH 14Jan97 	Bool	finishuid;
-//DeadCode RDH 14Jan97 		ITEM_STATUS trgstat;
-//DeadCode RDH 14Jan97 		UniqueIDBand	uidband;
-//DeadCode RDH 14Jan97 		UniqueID	nwptrg;
-//DeadCode RDH 14Jan97 		SLong		size=0;
-//DeadCode RDH 14Jan97 		Bool	inlist = FALSE;
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 //moved to scoring.cpp											//RDH 13Oct96
-//DeadCode RDH 14Jan97 //DeadCode RDH 13Oct96 //deal with blue ac
-//DeadCode RDH 14Jan97 //DeadCode RDH 13Oct96 //DeadCode JIM 11Oct96 	tmpitem=Persons_2.ConvertPtrUID(UID_AlAfHermies);
-//DeadCode RDH 14Jan97 //DeadCode RDH 13Oct96 	if (Persons_2.ItemStatus(UID_AlAfHermies).deadtime != 0)	//JIM 11Oct96
-//DeadCode RDH 14Jan97 //DeadCode RDH 13Oct96 		MMC.blueacflying = -1;
-//DeadCode RDH 14Jan97 //DeadCode RDH 13Oct96 	MMC.blueacflying++;
-//DeadCode RDH 14Jan97 //DeadCode RDH 13Oct96 	if (MMC.blueacflying > 4)
-//DeadCode RDH 14Jan97 //DeadCode RDH 13Oct96 		MMC.blueacflying = 4;
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 //get info about convoys back from 3d
-//DeadCode RDH 14Jan97 	for (i=0;i<MAXCONVOYS;i++)
-//DeadCode RDH 14Jan97 	{
-//DeadCode RDH 14Jan97 		size=0;
-//DeadCode RDH 14Jan97 		inlist = FALSE;
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 		if (MMC.convoys[i].size)
-//DeadCode RDH 14Jan97 		{
-//DeadCode RDH 14Jan97 			trgstat=ConvoyStatus(MMC.convoys[i].uid,MMC.convoys[i].uid,nwptrg,size);
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 			//put gun into bluegun list when truck arrives
-//DeadCode RDH 14Jan97 			if (Miss_Man.camp.convoys[i].bfield == BFTRUCKSET)
-//DeadCode RDH 14Jan97 			{
-//DeadCode RDH 14Jan97 				if (	(trgstat.deadtime != 0)					//JIM 13Dec96
-//DeadCode RDH 14Jan97 				 	&&	(Miss_Man.camp.playerbfield != FIL_NULL)	//JIM 13Dec96
-//DeadCode RDH 14Jan97 					)											//JIM 13Dec96
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 				{
-//DeadCode RDH 14Jan97 					size = 0;
-//DeadCode RDH 14Jan97 					j = 0;
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 					while 	(j < MAXGUNS)
-//DeadCode RDH 14Jan97 					{
-//DeadCode RDH 14Jan97 						if (Miss_Man.camp.blueguns[j] == nwptrg)
-//DeadCode RDH 14Jan97 							   inlist = TRUE;
-//DeadCode RDH 14Jan97 						j++;
-//DeadCode RDH 14Jan97 					}
-//DeadCode RDH 14Jan97 					if (!(inlist))
-//DeadCode RDH 14Jan97 					{
-//DeadCode RDH 14Jan97 						j = 0;
-//DeadCode RDH 14Jan97 						while (((Miss_Man.camp.blueguns[j]) !=UID_Null)
-//DeadCode RDH 14Jan97 							 &&	(j < MAXGUNS)
-//DeadCode RDH 14Jan97 							)
-//DeadCode RDH 14Jan97 							j++;
-//DeadCode RDH 14Jan97 						if (j < MAXGUNS)
-//DeadCode RDH 14Jan97 							Miss_Man.camp.blueguns[j] = nwptrg;
-//DeadCode RDH 14Jan97 					}
-//DeadCode RDH 14Jan97 				}
-//DeadCode RDH 14Jan97 			}
-//DeadCode RDH 14Jan97 			uidband = Persons_2.getbandfromUID((UniqueID) nwptrg);
-//DeadCode RDH 14Jan97 			if (uidband == RedCivilianBAND)
-//DeadCode RDH 14Jan97 			{
-//DeadCode RDH 14Jan97  				if (trgstat.deadtime == 0 )
-//DeadCode RDH 14Jan97 					MMC.specialeventbits |= TANKNEARBRIDGES;
-//DeadCode RDH 14Jan97 			}
-//DeadCode RDH 14Jan97 //DeadCode RDH 08Dec96 			}else
-//DeadCode RDH 14Jan97 //DeadCode RDH 08Dec96 			{
-//DeadCode RDH 14Jan97 //DeadCode RDH 08Dec96 				if (Miss_Man.camp.convoys[i].bfield != BFTRUCKSET)
-//DeadCode RDH 14Jan97 //DeadCode RDH 08Dec96 				{//kill gun that has been passed by tanks, 6 hrs	//RDH 06Dec96
-//DeadCode RDH 14Jan97 //DeadCode RDH 08Dec96 					ItemStatus(nwptrg,SetStatus(24,0));				//RDH 06Dec96
-//DeadCode RDH 14Jan97 //DeadCode RDH 08Dec96 																//RDH 06Dec96
-//DeadCode RDH 14Jan97 //DeadCode RDH 08Dec96 				}
-//DeadCode RDH 14Jan97 //DeadCode RDH 08Dec96 			}
-//DeadCode RDH 14Jan97 			MMC.convoys[i].size=size;
-//DeadCode RDH 14Jan97 		}
-//DeadCode RDH 14Jan97 	}
-//DeadCode RDH 14Jan97 //repairing bridges
-//DeadCode RDH 14Jan97 		tmpitem=Persons_2.ConvertPtrUID(UID_BrNtNoyelles);
-//DeadCode RDH 14Jan97 		if (	(tmpitem->MigStatus.LaunchFlags.Deadscale <1)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  <8)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  != 0)
-//DeadCode RDH 14Jan97 			)
-//DeadCode RDH 14Jan97 			MMC.specialeventbits |= TANK_BUILDPONTOONBRIDGE;
-//DeadCode RDH 14Jan97 		tmpitem=Persons_2.ConvertPtrUID(UID_BrNtCantaing);
-//DeadCode RDH 14Jan97 		if (	(tmpitem->MigStatus.LaunchFlags.Deadscale <1)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  <8)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  != 0)
-//DeadCode RDH 14Jan97 			)
-//DeadCode RDH 14Jan97 			MMC.specialeventbits |= TANK_BUILDPONTOONBRIDGE;
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 		tmpitem=Persons_2.ConvertPtrUID(UID_BrNtFontaine);
-//DeadCode RDH 14Jan97 		if (	(tmpitem->MigStatus.LaunchFlags.Deadscale <1)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  <8)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  != 0)
-//DeadCode RDH 14Jan97 			)
-//DeadCode RDH 14Jan97 			MMC.specialeventbits |= TANK_BUILDPONTOONBRIDGE;
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 		tmpitem=Persons_2.ConvertPtrUID(UID_BrNtMarcoing);
-//DeadCode RDH 14Jan97 		if (	(tmpitem->MigStatus.LaunchFlags.Deadscale <1)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  <8)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  != 0)
-//DeadCode RDH 14Jan97 			)
-//DeadCode RDH 14Jan97 			MMC.specialeventbits |= TANK_BUILDPONTOONBRIDGE;
-//DeadCode RDH 14Jan97 		tmpitem=Persons_2.ConvertPtrUID(UID_BrNtMasnieres);
-//DeadCode RDH 14Jan97 		if (	(tmpitem->MigStatus.LaunchFlags.Deadscale <1)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  <8)
-//DeadCode RDH 14Jan97 			&& (tmpitem->MigStatus.LaunchFlags.deadtime  != 0)
-//DeadCode RDH 14Jan97 			)
-//DeadCode RDH 14Jan97 			MMC.specialeventbits |= TANK_BUILDPONTOONBRIDGE;
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 //is campaign lost
-//DeadCode RDH 14Jan97 //if convoy.uid (waypoint at this stage == routesend wp
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 	finishuid = FALSE;
-//DeadCode RDH 14Jan97 	i = 0;
-//DeadCode RDH 14Jan97 	do
-//DeadCode RDH 14Jan97 	{
-//DeadCode RDH 14Jan97 		j = 0;
-//DeadCode RDH 14Jan97 		while ((j < MAXCONVOYS) && (finishuid == FALSE))
-//DeadCode RDH 14Jan97 		{
-//DeadCode RDH 14Jan97 			if ( Miss_Man.camp.routesenduids[i]
-//DeadCode RDH 14Jan97 						==	Miss_Man.camp.convoys[j].uid)
-//DeadCode RDH 14Jan97 					finishuid = TRUE;
-//DeadCode RDH 14Jan97 			j++;
-//DeadCode RDH 14Jan97 		}
-//DeadCode RDH 14Jan97 		i++;
-//DeadCode RDH 14Jan97 	}while ((finishuid == FALSE) && (i < MAXROUTES));
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 	if (finishuid == TRUE)
-//DeadCode RDH 14Jan97 		MMC.specialeventbits |= TANKCAMPAIGNLOST;
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 //if aaa site dead then associated gun goes back to being dead
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 //clear blueaaa list entry
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 	for (i =0;i<MAXGUNS;i++)
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 	{
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 		if (Miss_Man.camp.blueaaa[i] ==UID_Null)
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 		{	
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 			Miss_Man.camp.blueguns[i] = UID_Null;
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 		}
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 		Miss_Man.camp.blueaaa[i] = UID_Null;	
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 	
-//DeadCode RDH 14Jan97 //DeadCode RDH 17Oct96 	}
-//DeadCode RDH 14Jan97 
-//DeadCode RDH 14Jan97 //moved to scoring.cpp											//RDH 13Oct96
-//DeadCode RDH 14Jan97 //DeadCode RDH 13Oct96 	LaunchTankConvoy();
 }
 
 

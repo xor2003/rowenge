@@ -304,7 +304,6 @@ typedef	enum	Bool	{BOOL_TRUE=1,BOOL_FALSE=0,BOOL_Align=255} Bool;
 */
 enum	Bool	{BOOL_TRUE=1,BOOL_FALSE=0,BOOL_Align=255,TRUE=BOOL_TRUE,FALSE=BOOL_FALSE};
 
-//DeadCode DAW 30Jun96 enum	Bool	{TRUE=1,FALSE=0,BOOL_Align=255};
 
 typedef	signed	char	SByte,*SByteP;
 typedef	unsigned char	UByte,*UByteP;
@@ -493,36 +492,6 @@ struct _GUID;
 typedef struct _GUID GUID;
 typedef GUID *LPGUID;
 
-//DeadCode DAW 17Nov97 struct _DPSESSIONDESC;
-//DeadCode DAW 17Nov97 typedef struct _DPSESSIONDESC DPSESSIONDESC;
-//DeadCode DAW 17Nov97 typedef DPSESSIONDESC* LPDPSESSIONDESC;
-//DeadCode DAW 17Nov97 struct IDirectDraw2;
-//DeadCode DAW 17Nov97 typedef struct IDirectDraw2			*LPDIRECTDRAW2;				//ARM 25Nov96
-//DeadCode DAW 17Nov97
-//DeadCode DAW 17Nov97 struct IDirectDraw        ;
-//DeadCode DAW 17Nov97 struct IDirectDraw2        ;
-//DeadCode DAW 17Nov97 struct IDirectDrawSurface 	;
-//DeadCode DAW 17Nov97 struct IDirectDrawSurface2	 ;
-//DeadCode DAW 17Nov97 							  ;
-//DeadCode DAW 17Nov97 struct IDirectDrawPalette 	   ;
-//DeadCode DAW 17Nov97 struct IDirectDrawClipper 		;
-//DeadCode DAW 17Nov97 								 ;
-//DeadCode DAW 17Nov97 struct _DDFXROP           		  ;
-//DeadCode DAW 17Nov97 struct _DDSURFACEDESC     		   ;
-//DeadCode DAW 17Nov97 struct IDirect3D					;
-//DeadCode DAW 17Nov97
-//DeadCode DAW 17Nov97
-//DeadCode DAW 17Nov97 typedef struct IDirectDraw             *LPDIRECTDRAW;
-//DeadCode DAW 17Nov97 typedef struct IDirectDraw2            *LPDIRECTDRAW2;
-//DeadCode DAW 17Nov97 typedef struct IDirectDrawSurface      *LPDIRECTDRAWSURFACE;
-//DeadCode DAW 17Nov97 typedef struct IDirectDrawSurface2     *LPDIRECTDRAWSURFACE2;
-//DeadCode DAW 17Nov97
-//DeadCode DAW 17Nov97 typedef struct IDirectDrawPalette      *LPDIRECTDRAWPALETTE;
-//DeadCode DAW 17Nov97 typedef struct IDirectDrawClipper      *LPDIRECTDRAWCLIPPER;
-//DeadCode DAW 17Nov97
-//DeadCode DAW 17Nov97 typedef struct _DDFXROP                *LPDDFXROP;
-//DeadCode DAW 17Nov97 typedef struct _DDSURFACEDESC          *LPDDSURFACEDESC;
-//DeadCode DAW 17Nov97 typedef struct IDirect3D			*LPDIRECT3D;				//PD 03Feb97
 
 template	<class	enumtype,int minval,int maxval> class	MakeField;
 #define	MAKEFIELD(src,minval,maxval)		\

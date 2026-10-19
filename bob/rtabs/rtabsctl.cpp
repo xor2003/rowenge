@@ -801,7 +801,6 @@ CWnd* CRTabsCtrl::SelectTabBody(long tab)
 		}
 		else if (x==m_iCurrentSelection) pWnd->ShowWindow(SW_HIDE);
 	}
-//DEADCODE RDH 28/02/99 	GetParent()->SendMessage(WM_PLAYSOUND,FIL_SFX_OFFICE_DRAWER_SLIDE,NULL);
 	return currentWindow;
 }
 

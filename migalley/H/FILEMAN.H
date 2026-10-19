@@ -48,9 +48,6 @@ extern class	FileMan File_Man;
 typedef class	fileblock *fileblockptr;
 
 typedef	char	voidbigblock;
-//Old_Code PD 13Oct95 #ifndef	_STDIO_H_INCLUDED
-//Old_Code PD 13Oct95 struct	FILE;
-//Old_Code PD 13Oct95 #endif
 //typedef 	FILE	*file;
 
 typedef  void	filetrans
@@ -194,8 +191,8 @@ public:
 
 inline	ULong	getsize(fileblock&		fb)	{return(fb.getsize());};
 inline  void*	getdata(fileblock&		fb)	{return(fb.getdata());};
-inline	ULong	getsize(fileblockptr	fb)	{return(fb->getsize());};
-inline  void*	getdata(fileblockptr	fb)	{return(fb->getdata());};
+inline	ULong	getsize(fileblockptr	fb)	{return(fb?fb->getsize():0);};
+inline  void*	getdata(fileblockptr	fb)	{return(fb?fb->getdata():NULL);};
 
 
 //typedef	uword	dirindex;
@@ -321,13 +318,6 @@ string		pathnameptr;
 		UWord	CDGetDirectoryEntry(struct dir_entry*,string);	//PD 30Oct96
 		UWord	CDSeek(ULong);									//PD 30Oct96
 		UWord	CDReadFileBlock(ULong,void*,ULong);				//PD 30Oct96
-//Old_Code PD 18Nov96 		void	CDReSeek();										//PD 04Nov96
-//Old_Code PD 18Nov96 		void	CDMakeFileBlock(fileblock*,
-//Old_Code PD 18Nov96 								fileblocklink*,
-//Old_Code PD 18Nov96 								FileNum,
-//Old_Code PD 18Nov96 								ULong,
-//Old_Code PD 18Nov96 								ULong);							//PD 04Nov96
-//Old_Code PD 18Nov96 		Bool	CDgetthedata;									//PD 04Nov96
 
 public:															//JIM 10May96
 void		InitFileSystem();

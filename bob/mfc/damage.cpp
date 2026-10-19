@@ -198,8 +198,6 @@ void CDamage::DoDataExchange(CDataExchange* pDX)
 							totaleltc++;
 				displayline+=CSprintf(fractionformat,0,totaleltc);
 
-		//DEADCODE DAW 02/02/00 		l->AddString(RESSTRING(FULLY_F),1);
-		//DEADCODE DAW 02/02/00 		l->AddString(RESSTRING(F_FUNCTIONAL),2);
 			}
 		}
 	}
@@ -225,7 +223,6 @@ void CDamage::DoDataExchange(CDataExchange* pDX)
 			{
 				UniqueID startpoint=UID_NULL;
 				UniqueID findpoint=(UniqueID)wavenum;
-//DEADCODE JIM 07/06/99 							if (wavenum!=groupnum)
 				{
 					if (!DeadStream::MainWorldBand(UniqueID(i)))
 						startpoint=findpoint;
@@ -279,8 +276,6 @@ void CDamage::DoDataExchange(CDataExchange* pDX)
 
 void	CDamage::FillList()
 {
-//DeadCode JIM 20Oct00 	int setindex=-1;
-//DeadCode JIM 20Oct00 	int listlen=0;
 	CRListBox*	l=GETDLGITEM(IDC_LIST_ELEMENTS);
 	l->Clear();
 	//Find damage info for group
@@ -347,7 +342,6 @@ END_MESSAGE_MAP()
 BEGIN_EVENTSINK_MAP(CDamage, CDialog)
     //{{AFX_EVENTSINK_MAP(CDamage)
 	ON_EVENT(CDamage, IDC_COMBO_ELEMENTS, 1 /* TextChanged */, OnTextChangedComboElements, VTS_BSTR VTS_I2)
-//DEADCODE DAW 02/02/00 	ON_EVENT(CDamage, IDC_LIST_ELEMENTS, 1 /* Select */, OnSelectListElements, VTS_I4 VTS_I4)
 	//}}AFX_EVENTSINK_MAP
 END_EVENTSINK_MAP()
 
@@ -357,55 +351,13 @@ void CDamage::OnTextChangedComboElements(LPCTSTR text, short index)
   	CRCombo* combo;
 	combo=GETDLGITEM(IDC_COMBO_ELEMENTS);
 	int comboindex = combo->GetIndex();	
-//DEADCODE RDH 16/05/00 	if (comboindex==0)
 		groupnum=internalUIDList[comboindex];
-//DEADCODE RDH 16/05/00 	else
-//DEADCODE RDH 16/05/00 	{
-//DEADCODE RDH 16/05/00 		internalUIDList
-//DEADCODE RDH 16/05/00 		info_itemS*	p;
-//DEADCODE RDH 16/05/00 		UniqueIDBand band;
-//DEADCODE RDH 16/05/00 		for (int i=BritAAASiteBAND;i<WorldStuff::PITEMTABLESIZE;i++)
-//DEADCODE RDH 16/05/00 			if (	((p=Persons2::ConvertPtrUID(UniqueID(i)))!=NULL)
-//DEADCODE RDH 16/05/00 				&&	(p->SGT==wavenum && p->shape.Evaluate()!=EMPTY)
-//DEADCODE RDH 16/05/00 				&&	(band=Persons2::getbandfromUID(UniqueID(i)))!=0
-//DEADCODE RDH 16/05/00 				&&	band!=LandscapeBAND
-//DEADCODE RDH 16/05/00 				)
-//DEADCODE RDH 16/05/00 				if (--comboindex==0)
-//DEADCODE RDH 16/05/00 					groupnum=i;
-//DEADCODE RDH 16/05/00 	}
 	m_pView->m_mapdlg.ResetIcon(UniqueID(groupnum));
 	FillList();
 }
 
 void CDamage::OnSelectListElements(long row, long column) 
 {
-//DEADCODE DAW 02/02/00 	// TODO: Add your control notification handler code here
-//DEADCODE DAW 02/02/00 
-//DEADCODE DAW 02/02/00 //	m_pView->m_mapdlg.ResetIcon(damagedelements[row-1].loadedid);
-//DEADCODE DAW 02/02/00 	row--;
-//DEADCODE DAW 02/02/00 	UniqueID rv=UID_NULL;
-//DEADCODE DAW 02/02/00 	if (mode==M_ALL)
-//DEADCODE DAW 02/02/00 	{
-//DEADCODE DAW 02/02/00 		if (row==0)
-//DEADCODE DAW 02/02/00 			rv=UniqueID(wavenum);
-//DEADCODE DAW 02/02/00 		else
-//DEADCODE DAW 02/02/00 		{
-//DEADCODE DAW 02/02/00 			info_itemS*	p;
-//DEADCODE DAW 02/02/00 			for (int i=0;i<WorldStuff::PITEMTABLESIZE;i++)
-//DEADCODE DAW 02/02/00 				if ((p=*Persons2::ConvertPtrUID(UniqueID(i)))!=NULL)
-//DEADCODE DAW 02/02/00 					if (p->SGT==wavenum && p->shape.Evaluate()!=EMPTY) //DAW 07/06/99
-//DEADCODE DAW 02/02/00 						if (!--row)
-//DEADCODE DAW 02/02/00 							rv=UniqueID(i);
-//DEADCODE DAW 02/02/00 		}
-//DEADCODE DAW 02/02/00 	}
-//DEADCODE DAW 02/02/00 	else
-//DEADCODE DAW 02/02/00 	if (mode==M_DAMAGED)
-//DEADCODE DAW 02/02/00 	{
-//DEADCODE DAW 02/02/00 		if (numdamagedelts)
-//DEADCODE DAW 02/02/00 			rv=damagedelements[row].loadedid;
-//DEADCODE DAW 02/02/00 	}
-//DEADCODE DAW 02/02/00 	if (rv)
-//DEADCODE DAW 02/02/00 		m_pView->m_mapdlg.ResetIcon(rv);
 }
 
 /////////////////////////////////////////////////////
@@ -426,9 +378,6 @@ void CDamage::OnSelectListElements(long row, long column)
 //////////////////////////////////////////////////////////////////////
 bool	FormationItem::EnoughDamage3D(ItemPtr currtarget)
 {
-//DEADCODE JIM 22/03/00 	if ((duty&DUTYMASK)==DC_WW)
-//DEADCODE JIM 22/03/00 		return (currtarget->Status.deadtime!=0);
-//DEADCODE JIM 22/03/00 	else
 	if (!currtarget)
 		return	true;
 	else
@@ -446,7 +395,6 @@ bool	FormationItem::EnoughDamage3D(ItemPtr currtarget)
 		if (SGT==UID_NULL)
 			SGT=currtarget->uniqueID.count;
 		ItemPtr	test=*Persons2::ConvertPtrUID(SGT);
-//DeadCode JIM 20Oct00 		int	lowestdamage=900;
 		int	scan=-1;
 		int	totaltokens=0,deadtokens=0;
 		int	totalpoints=0,deadpoints=0;
@@ -520,18 +468,12 @@ ItemPtr	FormationItem::SelectTarget(ItemPtr currtarget,int* selectedelt,int coun
 			//count up live tokens
 			//if (damage-100*livetokens>700)
 			//		pick another target
-//DEADCODE DAW 01/07/99 			Bool	bombableSGT=CheckForWeapon(LT_BOMB);			  //DAW 01/07/99
 			UniqueID SGT=currtarget->SGT;
 			if (SGT==UID_NULL)
 				SGT=currtarget->uniqueID.count;
 			
-//DeadCode DAW 01Jul99 			if (!bombableSGT && Persons2::getbandfromUID(SGT)!=AmberAirfieldBAND && Persons2::getbandfromUID(SGT)!=AmberBridgeBAND)
-//DeadCode DAW 01Jul99 				bombableSGT=TRUE;
 
 			int damage=0,livetokens=0;
-//DeadCode DAW 01Jul99 			if (!bombableSGT && !currtarget->SGT)
-//DeadCode DAW 01Jul99 				damage=800;
-//DeadCode DAW 01Jul99 			else
 			if (currtarget->shape==EMPTY)
 				damage=1000;
 			else
@@ -541,29 +483,16 @@ ItemPtr	FormationItem::SelectTarget(ItemPtr currtarget,int* selectedelt,int coun
 					else
 						if (gi.IsStoresToken())
 							livetokens++;
-//DEADCODE JIM 22/03/00 			if ((duty&DUTYMASK)==DC_WW)
-//DEADCODE JIM 22/03/00 			{
-//DEADCODE JIM 22/03/00 				if (selectedelt)
-//DEADCODE JIM 22/03/00 					*selectedelt=SelectElement(rv,counter);
-//DEADCODE JIM 22/03/00 				rv=currtarget;
-//DEADCODE JIM 22/03/00 			}
-//DEADCODE JIM 22/03/00 			else
 			if (damage-livetokens*100<700)
 				rv=currtarget;
 			else
 			{
-//DeadCode DAW 27Jun99 				UniqueID SGT=currtarget->SGT;
-//DeadCode DAW 27Jun99 				if (SGT==UID_NULL)
-//DeadCode DAW 27Jun99 					SGT=currtarget->uniqueID.count;
 				ItemPtr	test=*Persons2::ConvertPtrUID(SGT);
 				int	lowestdamage=900;
 				int	scan=-1;
 				if (test)
 					do{
 						damage=0;livetokens=0;
-//DeadCode DAW 01Jul99 						if (!bombableSGT)
-//DeadCode DAW 01Jul99 							damage=1000;
-//DeadCode DAW 01Jul99 						else
 
 						if (currtarget->shape==EMPTY)
 							damage=1000;
@@ -576,7 +505,6 @@ ItemPtr	FormationItem::SelectTarget(ItemPtr currtarget,int* selectedelt,int coun
 									if (gi.IsStoresToken())
 										livetokens++;
 							}
-//DeadCode DAW 01Jul99 						bombableSGT=TRUE;
 						if (damage-livetokens*200<lowestdamage)
 						{
 							rv=test;
@@ -594,39 +522,11 @@ ItemPtr	FormationItem::SelectTarget(ItemPtr currtarget,int* selectedelt,int coun
 			if (rv && selectedelt)												//DAW 27Jun99
 				*selectedelt=SelectElement(rv,counter);			//DAW 27Jun99
 		}
-//DeadCode DAW 27Jun99 	if (rv && selectedelt)
-//DeadCode DAW 27Jun99 		if (rv->Status.size>=FORMATIONSIZE)
-//DeadCode DAW 27Jun99 		{
-//DeadCode DAW 27Jun99 			selectedelt=0;
-//DeadCode DAW 27Jun99 			rv=SelectConvoyMember(*rv,counter);
-//DeadCode DAW 27Jun99 		}
-//DeadCode DAW 27Jun99 		else
 	if(!rv)
 		return currtarget;
 	return	rv;
 }
 
-//DeadCode DAW 27Jun99 FormationItemPtr	FormationItem::SelectConvoyMember(FormationItemPtr curr,int count)
-//DeadCode DAW 27Jun99 {
-//DeadCode DAW 27Jun99 	if (count)
-//DeadCode DAW 27Jun99 	{
-//DeadCode DAW 27Jun99 		if (curr->Leader())
-//DeadCode DAW 27Jun99 		{
-//DeadCode DAW 27Jun99 			count--;
-//DeadCode DAW 27Jun99 			curr=curr->Leader();
-//DeadCode DAW 27Jun99 		}
-//DeadCode DAW 27Jun99 		while (count)
-//DeadCode DAW 27Jun99 		{
-//DeadCode DAW 27Jun99 			if (curr->follower)
-//DeadCode DAW 27Jun99 				curr=curr->Follower();
-//DeadCode DAW 27Jun99 			else
-//DeadCode DAW 27Jun99 				if (curr->Leader())
-//DeadCode DAW 27Jun99 					curr=curr->Leader();	//make it loop....
-//DeadCode DAW 27Jun99 			count--;
-//DeadCode DAW 27Jun99 		}
-//DeadCode DAW 27Jun99 	}
-//DeadCode DAW 27Jun99 	return curr;
-//DeadCode DAW 27Jun99 }
 
 bool	FormationItem::SelectedElement(ItemPtr currtarget,int counter/*=0*/,Coords3D* coords/*=&despos*/)
 {
@@ -770,10 +670,6 @@ void	GroupItterator::InitGroupFields()
 						MinAnimData*	mad = (MinAnimData*) animdata;
 						status = mad->itemstate;
 						deadittfirstbyteptr=&animdata[0];		//RJS 27Apr99 //CSB 04/06/99
-//DEADCODE DAW 26/04/99 #pragma message ("Deadbits need fixing Robert")
-//DEADCODE DAW 26/04/99 						deadittfirstbyte=*animptr;
-//DEADCODE DAW 26/04/99 						status = ((MinAnimData*)animdata)->itemstate;
-//DeadCode DAW 26Apr99 						status = ((MinAnimData*)animptr)->itemstate;
 					}
 					percentdamage=ptr->element_number;
 				}
@@ -801,11 +697,9 @@ void	GroupItterator::InitGroupFields()
 			status = mad->itemstate;
 
 			deadittfirstbyteptr=&animdata[0];		//RJS 27Apr99	  //CSB 04/06/99
-//DEADCODE DAW 26/04/99 			status = ((MinAnimData*)animdata)->itemstate;
 		}
 		percentdamage=300;
 
-//DEADCODE RDH 20/05/99 		hitlimit=true;
 	}
 }
 
@@ -1045,8 +939,6 @@ char*	GroupItterator::PostLauncherDataLoc()
 		animptr	newanimdata = animdata;
 
 		newanimdata += EltLauncherDataSize(newanimdata);	//RJS 27Apr99
-//DEADCODE DAW 28/04/99 Now in ELDS
-//DEADCODE DAW 28/04/99 		newanimdata += sizeof(MinAnimData);
 
 		return((char*)&newanimdata);
 	}
@@ -1070,13 +962,11 @@ void	GroupItterator::ResetLaunchers()
 {
 	if (animdata != NULL)
 	{
-//DeadCode RJS 21Apr99 		animptr			mad = animdata;
 		MinAnimData*	madold = (MinAnimData*) animdata;
 
 		UByte	oldinvisible = madold->IsInvisible;
 
 		SHAPE.InitGlobalItem();
-//DeadCode RJS 21Apr99 		SHAPE.InitItemAnim(mad,shape);
 		SHAPE.InitItemAnim(animdata,shape);						//RJS 21Apr99
 
 		madold->IsInvisible = oldinvisible;

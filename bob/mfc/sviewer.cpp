@@ -94,10 +94,6 @@ static char THIS_FILE[] = __FILE__;
 
 
 //##need to change heads up save game variable
-//DEADCODE RDH 02/04/99 	SETFIELD(BIT(gamedifficulty,GD_GUNCAMERAATSTART),				IDC_CBO_GUNCAMERAONATSTART,RESCOMBO(OFF,2),		NOLEVEL)	\
-//DEADCODE RDH 02/04/99 	SETFIELD(BIT(gamedifficulty,GD_GUNCAMERAONTRIGGER),				IDC_CBO_CAMERAONTRIGGER,RESCOMBO(OFF,2),		NOLEVEL)	\
-
-
 CSViewer::CSViewer(CWnd* pParent /*=NULL*/)
 	: RowanDialog(CSViewer::IDD, pParent)
 {
@@ -145,16 +141,6 @@ void CSViewer::DoDataExchange(CDataExchange* pDX)
 #define	SG2C_DISPLAY setlevel
 #include "sg2combo.h"
 	OPTIONS	
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_MULTIPLAYER_VIEW.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_PERIPHERAL_VISION.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_AUTO_PADLOCK.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_VIEW_MODE_SELECT.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_PADLOCK.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_CAMERACOLOUR.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_UNITS.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_GUNCAMERAONATSTART.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_HEADSUPDISPLAY.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 	m_IDC_CBO_INFOLINE.SetCircularStyle(TRUE);
 //
 
 }
@@ -203,13 +189,9 @@ BOOL CSViewer::OnInitDialog()
 
 	if (_DPlay.PlayerCreated)									//AMM 12Jul99
 	{															//AMM 12Jul99
-//DeadCode AMM 16Nov99 		_DPlay.UISendInPrefsMessage();							//AMM 12Jul99
-//DeadCode AMM 16Nov99 		DPlay::H2H_Player[_DPlay.mySlot].status=CPS_PREFS;		//AMM 12Jul99
 		_DPlay.SendStatusChange(DPlay::CPS_PREFS);
 	}															//AMM 12Jul99
 
-//DeadCode AMM 31Mar99 	if (RFullPanelDial::gamestate!=RFullPanelDial::TITLE)						//AMM 31Mar99
-//DeadCode AMM 31Mar99 		_Replay.prefscheck=true;								//AMM 31Mar99
 	
 	ViewsPref_Timer=SetTimer(DPlay::TIMER_PREFSVIEWS,0,NULL);
 
@@ -222,8 +204,6 @@ BOOL CSViewer::OnInitDialog()
 		combo->SetEnabled(false);
 		combo=GETDLGITEM(IDC_CBO_PERIPHERAL_VISION);
 		combo->SetEnabled(false);
-//DeadCode AMM 12Jul99 		combo=GETDLGITEM(IDC_CBO_AUTO_PADLOCK);
-//DeadCode AMM 12Jul99 		combo->SetEnabled(false);
 		combo=GETDLGITEM(IDC_CBO_VIEW_MODE_SELECT);
 		combo->SetEnabled(false);
 		combo=GETDLGITEM(IDC_CBO_PADLOCK);
@@ -237,8 +217,6 @@ BOOL CSViewer::OnInitDialog()
 		combo->SetEnabled(true);
 		combo=GETDLGITEM(IDC_CBO_PERIPHERAL_VISION);
 		combo->SetEnabled(true);
-//DeadCode AMM 12Jul99 		combo=GETDLGITEM(IDC_CBO_AUTO_PADLOCK);
-//DeadCode AMM 12Jul99 		combo->SetEnabled(true);
 		combo=GETDLGITEM(IDC_CBO_VIEW_MODE_SELECT);
 		combo->SetEnabled(true);
 		combo=GETDLGITEM(IDC_CBO_PADLOCK);
@@ -249,10 +227,6 @@ BOOL CSViewer::OnInitDialog()
 
 	if (RFullPanelDial::incomms)
 	{
-//DeadCode  26Sep00 		combo=GETDLGITEM(IDC_CBO_CAMERACOLOUR);
-//DeadCode  26Sep00 		combo->SetEnabled(false);
-//DeadCode AMM 25May99 		combo=GETDLGITEM(IDC_CBO_UNITS);
-//DeadCode AMM 25May99 		combo->SetEnabled(false);
 		combo=GETDLGITEM(IDC_CBO_GUNCAMERAONATSTART);
 		combo->SetEnabled(false);
 	}

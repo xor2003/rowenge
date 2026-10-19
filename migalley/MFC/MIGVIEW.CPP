@@ -854,16 +854,6 @@ int	CMIGView::WorldXY(Coords3D& w,int sx,int sy)
 	return WorldXY((int&)w.X,(int&)w.Z,sx,sy);
 }
 
-//DeadCode JIM 19Feb99 BOOL CMIGView::IsIconVisible(ItemBasePtr p, int&px, int&py)
-//DeadCode JIM 19Feb99 {
-//DeadCode JIM 19Feb99 	ScreenXY(p,px,py,m_scrollpoint.x,m_scrollpoint.y);
-//DeadCode JIM 19Feb99 	CRect rect;
-//DeadCode JIM 19Feb99 	GetClientRect(rect);
-//DeadCode JIM 19Feb99 	if (rect.IntersectRect(rect,CRect(px,py,px+m_iconradius*2,py+m_iconradius*2)))
-//DeadCode JIM 19Feb99 		return TRUE;
-//DeadCode JIM 19Feb99 	else
-//DeadCode JIM 19Feb99 		return FALSE;
-//DeadCode JIM 19Feb99 }
 
 void	CMIGView::DrawIcon(HDC hDC,int px,int py,BYTE* pData,BITMAPINFO* pInfo)
 {
@@ -895,11 +885,6 @@ void CMIGView::Zoom(CPoint screenpoint,bool redrawscalebar)
 		m_iconradius=12;
 	else 
 		m_iconradius=3;
-//DeadCode RDH 30Mar99 	m_scrollpoint += screenpoint;
-//DeadCode RDH 30Mar99 	m_scrollpoint = CPoint(m_scrollpoint.x*(m_zoom/m_oldzoom),m_scrollpoint.y*(m_zoom/m_oldzoom));
-//DeadCode RDH 30Mar99 	m_scrollpoint -= screenpoint;
-//DeadCode RDH 30Mar99 	m_size.cx=m_size.cx*(m_zoom/m_oldzoom);
-//DeadCode RDH 30Mar99 	m_size.cy=m_size.cy*(m_zoom/m_oldzoom);
 
 
 	CRect rect;
@@ -1202,10 +1187,6 @@ void CMIGView::PlotLine(CDC* pDC, UniqueID thiswp,UniqueID nextwp,BOOL japanwp)
 		pt1=Persons2::ConvertPtrUID(UniqueID(thiswp));
 		pt2=Persons2::ConvertPtrUID(UniqueID(nextwp));
 		if (!pt1 || !pt2) return;
-//DEADCODE RDH 18/04/99 		if (japanwp)
-//DEADCODE RDH 18/04/99 			ScreenXY(pt1->World.X + 40000000,pt1->World.Z - 20000000,
-//DEADCODE RDH 18/04/99 						px1,py1,-m_scrollpoint.x,-m_scrollpoint.y);
-//DEADCODE RDH 18/04/99 		else
 		ScreenXY(pt1,px1,py1,-m_scrollpoint.x,-m_scrollpoint.y);
 //rdh		if (japanwp)
 //			ScreenXY(pt2->World.X + 40000000,pt2->World.Z - 20000000,px2,py2,-m_scrollpoint.x,-m_scrollpoint.y);
@@ -1287,9 +1268,6 @@ void CMIGView::PlotMainRoute(CDC* pDC, SupplyLine* SL, int red, int green, int b
 //or should this be new ?
 // no comments so I cannot tell
 // commented out version crashes on entry to the map
-//Old_Code DAW 26Nov98 	while (			(count < 80)
-//Old_Code DAW 26Nov98 				&&	(currnode->forward->suppliee != NULL)
-//Old_Code DAW 26Nov98 			)
 	{
 		currroute = currnode->forward;
 		pt2=Persons2::ConvertPtrUID(UniqueID(currroute->suppliee->associated_item));
@@ -1459,21 +1437,6 @@ void CMIGView::PlotSupplyingRoutes(CDC* pDC)
 		for (int i = 0; i< 3; i++)
 		{
 			
-//DEADCODE DAW 14/05/99 			if (currnode->supplyline == &SupplyTree::WestRoute)
-//DEADCODE DAW 14/05/99 			{
-//DEADCODE DAW 14/05/99 				CPen pen (PS_SOLID,1,RGB(255,0,0));
-//DEADCODE DAW 14/05/99 				oldpen=pDC->SelectObject(&pen);
-//DEADCODE DAW 14/05/99 			}
-//DEADCODE DAW 14/05/99 			if (currnode->supplyline == &SupplyTree::CentralRoute)
-//DEADCODE DAW 14/05/99 			{
-//DEADCODE DAW 14/05/99 				CPen pen (PS_SOLID,1,RGB(0,255,0));
-//DEADCODE DAW 14/05/99 				oldpen=pDC->SelectObject(&pen);
-//DEADCODE DAW 14/05/99 			}
-//DEADCODE DAW 14/05/99 			if (currnode->supplyline == &SupplyTree::EastRoute)
-//DEADCODE DAW 14/05/99 			{
-//DEADCODE DAW 14/05/99 				CPen pen (PS_SOLID,1,RGB(0,0,255));
-//DEADCODE DAW 14/05/99 				oldpen=pDC->SelectObject(&pen);
-//DEADCODE DAW 14/05/99 			}
 
 			pDC->MoveTo(px1,py1);
 			if (currnode->route[i])
@@ -1573,15 +1536,6 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,UniqueID
 		dodrawonsize=false;
 	else
 	{
-//DeadCode DAW 22Jun99 		if (p->Status.deaded)
-//DeadCode DAW 22Jun99 		{
-//DeadCode DAW 22Jun99 			if (hilight)
-//DeadCode DAW 22Jun99 				filenum =FIL_ICON_DEAD_ON;
-//DeadCode DAW 22Jun99 			else
-//DeadCode DAW 22Jun99 				filenum =FIL_ICON_DEAD_OFF;
-//DeadCode DAW 22Jun99 			dodrawonsize=false;
-//DeadCode DAW 22Jun99 		}
-//DeadCode DAW 22Jun99 		else
 
 		if (((info_base*)p)->SGT != UID_Null)
 			if (((Item*)p)->shape == EMPTY)
@@ -1600,14 +1554,6 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,UniqueID
 
 	
 
-//DEADCODE RDH 13/02/99 	if (	 ( 	(SupplyTree::WestRoute.frontline->associated_item == i)
-//DEADCODE RDH 13/02/99 				||	(SupplyTree::CentralRoute.frontline->associated_item == i)
-//DEADCODE RDH 13/02/99 				||	(SupplyTree::EastRoute.frontline->associated_item == i)
-//DEADCODE RDH 13/02/99 			 )
-//DEADCODE RDH 13/02/99 		  &&	(		(Save_Data.mapfilters[FILT_FRONTLINE])
-//DEADCODE RDH 13/02/99 				||	(hilight)
-//DEADCODE RDH 13/02/99 					)
-//DEADCODE RDH 13/02/99 		)
 	// Route chain is unpopulated until a campaign/battlefield loads (map
 	// launched straight from the menus) - an empty chain just means this
 	// item is not a frontline position.
@@ -1960,17 +1906,6 @@ FileNum  CMIGView::DrawIconTest(ItemBasePtr p, UniqueID i, bool hilight,UniqueID
 				}
 				break;
 			}
-//DEADCODE RDH 22/06/99 			case		RedTroopBAND:
-//DEADCODE RDH 22/06/99 			{
-//DEADCODE RDH 22/06/99 				if (		(Save_Data.mapfilters[FILT_RED_TROOP])
-//DEADCODE RDH 22/06/99 						||	(hilight)
-//DEADCODE RDH 22/06/99 					)
-//DEADCODE RDH 22/06/99 				{
-//DEADCODE RDH 22/06/99 					filenum =FIL_ICON_R_CIVILIAN_ON;
-//DEADCODE RDH 22/06/99 					hifilenum =FIL_ICON_R_CIVILIAN_OFF2;
-//DEADCODE RDH 22/06/99 				}
-//DEADCODE RDH 22/06/99 				break;
-//DEADCODE RDH 22/06/99 			}
 			case		BlueTroopBAND:
 			{
 				if (		(Save_Data.mapfilters[FILT_BLUE_TROOP])
@@ -2583,7 +2518,6 @@ void CMIGView::UpdateBitmaps(CDC* pDC)
 	}
 
 	PlotDebugInfo(pDC);
-//DEADCODE JIM 29/05/99 	m_oldzoom=m_zoom;
 	m_drawing=FALSE;
 }
 /*
@@ -2707,16 +2641,6 @@ void CMIGView::OnMove(int x, int y)
 {
 	CView::OnMove(x, y);
 	
-//DEADCODE DAW 07/05/99 	// TODO: Add your message handler code here
-//DEADCODE DAW 07/05/99 	if (m_doIexist>2)
-//DEADCODE DAW 07/05/99 	{
-//DEADCODE DAW 07/05/99 		if (m_pfullpane) m_pfullpane->UpdateSize();
-//DEADCODE DAW 07/05/99 		if (m_currentpage==0) m_mapdlg.Invalidate();
-//DEADCODE DAW 07/05/99 //DeadCode JIM 15Jul98 		UpdateBitmaps();
-//DEADCODE DAW 07/05/99 //DeadCode JIM 15Jul98 		if (m_pfullpane) m_pfullpane->UpdateSize();
-//DEADCODE DAW 07/05/99 		RecalcLayout();
-//DEADCODE DAW 07/05/99 	}
-//DEADCODE DAW 07/05/99 //	UpdateScrollbars();
 	
 }
 
@@ -2727,8 +2651,6 @@ void CMIGView::OnSize(UINT nType, int cx, int cy)
 	{
 		if (m_pfullpane) m_pfullpane->UpdateSize();
 		if (m_currentpage==0) m_mapdlg.Invalidate();
-//DeadCode JIM 15Jul98 		UpdateBitmaps();
-//DeadCode JIM 15Jul98 		if (m_pfullpane) m_pfullpane->UpdateSize();
 	}
 	UpdateScrollbars();
 	m_doIexist++; // window only exists after it has been initially sized twice.
@@ -2737,7 +2659,6 @@ void CMIGView::OnSize(UINT nType, int cx, int cy)
 BOOL CMIGView::OnEraseBkgnd(CDC* pDC) 
 {
 	if (m_currentpage!=0)
-//DEADCODE JIM 19/06/99 		if (Rtestsh1::Start3d(Rtestsh1::S3D_DONEBACK))
 		{
 			CRect rect;
 			GetClientRect(rect);

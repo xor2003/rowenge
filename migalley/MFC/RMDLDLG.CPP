@@ -219,10 +219,6 @@ BOOL RMdlDlg::OnInitDialog()
 	// scale due to font size change
 	// xfactor seems to be slightly smaller than yfactor
 	// for some reason
-//DEADCODE JIM 18/08/99 	float yfactor=96.0f/RDialog::fontdpi;
-//DEADCODE JIM 18/08/99 	float xfactor=yfactor;
-//DEADCODE JIM 18/08/99 	if (xfactor!=1.0f)
-//DEADCODE JIM 18/08/99 		xfactor*=0.94f; // fiddle factor
 	CRect rect;
 	CRect parentrect;
 	CWnd* pControl;

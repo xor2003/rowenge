@@ -91,8 +91,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include	"winmove.h"													//RJS 12Oct00
 
 //#define	 REPLAYWPCHECK
-//DeadCode JIM 28Mar96 extern	PlaneType&	camel;										//RDH 23Feb96
-//Old_Code PD 27Aug96  	MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);
 //	extern	ULong	GR_FriendlyScoutType00;
 //	extern	ULong	GR_GlobalSkillMin;
 //	extern	ULong	GR_GlobalSkillMax;
@@ -106,7 +104,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 
 	extern	ULong	GR_Pack_Sq_Used[PT_GER_NONFLY+1];	//inc Yak
-//DEADCODE JIM 09/12/99 	AirStrucPtr	Persons3::migsq[2];
 //Nationality		defaultside=NAT_GREEN;
 
 //ItemBasePtr		*Persons2::pItem;
@@ -135,7 +132,6 @@ CON	Persons3::Persons3(WorldStuff* world,ViewPoint* vp,Inst3d* inst):
 {
 	inst3d=inst;
 	gotgrpnum=1;
-//DEADCODE JIM 09/12/99 	migsq[0]=migsq[1]=NULL;
 	baseSAGshape=ShapeNum(SAG00-1);
 	pilotedaircraft=NULL;
 	for (int i=0;i<PT_VEHICLES;	i++)
@@ -327,10 +323,6 @@ UniqueID	Persons3::Make3dAC(PlaneTypeSelect type)
 	Persons3::Reset3dAC(currac,type);
 	//ColourRulePlayerSquadron
 	SHAPE.SetAnimData(currac);
-//DEADCODE JIM 15/03/00 	AircraftAnimData*	anim=(AircraftAnimData*)currac->Anim;
-//DEADCODE JIM 15/03/00 	anim->imagemapacid1 = 1;							//RJS 11Mar99
-//DEADCODE JIM 15/03/00 	anim->imagemapacid2 = 2;							//RJS 11Mar99
-//DEADCODE JIM 15/03/00 	anim->imagemapacid3 = 3;							//RJS 11Mar99
 	Manual_Pilot.InitManualPilotSub(currac);
 	logUID(currac);
 	currac->AddToList();
@@ -350,8 +342,6 @@ void	Persons3::Reset3dAC(AirStruc*	currac,PlaneTypeSelect type)
 	currac->ai.attacker=NULL;
 	currac->ai.homebase=NULL;
 
-//DeadCode CSB 21Aug00 	for (int n=0;n<3;n++)												//AMM 23/02/00
-//DeadCode CSB 21Aug00 		currac->ai.secondunfriendly[n]=NULL;							//AMM 23/02/00
 	for(int n = 0; n < 4; n++)
 		currac->ai.spottedunfriendly[n] = NULL;								//CSB 21Aug00
 
@@ -373,7 +363,6 @@ void	Persons3::Reset3dAC(AirStruc*	currac,PlaneTypeSelect type)
 	currac->vel_x =0;
 	currac->vel_y =0;
 	currac->vel_z =0;
-//DEADCODE JIM 10/12/99 	currac->fly.vel_cms = 	0;
 	currac->fly.cpitch = ANGLES_0Deg;
 	currac->fly.aileron = 0;
 	currac->fly.elevator = 0;
@@ -389,9 +378,6 @@ void	Persons3::Reset3dAC(AirStruc*	currac,PlaneTypeSelect type)
   	currac->fly.rpm = currac->classtype->maxrpm;									//JIM 21Oct96	//CSB 23/02/00
 	currac->fly.thrustpercent = 0;							//JIM 21Oct96	//CSB 23/02/00
 	for(SWord i = 0; i < 4; i++)
-//DeadCode JIM 24Jul00 		if((currac->classtype->visible == ME109) && (Save_Data.flightdifficulty[FD_109FUEL]))
-//DeadCode JIM 24Jul00 			currac->fly.fuel_content[i] = currac->classtype->fueltankcap[i] * 1750;
-//DeadCode JIM 24Jul00 		else
 			currac->fly.fuel_content[i] = currac->classtype->fueltankcap[i] * 1000;
 
 	currac->ai.manoeuvre=MANOEUVRE_SELECT;
@@ -432,9 +418,6 @@ void	Persons3::Reset3dAC(AirStruc*	currac,PlaneTypeSelect type)
 //Returns
 //
 //------------------------------------------------------------------------------
-//DEADCODE JIM 09/12/99 static	SByte	Skill_Per_Period[]=
-//DEADCODE JIM 09/12/99 //		day0	day1	day2	day3	day4	day5	day6	day7	day8
-//DEADCODE JIM 09/12/99 {22,	0,1,2,	2,3,3,	4,4,4,	5,5,5,	5,4,4,	3,3,2,	2,1,1,	0,0,0};
 
 void	Persons3::make_airgrp(info_airgrp& I)
 {
@@ -449,44 +432,15 @@ void	Persons3::make_airgrp(info_airgrp& I)
 	AirStruc	*firstac=NULL;
 	AirStruc	*flleadac=NULL;
 	AirStruc	*fllastac=NULL;
-//DEADCODE RJS 16/02/00 	int& GR_WaveNum=(int&)::GR_WaveNum;
-//DEADCODE JIM 14/01/00 	int		offsetinformationleaderflights;
 
-//DeadCode JIM 20Oct00 	int sqnum=I.squadname.Evaluate();
 	Squadron*	squadrec=NULL;
-//DEADCODE RJS 15/02/00 	if (sqnum==ENABLE_COMPLEX_VAL)
-//DEADCODE RJS 15/02/00 	{
-//DEADCODE RJS 15/02/00 		if (I.shape.Evaluate()==ENABLE_COMPLEX_VAL)
-//DEADCODE RJS 15/02/00 			if (GR_WaveNum<0)
-//DEADCODE RJS 15/02/00 			{
-//DEADCODE RJS 15/02/00 				sqnum=-int(GR_WaveNum--);
-//DEADCODE RJS 15/02/00 			}
-//DEADCODE RJS 15/02/00 			else
-//DEADCODE RJS 15/02/00 			{
-//DEADCODE RJS 15/02/00 				int grpnum=gotgrpnum;
-//DEADCODE RJS 15/02/00 				sqnum=(GR_Scram_Squad[GR_WaveNum-1]>>(grpnum*8))&255;
-//DEADCODE RJS 15/02/00 				if (sqnum==0)
-//DEADCODE RJS 15/02/00 					sqnum=(GR_Scram_Squad[GR_WaveNum-1])&255;
-//DEADCODE RJS 15/02/00 				sqnum++;
-//DEADCODE RJS 15/02/00 				sqnum&=127;
-//DEADCODE RJS 15/02/00 			}
-//DEADCODE RJS 15/02/00 		else
-//DEADCODE RJS 15/02/00 			sqnum=0;
-//DEADCODE RJS 15/02/00 	}
 	int v1;
 	if ((v1=I.type.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE RJS 15/02/00 		if (v1>SQ_BR_START)
 			squadrec=Node_Data[SquadNum(v1)];
 
 	FormationIndex estformpos=FormationIndexMIN;
-//DeadCode JIM 20Oct00 	int	wingcount=0;
 	int wingac=I.inwing.Evaluate();
 	int	formac=ENABLE_COMPLEX_VAL;
-//DEADCODE JIM 06/12/99 	if (wingac==ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 06/12/99 	{
-//DEADCODE JIM 06/12/99 		_Error.EmitSysErr("Old system for denoting piloted A/C has been binned");
-//DEADCODE JIM 06/12/99 	}
-//DEADCODE JIM 06/12/99 	else
 	{
 		formac=I.inform.Evaluate();
 	}
@@ -497,19 +451,10 @@ void	Persons3::make_airgrp(info_airgrp& I)
 		formation=(formation&FORMTYPE_WING)>>FORMTYPE_WING_SH;
 		int entries=Aircraft_Formations [formation]->GetPerFl(formac);//numentries;
 		wingac=entries;
-//DeadCode JIM 22Sep00 		while (entries%100>=10)
-//DeadCode JIM 22Sep00 		{
-//DeadCode JIM 22Sep00 			wingac=entries%10;
-//DeadCode JIM 22Sep00 			breakif(formac%wingac==0);
-//DeadCode JIM 22Sep00 			entries/=10;
-//DeadCode JIM 22Sep00 		}
-//DeadCode JIM 22Sep00 		if (wingac==4)
-//DeadCode JIM 22Sep00 			wingac=2;
 	}
 
 	int	realformac=formac;
 
-//DeadCode JIM 20Oct00 	int	takeofftime=GR_TakeOffTime;
 	TakeOffState	takeoffstate=TOS_SIMPLE;
 	//This time they are either in the air or on the ground
 	if (I.movecode.Evaluate()!=ENABLE_COMPLEX_VAL
@@ -641,7 +586,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 							//may want to use this info for player position as well somehow...
 
 						}
-//DeadCode JIM 20Sep00 						offsetinformationleaderflights=0;
 					}
 					else
 						offsetinformationleaderflights+=4;	//worst case... LW 3s of bombers
@@ -661,7 +605,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 					if (formationleaderflights[v2]>=0x100)
 					{
 						squadrec=&Node_Data[SquadNum(squadrec->squadron+(formationleaderflights[v2]>>8))];
-//DeadCode RJS 10Nov00 						squadrec+=(formationleaderflights[v2]>>8);
 						v1=squadnum=squadrec->squadron;
 						setpointer((ItemBase**)&currac->ai.homebase,squadrec->homeairfield);
 					}
@@ -809,19 +752,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 			{
 				currac->ai.pilotnum=ai_info::PROPER_PILOT_MAX+v1;
 
-//DeadCode AMM 5Sep00 				if (currac->nationality==NAT_RAF)
-//DeadCode AMM 5Sep00 				{
-//DeadCode AMM 5Sep00 					FILE* fp=fopen("acpltnum.txt","at");
-//DeadCode AMM 5Sep00 					UWord uid=currac->uniqueID.count;
-//DeadCode AMM 5Sep00 					UByte pos=currac->fly.originalformpos;
-//DeadCode AMM 5Sep00 					UWord pltnum=currac->ai.pilotnum;
-//DeadCode AMM 5Sep00 					UWord colmask=(currac->fly.originalformpos & InFormMAX)+1;
-//DeadCode AMM 5Sep00 					UWord nummask=(currac->fly.originalformpos & InWingMAX)+1;
-//DeadCode AMM 5Sep00 					UWord callname=currac->fly.callname;
-//DeadCode AMM 5Sep00 					UWord callnum=currac->fly.callnum;
-//DeadCode AMM 5Sep00 					fprintf(fp,"AC %x ofp %d pltnum %d sqcol %d sqnum %d callname %d callnum %d\n",uid,pos,pltnum,colmask,nummask,callname,callnum);
-//DeadCode AMM 5Sep00 					fclose(fp);
-//DeadCode AMM 5Sep00 				}
 			}
 
 			currac->classtype=Plane_Type_Translate[v2][0];
@@ -849,9 +779,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 
 			for(SWord i = 0; i < 4; i++)
 			{
-//DeadCode JIM 24Jul00 				if((currac->classtype->visible == ME109) && (Save_Data.flightdifficulty[FD_109FUEL]))
-//DeadCode JIM 24Jul00 					currac->fly.fuel_content[i] = currac->classtype->fueltankcap[i] * 1750;
-//DeadCode JIM 24Jul00 				else
 					currac->fly.fuel_content[i] = currac->classtype->fueltankcap[i] * 1000;
 			}
 
@@ -882,7 +809,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 			if ((v1=I.shape.Evaluate(estformpos))==ENABLE_COMPLEX_VAL)
 				if (!isSGT)
 					currac->shape=currac->GetDrawShape();				//RJS 12Oct00
-//DeadCode RJS 12Oct00 					currac->shape=currac->classtype->visible;
 				else
 				{}
 			else
@@ -961,7 +887,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 												+GR_GlobalSkillMin
 											);
 
-//DEADCODE DAW 22/03/00 			FormOrDefault((UWord&)cols[COLS_DAMAGE],int,damage,0);
 			FormOrDefault((UWord&)cols[COLS_BOMBS],int,bombs,0);
 
 
@@ -981,19 +906,10 @@ void	Persons3::make_airgrp(info_airgrp& I)
 				else
 					currac->ai.attacker=NULL;
 
-//DEADCODE JIM 14/01/00 ONLY IF A/C is injected while 3d is already running
-//DEADCODE JIM 14/01/00 			if (Three_Dee.livelist)
-//DEADCODE JIM 14/01/00 			{
-//DEADCODE JIM 14/01/00 				DOLAUNCHER_PTR d=(DOLAUNCHER_PTR)SHAPE.GetLauncherPos(currac->shape,0);
-//DEADCODE JIM 14/01/00 				if ( d && (d->lnchrtype & LT_MASK) == LT_MOVEGUN )
-//DEADCODE JIM 14/01/00 					*Three_Dee.livelist+=currac;
-//DEADCODE JIM 14/01/00 			}
-//DEADCODE JIM 14/01/00
 
 			if (firstobject==IllegalSepID)
 				firstobject=currac->uniqueID.count;
 
-//DEADCODE DAW 22/03/00 			int dutyval=0,dvplus1=0,dvplus2=0;						  //JIM 25/03/99
 			int dutyval;
 			EvalOrDefault(dutyval,int,duty,PACK_AM_ESCORT);				  //JIM 25/03/99
 			currac->duty=dutyval&PACK_AM_MAINMETHOD_MASK;
@@ -1001,20 +917,11 @@ void	Persons3::make_airgrp(info_airgrp& I)
 			if (I.applywave.Evaluate()==-3)
 				currac->ai.submethod=ai_info::SubMethod(currac->ai.submethod|ai_info::SM_RETURN_ESCORT);
 
-//DEADCODE DAW 22/03/00 			currac->duty=DutyType(dutyval+dvplus1);					  //RDH 23/05/99
 			int	pattern;
 			EvalOrDefault(pattern,int,pattern,0);				  //JIM 25/03/99
 
-//DEADCODE JIM 08/12/99 			EvalOrDefault(currac->formation,FormationTypeIndex,form,SQUAD_STACKEDV);
 
 			FormOrDefault(currac->vel_,int,vel,currac->classtype->cruisevel);		//rdh
-//DEADCODE JIM 14/01/00 			GearState	onground;
-//DEADCODE JIM 17/01/00 			if (isSGT)
-//DEADCODE JIM 17/01/00 			{
-//DEADCODE JIM 17/01/00 				setposition(currac,I.position,TRUE);
-//DEADCODE JIM 17/01/00
-//DEADCODE JIM 17/01/00 			}
-//DEADCODE JIM 17/01/00 			else
 			if (estformpos==0)
 			{
 				EventVal* pos=&I.position;
@@ -1074,7 +981,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 						else
 							hb=currac->waypoint->target->uniqueID.count;
 					}
-//DeadCode MS 26Sep00 					assert(currac->waypoint->target->SGT==hb || currac->waypoint->target==currac->ai.homebase);
 					for (int i=RunwayEBAND;i<BlokeBAND;i++)
 					{
 						ItemPtr p=ConvertPtrUID(UniqueID(i));
@@ -1110,44 +1016,10 @@ void	Persons3::make_airgrp(info_airgrp& I)
 					currac->vel_ = currac->vel_x = currac->vel_y = currac->vel_z = 0;
 					currac->pitch = currac->classtype->deckangle;
 					currac->fly.thrustpercent = 0;
-//DEADCODE JON 6/6/00 #pragma message ( __HERE__ "ground take off here" )
-//DEADCODE JON 6/6/00 					{
-//DEADCODE JON 6/6/00 						ULong x = currac->ai.homebase->World.X >> 17;
-//DEADCODE JON 6/6/00 						ULong z = currac->ai.homebase->World.Z >> 17;
-//DEADCODE JON 6/6/00 						char blockStr[7];
-//DEADCODE JON 6/6/00 						blockStr[6] = char(0);
-//DEADCODE JON 6/6/00 						blockStr[5] = '1'+char(z%8);
-//DEADCODE JON 6/6/00 						blockStr[3] = '1'+char((z/8)%8);
-//DEADCODE JON 6/6/00 						blockStr[1] = '1'+char((z/64)%8);
-//DEADCODE JON 6/6/00 						blockStr[4] = '1'+char(x%8);
-//DEADCODE JON 6/6/00 						blockStr[2] = '1'+char((x/8)%8);
-//DEADCODE JON 6/6/00 						blockStr[0] = '1'+char((x/64)%8);
-//DEADCODE JON 6/6/00 						::AfxTrace("Currac homebase block position: %s\n", blockStr );
-//DEADCODE JON 6/6/00 					}
-//DEADCODE JON 6/6/00
-//DeadCode CSB 26Jun00 					currac->World.Y=Land_Scape.GetGroundLevel(currac->ai.homebase,NULL,true)+currac->classtype->deckshunt;
-//DeadCode CSB 18Oct00 					currac->World.Y=Land_Scape.GetGroundLevel(currac->World,NULL,true)+currac->classtype->deckshunt;	//CSB 26Jun00
 					currac->fly.pModel->GroundHeight = currac->ai.homebase->World.Y;
 					currac->World.Y = currac->fly.pModel->GroundHeight + currac->classtype->deckshunt;	//CSB 18Oct00
 					currac->roll = ANGLES_0Deg;
 
-//DeadCode CSB 12Jul00 					AircraftAnimData*		acanim  = NULL;
-//DeadCode CSB 12Jul00 					SimpleAircraftAnimData*	saganim = NULL;
-//DeadCode CSB 12Jul00 					if(currac->fly.numinsag)
-//DeadCode CSB 12Jul00 					{
-//DeadCode CSB 12Jul00 						saganim = (SimpleAircraftAnimData*)currac->Anim;
-//DeadCode CSB 12Jul00 						saganim->acrpm  = 0;
-//DeadCode CSB 12Jul00 					}
-//DeadCode CSB 12Jul00 					else
-//DeadCode CSB 12Jul00 					{
-//DeadCode CSB 12Jul00 						acanim = (AircraftAnimData*)currac->Anim;
-//DeadCode CSB 12Jul00 						acanim->acrpm  = 0;
-//DeadCode CSB 12Jul00 						acanim->acrpm1 = 0;
-//DeadCode CSB 12Jul00 						acanim->acleglowerl = 0;
-//DeadCode CSB 12Jul00 						acanim->acleglowerr = 0;
-//DeadCode CSB 12Jul00 						if((currac->fly.pModel->Type == AT_SPITFIRE) || (currac->fly.pModel->Type == AT_HURRICANE) || (currac->fly.pModel->Type == AT_JU87B))
-//DeadCode CSB 12Jul00 							acanim->accanopy = 255;
-//DeadCode CSB 12Jul00 					}
 				}
 				else
 				{
@@ -1175,7 +1047,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 				}
 			}
 
-//DEADCODE JIM 09/12/99 			currac->fly.comefrommap = FALSE;								//RDH 20Nov96
 
  			if (currac->pitch == ANGLES_180Deg)						//RDH 16Apr96
  				SetAngles (currac);									//RDH 16Apr96
@@ -1208,7 +1079,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 					currac->vel_ = currac->vel_x = currac->vel_y = currac->vel_z = 0;	//CSB 11Aug00
 				}
 			}
-//DEADCODE DAW 08/03/00 			currac->ai.eventlog=eventloglist;
 			if(estformpos)
 			{
 				setfollowerposition(currac);
@@ -1220,28 +1090,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 			}
 			else
 			{
-//DEADCODE DAW 08/03/00 				if (eventloglist->nat!=NAT_AMBER)
-//DEADCODE DAW 08/03/00 					if (I.follower.Evaluate()==ENABLE_COMPLEX_VAL
-//DEADCODE DAW 08/03/00 					&&	I.leader.Evaluate()==ENABLE_COMPLEX_VAL)
-//DEADCODE DAW 08/03/00 						currac->ai.eventlog=
-//DEADCODE DAW 08/03/00 							eventloglist=
-//DEADCODE DAW 08/03/00 								new EventLog (eventloglist);
-//DEADCODE DAW 08/03/00
-//DEADCODE DAW 08/03/00 				eventloglist->nat=currac->nationality;			//JIM 30Sep96
-//DEADCODE DAW 08/03/00 				if (I.leader.Evaluate()==ENABLE_COMPLEX_VAL)
-//DEADCODE DAW 08/03/00 				{
-//DEADCODE DAW 08/03/00 					eventloglist->targetuid=currac->uniqueID.count;
-//DEADCODE DAW 08/03/00 					if (eventloglist->stage!=EventLog::TAKEOFF)
-//DEADCODE DAW 08/03/00 					{
-//DEADCODE DAW 08/03/00 						eventloglist->encounteredtype=PlaneTypeSelect(v2);
-//DEADCODE DAW 08/03/00 						eventloglist->launchtime=takeofftime*SECS100;
-//DEADCODE DAW 08/03/00 //TEMPCODE RJS 16/11/99 						if (eventloglist->homebase==UID_Japan)
-//DEADCODE DAW 08/03/00 //TEMPCODE RJS 16/11/99 							eventloglist->launchtime-=30*60*SECS100;
-//DEADCODE DAW 08/03/00 					}
-//DEADCODE DAW 08/03/00 				}
-//DEADCODE DAW 08/03/00 				else
-//DEADCODE DAW 08/03/00 					if (eventloglist->stage!=EventLog::TAKEOFF)
-//DEADCODE DAW 08/03/00 						eventloglist->escorttype=PlaneTypeSelect(v2);
 
 
 //				if (formac==ENABLE_COMPLEX_VAL)
@@ -1249,67 +1097,23 @@ void	Persons3::make_airgrp(info_airgrp& I)
 //					UpdateLog(eventloglist,0,EventLog::TAKEOFF);//RDH 02Oct96
 //				}
 //				else
-//DEADCODE DAW 08/03/00 				{
-//DEADCODE DAW 08/03/00 					if (takeoffstate!=TOS_SECRET)
-//DEADCODE DAW 08/03/00 					{
-//DEADCODE DAW 08/03/00 //DEADCODE DAW 08/03/00 						if (isSGT)
-//DEADCODE DAW 08/03/00 							eventloglist->encsize += I.inform.Evaluate();			//RDH 02Oct96
-//DEADCODE DAW 08/03/00 						else
-//DEADCODE DAW 08/03/00 							eventloglist->encsize += formac;			//RDH 02Oct96
-//DEADCODE DAW 08/03/00 						if (/*currac->nationality==NAT_RED &&*/ eventloglist->stage!=EventLog::TAKEOFF)
-//DEADCODE DAW 08/03/00 						{
-//DEADCODE DAW 08/03/00 							UpdateLog(eventloglist,0,EventLog::UNSEEN);//RDH 02Oct96
-//DEADCODE DAW 08/03/00 							eventloglist->launchtime=takeofftime*SECS100;
 //TEMPCODE RJS 16/11/99 							if (eventloglist->homebase==UID_Japan)
 //TEMPCODE RJS 16/11/99 								eventloglist->launchtime-=30*60*SECS100;
-//DEADCODE DAW 08/03/00 						}
-//DEADCODE DAW 08/03/00 					}
-//DEADCODE DAW 08/03/00 				}
 
-//DEADCODE DAW 08/03/00 				if (	eventloglist->homebase==UID_NULL
-//DEADCODE DAW 08/03/00 					&& currac->ai.homebase
-//DEADCODE DAW 08/03/00 					&& (int)currac->ai.homebase!=-1
-//DEADCODE DAW 08/03/00 //					&& (currac->movecode==AUTO_TAKEOFF)		//RDH 13Nov96
-//DEADCODE DAW 08/03/00 					)
-//DEADCODE DAW 08/03/00 				{
-//DEADCODE DAW 08/03/00 					eventloglist->homebase=currac->ai.homebase->uniqueID.count;
-//DEADCODE DAW 08/03/00 //TEMPCODE RJS 16/11/99 					if (eventloglist->homebase==UID_Japan)
-//DEADCODE DAW 08/03/00 //TEMPCODE RJS 16/11/99 						eventloglist->launchtime-=30*60*SECS100;
-//DEADCODE DAW 08/03/00 				}
 			}
 
 			//Everybody goes through colourruleplayersquadron now!!!!!
 			int	pilotmarking=squadrec->markingscheme
 						+0x10000*( (currac->fly.originalformpos&InWingMAX)+ (currac->fly.originalformpos&InFormMAX)*wingac);
 			if (squadrec->markingscheme<64000)
-//DeadCode JIM 12Oct00 				if (offsetinformationleaderflights==12)
-//DeadCode JIM 12Oct00 				{
-//DeadCode JIM 12Oct00 //DeadCode CSB 4Oct00 					int staffelnum=(pilotmarking/1600)%40;	//H,M,R
-//DeadCode JIM 12Oct00 					pilotmarking=squadrec->markingscheme
-//DeadCode JIM 12Oct00 							+0x10000*((currac->formpos&InWingMAX)+ (currac->formpos&InFormMAX)*wingac);
-//DeadCode JIM 12Oct00 //DeadCode CSB 4Oct00 					if (staffelnum=='H'-'A')
-//DeadCode JIM 12Oct00 //DeadCode CSB 4Oct00 						pilotmarking+=('U'-'H')*1600;
-//DeadCode JIM 12Oct00 //DeadCode CSB 4Oct00 					elseif (staffelnum=='M'-'A')
-//DeadCode JIM 12Oct00 //DeadCode CSB 4Oct00 						pilotmarking+=('V'-'M')*1600;
-//DeadCode JIM 12Oct00 //DeadCode CSB 4Oct00 					else
-//DeadCode JIM 12Oct00 //DeadCode CSB 4Oct00 						pilotmarking+=('W'-'R')*1600;
-//DeadCode JIM 12Oct00
-//DeadCode JIM 12Oct00
-//DeadCode JIM 12Oct00
-//DeadCode JIM 12Oct00 				}
-//DeadCode JIM 12Oct00 				else
 					pilotmarking=squadrec->markingscheme
 							+0x10000*((currac->formpos&InWingMAX)+ (currac->formpos&InFormMAX)*wingac)
 							+1600*(	offsetinformationleaderflights/4 );
 			if (!isSGT)
 			{
 				ColourRulePlayerSquadron(currac,currac->formpos,cols,pilotmarking,damagetable);			//RDH 16Apr96
-//DeadCode DAW 09Jul99 			if (takeoffstate>TOS_TAKENOFF)
 				if (takeoffstate==TOS_TAKINGOFF)
-//DEADCODE CSB 06/03/00 				{
 					currac->fly.pModel->GearDown(currac);
-//DEADCODE CSB 06/03/00 					SHAPE.NavigationLightsActive(currac, TRUE);
-//DEADCODE CSB 06/03/00 				}
 				else													//CSB 06/03/00
 					currac->fly.pModel->GearUp(currac);					//CSB 06/03/00
 
@@ -1338,14 +1142,6 @@ void	Persons3::make_airgrp(info_airgrp& I)
 				else
 				{
 			 		estformpos+=(InForm)1;
-//DEADCODE JIM 14/01/00 					if (takeoffstate>TOS_TAKENOFF)
-//DEADCODE JIM 14/01/00 						takeofftime+=TIME_TAKEOFF_FLIGHT;
-//DEADCODE JIM 14/01/00 					if (takeoffstate==TOS_RUNWAY)
-//DEADCODE JIM 14/01/00 						takeoffstate=TOS_NEXTFLIGHTS;
-//DEADCODE JIM 14/01/00 					else
-//DEADCODE JIM 14/01/00 					if (takeoffstate==TOS_TAKINGOFF)
-//DEADCODE JIM 14/01/00 						if (takeofftime>=GR_TakeOffTime)
-//DEADCODE JIM 14/01/00 							takeoffstate=TOS_RUNWAY;	//next flight is player!!
 				}
 			}
 			else
@@ -1469,8 +1265,6 @@ UniqueID	Persons3::make_waypoint(info_waypoint& I)
 
 		gotgrpnum=0;
 		gotgrpflags=0xffff0000;
-//DEADCODE RJS 15/02/00 		if ((int)GR_WaveNum>=0)
-//DEADCODE RJS 15/02/00 			GR_WaveNum++;
 		nextwpname=WPNAME_None;
 		nextwpnum=1;
 		GR_lastroutefirstwaypoint=UID_NULL;
@@ -1503,13 +1297,9 @@ UniqueID	Persons3::make_waypoint(info_waypoint& I)
 		WayPointPtr	newwaypoint=new WayPoint;
 		if (I.events!=NULL)
 		{
-//DeadCode AMM 10Jun98 			newwaypoint->uniqueID.deaded=TRUE;
-//DeadCode AMM 30Nov98 			newwaypoint->uniqueID.commsmove=TRUE;				//AMM 10Jun98
 			newwaypoint->Status.deaded=TRUE;					//AMM 30Nov98
 			make_events(I.events,newwaypoint);
 		}
-//DeadCode AMM 10Jun98  		newwaypoint->uniqueID.deaded=FALSE;
-//DeadCode AMM 30Nov98  		newwaypoint->uniqueID.commsmove=FALSE;					//AMM 10Jun98
  		newwaypoint->Status.deaded=FALSE;						//AMM 30Nov98
  ////		newwaypoint->bfieldindex=1;
 		newwaypoint->ETA = 0;										//RDH 19Feb96
@@ -1759,7 +1549,6 @@ void	Persons3::FixUpWaypointsToGroup(int grpnum,int wavenum,UniqueID route,Uniqu
 		}
 		else
 		{
-//DeadCode JIM 7Nov00 			assert(leader==table[wavenum][1]+1 && numinflight==1);
 			table[wavenum][1]=leader;
 		}
 	}
@@ -1865,15 +1654,6 @@ void	Persons3::make_itemS(info_itemS& I,bool enabled)
 			 UsedFixedUID=TRUE;
 		return;
 	}
-//DEADCODE JON 07/03/00 	if (I.band.Evaluate()==BritAAASiteBAND && Math_Lib.rnd()>GR_AAALevel64K)
-//DEADCODE JON 07/03/00 		return;	//Discard some AAA sites if low activity!!!!
-//DEADCODE JON 07/03/00
-//DEADCODE JIM 16/11/99 	if (I.band.Evaluate()==RedAAALargeBAND)
-//DEADCODE JIM 16/11/99 	{	//this may be quite painful!
-//DEADCODE JIM 16/11/99 		assert (I.SGT);
-//DEADCODE JIM 16/11/99 		if (SupplyTree::FindSupplyNodeForNodeItem(I.SGT)->status!=BEHINDREDLINES)
-//DEADCODE JIM 16/11/99 			return;
-//DEADCODE JIM 16/11/99 	}
 
 	if (_DPlay.PlayerCreated && _DPlay.GameType<DPlay::COMMSQUICKMISSION)	// 13Oct00
 	{
@@ -1899,17 +1679,6 @@ void	Persons3::make_itemS(info_itemS& I,bool enabled)
 		_Error.EmitSysErr("Shape not set in item");
 	*shapefield|=
 		(tmpitem->shape=(ShapeNum)I.shape.Evaluate());
-//DeadCode RJS 11Sep00 	if (I.attitude.Evaluate() != ENABLE_COMPLEX_VAL)
-//DeadCode RJS 11Sep00 	{
-//DeadCode RJS 11Sep00 		// Set anim for bridge shape....
-//DeadCode RJS 11Sep00 		// ... and fill it in for animation
-//DeadCode RJS 11Sep00
-//DeadCode RJS 11Sep00 		if (SHAPE.SetAnimData(tmpitem,0) == sizeof(ExplodeAnimData))
-//DeadCode RJS 11Sep00 		{
-//DeadCode RJS 11Sep00 			ExplodeAnimData*	adptr = (ExplodeAnimData*) tmpitem->Anim;
-//DeadCode RJS 11Sep00 			adptr->frameno = I.attitude.Evaluate();
-//DeadCode RJS 11Sep00 		}
-//DeadCode RJS 11Sep00 	}
 
 // Set anim data for balloon groups...
 	if (tmpitem->shape == BALGRP)
@@ -1925,7 +1694,6 @@ void	Persons3::make_itemS(info_itemS& I,bool enabled)
 	if (firstobject==IllegalSepID)
 		firstobject=tmpitem->uniqueID.count;
 
-//DeadCode JIM 08Jan96 		AddToWorld(tmpitem);
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2055,7 +1823,6 @@ FormationItemPtr
 			currtruck->vel_x =0;												//RDH 26Feb96
 			currtruck->vel_y =0;												//RDH 26Feb96
 			currtruck->vel_z =0;												//RDH 26Feb96
-//DEADCODE CSB 08/11/99 			currtruck->velhori =0;												//RDH 26Feb96
 
 			FormOrDefault(currtruck->vel_,int,vel,VEL_10KT);//5 m/s or 10mph
 
@@ -2137,86 +1904,6 @@ FormationItemPtr
 //------------------------------------------------------------------------------
 void	Persons3::make_events(info_event_ptr&	I,ItemBasePtr P)
 {
-//DEADCODE JIM 17/03/99 	if (justscanning)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		return;
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 	info_event_ptr J=I;
-//DEADCODE JIM 17/03/99 	I=NULL;
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 		info_event_ptr I=J;
-//DEADCODE JIM 17/03/99 	while (I)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99
-//DEADCODE JIM 17/03/99 		EventRecPtr	newevent;
-//DEADCODE JIM 17/03/99 		int count=10;
-//DEADCODE JIM 17/03/99 		int bfnum;
-//DEADCODE JIM 17/03/99 		do
-//DEADCODE JIM 17/03/99 		{
-//DEADCODE JIM 17/03/99 			bfnum=I->bfields.Evaluate();
-//DEADCODE JIM 17/03/99 			breakif (bfnum==ENABLE_COMPLEX_VAL);
-//DEADCODE JIM 17/03/99 			if (BITTEST(usedevents,bfnum&255))
-//DEADCODE JIM 17/03/99 				bfnum=ENABLE_COMPLEX_VAL;
-//DEADCODE JIM 17/03/99 			else
-//DEADCODE JIM 17/03/99 			{	//more complex: load the battlefield and
-//DEADCODE JIM 17/03/99 				//test for used fixed UID flag
-//DEADCODE JIM 17/03/99 				UsedFixedUID=FALSE;
-//DEADCODE JIM 17/03/99 				{
-//DEADCODE JIM 17/03/99 					WorldStuff* wpbackup=myworld;
-//DEADCODE JIM 17/03/99 ////					justscanning=SCANNAMES;
-//DEADCODE JIM 17/03/99 					{
-//DEADCODE JIM 17/03/99 						LoadSubPiece(NULL,(FileNum)bfnum,(int)Persons2::LOADEDBFS-1,SCANNAMES);
-//DEADCODE JIM 17/03/99 					}
-//DEADCODE JIM 17/03/99 					myworld=wpbackup;
-//DEADCODE JIM 17/03/99 	////				justscanning=LOAD;
-//DEADCODE JIM 17/03/99 				}
-//DEADCODE JIM 17/03/99 				if (UsedFixedUID)
-//DEADCODE JIM 17/03/99 					BITSET(usedevents,bfnum&255);
-//DEADCODE JIM 17/03/99 			}
-//DEADCODE JIM 17/03/99 		} while (bfnum==ENABLE_COMPLEX_VAL && count--);
-//DEADCODE JIM 17/03/99
-//DEADCODE JIM 17/03/99 		int i=I->usedsetvals;
-//DEADCODE JIM 17/03/99 		if (bfnum!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 		{
-//DEADCODE JIM 17/03/99 			newevent=new EventRec (P,i+1);
-//DEADCODE JIM 17/03/99 			newevent->eventlist[i].Index=EventSet::GV_EVENT_EVENT;
-//DEADCODE JIM 17/03/99 			newevent->eventlist[i].Value=bfnum;
-//DEADCODE JIM 17/03/99 		}
-//DEADCODE JIM 17/03/99 		else
-//DEADCODE JIM 17/03/99 			newevent=new EventRec (P,i);
-//DEADCODE JIM 17/03/99
-//DEADCODE JIM 17/03/99 		int v1;
-//DEADCODE JIM 17/03/99 		newevent->eventwstart=
-//DEADCODE JIM 17/03/99 			newevent->eventwend=0;
-//DEADCODE JIM 17/03/99 		if ((v1=I->starts.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwstart+=v1*100;
-//DEADCODE JIM 17/03/99 		if ((v1=I->startm.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwstart+=v1*60*100;
-//DEADCODE JIM 17/03/99 		if ((v1=I->starth.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwstart+=v1*60*60*100;
-//DEADCODE JIM 17/03/99
-//DEADCODE JIM 17/03/99 		if ((v1=I->wins.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwend+=v1*100;
-//DEADCODE JIM 17/03/99 		if ((v1=I->winm.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwend+=v1*60*100;
-//DEADCODE JIM 17/03/99 		if ((v1=I->winh.Evaluate())!=ENABLE_COMPLEX_VAL)
-//DEADCODE JIM 17/03/99 			newevent->eventwend+=v1*60*60*100;
-//DEADCODE JIM 17/03/99
-//DEADCODE JIM 17/03/99
-//DEADCODE JIM 17/03/99 		while (--i>=0)
-//DEADCODE JIM 17/03/99 		{
-//DEADCODE JIM 17/03/99 			newevent->eventlist[i].Index=I->setvals[i].index;
-//DEADCODE JIM 17/03/99 			newevent->eventlist[i].Value=I->setvals[i].Evaluate();
-//DEADCODE JIM 17/03/99 		}
-//DEADCODE JIM 17/03/99 		if (newevent->eventwend)								//JIM 04Nov96
-//DEADCODE JIM 17/03/99 			newevent->eventwend+=newevent->eventwstart+Timer_Code.realtime;
-//DEADCODE JIM 17/03/99 		if (newevent->eventwstart)								//JIM 14Aug96
-//DEADCODE JIM 17/03/99 			newevent->eventwstart+=Timer_Code.realtime;
-//DEADCODE JIM 17/03/99
-//DEADCODE JIM 17/03/99 		I=(info_event_ptr)I->next;
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -2254,66 +1941,21 @@ void	Persons3::make_setval(EventVar& es)
 //Returns
 //
 //------------------------------------------------------------------------------
-//DEADCODE JIM 25/03/99 extern	MissionType CustomMission;
-//DEADCODE JIM 25/03/99 extern	char	CustomMissionDesc[];
-//DEADCODE JIM 25/03/99 extern	char	CustomMissionNews[];
-//DEADCODE JIM 25/03/99 extern	char	CustomMissionTitle[];
 
 
 void	Persons3::make_string(string src,int len,TokenCode t)
 {
-//DEADCODE JIM 25/03/99 	MissionType*	M=&CustomMission;
 
 	if (justscanning)
 	{
 		switch (t)
 		{
 			case T_comment:
-//DEADCODE JIM 25/03/99 				if ((UWord&)CustomMissionDesc[0])
-//DEADCODE JIM 25/03/99 				{
-//DEADCODE JIM 25/03/99 					if (!(UWord&)CustomMissionNews[0])
-//DEADCODE JIM 25/03/99 					{
-//DEADCODE JIM 25/03/99 						CustomMissionNews[1]=1;
-//DEADCODE JIM 25/03/99 						strncpy(CustomMissionNews,src,len);
-//DEADCODE JIM 25/03/99 						CustomMissionNews[len]=0;
-//DEADCODE JIM 25/03/99 					}
-//DEADCODE JIM 25/03/99 				}
-//DEADCODE JIM 25/03/99 				else
-//DEADCODE JIM 25/03/99 				{
-//DEADCODE JIM 25/03/99 					CustomMissionDesc[1]=1;
-//DEADCODE JIM 25/03/99 					strncpy(CustomMissionDesc,src,len);
-//DEADCODE JIM 25/03/99 					CustomMissionDesc[len]=0;
-//DEADCODE JIM 25/03/99 				}
 			break;
 			case T_name:
-//DEADCODE JIM 25/03/99 				strncpy(CustomMissionTitle,src,len);
-//DEADCODE JIM 25/03/99 				CustomMissionTitle[len]=0;
 			break;
 			case T_family:
 			{
-//DEADCODE JIM 25/03/99 				char dummyc;
-//DEADCODE JIM 25/03/99 				int	dummyi;
-//DEADCODE JIM 25/03/99 				sscanf(src,
-//DEADCODE JIM 25/03/99 					"%i %i "
-//DEADCODE JIM 25/03/99 					"%hi %hi "
-//DEADCODE JIM 25/03/99 					"%c %c "
-//DEADCODE JIM 25/03/99 					"%hi %hi %hi "
-//DEADCODE JIM 25/03/99 					"%hi %hi %hi "
-//DEADCODE JIM 25/03/99 					"%hi %hi "
-//DEADCODE JIM 25/03/99 					"%hi %hi "
-//DEADCODE JIM 25/03/99 					"%hi %hi %hi"
-//DEADCODE JIM 25/03/99 					,
-//DEADCODE JIM 25/03/99 					&M->missiondate,&M->timeofday,
-//DEADCODE JIM 25/03/99 					&M->numofsquadronac,&M->numofflightac,
-//DEADCODE JIM 25/03/99 					&dummyc/*M->PlayerNationality*/,&M->formationtypeindex,
-//DEADCODE JIM 25/03/99 					&M->weathernum,&M->windspeed,&M->winddirection,
-//DEADCODE JIM 25/03/99 					&dummyi,&dummyi,&dummyi,	//&M->era,&M->region,&M->PlayerAcType,
-//DEADCODE JIM 25/03/99 					&dummyi,&dummyi,			//&M->PlayerHomeBase,&M->EnemyHomeBase,
-//DEADCODE JIM 25/03/99 					&M->wplist->wpset[0]->mainobjective,&M->wplist->wpset[0]->subobjective,
-//DEADCODE JIM 25/03/99 					&M->wplist->wpset[0]->wp1,&M->wplist->wpset[0]->wp2,&M->wplist->wpset[0]->wp3
-//DEADCODE JIM 25/03/99 					);
-//DEADCODE JIM 25/03/99 				//M->PlayerNationality&=31;
-//DEADCODE JIM 25/03/99 				M->formationtypeindex=FormationTypeIndex(M->formationtypeindex&31);
 			}
 			break;
 		}
@@ -2502,8 +2144,6 @@ COORDS3D*	Persons3::setfolloweroffset(AirStrucPtr	newac)
 {
 	COORDS3D	*despos;
 
-//DeadCode RDH 27Feb96 	if (newac->pitch == ANGLES_180Deg)
-//DeadCode RDH 27Feb96 		SetAngles (newac);
 	newac->HdgIntercept=newac->hdg;
 	if (newac->formpos != 0)
 	{
@@ -2511,10 +2151,8 @@ COORDS3D*	Persons3::setfolloweroffset(AirStrucPtr	newac)
 			||	((newac->fly.leadflight) && ((newac->fly.leadflight->movecode == AUTO_TAKEOFF) || (newac->fly.leadflight->movecode == AUTO_TRAININGTAKEOFF)))	)	//CSB 06/03/00
 		{
 			newac->pitch = newac->classtype->deckangle;			//JIM 04Dec96
-//DeadCode JIM 27Nov96 			newac->pitch=ANGLES_5Deg;
 			newac->movecode=AUTO_TAKEOFF;
 			newac->vel_ = 0;										//RDH 30Sep96
-//DEADCODE JIM 10/12/99 			newac->fly.vel_cms = 	0;							//RDH 30Sep96
 //			newac->fly.vel_mms = 	0;							//RDH 30Sep96
 			return (newac->PositionTakeOffWRTLeader ());
 		}else
@@ -2530,7 +2168,6 @@ COORDS3D*	Persons3::setfolloweroffset(AirStrucPtr	newac)
 					newac->pitch=ANGLES_0Deg;
 				}
 			return despos;										//AMM 19Aug97
-//DeadCode AMM 20Aug97 			return (newac->PositionWRTLeader ());
 		}
 	}else
 	{
@@ -2540,7 +2177,6 @@ COORDS3D*	Persons3::setfolloweroffset(AirStrucPtr	newac)
 			newac->pitch = newac->classtype->deckangle;			//JIM 04Dec96
 			newac->roll = ANGLES_0Deg;
 			newac->vel_ = 0;										//RDH 30Sep96
-//DEADCODE JIM 10/12/99 			newac->fly.vel_cms = 	0;							//RDH 30Sep96
 //			newac->fly.vel_mms = 	0;							//RDH 30Sep96
 			return NULL;
 		}
@@ -2796,7 +2432,6 @@ void	Persons3::adduidrequest(UnresolvedUidNode *newnode,UniqueID srcuid)
 //------------------------------------------------------------------------------
 void	Persons3::logpointercopy(ItemBasePtr *trgitemptr,UniqueID srcuid)
 {
-//DeadCode JIM 20Oct00 	UILogType	request = ptrcopy;
 
 	adduidrequest(trgitemptr,srcuid);
 
@@ -2868,11 +2503,6 @@ void	Persons3::logUID(ItemBasePtr	selecteditem)
 {
 	UniqueID		theuid;
 
-//DeadCode JIM 20Oct00 	if (selecteditem->uniqueID.count==0x012e)
-//DeadCode JIM 20Oct00 	{
-//DeadCode JIM 20Oct00 		int bp=0;
-//DeadCode JIM 20Oct00
-//DeadCode JIM 20Oct00 	}
 
 	theuid = selecteditem->uniqueID.count;
     bobassert(theuid>=0,"x0r it should be positive");
@@ -3135,7 +2765,6 @@ Bool	Persons3::anyoutstanding()
 
 void Persons3::InitGamePiece()
 {
-//DEADCODE DAW 12/05/99 	File_Man.DiscardDirList(FIL_RUNTIMEPACK0);
 	{
 	for (int i=0;i<LOADEDBFS;i++)
 		loadedBF[i]=FIL_NULL;
@@ -3160,12 +2789,6 @@ void Persons3::InitGamePiece()
 	}
 
     ClearGlobrefStaticVars();
-//DEADCODE DAW 08/03/00 	while (eventloglist)
-//DEADCODE DAW 08/03/00 	{
-//DEADCODE DAW 08/03/00 		EventLogPtr	tmp=eventloglist;
-//DEADCODE DAW 08/03/00 		eventloglist=tmp->next;
-//DEADCODE DAW 08/03/00 		delete tmp;
-//DEADCODE DAW 08/03/00 	}
 
 //	ClrMessage(UserMsg::NOMSG);									//JIM 23Oct96
 
@@ -3191,9 +2814,6 @@ void	Persons3::InitSubPiece()
 	{
 		prevSAGsquadron=NULL;
 		firstobject=IllegalSepID;
-//DEADCODE DAW 08/03/00 		eventloglist=new EventLog(eventloglist);
-//DEADCODE DAW 08/03/00 	   if (inst3d)
-//DEADCODE DAW 08/03/00 		eventloglist->launchtime=inst3d->timeofday;
 ///		eventloglist->launchtime=Timer_Code.realtime;
 		shapefield=new ShapeNumField;
 		*shapefield=0;
@@ -3223,19 +2843,10 @@ void Persons3::FinishSetPiece()
 		Todays_Packages.ClearPack(p);
 	Todays_Packages.hiwp=UID_NULL;
 
-//DeadCode AMM 21Feb100 	SLong len;
-//DeadCode AMM 21Feb100 	UWord oldsector;
 
 	//get airfield altitudes loaded. This causes too much grief otherwise
-//DEADCODE JIM 16/11/99 	for (int afnum=0;SupplyTree::airfieldinfo[afnum].nationality!=NAT_ALIGN;afnum++)
-//DEADCODE JIM 16/11/99 	{
-//DEADCODE JIM 16/11/99 		ItemPtr I=*ConvertPtrUID(SupplyTree::airfieldinfo[afnum].airfield);
-//DEADCODE JIM 16/11/99 		if (I->World.Y==0)
-//DEADCODE JIM 16/11/99 			I->World.Y=Land_Scape.GetGroundLevel(I,NULL,true);
-//DEADCODE JIM 16/11/99 	}
 
 
-//DeadCode CSB 20Jun00 	AirStrucPtr ac=*Persons2::ConvertPtrUID((UniqueID)0x10a7);
 
 	if (_DPlay.Implemented)
 	{
@@ -3256,15 +2867,12 @@ void Persons3::FinishSetPiece()
 		}
 	}
 
-//DeadCode AMM 17Nov98 //	if (_Replay.Record)
-//DeadCode AMM 17Nov98 		_Replay.AddFileAndGlobRefsToList(FIL_NULL);
 
 	if (!_Replay.Playback)
 		SENT_REQ=FALSE;
 	if (anyoutstanding())
 		_Error.EmitSysErr("Unresolved UIDS! One is: %x",rootuidnode->uidattack);
 
-//DeadCode CSB 20Jun00 	ac=*Persons2::ConvertPtrUID((UniqueID)0x10a7);
 
 	SagExpansionCounter::totalexpanded=0;
 	SagExpansionCounter::highdemandrange=METRES2000;					//DAW 15/02/00
@@ -3299,16 +2907,11 @@ void Persons3::FinishSetPiece()
 
 	}
 
-//DeadCode AMM 23Jul98 	if (_Replay.Playback)
-//DeadCode AMM 23Jul98 	{
-//DeadCode AMM 23Jul98 		Manual_Pilot.controlmode==ManualPilot::AUTO;
-//DeadCode AMM 23Jul98 	}
 
 	Persons2::PlayerGhostAC=Manual_Pilot.ControlledAC2;
 
 // both AC start off the same
 
-//DeadCode AMM 16Nov99 	_DPlay.CopyBuffer((char*)Persons2::PlayerSeenAC,(char*)Persons2::PlayerGhostAC,sizeof(AirStruc));
  	memcpy((char*)Persons2::PlayerSeenAC,(char*)Persons2::PlayerGhostAC,sizeof(AirStruc));
 
 	Manual_Pilot.ControlledAC2=Persons2::PlayerSeenAC;
@@ -3547,11 +3150,7 @@ void	Persons3::ColourRulePlayerSquadron(AirStrucPtr	newac,FormationIndex formpos
 		if((newac->movecode==AUTO_TAKEOFF))// || (newac->movecode==AUTO_TRAININGTAKEOFF))
 		{
 			newac->movecode=AUTO_FOLLOWWP;
-//DeadCode AMM 29Aug00 			newac->playermoving=false;
 		}
-//DeadCode AMM 29Aug00 		else
-//DeadCode AMM 29Aug00 			newac->playermoving=true;
-//DeadCode AMM 29Aug00 		newac->playernotmovingheldac=NULL;
 		UpdateLog(newac,0,EventLog::TAKEOFF);
 	}
 	else
@@ -3616,7 +3215,6 @@ void	Persons3::FreeRoutes()
 
 void	Persons3::FreeEvents()
 {
-//DEADCODE JIM 17/03/99 	while (EventRec::eventbase)	delete EventRec::eventbase;
 
 }
 
@@ -3646,11 +3244,8 @@ void	Persons3::FreeEvents()
 //------------------------------------------------------------------------------
 void	Persons3::PreScanBF(FileNum f)
 {
-//DEADCODE JIM 25/03/99 	(UWord&)CustomMissionDesc[0]=0;
-//DEADCODE JIM 25/03/99 	(UWord&)CustomMissionNews[0]=0;
 //	justscanning=SCANNAMES;
 	LoadSubPiece(NULL,f,(int)LOADEDBFS-1,SCANNAMES);
-//DEADCODE JIM 25/03/99 	CustomMission.playerbf=f;
   //	justscanning=LOAD;
 }
 //
@@ -3819,8 +3414,6 @@ void	Persons3::ExpandPilotedFlights()
 		}
 	}
 
-//DeadCode CSB 10Oct00 	for(AirStrucPtr sag = AirStrucPtr(MobileItem::SAGList); sag; sag = AirStrucPtr(sag->nextmobile))
-//DeadCode CSB 10Oct00 		sag->PatchGroupAndAnim();
 
 	AirStrucPtr(MobileItem::ACList)->ClearUpAI();
 
@@ -3865,8 +3458,6 @@ void	Persons3::ExpandPilotedFlights()
 		Manual_Pilot.Associate(leader,ManualPilot::MANUAL);						//RDH 17Jun96
 		SHAPE.SetPilotedAcAnim(leader);							//PD 26Jun96
 		UpdateLog(leader,0,EventLog::TAKEOFF);
-//DEADCODE DAW 08/03/00 		if (leader->ai.homebase)
-//DEADCODE DAW 08/03/00 			leader->ai.eventlog->homebase=leader->ai.homebase->uniqueID.count;
 
 
 	}

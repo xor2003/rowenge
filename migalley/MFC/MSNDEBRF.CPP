@@ -164,8 +164,6 @@ BOOL CDeBrief::OnInitDialog()
 	info_airgrp* g= *Persons2::ConvertPtrUID(Todays_Packages[packnum][0][0].uid);
 	DutyType duty = (DutyType)g->duty.Evaluate();
 	SupplyNode*	battlenode = node->supplyline->frontline->forward->suppliee;
-//DEADCODE RDH 25/06/99 	if (node == battlenode)
-//DEADCODE RDH 25/06/99 		duty = DC_CAS;		
 
 	s=GETDLGITEM(IDC_RATING);
 	bool missionsuccess = MMC.GetMissionSuccess(packnum);
@@ -197,18 +195,10 @@ BOOL CDeBrief::OnInitDialog()
 			s->ShowWindow(SW_SHOW);
 	 		s->SetString(RESSTRING(SUPPLIESREMAINING));
 
-//DeadCode RDH 01Jul99 		 	s=GETDLGITEM(IDC_STATUS);
-//DeadCode RDH 01Jul99 			s->ShowWindow(SW_SHOW);
-//DeadCode RDH 01Jul99 		 	if (node->attackstats.damagelevel == 0)
-//DeadCode RDH 01Jul99 		 		s->SetString(RESSTRING(OPERATIONAL));
-//DeadCode RDH 01Jul99 		 	else if (node->attackstats.damagelevel < 100)
-//DeadCode RDH 01Jul99 		 		s->SetString(RESSTRING(DAMAGED));
-//DeadCode RDH 01Jul99 		 	else 
-//DeadCode RDH 01Jul99 		 		s->SetString(RESSTRING(DESTROYED));
 
 		   	s=GETDLGITEM(IDC_INFOSOFT0);
 
-			int damage, damage_this_mission;
+			int damage=0, damage_this_mission;
 			SupplyTree::Supply2UID rel;
 			SupplyNode*	node=SupplyTree::FindSupplyNodeForItem(Todays_Packages.pack[packnum].packagetarget,&rel);
 			switch (rel)
@@ -219,12 +209,16 @@ BOOL CDeBrief::OnInitDialog()
 				case SupplyTree::S2U_AF0:
 				case SupplyTree::S2U_AF1:
 				case SupplyTree::S2U_AF2:
-					damage=SupplyTree::FindAirfieldForItem(Todays_Packages.pack[packnum].packagetarget)->attackstats.damagelevel;
+				{
+					AirFieldInfo* af=SupplyTree::FindAirfieldForItem(Todays_Packages.pack[packnum].packagetarget);
+					if (af) damage=af->attackstats.damagelevel;
+				}
 				break;
 				case SupplyTree::S2U_ROUTE0:
 				case SupplyTree::S2U_ROUTE1:
 				case SupplyTree::S2U_ROUTE2:
-					damage=node->route[rel-SupplyTree::S2U_ROUTE0]->attackstats.damagelevel;
+					if (node->route[rel-SupplyTree::S2U_ROUTE0])
+						damage=node->route[rel-SupplyTree::S2U_ROUTE0]->attackstats.damagelevel;
 			}
 			damage_this_mission = damage - MMC.packageprevscores[packnum];
 			if (damage_this_mission > 100)
@@ -233,7 +227,6 @@ BOOL CDeBrief::OnInitDialog()
 				damage_this_mission = 0;							  //RDH 09/06/99
 		  	s->SetString(CSprintf("%i%%", damage_this_mission));
 		   	s=GETDLGITEM(IDC_INFOSOFT1);
-//DEADCODE RDH 07/06/99 			damage = node->attackstats.damagelevel;
 			if (damage > 100)
 				damage = 100;
 			if (damage < 0)											  //RDH 09/06/99
@@ -258,17 +251,6 @@ BOOL CDeBrief::OnInitDialog()
 		 		s->SetString(RESSTRING(DESTROYED));
 
 			
-//DEADCODE RDH 27/05/99 			while   (	(i < NUM_OF_SUPPLYROUTES)
-//DEADCODE RDH 27/05/99 					)
-//DEADCODE RDH 27/05/99 			{
-//DEADCODE RDH 27/05/99 				currroute =  node->route[i];
-//DEADCODE RDH 27/05/99 				while (currroute)
-//DEADCODE RDH 27/05/99 				{
-//DEADCODE RDH 27/05/99 					stores_destroyed += currroute->stores_destroyed;
-//DEADCODE RDH 27/05/99 					currroute = currroute->alternateroute;  
-//DEADCODE RDH 27/05/99 				}
-//DEADCODE RDH 27/05/99 				i++;
-//DEADCODE RDH 27/05/99 			}			
 
 
 			if (	 	(rel == SupplyTree::S2U_AF0)
@@ -327,7 +309,6 @@ BOOL CDeBrief::OnInitDialog()
 			s->SetString(RESSTRING(UNACLOST));
 	    	s=GETDLGITEM(IDC_RSTATICSOFT2);
 			s->ShowWindow(SW_HIDE);
-//DEADCODE RDH 14/05/99 			s->SetString(RESSTRING(UNACLOST));
 	    	s=GETDLGITEM(IDC_RSTATICSOFT3);
 			s->ShowWindow(SW_HIDE);
 
@@ -363,9 +344,6 @@ BOOL CDeBrief::OnInitDialog()
 
 	    	s=GETDLGITEM(IDC_RSTATICSOFT2);
 			s->SetString(RESSTRING(SUPPLIESDESTROYED));
-//DEADCODE RDH 23/06/99 	    	s=GETDLGITEM(IDC_RSTATICSOFT3);
-//DEADCODE RDH 23/06/99 			s->ShowWindow(SW_SHOW);
-//DEADCODE RDH 23/06/99 	 		s->SetString(RESSTRING(SUPPLIESREMAINING));
 	    	s=GETDLGITEM(IDC_RSTATICSOFT3);
 			s->ShowWindow(SW_HIDE);
 
@@ -378,10 +356,11 @@ BOOL CDeBrief::OnInitDialog()
 
 
 
-		 	SupplyRoute*	currroute;
+		 	SupplyRoute*	currroute=NULL;
 			SupplyTree::Supply2UID rel;
 
 			SupplyNode*	node=SupplyTree::FindSupplyNodeForItem(Todays_Packages.pack[packnum].packagetarget,&rel);
+			if (node)
 			switch (rel)
 			{
 				case SupplyTree::S2U_ROUTE0:
@@ -394,37 +373,19 @@ BOOL CDeBrief::OnInitDialog()
 					currroute = node->route[2];
 					break;
 			}
-			currroute = SupplyTree::FindBridge(Todays_Packages.pack[packnum].packagetarget, currroute);
+			if (currroute)
+				currroute = SupplyTree::FindBridge(Todays_Packages.pack[packnum].packagetarget, currroute);
 		   	s=GETDLGITEM(IDC_INFOSOFT1);
-		  	s->SetString(CSprintf("%i", currroute->stores_destroyed/currroute->storespermobile));
+		  	s->SetString(CSprintf("%i", currroute && currroute->storespermobile ? currroute->stores_destroyed/currroute->storespermobile : 0));
 
 
-//DEADCODE RDH 30/06/99 
-//DEADCODE RDH 30/06/99 			stores_destroyed = MMC.StoresDestroyedForNodeRoute(node);
-//DEADCODE RDH 30/06/99 
-//DEADCODE RDH 30/06/99 		   	s=GETDLGITEM(IDC_INFOSOFT1);
-//DEADCODE RDH 30/06/99 			//this is a simplification because the stored_destroyed may not be 
-//DEADCODE RDH 30/06/99 			//transported in the route 0 type						  //RDH 27/05/99
-//DEADCODE RDH 30/06/99 		  	s->SetString(CSprintf("%i", stores_destroyed/node->route[0]->storespermobile));
 
 
-//DEADCODE RDH 24/03/99 			while   (	(i < NUM_OF_SUPPLYROUTES)
-//DEADCODE RDH 24/03/99 					)
-//DEADCODE RDH 24/03/99 			{
-//DEADCODE RDH 24/03/99 				currroute =  node->route[i];
-//DEADCODE RDH 24/03/99 				while (currroute)
-//DEADCODE RDH 24/03/99 				{
-//DEADCODE RDH 24/03/99 					stores_destroyed = currroute->stores_destroyed;
-//DEADCODE RDH 24/03/99 					currroute = currroute->alternateroute;  
-//DEADCODE RDH 24/03/99 				}
-//DEADCODE RDH 24/03/99 				i++;
-//DEADCODE RDH 24/03/99 			}			
 			s=GETDLGITEM(IDC_INFOSOFT2);
-		  	s->SetString(CSprintf("%i", currroute->stores_destroyed));
+		  	s->SetString(CSprintf("%i", currroute ? currroute->stores_destroyed : 0));
 
 			s=GETDLGITEM(IDC_INFOSOFT3);
 			s->ShowWindow(SW_HIDE);
-//DEADCODE RDH 23/06/99 		  	s->SetString(CSprintf("%i", node->currentstores));
 
 
 			break;
@@ -452,7 +413,6 @@ BOOL CDeBrief::OnInitDialog()
 			TeamDef::Team blueforce;
 
 			if	(		(node->supplyline->initiative==REDATTACKING)
-//DEADCODE RDH 28/02/99 				&&	(tabside == 0)
 			)
 				blueforce = TeamDef::HOME;
 			else

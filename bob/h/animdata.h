@@ -323,10 +323,6 @@ public:
 	UByte	fuelswitch:1,										//RDH 13Apr99
 			gunotherswitch:1,									//RDH 13Apr99
 			bombrocketswitch;									//RJS 24Nov99
-//DeadCode RJS 18Apr00 			acundercarriage:1,									//RJS 24Nov99
-//DeadCode RJS 18Apr00 			acundercarriage2:1,									//RJS 24Nov99
-//DeadCode RJS 18Apr00 			acundercarriage3:1,									//RJS 24Nov99
-//DeadCode RJS 18Apr00 			acundercarriage4:1;									//RJS 24Nov99
 
 	UByte	acfuelwarning:1,									//RJS 24Nov99
 			acfuelwarning2:1,
@@ -375,7 +371,7 @@ public:															//RJS 01Oct97
 			weapindex2:3;										//RJS 08Sep98
 	UByte	lnchtype;											//RJS 21Jul98
 	UByte	delay;												//RJS 21Jul98
-	uintptr_t			originitm;											//RJS 21Jul98
+	ULong			originitm;											//RJS 21Jul98
 };																//RJS 21Jul98
 
 class	FlareAnimData:public	MinAnimData						//RJS 21Jan98
@@ -418,7 +414,7 @@ public:
 	UByte	frameno;
 	UByte	hitstrength;										//DAW 01Dec98
 	UByte	novirtualguns;										//RJS 29Mar99
-	uintptr_t			lastmissile;										//RJS 29Mar99
+	ULong			lastmissile;										//RJS 29Mar99
 	UWord	target;
 	UByte	wpIndex;											//RJS 12Nov99
 	UByte	pad;												//RJS 12Nov99
@@ -434,7 +430,7 @@ class	SmokeTrailAnimData:public	MinAnimData
 {
 public:
 	WeapAnimData	weaponlaunchers[1];
-	uintptr_t			thelist;
+	ULong			thelist;
 	UWord			nopoints;					
  	ULong			lifetime;									
 	ULong			currTime;										

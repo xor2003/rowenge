@@ -78,7 +78,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 
 #include "strings.h"
 
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"makebf.h"
 #include	"myangles.h"
 #include	"bfnumber.h"

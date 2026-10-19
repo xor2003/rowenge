@@ -42,7 +42,6 @@ enum	LUMINOSITYTYPE											//RJS 19Jan98
 };																//RJS 19Jan98
 
 enum	ObjectType	{DUFF_OBJECT=0, //PD 06/12/99
-//DEADCODE PD 06/12/99 	GROUND_TILE_OBJECT=0,
 //DEAD					NRGRND_TILE_OBJECT,							//PD 18Mar96
 //DEAD					SKY_TILE_OBJECT,
 //DEAD					HORIZON_TILE_OBJECT,
@@ -54,7 +53,6 @@ enum	ObjectType	{DUFF_OBJECT=0, //PD 06/12/99
 					COCKPIT_OBJECT,
 					MAP_OBJECT,									//RJS 08Sep98
 					SHADEOVERRIDE_OBJECT,
-//DEADCODE PD 06/12/99 					SPECIAL_TILE_OBJECT,
 					XXX_DUMMYTYPE = 0x07FFF						//PD 23Aug96
 					};
 
@@ -156,8 +154,6 @@ typedef float R3DVALUE;
 
 struct	Base_Obj3D
 {
-//DeadCode RJS 07Feb00	BaseObj3DPtr	lptr,
-//DeadCode RJS 07Feb00					rptr;
 	ObjectType		objtype;
 	IFShare			realbz;
 };
@@ -296,21 +292,6 @@ inline void _clipLR(UWord& cf,Float x,Float z)
 	else if (x>z) cf|=CF3D_OFFRIGHT;
 }
 */
-//Old_Code PD 26Feb99 inline void _clipLR(UWord& cf,Float x,Float z)
-//Old_Code PD 26Feb99 {
-//Old_Code PD 26Feb99  	ULong abs_z_high=*((ULong*)&z+1)&~CF3D_SIGNBITMASK;
-//Old_Code PD 26Feb99 	ULong abs_x_high=*((ULong*)&x+1);
-//Old_Code PD 26Feb99 	if (abs_x_high&CF3D_SIGNBITMASK)
-//Old_Code PD 26Feb99 	{
-//Old_Code PD 26Feb99 		abs_x_high&=~CF3D_SIGNBITMASK;
-//Old_Code PD 26Feb99 		if (abs_x_high>abs_z_high || 
-//Old_Code PD 26Feb99 			(abs_x_high==abs_z_high && *(ULong*)&x>*(ULong*)&z))
-//Old_Code PD 26Feb99 			cf|=CF3D_OFFLEFT;
-//Old_Code PD 26Feb99 	}
-//Old_Code PD 26Feb99 	else if (abs_x_high>abs_z_high || 
-//Old_Code PD 26Feb99 			(abs_x_high==abs_z_high && *(ULong*)&x>*(ULong*)&z))
-//Old_Code PD 26Feb99 			cf|=CF3D_OFFRIGHT;
-//Old_Code PD 26Feb99 }
 
 //������������������������������������������������������������������������������
 //Procedure	_clipTB
@@ -329,21 +310,6 @@ inline void _clipLR(UWord& cf,Float x,Float z)
 	}
 	else if (y>z) cf|=CF3D_OFFTOP;
 }*/
-//Old_Code PD 26Feb99 inline void _clipTB(UWord& cf,Float y,Float z)
-//Old_Code PD 26Feb99 {
-//Old_Code PD 26Feb99  	ULong abs_z_high=*((ULong*)&z+1)&~CF3D_SIGNBITMASK;
-//Old_Code PD 26Feb99 	ULong abs_y_high=*((ULong*)&y+1);
-//Old_Code PD 26Feb99 	if (abs_y_high&CF3D_SIGNBITMASK)
-//Old_Code PD 26Feb99 	{
-//Old_Code PD 26Feb99 		abs_y_high&=~CF3D_SIGNBITMASK;
-//Old_Code PD 26Feb99 		if (abs_y_high>abs_z_high || 
-//Old_Code PD 26Feb99 			(abs_y_high==abs_z_high && *(ULong*)&y>*(ULong*)&z))
-//Old_Code PD 26Feb99 			cf|=CF3D_OFFBOTTOM;
-//Old_Code PD 26Feb99 	}
-//Old_Code PD 26Feb99 	else if (abs_y_high>abs_z_high || 
-//Old_Code PD 26Feb99 			(abs_y_high==abs_z_high && *(ULong*)&y>*(ULong*)&z))
-//Old_Code PD 26Feb99 			cf|=CF3D_OFFTOP;
-//Old_Code PD 26Feb99 }
 //#endif
 
 //struct	DoPointStruc
@@ -366,8 +332,6 @@ inline void _clipLR(UWord& cf,Float x,Float z)
 //		};
 
 // moved the dopointstruc stuff to lib3d.h
-//DEADCODE JON 5/19/00 struct R3DVERTEX;
-//DEADCODE JON 5/19/00 typedef R3DVERTEX DoPointStruc;
 
 typedef	DoPointStruc	*dopointptr;
 
@@ -458,14 +422,6 @@ const	SLong	ObjectTreeSize	 = 1024;						//PD 13Mar96
 const	SLong	AircraftTreeSize	= 64;						//PD 28Oct98
 
 //typedef
-//DeadCode PD 03Mar98 enum PInOut{pio_NULL 	= 0x0000,
-//DeadCode PD 03Mar98 	 		pio_Top		= 0x0020,
-//DeadCode PD 03Mar98 	 		pio_Bottom	= 0x0010,
-//DeadCode PD 03Mar98 	 		pio_North	= 0x0008,
-//DeadCode PD 03Mar98 	 		pio_South	= 0x0004,
-//DeadCode PD 03Mar98 	 		pio_East	= 0x0002,
-//DeadCode PD 03Mar98 	 		pio_West	= 0x0001,
-//DeadCode PD 03Mar98 			pio_ALL		= 0x003F} PInOut;
 
 typedef
 class PointType

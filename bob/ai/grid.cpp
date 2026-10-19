@@ -480,8 +480,8 @@ bool Grid_Word::save(const char *filename )
 		if ( temp[i] >= hdSt[i] )
 			fwrite( data[ hdSt[i] ], 2, 8*8, fp );			// write out this block (first time seen)
 
-		delete[] newHd;
-		delete[] temp;
+	delete[] newHd;
+	delete[] temp;
 	fclose(fp);
 
 	return true; // we have been sucessfull...
@@ -591,8 +591,8 @@ bool Grid_Long::save(const char *filename )
 	for ( int i = 0; i<80*80; i++ )
 		if ( temp[i] >= hdSt[i] )
 			fwrite( data[ hdSt[i] ], 4, 8*8, fp );			// write out this block (first time seen)
-		delete[] newHd;
-		delete[] temp;
+	delete[] newHd;
+	delete[] temp;
 	fclose(fp);
 
 	return true; // we have been sucessfull...
@@ -634,10 +634,8 @@ Grid_Byte* Grid_Byte_File::blank = &blankInst;
 
 //#define new DEBUG_NEW
 
-//DeadCode JON 28Jul00 Grid_Byte_File* Grid_Base::gridfiles[GF_TABLESIZE]={ /*NULL*/};
 static Grid_Byte_File gridTable[Grid_Base::GF_TABLESIZE];
 Grid_Byte_File* Grid_Base::gridfiles = gridTable;
-//DeadCode JON 11Aug00 Grid_Byte_File* Grid_Base::gridfiles/*[GF_TABLESIZE]*/=new Grid_Byte_File[GF_TABLESIZE];
 fileblock* Grid_Base::CloudGrids[3]={ NULL };
 
 //////////////////////////////////////////////////////////////////////
@@ -652,13 +650,8 @@ fileblock* Grid_Base::CloudGrids[3]={ NULL };
 void	Grid_Base::OpenGridFiles()
 {
 	CloseGridFiles();
-//DeadCode JON 28Jul00 	gridfiles[GF_RADAR]=new fileblock(FIL_RADARGRID, makeGridAt );
-//DeadCode JON 28Jul00 	gridfiles[GF_COLOUR]=new fileblock( FIL_4COLGRID, makeGridAt );
-//DeadCode JON 28Jul00 //DeadCode JON 28Jul00 	gridfiles[GF_LOWCLOUD]=new fileblock( FIL_CLOUDGRID_01, makeGridAt );
-//DeadCode JON 28Jul00 	gridfiles[GF_MINALT]=new fileblock( FIL_MINALT, makeGridAt );
 	gridfiles[GF_RADAR].SetFile( new fileblock(FIL_RADARGRID, makeGridAt ) );
 	gridfiles[GF_COLOUR].SetFile( new fileblock( FIL_4COLGRID, makeGridAt ) );
-//DeadCode JON 28Jul00 	gridfiles[GF_LOWCLOUD]=new fileblock( FIL_CLOUDGRID_01, makeGridAt );
 	gridfiles[GF_MINALT].SetFile( new fileblock( FIL_MINALT, makeGridAt ) );
 	gridfiles[GF_CORNERALT].SetFile( new fileblock( FIL_CORNERALT, makeGridAt ));
 	CloudGrids[0]=new fileblock(FIL_CLOUDGRID_00, makeGridAt );
@@ -679,27 +672,6 @@ void	Grid_Base::OpenGridFiles()
 
 void	Grid_Base::SetCloudGrid( int layer, UByte cover )
 {
-//DeadCode JON 28Jul00 	if ( gridfiles[GF_CLOUDLAYER0+layer] != NULL )
-//DeadCode JON 28Jul00 	{
-//DeadCode JON 28Jul00 		delete gridfiles[GF_CLOUDLAYER0+layer];
-//DeadCode JON 28Jul00 		gridfiles[GF_CLOUDLAYER0+layer] = NULL;
-//DeadCode JON 28Jul00 	}
-//DeadCode JON 28Jul00 	if ( cover < 64 )
-//DeadCode JON 28Jul00 		gridfiles[GF_CLOUDLAYER0+layer]=new fileblock( (void*)new Grid_Byte() );// blank
-//DeadCode JON 28Jul00 	else if ( cover < 128 )
-//DeadCode JON 28Jul00 		gridfiles[GF_CLOUDLAYER0+layer]=new fileblock( FIL_CLOUDGRID_00, makeGridAt ); // scattered
-//DeadCode JON 28Jul00 	else if ( cover < 192 )
-//DeadCode JON 28Jul00 		gridfiles[GF_CLOUDLAYER0+layer]=new fileblock( FIL_CLOUDGRID_01, makeGridAt ); // overcast
-//DeadCode JON 28Jul00 	else
-//DeadCode JON 28Jul00 		gridfiles[GF_CLOUDLAYER0+layer]=new fileblock( FIL_CLOUDGRID_02, makeGridAt ); // heavy
-//DeadCode JON 6Sep00 	if ( cover < 64 )
-//DeadCode JON 6Sep00 		gridfiles[GF_CLOUDLAYER0+layer].CloseFile();// blank
-//DeadCode JON 6Sep00 	else if ( cover < 128 )
-//DeadCode JON 6Sep00 		gridfiles[GF_CLOUDLAYER0+layer].SetFile( CloudGrids[0] ); // scattered
-//DeadCode JON 6Sep00 	else if ( cover < 192 )
-//DeadCode JON 6Sep00 		gridfiles[GF_CLOUDLAYER0+layer].SetFile( CloudGrids[1] ); // overcast
-//DeadCode JON 6Sep00 	else
-//DeadCode JON 6Sep00 		gridfiles[GF_CLOUDLAYER0+layer].SetFile( CloudGrids[2] ); // heavy
 	switch ( cover>>6 )
 	{
 	case 0: // cover < 64
@@ -749,8 +721,6 @@ void	Grid_Base::CloseGridFiles()
 	{
 		if ( gridfiles[i].getdata() != NULL )
 		{
-//DeadCode JON 28Jul00 			delete gridfiles[i];
-//DeadCode JON 28Jul00 			gridfiles[i]=NULL;
 			gridfiles[i].ReallyCloseFile();
 		}
 	}

@@ -85,7 +85,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "myerror.h"
 #include "monotxt.h"
 #include "savegame.h"
-//DeadCode RJS 02Dec97 #include "3dcom.h"
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 //Procedure		DerivativeBase
@@ -156,7 +155,6 @@ void Model::DerivativeBase ()
 	CTRLDERVS C;
 	ACCDERVS A;
 
-//DeadCode AMM 24Nov99 	MODEL_DT = 3;
 	MODEL_LOOPS = 1;
 
 	static Bool setup = TRUE;

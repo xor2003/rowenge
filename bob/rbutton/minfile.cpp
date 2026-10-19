@@ -86,7 +86,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 //  Then, the fixup routine will only be called for the initial load.
 //
 //
-//DeadCode JIM 02Jul96 #include	<ASSERT.h>
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 #include <afxctl.h>
@@ -177,7 +176,6 @@ CON	fileman::fileman()
 	dirrootblock=NULL;
 //	direntries[MAXDIRENTRIES];
 //	makerootdirlist();
-//DeadCode JIM 24Oct96 	makerootdirlist();
 //	MemFailPFU=_set_new_handler(MyMemFailPFU);
 }
 
@@ -228,10 +226,6 @@ void	fileman::makerootdirlist()
 {
 
 
-//DeadCode JIM 21Sep95 char	here[]=".",
-//DeadCode JIM 21Sep95 		exedir[80],
-//DeadCode JIM 21Sep95 		cddir[80],
-//DeadCode JIM 21Sep95 		paramdir[80];
 		
 static char	worker[200];
 		dirfakeblock=worker;
@@ -333,7 +327,6 @@ void	fileman::GetParamDir(string		paramdir)
 
 void	translatedirlist(void*	&dataarea,ULong&	datalengthin)
 {
-//DeadCode JIM 07Sep95 ULong	outputpos=0;
 string	datascan=	(string)dataarea,
 		outptr=		(string)dataarea;
 int		outind=0;
@@ -422,7 +415,6 @@ int		pathstart=outind;
 //Now add fix for alias directories - modify pointer to NULL &!!DONT delete text DONT!!
 		if 	(	(outptr[pathstart]=='.')  &&	(outptr[pathstart+1]==0))
 		{
-//DeadCode JIM 21Sep95 			outind=pathstart;
 			pathstart=fileman::ALIASDIRIND;
 		}
 
@@ -459,13 +451,11 @@ int		pathstart=outind;
 
 void	retranslatedirlist(void*	&dataarea,ULong&	datalengthin)
 {
-//DeadCode JIM 07Sep95 ULong	outputpos=0;
 string	datascan=	(char*)dataarea,
 		outptr=		(char*)dataarea;
 int		outind=0,
 		datalength=datalengthin;
 
-//DeadCode JIM 06Nov95 dirindex	dirnum;
 //Skip leading garbage...
 	while (	(*datascan<'0')	  ||	(*datascan>'9'))
 	{
@@ -528,9 +518,6 @@ int		outind=0,
 //Ok.. now process the info collected.
 //First perform sanity checks - not needed on reload
 //Now add fix for alias directories - modify pointer to NULL & delete text
-//DeadCode JIM 21Sep95 	This is difficult so I have stopped doing it ever!
-//DeadCode JIM 21Sep95 		if 	(*((uword*) &outptr[outind-2])==*((uword*) "."))
-//DeadCode JIM 21Sep95 			outind-=2;
 
 //Thats it for this reading loop
 		}
@@ -700,7 +687,6 @@ string	srcchar=(string)	srcdata;
 	ASSERT 	((srcsize) && ("=0=wildcard - not implemented"));
 //If first byte is zero then it is a concatenated directory
 	//else
-//Old_Code DAW 24Feb97 	ASSERT	((srcchar[0])&&("=0=concatenated - not implemented"));
 	if (srcchar[0]==0)			//Concatinated Dir.dir files
 	{							//Don't do anything yet
 		INT3;
@@ -747,13 +733,7 @@ int			count=16;
 			while (count--)
 				*(outchar++)=0;
 		}
-//DeadCode JIM 21Sep95 //Return the result
-//DeadCode JIM 21Sep95 		return(outstart);
 	}
-//DeadCode JIM 21Sep95 	//else
-//DeadCode JIM 21Sep95 	{
-//DeadCode JIM 21Sep95 		return(srcdata);
-//DeadCode JIM 21Sep95 	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -763,8 +743,6 @@ int			count=16;
 fileblockptr	fileman::readfilelist(dirindex	reqdir)
 {
 fileblockptr	dfblock;
-//DeadCode JIM 21Sep95 dirindex
-//DeadCode JIM 21Sep95 	reqdir= dirnum(MyFile);
 	makedirectoryname(reqdir,filenameindex);
 	//At this point I want to load 'dir.dir'
 	//This would be:
@@ -809,7 +787,6 @@ string	fileman::namenumberedfile(FileNum	MyFile)
 	currfilenum=MyFile;
 	string		dirlister=(string)	fb.getdata();
 
-//DeadCode DAW 25Feb97 	INT3();
 	if (dirlister[0]==0)										//DAW 25Feb97
 		return("//");
 	ASSERT(  (dirlister[0]) && ("Not expecting concatenated directory here!") );
@@ -900,42 +877,12 @@ ULong 	oldpos=(ULong)	ftell(filehandle);
 ULong 	returnval=(ULong)	ftell(filehandle);
 		fseek(filehandle,oldpos,SEEK_SET);
 		return(returnval);
-//Old_Code PD 19Sep96 		DPMIregs	regs;
-//Old_Code PD 19Sep96 
-//Old_Code PD 19Sep96 		regs.w.ax=0x4201;
-//Old_Code PD 19Sep96 		regs.w.bx=filehandle->_handle;
-//Old_Code PD 19Sep96 		regs.w.cx=0;
-//Old_Code PD 19Sep96 		regs.w.dx=0;
-//Old_Code PD 19Sep96 		ASM_DOSvia31(0x21,&regs);
-//Old_Code PD 19Sep96 ULong	oldposl=regs.w.ax;
-//Old_Code PD 19Sep96 ULong	oldposh=regs.w.dx;
-//Old_Code PD 19Sep96 		regs.w.ax=0x4202;
-//Old_Code PD 19Sep96 		regs.w.bx=filehandle->_handle;
-//Old_Code PD 19Sep96 		regs.w.cx=0;
-//Old_Code PD 19Sep96 		regs.w.dx=0;
-//Old_Code PD 19Sep96 		ASM_DOSvia31(0x21,&regs);
-//Old_Code PD 19Sep96 ULong	returnval=regs.w.ax+(regs.w.dx<<16);
-//Old_Code PD 19Sep96 		regs.w.ax=0x4200;
-//Old_Code PD 19Sep96 		regs.w.bx=filehandle->_handle;
-//Old_Code PD 19Sep96 		regs.w.cx=oldposh;
-//Old_Code PD 19Sep96 		regs.w.dx=oldposl;
-//Old_Code PD 19Sep96 		ASM_DOSvia31(0x21,&regs);
-//Old_Code PD 19Sep96 		return(returnval);
 };
 //////////////////////////////////////////////////////////////////////
 ULong	fileman::seekfilepos(file	filehandle,ULong	offset)
 {
 	fseek(filehandle,offset,SEEK_SET);
 	return((ULong) ftell(filehandle));
-//Old_Code PD 19Sep96 		DPMIregs	regs;
-//Old_Code PD 19Sep96 
-//Old_Code PD 19Sep96 		regs.w.ax=0x4200;
-//Old_Code PD 19Sep96 		regs.w.bx=filehandle->_handle;
-//Old_Code PD 19Sep96 		regs.w.cx=offset >>16;
-//Old_Code PD 19Sep96 		regs.w.dx=offset;
-//Old_Code PD 19Sep96 		ASM_DOSvia31(0x21,&regs);
-//Old_Code PD 19Sep96 ULong	returnval=regs.w.ax+(regs.w.dx<<16);
-//Old_Code PD 19Sep96 		return(returnval);
 };
 //////////////////////////////////////////////////////////////////////
 ULong	fileman::readfileblock(
@@ -953,49 +900,7 @@ void	fileman::closefile(file	filehandle)
 }
 
 static	Bool	gotnewfix=FALSE;
-//DeadCode DAW 16Dec96 
-//DeadCode DAW 16Dec96 Moved to loadlist.cpp
-//DeadCode DAW 16Dec96 
-//DeadCode DAW 16Dec96 
 
-//DeadCode DAW 16Dec96 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-//DeadCode DAW 16Dec96 //Procedure		preload
-//DeadCode DAW 16Dec96 //Author		Robert Slater
-//DeadCode DAW 16Dec96 //Date			Mon 2 Dec 1996
-//DeadCode DAW 16Dec96 //
-//DeadCode DAW 16Dec96 //Description	
-//DeadCode DAW 16Dec96 //
-//DeadCode DAW 16Dec96 //Inputs		
-//DeadCode DAW 16Dec96 //
-//DeadCode DAW 16Dec96 //Returns	
-//DeadCode DAW 16Dec96 //
-//DeadCode DAW 16Dec96 //------------------------------------------------------------------------------
-//DeadCode DAW 16Dec96 void	fileman::preload()
-//DeadCode DAW 16Dec96 {
-//DeadCode DAW 16Dec96 	fileblock	pl(FIL_PRELOAD_LIST);
-//DeadCode DAW 16Dec96 	char* t=(char*)getdata(pl);
-//DeadCode DAW 16Dec96 	FileNum f;
-//DeadCode DAW 16Dec96 	while (*t<'0')	t++;
-//DeadCode DAW 16Dec96 	f=(FileNum)Math_Lib.a2iend(t);
-//DeadCode DAW 16Dec96 	while(f)
-//DeadCode DAW 16Dec96 		if (dirnum(f)==dirnum(FIL_SUN_NUM))
-//DeadCode DAW 16Dec96 		{
-//DeadCode DAW 16Dec96 
-//DeadCode DAW 16Dec96 			fileblock z(f,shapestuff::FixupShapeFile);
-//DeadCode DAW 16Dec96 			while (*t<'0')	t++;
-//DeadCode DAW 16Dec96 			f=(FileNum)Math_Lib.a2iend(t);
-//DeadCode DAW 16Dec96 		}
-//DeadCode DAW 16Dec96 		else
-//DeadCode DAW 16Dec96 		{
-//DeadCode DAW 16Dec96 			if (dirnum(f)==dirnum(FIL_MUSIC_BASE))				//JIM 15Dec96
-//DeadCode DAW 16Dec96 				f=(FileNum)(f+_Miles.MusicDir);					//JIM 15Dec96
-//DeadCode DAW 16Dec96 			fileblock z(f);
-//DeadCode DAW 16Dec96 			while (*t<'0')	t++;
-//DeadCode DAW 16Dec96 			f=(FileNum)Math_Lib.a2iend(t);
-//DeadCode DAW 16Dec96 		}
-//DeadCode DAW 16Dec96 
-//DeadCode DAW 16Dec96 }
-//DeadCode DAW 16Dec96 
 
 	extern	SLong eip();
 #ifdef __WATCOMC__
@@ -1206,7 +1111,6 @@ FILE*	filehandle;
 	if (link)
 		link->breaklink();	//this does all the work now!
 
-//DeadCode JIM 01Apr96 	if ((fileblockdata)&&(datasize))
 	{
 //TempCode JIM 29Mar96 		dirindex reqdir=dirnum(filenum);
 //TempCode JIM 29Mar96 		//find in old list
@@ -1229,7 +1133,6 @@ FILE*	filehandle;
 //TempCode JIM 29Mar96 		newfb->nextindir=search;
 //TempCode JIM 29Mar96 		search = newfb;
 
-//DeadCode JIM 01Apr96 		delete []	(voidbigblock*)	fileblockdata;
 	}
 }
 
@@ -1438,7 +1341,6 @@ Bool	fileblocklink::deletelink(ULong size)
 		while (s2)
 		{
 			s2->dir.remove(s2);									//JIM 10Apr96
-//DeadCode JIM 10Apr96 			s2->heap.remove(s2);			//JIM 10Apr96
  			FILEMAN.allfreedfiles=s2->heap.next;
 			//do something with file handles
 			delete [] (voidbigblock*) s2->fileblockdata;
@@ -1452,12 +1354,6 @@ Bool	fileblocklink::deletelink(ULong size)
 }
 
 ////////////////////////////////////////////////////////
-//DeadCode JIM 21Sep95 ULong	fileblock::getsize()
-//DeadCode JIM 21Sep95 	{return(datasize);}
-//DeadCode JIM 21Sep95 
-//DeadCode JIM 21Sep95 ////////////////////////////////////////////////////////
-//DeadCode JIM 21Sep95 void*	fileblock::getdata()
-//DeadCode JIM 21Sep95 	{return(fileblockdata);}
 
 ////////////////////////////////////////////////////////
 	fileman::dirfileentry::dirfileentry()
@@ -1698,7 +1594,6 @@ void fileman::InitFileSystem()
 	delete loaddirlist(FIL_640resDIR);
 	delete loaddirlist(FIL_soundsDIR);
 	delete loaddirlist(FIL_battleDIR);
-//DeadCode DAW 08Jan97 	delete FILEMAN.loaddirlist(FIL_localsDIR);
 
 //	return(TRUE);
 }
@@ -1725,7 +1620,6 @@ dirindex fileman::getbasedir(dirindex	d)						//DAW 24Sep96
 		n=direntries[n].parentdir;
 	if (direntries[n].driverfile==INVALIDFILENUM)
 		return(RAMCACHEHANDLEDIR);
-//DeadCode DAW 25Sep96 	printf("directory src:%i\tdest:%i\n",d,n);
 	return(n);
 }
 
@@ -1792,7 +1686,6 @@ string	fileman::namenumberedfilelessfail(FileNum	MyFile)
 	currfilenum=MyFile;
 	string		dirlister=(string)	fb.getdata();
 
-//DeadCode DAW 25Feb97 	INT3();
 	if (dirlister[0]==0)										//DAW 25Feb97
 		return("//");
 	ASSERT(  (dirlister[0]) && ("Not expecting concatenated directory here!") );

@@ -562,10 +562,6 @@ void CRListBoxCtrl::OnDraw(
 	if (m_bDrawing) return;
 	if (m_hWnd)
 	{
-//DeadCode JIM 01Aug100 		QueryPerformanceCounter(&drawtime);
-//DEADCODE JIM 14/12/99 		BYTE b;
-//DEADCODE JIM 14/12/99 		INT3;
-//DEADCODE JIM 14/12/99 		DDP_Text(NULL, 3, b, "Hello");
 		pdc->SetMapMode(MM_TEXT);
 		m_bDrawing=TRUE;
 		CRect rc=rcBounds;
@@ -617,8 +613,6 @@ void CRListBoxCtrl::OnDraw(
 			long offsetx;
 			long offsety;
 
-//DEADCODE JIM 14/12/99 		if (m_hWnd)
-//DEADCODE JIM 14/12/99 		{
 //			long offsets;
 //			offsets=parent->SendMessage(WM_GETXYOFFSET,NULL,NULL);
 			CRect rect;
@@ -627,14 +621,6 @@ void CRListBoxCtrl::OnDraw(
 			parent->GetWindowRect(parentrect);
 			offsetx=short(offsets & 0x0000FFFF)+parentrect.left-rect.left;
 			offsety=short((offsets & 0xFFFF0000)>>16)+parentrect.top-rect.top;
-//DEADCODE JIM 14/12/99 		}
-//DEADCODE JIM 14/12/99 		else
-//DEADCODE JIM 14/12/99 		{
-//DEADCODE JIM 14/12/99 			offsetx=0;
-//DEADCODE JIM 14/12/99 			offsety=0;
-//DEADCODE JIM 14/12/99 		}
-//DEADCODE JIM 14/12/99 		if (m_hWnd)
-//DEADCODE JIM 14/12/99 		{
 			BYTE* pData;
 			if (artnum)
 			{
@@ -651,7 +637,6 @@ void CRListBoxCtrl::OnDraw(
 				parent->SendMessage(WM_RELEASELASTFILE,NULL,NULL);
 			}
 			X2flag=parent->SendMessage(WM_GETX2FLAG,NULL,NULL);
-//DEADCODE JIM 14/12/99 		}
 			if (!artnum && m_FirstSweep != TRUE || !m_hWnd)
 			{
 				pOffScreenDC->FillRect(rcBounds, CBrush::FromHandle((HBRUSH)GetStockObject(BLACK_BRUSH)));
@@ -685,14 +670,11 @@ void CRListBoxCtrl::OnDraw(
  		if (m_pFontPtr) 
 			pOldFont = pOffScreenDC->SelectObject(m_pFontPtr);
  		else 
-//DEADCODE JIM 14/12/99 		if (m_hWnd)
 	 	{
 	 		CFont*	temp ;
  			temp = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT,abs(m_FontNum2),NULL) ;
  			pOldFont = pOffScreenDC->SelectObject(temp);
 	 	}
-//DEADCODE JIM 14/12/99  	else 
-//DEADCODE JIM 14/12/99 		pOldFont = pOffScreenDC->GetCurrentFont();
  		int toprowheight=0;
  		int leftcolumnwidth=0;
 		TEXTMETRIC tm;
@@ -856,7 +838,6 @@ void CRListBoxCtrl::OnDraw(
 		position5 = m_isRightAlignedList.GetHeadPosition();
 		if (m_pFontPtr) pOffScreenDC->SelectObject(m_pFontPtr);
 		else 
-//DEADCODE JIM 14/12/99 			if (m_hWnd) 
 			pOffScreenDC->SelectObject((CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT,abs(m_FontNum),NULL));
 
 		for (int x=0;x<m_list.GetCount();x++)
@@ -904,9 +885,6 @@ void CRListBoxCtrl::OnDraw(
 					rowcolour=m_rowColourList.GetNext(position7);
 					char* string=list->GetNext(position2);
 					bottomline=(y+1)*tm.tmHeight-m_lVertScrollPos;
-//DEADCODE JIM 14/12/99 					if (m_bCentred) 
-//DEADCODE JIM 14/12/99 						leftedge=((rcBounds.right-rcBounds.left-pOffScreenDC->GetTextExtent(string,strlen(string)).cx)/2);
-//DEADCODE JIM 14/12/99 					else 
 					int clipleftedge;
 					if (leftedge<leftcolumnwidth)
 						clipleftedge=leftcolumnwidth;
@@ -1218,8 +1196,6 @@ void CRListBoxCtrl::Clear()
 		m_isPictureList.RemoveAll();
 		colwidths[0]=0;		//Force all future calls to forget columns
 	}
-//DeadCode RDH 27Oct00 	else
-//DeadCode RDH 27Oct00 		INT3;
 
 //	UpdateScrollBar();
 	m_lVertScrollPos=0;
@@ -1250,7 +1226,6 @@ void CRListBoxCtrl::OnScrollHorz(long nPos)
 
 void CRListBoxCtrl::UpdateScrollBar()
 {
-//DeadCode JIM 20Oct00 	CWnd* parent=GetParent();
 	m_vert=0;
 	m_horz=0;
 	CDC* pdc;
@@ -1356,7 +1331,6 @@ void CRListBoxCtrl::UpdateScrollBar()
 		m_pVertScrollBar->SetStepSize(tm.tmHeight);
 		m_pVertScrollBar->SetPageSize(rcBounds.bottom-rcBounds.top);
 		if (m_lVertScrollPos>maxvalue || m_maxscrl == TRUE)		//AMM 10Jul99
-//DeadCode AMM 10Jul99 		if (m_lVertScrollPos>maxvalue)
 		{
 			m_lVertScrollPos=maxvalue;
 			m_maxscrl = FALSE;									//AMM 10Jul99
@@ -1384,15 +1358,11 @@ void CRListBoxCtrl::AddColumn(long width)
  			temp = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT,abs(m_FontNum2),NULL) ;
  			pOldFont = dc->SelectObject(temp);
 	 	}
-//DEADCODE JIM 14/12/99  	else 
-//DEADCODE JIM 14/12/99 		pOldFont = pOffScreenDC->GetCurrentFont();
 		TEXTMETRIC tm;
 		dc->GetTextMetrics(&tm);
 		dc->SelectObject(pOldFont);
 		ReleaseDC(dc);
 
-//DeadCode JIM 20Oct00  		int toprowheight=0;
-//DeadCode JIM 20Oct00  		int leftcolumnwidth=0;
  		tm.tmHeight+=GetShadow2YOffset(tm.tmHeight);
  		tm.tmHeight+=m_vertSeperation;
 		width=(width*tm.tmHeight)/16;
@@ -1432,10 +1402,6 @@ void CRListBoxCtrl::SetColumnWidth(short index, long width)
  			temp = (CFont*)GetParent()->SendMessage(WM_GETGLOBALFONT,abs(m_FontNum2),NULL) ;
  			pOldFont = dc->SelectObject(temp);
 	 	}
-//DEADCODE JIM 14/12/99  	else 
-//DEADCODE JIM 14/12/99 		pOldFont = pOffScreenDC->GetCurrentFont();
-//DeadCode JIM 20Oct00  		int toprowheight=0;
-//DeadCode JIM 20Oct00  		int leftcolumnwidth=0;
 		TEXTMETRIC tm;
 		dc->GetTextMetrics(&tm);
 		dc->SelectObject(pOldFont);
@@ -1578,9 +1544,6 @@ void CRListBoxCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			m_bSelectRecentlyFired=TRUE;
 			InvalidateControl();
 			CWnd* parent;
-	//DEADCODE DAW 13/04/99 		if (m_pParent)
-	//DEADCODE DAW 13/04/99 			parent=m_pParent;
-	//DEADCODE DAW 13/04/99 		else
 				parent=GetParent();
 			// do a sound dependent on the current font
 
@@ -1805,7 +1768,7 @@ void CRListBoxCtrl::OnMouseMove(UINT nFlags, CPoint point)
 				long shirtNum=atol((char*)GetString(m_iRowSel,1));
 				TRACE1("Dragging %d\n",playerNum);
 				HGLOBAL hglobal;
-				hglobal=GlobalAlloc(GHND,12);
+				hglobal=GlobalAlloc(GHND,sizeof(long)*3);	//RERUN: 3 longs, 24B on LP64
 				if (hglobal==NULL) 
 					return;
 				long* pglobal = (long*)GlobalLock(hglobal);
@@ -2141,17 +2104,11 @@ void CRListBoxCtrl::ResizeToFit()
 
 void CRListBoxCtrl::SetParentPointer(long nNewValue) 
 {						//Called for combo list box
-//DeadCode JIM 01Aug100 	if (nNewValue)
-//DeadCode JIM 01Aug100 		QueryPerformanceCounter(&spptime);
-//DeadCode JIM 01Aug100 	else
-//DeadCode JIM 01Aug100 		TRACE0("LB SPP ZERO!!!!!\n") ;
 
 	m_pParenthWnd=(HWND)nNewValue;
 	TRACE0("List box parent\n");
 	if (m_pVertScrollBar)
 		m_pVertScrollBar->SetParentPointer(nNewValue);
-//DeadCode CSB 4Aug00 	else
-//DeadCode CSB 4Aug00 		INT3;
 	if (m_pHorzScrollBar)
 		m_pHorzScrollBar->SetParentPointer(nNewValue); 
 	m_isIcon=TRUE;		 //Forces redraw

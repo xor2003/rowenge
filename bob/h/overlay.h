@@ -173,8 +173,6 @@ struct MapScr
 			SelectFromAccelMap,
 			SelectFromWaypointMap,
 			SelectFromRadioMap,
-//DeadCode JON 17Oct00 			SelectFromCommsMsgMap,
-//DeadCode JON 17Oct00 			SelectFromCommsRecipientMap,
 			SelectFromCommsMsgOrders,
 			SelectFromCommsRecipientOrders,
 			SelectFromReplayScreen,
@@ -200,16 +198,7 @@ struct MapScr
 	void	ShowItemIcons(bool);
 	void	ShowItemIconsZoomed(bool);
 
-//DeadCode JON 8Nov00 	void	ShowBackgroundMap(COORDS3D&,SWord*,SWord*);
-//DeadCode JON 8Nov00 	void	ShowWaypointIcon(SWord,SWord,WayPointPtr);
-//DeadCode JON 8Nov00 	void	ShowAircraftRoute(AirStrucPtr,SWord *,SWord *,bool);
-//DeadCode JON 29Oct00 	void	ShowAircraftIcon(SWord,SWord,AirStrucPtr);
-//DeadCode JON 29Oct00 	void	ShowAircraftIcons(SWord *,SWord *,bool);
-//DeadCode JON 29Oct00 	void	ShowTargetLocation(itemptr,SWord *,SWord *);
-//DeadCode JON 29Oct00 	void	ShowTargetIcon(SWord,SWord,itemptr);
 
-//DeadCode JON 29Oct00 	void	ShowAircraftIconsZoomed(SLong *,SLong *,bool);
-//DeadCode JON 8Nov00 	void	ShowAircraftRouteZoomed(AirStrucPtr,SLong *,SLong *,bool);
 };
 
 #define MSBlankLine {0,0xFF,SEL_BLANK,NULL}
@@ -224,8 +213,6 @@ typedef struct 	ImageMap_Desc									//PD 01Aug96
 //struct	DoPointStruc;
 class	ViewPoint;
 //it is a template class CString;
-//DEADCODE JON 5/22/00 struct R3DVERTEX;
-//DEADCODE RDH 5/19/00 typedef R3DVERTEX DoPointStruc;
 enum	Colour;
 class __declspec(dllimport) CLib3D;
 
@@ -306,10 +293,6 @@ public:
 			ScrollToEndTime=10*100,
 			WaitToScrollBackTime=WaitToScrollTime,
 			ScrollToFrontTime=ScrollToEndTime
-//DeadCode JON 10Oct00 			WaitToScrollTime=10*100,
-//DeadCode JON 10Oct00 			ScrollToEndTime=10*100,
-//DeadCode JON 10Oct00 			WaitToScrollBackTime=10*100,
-//DeadCode JON 10Oct00 			ScrollToFrontTime=ScrollToEndTime
 		};
 
 		SWord timer;
@@ -368,20 +351,15 @@ public:
 	PBlobStruc	pBlob[32];												//RJS 31Jul00
 	int			pBlobCnt;												//RJS 31Jul00
 
-//DeadCode RJS 11Oct00 	UByte quit3d;
 	void ChopStr(CString&,CString&);
 	void MakeDotDotDot(CString&);
 	SWord CalcTargIndex(CString&);
 
 	static MapScr 	firstMapScr,
 					firstMapScrBomber,
-//DeadCode JON 17Oct00 					firstMapScrCOMMS,
 					accelMapScr,
 					waypointMapScr,
 					radioMapScr,
-//DeadCode JON 17Oct00 					radioMapScrCOMMS,									//JON 17Oct00
-//DeadCode JON 17Oct00 					commsMsgMapScr,
-//DeadCode JON 17Oct00 					commsRecipientMapScr,
 					continueQuitScr,									//JON 31Oct00
 					commsMsgOrdersScr,
 					commsRecipientOrdersScr,
@@ -431,7 +409,6 @@ public:
 	void SetGridDimensions(MapScr *);
 	void MsgOptionSelected(MESSAGE_STRUC*,SLong);
 	void SetTargName(char*);
-//DeadCode JON 21Aug00 	void ClippedPutC(R3DVERTEX*,ImageMapDescPtr,FRect&);
 	void	PatchFontTable(ImageMapDesc* imap);
 	UByte startMarker,endMarker,curPos;
 
@@ -492,8 +469,6 @@ public:
 	void InitInfoTexts();
 	void ReleaseInfoTexts();
 	char* LdStr(SLong);
-//DeadCode JON 10Oct00 	SLong StrPixelLen(char*);
-//DeadCode JON 10Oct00 	SLong StrPixelLen2(char*);
 
 	void InitMousePos();
 	bool UpdateMousePos();
@@ -510,7 +485,6 @@ public:
 	COverlay()
 	{	msgText=NULL;
 		otherText=NULL;
-//DeadCode RJS 11Oct00 		quit3d=0;
 		averageFrameRate=0;
 		fontSize=16;
 		messageText=NULL;
@@ -558,10 +532,6 @@ public:
 	void SetInfoLineVals(SLong s,SLong m,SLong a, SLong h,SLong t);
 	void RenderMapPad();										//RJS 11Sep98
 	void DisplayProfileData(bool );
-//DeadCode JON 29Oct00 	void InitPrefs3D();
-//DeadCode JON 29Oct00 	void Prefs3D();
-//DeadCode JON 29Oct00 	void UpdateSelections();
-//DeadCode JON 29Oct00 	void UpdateSelections2();
 	void SetViewVals(SLong rng,SLong relB,SLong relA);
 	void LoaderScreen(int );
 	void CommsWaitingScreen(int);
@@ -569,7 +539,6 @@ public:
 	void CrossHair();
 	void GetSurfaceDimensions(SLong& w,SLong& h);
 	void PutC(ImageMapDesc*,const Lib3DPoint*,bool forceReload=false);
-//DeadCode JON 21Aug00 	void PutA(ImageMapDesc*,R3DVERTEX*);
 	void SmokedGlassBox(SLong x,SLong y,SLong width,SLong height);
 	void SmokedGlassBox(const SLong x,const SLong y,const SLong width,const SLong height,const ULong col,ULong alpha);
 	void	ShapeCheat(char*);

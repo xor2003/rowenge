@@ -548,7 +548,6 @@ CON	direct_draw::direct_draw()
 
 				if (dderrval==DD_OK)
 				{
-//DEADCODE					EightBitOnly=FALSE;
 					dderrval =
 					pDD2->EnumDisplayModes(DDEDM_REFRESHRATES,NULL,(LPVOID)this,
 											(LPDDENUMMODESCALLBACK)&enumDisplayModes);
@@ -1209,7 +1208,6 @@ direct_draw::enumDisplayModes(	LPDDSURFACEDESC lpDDSurfaceDesc,
 	//Scan the supported mode list - this mode may already be supported
 	//by another driver
 
-//DEADCODE	if (directddp->EightBitOnly==TRUE)
 	if (lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount!=16)
 		return (DDENUMRET_OK);
 
@@ -1229,8 +1227,6 @@ direct_draw::enumDisplayModes(	LPDDSURFACEDESC lpDDSurfaceDesc,
 	//(just to prevent mode list from overflowing in the
 	//graphics config. screen)
 
-//DEADCODE	if (lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount>16)
-//DEADCODE		return (DDENUMRET_OK);
 
 	//found a real 'new mode'
 
@@ -1666,6 +1662,12 @@ void direct_draw::LockScr(struct _DirectDraw* pdirectd,ROWANSURFACEDESC* rsd)
 		{
 			do{ hr = SDL_LockSurface(pdirectd->lpDDSBack); } while (hr != 0);
 		}
+		else
+		{
+			lockLevel++;
+			*rsd=rsdGlobal;
+			return;
+		}
 		sd.lpSurface = pdirectd->lpDDSBack->pixels;
 		sd.dwWidth = pdirectd->lpDDSBack->w; // 800;
 		sd.dwHeight = pdirectd->lpDDSBack->h; // 600;
@@ -1716,6 +1718,13 @@ void direct_draw::GetColourInfo(struct _DirectDraw* pdirectd,
 			do{ hr = SDL_LockSurface(pdirectd->lpDDSBack); } while (hr != 0);
 			SDL_UnlockSurface(pdirectd->lpDDSBack);
 		}
+		else
+		{
+			sd.ddpfPixelFormat.dwRBitMask=0x00ff0000;
+			sd.ddpfPixelFormat.dwGBitMask=0x0000ff00;
+			sd.ddpfPixelFormat.dwBBitMask=0x000000ff;
+			goto masksdone;
+		}
 		sd.lpSurface = pdirectd->lpDDSBack->pixels;
 		sd.dwWidth = pdirectd->lpDDSBack->w; // 800;
 		sd.dwHeight = pdirectd->lpDDSBack->h; // 600;
@@ -1724,7 +1733,7 @@ void direct_draw::GetColourInfo(struct _DirectDraw* pdirectd,
 		sd.ddpfPixelFormat.dwRBitMask = pdirectd->lpDDSBack->format->Rmask;
 		sd.ddpfPixelFormat.dwGBitMask = pdirectd->lpDDSBack->format->Gmask;
 		sd.ddpfPixelFormat.dwBBitMask = pdirectd->lpDDSBack->format->Bmask;
-
+masksdone:
 		DWORD	bits,shift,mask;
 
 		for (shift = 0, mask = sd.ddpfPixelFormat.dwRBitMask; !(mask & 1); shift++, mask >>= 1);

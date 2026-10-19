@@ -97,7 +97,6 @@ RAFDiaryList::RAFDiaryList(SquadNum* squadnumptr, int* currentryptr, SquadronBas
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	currentptr = currentryptr;
-//DeadCode JIM 20Oct00 	SquadNum* sqnumptr = squadnumptr;
 	sqdtlsptr = sqdetailsptr;
 
 }
@@ -145,7 +144,6 @@ void RAFDiaryList::FindDetails()
 void RAFDiaryList::Refresh()
 {
 
-//DEADCODE  10/02/00 	FindDetails();
 	
 	CRRadio* pradio;
 
@@ -197,10 +195,7 @@ void RAFDiaryList::Refresh()
 			}
  
  			//TIME! NOT raid
-//DeadCode JIM 15Oct00 			char* raidletter="F%03i";
-//DeadCode JIM 15Oct00 			rlistbox->AddString(GetTimeName(intercept->takeofftime),1);
 
-	//DEADCODE RDH 15/05/00  		rlistbox->AddString(CSprintf("F%i", intercept->diaryraidindex),1);
  			
  			//size
  				rlistbox->AddString(CSprintf("%i",sqentry->noaclaunched),2);
@@ -235,48 +230,6 @@ BOOL RAFDiaryList::OnInitDialog()
 	CDialog::OnInitDialog();
 	
 	Refresh();
-//DEADCODE  09/02/00 	CRRadio* pradio;
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	pradio=GETDLGITEM(IDC_RRADIODISPLAY);
-//DEADCODE  09/02/00 	pradio->AddButton(RESSTRING(VIEWSINGLE));
-//DEADCODE  09/02/00 	pradio->AddButton(RESSTRING(ALL));
-//DEADCODE  09/02/00   	pradio->SetCurrentSelection(1);
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	CRListBox* rlistbox;
-//DEADCODE  09/02/00 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DEADCODE  09/02/00 	rlistbox->Clear();
-//DEADCODE  09/02/00 	rlistbox->AddColumn(100);
-//DEADCODE  09/02/00 	rlistbox->AddColumn(60);
-//DEADCODE  09/02/00 	rlistbox->AddColumn(60);
-//DEADCODE  09/02/00 	rlistbox->AddColumn(60);
-//DEADCODE  09/02/00 	rlistbox->AddColumn(70);
-//DEADCODE  09/02/00 	rlistbox->AddColumn(TARGETFIELDWIDTH);										  //RDH 02/06/99
-//DEADCODE  09/02/00 	rlistbox->AddColumn(60);
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(DATE),0);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(RAID),1);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(SIZE),2);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(TO),3);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(MISSION),4);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(TARGET),5);
-//DEADCODE  09/02/00 	rlistbox->AddString(RESSTRING(TALLY),6);
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	rlistbox->AddString("10 July 1940",0);
-//DEADCODE  09/02/00 	rlistbox->AddString("100",1);
-//DEADCODE  09/02/00 	rlistbox->AddString("40",2);
-//DEADCODE  09/02/00 	rlistbox->AddString("13:00",3);
-//DEADCODE  09/02/00 	rlistbox->AddString("Strike",4);
-//DEADCODE  09/02/00 	rlistbox->AddString("Biggin Hill",5);
-//DEADCODE  09/02/00 	rlistbox->AddString("0/4",6);
-//DEADCODE  09/02/00 
-//DEADCODE  09/02/00 	rlistbox->AddString("10 July 1940",0);
-//DEADCODE  09/02/00 	rlistbox->AddString("100",1);
-//DEADCODE  09/02/00 	rlistbox->AddString("40",2);
-//DEADCODE  09/02/00 	rlistbox->AddString("13:00",3);
-//DEADCODE  09/02/00 	rlistbox->AddString("Strike",4);
-//DEADCODE  09/02/00 	rlistbox->AddString("Biggin Hill",5);
-//DEADCODE  09/02/00 	rlistbox->AddString("0/4",6);
 
 
 	

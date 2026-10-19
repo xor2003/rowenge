@@ -167,14 +167,6 @@ int			tmpleft=VESA.PageSize-off;
 			}
 			else
 				src+=tmpleft;
-//DeadCode JIM 19Nov96 			tmpleft=tmpleft>>2;
-//DeadCode JIM 19Nov96 			trg2=off+trg;
-//DeadCode JIM 19Nov96 			while (tmpleft--)
-//DeadCode JIM 19Nov96 			{
-//DeadCode JIM 19Nov96 				*((ULong*) (trg2))=*((LogicalLPtr) src);
-//DeadCode JIM 19Nov96 				src+=4;
-//DeadCode JIM 19Nov96 				trg2+=4;
-//DeadCode JIM 19Nov96 			}
 			off=0;
 
 			//set to next page
@@ -194,12 +186,6 @@ int			tmpleft=VESA.PageSize-off;
 		colleft=colleft>>2;
 		if (colleft)
 			src=(LogicalPtr)copydata(src,trg2,colleft);
-//DeadCode JIM 19Nov96 		while (colleft--)
-//DeadCode JIM 19Nov96 		{
-//DeadCode JIM 19Nov96 			*((ULong*) (trg2))=*((LogicalLPtr) src);
-//DeadCode JIM 19Nov96 			src+=4;
-//DeadCode JIM 19Nov96 			trg2+=4;
-//DeadCode JIM 19Nov96 		}
 		off+=skipbytes;
 	}
 };
@@ -270,8 +256,6 @@ Bool	Display::XX_CopyP2L(LogicalPtr	,int ,int )
 
 void	Display::XX_ResetGraphicsMode()
 {
-//DeadCode RDH 30Oct96 	if (NumberOfScreens>1)
-//DeadCode RDH 30Oct96 		LogicalScreenPtr=NULL;	//block deletion
 }
 
 

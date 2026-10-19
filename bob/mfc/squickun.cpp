@@ -182,14 +182,8 @@ BOOL CSQuickLine::OnInitDialog() 		//FP
 
 BOOL CSQuickLine::OnInitDialog2() 		//FP
 {
-//DEADCODE RDH 18/01/00 	m_IDC_FLIGHTS.SetCircularStyle(TRUE);
-//DEADCODE RDH 18/01/00 	m_IDC_TYPE.SetCircularStyle(TRUE);
-//DEADCODE RDH 18/01/00 	m_IDC_ALT.SetCircularStyle(TRUE);
-//DEADCODE RDH 18/01/00 	m_IDC_SKILL.SetCircularStyle(TRUE);
-//DEADCODE RDH 18/01/00 
 
 	CRButton* currfl=GETDLGITEM(IDC_PILOTEDFLAG);
-//DeadCode AMM 14Oct98 	if (_DPlay.CurrPlayers == 0)
 	if (!RFullPanelDial::incomms)								//AMM 14Oct98
 	{
 		currfl->ShowWindow(SW_SHOW);
@@ -293,10 +287,6 @@ void CSQuickLine::SetVariableBits(bool Icanbeplayer)
 			avail+=fields->flights;
 			if (avail>3)
 				avail=CSQuick1::MaxFlights(PlaneTypeSelect(sq));					//MS 02/05/00
-//DEADCODE MS 02/05/00 			if (sq>=PT_GER_FLYABLE && avail>3)
-//DEADCODE MS 02/05/00 				avail=3;
-//DEADCODE MS 02/05/00 			elseif (avail>4)
-//DEADCODE MS 02/05/00 				avail=4;
 		}
 		if (avail>=min)
 		{
@@ -334,10 +324,6 @@ void CSQuickLine::SetVariableBits(bool Icanbeplayer)
 		{
 			numflights=CSQuick1::MaxFlights(PlaneTypeSelect(fields->actype));					//MS 02/05/00
 
-//DEADCODE MS 02/05/00 			if (packnum)
-//DEADCODE MS 02/05/00 				numflights=3;
-//DEADCODE MS 02/05/00 			else
-//DEADCODE MS 02/05/00 				numflights=4;
 		}
 
 // check to make sure that index/number of flights are valid and reduce if necessary
@@ -351,15 +337,11 @@ void CSQuickLine::SetVariableBits(bool Icanbeplayer)
 
 		if (min==0) 
 		{
-//DEADCODE AMM 06/03/00 			combo->MakeNumList(CSQuick1::quickdef.SpareFlights(fields->actype)+fields->flights+1,0)
-//DEADCODE AMM 06/03/00 				->SetIndex(fields->flights);
 			combo->MakeNumList(numflights+1,0);
 			combo->SetIndex(index);
 		}
 		else
 		{
-//DEADCODE AMM 06/03/00 			combo->MakeNumList(CSQuick1::quickdef.SpareFlights(fields->actype)+fields->flights,1)
-//DEADCODE AMM 06/03/00 				->SetIndex(fields->flights-1);
 			combo->MakeNumList(numflights,1);
 			combo->SetIndex(index-1);
 		}
@@ -468,7 +450,6 @@ void CSQuickLine::OnTextChangedType(LPCTSTR text, short index)
 {
 	// TODO: Add your control notification handler code here
 	CRCombo* combo=GETDLGITEM(IDC_TYPE);
-//DeadCode JIM 20Oct00 	CRButton* but=GETDLGITEM(IDC_PILOTEDFLAG);
 	int newtype=aclines[combo->GetIndex()];
 	switch (fields->Duty())
 	{
@@ -505,7 +486,6 @@ void CSQuickLine::OnTextChangedType(LPCTSTR text, short index)
 	if (newtype!=fields->actype)
 	{
 		int availcount=CSQuick1::quickdef.SpareFlights(newtype);
-//DeadCode JIM 20Oct00 		int oldtype=fields->actype;
 		fields->actype=newtype;
 		int oldcount=fields->flights;
 		fields->flights=0;
@@ -529,7 +509,6 @@ void CSQuickLine::OnTextChangedFlights(LPCTSTR text, short index)
 {
 	// TODO: Add your control notification handler code here
 	CRCombo* combo=GETDLGITEM(IDC_FLIGHTS);
-//DeadCode JIM 20Oct00 	bool oldcount=(fields->flights==0);
 	if (fields->AllowZero()											  //RDH 03/03/99
 		&&	(	packnum!=CSQuick1::quickdef.plside
 			||	wavenum!=CSQuick1::quickdef.plwave

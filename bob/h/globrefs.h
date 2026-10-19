@@ -159,7 +159,6 @@ endstatic
 startglobal
 
 #else
-//DeadCode JIM 16Sep00 #pragma warnmsg ("here")
 #define	entry(name)	extern ULong& name;
 #define	endglobal
 

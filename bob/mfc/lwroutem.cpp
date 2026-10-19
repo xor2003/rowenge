@@ -138,33 +138,7 @@ BOOL LWRouteMain::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	
-//DEADCODE RDH 07/01/00 	currwp = UID_NULL;
-//DEADCODE RDH 04/01/00 	CRListBox* rlistbox;
-//DEADCODE RDH 04/01/00 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DEADCODE RDH 04/01/00 	rlistbox->Clear();
-//DEADCODE RDH 04/01/00 	rlistbox->AddColumn(80);
-//DEADCODE RDH 04/01/00 	rlistbox->AddColumn(TARGETFIELDWIDTH);										  //RDH 02/06/99
-//DEADCODE RDH 04/01/00 	rlistbox->AddColumn(70);										  //RDH 02/06/99
-//DEADCODE RDH 04/01/00 	rlistbox->AddColumn(60);										  //RDH 02/06/99
-//DEADCODE RDH 04/01/00 	rlistbox->AddColumn(60);
-//DEADCODE RDH 04/01/00 	rlistbox->AddColumn(60);
-//DEADCODE RDH 04/01/00 	rlistbox->AddColumn(60);
-//DEADCODE RDH 04/01/00 	rlistbox->AddString("",0);
-//DEADCODE RDH 04/01/00 	rlistbox->AddString(RESSTRING(LOCATION),1);
-//DEADCODE RDH 04/01/00 	rlistbox->AddString(RESSTRING(ALT),2);
-//DEADCODE RDH 04/01/00 	rlistbox->AddString(RESSTRING(ETA),3);
-//DEADCODE RDH 04/01/00 	rlistbox->AddString(RESSTRING(RELTOT),4);
-//DEADCODE RDH 04/01/00 	rlistbox->AddString(RESSTRING(STRIKEFUEL),5);
-//DEADCODE RDH 04/01/00 	rlistbox->AddString(RESSTRING(ESCORTFUEL),6);
 	
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("Strike",0);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("Wissen",1);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("20,000ft",2);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("14:00",3);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("-01:20",4);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("3000",5);
-//DEADCODE ROD 17/12/99 	rlistbox->AddString("3000",6);
-//DEADCODE ROD 17/12/99 
 
 	RefreshList();
 	RefreshButtons();
@@ -408,79 +382,21 @@ void	LWRouteMain::RefreshList()
 	CString buffer;
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 		//rlistbox->AddColumn(160);
 		//rlistbox->AddColumn(TARGETFIELDWIDTH);										  //RDH 02/06/99
 		//rlistbox->AddColumn(70);										  //RDH 02/06/99
 		//rlistbox->AddColumn(50);										  //RDH 02/06/99
 		//rlistbox->AddColumn(50);
-//DEADCODE RDH 06/01/00 	rlistbox->AddColumn(50);
-//DEADCODE RDH 06/01/00 	rlistbox->AddColumn(50);
 	rlistbox->AddString("",0);
 	rlistbox->AddString(RESSTRING(RELTOT),4);
-//DeadCode JIM 19Sep00 	if ((tab == 0) || (tab ==4))
-//DeadCode JIM 19Sep00 	{
-//DeadCode JIM 19Sep00 		if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DeadCode JIM 19Sep00 			rlistbox->AddString(RESSTRING(GRUPPE),1);
-//DeadCode JIM 19Sep00 		else
-//DeadCode JIM 19Sep00 			rlistbox->AddString(RESSTRING(SQUADRON),1);
-//DeadCode JIM 19Sep00 
-//DeadCode JIM 19Sep00 	}else
 		rlistbox->AddString(RESSTRING(LOCATION),1);
 	rlistbox->AddString(RESSTRING(ALT),2);
 	rlistbox->AddString(RESSTRING(ETA),3);
 
-//DeadCode JIM 20Oct00 	WpState wpstate = FIRST;
 
 	FillWpList();
 
-//DEADCODE  23/02/00 	int currhilight = -1;
-//DEADCODE  23/02/00 	if (Todays_Packages.pack[Todays_Packages.hipack].packagestatus!=Profile::PS_SPARE)
-//DEADCODE  23/02/00 	{
-//DEADCODE  23/02/00 		Profile& pack = Todays_Packages.pack[Todays_Packages.hipack];
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 		UniqueID wpuid = pack.route;
-//DEADCODE  23/02/00 		int i=1;
-//DEADCODE  23/02/00 		while (wpuid)
-//DEADCODE  23/02/00 		{
-//DEADCODE  23/02/00 			info_waypoint* wp=*Persons2::ConvertPtrUID(wpuid);
-//DEADCODE  23/02/00 			wpstate = (WpState)UpdateWpType(wp, wpstate);
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00  			if (	(wpstate == FIRSTTAKEOFF)
-//DEADCODE  23/02/00 				||	(wpstate == INGRESS)
-//DEADCODE  23/02/00 				||	(wpstate == EGRESS)
-//DEADCODE  23/02/00 				)
-//DEADCODE  23/02/00 			{
-//DEADCODE  23/02/00 				rlistbox->AddString(LoadResString(Profile::WPType(wpuid)),0);
-//DEADCODE  23/02/00 //DEADCODE RDH 05/01/00 			rlistbox->AddString(RESLIST(MAIN_WP_GAP,i++),0);
-//DEADCODE  23/02/00 			if (	(wp->target != GOT_UNDEFINED_VAL)
-//DEADCODE  23/02/00 				&&	 (wp->target.Evaluate())
-//DEADCODE  23/02/00 				)
-//DEADCODE  23/02/00 				rlistbox->AddString(GetTargName((UniqueID)wp->target.Evaluate()),1);
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 			int alt = (wp->World.Y*10)/Save_Data.alt.mediummm;
-//DEADCODE  23/02/00 			alt = 100*((alt + 50)/100);
-//DEADCODE  23/02/00 						rlistbox->AddString(CSprintf("%i%s",alt,LoadResString(Save_Data.alt.mediumabbr)),2);
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 			int t=wp->etas/60;
-//DEADCODE  23/02/00 			rlistbox->AddString(CSprintf("%02i:%02i",t/60,t%60),3);
-//DEADCODE  23/02/00 			t=t - pack.primarytargetETA/60;
-//DEADCODE  23/02/00 		    if (t>=0)
-//DEADCODE  23/02/00 				rlistbox->AddString(CSprintf("%02i:%02i",+t/60,t%60),4);
-//DEADCODE  23/02/00 			else
-//DEADCODE  23/02/00 				rlistbox->AddString(CSprintf("-%02i:%02i",-t/60,-t%60),4);
-//DEADCODE  23/02/00 		
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 			if (Todays_Packages.hiwp == wpuid)
-//DEADCODE  23/02/00 				currhilight = i;
-//DEADCODE  23/02/00 			
-//DEADCODE  23/02/00 			i++;
-//DEADCODE  23/02/00 			}
-//DEADCODE  23/02/00 			wpuid = wp->nextwp;
-//DEADCODE  23/02/00 		}
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 	}
 
 		int i = 0;
 		Profile& pack = Todays_Packages.pack[Todays_Packages.hipack];
@@ -503,41 +419,6 @@ void	LWRouteMain::RefreshList()
 			else
 				rlistbox->AddString(LoadResString(Profile::WPType(WpList[i])),0);
 
-//DeadCode JIM 12Sep00 			if (tab == 0)
-//DeadCode JIM 12Sep00 			{
-//DeadCode JIM 12Sep00 					int k =0;
-//DeadCode JIM 12Sep00 					while  (		(k < pack.squadlist) 
-//DeadCode JIM 12Sep00 								&&	 (pack[k].takeoffwp != WpList[i])
-//DeadCode JIM 12Sep00 							)
-//DeadCode JIM 12Sep00 						k++;
-//DeadCode JIM 12Sep00 					if (k < pack.squadlist)
-//DeadCode JIM 12Sep00 					{
-//DeadCode JIM 12Sep00 						Squadron* sq;
-//DeadCode JIM 12Sep00 						sq = &Node_Data[pack[k].squadnum];
-//DeadCode JIM 12Sep00 						CString name = ;
-//DeadCode JIM 12Sep00 						name = name + sq->SubName();
-//DeadCode JIM 12Sep00 
-//DeadCode JIM 12Sep00 						rlistbox->AddString(name,1);
-//DeadCode JIM 12Sep00 					}else
-//DeadCode JIM 12Sep00 						rlistbox->AddString("",1);
-//DeadCode JIM 12Sep00 
-//DeadCode JIM 12Sep00 			}else if (tab ==4)
-//DeadCode JIM 12Sep00 			{
-//DeadCode JIM 12Sep00 					int k =0;
-//DeadCode JIM 12Sep00 					Squadron* sq;
-//DeadCode JIM 12Sep00 					while  ((k < pack.squadlist) && (pack[k].landingwp != WpList[i]) )	//RDH 29/03/00
-//DeadCode JIM 12Sep00 						k++;
-//DeadCode JIM 12Sep00 					if (k < pack.squadlist)
-//DeadCode JIM 12Sep00 					{
-//DeadCode JIM 12Sep00 						sq = &Node_Data[pack[k].squadnum];
-//DeadCode JIM 12Sep00 						CString name = sq->ShortName() + "/";
-//DeadCode JIM 12Sep00 						name = name + sq->SubName();
-//DeadCode JIM 12Sep00 
-//DeadCode JIM 12Sep00 						rlistbox->AddString(name,1);
-//DeadCode JIM 12Sep00 					}else
-//DeadCode JIM 12Sep00 						rlistbox->AddString("",1);
-//DeadCode JIM 12Sep00 			}
-//DeadCode JIM 12Sep00 			else
 			{
 				int& gri=wp->target.UsesGlobRef();
 				if (&gri!=&EventVal::minus1)
@@ -578,8 +459,8 @@ void	LWRouteMain::RefreshList()
 			else
 				rlistbox->AddString(CSprintf("-%02i:%02i",-t/60,-t%60),4);
 		
-				if (Todays_Packages.hiwp == WpList[i])
-					currhilight = i + 1;
+			if (Todays_Packages.hiwp == WpList[i])
+				currhilight = i + 1;
 
 			
 			i++;
@@ -604,28 +485,6 @@ END_EVENTSINK_MAP()
 
 void LWRouteMain::OnSelectRlistboxctrl1(long row, long column) 
 {
-//DEADCODE  23/02/00 	if (Todays_Packages.pack[Todays_Packages.hipack].packagestatus!=Profile::PS_SPARE)
-//DEADCODE  23/02/00 	{
-//DEADCODE  23/02/00 		Profile& pack = Todays_Packages.pack[Todays_Packages.hipack];
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 		UniqueID wpuid = pack.route;
-//DEADCODE  23/02/00 		int i = 1;
-//DEADCODE  23/02/00 		while (	(wpuid)	&&	(i != row))
-//DEADCODE  23/02/00 		{
-//DEADCODE  23/02/00 			info_waypoint* wp=*Persons2::ConvertPtrUID(wpuid);
-//DEADCODE  23/02/00 			wpuid = wp->nextwp;
-//DEADCODE  23/02/00 			i++;
-//DEADCODE  23/02/00 		}
-//DEADCODE  23/02/00 		RDialog::m_pView->SetHiLightInfo(Todays_Packages.hipack, 0,wpuid);
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 		RefreshButtons();
-//DEADCODE  23/02/00 		RefreshWpDialog();
-//DEADCODE  23/02/00 		m_pView->m_mapdlg.Invalidate();
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 
-//DEADCODE  23/02/00 	}
 
 	
 	int index = row -1;
@@ -684,19 +543,7 @@ void LWRouteMain::OnClickedRbuttonnewdogleg()
 	{
 		pk.doglegloc = targp->doglegs[i];
 
-//DeadCode JIM 20Oct00   		UniqueID wpuid = pk.route;
-//DeadCode JIM 7Aug00 		while	(		(wpuid)
-//DeadCode JIM 7Aug00 					&&	(Profile::WPType(wpuid) == IDS_WP_DOGLEG)
-//DeadCode JIM 7Aug00 				)
-//DeadCode JIM 7Aug00 		{
-//DeadCode JIM 7Aug00 			info_waypoint* wp=*Persons2::ConvertPtrUID(wpuid);
-//DeadCode JIM 7Aug00 			wpuid = wp->nextwp;
-//DeadCode JIM 7Aug00 		}
-//DeadCode JIM 7Aug00 
-//DeadCode JIM 7Aug00 		if (wpuid)
 		{
-//DeadCode JIM 7Aug00 			info_waypoint* hwp=*Persons2::ConvertPtrUID(wpuid);
-//DeadCode JIM 7Aug00 			hwp->target = targp->doglegs[i];
 
 
 			RefreshWpDialog();
@@ -744,7 +591,6 @@ void LWRouteMain::OnClickedRbuttonapplyalt()
 		Profile& pack = Todays_Packages.pack[Todays_Packages.hipack];
 
 		UniqueID wpuid = pack.route;
-//DeadCode JIM 20Oct00 		int i=1;
 		info_waypoint* cwp=*Persons2::ConvertPtrUID(Todays_Packages.hiwp);
 		int worldY=cwp->World.Y;
 		if (cwp->uid==-SGR_WPP_BombRendezvous || cwp->uid==-SGR_WPP_BombDisperse)

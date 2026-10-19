@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(MigAlley LANGUAGES CXX)
+project(MigAlley LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -54,7 +54,7 @@ endif()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SDL2 REQUIRED sdl2)
 pkg_check_modules(SDL2TTF REQUIRED SDL2_ttf)
-pkg_check_modules(SDL2_MIXER REQUIRED SDL2_mixer)
+pkg_check_modules(FLUIDSYNTH fluidsynth)
 pkg_check_modules(VULKAN REQUIRED vulkan)
 
 # Common settings for all in-house targets
@@ -71,7 +71,10 @@ if(NOT MSVC)
             -fms-extensions -Wno-enum-compare -fno-delete-null-pointer-checks
             -fwrapv -msse2 -mfpmath=sse
             # surface the 32→64 porting hazards loudly
-            -Wpointer-to-int-cast -Wint-to-pointer-cast -Wformat)
+            -Wpointer-to-int-cast -Wint-to-pointer-cast -Wformat
+            # legacy idiom `if(cond) stmt; stmt2;` ran stmt2 unconditionally;
+            # catch misleading indentation permanently (PATHOLOGY #3)
+            -Wmisleading-indentation)
         target_link_options(ProjectDefaults INTERFACE
             -static-libstdc++ -static-libgcc)
     else()
@@ -129,7 +132,7 @@ target_include_directories(ProjectDefaults INTERFACE
     ${CMAKE_SOURCE_DIR}/H
     ${SDL2_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
-    ${SDL2_MIXER_INCLUDE_DIRS}
+    ${FLUIDSYNTH_INCLUDE_DIRS}
     ${VULKAN_INCLUDE_DIRS}
     # multiarch headers (SDL2/_real_SDL_config.h lives in the arch dir)
     ${ROWAN_SYSROOT}/usr/include/$<$<BOOL:${ROWAN_64BIT}>:x86_64>$<$<NOT:$<BOOL:${ROWAN_64BIT}>>:i386>-linux-gnu
@@ -145,7 +148,7 @@ target_include_directories(ProjectDefaults INTERFACE
 target_link_directories(ProjectDefaults INTERFACE
     ${SDL2_LIBRARY_DIRS}
     ${SDL2TTF_LIBRARY_DIRS}
-    ${SDL2_MIXER_LIBRARY_DIRS}
+    ${FLUIDSYNTH_LIBRARY_DIRS}
     ${VULKAN_LIBRARY_DIRS}
     # sysroot libs (SDL2_ttf, vulkan, openal dev symlinks)
     ${ROWAN_SYSROOT}/usr/lib/x86_64-linux-gnu
@@ -154,7 +157,7 @@ target_link_directories(ProjectDefaults INTERFACE
 target_link_libraries(ProjectDefaults INTERFACE
     ${SDL2_LIBRARIES}
     ${SDL2TTF_LIBRARIES}
-    ${SDL2_MIXER_LIBRARIES}
+    ${FLUIDSYNTH_LIBRARIES}
     ${VULKAN_LIBRARIES}
     # XSetErrorHandler — only the versioned runtime lib exists (no -dev pkg)
     -l:libX11.so.6
@@ -169,6 +172,21 @@ target_compile_definitions(ProjectDefaults INTERFACE
     # in CWD first, then here (installed games can place them beside the exe).
     MIG_SHADER_DIR="${CMAKE_SOURCE_DIR}/Hardware"
 )
+
+# -------------------------------------------------------------------
+# Vendored ENet (reliable-ordered UDP) — the DirectPlay session transport.
+add_subdirectory(${CMAKE_SOURCE_DIR}/../engine/enet ${CMAKE_BINARY_DIR}/enet)
+# miniaudio + FluidSynth audio backend (replaces SDL2_mixer).
+add_subdirectory(${CMAKE_SOURCE_DIR}/../engine/audio ${CMAKE_BINARY_DIR}/audio)
+# Vendored libsmacker — SMK video decode (replaces the ffmpeg pipes).
+add_subdirectory(${CMAKE_SOURCE_DIR}/../engine/smacker ${CMAKE_BINARY_DIR}/smacker)
+target_link_libraries(ProjectDefaults INTERFACE rowan_enet rowan_audio rowan_smacker)
+target_include_directories(ProjectDefaults INTERFACE
+    ${CMAKE_SOURCE_DIR}/../engine/enet/include
+    ${CMAKE_SOURCE_DIR}/../engine/miniaudio
+    ${CMAKE_SOURCE_DIR}/../engine/audio
+    ${CMAKE_SOURCE_DIR}/../engine/smacker
+    ${CMAKE_SOURCE_DIR}/../engine/compat)
 
 # -------------------------------------------------------------------
 # Add subprojects

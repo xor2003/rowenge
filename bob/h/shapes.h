@@ -10,8 +10,6 @@
 #ifndef	SHAPES_Included
 #define	SHAPES_Included
 
-//DeadCode RJS 01Dec97 #include	"AnimData.h"										//RJS 10Feb97
-//DeadCode RJS 01Dec97 #include	"3dInstr.H"
 #include	"shapenum.g"										//PD 27Aug96
 
 #include	"bitfield.h"										//PD 27Aug96
@@ -24,7 +22,6 @@ MAKEFIELD	(ShapeNum,ShapeNumMIN,ShapeNumMAX);					//PD 27Aug96
 #define	SIMPLE	0
 #define	COMPLX	1
 
-//DeadCode RJS 06Mar98 #define MaxNumberOfShapes	512
 
 typedef UWord	ShapeNumber;
 
@@ -77,15 +74,9 @@ typedef	struct	Shape_Desc										//RJS 02Dec97
 ShapeDesc,
 *ShapeDescPtr;													//RJS 02Dec97
 
-//DeadCode RDH 28Nov95 class	fileblock;
-//DeadCode RDH 28Nov95 typedef	fileblock	*fileblockptr;								//JIM 31Oct95
-//DeadCode PD 15Mar96 #ifndef	FILEMAN_Included
-//DeadCode PD 15Mar96 typedef class	fileblock *fileblockptr;
-//DeadCode PD 15Mar96 #endif
 //------------------------------------------------------------------------------
 //	ShapeStuff class definition
 //------------------------------------------------------------------------------
-//DeadCode JIM 17Jan96 typedef	struct	ShapeNumField*	ShapeNumFieldPtr;
 
 class	shapestuff
 		{
@@ -116,14 +107,12 @@ class	shapestuff
 
 		ShapeNum		ShapeFixing;							//RJS 23Apr97
 
-//DeadCode RJS 01Dec97 		shpinstfix		fixuptable[dosetglassrangeno+1];		//PD 13Mar96
 		shpinstfixptr		fixuptable;							//RJS 01Dec97
 
 		UWord			//Fixup table size						//PD 13Mar96
 						list_size,
 						list_index;
 
-//Old_Code PD 27Aug96 		ULong	glob_list[(MaxNumberOfShapes/32)];
 
 		ShapeNumField	gsnf;									//PD 27Aug96
 
@@ -143,13 +132,11 @@ class	shapestuff
 
 		~shapestuff(void );
 
-//Old_Code PD 27Aug96 		UWord 	LoadShapes(ShapeListPtr );
 
 		ShapeDescPtr
 				GetShapePtr(ShapeNumber );
 
 		void	AddShapesToGlobList(ShapeNumField* reqdshps);
-//Old_Code PD 27Aug96 		void	AddShapesToGlobList(UWord *,UWord&);
 
 		void	LoadRequiredShapes(void );
 

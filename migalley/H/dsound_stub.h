@@ -303,9 +303,31 @@ inline DWORD RowanGuidD1(const GUID& g)
     DWORD v; memcpy(&v, &g, sizeof v); return v;
 }
 
-struct IDirectSound3DBuffer;    // fwd
+struct IDirectSoundBuffer;      // fwd
 struct IDirectSound3DListener;  // fwd
 IDirectSound3DListener* RowanDSListener();  // defined below IDirectSound3DListener
+
+// 3D buffer facade — embedded member of IDirectSoundBuffer (stack/member
+// lifetime, no heap). Methods are defined after IDirectSoundBuffer since
+// they dereference `owner`.
+struct IDirectSound3DBuffer {
+    LONG refCnt;
+    IDirectSoundBuffer* owner;
+    IDirectSound3DBuffer(IDirectSoundBuffer* o) : refCnt(0), owner(o) {}
+    HRESULT QueryInterface(const GUID&, void** ppv) { *ppv = 0; return DSERR_GENERIC; }
+    DWORD AddRef();
+    DWORD Release();
+    HRESULT SetMaxDistance(D3DVALUE d, DWORD);
+    HRESULT GetMaxDistance(D3DVALUE* p);
+    HRESULT SetMinDistance(D3DVALUE d, DWORD);
+    HRESULT GetMinDistance(D3DVALUE* p);
+    HRESULT SetMode(DWORD m, DWORD);
+    HRESULT GetMode(DWORD* p);
+    HRESULT SetPosition(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD);
+    HRESULT GetPosition(void* v);
+    HRESULT SetVelocity(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD);
+    HRESULT GetVelocity(void* v);
+};
 
 struct IDirectSoundBuffer {
     LONG refCnt;
@@ -322,7 +344,7 @@ struct IDirectSoundBuffer {
     // 3D state
     float  px,py,pz, pvx,pvy,pvz, mind, maxd;
     DWORD mode3d;
-    IDirectSound3DBuffer* buf3d;     // facade, created on first QI
+    IDirectSound3DBuffer buf3d;      // embedded facade — same lifetime as owner
 
     IDirectSoundBuffer()
         : refCnt(1), capsFlags(0), primary(false), is3d(false),
@@ -330,7 +352,7 @@ struct IDirectSoundBuffer {
           vol(0), panv(0), freq(0),
           px(0),py(0),pz(0), pvx(0),pvy(0),pvz(0),
           mind(1.0f), maxd(1000000000.0f), mode3d(DS3DMODE_NORMAL),
-          buf3d(0)
+          buf3d(this)
     { memset(&fmt, 0, sizeof fmt); }
 
     ~IDirectSoundBuffer();   // defined after IDirectSound3DBuffer (complete type needed)
@@ -460,36 +482,28 @@ struct IDirectSoundBuffer {
     HRESULT Initialize(IDirectSound*, LPCDSBUFFERDESC) { return DSERR_GENERIC; }
 };
 
-// 3D buffer facade — forwards into the owning secondary buffer's state.
-struct IDirectSound3DBuffer {
-    LONG refCnt;
-    IDirectSoundBuffer* owner;
-    IDirectSound3DBuffer(IDirectSoundBuffer* o) : refCnt(0), owner(o) {}
-    HRESULT QueryInterface(const GUID&, void** ppv) { *ppv = 0; return DSERR_GENERIC; }
-    DWORD AddRef()  { if (owner) owner->AddRef(); return ++refCnt; }
-    DWORD Release()
-    {
-        DWORD r = refCnt ? --refCnt : 0;
-        IDirectSoundBuffer* o = owner;
-        if (!r) delete this;
-        if (o) o->Release();
-        return r;
-    }
-    HRESULT SetMaxDistance(D3DVALUE d, DWORD) { if(owner){owner->maxd=d;} return DS_OK; }
-    HRESULT GetMaxDistance(D3DVALUE* p) { if(p)*p=owner?owner->maxd:0; return DS_OK; }
-    HRESULT SetMinDistance(D3DVALUE d, DWORD) { if(owner){owner->mind=d>0?d:0.001f;} return DS_OK; }
-    HRESULT GetMinDistance(D3DVALUE* p) { if(p)*p=owner?owner->mind:0; return DS_OK; }
-    HRESULT SetMode(DWORD m, DWORD) { if(owner)owner->mode3d=m; return DS_OK; }
-    HRESULT GetMode(DWORD* p) { if(p)*p=owner?owner->mode3d:0; return DS_OK; }
-    HRESULT SetPosition(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD)
-        { if(owner){rowan_ds::Lock_();owner->px=x;owner->py=y;owner->pz=z;rowan_ds::Unlock_();} return DS_OK; }
-    HRESULT GetPosition(void* v)
-        { if(v&&owner){((D3DVALUE*)v)[0]=owner->px;((D3DVALUE*)v)[1]=owner->py;((D3DVALUE*)v)[2]=owner->pz;} return DS_OK; }
-    HRESULT SetVelocity(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD)
-        { if(owner){owner->pvx=x;owner->pvy=y;owner->pvz=z;} return DS_OK; }
-    HRESULT GetVelocity(void* v)
-        { if(v&&owner){((D3DVALUE*)v)[0]=owner->pvx;((D3DVALUE*)v)[1]=owner->pvy;((D3DVALUE*)v)[2]=owner->pvz;} return DS_OK; }
-};
+inline DWORD IDirectSound3DBuffer::AddRef() { if (owner) owner->AddRef(); return ++refCnt; }
+inline DWORD IDirectSound3DBuffer::Release()
+{
+    DWORD r = refCnt ? --refCnt : 0;
+    IDirectSoundBuffer* o = owner;
+    if (o) o->Release();
+    return r;
+}
+inline HRESULT IDirectSound3DBuffer::SetMaxDistance(D3DVALUE d, DWORD) { if(owner){owner->maxd=d;} return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::GetMaxDistance(D3DVALUE* p) { if(p)*p=owner?owner->maxd:0; return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::SetMinDistance(D3DVALUE d, DWORD) { if(owner){owner->mind=d>0?d:0.001f;} return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::GetMinDistance(D3DVALUE* p) { if(p)*p=owner?owner->mind:0; return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::SetMode(DWORD m, DWORD) { if(owner)owner->mode3d=m; return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::GetMode(DWORD* p) { if(p)*p=owner?owner->mode3d:0; return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::SetPosition(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD)
+    { if(owner){rowan_ds::Lock_();owner->px=x;owner->py=y;owner->pz=z;rowan_ds::Unlock_();} return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::GetPosition(void* v)
+    { if(v&&owner){((D3DVALUE*)v)[0]=owner->px;((D3DVALUE*)v)[1]=owner->py;((D3DVALUE*)v)[2]=owner->pz;} return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::SetVelocity(D3DVALUE x, D3DVALUE y, D3DVALUE z, DWORD)
+    { if(owner){owner->pvx=x;owner->pvy=y;owner->pvz=z;} return DS_OK; }
+inline HRESULT IDirectSound3DBuffer::GetVelocity(void* v)
+    { if(v&&owner){((D3DVALUE*)v)[0]=owner->pvx;((D3DVALUE*)v)[1]=owner->pvy;((D3DVALUE*)v)[2]=owner->pvz;} return DS_OK; }
 
 inline HRESULT IDirectSoundBuffer::QueryInterface(const GUID& riid, void** ppv)
 {
@@ -497,9 +511,8 @@ inline HRESULT IDirectSoundBuffer::QueryInterface(const GUID& riid, void** ppv)
     *ppv = 0;
     if (RowanGuidD1(riid) == ROWAN_IID_DS3DBUFFER_D1) {
         if (!is3d || primary) return DSERR_GENERIC;
-        if (!buf3d) buf3d = new IDirectSound3DBuffer(this);
-        buf3d->AddRef();
-        *ppv = buf3d;
+        buf3d.AddRef();
+        *ppv = &buf3d;
         return S_OK;
     }
     if (RowanGuidD1(riid) == ROWAN_IID_DS3DLISTENER_D1 && primary) {
@@ -516,7 +529,6 @@ inline IDirectSoundBuffer::~IDirectSoundBuffer()
     for (size_t i = 0; i < v.size(); ++i)
         if (v[i] == this) { v.erase(v.begin()+i); break; }
     rowan_ds::Unlock_();
-    delete buf3d;   // facade only forwards into us — plain delete, no Release chain
 }
 
 // 3D listener facade — writes into the global mixer listener state.
@@ -525,7 +537,7 @@ struct IDirectSound3DListener {
     IDirectSound3DListener() : refCnt(1) {}
     HRESULT QueryInterface(const GUID&, void** ppv) { *ppv = 0; return DSERR_GENERIC; }
     DWORD AddRef()  { return ++refCnt; }
-    DWORD Release() { DWORD r=--refCnt; if(!r) delete this; return r; }
+    DWORD Release() { return refCnt ? --refCnt : 0; }   // static singleton — never deleted
     HRESULT CommitDeferredSettings() { return DS_OK; }
     HRESULT SetDistanceFactor(D3DVALUE f, DWORD) { rowan_ds::S().lis.distFactor=f; return DS_OK; }
     HRESULT SetDopplerFactor(D3DVALUE f, DWORD)  { rowan_ds::S().lis.doppler=f;    return DS_OK; }
@@ -555,9 +567,9 @@ struct IDirectSound3DListener {
 // one shared listener facade (3D listener is a singleton resource in DS)
 inline IDirectSound3DListener* RowanDSListener()
 {
-    static IDirectSound3DListener* l = new IDirectSound3DListener();
-    l->AddRef();
-    return l;
+    static IDirectSound3DListener l;    // static storage — no heap
+    l.AddRef();
+    return &l;
 }
 
 namespace rowan_ds {
@@ -623,7 +635,8 @@ inline void AudioCb(void*, Uint8* stream, int len)
             float pan3 = 0;
             if (rl > 0.001f && dist > 0.001f)
                 pan3 = (rx*crx + ry*cry + rz*crz) / (dist * rl * l.distFactor);
-            if (pan3 > 1) pan3 = 1; if (pan3 < -1) pan3 = -1;
+            if (pan3 > 1) pan3 = 1;
+            if (pan3 < -1) pan3 = -1;
             float g3 = g * att;
             pl = g3 * (1.0f - (pan3 > 0 ? pan3 : 0) * 0.7f);
             pr = g3 * (1.0f + (pan3 < 0 ? pan3 : 0) * 0.7f);
@@ -639,8 +652,10 @@ inline void AudioCb(void*, Uint8* stream, int len)
             DecodeFrame(b, f, L, R);
             int accL = out[i*s.ch]   + (int)(L * pl * 32767.0f);
             int accR = out[i*s.ch+1] + (int)(R * pr * 32767.0f);
-            if (accL > 32767) accL = 32767; if (accL < -32768) accL = -32768;
-            if (accR > 32767) accR = 32767; if (accR < -32768) accR = -32768;
+            if (accL > 32767) accL = 32767;
+            if (accL < -32768) accL = -32768;
+            if (accR > 32767) accR = 32767;
+            if (accR < -32768) accR = -32768;
             out[i*s.ch]   = (short)accL;
             out[i*s.ch+1] = (short)accR;
             b->cursor += step;

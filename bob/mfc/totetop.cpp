@@ -88,23 +88,6 @@ RDialog*	ToteTop::Make()
 			DialBox(FIL_D_TOTEBOARD,new ToteTop())
 			);
 
-//DEADCODE RDH 09/12/99 	CString	tabtitle[6];
-//DEADCODE RDH 09/12/99 	tabtitle[0] = RESSTRING(GROUP10); 
-//DEADCODE RDH 09/12/99 	tabtitle[1] = RESSTRING(GROUP11); 
-//DEADCODE RDH 09/12/99 	tabtitle[2] = RESSTRING(GROUP11);
-//DEADCODE RDH 09/12/99 	tabtitle[3] = RESSTRING(GROUP12);
-//DEADCODE RDH 09/12/99 
-//DEADCODE RDH 09/12/99 	return
-//DEADCODE RDH 09/12/99 			MakeTopDialog(::Place(POSN_CENTRE,POSN_CENTRE),
-//DEADCODE RDH 09/12/99 					DialList(DialBox(FIL_NULL,new ToteTop,Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE,EDGE::ALIGN_MAX + EDGE::OCCLUDE_INSIDE)),
-//DEADCODE RDH 09/12/99 						HTabBox(FIL_NULL,IdList(tabtitle[0],tabtitle[1],tabtitle[2],tabtitle[3]),Edges(EDGE::ALIGN_MIN,EDGE::ALIGN_MIN,EDGE::ALIGN_MAX,EDGE::ALIGN_MAX), 
-//DEADCODE RDH 09/12/99 							DialBox(FIL_D_TOTEBOARD,new ToteSector()),
-//DEADCODE RDH 09/12/99 							DialBox(FIL_D_TOTEBOARD,new ToteSector()),
-//DEADCODE RDH 09/12/99 							DialBox(FIL_D_TOTEBOARD,new ToteSector()),
-//DEADCODE RDH 09/12/99 							DialBox(FIL_D_TOTEBOARD,new ToteSector())
-//DEADCODE RDH 09/12/99 
-//DEADCODE RDH 09/12/99 										)	)	);
-//DEADCODE RDH 09/12/99 
 }
 
 

@@ -432,7 +432,7 @@ void polygon::createpoly(UByte sR,UByte sG,UByte sB,UByte dR,UByte dG,UByte dB)
 		fFoggingRequired=false;
 		fFoggingActive=false;
 		doclip=0;
-		horilinertn=currscreen->GetScanLineAddr(polytype);
+		horilinertn=currscreen ? currscreen->GetScanLineAddr(polytype) : NULL;	//RERUN: currscreen NULL in menu/offscreen paths
 		scanconvert=&polygon::gpolyscancnvrt;
 		scanconvertflat=&polygon::gflatscancnvrt;
 		clipperflag=CLIPF_INTENSITY;
@@ -1406,6 +1406,8 @@ void polygon::softpoly()
 
 	//Scan the list to find the top and bottom of the polygon
 
+	if (!*nvertptr)							//RERUN: empty vertex list
+		return;
 	minilp =
 		maxip = nvertptr;
 
@@ -3120,6 +3122,8 @@ bool polygon::GenericPolyClip()
  *	Clip against near clipping plane
  ************************************/
 
+	if (!*nvertptr)							//RERUN: empty list -> DOCLIP derefs (*cind)
+		return false;
 	for (cind=nvertptr,nind=cind+1,newpnt=cvertptr,newvertcount=0;*nind;)
 	{
 		DOCLIP(cind,nind,newpnt,ClipToFront,CF3D_BEHINDNEARZ,newvertcount);
@@ -3703,25 +3707,27 @@ void polygon::split(PolyRecord* original,PolyRecord* newfragment,UWord whichaxis
 	//find min & max values for poly BZ
 
 	cur=original->vptr;
+	if (!cur || !*cur)						//RERUN: no vertices to split
+		return;
 
 	if (whichaxis==AXIS_BZ)
 	{
 		min=max=(*cur)->bz.f;
-		for (++cur,i=vertcount-2;i>=0;i--,cur++){
+		for (++cur,i=vertcount-2;i>=0 && *cur;i--,cur++){	//RERUN: vptr elements may be NULL
 			if ((*cur)->bz.f>max)	max=(*cur)->bz.f;
 			if ((*cur)->bz.f<min)	min=(*cur)->bz.f;
 		}
 	}
 	else if (whichaxis==AXIS_BY){
 		min=max=(*cur)->by.f;
-		for (++cur,i=vertcount-2;i>=0;i--,cur++){
+		for (++cur,i=vertcount-2;i>=0 && *cur;i--,cur++){	//RERUN: vptr elements may be NULL
 			if ((*cur)->by.f>max)	max=(*cur)->by.f;
 			if ((*cur)->by.f<min)	min=(*cur)->by.f;
 		}
 	}
 	else{	//AXIS_BX
 		min=max=(*cur)->bx.f;
-		for (++cur,i=vertcount-2;i>=0;i--,cur++){
+		for (++cur,i=vertcount-2;i>=0 && *cur;i--,cur++){	//RERUN: vptr elements may be NULL
 			if ((*cur)->bx.f>max)	max=(*cur)->bx.f;
 			if ((*cur)->bx.f<min)	min=(*cur)->bx.f;
 		}
@@ -3734,7 +3740,7 @@ void polygon::split(PolyRecord* original,PolyRecord* newfragment,UWord whichaxis
 	top=original->vptr;
 	bot=newfragment->vptr;
 
-	for (i=vertcount-1,nxt=copy.vptr,cur=nxt+i;i>=0;i--)
+	for (i=vertcount-1,nxt=copy.vptr,cur=nxt+i;i>=0 && *cur && *nxt;i--)
 	{
 		Float testval,nextval,frac;
 		

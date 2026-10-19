@@ -74,7 +74,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "strings.h"
 			  
 #include "waypoint.h"
-//DEADCODE JIM 09/02/00 #include	"text.h"
 #include	"worldinc.h"
 #include	"bfnumber.h"
 #include	"persons2.h"
@@ -92,7 +91,6 @@ extern int CPAircraftAvailable[];
 
 //---------------------------------------------------------------------------
 #pragma link "sampreg"
-//DeadCode DAW 03Sep97 #pragma link "spin"
 #pragma resource "*.dfm"
 TAcItemForm *AcItemForm;
 //---------------------------------------------------------------------------

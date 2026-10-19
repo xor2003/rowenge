@@ -334,7 +334,6 @@ Bool	AirStruc::SubjectOnTargetTail(ANGLES angle)
 //	ANGLES	temp;
 //	
 //	temp = HdgIntercept + angle - unfriendly->hdg; 
-////DeadCode RDH 30Mar98 	if (temp < (2 * angle))
 //	if (temp << (angle + angle))
 //	{
 //		temp = PitchIntercept + angle - unfriendly->pitch;
@@ -4300,16 +4299,6 @@ void	AirStruc::ManualACM ()
 		ai.oldoldoldpitchI = ai.oldoldpitchI;
 		ai.oldoldpitchI = ai.oldpitchI;
 		ai.oldpitchI = PitchIntercept;
-//Old_Code DAW 18May99 	if (	(Save_Data.flightdifficulty [FD_AUTOTHROTTLE])
-//Old_Code DAW 18May99 		&&	(	ai.unfriendly == Persons2::PlayerGhostAC 
-//Old_Code DAW 18May99 				|| (		(ai.unfriendly)
-//Old_Code DAW 18May99 						&&	(ai.unfriendly->uniqueID.UniqueID.commsmove)				//AMM 07May99
-//Old_Code DAW 18May99 					)
-//Old_Code DAW 18May99 			)
-//Old_Code DAW 18May99 		&&	(Range  < OUTERCOMBATRANGE)
-//Old_Code DAW 18May99 		&&	(TargetFacingSubject(ANGLES_45Deg))
-//Old_Code DAW 18May99 		&&	(TargetOnSubjectTail(ANGLES_45Deg))
-//Old_Code DAW 18May99 		)
 	if (	(ai.unfriendly )
 		&&	(Save_Data.flightdifficulty [FD_AUTOTHROTTLE])
 		&&	((ai.unfriendly == Persons2::PlayerGhostAC)

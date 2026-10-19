@@ -1,0 +1,29 @@
+# clang-tidy for the Rowan port trees (migalley/ + bob/).
+#
+# Curated for bug-finding on a 1998-era codebase: correctness and
+# static-analysis checks only. Style/readability/modernize checks are
+# deliberately excluded — tidy rewrites would make the tree harder to
+# diff against the original sources, and style noise on this codebase
+# would be enormous.
+#
+# CI gates on "error:" diagnostics located in changed files; warnings
+# are printed for information (same policy as cppcheck in lint.sh).
+Checks: >
+  bugprone-*,
+  clang-analyzer-*,
+  concurrency-*,
+  misc-*,
+  -misc-const-correctness,
+  -misc-non-private-member-variables-in-classes,
+  -misc-include-cleaner*,
+  -misc-header-include-cycle,
+  -misc-no-recursion,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-narrowing-conversions,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -clang-analyzer-security.insecureAPI.strcpy
+
+# Warnings stay warnings — CI's file gate decides what fails.
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+FormatStyle: none

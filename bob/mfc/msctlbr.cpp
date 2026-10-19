@@ -139,20 +139,6 @@ void CMiscToolbar::OnClickedReplay()
  		return;															//RJS 29Oct00
 
 	Todays_Packages.SaveBin();
-//DeadCode AMM 7Aug00 	if (MMC.indebrief)
-//DeadCode AMM 7Aug00 	{
-//DeadCode AMM 7Aug00 // there is no debrief in campaign now, so go to save screen only
-//DeadCode AMM 7Aug00 		INT3;
-//DeadCode AMM 7Aug00 		if (_Replay.badrecord)									//AMM 09Mar99
-//DeadCode AMM 7Aug00 			RFullPanelDial::RMessageBox(IDS_BOB,IDS_BADREPLAY,NULL,IDS_OK);
-//DeadCode AMM 7Aug00 		else
-//DeadCode AMM 7Aug00 		{
-//DeadCode AMM 7Aug00 			_Replay.MapPlayback=true;
-//DeadCode AMM 7Aug00 			RDialog::m_pView->LaunchFullPane(&RFullPanelDial::replaysave,SaveData::UIR_FRAG);
-//DeadCode AMM 7Aug00 		}
-//DeadCode AMM 7Aug00 //DeadCode AMM 10Mar99 		RDialog::m_pView->LaunchFullPane(&RFullPanelDial::replaysave);
-//DeadCode AMM 7Aug00 	}
-//DeadCode AMM 7Aug00 	else
 	{
 		if (_Replay.badrecord)									//AMM 09Mar99
 			RFullPanelDial::RMessageBox(IDS_BOB,IDS_BADREPLAY,NULL,IDS_OK);
@@ -161,12 +147,6 @@ void CMiscToolbar::OnClickedReplay()
 			_Replay.MapPlayback=true;
 			RDialog::m_pView->LaunchFullPane(&RFullPanelDial::replaysave,SaveData::UIR_FRAG);
 		}
-//DeadCode AMM 7Aug00 		_Replay.MapPlayback=true;
-//DeadCode AMM 7Aug00 //DeadCode AMM 26Feb99 		Todays_Packages.SaveBin();
-//DeadCode AMM 7Aug00 //	if (!RFullPanelDial::incomms)								//rdh 10/1/99
-//DeadCode AMM 7Aug00 		RDialog::m_pView->LaunchFullPane(&RFullPanelDial::replayload,SaveData::UIR_FRAG);
-//DeadCode AMM 7Aug00 //	else
-//DeadCode AMM 7Aug00 //		RDialog::m_pView->LaunchFullPane(&RFullPanelDial::SelectReadyRoom);
 	}
 		
 }
@@ -184,24 +164,7 @@ void CMiscToolbar::OnClickedReadyRoom()
 		
 }
 
-//DEADCODE RDH 08/11/99 void CMiscToolbar::OnClickedZoomin() 
-//DEADCODE RDH 08/11/99 {
-//DEADCODE RDH 08/11/99 
-//DEADCODE RDH 08/11/99 	if (!LoggedChild(CONTROL))
-//DEADCODE RDH 08/11/99 		LogChild(CONTROL,ControlTopLevel::Make()
-//DEADCODE RDH 08/11/99 						);
-//DEADCODE RDH 08/11/99 	else
-//DEADCODE RDH 08/11/99 		CloseLoggedChild(CONTROL);
-//DEADCODE RDH 08/11/99 
-//DEADCODE RDH 08/11/99 
-//DEADCODE RDH 08/11/99 	
-//DEADCODE RDH 08/11/99 //DEADCODE RDH 08/11/99 	RDialog::m_pView->OnZoomIn();
-//DEADCODE RDH 08/11/99 }
 
-//DEADCODE RDH 08/11/99 void CMiscToolbar::OnClickedZoomout() 
-//DEADCODE RDH 08/11/99 {
-//DEADCODE RDH 08/11/99 	RDialog::m_pView->OnZoomOut();
-//DEADCODE RDH 08/11/99 }
 
 void CMiscToolbar::OnClickedThumbnail() 
 {
@@ -284,21 +247,6 @@ void CMiscToolbar::OpenSaveOnly(bool quitafter)
 void CMiscToolbar::OnShowWindow(BOOL bShow, UINT nStatus) 
 {
 	CRToolBar::OnShowWindow(bShow, nStatus);
-//DEADCODE RDH 19/03/99 	if (!RFullPanelDial::incomms)								//rdh 10/1/99
-//DEADCODE RDH 19/03/99 	{
-//DEADCODE RDH 19/03/99 		CRButton*   b;
-//DEADCODE RDH 19/03/99 		b=GETDLGITEM(IDC_REPLAY);
-//DEADCODE RDH 19/03/99 		b->ShowWindow(SW_SHOW);
-//DEADCODE RDH 19/03/99 		b=GETDLGITEM(IDC_READYROOM);
-//DEADCODE RDH 19/03/99 		b->ShowWindow(SW_HIDE);
-//DEADCODE RDH 19/03/99 	}else
-//DEADCODE RDH 19/03/99 	{
-//DEADCODE RDH 19/03/99 		CRButton*   b;
-//DEADCODE RDH 19/03/99 		b=GETDLGITEM(IDC_REPLAY);
-//DEADCODE RDH 19/03/99 		b->ShowWindow(SW_HIDE);
-//DEADCODE RDH 19/03/99 		b=GETDLGITEM(IDC_READYROOM);
-//DEADCODE RDH 19/03/99 		b->ShowWindow(SW_SHOW);
-//DEADCODE RDH 19/03/99 	}
 
 	CRButton*	but = GETDLGITEM(IDC_REPLAY);
 	but->SetPressed(FALSE);		//always lift replay button, might have been pressed
@@ -406,10 +354,6 @@ void CMiscToolbar::OnClickedDirectivetoggle()
 	m_dialids[DIRECTIVESTOGGLE].SetHintString(RESSTRING(DIRECTIVES)+": "+RESLIST(OFF,!MMC.directivespopup));
 
 	
-//DEADCODE  18/02/00 	if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DEADCODE  18/02/00 		OpenDirectivetoggle(NULL); 
-//DEADCODE  18/02/00 	else
-//DEADCODE  18/02/00 		OpenRAFDirectivetoggle(NULL); 
 
 }
 

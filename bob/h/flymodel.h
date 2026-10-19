@@ -56,45 +56,11 @@ public:
 				left_aoa;
 
 private:
-//DeadCode RDH 15Dec95 	PTypePtr	classtype;
-//DeadCode RDH 28Feb96 	SWord		aileron,
-//DeadCode RDH 28Feb96 				elevator,
-//DeadCode RDH 28Feb96 				rudder;
-//DeadCode RDH 28Feb96
-//DeadCode RDH 20Dec95 	INSTABILITY	Instability;
 
-//DeadCode RDH 28Feb96 	ANGLES		oldpitch,
-//DeadCode RDH 28Feb96 				oldroll,
-//DeadCode RDH 28Feb96 				acroll,
-//DeadCode RDH 28Feb96 //DeadCode RDH 18Dec95 				cpitch,
-//DeadCode RDH 28Feb96 				croll,
-//DeadCode RDH 28Feb96 				chdg,
-//DeadCode RDH 28Feb96 				coldpitch,
-//DeadCode RDH 28Feb96 				coldroll,
-//DeadCode RDH 28Feb96 				oldacpitch,
-//DeadCode RDH 28Feb96 				oldacroll,
-//DeadCode RDH 28Feb96 				oldachdg,
-//DeadCode RDH 28Feb96 				stalldirection;
-//DeadCode RDH 28Feb96
-//DeadCode RDH 28Feb96 	SLong		cposy;
-//DeadCode RDH 28Feb96
-//DeadCode RDH 28Feb96 //DeadCode RDH 20Dec95 	SWord		idle,
-//DeadCode RDH 28Feb96 	SWord		rpm_lastcycle,
-//DeadCode RDH 28Feb96 				rpmtrimtime,
-//DeadCode RDH 28Feb96 //DeadCode RDH 20Dec95 				xextra,
-//DeadCode RDH 28Feb96 				oldvelx,
-//DeadCode RDH 28Feb96 				oldvely,
-//DeadCode RDH 28Feb96 				oldvelz,
-//DeadCode RDH 28Feb96 				cvely,
-//DeadCode RDH 28Feb96 				vel_cms,
-//DeadCode RDH 28Feb96 				rotr_xbl,
-//DeadCode RDH 28Feb96 				rotr_ybl,
-//DeadCode RDH 28Feb96 				rotr_zbl;
 //temp vars														//RDH 20Dec95
 	SWord		airdensity,
 				cl_coeff,
 				sos,
-//DeadCode RDH 22Jul96 				trim,
 				sinoldacpitch,
 				cosoldacpitch,
 				sinoldachdg,
@@ -121,7 +87,6 @@ private:
 				dynamicpressure,
 				groundlevel,
 				vel_from_yaw,
-//DeadCode RDH 02Jul96 				aoa_from_roll,
 				aoa_from_dihedral,
 				vel_from_roll,
 				hori_vel_left,
@@ -136,11 +101,9 @@ private:
 				mass,
 				lastmsgtime,
 				thrust;
-//DeadCode AMM 29Jun99 	ANGLES		grndhdg;
 	SWord		grndvel;
 	SWord		flapsitu,flapcl,flapcmo;
 	SWord	keyboardcontrol;									//RDH 29Apr96
-//DeadCode RDH 01Mar96 	UWord		pilotframetime;
 	SLong		velocity_p2;
 	UWord		cycletimeres;
 //manual ac specific
@@ -160,7 +123,6 @@ UWordP		elevatordeflectiondata,
 				shokdata,
 				parasiticdata;
 
-//DeadCode RDH 25Jun96 static UWord airdensityratiosquareroot[];
 
 private:
 	void	SubManualPilot(AirStrucPtr const ControlledAC);
@@ -173,7 +135,6 @@ private:
 	SLong	CalcTailLiftSub (AirStrucPtr const ControlledAC,SWord elevator,SWord aoa);
 	void	CalcRudderLift (AirStrucPtr const ControlledAC);
 	void	CalcRudderDrag (AirStrucPtr const ControlledAC);
-//DeadCode RDH 30Mar96 	void	CalcLift (AirStrucPtr const ControlledAC);
 	SLong	CalcLiftSub(AirStrucPtr const ControlledAC,SWord aoa,SLong vel);
 	void	CalcSideForce (AirStrucPtr const ControlledAC);
 	SWord	CalcK2 (AirStrucPtr const ControlledAC,SWord elevator);
@@ -191,7 +152,6 @@ private:
 	void	CalcDeltasDebug ();									//PD 01Jul96
 	#endif														//PD 01Jul96
 
-//DEADCODE CSB 08/11/99 	void	CalcVel (AirStrucPtr const ControlledAC);
 	void	VcoAlfaBeta (AirStrucPtr const ControlledAC);
 	void	CalcPosition (AirStrucPtr const ControlledAC);
 	void	ChkLandedLocation (AirStrucPtr const ControlledAC);
@@ -200,11 +160,9 @@ private:
 	void	DataTrans (AirStrucPtr const ControlledAC);
 //**	void	SetFlags ();
 	void	DoTrim (AirStrucPtr const ControlledAC);			//RDH 15Nov96
-//DeadCode RDH 10Apr96 	void	RotasFixedRate(AirStrucPtr const ControlledAC);
 	void	RotasFixedRate_x(AirStrucPtr const ControlledAC);	//RDH 19Mar96
 	void	RotasFixedRate_y(AirStrucPtr const ControlledAC);	//RDH 09Apr96
 	void	RotasFixedRate_z(AirStrucPtr const ControlledAC);	//RDH 09Apr96
-//DeadCode RDH 30Nov95 	void 	CalcNewPos(SLong ,SLong,SLong);
 	void	GetStickKeys (AirStrucPtr const ControlledAC);
 	void	GetRPMABKeys(AirStrucPtr const ControlledAC);
 	void	SensitivityMsg(AirStrucPtr const ControlledAC);		//RDH 03Dec96
@@ -218,40 +176,6 @@ private:
 	//	void	FindMaxRPM (AirStrucPtr const ControlledAC);
 
 //automove test
-//DeadCode RDH 01Mar96 	void	MoveToHdg (ANGLES);
-//DeadCode RDH 01Mar96 	void	MoveToPitch (ANGLES);
-//DeadCode RDH 01Mar96 	SWord	MoveToDesiredPitch (ANGLES);
-//DeadCode RDH 01Mar96 	SWord	DesiredPitchChk (ANGLES);
-//DeadCode RDH 01Mar96 	SWord	MoveToDesiredHdg (ANGLES,ANGLES);
-//DeadCode RDH 01Mar96 	void	MoveToRoll (SWord);
-//DeadCode RDH 01Mar96 	void	MoveToRPM (SWord);
-//DeadCode RDH 01Mar96 	void 	SetManoeuvreTime (SWord);
-//DeadCode RDH 01Mar96 	SWord 	ManoeuvreTimeLeft ();
-//DeadCode RDH 01Mar96
-//DeadCode RDH 01Mar96 	void	TightTurn (ANGLES);
-//DeadCode RDH 01Mar96 	void	SplitS ();
-//DeadCode RDH 01Mar96 	void	ZoomandDrop ();
-//DeadCode RDH 01Mar96 	void	ZoomAndTurn (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	BarrelRoll (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	Scissors (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	MildScissors (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	StraightandLevel (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	SideSlip (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	SpinOut (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	DiveforHome (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	GoHome (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	MakeForFriendly (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	MoveAway (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	AccidentalSpinOut (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	TurningFight (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	LowGYoYo (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	RollAway (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	VerticalLoop (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	ImmelmannTurn (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	HeadOnOffset (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	Immelmann (SWord,SWord);
-//DeadCode RDH 01Mar96 	void	StayWithPrey (SWord,SWord);
-//DeadCode RDH 01Mar96
 
 
 
@@ -269,7 +193,6 @@ public:
 
 	void InitSimpleAc(AirStrucPtr const ControlledAC);
 
-//DEADCODE JIM 31/03/00 	void	PrintStatistics (class Window*);
 	void	Associate(
 			AirStruc*	manualas,				//item to move
 			CONTROLMODE		inmanual=MANUAL);			//flag for man/auto
@@ -279,7 +202,6 @@ public:
 
 	Bool	IsPiloted(ItemBasePtr i)	{return (Bool) (i==ControlledAC2);}//JIM 26Jul96
 
-//DeadCode AMM 26Jan99 	Bool	DeathSequenceOverride(ItemPtr,int);					//DAW 03Sep98
 	Bool	DeathSequenceOverride(ItemPtr,int,bool commscalled=false);					//AMM 26Jan99
 	bool	DeathSequenceOverrideDiary(ItemPtr,int,bool commscalled=false);	//RJS 31Oct00
 

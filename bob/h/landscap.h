@@ -78,7 +78,6 @@ public:
 	HTEXT textHandle;	// image map number (Word value)				2
 	UByte currentRes;	// the current resolution (OFFSCREENRES=none)	1
 	UByte desiredRes;	// the desired resolution (OFFSCREENRES=none)	1
-//DeadCode JON 2Aug00 	UWord age;			// the last seen age							2
 	UByte meshRes;		// the detail level for the polygon data		1
 	UByte viewRadius;	// distance in tiles from the view				1
 	UWord nextLink;		// the next link in one of the lists			2
@@ -87,7 +86,6 @@ public:
 	{
 		currentRes = OFFSCREENRES;
 		desiredRes = OFFSCREENRES;
-//DeadCode JON 2Aug00 		age = 0;
 		nextLink = NULLTILEOFFSET;
 		textHandle = HTEXTNULL;
 	}
@@ -102,11 +100,7 @@ public:
 	UWord	newTile;				//	2
 	UWord	underResTile;			//	2	4
 	UWord	overResTile;			//	2	6
-//DeadCode JON 2Aug00 	UWord	offScreenOldest;		//	2	8
-//DeadCode JON 2Aug00 	UWord	offScreenRemaining;		//	2	10
 	UWord	offScreen;				//	2	8
-//DeadCode JON 2Aug00 	UWord	oldestAge;				//	2	12
-//DeadCode JON 2Aug00 	UWord	nextOldestAge;			//	2	14
 	SLong 	desiredTiles;			//	4	10
 	SLong	freeTiles;				//	4	12
 	SLong 	totalTiles;				//	4	14
@@ -119,8 +113,6 @@ public:
 		newTile = NULLTILEOFFSET;
 		underResTile = NULLTILEOFFSET;
 		overResTile = NULLTILEOFFSET;
-//DeadCode JON 2Aug00 		offScreenOldest = NULLTILEOFFSET;
-//DeadCode JON 2Aug00 		offScreenRemaining = NULLTILEOFFSET;
 		offScreen = NULLTILEOFFSET;
 		desiredTiles = 0;
 		totalTiles = 0;
@@ -132,9 +124,6 @@ public:
 		newTile = NULLTILEOFFSET;
 		underResTile = NULLTILEOFFSET;
 		overResTile = NULLTILEOFFSET;
-//DeadCode JON 2Aug00 		offScreenOldest = NULLTILEOFFSET;
-//DeadCode JON 2Aug00 		offScreenRemaining = NULLTILEOFFSET;
-//DeadCode JON 2Aug00 		nextOldestAge = 0xFFFF; // set to
 		offScreen = NULLTILEOFFSET;
 		freeTiles = totalTiles;
 		desiredTiles = 0;
@@ -176,15 +165,6 @@ struct SLandLight
 
 struct SLightingRGB
 {
-//deadcode  	SLayerRGB	horizonBase;		/* horizon fade colour 		*/
-//deadcode	SLayerRGB	horizonMid;			/* colour @ the top of the
-//deadcode									   lower horizon strip 		*/
-//deadcode	SLayerRGB	horizonUnderClouds;	/* colour underneath the
-//deadcode									   cloud layer				*/
-//deadcode	SLayerRGB	horizonAtClouds;	/* colour @ the cloud layer */
-//deadcode	SLayerRGB	horizonAboveClouds;	/* colour above the clouds	*/
-//deadcode	SLayerRGB	horizonTop;			/* colour @ highest point of
-//deadcode									   the horizon				*/
 	SLayerRGB	landAmbientCollo,landAmbientColhi,landAmbientColamb;			/* Ambient lighting value
 																				for the landscape polys	*/
 	SLayerRGB	shadedAmbientCollo,shadedAmbientColhi,shadedAmbientColamb;		/* Ambient lighting value
@@ -192,9 +172,6 @@ struct SLightingRGB
 	SLayerRGB	staticAmbientCollo,staticAmbientColhi,staticAmbientColamb;		/* Ambient lighting value
 																				for non-light shaded
 																				shapes					*/
-//DeadCode JON 2Nov00 	SLayerRGB	cockpitAmbientCollo,cockpitAmbientColhi,cockpitAmbientColamb;	/* Ambient light for internal
-//DeadCode JON 2Nov00 																				cockpit view */
-//DeadCode JON 2Nov00 	SLayerRGB	effectsAmbientCollo,effectsAmbientColhi,effectsAmbientColamb;	/* Ambient light for explosions */
 
 	// for the background horizon...
 	SLayerRGB	deepestSkyCol,otherSkyColSun,cloudColSun,horizonColSun,fogColSun;	//JON 4/20/00
@@ -319,7 +296,6 @@ public:
 		_medMaxMAX=_halfAreaSizeMAX+_mediumAreaSize,
 		_medMaxMIN=_halfAreaSizeMIN+_mediumAreaSize,
 		_maxalt=257000,
-//DeadCode JON 31Aug00 		_hirezDrawDist=1181838,//1351838, (trimmed and accounted for the 0.9 far fog)	//JON 31Aug00
 		_hirezDrawDist=(_halfAreaSizeMIN*_blockWidth),
 
 		//grid cone constants
@@ -403,9 +379,6 @@ public:
 	ImageMapDescPtr horizonImg;
 
 	SLong GroundHuggingAltitude(MobileItem*);
-//deadcode JON 19/06/01		void AddLight(SLandLight*);
-//deadcode JON 19/06/01		inline void ResetLights();
-//DeadCode JON 20Sep00 	void ProcessLights(SLong,SLong);
 
 	void RefreshLandscape();
 	void PossibleTeleport();											//JON 9Oct00
@@ -414,7 +387,6 @@ public:
 
 	void	LogCrater(Coords3D&,SLong);							//RJS 18Nov99
 	void	StompImageMap(SWord,SWord);							//RJS 30Nov99
-//deadcode JON 19/06/01		void	ProcessStompMap();									//RJS 30Nov99
 	void	DrawHorizon( void );								//JON
 	void	DistDrawClouds(SLong );
 	void	SetFogBand(); // sets the fog distance band to be correct 4 the length of the horizon
@@ -439,30 +411,21 @@ private:
 //jon	SLong treeHeight;
 	RaiseFlag raiseFlag;
 	SLong hedgeHeight;
-//DeadCode JON 4Oct00 	SLong cliffHeight;
 
 	struct RouteData;
 
 
 	RouteData* pRouteData;
 
-//DeadCode JON 12Sep00 	UByte* gridCorners;
 
 	DoPointStruc horizPoint[_horizonPoints*_horizonPoints];
 	UByte* gridCone;
 	bool *horizCone;
-//DeadCode JON 12Sep00 	UByte* lightCone;
-//DeadCode JON 12Sep00 	UByte* routeDetail;
-//DeadCode JON 3Aug00 	UByte* groundDetail;
-//DeadCode JON 12Sep00 	UByte* landRnd;						//for noise generation
-//DeadCode JON 5Sep00 	UByte* softGrid;					//for s/w version item tracking
 
 	bool maxResTiles;													//JON 19Jul00
 	TileElement* tileCacheGrid;							//JON 4/26/00
 	TileResList tileResList[8];							//JON 4/27/00
 	UByte*	meshDetailLevel; // the detail leval at each increacing radius from view		//JON 2Aug00
-//DEADCODE JON 4/26/00 	UByte* pLastGrid;
-//DEADCODE JON 4/27/00 	HTEXT* pHTextureGrid;
 	SLong lastPx,lastPz;
 
 	SLong View_Ground_Height;
@@ -507,11 +470,9 @@ private:
 	SLong	sky_band_start,sky_band_end;
 	SLong	viewer_x,viewer_y,viewer_z,viewer_dy,cviewer_dy;
 
-//DEADCODE JON 4/6/00 	FPMATRIX_PTR fpviewer_matrix;
 
 	//Poly sorting variables
 	LandObj3DPtr list_index,start_index,list_header,list_end;
-//DeadCode JON 3Aug00 	DoPointStruc* highco;
 	ANGLES	viewer_hdg;
 	UWord	list_size;
 	ANGLES	viewconeangle;
@@ -536,7 +497,6 @@ private:
 	COORDS3D	cloudset;									//RJS 01Apr98
 	SLong	fade_band_start,fade_band_end,fade_band_mid;
 	SLong	Cloud_Layer_Height;
-//DEADCODE JON 2/1/00 	SLong	view_range;
 	SLong	gvisrange,cvisrange;
 	SLong	blackingout,redingout,whitingout;
 
@@ -556,16 +516,11 @@ private:
 	void Exit();
 
 	void SetLVector(COORDS3D&);
-//DeadCode JON 23Oct00 	void SetFogMode(SLong,SLong);
 	void CloudLayer(ViewPoint*);									//PD 05Dec96
 	void IncDetailLevel();								//PD 12Sep96
 	void DecDetailLevel();								//PD 12Sep96
 	SLong SetViewDetail();								//RJS 25Jun98
 	void RenderLandscape(	CLib3D * );
-//DEADCODE JON 4/6/00 ViewPoint* VP,
-//DEADCODE JON 4/6/00 							FPMATRIX_PTR,
-//DEADCODE JON 4/6/00 							ULong&, ULong&, ULong&,
-//DEADCODE JON 4/6/00 							ANGLES);						//PD 07Jan97
 	// set up the landscape visibility stuff before each frame is drawn - passed in view point info
 	void  SetUpVisibleCones(	CLib3D *lib3d,
 								ViewPoint* vp,
@@ -617,28 +572,18 @@ private:
 	void InfiniteStrip( const ANGLES pitch, const ANGLES roll );
 	void GStrip(DoPointStruc**,UByte,UByte,UByte,UByte,UByte,UByte);
 
-//DEADCODE JON 3/30/00 	void  GridCone(const SLong,const SLong);
 	bool  FillDataGrid(SLong,SLong);
 	bool  LVisCheck(SLong x,SLong z);
 
-//DEADCODE JON 4/27/00 	void ScrollGrid(SLong,SLong,UByte*);
-//DEADCODE JON 4/27/00 	void ScrollGridDis(SLong,SLong,HTEXT*,Dropped*);
 	void ScrollTileGrid(SLong,SLong);
 	bool ManageHighLandTextures(SLong,SLong); // returns value saying if all are at required res..
 	void MakeSpaceInList( TileResList* curResList, UWord& numDesired, UWord& listToFree, int& reducedRez );	//JON 17Jul00
 
 
-//DeadCode JON 12Sep00 	inline SLong perm(SLong x) {return landRnd[x&0xFF];}
-//DeadCode JON 12Sep00 	inline UByte index2d(SLong x,SLong y) {return (UByte)perm(x+perm(y));}
-//DeadCode JON 12Sep00 	inline UByte index3d(SLong x,SLong y,SLong z) {return (UByte)perm(x+perm(y+perm(z)));}
 
-//deadcode JON 19/06/01		void		DoRain(ViewPoint*,SLong);				//RJS 25Jun98
 
-//deadcode JON 19/06/01		void SetMist(DoPointStruc&);
 	void PrintDebugs();
 
-//deadcode JON 19/06/01		void DoCloudLayer();
-//deadcode JON 19/06/01		void RenderTrees(UByte*,COORDS3D&);
 	void HighDetailTileRender(SLong ,SLong );
 	void HorizonTile( const int x, const int z );						//JON 28Sep00
 	void HiRezTile(
@@ -760,14 +705,10 @@ private:
 	inline void DoubleRez(UWord*,UWord,UWord*&);
 	inline void MakeTopLevel(SLong,SLong,UWord*&);
 	void InitialiseCloudTables();
-//deadcode JON 19/06/01		void RenderLevel00(const COORDS3D&,UWord*,UWord,R3DVALUE*);
-//deadcode JON 19/06/01		void RenderACloudLayer(const COORDS3D&,const UWord);
-//deadcode JON 19/06/01		void SmokeyCockpit();
 	public:
 	bool	UpdateTexturesWRTViewPos();
 	void	DrawWayPointIcon( const COORDS3D& pos, const ULong viewerx, const ULong viewery, const ULong viewerz, const int type );	//JON 8Nov00
 
-//DeadCode JON 20Oct00 	void MakeATRecs(UByte *);
 
 
 };

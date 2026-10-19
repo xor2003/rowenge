@@ -257,9 +257,9 @@ void ThreeDee::Init3D(MigWindow* win,ViewPoint*	vp)
 		pMigLand=new CMigLand;
 		pTMake=new TMake;
 	}
-	PaletteBlender(View_Point->TimeOfDay());
+	PaletteBlender(View_Point ? View_Point->TimeOfDay() : 0);	//RERUN: View_Point may be NULL during early init
 	pMigLand->BigInit(View_Point);
-	pTMake->Init(vp->World.X,vp->World.Z,win);
+	if (vp) pTMake->Init(vp->World.X,vp->World.Z,win);	//RERUN: vp is NULL-checked above
 	OverLay.LoaderScreen((2<<8)+128+96);
 	MaxShapeCount = FILEMAN.filesindir(DIR_SHAPES) - 1;
 	MaxShape2Count = 255 + FILEMAN.filesindir(DIR_MOBSHPS);
@@ -2174,7 +2174,7 @@ void ThreeDee::ResetCompass()
 void ThreeDee::CalcLightsOn(SLong	time)
 {
 	SLong			timedif,palpos;
-	Bool			timetochange;
+	Bool			timetochange=FALSE;	//RERUN: skipped init when all transitions fail
 
 	time /= 100;							// To seconds
 	lightson = TRUE;

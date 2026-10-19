@@ -15,7 +15,6 @@
 	#include	"WorldInc.h"
 	#include	"UniqueID.h"
 	#include	"world.h"
-//DEADCODE MS 31/01/00 #include	"text.h"
 #include	"files.g"
 //TempCode JIM 19Jul96 	#include	"text.g"
 #define	DEFAULT_PERSONS2 0
@@ -26,41 +25,6 @@ struct EventVar;
 enum	TokenCode	{};
 #endif
 //------------------------------------------------------------------------------
-//DEADCODE JIM 17/03/99 typedef	struct	EventRec*	EventRecPtr;
-//DEADCODE JIM 17/03/99 struct	EventSet
-//DEADCODE JIM 17/03/99 {
-//DEADCODE JIM 17/03/99 enum	fixedgvars	{GV_EVENT_START=-1,GV_EVENT_WINDOW=-2,GV_EVENT_EVENT=-3,GV_EVENT_NEST=-4};
-//DEADCODE JIM 17/03/99 	int	Index;
-//DEADCODE JIM 17/03/99 	union	{int	Value;EventRec* Nesting;};
-//DEADCODE JIM 17/03/99 };
-//DEADCODE JIM 17/03/99 struct	EventRec
-//DEADCODE JIM 17/03/99 {
-//DEADCODE JIM 17/03/99 	static	EventRec*	eventbase;
-//DEADCODE JIM 17/03/99 	EventRec*	eventlink;
-//DEADCODE JIM 17/03/99 	int			eventlistsize;
-//DEADCODE JIM 17/03/99 	ItemBasePtr	attitem;
-//DEADCODE JIM 17/03/99 	EventSet*	eventlist;
-//DEADCODE JIM 17/03/99 	ULong		eventwstart;
-//DEADCODE JIM 17/03/99 	ULong		eventwend;
-//DEADCODE JIM 17/03/99 	EventRec(ItemBasePtr i,int count)
-//DEADCODE JIM 17/03/99 	{
-//DEADCODE JIM 17/03/99 	 	eventlink=eventbase;
-//DEADCODE JIM 17/03/99 		eventbase=this;
-//DEADCODE JIM 17/03/99 		attitem=i;
-//DEADCODE JIM 17/03/99 		eventlistsize=count;
-//DEADCODE JIM 17/03/99 		eventlist=new EventSet [count];
-//DEADCODE JIM 17/03/99 		eventwstart=0;
-//DEADCODE JIM 17/03/99 		eventwend=0;
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99
-//DEADCODE JIM 17/03/99 	~EventRec()
-//DEADCODE JIM 17/03/99 	{	delete [] eventlist;			//delete list array
-//DEADCODE JIM 17/03/99 		EventRec**	ev2=&eventbase;		//find this record in static list
-//DEADCODE JIM 17/03/99 		while (*ev2!=this)	ev2=&ev2[0]->eventlink;
-//DEADCODE JIM 17/03/99 		*ev2=eventlink;					//remove
-//DEADCODE JIM 17/03/99 	}
-//DEADCODE JIM 17/03/99 };
-//DEADCODE JIM 17/03/99
 //------------------------------------------------------------------------------
 struct	PosCtrl
 {
@@ -126,84 +90,10 @@ struct  UnresolvedUidNode
 
 //------------------------------------------------------------------------------
 
-//DEADCODE DAW 08/03/00 	struct	EventLog:EventEntry
-//DEADCODE DAW 08/03/00 {
-//DEADCODE DAW 08/03/00 	EventLog*	next;
-//DEADCODE DAW 08/03/00 	UniqueID	targetuid;	//can distinguish friend/enemy a/c or ground
-//DEADCODE DAW 08/03/00
-//DEADCODE DAW 08/03/00 	Nationality	nat;
-//DEADCODE DAW 08/03/00 //	Had famekill and fameloss in old engine
-//DEADCODE DAW 08/03/00
-//DEADCODE DAW 08/03/00 	EventLog(EventLog* last)	{	next=last;stage=EMPTY;encsize=losses=hits=0;
-//DEADCODE DAW 08/03/00 									nat=NAT_AMBER;place=-1;homebase=UID_NULL;
-//DEADCODE DAW 08/03/00 									encounteredtype=PT_VEHICLES;escorttype=PT_BADMAX;	}
-//DEADCODE DAW 08/03/00 };
 
 
 // Message enums moved to rchatter.h							//RJS 27Jan99
 
-//DeadCode RJS 27Jan99 class	UserMsg:public ItemBase
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 public:
-//DeadCode RJS 27Jan99 	enum		Reason
-//DeadCode RJS 27Jan99 				{	NOMSG,
-//DeadCode RJS 27Jan99 					COURSE,			//come to xxx
-//DeadCode RJS 27Jan99 					PASSEDWP,		//passed WP: name/action
-//DeadCode RJS 27Jan99 					ATTACK,			//ASSIGNEDAC
-//DeadCode RJS 27Jan99 					ATTACKED,		//Being attacked by/bounced/taking hits
-//DeadCode RJS 27Jan99 					CLOSE,			//Enemy a/c Close/Reconn/Spotter/Bomber/Balloon/ground
-//DeadCode RJS 27Jan99 					TIME,			//acccel/takeover/paused/auto/regroup/regroup initiated
-//DeadCode RJS 27Jan99 									//sensitivity
-//DeadCode RJS 27Jan99 					SIGHTED,		//Unknown/Dogfight/Unfriend/Friendly/Vehicle/flak(e/f)
-//DeadCode RJS 27Jan99 					GOHOME,			//Going Home/Killed/Assume Lead/Low/no fuel/ammo / too damaged
-//DeadCode RJS 27Jan99 					FRIENDLY,		//Shooting a friendly
-//DeadCode RJS 27Jan99 					OBJECTIVE,		//sighted/destroyed/balloonflamed
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 					COMMSKILL1,		//killed in comms 1 - 8
-//DeadCode RJS 27Jan99 					COMMSKILL2,		//killed in comms 1 - 8
-//DeadCode RJS 27Jan99 					COMMSKILL3,		//killed in comms 1 - 8
-//DeadCode RJS 27Jan99 					COMMSKILL4,		//killed in comms 1 - 8
-//DeadCode RJS 27Jan99 					COMMSKILL5,		//killed in comms 1 - 8
-//DeadCode RJS 27Jan99 					COMMSKILL6,		//killed in comms 1 - 8
-//DeadCode RJS 27Jan99 					COMMSKILL7,		//killed in comms 1 - 8
-//DeadCode RJS 27Jan99 					COMMSKILL8,		//killed in comms 1 - 8
-//DeadCode RJS 27Jan99 					COMMSKILLU,		//unfriendly
-//DeadCode RJS 27Jan99 					COMMSKILLF,		//friendly
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 					LEFTGAME,		// comms player has left game //AMM 18Jun97
-//DeadCode RJS 27Jan99 				}
-//DeadCode RJS 27Jan99 				reason;
-//DeadCode RJS 27Jan99 	ItemBasePtr	trgplace;	//for angle and range do intercept to trgplace
-//DeadCode RJS 27Jan99 	TextSnip0	trgname;
-//DeadCode RJS 27Jan99 	UserMsg& operator = (UserMsg& s)
-//DeadCode RJS 27Jan99 		{
-//DeadCode RJS 27Jan99 			reason=s.reason;
-//DeadCode RJS 27Jan99 			if (s.trgplace==&s)
-//DeadCode RJS 27Jan99 			{
-//DeadCode RJS 27Jan99 				trgplace=this;
-//DeadCode RJS 27Jan99 				World=s.World;
-//DeadCode RJS 27Jan99 			}
-//DeadCode RJS 27Jan99 			else
-//DeadCode RJS 27Jan99 				trgplace=s.trgplace;
-//DeadCode RJS 27Jan99 			trgname=s.trgname;
-//DeadCode RJS 27Jan99 			return	(*this);
-//DeadCode RJS 27Jan99 		}
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 };
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 struct	UserMessages
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	enum	{MAX=5};
-//DeadCode RJS 27Jan99 	UserMsg	line[MAX];
-//DeadCode RJS 27Jan99 	Bool	newmessages;
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 };
-//DeadCode RJS 27Jan99
-//DeadCode RJS 27Jan99 struct	LastMsg
-//DeadCode RJS 27Jan99 {
-//DeadCode RJS 27Jan99 	UserMsg::Reason		reason;
-//DeadCode RJS 27Jan99 	TextSnip0	trgname;
-//DeadCode RJS 27Jan99 };
 
 //------------------------------------------------------------------------------
 
@@ -306,10 +196,6 @@ enum	BattlefieldType	{	MAINWORLDBF = 0,
 							//put any more in before here!
 							ENDPLAYTARGBF,
 
-//DEADCODE JIM 09/12/99 							GROUNDBF =  4*(int)BFTYPE,
-//DEADCODE JIM 09/12/99 							EASTGROUNDBF= (int)GROUNDBF+64,
-//DEADCODE JIM 09/12/99 							CENTGROUNDBF= (int)GROUNDBF+128,
-//DEADCODE JIM 09/12/99 							WESTGROUNDBF= (int)GROUNDBF+192,
 
 							SCRAMBF =	40*+BFTYPE,
 							SQ0TODETBF,
@@ -354,8 +240,6 @@ static	ItemBasePtr		*pItem;	//array now in struct world
 //	ContourList	*contourlists;
 //	RouteHdr	*routelist;
 
-//DeadCode RDH 22Jul96 	UserMessages	usermessages;
-//DEADCODE JIM 07/12/99 	PaintSchemes	colourrule;
 	UnresolvedUidNode			*rootuidnode;
 	WorldStuff*	myworld;
 	ShapeNumFieldPtr	shapefield;
@@ -468,9 +352,6 @@ protected:
 virtual FileNum FindCommsNextBf (Persons2::BattlefieldType& bfctrl)=0;		//ARM 27Sep96
 FileNum	FindNextBf (BattlefieldType &nextbftype);
 FileNum	LaunchMigPatrol(SquadSelect squad,int prefsize,UniqueID takeoff,int migdaytype,int migcaptime);
-//DEADCODE JIM 28/02/00 	UniqueID	bluenemigcap;
-//DEADCODE JIM 28/02/00 	UniqueID	blueswmigcap;
-//DEADCODE JIM 28/02/00
 Bool	LaunchConvoy(FileNum,SWord);					//RDH 30Sep96
 void	SetSecondWP (WayPointPtr	tmpitem);
 
@@ -505,17 +386,8 @@ void 		LoadSetPiece(WorldStuff *worldptr);
 
 //virtual void		FreeRoutes()=0;
 //virtual void		FreeEvents()=0;
-//DEADCODE DAW 08/03/00 static EventLogPtr	eventloglist,TruckLog,TargLog,PlayerLog;
-//DeadCode RJS 27Jan99 void	AddMessageIfPlayerSq(AirStrucPtr eye,UserMsg::Reason r,TextSnip0 t,ItemBasePtr trg);
-//DeadCode RJS 27Jan99 void	AddMessageIfPlayer(ItemBasePtr eye,UserMsg::Reason,TextSnip0,ItemBasePtr trg);
-//DeadCode RJS 27Jan99 void	AddMessage(UserMsg::Reason,TextSnip0,ItemBasePtr trg);
-//DeadCode RJS 27Jan99 void	AddMessage(UserMsg::Reason,TextSnip0,Coords3D& trg);
-//DeadCode RJS 27Jan99 void	ClrMessage(UserMsg::Reason);
 static void	UpdateLog(AirStrucPtr	eventlogowner,int	credits,EventLog::Stage stage);
-//DEADCODE DAW 08/03/00 static void	UpdateLog(MobileItemPtr	eventlogowner,int	credits,EventLog::Stage stage);
 static void	UpdateLog(EventLogPtr	eventlog,int	credits,EventLog::Stage stage,ItemBasePtr place=NULL);
-//DEADCODE DAW 08/03/00 static void	UpdatePlayerLog(AirStrucPtr	eventitem,EventLog::Stage stage);
-//DEADCODE DAW 08/03/00 static void	UpdateLog(ItemPtr	eventlogowner,int	credits,EventLog::Stage stage);
 
 
 
@@ -576,7 +448,6 @@ class	Persons3:public	Persons2
 	friend class	Mast3d;
 enum	TakeOffState
 {TOS_SIMPLE,TOS_SECRET,TOS_MIGTAKEOFF,TOS_INAIR,TOS_TAKENOFF,TOS_TAKINGOFF,TOS_RUNWAY,TOS_NEXTFLIGHTS,TOS_TAXIING,TOS_HOLDING};
-//DEADCODE JIM 09/12/99 	static	AirStrucPtr	migsq[2];
 	AirStrucPtr	pilotedaircraft;
 	int	gotgrpflags;int gotgrpnum;
 	WPNames	nextwpname;
@@ -587,7 +458,6 @@ enum	TakeOffState
 	int		nextwpnum;
 	enum	{MAXCALLNAMES=40};		//1-32 inclusive...
 	char	callsignnamecount[MAXCALLNAMES];
-//DeadCode CSB 7Nov00 	ShapeNum			baseSAGshape;
 	Squadron*			prevSAGsquadron;
 	int		instancesSAG[PT_VEHICLES],instancesAC[PT_VEHICLES],formationleaderflights[PT_VEHICLES];
 	int		offsetinformationleaderflights;
@@ -654,16 +524,12 @@ void		AddRoute(UniqueID);
 void	PreScanBF(FileNum f);
 void		adduidrequest(UnresolvedUidNode* newnode,UniqueID srcuid);
 //nonvirtual functions... only a couple!
-//DEADCODE JIM 09/12/99 static PlaneTypeSelect	squad2type[];
 public:
 ShapeNum	baseSAGshape;												//CSB 7Nov00
 
 static void		Reset3dAC(AirStrucPtr currac,PlaneTypeSelect type);
 
-//DEADCODE JIM 09/12/99 static PlaneTypeSelect Squad2Type(int);
 private:
-//DEADCODE JIM 28/02/00 	enum	GearState	{GS_INAIR,GS_GEAR,GS_PARKED};
-//DEADCODE JIM 28/02/00 GearState	setpositionMIG(AirStrucPtr currac,EventVal* pos,TakeOffState	takeoffstate,int takeofftimesecs);						//RDH 17Jun96
 
 //void		adduidrequest(ItemBasePtr trgitemptr,UniqueID srcuid,EventVal& pos,UILogType request)
 //{Persons2::adduidrequest(trgitemptr,srcuid,pos,request);}
@@ -678,7 +544,6 @@ void	FreeRoutes();
 void	FreeEvents();
 void	ProcessLogList();
 UniqueID	prevflightleader;
-//DEADCODE JIM 14/01/00 int		numprevflights;
 struct	SagExpansionCounter
 {
 	int			mintriggerrange;										//CSB 27Jul00

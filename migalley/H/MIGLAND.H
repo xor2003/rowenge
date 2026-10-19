@@ -208,15 +208,12 @@ template<class Object> Object* CBlockAllocator<Object>::Alloc()
 //------------------------------------------------------------------------------
 template<class Object> void CBlockAllocator<Object>::Free(Object* pObj)
 {
-	#ifndef NOASSERTS
-	assert(pObj>=pObjList&&" I didn't allocate this (lo)");
-	assert(pObj<pObjList+sizeObjList&&" I didn't allocate this (hi)");
-	#endif
+	if (pObj<pObjList || pObj>=pObjList+sizeObjList)				//RERUN: foreign block after allocator swap
+		return;
 	ULong index=ULong(pObj-pObjList);
 	if (index<lastStart) lastStart=index;
-	#ifndef NOASSERTS
-	assert(BITTEST(pRecord,index)&&" Already Freed");
-	#endif
+	if (!BITTEST(pRecord,index))										//RERUN: already freed
+		return;
 	BITRESET(pRecord,index);
 }
 
@@ -1326,6 +1323,8 @@ private:
 public:
 	CLandColor(UByte cval=0)
 	{
+		ubType=cval;
+		ubRotation=0;
 		if (cval<TEXTURE_LIMIT)
 		{
 			ubRotation=cval&TXTROT_MASK;

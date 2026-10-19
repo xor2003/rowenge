@@ -91,10 +91,6 @@ void	Display::XX_PalChange()
 		ASM_OutSB(0x3c9,Palette,768);
 }
 
-//DeadCode RJS 14Mar96 void	Display::XX_PhysMouseMove(MouseSave* oldpos,void* MouseShape,MouseSave* newpos)
-//DeadCode RJS 14Mar96 {
-//DeadCode RJS 14Mar96 	INT3();
-//DeadCode RJS 14Mar96 }
 
 Bool	Display::XX_CopyP2L(LogicalPtr	,int ,int )
 {
@@ -121,7 +117,6 @@ ULong	Display::XX_PlotPixelNoClip(UWord	x, UWord	y, ULong	thecol)
 
 void	Display::XX_ResetGraphicsMode()
 {
-//DeadCode RDH 30Oct96 	if (NumberOfScreens>1)
 		logicalscreenptr=NULL;	//block deletion
 }
 

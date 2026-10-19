@@ -232,8 +232,18 @@ void CRRadio::OnPaint()
     // BoB honors the persisted Cols verbatim (IDD_RAFDIRECTIVE's Patrol-size
     // radio is 114x55 yet stacks 3 items vertically at Cols=1).
     int cols = m_cols;
-    if (!g_rowanGameIsBoB && cols == 1 && rect.Width() > rect.Height() * 2 && m_buttons.size() > 1)
-        cols = m_buttons.size();
+    if (!g_rowanGameIsBoB && cols == 1 && rect.Width() > rect.Height() * 2 && m_buttons.size() > 1) {
+        // RERUN: only fan out horizontally when the widest label really fits
+        // its column pitch — IDD_LOCKERROOM's game-type radio is 194x91
+        // (barely 2:1) and a forced 3-across made "Deathmatch" paint under
+        // the next circle. 40px covers the circle/icon + padding.
+        int widest = 0;
+        for (const auto& b : m_buttons)
+            widest = std::max(widest, (int)dc.GetTextExtent(b.c_str()).cx);
+        int pitch = rect.Width() / (int)m_buttons.size();
+        if (pitch >= widest + 40)
+            cols = m_buttons.size();
+    }
     if (cols < 1) cols = 1;
 
     // Original CRRadioCtrl::OnDraw semantics: ColumnWidth is in average-char
@@ -256,6 +266,12 @@ void CRRadio::OnPaint()
     // (IDD_SQUICKMISSION's 4th radio sits past the 325-unit control edge).
     if (!g_rowanGameIsBoB && colWidth * cols > rect.Width())
         colWidth = rect.Width() / cols;
+    // Same for the row axis: the persisted pitch can overflow the control
+    // height (IDD_LOCKERROOM: 3 rows x 44px into a 91px rect clipped the
+    // third button). Distribute evenly when it fits at buttonHeight or more.
+    int nrows = (int)((m_buttons.size() + cols - 1) / cols);
+    if (!g_rowanGameIsBoB && nrows > 1 && rowHeight * nrows > rect.Height())
+        rowHeight = rect.Height() / nrows;
     if (colWidth < 1) colWidth = 1;
     if (rowHeight < buttonHeight) rowHeight = buttonHeight;
 
@@ -379,8 +395,16 @@ void CRRadio::OnLButtonDown(UINT nFlags, CPoint point)
     CRect rect;
     GetClientRect(rect);
     int cols = m_cols;
-    if (cols == 1 && rect.Width() > rect.Height() * 2 && m_buttons.size() > 1)
-        cols = m_buttons.size();
+    if (!g_rowanGameIsBoB && cols == 1 && rect.Width() > rect.Height() * 2 && m_buttons.size() > 1) {
+        // Same fit check as OnPaint: don't fan out when labels can't fit
+        // the resulting column pitch.
+        int widest = 0;
+        for (const auto& b : m_buttons)
+            widest = std::max(widest, (int)dc.GetTextExtent(b.c_str()).cx);
+        int pitch = rect.Width() / (int)m_buttons.size();
+        if (pitch >= widest + 40)
+            cols = m_buttons.size();
+    }
     if (cols < 1) cols = 1;
 
     // Same layout math as OnPaint — ColumnWidth is in average-char units.
@@ -391,6 +415,12 @@ void CRRadio::OnLButtonDown(UINT nFlags, CPoint point)
     int rowHeight = (tm.tmHeight > 0) ? tm.tmHeight * m_colWidth / 10 + 2 : buttonHeight;
     if (!g_rowanGameIsBoB && colWidth * cols > rect.Width())
         colWidth = rect.Width() / cols;
+    // Same for the row axis: the persisted pitch can overflow the control
+    // height (IDD_LOCKERROOM: 3 rows x 44px into a 91px rect clipped the
+    // third button). Distribute evenly when it fits at buttonHeight or more.
+    int nrows = (int)((m_buttons.size() + cols - 1) / cols);
+    if (!g_rowanGameIsBoB && nrows > 1 && rowHeight * nrows > rect.Height())
+        rowHeight = rect.Height() / nrows;
     if (colWidth < 1) colWidth = 1;
     if (rowHeight < buttonHeight) rowHeight = buttonHeight;
 

@@ -143,8 +143,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 			c.X=120;
 		SetConsoleScreenBufferSize(ConsoleOutput,c);
 	}
-//DEADCODE MS 01/02/00 	GUITHREADINFO t;
-//DEADCODE MS 01/02/00 	GetGUIThreadInfo(NULL,&t);
    MoveWindow(hWnd,0,0,600,0,FALSE);
    ShowWindow(hWnd, nCmdShow);
 	Sleep(50);
@@ -300,13 +298,6 @@ inline bool	operator +	(Crud)			{return false;}
 inline const char* operator -	(const char* s,Crud)	{return s;}
 inline const char* operator -	(int s,Crud)	{return Decimal(s);}
 inline const char* operator -	(Crud)			{return NULL;}
-//DEADCODE MS 01/02/00 BOOL WriteFile(
-//DEADCODE MS 01/02/00   HANDLE hFile,                    // handle to file
-//DEADCODE MS 01/02/00   LPCVOID lpBuffer,                // data buffer
-//DEADCODE MS 01/02/00   DWORD nNumberOfBytesToWrite,     // number of bytes to write
-//DEADCODE MS 01/02/00   LPDWORD lpNumberOfBytesWritten,  // number of bytes written
-//DEADCODE MS 01/02/00   LPOVERLAPPED lpOverlapped        // overlapped buffer
-//DEADCODE MS 01/02/00 );
 DWORD written;
 void	Fputs(const char* s,FILE* f)
 {
@@ -703,9 +694,6 @@ void	TryKeySetup()
 						fputsflush(stream,"DIPROP_BUFFERSIZE Error:",rv);
 					}
 				DIDATAFORMAT dataform={sizeof(DIDATAFORMAT),sizeof(DIOBJECTDATAFORMAT),DIDF_ABSAXIS ,definition_tops,max_dataobjects,dataobjects};
-//DEADCODE DAW 25/01/00 				if (d==3)
-//DEADCODE DAW 25/01/00 					dev_uids[d].dev2->SetDataFormat(&c_dfDIJoystick2 );
-//DEADCODE DAW 25/01/00 				else
 				dev_uids[d].dev2->SetDataFormat(&dataform);
 
 				int	trylevel=DL_START;
@@ -883,13 +871,6 @@ void	TryKeySetup()
 	}
 
 }
-//DEADCODE MS 01/02/00 If you want to know the: Use: 
-//DEADCODE MS 01/02/00 Handle to a process HANDLE GetCurrentProcess (void); 
-//DEADCODE MS 01/02/00 Identifier of a process DWORD GetCurrentProcessId (void); 
-//DEADCODE MS 01/02/00 Handle of another process HANDLE OpenProcess (0, FALSE, 
-//DEADCODE MS 01/02/00 DWORD dwProcessId); 
-//DEADCODE MS 01/02/00 Process identifier for the process that created a particular window DWORD GetWindowThreadProcessId 
-//DEADCODE MS 01/02/00 (HWND hWnd, LPWORD lpdwProcessId); 
 //////////////////////////////////////////////////////////////////////
 //
 // Function:    TryStaticSetup
@@ -925,7 +906,6 @@ void	TryStaticSetup()
 			if (!SUCCEEDED(hres))
 			{
 				fputsflush(stream,"Created V1");
-//DEADCODE DAW 02/02/00 				rv=dev_uids[d].dev1->SetProperty(DIPROP_BUFFERSIZE,&buffprop.diph);
 				if (!SUCCEEDED(rv))
 					switch (rv)
 					{
@@ -998,7 +978,6 @@ void	TryStaticSetup()
 				fputsflush(stream,"Created V2");
 				max_dataobjects=0;
 				dev_uids[d].dev2->EnumObjects(DIEnumObjectsToDF,NULL,DIDFT_BUTTON+DIDFT_AXIS+DIDFT_POV);
-//DEADCODE DAW 02/02/00 				rv=dev_uids[d].dev2->SetProperty(DIPROP_BUFFERSIZE,&buffprop.diph);
 				if (!SUCCEEDED(rv))
 					switch (rv)
 					{
@@ -1011,9 +990,6 @@ void	TryStaticSetup()
 						fputsflush(stream,"DIPROP_BUFFERSIZE Error:",rv);
 					}
 				DIDATAFORMAT dataform={sizeof(DIDATAFORMAT),sizeof(DIOBJECTDATAFORMAT),DIDF_ABSAXIS ,definition_tops,max_dataobjects,dataobjects};
-//DEADCODE DAW 25/01/00 				if (d==3)
-//DEADCODE DAW 25/01/00 					dev_uids[d].dev2->SetDataFormat(&c_dfDIJoystick2 );
-//DEADCODE DAW 25/01/00 				else
 				dev_uids[d].dev2->SetDataFormat(&dataform);
 
 				int	trylevel=DL_START;
@@ -1157,10 +1133,8 @@ void	TryStaticSetup()
 							dev_axes[j].lastval=newval;
 							fputsflush(stream,dev_axes[j].offset," ",dev_axes[j].dwType,"\t= ");
 							fputsflush(stream,dev_uids[dev_axes[j].devnum].devname,":",dev_axes[j].axisname,"\t",newval,"\n");
-//DEADCODE DAW 02/02/00 							fputsflush(stream,dev_uids[dev_axes[j].devnum].devname,":",dev_axes[j].axisname,"=",newval," ");
 						}
 					}
-//DEADCODE DAW 02/02/00 				fputsflush(stream,"\n");	
 			}
 
 	}
@@ -1198,7 +1172,6 @@ unsigned long __stdcall	SearchDevices(   LPVOID lpParameter   )
 				"matches what you expected to see.\n"
 				"Note that some advanced joysticks quote extra buttons to allow axes to be mapped as buttons.\n\n"
 				"Press any key (on keyboard) to continue...\n\n");	WaitKeyDown();
-//DEADCODE MS 01/02/00 	DirectInputCreate(ConsoleInstance,DIRECTINPUT_VERSION,&DIdev,NULL);
 	DirectInputCreate(GetModuleHandle(NULL),DIRECTINPUT_VERSION,&DIdev,NULL);
 	fputsflush(stream,"\nKEYBOARD DEVICES (DIDEVTYPE_KEYBOARD): Mig Alley uses the FIRST keyboard device.\n");
 	DIdev->EnumDevices(DIDEVTYPE_KEYBOARD,DIEnumDevicesProc,DIdev,DIEDFL_ATTACHEDONLY);

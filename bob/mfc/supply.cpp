@@ -94,8 +94,6 @@ static char THIS_FILE[] = __FILE__;
 
 CSupply::CSupply(int index, CWnd* pParent /*=NULL*/)
 	: RowanDialog(CSupply::IDD, pParent)
-//DEADCODE  08/02/00 	,
-//DEADCODE  08/02/00 	target(new LWDirectivesResultsTargetList[LWDirectivesResultsTargetList::MAX_TARGETS])
 {
 
 	sortindex = 0;
@@ -112,7 +110,6 @@ CSupply::~CSupply()
 	if (dr)
 		delete dr;
 
-//DEADCODE  08/02/00 	delete []target;
 }
 
 void CSupply::DoDataExchange(CDataExchange* pDX)
@@ -122,8 +119,6 @@ void CSupply::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX,IDC_RSTATICCTRL2,m_IDC_RSTATICCTRL2);
 	DDX_Control(pDX,IDC_SORTCOMBO,m_IDC_SORTCOMBO);
 	DDX_Control(pDX,IDC_RLISTBOXCTRL1,m_IDC_RLISTBOXCTRL1);
-//DEADCODE JIM 16/12/99 	DDX_Control(pDX,IDC_AUTHORISE,m_IDC_AUTHORISE);
-//DEADCODE JIM 30/11/99 	DDX_Control(pDX,IDC_DOSSIER,m_IDC_DOSSIER);
 	DDX_Control(pDX, IDC_RBUTTONAUTHORISE, m_IDC_RBUTTONAUTHORISE);
 	DDX_Control(pDX, IDC_RBUTTONDETAILS, m_IDC_RBUTTONDETAILS);
 	//}}AFX_DATA_MAP
@@ -148,7 +143,7 @@ void	CSupply::ReDrawButtons()
 		dosbut->SetDisabled(false);
 		if (Node_Data.GotBadWeatherPeriod())
 			authbut->ShowWindow(SW_HIDE);
-	  		if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
+		if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
 			{
 				authbut->ShowWindow(true);
 				authbut->SetForeColor(RGB(255,255,0));
@@ -166,7 +161,7 @@ void	CSupply::ReDrawButtons()
 		dosbut->SetDisabled(true);
 		if (Node_Data.GotBadWeatherPeriod())
 			authbut->ShowWindow(SW_HIDE);
-	  		if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
+		if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
 			{
 				authbut->ShowWindow(true);
 				authbut->SetForeColor(RGB(160,160,80));
@@ -181,10 +176,9 @@ void	CSupply::ReDrawButtons()
 }
 
 
-//DEADCODE  08/02/00 int	CSupply::FillPanel(LWDirectivesResults::TargetList* target, int panel)
 int	CSupply::FillPanel( int panel)
 {
-	int uidbandstart, uidbandend;
+	int uidbandstart=RAF_FighterAFBAND, uidbandend=CLRadarBAND;
 	switch (panel)
 	{
 	default_neverreferenced;
@@ -254,13 +248,6 @@ int	LWDirectivesResults::FillTargetList(TargetList* target,int uidbandstart, int
 		p=Persons2::ConvertPtrUID((UniqueID)uid);
 		//only statics and convoys in the world have a pointer
 
-//DeadCode RDH 12Oct00 		if (		(trg) && (p) && uid!=UID_AF_NEWCASTLE
-//DeadCode RDH 12Oct00 				&&	(		(trgtype != Target::TT_LONDON)
-//DeadCode RDH 12Oct00 						||	(		(trgtype == Target::TT_LONDON)
-//DeadCode RDH 12Oct00 								&&	(trg->London())
-//DeadCode RDH 12Oct00 							)
-//DeadCode RDH 12Oct00 					)
-//DeadCode RDH 12Oct00 			)
 //
 //only allow trg insert if (trgtype and trg is london) or (trgtype and trg is not london)
 		if (		(trg) && (p) && uid!=UID_AF_NEWCASTLE
@@ -288,10 +275,7 @@ int	LWDirectivesResults::InsertTarget(TargetList* target, UniqueID uid, int curr
 	int i = 0, trgpriority;
 	TargetGroup*	tg = Node_Data[uid];
 
-//DeadCode JIM 3Jul00 	if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
 		trgpriority = tg->falsepriority;   //PlayerPriority();//
-//DeadCode JIM 3Jul00 	else
-//DeadCode JIM 3Jul00 		trgpriority = tg->truepriority;
 
 	if (		(tg->knownstatus >= Target::TS_NEARLYDESTROYED)
 			&&	(tg->knownstatus < Target::TS_MAXIMUM)
@@ -328,7 +312,6 @@ void	CSupply::ReDraw(int	numoftargets)
 {
 	CRListBox* rlistbox;
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
-//DeadCode RDH 31Oct00 	rlistbox->AddString("",0);
 	rlistbox->Clear();
 	//rlistbox->AddColumn(TARGETFIELDWIDTH+60); //MIKE
 	//rlistbox->AddColumn(70);
@@ -353,14 +336,6 @@ void	CSupply::ReDraw(int	numoftargets)
 
 		int j;
 		j= Node_Data[(UniqueID)dr->target[i].target].PlayerType();
-//DeadCode JIM 30Oct00 		if (		(RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)
-//DeadCode JIM 30Oct00 				&&	(!Save_Data.gamedifficulty[GD_LWINTELL])
-//DeadCode JIM 30Oct00 			)
-//DeadCode JIM 30Oct00 			j = Node_Data[(UniqueID)dr->target[i].target].falsetargtype;
-//DeadCode JIM 30Oct00 	   else
-//DeadCode JIM 30Oct00 			j = Node_Data[(UniqueID)dr->target[i].target].truetargtype;
-//DeadCode JIM 3Jul00 		if ( j == Target::TT_AS_KNOWN)
-//DeadCode JIM 3Jul00 			j = Node_Data[(UniqueID)dr->target[i].target].truetargtype;
  		rlistbox->AddString(RESLIST(TT_AS_KNOWN, j),1);
 
 
@@ -413,7 +388,6 @@ BOOL CSupply::OnInitDialog()
 	
 
 
-//DEADCODE  08/02/00 	int	numoftargets = FillPanel(target, panel);
 	int	numoftargets = FillPanel( panel);
 	ReDraw(numoftargets);
 
@@ -425,7 +399,6 @@ BOOL CSupply::OnInitDialog()
 
 BEGIN_EVENTSINK_MAP(CSupply, CDialog)
     //{{AFX_EVENTSINK_MAP(CSupply)
-//DEADCODE JIM 30/11/99 	ON_EVENT(CSupply, IDC_DOSSIER, 1 /* Clicked */, OnClickedDossier, VTS_NONE)
 	ON_EVENT(CSupply, IDC_SORTCOMBO, 1 /* TextChanged */, OnTextChangedSortcombo, VTS_BSTR VTS_I2)
 	ON_EVENT(CSupply, IDC_RLISTBOXCTRL1, 1 /* Select */, OnSelectRlistboxctrl1, VTS_I4 VTS_I4)
 	ON_EVENT(CSupply, IDC_AUTHORISE, 1 /* Clicked */, OnClickedAuthorise, VTS_NONE)
@@ -436,30 +409,11 @@ END_EVENTSINK_MAP()
 
 void CSupply::OnClickedDossier() 
 {
-//DEADCODE JIM 16/12/99 	if  (		(currrow != -1)
-//DEADCODE JIM 16/12/99 			&&	(target[currrow].target != UID_NULL)
-//DEADCODE JIM 16/12/99 		)
-//DEADCODE JIM 16/12/99 	{
-//DEADCODE JIM 16/12/99 		m_pView->ZoomToUID(target[currrow].target,m_pView->m_zoom);
-//DEADCODE JIM 16/12/99 		m_pView->m_mapdlg.ResetIcon(target[currrow].target);
-//DEADCODE JIM 16/12/99 		MainToolBar().OpenDossier(target[currrow].target);
-//DEADCODE JIM 16/12/99 //		CTargetDossier::MakeSheet(CRect(180,400,0,0),target[currrow].target);
-//DEADCODE JIM 16/12/99 		OnOK();
-//DEADCODE JIM 16/12/99 
-//DEADCODE JIM 16/12/99 	}
 }
 
 void CSupply::OnTextChangedSortcombo(LPCTSTR text, short index) 
 {
 
-//DEADCODE JIM 16/12/99   	CRCombo* combo;
-//DEADCODE JIM 16/12/99 	combo=GETDLGITEM(IDC_SORTCOMBO);
-//DEADCODE JIM 16/12/99 	sortindex = combo->GetIndex();
-//DEADCODE JIM 16/12/99 	if (sortindex > 2)
-//DEADCODE JIM 16/12/99 		sortindex++;
-//DEADCODE JIM 16/12/99 	SortIntell();
-//DEADCODE JIM 16/12/99 	ReDraw();
-//DEADCODE JIM 16/12/99 	ReDrawButtons();
 		 
 }
 
@@ -472,11 +426,6 @@ void CSupply::OnSelectRlistboxctrl1(long row, long column)
 
 void CSupply::OnClickedAuthorise() 
 {
-//DEADCODE JIM 30/11/99 	if  (		(currrow != -1)
-//DEADCODE JIM 30/11/99 			&&	(target[currrow].target != UID_NULL)
-//DEADCODE JIM 30/11/99 		)
-//DEADCODE JIM 30/11/99 	{
-//DEADCODE JIM 30/11/99 		MainToolBar().OpenLoadProfile(target[currrow].target);		  //rdh 29/04/99
 
 //		int	pack=Todays_Packages.NewPackage(target[currrow].target);
 //		if (pack>=0)
@@ -488,8 +437,6 @@ void CSupply::OnClickedAuthorise()
 //		}
 
 		OnOK();
-//DEADCODE JIM 30/11/99 
-//DEADCODE JIM 30/11/99 	}
 	
 }
 

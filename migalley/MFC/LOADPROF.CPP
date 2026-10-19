@@ -139,7 +139,6 @@ public:	UniqueID	trguid;	UserProfAttack(UniqueID uid)	{trguid=uid;}
 			if 	(Todays_Packages.UsedWaypoints()>Todays_Packages.MaxWaypoints())
 				retval =0;
 			else if 	(		(Todays_Packages.pack[pack].duty != DC_BOMB)
-//DeadCode DAW 26Mar99 					&&	(Todays_Packages.pack[pack].duty != DUTYDIVEBOMB)
 				)
 					retval = 0;
 			else
@@ -212,7 +211,6 @@ public:	UniqueID	trguid;	UserProfPatrol(UniqueID uid)	{trguid=uid;}
 			if 	(Todays_Packages.UsedWaypoints()>Todays_Packages.MaxWaypoints())
 				retval =0;
 			else if 	(		(Todays_Packages.pack[pack].duty == DC_BOMB)
-//DEADCODE DAW 26/03/99 					||	(Todays_Packages.pack[pack].duty == DUTYDIVEBOMB)
 				)
 					retval =0;
 			else
@@ -617,8 +615,6 @@ void CLoadProf::OnOK()
 		int	pack=Todays_Packages.NewPackage(UniqueID(trguid), DC_BOMB);
 		if (pack>=0)
 		{
-//DeadCode CSB 31/03/99	//			DirControl	dir_ctrl;
-//DeadCode CSB 31/03/99	//			dir_ctrl.AllocateAcToOneTarget(pack, UniqueID(trguid));
 
 			m_pView->ZoomToUID(UniqueID(trguid),m_pView->m_zoom);
 			m_pView->m_mapdlg.ResetIcon(UniqueID(trguid));

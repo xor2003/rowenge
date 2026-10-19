@@ -71,7 +71,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include "SSound.h"
 #include "rcombo.h"
 #include "miles.h"
-//DeadCode AMM 23Nov99 #include "comms.h"
 #include "winmove.h"
 
 #ifdef _DEBUG
@@ -102,9 +101,6 @@ CSSound::CSSound(CWnd* pParent /*=NULL*/)
 	SETFIELD(BIT(hardwareconfig,HW_SFXQUALITY),		IDC_CBO_RADIOQUALITY,RESCOMBO(LOWQUAL,2),		NOLEVEL)	\
 
 
-//DEADCODE RDH 07/03/00   	SETFIELD(CHAR(vol.music,0,25),				IDC_CBO_MUSIC,RESCOMBO(OBLMHT_OFF,6),					NOLEVEL)	\
-//DEADCODE RDH 23/05/00  	SETFIELD(BIT(hardwareconfig,HW_RAFVOICE),		IDC_CBO_RAFVOICE,RESCOMBO(ENGLISH,2),		NOLEVEL)	\
-//DEADCODE RDH 23/05/00 	SETFIELD(BIT(hardwareconfig,HW_LWVOICE),		IDC_CBO_LWVOICE,RESCOMBO(GERMAN,2),		NOLEVEL)	
 
 
 void CSSound::DoDataExchange(CDataExchange* pDX)
@@ -142,16 +138,6 @@ void CSSound::DoDataExchange(CDataExchange* pDX)
 //		m_IDC_CBO_AUTOVECTORING.SetCircularStyle(TRUE);
 
 
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_MUSIC.SetCircularStyle(TRUE);						  //RDH 03/04/99
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_SFX.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_SFX2.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_SFX3.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_RADIOCHATTER.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_ENGINESOUND.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_GEFFECTS.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_INJURYEFFECTS.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_WHITEOUTS.SetCircularStyle(TRUE);
-//DEADCODE RDH 24/11/99 		m_IDC_CBO_AUTOVECTORING.SetCircularStyle(TRUE);				  //RDH 03/04/99
 		
 		if (!_Miles.IsEnabled(SOUND_DIGITAL))
 		{
@@ -227,10 +213,6 @@ void CSSound::PreDestroyPanel()
 
 // used to test switching between stereo/3d sound
 
-//DEADCODE AMM 24/11/99 	if (Save_Data.ThreeDeeSound)
-//DEADCODE AMM 24/11/99 		Save_Data.ThreeDeeSound=false;
-//DEADCODE AMM 24/11/99 	else
-//DEADCODE AMM 24/11/99 		Save_Data.ThreeDeeSound=true;
 }
 #define SG2C_CLEANUP
 #include "sg2combo.h"
@@ -255,31 +237,6 @@ BOOL CSSound::OnInitDialog()
 
 	OthersPref_Timer=SetTimer(DPlay::TIMER_PREFSOTHERS,0,NULL);
 
-//DEADCODE RDH 25/11/99 	CRCombo* combo;
-//DEADCODE RDH 25/11/99 	if	(		(RFullPanelDial::incomms)
-//DEADCODE RDH 25/11/99 			&&	(_DPlay.UIPlayerType==PLAYER_GUEST)
-//DEADCODE RDH 25/11/99 		)
-//DEADCODE RDH 25/11/99 	{
-//DEADCODE RDH 25/11/99 		combo=GETDLGITEM(IDC_CBO_GEFFECTS);
-//DEADCODE RDH 25/11/99 		combo->SetEnabled(false);
-//DEADCODE RDH 25/11/99 		combo=GETDLGITEM(IDC_CBO_INJURYEFFECTS);
-//DEADCODE RDH 25/11/99 		combo->SetEnabled(false);
-//DEADCODE RDH 25/11/99 		combo=GETDLGITEM(IDC_CBO_WHITEOUTS);
-//DEADCODE RDH 25/11/99 		combo->SetEnabled(false);
-//DEADCODE RDH 25/11/99 		combo=GETDLGITEM(IDC_CBO_AUTOVECTORING);
-//DEADCODE RDH 25/11/99 		combo->SetEnabled(false);
-//DEADCODE RDH 25/11/99 	}else
-//DEADCODE RDH 25/11/99 	{
-//DEADCODE RDH 25/11/99 		combo=GETDLGITEM(IDC_CBO_GEFFECTS);
-//DEADCODE RDH 25/11/99 		combo->SetEnabled(true);
-//DEADCODE RDH 25/11/99 		combo=GETDLGITEM(IDC_CBO_INJURYEFFECTS);
-//DEADCODE RDH 25/11/99 		combo->SetEnabled(true);
-//DEADCODE RDH 25/11/99 		combo=GETDLGITEM(IDC_CBO_WHITEOUTS);
-//DEADCODE RDH 25/11/99 		combo->SetEnabled(true);
-//DEADCODE RDH 25/11/99 		combo=GETDLGITEM(IDC_CBO_AUTOVECTORING);
-//DEADCODE RDH 25/11/99 		combo->SetEnabled(true);
-//DEADCODE RDH 25/11/99 	}
-//DEADCODE RDH 25/11/99 
 
 
 	CRCombo* combo;
@@ -315,38 +272,6 @@ BOOL CSSound::OnInitDialog()
 
 	combo->SetIndex(index);
 
-//DEADCODE RDH 07/03/00 	combo=GETDLGITEM(IDC_CBO_MUSICDRIVER);
-//DEADCODE RDH 07/03/00 	combo->Clear();
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 	LPDMPORTINFO temp=NULL;
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 	index=0;
-//DEADCODE RDH 07/03/00 	
-//DEADCODE RDH 07/03/00 	if (_Miles.mdi && _Miles.mdi->MDI_valid())
-//DEADCODE RDH 07/03/00 	{
-//DEADCODE RDH 07/03/00 		temp=_Miles.mdi->PortInfo;
-//DEADCODE RDH 07/03/00 	}
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 	if (!temp)
-//DEADCODE RDH 07/03/00 	{
-//DEADCODE RDH 07/03/00 		combo->AddString(RESSTRING(NOTAVAILABLE));
-//DEADCODE RDH 07/03/00 	}
-//DEADCODE RDH 07/03/00 	else
-//DEADCODE RDH 07/03/00 	{
-//DEADCODE RDH 07/03/00 		ULong n=0;
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 		while (temp)
-//DEADCODE RDH 07/03/00 		{
-//DEADCODE RDH 07/03/00 			combo->AddString(temp->device);
-//DEADCODE RDH 07/03/00 			if (temp->port==Save_Data.MusicDevice)
-//DEADCODE RDH 07/03/00 				index=n;
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 			n++;
-//DEADCODE RDH 07/03/00 			temp=temp->next;
-//DEADCODE RDH 07/03/00 		}
-//DEADCODE RDH 07/03/00 	}
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 	combo->SetIndex(index);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -364,16 +289,6 @@ void CSSound::OnTimer(UINT nIDEvent)
 
 void CSSound::OnClickedRbuttonmusictest() 
 {
-//DEADCODE RDH 07/03/00 	// TODO: Add your control notification handler code here
-//DEADCODE RDH 07/03/00 	
-//DEADCODE RDH 07/03/00 	{
-//DEADCODE RDH 07/03/00 		if (_Miles.mdi && _Miles.mdi->MDI_valid())
-//DEADCODE RDH 07/03/00 		{
-//DEADCODE RDH 07/03/00 			_Miles.mdi->Stop();
-//DEADCODE RDH 07/03/00 			_Miles.mdi->CreateAndAddPort(Save_Data.MusicDevice);
-//DEADCODE RDH 07/03/00 			_Miles.mdi->Play(NULL,NULL,true);
-//DEADCODE RDH 07/03/00 		}
-//DEADCODE RDH 07/03/00 	}
 }
 
 void CSSound::OnTextChangedCboSounddriver(LPCTSTR Caption, short index) 
@@ -405,30 +320,4 @@ void CSSound::OnTextChangedCboSounddriver(LPCTSTR Caption, short index)
 void CSSound::OnTextChangedCboMusicdriver(LPCTSTR Caption, short index) 
 {
 	
-//DEADCODE RDH 07/03/00 	{
-//DEADCODE RDH 07/03/00 		CRCombo* combo;
-//DEADCODE RDH 07/03/00 		combo=GETDLGITEM(IDC_CBO_ENGINESOUND);
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 		LPDMPORTINFO temp=NULL;
-//DEADCODE RDH 07/03/00 		
-//DEADCODE RDH 07/03/00 		if (_Miles.mdi && _Miles.mdi->MDI_valid())
-//DEADCODE RDH 07/03/00 		{
-//DEADCODE RDH 07/03/00 			temp=_Miles.mdi->PortInfo;
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 			while (temp && index--)
-//DEADCODE RDH 07/03/00 			{
-//DEADCODE RDH 07/03/00 				temp=temp->next;
-//DEADCODE RDH 07/03/00 			}
-//DEADCODE RDH 07/03/00 			if (temp)
-//DEADCODE RDH 07/03/00 			{
-//DEADCODE RDH 07/03/00 				Save_Data.MusicDevice=temp->port;
-//DEADCODE RDH 07/03/00 			}
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 // changed device, stop any music currently playing in case confusion arises
-//DEADCODE RDH 07/03/00 // as to which music device is playing music. To test music players will have to
-//DEADCODE RDH 07/03/00 // re-click on TestMusic button
-//DEADCODE RDH 07/03/00 
-//DEADCODE RDH 07/03/00 			_Miles.mdi->Stop();
-//DEADCODE RDH 07/03/00 		}
-//DEADCODE RDH 07/03/00 	}
 }

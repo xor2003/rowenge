@@ -4248,11 +4248,6 @@ void MapScr::ShowItemIcons(bool flag)
 	ShowTargetLocationHi(OverLay.target_item,x,y);
 	ShowAircraftIconsHi(x,y,flag);
 }
-//DeadCode DAW 27Aug99 	ShowBackgroundMap(Manual_Pilot.ControlledAC2->World,x,y);
-//DeadCode DAW 27Aug99 	ShowAircraftRoute(Manual_Pilot.ControlledAC2,x,y,true);	//flag);
-//DeadCode DAW 27Aug99 	ShowTargetLocation(OverLay.target_item,x,y);
-//DeadCode DAW 27Aug99 	ShowAircraftIcons(x,y,flag);
-//DeadCode DAW 27Aug99 }
 
 void MapScr::ShowItemIconsZoomed(bool flag)
 {
@@ -4440,7 +4435,6 @@ Key MapScr::FirstMapInit()
 	_MsgBuffer.InitMessageWindow();
 	if (!_DPlay.Implemented)
 		OverLay.keyFlags=KF_PAUSEON;
-//Old_Code DAW 26Mar99 	OverLay.keyFlags=KF_PAUSEON;
 	refreshLandscape=false;
 	return SEL_0;
 }
@@ -4528,7 +4522,6 @@ MapScr COverlay::firstMapScr=
 		{IDS_MAP_WAYPOINTS,0,SEL_2,MYPREFIX MapScr::SelectFromFirstMap},
 		{IDS_MAP_RADIO,0,SEL_3,MYPREFIX MapScr::SelectFromFirstMap},
 		{IDS_MAP_ZOOM,0,SEL_4,MYPREFIX MapScr::SelectFromFirstMap},
-//DeadCode JON 17Oct00 		MSBlankLine,
 		MSBlankLine,
 		MSEscapeLine(MYPREFIX MapScr::SelectFromFirstMap),
 		{IDS_MAP_EXIT,0,SEL_0,MYPREFIX MapScr::SelectFromFirstMap},
@@ -4690,7 +4683,6 @@ MapScr* MapScr::SelectFromUserMsg(UByte&,Key k)
 		break;
 	case SEL_7:
 //		localDec=CommsPlyrMsg;
-//DeadCode AMM 14May99 		retval=&COverlay::commsMsgOrdersScr;
 		if (_DPlay.Implemented)//AMM20May
 			retval=&COverlay::commsRecipientOrdersScr;
 		localDec=NULL;
@@ -4698,7 +4690,6 @@ MapScr* MapScr::SelectFromUserMsg(UByte&,Key k)
 	case SEL_8:
 //		localDec=CommsMsgMsg;
 		localDec=NULL;
-//DeadCode AMM 14May99 		retval=&COverlay::commsRecipientOrdersScr;
 		if (_DPlay.Implemented)//AMM20May
 			retval=&COverlay::commsMsgOrdersScr;					//AMM 14May99
 		break;
@@ -4896,7 +4887,6 @@ MapScr* MapScr::SelectFromUserOptions(UByte&,Key k)
 			
 		if (dec)
 		{
-	//DeadCode AMM 21May99 		DecisionAI::OptionRef* opt=dec->GetMsgOptions();
 
 			if (k>=SEL_1 && k<=SEL_9)
 			{
@@ -5730,7 +5720,6 @@ MapScr COverlay::commsRecipientOrdersScr=
 	MapGridNumCols,MapGridNumRows,
 	0x0000,
 	MYPREFIX MapScr::CommsRecipientOrdersInit,
-//DeadCode AMM 14May99 	MapScr::UpdateMessageDisplay,
     MYPREFIX MapScr::TimeLimitedDisplay,
 	{ 
 		{ IDS_EVERYBODY, 0, SEL_1, MYPREFIX MapScr::SelectFromCommsRecipientOrders },
@@ -5821,7 +5810,6 @@ MapScr* MapScr::SelectFromReplayScreen(UByte&,Key k)
 			_Replay.ReplayFlag=RF_SKIPTOPREVIOUSMARK;
 			_Replay.SkipToPreviousMark();
 //			Land_Scape.RefreshLandscape();
-//DEADCODE JIM 19/05/99 			_Replay.CalcCurrPos();
 //			OverLay.pvp->BlockTick(FALSE);
 			break;
 		case SEL_2:		//back a block
@@ -5863,7 +5851,6 @@ MapScr* MapScr::SelectFromReplayScreen(UByte&,Key k)
 			}
 			else
 			{
-//DeadCode AMM 22Apr99 				_Replay.setpaused=true;
 				_Replay.setpaused=1;
 				_Replay.PlaybackPaused=TRUE;
 			}*/
@@ -5887,7 +5874,6 @@ MapScr* MapScr::SelectFromReplayScreen(UByte&,Key k)
 			_Replay.ReplayFlag=RF_SKIPTONEXTMARK;
 			_Replay.SkipToNextMark();
 //			Land_Scape.RefreshLandscape();
-//DEADCODE JIM 19/05/99 			_Replay.CalcCurrPos();
 //			OverLay.pvp->BlockTick(FALSE);
 			break;
 		case SEL_9:		//clear markers
@@ -5949,7 +5935,6 @@ MapScr COverlay::replayPlayingScr=
 		{ IDS_MAPICON02LO, 1, SEL_2, MYPREFIX MapScr::SelectFromReplayScreen },		//back a block
 		{ IDS_MAPICON12LO, 1, SEL_3, MYPREFIX MapScr::SelectFromReplayScreen },		//back a frame
 		{ IDS_MAPICON04LO, 1, SEL_4, MYPREFIX MapScr::SelectFromReplayScreen },		//play
-//DeadCode AMM 24Feb99 		{IDS_MAPICON03LO,1,SEL_4,MapScr::SelectFromReplayScreen},		//pause
 		{ IDS_MAPICON11LO, 1, SEL_5, MYPREFIX MapScr::SelectFromReplayScreen },		//forward a frame
 		{ IDS_MAPICON05LO, 1, SEL_6, MYPREFIX MapScr::SelectFromReplayScreen },		//forward a block
 		{ IDS_MAPICON10LO, 1, SEL_7, MYPREFIX MapScr::SelectFromReplayScreen },		//skip forward
@@ -5995,7 +5980,6 @@ MapScr COverlay::replayScr=
 		{ IDS_MAPICON01LO, 1, SEL_1, MYPREFIX MapScr::SelectFromReplayScreen },		//skip back
 		{ IDS_MAPICON02LO, 1, SEL_2, MYPREFIX MapScr::SelectFromReplayScreen },		//back a block
 		{ IDS_MAPICON12LO, 1, SEL_3, MYPREFIX MapScr::SelectFromReplayScreen },		//back a frame
-//DeadCode AMM 24Feb99 		{IDS_MAPICON04LO,1,SEL_4,MapScr::SelectFromReplayScreen},		//play
 		{ IDS_MAPICON03LO, 1, SEL_4, MYPREFIX MapScr::SelectFromReplayScreen },		//pause
 		{ IDS_MAPICON11LO, 1, SEL_5, MYPREFIX MapScr::SelectFromReplayScreen },		//forward a frame
 		{ IDS_MAPICON05LO, 1, SEL_6, MYPREFIX MapScr::SelectFromReplayScreen },		//forward a block
@@ -6844,7 +6828,6 @@ void COverlay::HotKeyTriggerMessage(SWord sel1,SWord sel2)
 		if (dec!=NULL)
 		{
 			k=(Key)sel2;
-//DeadCode AMM 21May99 			DecisionAI::OptionRef* opt=dec->GetMsgOptions();
 			if (k>=SEL_1 && k<=SEL_9)
 			{
 				_Miles.SetDelayed(true);
@@ -6855,26 +6838,6 @@ void COverlay::HotKeyTriggerMessage(SWord sel1,SWord sel2)
 								Persons2::PlayerGhostAC);
 				_Miles.SetDelayed(false);
 
-//DeadCode AMM 21May99 				opt+=SLong(k-SEL_1);
-//DeadCode AMM 21May99 				if (_DPlay.Implemented || _Replay.Record)		//AMM 17May99
-//DeadCode AMM 21May99 				{												//AMM 17May99
-//DeadCode AMM 21May99 					UByte option=(UByte)(k-SEL_1);				//AMM 17May99
-//DeadCode AMM 21May99 					UniqueID trg=Persons2::PlayerGhostAC->uniqueID.bitfieldUid.count;//AMM 17May99
-//DeadCode AMM 21May99 					UByte decision=dec->optionnumber;			//AMM 17May99
-//DeadCode AMM 21May99 					_DPlay.NewWingmanCommand(decision,option,trg);//AMM 17May99
-//DeadCode AMM 21May99 				}												//AMM 17May99
-//DeadCode AMM 21May99 				else											//AMM 17May99
-//DeadCode AMM 21May99 				{												//AMM 17May99
-//DeadCode AMM 21May99 					MESSAGE_STRUC newMsg(opt->saidmsg,
-//DeadCode AMM 21May99 										MSG_HIPRIORITY,
-//DeadCode AMM 21May99 										Persons2::PlayerGhostAC,//AMM 17May99
-//DeadCode AMM 21May99 										Persons2::PlayerGhostAC,//AMM 17May99
-//DeadCode AMM 21May99 										Persons2::PlayerGhostAC);//AMM 17May99
-//DeadCode AMM 21May99 //DeadCode AMM 17May99 											Manual_Pilot.ControlledAC2,
-//DeadCode AMM 21May99 //DeadCode AMM 17May99 											Manual_Pilot.ControlledAC2,
-//DeadCode AMM 21May99 //DeadCode AMM 17May99 											Manual_Pilot.ControlleddAC2);
-//DeadCode AMM 21May99 					SendMessageAndCall(&newMsg,opt->airesult[0]);
-//DeadCode AMM 21May99				}												//AMM 17May99
 			}
 		}
 	}
@@ -7014,25 +6977,6 @@ void	COverlay::AccelSelection(UByte hilight,ULong acceltype)
 	if (_DPlay.Implemented)											  //AMM 02/07/99
 		return;														  //AMM 02/07/99
 
-//DeadCode AMM 01Jul99 // in comms only allow accel forward 
-//DeadCode AMM 01Jul99 
-//DeadCode AMM 01Jul99 	if (_DPlay.Implemented && _DPlay.AccelComms==DPlay::ACCEL_FORWARD)
-//DeadCode AMM 01Jul99 	{
-//DeadCode AMM 01Jul99 // if this is the first time I have pressed accel then send
-//DeadCode AMM 01Jul99 // a message to other players indicating I want accel
-//DeadCode AMM 01Jul99 
-//DeadCode AMM 01Jul99 		if (!(_DPlay.accelselected&(1<<_DPlay.mySlot)))
-//DeadCode AMM 01Jul99 		{
-//DeadCode AMM 01Jul99 			_DPlay.SendStartAccelMessage();
-//DeadCode AMM 01Jul99 		}
-//DeadCode AMM 01Jul99 
-//DeadCode AMM 01Jul99 
-//DeadCode AMM 01Jul99 // we are still waiting for players to select accel 
-//DeadCode AMM 01Jul99 // dont do it yet
-//DeadCode AMM 01Jul99 
-//DeadCode AMM 01Jul99 		if (_DPlay.accelselected!=_DPlay.ActivePlayers)
-//DeadCode AMM 01Jul99 			return;
-//DeadCode AMM 01Jul99 	}
 
  	OverLay.hilight=(Key)hilight;
 	OverLay.keyFlags=KF_ACCELON+KF_FASTACCEL;

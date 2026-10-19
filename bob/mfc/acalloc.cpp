@@ -311,7 +311,6 @@ void AircraftAllocation::FillOneSqCombo(int i)
 {
 
 	
-//DEADCODE RDH 06/01/00 	BritSquadron* sq = Node_Data[Node_Data.production[actoalloc[i]].recipient];
 	CRCombo* combo;
 	int recipientfound = -1;
 
@@ -328,14 +327,6 @@ void AircraftAllocation::FillOneSqCombo(int i)
 //			name = name + sq->SubName();
 //			combo->AddString(name);
 		Gruppen* sq;
-//DeadCode JIM 22Oct00 		sq = Node_Data[Node_Data.production[actoalloc[i]].recipient];
-//DeadCode JIM 22Oct00 		if (Node_Data.production[actoalloc[i]].recipient != SQ_ZERO)
-//DeadCode JIM 22Oct00 		{
-//DeadCode JIM 22Oct00 			CString name = sq->ShortName() + "/";
-//DeadCode JIM 22Oct00 			name = name + sq->SubName();
-//DeadCode JIM 22Oct00 			combo->AddString(name);
-//DeadCode JIM 22Oct00 			recipientfound = true;
-//DeadCode JIM 22Oct00 		}
 	   	while (Node_Data.gruppe[j].squadron != SQ_ZERO)
 		{
 
@@ -343,15 +334,10 @@ void AircraftAllocation::FillOneSqCombo(int i)
 			sq = &Node_Data.gruppe[j];
 			int actype= sq->AcType();
 			if (
-//DeadCode JIM 22Oct00 				(Node_Data.gruppe[j].squadron != Node_Data.production[actoalloc[i]].recipient)
 					(actype == actoalloc[i])
 				&&	(sq->periodsuntilready != Gruppen::BUSY_IN_EUROPE)		//only include squads that are
 				)
 				{
-//DEADCODE RDH 06/01/00 					int wader;
-//DEADCODE RDH 06/01/00 					wader = Node_Data.gruppe[j].wadernum; 
-//DEADCODE RDH 06/01/00 					CString name = RESLIST(J, Node_Data.geschwader[wader].wadername) ;
-//DEADCODE RDH 06/01/00 					name = name + CSprintf("%i/", Node_Data.geschwader[wader].wadernum);
 					CString name = sq->ShortName() + "/";
 					name = name + sq->SubName();
 					combo->AddString(name);
@@ -365,19 +351,11 @@ void AircraftAllocation::FillOneSqCombo(int i)
 	{
 		Squadron* sq;
 		sq = Node_Data[Node_Data.production[actoalloc[i]].recipient];
-//DeadCode JIM 22Oct00 		if (Node_Data.production[actoalloc[i]].recipient != SQ_ZERO)
-//DeadCode JIM 22Oct00 		{
-//DeadCode JIM 22Oct00 			combo->AddString(sq->SubName());
-//DeadCode JIM 22Oct00 			recipientfound = true;
-//DeadCode JIM 22Oct00 
-//DeadCode JIM 22Oct00 		}
 		while (Node_Data.squadron[j].squadron != SQ_ZERO)
 		{
 			sq = Node_Data[Node_Data.squadron[j].squadron];
 			int actype= sq->AcType();
 			if (
-//DeadCode JIM 22Oct00 				(Node_Data.squadron[j].squadron != Node_Data.production[actoalloc[i]].recipient)
-//DeadCode JIM 22Oct00 					&&
 					((actype&-2) == actoalloc[i])
 				)
 			{
@@ -428,10 +406,6 @@ BOOL AircraftAllocation::OnInitDialog()
 //	BritSquadron* sq = Node_Data[Node_Data.production[0].recipient];
 
 
-//DEADCODE RDH 20/12/99  		s= GETDLGITEM(IDC_STATIC_ETA0);
-//DEADCODE RDH 20/12/99 		s->SetString("10/7/40");
-//DEADCODE RDH 20/12/99  		s= GETDLGITEM(IDC_STATIC_ETA1);
-//DEADCODE RDH 20/12/99 		s->SetString("20/7/40");
 
 
 //		combo=GETDLGITEM(IDC_COMBO_SQUAD1);
@@ -471,7 +445,6 @@ void AircraftAllocation::OnTextChangedComboSquad0(int id, LPCTSTR Caption, short
 	int linenum = id - IDC_COMBO_SQUAD0;
 	Squadron* sq;
 	int recipient;
-//DeadCode JIM 22Oct00 	if (index != 0)
 	{
 			int j = 0, count = -1;
 		if (RFullPanelDial::gameside == RFullPanelDial::SIDE_LW)

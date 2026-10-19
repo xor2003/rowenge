@@ -112,11 +112,7 @@ public:
 	CRButton	m_IDC_FLIP_PANHORI;
 	//}}AFX_DATA
 
-//DeadCode AMM 21Feb100 	bool	SetAxesCombo(CRCombo& ID,AxisUses task,bool xonly,bool analogonly,bool paironly);
-//DeadCode AMM 27Jul00 	bool	SetAxesCombo(CRCombo& ID,AxisUses task,bool xonly,bool analogonly,bool paironly,bool notstick, bool notmouse, bool allowshifted);
 	bool	SetAxesCombo(CRCombo& ID,AxisUses task,bool xonly,bool analogonly,bool paironly,bool notstick, bool notmouse, bool allowshifted, bool allownormal,AllowAliasing allowaliassing=AA_NONE);
-//DeadCode AMM 21Feb100 	int		ChangedAxesCombo(CRCombo& ID,AxisUses task,bool xonly,bool analogonly,bool paironly);
-//DeadCode AMM 27Jul00 	int		ChangedAxesCombo(CRCombo& ID,AxisUses task,bool xonly,bool analogonly,bool paironly,bool notstick, bool notmouse, bool allowshifted);
 	int		ChangedAxesCombo(CRCombo& ID,AxisUses task,bool xonly,bool analogonly,bool paironly,bool notstick, bool notmouse, bool allowshifted, bool allownormal,AllowAliasing allowaliassing=AA_NONE);
 	void	ChangedAxesValue(int newind,AxisUses task);
 	void	RemakeAxes();
@@ -126,7 +122,6 @@ public:
 
 
 	static bool	GetAxisConfig(bool setff=false);
-//DeadCode AMM 21Feb100 	static void	SetAxisConfig();
 	static void	SetAxisConfig(bool, bool);
 	static void BuildEnumerationTables();
 	static void SetDefaultStickSettings(bool);

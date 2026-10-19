@@ -166,7 +166,7 @@ int localValidateTime(CString* buffer, int packnum, int wavenum)
 			*cnt++ = 0;
 			time = atoi(min) + 60 * atoi(hr);
 
-			int currtime;
+			int currtime=MORNINGPERIODSTART/60;
 			if (Miss_Man.currcampaignnum==Miss_Man.SO51_CAMPAIGN)
 			{
 				if (MMC.debrief.currperiod == 0)
@@ -241,12 +241,6 @@ void CWaveInsert::OnSelectedMainduty(long ButtonNum)
 
 void CWaveInsert::OnTextChangedTime(LPTSTR text) 
 {
-//DeadCode RDH 24Jun99 		CREdit* edit;
-//DeadCode RDH 24Jun99 		CString	buffer;
-//DeadCode RDH 24Jun99 		edit=GETDLGITEM(IDC_TIME);
-//DeadCode RDH 24Jun99 		buffer = edit->GetCaption();
-//DeadCode RDH 24Jun99 		trunc(text,5);
-//DeadCode RDH 24Jun99 		Profile::ValidateTime(&buffer, packnum, wavenum);
 	
 }
 

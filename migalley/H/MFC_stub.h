@@ -104,6 +104,14 @@ HWND allocate_hwnd(); // declaration only
 WindowBackend* backend_from_hwnd(HWND h);
 // Set a virtual client size on the backend owning `h` (0,0 disables).
 void MFC_SetVirtualClient(HWND h, int w, int hgt);
+// Empty the X11 input shape of an SDL overlay so clicks fall through to
+// the game window beneath it (BoB rowanvideo.cpp intro/outro overlay).
+void MakeX11WindowClickThrough(struct SDL_Window* w);
+// Reparent an SDL overlay into the game's main window at client-relative
+// x,y so it tracks window moves like a real WS_CHILD video window.
+void MFC_ReparentOverlayToWindow(struct SDL_Window* child,
+                                 struct SDL_Window* parent, int x, int y);
+unsigned long MFC_X11WindowId(struct SDL_Window* w);
 ///SDL
 
 // MFC message‑map annotation compatibility
@@ -1829,7 +1837,13 @@ public:
     TYPE& GetNext(POSITION& pos)
     {
         Node* n = (Node*)pos;
-        pos = (POSITION)(n ? n->next : nullptr);
+        if (!n)
+        {
+            static TYPE null_item = TYPE();	//RERUN: MFC requires non-null pos; return sentinel instead of crashing
+            pos = nullptr;
+            return null_item;
+        }
+        pos = (POSITION)(n->next);
         return n->data;
     }
 

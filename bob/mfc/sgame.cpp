@@ -129,15 +129,6 @@ void CSGame::DoDataExchange(CDataExchange* pDX)
 #define	SG2C_DISPLAY setlevel
 #include "sg2combo.h"
 	OPTIONS	
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_WEAPONS.SetCircularStyle(TRUE);
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_VULNERABLETOFIRE.SetCircularStyle(TRUE);
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_GROUNDCOLLISIONS.SetCircularStyle(TRUE);
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_MIDAIRCOLLISIONS.SetCircularStyle(TRUE);
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_AIPILOTALLTIME.SetCircularStyle(TRUE);
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_ACCELOFF.SetCircularStyle(TRUE);
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_TARGETSIZE.SetCircularStyle(TRUE);
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_SKILL_UN.SetCircularStyle(TRUE);
-//DEADCODE RDH 05/11/99 	m_IDC_CBO_SKILL_REDS.SetCircularStyle(TRUE);
 }
 
 
@@ -157,8 +148,6 @@ BOOL CSGame::OnInitDialog()
 
 	if (_DPlay.PlayerCreated)									//AMM 12Jul99
 	{															//AMM 12Jul99
-//DeadCode AMM 16Nov99 		_DPlay.UISendInPrefsMessage();							//AMM 12Jul99
-//DeadCode AMM 16Nov99 		DPlay::H2H_Player[_DPlay.mySlot].status=CPS_PREFS;		//AMM 12Jul99
 	_DPlay.SendStatusChange(DPlay::CPS_PREFS);
 	}															//AMM 12Jul99
 

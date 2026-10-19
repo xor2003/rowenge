@@ -133,7 +133,6 @@ BOOL CMisn_log::OnInitDialog()
 	rlistbox=GETDLGITEM(IDC_RLISTBOXCTRL1);
 	rlistbox->Clear();
 	rlistbox->AddColumn(48);
-//DEADCODE RDH 09/06/99 	rlistbox->AddColumn(40);
 	rlistbox->AddColumn(TARGETFIELDWIDTH+14);
 //can't fit this in	rlistbox->AddColumn(20);
 	rlistbox->AddColumn(2);
@@ -141,14 +140,10 @@ BOOL CMisn_log::OnInitDialog()
 	string.LoadString(IDS_DATE);
 	rlistbox->AddString(string,0);
 
-//DEADCODE RDH 09/06/99 	string.LoadString(IDS_ROLE); can't fit it in
-//DEADCODE RDH 09/06/99 	rlistbox->AddString(string,1);
 
 	string.LoadString(IDS_MAIN_WP_TARGET);
 	rlistbox->AddString(string,1);
 
-//DEADCODE JIM 10/04/99 	string.LoadString(IDS_AC);
-//DEADCODE JIM 10/04/99 	rlistbox->AddString(string,3);
 
 	string.LoadString(IDS_KILLS);
 	rlistbox->AddString(string,2);
@@ -166,7 +161,6 @@ BOOL CMisn_log::OnInitDialog()
 				if (MMC.debrief.playerlog[day][period].target1 != UID_NULL)
 					rlistbox->AddString(GetTargName(MMC.debrief.playerlog[day][period].target1), 1);
 
-//DEADCODE JIM 10/04/99 				rlistbox->AddString(RESLIST(SQ_BF_F86A,MMC.debrief.playerlog[day][period].pilotsquad),3);
 				int kills = MMC.debrief.playerlog[day][period].kills;	
 				rlistbox->AddString(CSprintf("%i",kills),2);	
 			}

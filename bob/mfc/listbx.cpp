@@ -112,7 +112,6 @@ BEGIN_MESSAGE_MAP(CListBx, CDialog)
 	ON_WM_ACTIVATE()
 	//}}AFX_MSG_MAP
 	ON_MESSAGE( WM_PLAYSOUND, OnPlaySound)
-//DEADCODE DAW 02/02/00 	ON_MESSAGE( WM_GETARTWORK, OnGetArtWork)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////

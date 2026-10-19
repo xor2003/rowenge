@@ -11,7 +11,6 @@
 #define F_SOUNDS
 //#include	"myError.h"
 #include	"files.g"											//JIM 07Nov95
-//DeadCode PD 29Oct96 #include	"mscdex.h"
 
 struct RequestHeader; struct CDComm; struct dir_entry;
 
@@ -48,10 +47,6 @@ typedef class	fileblock *fileblockptr;
 
 typedef	char	voidbigblock;
 
-//DeadCode JIM 29Jul96 typedef void	proc;
-//Old_Code PD 13Oct95 #ifndef	_STDIO_H_INCLUDED
-//Old_Code PD 13Oct95 struct	FILE;
-//Old_Code PD 13Oct95 #endif
 typedef 	FILE	*file;
 
 typedef  void	filetrans
@@ -247,7 +242,6 @@ string		pathnameptr;
 
 	struct	dirfileentry
 	{
-//DeadCode RDH 30Sep96 	public:
 	FileNum			driverfile;
 	DirNameInd		dirnameind;
 	dirindex		parentdir;
@@ -276,13 +270,6 @@ string		pathnameptr;
 		UWord	CDSeek(ULong);									//PD 30Oct96
 		UWord	CDReadFileBlock(ULong,void*,ULong);				//PD 30Oct96
 		void	SendCDCommand(UByteP);							//PD 16Dec96
-//Old_Code PD 18Nov96 		void	CDReSeek();										//PD 04Nov96
-//Old_Code PD 18Nov96 		void	CDMakeFileBlock(fileblock*,
-//Old_Code PD 18Nov96 								fileblocklink*,
-//Old_Code PD 18Nov96 								FileNum,
-//Old_Code PD 18Nov96 								ULong,
-//Old_Code PD 18Nov96 								ULong);							//PD 04Nov96
-//Old_Code PD 18Nov96 		Bool	CDgetthedata;									//PD 04Nov96
 
 public:															//JIM 10May96
 void		InitFileSystem();

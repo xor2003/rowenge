@@ -146,14 +146,6 @@ void	mobileitem::NextWayPoint ()
 			if (AirStrucPtr(*this)->AcIsPlayer())
 				switch (waypoint->wpname)
 				{
-//DeadCode CSB 30Oct00 				case WPNAME_IP:
-//DeadCode CSB 31Oct00 				case WPNAME_EscRendezvous:
-//DeadCode CSB 31Oct00 					{
-//DeadCode CSB 31Oct00 						AirStrucPtr ap=*this,ap2=ap->FindGroupLeader();
-//DeadCode CSB 31Oct00 						if(ap->formpos)
-//DeadCode CSB 31Oct00 							Art_Int.SendMsgAndCall(MESSAGE_STRUC(SCRIPT_TESTGUNS,MSG_STATUSREQUEST,ap2,NULL,ap), TestGuns);	
-//DeadCode CSB 31Oct00 					}
-//DeadCode CSB 31Oct00 				break;
 				case WPNAME_Target:
 					{
 						_Miles.SequenceAudible(FIL_MUSIC_OBJECTIVE_SIGHTED);
@@ -170,8 +162,6 @@ void	mobileitem::NextWayPoint ()
 			AirStrucPtr ap=*this;
 			if (ap-> formpos)	//wing splitting off
 			{
-	//DEADCODE CSB 04/05/00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLER_BREAK_ORBIT, MSG_MOVETOACTIVE, ap->fly.leadflight, NULL, ap));
-	//DEADCODE CSB 04/05/00 			_Radio.TriggerMsg(MESSAGE_STRUC(OLDSCRIPT_CALLEE_BREAK_ORBITREPLY, MSG_DISENGAGE_DELAY_LP_RPT, ap,NULL,ap->fly.leadflight));
 				_Radio.TriggerMsg(MESSAGE_STRUC(PHRASE_BREAKINGOFF, MSG_MOVETOACTIVE, ap->fly.leadflight, NULL, ap));
 				_Radio.TriggerMsg(MESSAGE_STRUC(SCRIPT_CALLEE_BREAK_ORBITREPLY, MSG_DISENGAGE_DELAY_LP_RPT, ap,NULL,ap->fly.leadflight));
 			}  
@@ -214,7 +204,6 @@ void	mobileitem::TeleportWayPoint ()
 	roll=ANGLES_0Deg;											//MS 07May96
 	hdg=HdgIntercept;
 	pitch=PitchIntercept;
-//DeadCode JIM 26Apr96 	This->cpitch=PitchIntercept;
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -401,10 +390,7 @@ BFieldWaypointActions	rv=wpbreakloop;
 			)
 			wp=wp->next;
 		assert (wp);
-//DeadCode CSB 26Jul00 			wp=wp->next;
 		wp = wp->NextWP(this);											//CSB 26Jul00
-//DeadCode CSB 26Jul00 		else															//CSB 26Jul00
-//DeadCode CSB 26Jul00 			INT3;														//CSB 26Jul00
 		AirStrucPtr(*this)->SetGroupWP(wp);
 //		ForceBreakLoopWayPoint();
 
@@ -468,7 +454,6 @@ void	mobileitem::WaitDeadWayPoint ()
 //------------------------------------------------------------------------------
 void	mobileitem::LandingWayPoint ()
 {
-//DEADCODE MS 07/03/00 	waypoint=NULL;	  		//run out of waypoints
 	//Want to keep on landing waypoint!
 	if (Status.size==AirStrucSize)
 	{
@@ -478,13 +463,6 @@ void	mobileitem::LandingWayPoint ()
 			if((a == Persons2::PlayerSeenAC) || (a == Persons2::PlayerGhostAC))
 				OverLay.CancelAccel();
 
-//DeadCode CSB 3Oct00 		if (a->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode CSB 3Oct00 		{
-//DeadCode CSB 3Oct00 //TEMP			Timer_Code.AccelToggle(FALSE);
-//DeadCode CSB 3Oct00 			OverLay.CancelAccel();
-//DeadCode CSB 3Oct00 	
-//DeadCode CSB 3Oct00 //DEADCODE DAW 10/05/99 			Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);	//JIM 25Jul96
-//DeadCode CSB 3Oct00 		}
 		if (a->formpos==0)
 			a->fly.leadflight=NULL;		//break from bombers
 
@@ -526,8 +504,6 @@ void	FormationItem::FighterLimitWayPoint()
 				ac->fly.expandedsag->fly.leadflight = NULL;												//CSB 23Aug00
 		}																								//CSB 23Aug00
 	}
-//DeadCode CSB 25Jul00 	else
-//DeadCode CSB 25Jul00 		NextWayPoint();
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -544,13 +520,7 @@ void	FormationItem::FighterLimitWayPoint()
 //------------------------------------------------------------------------------
 void	mobileitem::KillItNow ()
 {
-//DeadCode JIM 18Jul00 	if (	//(waypoint->next && waypoint->next->eta && waypoint->next->eta<Timer_Code.realtime)//MS 02Sep96
-//DeadCode JIM 18Jul00 			(Status.size==AirStrucSize && ((AirStrucPtr)*this)->FuelShort(SECS100*60*10))//MS 02Sep96
-//DeadCode JIM 18Jul00 		||	(Status.size==AirStrucSize && ((AirStrucPtr)*this)->AircraftDamaged())
-//DeadCode JIM 18Jul00 //		||	winchester											//MS 02Sep96
-//DeadCode JIM 18Jul00 		)
 		NextWayPoint();					//Move on to next waypoint
-//DeadCode JIM 18Jul00 	else
 		if (Status.size>=AIRSTRUCSIZE)	//But stay on current heading for 60 seconds	//RJS 4Sep00
 		{
 			AirStrucPtr a=*this;
@@ -580,51 +550,6 @@ void	mobileitem::KillItNow ()
 void	mobileitem::StartBombing()
 {
 	AirStrucPtr a=*this;
-//DeadCode JIM 17Nov96 	if (a->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode JIM 17Nov96 		_Miles.SequenceAudible(FIL_MUSIC_OBJECTIVE_SEEN);
-//DeadCode CSB 25/03/99		if (a->leader)	a=a->Leader();
-//DeadCode CSB 25/03/99		if (a->formpos)	a=a->fly.leadflight;
-//DeadCode CSB 25/03/99		//a is now squad leader... is he escorting?
-//DeadCode CSB 25/03/99		if (a->fly.leadflight)
-//DeadCode CSB 25/03/99		{
-//DeadCode CSB 25/03/99			a=a->fly.leadflight;
-//DeadCode CSB 25/03/99			if (a->waypoint==waypoint)
-//DeadCode CSB 25/03/99			{	//bomber still a'bombing
-//DeadCode CSB 25/03/99				a=*this;
-//DeadCode CSB 25/03/99				if (this==Manual_Pilot.ControlledAC2)
-//DeadCode CSB 25/03/99				{
-//DeadCode CSB 25/03/99	//TEMP			 	Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_CHARGESBOMBING,waypoint->target);
-//DeadCode CSB 25/03/99				}
-//DeadCode CSB 25/03/99				if (a->formpos==0)
-//DeadCode CSB 25/03/99					if (vely>=0)
-//DeadCode CSB 25/03/99						a->SetManoeuvreTime(180*SECS100);	//travel 3 mins in straight line
-//DeadCode CSB 25/03/99					else
-//DeadCode CSB 25/03/99						a->SetManoeuvreTime(10*SECS100);	//travel 3 mins in straight line
-//DeadCode CSB 25/03/99			}
-//DeadCode CSB 25/03/99			else
-//DeadCode CSB 25/03/99			{
-//DeadCode CSB 25/03/99				a=*this;
-//DeadCode CSB 25/03/99				if (this==Manual_Pilot.ControlledAC2 && movecode!=AUTO_BOMB)
-//DeadCode CSB 25/03/99				{
-//DeadCode CSB 25/03/99					if (waypoint->target->Status.deadtime)
-//DeadCode CSB 25/03/99					{
-//DeadCode CSB 25/03/99						_Miles.SequenceAudible(FIL_MUSIC_OBJECTIVE_COMPLETED);
-//DeadCode CSB 25/03/99	//TEMP					Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_OBJECTIVEDESTROYED,waypoint->target);
-//DeadCode CSB 25/03/99					}
-//DeadCode CSB 25/03/99					else
-//DeadCode CSB 25/03/99					{
-//DeadCode CSB 25/03/99						_Miles.SequenceAudible(FIL_MUSIC_OBJECTIVE_FAILED);
-//DeadCode CSB 25/03/99	//TEMP					Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_AMMOOUTOF,waypoint->target);
-//DeadCode CSB 25/03/99					}
-//DeadCode CSB 25/03/99				}
-//DeadCode CSB 25/03/99	
-//DeadCode CSB 25/03/99				NextWayPoint();
-//DeadCode CSB 25/03/99				if (movecode==AUTO_BOMB)
-//DeadCode CSB 25/03/99					Art_Int.BreakOff(*this);
-//DeadCode CSB 25/03/99				return;		//SKIP PAST ACCEL CLEAR
-//DeadCode CSB 25/03/99			}
-//DeadCode CSB 25/03/99		}
-//DeadCode CSB 25/03/99		else
 	{
 
 		assert(waypoint->target&&"Need target to kill in wp");
@@ -635,11 +560,7 @@ void	mobileitem::StartBombing()
 ////TEMPCODE JIM 21/04/99 				Art_Int.BreakOff(*this);
 ////TEMPCODE JIM 21/04/99 			return;		//SKIP PAST ACCEL CLEAR
 ////TEMPCODE JIM 21/04/99 		}
-////TEMPCODE JIM 21/04/99 //DeadCode JIM 05Dec96 			NextWayPoint();
 ////TEMPCODE JIM 21/04/99 		else
-//DeadCode CSB 18Aug00 		if  (		((a->duty&PACK_AM_MASK)==PACK_AM_LWSTART)		//don't want cap to get unfriendly set //JIM 23/05/99
-//DeadCode CSB 18Aug00 				&&	(movecode!=AUTO_BOMB)
-//DeadCode CSB 18Aug00 			)
 		{
 			a->ai.unfriendly=waypoint->target;						  //JIM 21/04/99
 			movecode=AUTO_BOMB;
@@ -655,12 +576,6 @@ void	mobileitem::StartBombing()
 		}
 	}
 
-//DeadCode CSB 3Oct00 	if (a->ai.eventlog->stage==EventLog::TAKEOFF)
-//DeadCode CSB 3Oct00 	{
-//DeadCode CSB 3Oct00 		OverLay.CancelAccel();
-//DeadCode CSB 3Oct00 		//TEMP		Timer_Code.AccelToggle(FALSE);
-//DeadCode CSB 3Oct00 //DEADCODE DAW 10/05/99 		Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);	//JIM 25Jul96
-//DeadCode CSB 3Oct00 	}
 
 	Squad_Diary.ArrivedAtTarget(a,waypoint->target);				//RJS 09Mar00
 }
@@ -679,71 +594,6 @@ void	mobileitem::StartBombing()
 //------------------------------------------------------------------------------
 void	mobileitem::StartStraffe()
 {
-//DEADCODE DAW 10/05/99 	AirStrucPtr a=*this;
-//DEADCODE DAW 10/05/99 //DeadCode JIM 17Nov96 	if (a->ai.eventlog->stage==EventLog::TAKEOFF)
-//DEADCODE DAW 10/05/99 //DeadCode JIM 17Nov96 		_Miles.SequenceAudible(FIL_MUSIC_OBJECTIVE_SEEN);
-//DEADCODE DAW 10/05/99 	if (a->leader)	a=a->Leader();
-//DEADCODE DAW 10/05/99 	if (a->formpos)	a=a->fly.leadflight;
-//DEADCODE DAW 10/05/99 	//a is now squad leader... is he escorting?
-//DEADCODE DAW 10/05/99 	if (a->fly.leadflight)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		a=a->fly.leadflight;
-//DEADCODE DAW 10/05/99 		if (a->waypoint==waypoint)
-//DEADCODE DAW 10/05/99 		{	//bomber still a'bombing
-//DEADCODE DAW 10/05/99 			a=*this;
-//DEADCODE DAW 10/05/99 			if (this==Manual_Pilot.ControlledAC2)
-//DEADCODE DAW 10/05/99 			{
-//DEADCODE DAW 10/05/99 //TEMP			 	Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_CHARGESBOMBING,waypoint->target);
-//DEADCODE DAW 10/05/99 			}
-//DEADCODE DAW 10/05/99 			if (a->formpos==0)
-//DEADCODE DAW 10/05/99 				if (vely>=0)
-//DEADCODE DAW 10/05/99 					a->SetManoeuvreTime(180*SECS100);	//travel 3 mins in straight line
-//DEADCODE DAW 10/05/99 				else
-//DEADCODE DAW 10/05/99 					a->SetManoeuvreTime(10*SECS100);	//travel 3 mins in straight line
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99 		else
-//DEADCODE DAW 10/05/99 		{
-//DEADCODE DAW 10/05/99 			a=*this;
-//DEADCODE DAW 10/05/99 			if (this==Manual_Pilot.ControlledAC2 && movecode!=AUTO_STRAFFE)
-//DEADCODE DAW 10/05/99 			{
-//DEADCODE DAW 10/05/99 				if (waypoint->target->Status.deadtime)
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					_Miles.SequenceAudible(FIL_MUSIC_OBJECTIVE_COMPLETED);
-//DEADCODE DAW 10/05/99 //TEMP					Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_OBJECTIVEDESTROYED,waypoint->target);
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99 				else
-//DEADCODE DAW 10/05/99 				{
-//DEADCODE DAW 10/05/99 					_Miles.SequenceAudible(FIL_MUSIC_OBJECTIVE_FAILED);
-//DEADCODE DAW 10/05/99 //TEMP					Persons_2.AddMessage(UserMsg::SIGHTED,TEXT_AMMOOUTOF,waypoint->target);
-//DEADCODE DAW 10/05/99 				}
-//DEADCODE DAW 10/05/99 			}
-//DEADCODE DAW 10/05/99 
-//DEADCODE DAW 10/05/99 			NextWayPoint();
-//DEADCODE DAW 10/05/99 			if (movecode==AUTO_STRAFFE)
-//DEADCODE DAW 10/05/99 				Art_Int.BreakOff(*this);
-//DEADCODE DAW 10/05/99 			return;		//SKIP PAST ACCEL CLEAR
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99 	
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99 	else
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		assert(waypoint->target&&"Need target to kill in wp");
-//DEADCODE DAW 10/05/99 		if (waypoint->target->Status.deadtime)
-//DEADCODE DAW 10/05/99 		{														//JIM 05Dec96
-//DEADCODE DAW 10/05/99 			NextWayPoint();
-//DEADCODE DAW 10/05/99 			if (movecode==AUTO_STRAFFE)
-//DEADCODE DAW 10/05/99 				Art_Int.BreakOff(*this);
-//DEADCODE DAW 10/05/99 			return;		//SKIP PAST ACCEL CLEAR
-//DEADCODE DAW 10/05/99 		}
-//DEADCODE DAW 10/05/99 //DeadCode JIM 05Dec96 			NextWayPoint();
-//DEADCODE DAW 10/05/99 		else
-//DEADCODE DAW 10/05/99 			movecode=AUTO_STRAFFE;
-//DEADCODE DAW 10/05/99 	}
-//DEADCODE DAW 10/05/99 	if (a->ai.eventlog->stage==EventLog::TAKEOFF)
-//DEADCODE DAW 10/05/99 	{
-//DEADCODE DAW 10/05/99 		//TEMPTimer_Code.AccelToggle(FALSE);
-//DEADCODE DAW 10/05/99 		Manual_Pilot.AutoToggle(Manual_Pilot.MANUAL);	//JIM 25Jul96
-//DEADCODE DAW 10/05/99 	}
 }
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -822,9 +672,6 @@ Bool	AirStruc::FuelShort (int safetytime,int* fuelavailP,int* safetyfuelP)
 {
 	if (ai.homebase && classtype->aerobaticfactor!=AEROBATIC_LOW)
 	{
-//DEADCODE CSB 05/11/99 		int fuelavail=		weap.centre.int_fuel+weap.centre.ext_fuel
-//DEADCODE CSB 05/11/99 						+	weap.right.int_fuel+weap.right.ext_fuel
-//DEADCODE CSB 05/11/99 						+	weap.left.int_fuel+weap.left.ext_fuel;
 		int fuelavail = 0;
 		for(SWord i = 0; i < 4; i++)
 			fuelavail += fly.fuel_content[i];
@@ -841,9 +688,6 @@ Bool	AirStruc::FuelShort (int safetytime,int* fuelavailP,int* safetyfuelP)
 		if (sq>fuelavail)		//sq is low for squad num if not pilotable.
 			return	TRUE;
 
-//DeadCode CSB 29Aug00 		InterceptandRange(ai.homebase);
-//DeadCode CSB 29Aug00 		int time=MULDIVSIN(Range,10,classtype->cruisevel)+safetytime;	//all centiseconds
-//DeadCode CSB 29Aug00 		int fuelused=time*(classtype->fuelaboff/4);
 		FP time = (FP(Distance3D(&ai.homebase->World)) * 11000.0) / FP(classtype->cruisevel);
 		time += safetytime;
 		int fuelused = time * classtype->fuelaboff;

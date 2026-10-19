@@ -79,7 +79,6 @@ http://www.simhq.com/cgi-bin/boards/cgi-bin/forumdisplay.cgi?action=topics&forum
 #include <stdio.h>
 #include <string.h>
 #include <c:\Program Files\DevStudio\Vc\include\math.h>
-//DeadCode JIM 02Apr98 #include <c:\watcom\h\math.h>
 
 //#include "myworldinc.h"
 #include "modvec.h"

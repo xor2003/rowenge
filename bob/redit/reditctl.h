@@ -48,9 +48,7 @@ public:
 	long m_FontNum;
 	UINT m_timerID;
 	BOOL m_bShowCursor;
-//DeadCode JON 26Jun00 	static BOOL m_bDrawing;
 	Bool m_FirstSweep;
-//DeadCode JON 26Jun00 	BOOL m_bDisabled;
 //	CBitmap* partwork;
 //	BITMAP	artworkinfo;
 

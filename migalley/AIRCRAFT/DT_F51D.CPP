@@ -96,13 +96,10 @@ void F51D_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	pMainPlane->SetMaskAngle(0, 0, 0, 0);//-0.865, -1.089);//
 	pMainPlane->SetDragPolar (0.0163, 0.0724);
 	pMainPlane->SetCurves ("F80C", "Cl", "Cd", "CompCd0", "CompK", "Cm");
-//DeadCode AMM 29Jun99 	pMainPlane->StallAoa = Degs2Rads(0);//22.5);
-//DeadCode AMM 29Jun99 	pMainPlane->UnStallAoa = Degs2Rads(12.5);
 	pMainPlane->dCMdq = 0;
 	pMainPlane->dCMdp = 0;
 	pMainPlane->dCMdr = 0;
 
-//DeadCode CSB 31/05/99		pMainPlane->SetSlipstream(pThrust, 25);
 	pMainPlane->SetSlipstream(pThrust, 22);
 
 	pMainPlane->buffetAoa0 = Degs2Rads(15);	
@@ -117,7 +114,6 @@ void F51D_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	pTailPlane1->SetOrientation (0, 0, 0);
 	pTailPlane1->SetMaskAngle(0, 0);
 	pTailPlane1->SetCurves ("P51D", "TailCl", "COMM", "TailCd");//, "", "", "COMM", "CompK");
-//DeadCode CSB 31/05/99		pTailPlane1->SetSlipstream(pThrust, 50);//84);
 	pTailPlane1->SetSlipstream(pThrust, 70);
 	
 	PSURFACE pTailPlane2 = new SURFACE (pModel, ST_PLANE, SD_TAILPLANE, 19000);//, 95);
@@ -125,7 +121,6 @@ void F51D_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	pTailPlane2->SetOrientation (0, 0, 0);
 	pTailPlane2->SetMaskAngle(0, 0);
 	pTailPlane2->SetCurves ("P51D", "TailCl", "COMM", "TailCd");//, "", "", "COMM", "CompK");
-//DeadCode CSB 31/05/99		pTailPlane2->SetSlipstream(pThrust, 50);//84);
 	pTailPlane2->SetSlipstream(pThrust, 70);
 	
 	PSURFACE pFin = new SURFACE (pModel, ST_PLANE, SD_FIN, 23300);//, 135);
@@ -133,7 +128,6 @@ void F51D_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	pFin->SetOrientation (0, 0, -90);
 	pFin->SetMaskAngle(0, 0);//-0.153);
 	pFin->SetCurves ("P51D", "FinCl", "COMM", "TailCd");//, "", "", "COMM", "CompK");
-//DeadCode CSB 31/05/99		pFin->SetSlipstream(pThrust, 75);//90);		
 	pFin->SetSlipstream(pThrust, 60);
 
 	
@@ -174,9 +168,6 @@ void F51D_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	pEngine->pPower0 = _CurveRsc.FindCurve ("F51D", "Power0");
 	pEngine->pPowerAlt = _CurveRsc.FindCurve ("F51D", "PowerAlt");
 	pEngine->pPowerAltSuper = _CurveRsc.FindCurve ("F51D", "PowerAltSuper");	//CSB
-//DeadCode CSB 28/04/99		pEngine->pPropEff = _CurveRsc.FindCurve ("F51D", "PropEff");
-//DeadCode CSB 28/04/99		pEngine->pPropTq = _CurveRsc.FindCurve ("F51D", "PropTq");
-//DeadCode AMM 29Jun99 	pEngine->EngineCount = 1;
 	pEngine->HighBlowerAlt = 457205;	//High Gear Supercharger cuts in at 15000ft //CSB
 	pEngine->LowBlowerAlt  = 411485;	//High Gear Supercharger cuts out at 13500ft //CSB
 	pEngine->BlowerHigh	   = FALSE;
@@ -221,10 +212,8 @@ void F51D_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	Model.ControlForce = 100;			// Relative amount of force feedback
 	Model.BuffetForce  = 100; 
 
-//DeadCode CSB 07/06/99		pModel->SetMassInertias (ControlledAC, 0.75*26500, 0.75*36800, 0.75*11000);				//0.75 * F80
 	pModel->SetMassInertias (ControlledAC, 20250,	27000,	7500);
 
-//DeadCode CSB 22/03/99		pModel->SetMassInertias (ControlledAC, 26500, 36800, 11000);	//F86E
 
 	Model.MaxG = 9;
 	Model.MinG = -5;
@@ -234,58 +223,16 @@ void F51D_Setup (AirStrucPtr const ControlledAC, ULong Version)
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.elevator, &adptr->acelevator,32767,-32768);//RJS 14May98
 	new MODELANIM (ControlledAC,MA_SURFACE, pModel, &ControlledAC->fly.rudder, &adptr->acrudder);
 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &ControlledAC->fly.rpm, &adptr->acrpm, 0, 65536);
-//DeadCode RJS 05May99 	new MODELANIM (ControlledAC,MA_GENERICFP, pModel, &pModel->Inst.Rpm1, &adptr->acrpm, 0, 65536);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pTail, &adptr->aclegsuspb, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainPort, &adptr->aclegsuspl, 0, 255);
 	new MODELANIM (ControlledAC,MA_SUSPENSION, pMainStbd, &adptr->aclegsuspr, 0, 255);
 
-//DeadCode AMM 29Jun99 	Model.CoordRudder = 768;
 	Model.PowerBoost = 1.5;
 
-//DeadCode AMM 29Jun99 	Model.ContrailBand = FEET2CM(10000);
 	Model.ContrailDuration = 1.0;
 
 	F51D_SetupAI (ControlledAC, Version);
 }
 
-//DeadCode CSB 10/12/98	//	ACM.pModel = pModel;
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98		ACM.BrakePower = 14;
-//DeadCode CSB 10/12/98		ACM.SteerRatio = 8e-6;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.ClimbRate_Elevator_Damping_Power = 5000;
-//DeadCode CSB 10/12/98	//	ACM.ClimbRate_Elevator_Offset_Power = 50;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.Height_Elevator_Offset_Power = 0.1;
-//DeadCode CSB 10/12/98	//	ACM.Height_Elevator_Limit = 500;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.RollRate_Aileron_Offset_Power = 12500;
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	//	ACM.Roll_Aileron_Offset_Power = 5000;
-//DeadCode CSB 10/12/98	//	ACM.Roll_Aileron_MaxBankOffset_Power = 25000;
-//DeadCode CSB 10/12/98		ACM.MaxAileron = 32767;
-//DeadCode CSB 10/12/98	//	ACM.lastdeltaroll = 0;
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	//	ACM.Heading_Aileron_Limit = DEGS2RADS(45);
-//DeadCode CSB 10/12/98	 //	ACM.Heading_Aileron_Offset_Power = 5000;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.PitchRate_Elevator_Offset_Power = 2048;
-//DeadCode CSB 10/12/98	//	ACM.PitchRate_Elevator_Damping_Power = 262144;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//DeadCode RDH 17Apr98 	ACM.Pitch_Elevator_Offset_Power = 2048;
-//DeadCode CSB 10/12/98	//DeadCode RDH 17Apr98 	ACM.Pitch_Elevator_Damping_Power = 262144;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98		ACM.DeltaPitchForMaxElevator	= 1.0472;
-//DeadCode CSB 10/12/98		ACM.MaxElevatorForTightTurn	= 25000;
-//DeadCode CSB 10/12/98	//	ACM.DiffPitchForMaxElevator	= 0.1745;
-//DeadCode CSB 10/12/98		ACM.lastdeltapitch = 0;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//	ACM.Speed_Throttle_Offset_Power = 0.5;
-//DeadCode CSB 10/12/98	//	ACM.Speed_Throttle_Damping_Power = 64;
-//DeadCode CSB 10/12/98	
-//DeadCode CSB 10/12/98	//DeadCode CSB 06/11/98		Model.ClAileronLoss = 1.50;
-//DeadCode CSB 10/12/98		Model.MElevatorLoss = 1.10;	
-//DeadCode CSB 10/12/98		
-//DeadCode CSB 10/12/98	}
 
 

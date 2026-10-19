@@ -29,7 +29,6 @@ struct _dsportinfo
 	LPDSPORTINFO next;
 	char device[512];
 	GUID port;
-//DeadCode AMM 29Nov99 	DWORD	ChannelGroups;
 };
 
 class	DigitalDriver
@@ -116,7 +115,6 @@ public:
 	void Test3DSound();
 };
 
-//DeadCode RJS 08Nov99 extern DigitalDriver Dig_Driver;
 
 #endif
 #include "sound.h"

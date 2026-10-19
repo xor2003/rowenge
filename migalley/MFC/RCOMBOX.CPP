@@ -292,7 +292,6 @@ CString		GetDateName(int date,DateFormat form,int time)
 	{
 	case DATE_SHORT:
 		{
-//DEADCODE RDH 15/06/99 			cdate.Format("%i/%i/%i",day,month+1,year - 1900);
 			cdate.Format("%i/%i/%i",month+1,day,year - 1900);	//use US format //RDH 15/06/99
 			return(cdate);
 		}

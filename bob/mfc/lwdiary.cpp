@@ -148,7 +148,6 @@ void	LWDiary::RefreshData(int effect)
 		case 2:
 		{
 			FindGeschwader();
-//DeadCode JIM 13Oct00 			FillGruppeDetails(grdetails[0]);
 			Refresh();
 			dlist->RefreshData(groupnum);
 			ddet->RefreshData(groupnum);
@@ -181,18 +180,11 @@ END_MESSAGE_MAP()
 void	LWDiary::FindGeschwader()
 {
 	geschwadertype = 0;
-//DeadCode JIM 13Oct00  	int j=0, i = 0;
-//DeadCode JIM 13Oct00  	while (		(Node_Data.gruppe[i].squadron != SQ_ZERO)
-//DeadCode JIM 13Oct00  			&&	(j < MAX_GRUPPE)			
-//DeadCode JIM 13Oct00  		  )
  	{
-//DeadCode JIM 13Oct00  		if(*grnumptr == Node_Data.gruppe[i].squadron)
  		{
 			int wader = GruppenPtr(Node_Data[*grnumptr])->wadernum;
  			geschwadertype = Node_Data.geschwader[wader].wadername;
-//DeadCode JIM 13Oct00  			break;
  		}
-//DeadCode JIM 13Oct00  	  i++;
  	 }
  
 
@@ -297,10 +289,7 @@ void LWDiary::FillGruppeDetails(SquadNum grnum,SquadronBase* currrecord,Squadron
 			INT3;
 	}
  
-//DeadCode JIM 23Oct00   	while (i < MAX_SQDETAILS)
-//DeadCode JIM 23Oct00   	{
   		grdetails[i++] = NULL;
-//DeadCode JIM 23Oct00   	}
 
 }
 

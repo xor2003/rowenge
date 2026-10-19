@@ -117,7 +117,6 @@ BOOL CCredits::OnInitDialog()
 	CDialog::OnInitDialog();
 	CString doc=__DATE__;
 	creds=IDS_CT_DESIGNTEAMTITLE;									  //DAW 21/06/99
-//DEADCODE RDH 13/04/00 	numcr=10;
 
 	CRStatic* text=GETDLGITEM(IDC_SDETAIL1);
 	text->SetString(LoadResString(creds));
@@ -180,8 +179,6 @@ BOOL CCredits::OnInitDialog()
 void CCredits::OnTimer(UINT nIDEvent) 
 {
 	CRStatic* text=GETDLGITEM(IDC_SDETAIL1);
-//DEADCODE RDH 13/04/00 	creds++;														  //DAW 21/06/99
-//DEADCODE RDH 13/04/00 	numcr--;
 	if (numcr!=-1)
 
 	if (creds < IDS_CT_COPYRIGHT)
@@ -195,10 +192,6 @@ void CCredits::OnTimer(UINT nIDEvent)
 
 //	if (nIDEvent==m_timerID)
 //	{
-//DeadCode DAW 14Jun99 		if (!DoSmack((int)m_hWnd))
-//DeadCode DAW 14Jun99 		{
-//DeadCode DAW 14Jun99 			OnOK();
-//DeadCode DAW 14Jun99 		}
 //	}
 //	CDialog::OnTimer(nIDEvent);
 }

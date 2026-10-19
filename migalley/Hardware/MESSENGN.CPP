@@ -1112,18 +1112,13 @@ CString	MessageBuffer::GetPlaceName(Coords3D&	wpos)
 {
 	PhraseBuffer	phrasebuff;
 	CString			thestring = "";
-	item*			tmpitem = new item;
+	item			tmpitem;
 
-	if (tmpitem)
-	{
-		tmpitem->World = wpos;
+	tmpitem.World = wpos;
 
-		_Radio.ExpandPlacename(phrasebuff,tmpitem);
+	_Radio.ExpandPlacename(phrasebuff,&tmpitem);
 
-		PhraseToString(thestring,phrasebuff);
-
-		delete tmpitem;
-	}
+	PhraseToString(thestring,phrasebuff);
 
 	return(thestring);
 }

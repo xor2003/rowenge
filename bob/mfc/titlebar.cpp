@@ -144,78 +144,6 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // TitleBar message handlers
 
-//DEADCODE RJS 15/11/99 BOOL TitleBar::OnEraseBkgnd(CDC* pDC) 
-//DEADCODE RJS 15/11/99 {	//STOLEN FROM RTOOLBAR.CPP
-//DEADCODE RDH 03/11/99 	CRect rect;
-//DEADCODE RDH 03/11/99 	GetWindowRect(rect);
-//DEADCODE RDH 03/11/99 	CRect viewrect;
-//DEADCODE RDH 03/11/99 	m_pFrame->GetWindowRect(viewrect);
-//DEADCODE RDH 03/11/99 	FileNum artnum;
-//DEADCODE RDH 03/11/99 	if (m_bHorzAlign) 
-//DEADCODE RDH 03/11/99 		artnum=FIL_TOOL_HORIZONTAL;
-//DEADCODE RDH 03/11/99 	else
-//DEADCODE RDH 03/11/99 		artnum=FIL_TOOL_VERTICAL;
-//DEADCODE RDH 03/11/99 	BYTE* pData;
-//DEADCODE RDH 03/11/99 	if (artnum)
-//DEADCODE RDH 03/11/99 	{
-//DEADCODE RDH 03/11/99 		fileblock picture(artnum);
-//DEADCODE RDH 03/11/99 		pData=(BYTE*)getdata(picture);
-//DEADCODE RDH 03/11/99 		if (pData[0]=='B' && pData[1]=='M') // checks if its a bitmap file
-//DEADCODE RDH 03/11/99 		{
-//DEADCODE RDH 03/11/99 			// now render it...
-//DEADCODE RDH 03/11/99 			BITMAPFILEHEADER* pFile=(BITMAPFILEHEADER*)pData;
-//DEADCODE RDH 03/11/99 			BITMAPINFO* pInfo=(BITMAPINFO*)(pData+sizeof(BITMAPFILEHEADER));
-//DEADCODE RDH 03/11/99 			pData+=pFile->bfOffBits;
-//DEADCODE RDH 03/11/99 			int yoffset=0;
-//DEADCODE RDH 03/11/99 			int xoffset=0;
-//DEADCODE RDH 03/11/99 			if (m_index>-1) // offset the artwork if docked
-//DEADCODE RDH 03/11/99 			{
-//DEADCODE RDH 03/11/99 				if (m_bHorzAlign)
-//DEADCODE RDH 03/11/99 					xoffset=viewrect.right-rect.left-pInfo->bmiHeader.biWidth;
-//DEADCODE RDH 03/11/99 				else
-//DEADCODE RDH 03/11/99 					yoffset=viewrect.bottom-rect.top-pInfo->bmiHeader.biHeight;
-//DEADCODE RDH 03/11/99 				if (m_align==1)
-//DEADCODE RDH 03/11/99 				{
-//DEADCODE RDH 03/11/99 					yoffset=-m_row*46;
-//DEADCODE RDH 03/11/99 //					if (m_row==0)
-//DEADCODE RDH 03/11/99 //					{
-//DEADCODE RDH 03/11/99 //						CRect rect3;
-//DEADCODE RDH 03/11/99 //						m_pFrame->m_wndSystemBox->GetWindowRect(rect3);
-//DEADCODE RDH 03/11/99 //						xoffset+=rect3.Width();
-//DEADCODE RDH 03/11/99 //					}
-//DEADCODE RDH 03/11/99 				}
-//DEADCODE RDH 03/11/99 				if (m_align==3)
-//DEADCODE RDH 03/11/99 					yoffset=(m_row-2)*46;
-//DEADCODE RDH 03/11/99 //				m_xoffset=xoffset;
-//DEADCODE RDH 03/11/99 //				m_yoffset=yoffset;
-//DEADCODE RDH 03/11/99 			}
-//DEADCODE RDH 03/11/99 			else
-//DEADCODE RDH 03/11/99 			{
-//DEADCODE RDH 03/11/99 //				xoffset=m_xoffset;
-//DEADCODE RDH 03/11/99 //				yoffset=m_yoffset;
-//DEADCODE RDH 03/11/99 			}
-//DEADCODE RDH 03/11/99 			SetDIBitsToDevice(pDC->m_hDC,xoffset,yoffset,pInfo->bmiHeader.biWidth, pInfo->bmiHeader.biHeight,
-//DEADCODE RDH 03/11/99 				0,0,0,pInfo->bmiHeader.biHeight,pData,pInfo,DIB_RGB_COLORS);
-//DEADCODE RDH 03/11/99 			COLORREF	rgb=RGB(66,75,99);
-//DEADCODE RDH 03/11/99 			if (yoffset>0)
-//DEADCODE RDH 03/11/99 				pDC->FillSolidRect(0,0,rect.Width(),yoffset,rgb);
-//DEADCODE RDH 03/11/99 			if (pInfo->bmiHeader.biHeight+yoffset<rect.Height()) //RJS 15/11/99
-//DEADCODE RDH 03/11/99 				if (pInfo->bmiHeader.biHeight+yoffset)
-//DEADCODE RDH 03/11/99 					pDC->FillSolidRect(0,0,rect.Width(),rect.Height(),rgb);
-//DEADCODE RDH 03/11/99 				else
-//DEADCODE RDH 03/11/99 					pDC->FillSolidRect(0,pInfo->bmiHeader.biHeight+yoffset,rect.Width(),rect.Height(),rgb);
-//DEADCODE RDH 03/11/99 			if (xoffset>0)
-//DEADCODE RDH 03/11/99 				pDC->FillSolidRect(0,0,xoffset,rect.Height(),rgb);
-//DEADCODE RDH 03/11/99 			if (pInfo->bmiHeader.biWidth+xoffset<rect.Width())
-//DEADCODE RDH 03/11/99 				if (pInfo->bmiHeader.biWidth+xoffset<0)
-//DEADCODE RDH 03/11/99 					pDC->FillSolidRect(0,0,rect.Width(),rect.Height(),rgb);
-//DEADCODE RDH 03/11/99 				else
-//DEADCODE RDH 03/11/99 					pDC->FillSolidRect(pInfo->bmiHeader.biWidth+xoffset,0,rect.Width(),rect.Height(),RGB(78,100,78));
-//DEADCODE RDH 03/11/99 		}
-//DEADCODE RDH 03/11/99 	}
-//DEADCODE RDH 03/11/99 
-//DEADCODE RJS 15/11/99 	return TRUE;
-//DEADCODE RJS 15/11/99 }
 
 
 BEGIN_EVENTSINK_MAP(TitleBar, CRToolBar)
@@ -353,8 +281,6 @@ void TitleBar::DialoguesVisible( bool vis)
 void TitleBar::OpenSelTrg(int squad, int tab, int unitdisplaylevel, SelectTargetMode selecttargetmode) 
 {
 
-//DEADCODE RDH 17/05/00 	MainToolBar().DialoguesVisible(false);
-//DEADCODE RDH 17/05/00 	DialoguesVisible(false);
 
 	if (!LoggedChild(SELTRG))
 		LogChild(SELTRG,SelectTarget::Make(squad, tab, unitdisplaylevel, selecttargetmode)
@@ -368,7 +294,6 @@ void TitleBar::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	CRToolBar::OnShowWindow(bShow, nStatus);
 	
-//DEADCODE RDH 13/04/00 	OnClickedFastforward(); 
 
 	if (bShow) 
 		Redraw();
@@ -382,7 +307,6 @@ void TitleBar::OnClickedPause()
 	MMC.curracceltype=MMC.ACCEL_PAUSED;
 	MMC.curraccelrate = MMC.accelrates[MMC.ACCEL_PAUSED];
 	UnPressBtns();
-//DeadCode JIM 9Oct00 	GETDLGITEM(IDC_PAUSE)->SetPressed(TRUE);
 
 	GETDLGITEM(IDC_DATETIME)->SetString(CSprintf("%s: %s x%i",
 		GetDateName(MMC.currdate, DATE_LONG),GetTimeName(MMC.currtime),MMC.curraccelrate	));
@@ -400,7 +324,6 @@ void TitleBar::OnClickedFastforward()
 		MMC.curracceltype=MMC.ACCEL_DIALOGSPEED;
 	MMC.curraccelrate = MMC.accelrates[MMC.curracceltype];
 	UnPressBtns();
-//DeadCode JIM 9Oct00 	GETDLGITEM(IDC_FASTFORWARD)->SetPressed(TRUE);
 	GETDLGITEM(IDC_DATETIME)->SetString(CSprintf("%s: %s x%i",
 		GetDateName(MMC.currdate, DATE_LONG),GetTimeName(MMC.currtime),MMC.curraccelrate	));
 	GETDLGITEM(IDC_DATETIME)->Invalidate();
@@ -423,7 +346,6 @@ void TitleBar::OnClickedPlay()
 	MMC.curracceltype=MMC.ACCEL_NORMAL;
 	MMC.curraccelrate = MMC.accelrates[MMC.ACCEL_NORMAL];
 	UnPressBtns();
-//DeadCode JIM 9Oct00 	GETDLGITEM(IDC_PLAY)->SetPressed(TRUE);
 	GETDLGITEM(IDC_DATETIME)->SetString(CSprintf("%s: %s x%i",
 		GetDateName(MMC.currdate, DATE_LONG),GetTimeName(MMC.currtime),MMC.curraccelrate	));
 	GETDLGITEM(IDC_DATETIME)->Invalidate();

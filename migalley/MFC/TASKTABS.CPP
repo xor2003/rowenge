@@ -124,7 +124,6 @@ BOOL CTaskTabs::OnInitDialog()
 	CDialog::OnInitDialog();
 	
 	RDialog* parent=(RDialog*)GetParent();
-//DEADCODE RDH 09/06/99 	parent->SetMaxSize(CRect(0,0,450,450));
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE

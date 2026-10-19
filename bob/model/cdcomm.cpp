@@ -75,24 +75,6 @@ void LoadCurvesCOMM ()
 
 
 
-//DeadCode CSB 07 Sep 98	// ****  COMM  TailCd  **** //
-//DeadCode CSB 07 Sep 98	
-//DeadCode CSB 07 Sep 98	CURVEPNT COMM_TailCd [6] = {
-//DeadCode CSB 07 Sep 98		0.000000000000,0.000000000000,
-//DeadCode CSB 07 Sep 98		0.349065850418,0.000000000000,
-//DeadCode CSB 07 Sep 98		1.570796361786,1.000000000000,
-//DeadCode CSB 07 Sep 98		3.141592653759,0.000000000000,
-//DeadCode CSB 07 Sep 98		4.712388998091,1.000000000000,
-//DeadCode CSB 07 Sep 98		5.934119457100,0.000000000000
-//DeadCode CSB 07 Sep 98	};
-//DeadCode CSB 07 Sep 98	
-//DeadCode CSB 07 Sep 98	new CURVE ("COMM",
-//DeadCode CSB 07 Sep 98				"TailCd",
-//DeadCode CSB 07 Sep 98				6,
-//DeadCode CSB 07 Sep 98				0.000000000000,
-//DeadCode CSB 07 Sep 98				6.283185482051,
-//DeadCode CSB 07 Sep 98				1,
-//DeadCode CSB 07 Sep 98				COMM_TailCd);
 // ****  F51D  TailCd  **** //
 
 CURVEPNT COMM_TailCd [9] = {

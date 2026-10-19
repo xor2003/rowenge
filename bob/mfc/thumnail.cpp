@@ -216,9 +216,6 @@ void CThumbnail::OnPaint()
 	button->GetClientRect(buttonrect);
 	rect.top+=buttonrect.bottom;
 	// +1 prevents gaps
-//DeadCode JIM 20Oct00 	int halfheight=rect.Height()/2+1;
-//DeadCode JIM 20Oct00 	int offset=rect.Height()/8+1;
-//DeadCode JIM 20Oct00 	int offset2=rect.Height()/16+1;
 	if (rect.Width()<400)
 	{
 		DrawScaledBitmap(pDC,FIL_MAP512_11,rect.left,rect.top,rect.Width(),rect.Height());
