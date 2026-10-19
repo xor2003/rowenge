@@ -31,8 +31,9 @@
 #include <vulkan/vulkan.h>
 #include <dlfcn.h>
 #include <mutex>
-#include <map>
+#include <unordered_map>
 #include <alloca.h>
+#include <time.h>
 #else
 #define ROWAN_VK_LOADED 0
 #endif
@@ -145,6 +146,43 @@ struct Tex {
     DWORD w,h;
 };
 
+// One GPU render-target set per (rt,zb) surface pair.  BoB draws each frame
+// into the back buffer plus small offscreen targets (gauge/mirror prerenders
+// at 128x128, 256x256); keeping the images/framebuffer alive across target
+// switches avoids a destroy/recreate + forced re-upload per switch.
+struct Tgt {
+    IDirectDrawSurface7 *rt,*zb;
+    VkImage rtImg; VkDeviceMemory rtMem; VkImageView rtView; VkFormat rtFmt;
+    DWORD   W,H;
+    DWORD   rtSurfGen;      // cpuGen value mirrored into rtImg
+    VkImage zImg; VkDeviceMemory zMem; VkImageView zView; VkFormat zFmt;
+    int     zbits;
+    DWORD   zbSurfGen;      // cpuGen value mirrored into zImg
+    VkRenderPass rp; VkFramebuffer fb;
+
+    bool gpuOwns;       // rtImg content ahead of rt->lpSurface
+    bool zbAhead;       // zImg content ahead of zb->lpSurface
+    bool zbUseW;        // depth encoding when zbAhead was set
+    bool zbWanted;      // a CPU-side read of zb was requested since last drain
+    bool copyOwed;      // gpu/zb content newer than the last recorded readback
+    bool rbPending;     // in-flight submit ends with this target's colour copy
+    bool zbPending;     //   readback also carried the depth image
+    VkDeviceSize rbOff; // stable readback slot inside rb (colour at rbOff,
+                        // depth at rbOff+zbSlotOff)
+    VkDeviceSize zbSlotOff;
+};
+
+struct TgtKey {
+    IDirectDrawSurface7 *rt,*zb;
+    bool operator==(const TgtKey&o)const{ return rt==o.rt && zb==o.zb; }
+};
+struct TgtKeyHash {
+    size_t operator()(const TgtKey&k)const{
+        return std::hash<IDirectDrawSurface7*>()(k.rt)*31
+             + std::hash<IDirectDrawSurface7*>()(k.zb);
+    }
+};
+
 struct Dev {
     bool tried,avail;
     void* lib;
@@ -154,22 +192,12 @@ struct Dev {
     bool cmdRec;        // command buffer open
     bool inPass;        // render pass open inside it
     bool inFlight;      // submitted, fence not yet waited
-    bool gpuOwns;       // rtImg content ahead of rt->lpSurface
-    bool zbAhead;       // zImg content ahead of zb->lpSurface
-    bool zbUseW;        // depth encoding when zbAhead was set
-    bool rbPending;     // in-flight submit ends with the readback copy
-    bool zbPending;     //   readback also carried the depth image
-    VkDeviceSize rbZOff; // depth slice inside rb (colour lands at 0)
     bool poolFail;      // descriptor pool exhausted during last BindState
 
-    IDirectDrawSurface7 *rt,*zb,*failed;   // failed: rt that alloc-failed once
-    VkImage rtImg; VkDeviceMemory rtMem; VkImageView rtView; VkFormat rtFmt;
-    DWORD   rtW,rtH;
-    DWORD   rtSurfGen;      // cpuGen value mirrored into rtImg
-    VkImage zImg; VkDeviceMemory zMem; VkImageView zView; VkFormat zFmt;
-    int     zbits;
-    DWORD   zbSurfGen;      // cpuGen value mirrored into zImg
-    VkRenderPass rp; VkFramebuffer fb;
+    std::unordered_map<TgtKey,Tgt,TgtKeyHash> tgts;
+    Tgt* cur;
+    IDirectDrawSurface7* failed;   // rt that alloc-failed once
+    VkDeviceSize rbAlloc;          // bump allocator for per-target rb slots
 
     VkBuffer vb; VkDeviceMemory vbMem; BYTE* vbMap; VkDeviceSize vbCap,vbOff;
     VkBuffer rb; VkDeviceMemory rbMem; BYTE* rbMap; VkDeviceSize rbCap;
@@ -180,22 +208,57 @@ struct Dev {
     VkImage dummyImg; VkDeviceMemory dummyMem; VkImageView dummyView;
     VkSampler dummySamp;
 
-    std::map<IDirectDrawSurface7*,Tex> texes;
-    std::map<uint64_t,VkPipeline> pipes;
-    std::map<uint32_t,VkSampler> samps;
+    std::unordered_map<IDirectDrawSurface7*,Tex> texes;
+    std::unordered_map<uint64_t,VkPipeline> pipes;
+    std::unordered_map<uint32_t,VkSampler> samps;
     struct SetKey { VkImageView v0,v1,v2; uint32_t sc;
-        bool operator<(const SetKey&o)const{
-            if(v0!=o.v0)return v0<o.v0;
-            if(v1!=o.v1)return v1<o.v1;
-            if(v2!=o.v2)return v2<o.v2;
-            return sc<o.sc; } };
-    std::map<SetKey,VkDescriptorSet> sets;
+        bool operator==(const SetKey&o)const{
+            return v0==o.v0 && v1==o.v1 && v2==o.v2 && sc==o.sc; } };
+    struct SetKeyHash {
+        size_t operator()(const SetKey&k)const{
+            return std::hash<VkImageView>()(k.v0)*131
+                 + std::hash<VkImageView>()(k.v1)*17
+                 + std::hash<VkImageView>()(k.v2)*3 + k.sc; } };
+    std::unordered_map<SetKey,VkDescriptorSet,SetKeyHash> sets;
 };
 // Leaked on purpose: the render thread can still be inside TexFor()/Draw() when
 // exit() runs static destructors, so destroying D's maps there is a use-after-free.
 // () is load-bearing: it zero-initializes the POD members like static storage did.
 static Dev& D = *new Dev();
 static std::mutex vkMutex;
+
+// --- perf counters (ROWAN_VK_PERF=1) -----------------------------------------
+// Per-second rollup of where the frame time goes: fence wait, readback
+// copies, CPU->GPU uploads, draws.  Zero cost when the env var is unset.
+struct Perf {
+    uint64_t waitNs,rtNs,zbNs,upRTns,upZBns,upTexNs;
+    uint32_t nFlush,nDraws,nUpRT,nUpZB,nUpTex,nPipeMk;
+    uint64_t lastLog;
+};
+static Perf& P = *new Perf();
+static uint64_t NowNs() {
+    timespec ts; clock_gettime(CLOCK_MONOTONIC,&ts);
+    return (uint64_t)ts.tv_sec*1000000000ull+(uint64_t)ts.tv_nsec;
+}
+static int PerfOn() {
+    static int on=-1; if(on<0)on=getenv("ROWAN_VK_PERF")?1:0; return on;
+}
+static void PerfLog() {
+    if(!PerfOn()) return;
+    uint64_t n=NowNs();
+    if(!P.lastLog){P.lastLog=n;return;}
+    if(n-P.lastLog<2000000000ull) return;
+    double s=(n-P.lastLog)/1e9;
+    fprintf(stderr,"[vkperf] %.1fs wait=%.1fms rtcp=%.1f zbcp=%.1f "
+            "upRT=%.1f(%u) upZB=%.1f(%u) upTex=%.1f(%u) "
+            "fl=%u dr=%u pipes=%u\n",
+            s,P.waitNs/1e6,P.rtNs/1e6,P.zbNs/1e6,
+            P.upRTns/1e6,P.nUpRT,P.upZBns/1e6,P.nUpZB,
+            P.upTexNs/1e6,P.nUpTex,P.nFlush,P.nDraws,P.nPipeMk);
+    P.waitNs=P.rtNs=P.zbNs=P.upRTns=P.upZBns=P.upTexNs=0;
+    P.nFlush=P.nDraws=P.nUpRT=P.nUpZB=P.nUpTex=P.nPipeMk=0;
+    P.lastLog=n;
+}
 
 // --- small helpers -------------------------------------------------------------
 static uint32_t MemType(uint32_t bits, VkMemoryPropertyFlags want) {
@@ -228,63 +291,79 @@ static void EndPass() { if(D.inPass){V(CmdEndRenderPass)(D.cmd);D.inPass=false;}
 // Wait for the in-flight submit and land the readback into lpSurface.
 static void Drain() {
     if(!D.inFlight) return;
+    uint64_t t0=NowNs();
     V(WaitForFences)(D.dev,1,&D.fence,VK_TRUE,~0ull);
     D.inFlight=false;
-    if(D.rbPending&&D.rt){
-        DWORD bpp=D.rt->desc.ddpfPixelFormat.dwRGBBitCount?
-                  D.rt->desc.ddpfPixelFormat.dwRGBBitCount/8:2;
-        VkDeviceSize row=(VkDeviceSize)D.rtW*bpp;
-        BYTE* dst=(BYTE*)D.rt->desc.lpSurface;
-        for(DWORD y=0;y<D.rtH;y++)
-            memcpy(dst+y*D.rt->desc.lPitch,D.rbMap+y*row,(size_t)row);
-        D.rbPending=false; D.gpuOwns=false;
-        D.rtSurfGen=D.rt->cpuGen;      // surface now mirrors the image
-    }
-    if(D.zbPending&&D.zb){
-        // Inverse of UploadZB's translation; 16-bit non-w copies bytewise.
-        bool usew=D.zbUseW;
-        VkDeviceSize pxB=(D.zFmt==VK_FORMAT_D16_UNORM)?2:4;
-        bool direct=(D.zbits==16&&!usew);
-        const BYTE* src=D.rbMap+D.rbZOff;
-        if(direct){
-            for(DWORD y=0;y<D.rtH;y++)
-                memcpy((BYTE*)D.zb->desc.lpSurface+y*D.zb->desc.lPitch,
-                       src+y*pxB*D.rtW,(size_t)(pxB*D.rtW));
-        } else {
-            for(DWORD y=0;y<D.rtH;y++)for(DWORD x=0;x<D.rtW;x++){
-                float f=(pxB==2)?((const uint16_t*)src)[y*D.rtW+x]/65535.0f
-                                :((const float*)src)[y*D.rtW+x];
-                DWORD nz;
-                if(usew){
-                    float w=(f>=1.0f)?3.402823466e38f:f/(1.0f-f);
-                    memcpy(&nz,&w,4);
-                    if(D.zbits<32)nz>>=(32-D.zbits);
-                } else {
-                    double zmax=D.zbits>=32?4294967295.0:
-                               D.zbits>=24?16777215.0:65535.0;
-                    nz=(DWORD)(f*zmax);
-                }
-                Rast7::WriteZ(D.zb,x,y,nz);
-            }
+    if(PerfOn()) P.waitNs+=NowNs()-t0;
+    for(std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator ti=D.tgts.begin();ti!=D.tgts.end();++ti){
+        Tgt& t=ti->second;
+        if(t.rbPending&&t.rt){
+            uint64_t tc=NowNs();
+            DWORD bpp=t.rt->desc.ddpfPixelFormat.dwRGBBitCount?
+                      t.rt->desc.ddpfPixelFormat.dwRGBBitCount/8:2;
+            VkDeviceSize row=(VkDeviceSize)t.W*bpp;
+            BYTE* dst=(BYTE*)t.rt->desc.lpSurface;
+            for(DWORD y=0;y<t.H;y++)
+                memcpy(dst+y*t.rt->desc.lPitch,D.rbMap+t.rbOff+y*row,(size_t)row);
+            t.rbPending=false; t.gpuOwns=false;
+            t.rtSurfGen=t.rt->cpuGen;      // surface now mirrors the image
+            if(PerfOn()) P.rtNs+=NowNs()-tc;
         }
-        D.zbPending=false; D.zbAhead=false;
-        D.zbSurfGen=D.zb->cpuGen;
+        // The depth copy is consumed only when the CPU actually asked for the
+        // z surface (ReadSync/Lock).  BoB never locks it mid-flight, so the
+        // per-pixel float->int conversion is skipped most frames.
+        if(t.zbPending&&t.zb&&t.zbWanted){
+            uint64_t tz=NowNs();
+            // Inverse of UploadZB's translation; 16-bit non-w copies bytewise.
+            bool usew=t.zbUseW;
+            VkDeviceSize pxB=(t.zFmt==VK_FORMAT_D16_UNORM)?2:4;
+            bool direct=(t.zbits==16&&!usew);
+            const BYTE* src=D.rbMap+t.rbOff+t.zbSlotOff;
+            if(direct){
+                for(DWORD y=0;y<t.H;y++)
+                    memcpy((BYTE*)t.zb->desc.lpSurface+y*t.zb->desc.lPitch,
+                           src+y*pxB*t.W,(size_t)(pxB*t.W));
+            } else {
+                for(DWORD y=0;y<t.H;y++)for(DWORD x=0;x<t.W;x++){
+                    float f=(pxB==2)?((const uint16_t*)src)[y*t.W+x]/65535.0f
+                                    :((const float*)src)[y*t.W+x];
+                    DWORD nz;
+                    if(usew){
+                        float w=(f>=1.0f)?3.402823466e38f:f/(1.0f-f);
+                        memcpy(&nz,&w,4);
+                        if(t.zbits<32)nz>>=(32-t.zbits);
+                    } else {
+                        double zmax=t.zbits>=32?4294967295.0:
+                                   t.zbits>=24?16777215.0:65535.0;
+                        nz=(DWORD)(f*zmax);
+                    }
+                    Rast7::WriteZ(t.zb,x,y,nz);
+                }
+            }
+            t.zbPending=false; t.zbAhead=false; t.zbWanted=false;
+            t.zbSurfGen=t.zb->cpuGen;
+            if(PerfOn()) P.zbNs+=NowNs()-tz;
+        }
     }
+    PerfLog();
 }
-// Close the buffer (appending the readback copy when owed) and submit.
-// wait=false leaves the GPU racing ahead of the CPU — the async frame.
+// Close the buffer (appending the readback copy for every target that owes
+// one) and submit.  wait=false leaves the GPU racing ahead of the CPU.
 static void Flush(bool wait) {
     if(!D.cmdRec) { if(wait) Drain(); return; }
     EndPass();
-    if(D.rt&&D.gpuOwns){
-        DWORD bpp=D.rt->desc.ddpfPixelFormat.dwRGBBitCount?
-                  D.rt->desc.ddpfPixelFormat.dwRGBBitCount/8:2;
-        VkDeviceSize row=(VkDeviceSize)D.rtW*bpp;
-        if(row*D.rtH<=D.rbCap){
+    for(std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator ti=D.tgts.begin();ti!=D.tgts.end();++ti){
+        Tgt& t=ti->second;
+        if(!t.copyOwed) continue;
+        if(t.rt&&t.gpuOwns){
+        DWORD bpp=t.rt->desc.ddpfPixelFormat.dwRGBBitCount?
+                  t.rt->desc.ddpfPixelFormat.dwRGBBitCount/8:2;
+        VkDeviceSize row=(VkDeviceSize)t.W*bpp;
+        if(t.rbOff+row*t.H<=D.rbCap){
             VkImageMemoryBarrier b={VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
             b.oldLayout=VK_IMAGE_LAYOUT_GENERAL; b.newLayout=VK_IMAGE_LAYOUT_GENERAL;
             b.srcQueueFamilyIndex=b.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;
-            b.image=D.rtImg; b.subresourceRange.aspectMask=VK_IMAGE_ASPECT_COLOR_BIT;
+            b.image=t.rtImg; b.subresourceRange.aspectMask=VK_IMAGE_ASPECT_COLOR_BIT;
             b.subresourceRange.levelCount=1; b.subresourceRange.layerCount=1;
             b.srcAccessMask=VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT
                            |VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -292,27 +371,28 @@ static void Flush(bool wait) {
             V(CmdPipelineBarrier)(D.cmd,VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
                 VK_PIPELINE_STAGE_TRANSFER_BIT,0,0,0,0,0,1,&b);
             VkBufferImageCopy c={};
-            c.bufferRowLength=D.rtW; c.bufferImageHeight=D.rtH;
-            c.imageExtent.width=D.rtW; c.imageExtent.height=D.rtH;
+            c.bufferOffset=t.rbOff;
+            c.bufferRowLength=t.W; c.bufferImageHeight=t.H;
+            c.imageExtent.width=t.W; c.imageExtent.height=t.H;
             c.imageExtent.depth=1;
             c.imageSubresource.aspectMask=VK_IMAGE_ASPECT_COLOR_BIT;
             c.imageSubresource.layerCount=1;
-            V(CmdCopyImageToBuffer)(D.cmd,D.rtImg,VK_IMAGE_LAYOUT_GENERAL,D.rb,1,&c);
+            V(CmdCopyImageToBuffer)(D.cmd,t.rtImg,VK_IMAGE_LAYOUT_GENERAL,D.rb,1,&c);
             b.srcAccessMask=VK_ACCESS_TRANSFER_READ_BIT;
             b.dstAccessMask=VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
             V(CmdPipelineBarrier)(D.cmd,VK_PIPELINE_STAGE_TRANSFER_BIT,
                 VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,0,0,0,0,0,1,&b);
-            D.rbPending=true;
+            t.rbPending=true;
         }
-    }
-    if(D.zb&&D.zbAhead&&D.zImg){
-        VkDeviceSize pxB=(D.zFmt==VK_FORMAT_D16_UNORM)?2:4;
-        D.rbZOff=((VkDeviceSize)D.rtW*D.rtH*4+255)&~(VkDeviceSize)255;
-        if(D.rbZOff+pxB*D.rtW*D.rtH<=D.rbCap){
+        }
+        if(t.zb&&t.zbAhead&&t.zImg){
+        VkDeviceSize pxB=(t.zFmt==VK_FORMAT_D16_UNORM)?2:4;
+        VkDeviceSize zoff=t.rbOff+t.zbSlotOff;
+        if(zoff+pxB*t.W*t.H<=D.rbCap){
             VkImageMemoryBarrier b={VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
             b.oldLayout=VK_IMAGE_LAYOUT_GENERAL; b.newLayout=VK_IMAGE_LAYOUT_GENERAL;
             b.srcQueueFamilyIndex=b.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;
-            b.image=D.zImg; b.subresourceRange.aspectMask=VK_IMAGE_ASPECT_DEPTH_BIT;
+            b.image=t.zImg; b.subresourceRange.aspectMask=VK_IMAGE_ASPECT_DEPTH_BIT;
             b.subresourceRange.levelCount=1; b.subresourceRange.layerCount=1;
             b.srcAccessMask=VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
             b.dstAccessMask=VK_ACCESS_TRANSFER_READ_BIT;
@@ -320,19 +400,21 @@ static void Flush(bool wait) {
                 VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
                 VK_PIPELINE_STAGE_TRANSFER_BIT,0,0,0,0,0,1,&b);
             VkBufferImageCopy c={};
-            c.bufferOffset=D.rbZOff;
-            c.bufferRowLength=D.rtW; c.bufferImageHeight=D.rtH;
-            c.imageExtent.width=D.rtW; c.imageExtent.height=D.rtH;
+            c.bufferOffset=zoff;
+            c.bufferRowLength=t.W; c.bufferImageHeight=t.H;
+            c.imageExtent.width=t.W; c.imageExtent.height=t.H;
             c.imageExtent.depth=1;
             c.imageSubresource.aspectMask=VK_IMAGE_ASPECT_DEPTH_BIT;
             c.imageSubresource.layerCount=1;
-            V(CmdCopyImageToBuffer)(D.cmd,D.zImg,VK_IMAGE_LAYOUT_GENERAL,D.rb,1,&c);
+            V(CmdCopyImageToBuffer)(D.cmd,t.zImg,VK_IMAGE_LAYOUT_GENERAL,D.rb,1,&c);
             b.srcAccessMask=VK_ACCESS_TRANSFER_READ_BIT;
             b.dstAccessMask=VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
             V(CmdPipelineBarrier)(D.cmd,VK_PIPELINE_STAGE_TRANSFER_BIT,
                 VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,0,0,0,0,0,1,&b);
-            D.zbPending=true;
+            t.zbPending=true;
         }
+        }
+        t.copyOwed=false;
     }
     if(V(EndCommandBuffer)(D.cmd)==VK_SUCCESS){
         VkSubmitInfo si={VK_STRUCTURE_TYPE_SUBMIT_INFO};
@@ -342,6 +424,7 @@ static void Flush(bool wait) {
         D.inFlight=true;
     }
     D.cmdRec=false;
+    if(PerfOn()) P.nFlush++;
     if(wait) Drain();
 }
 
@@ -568,7 +651,7 @@ static bool Init() {
     D.vb=MkBuf(D.vbCap,VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         &D.vbMem,&D.vbMap);
-    D.rbCap=16u<<20;
+    D.rbCap=64u<<20;                   // per-target readback slots
     D.rb=MkBuf(D.rbCap,VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         &D.rbMem,&D.rbMap);
@@ -634,44 +717,40 @@ static VkFormat DepthFmt(int bits) {
     if(bits>=32) return VK_FORMAT_D32_SFLOAT;
     return VK_FORMAT_D16_UNORM;          // 24bpp lands on D16 — close enough
 }
-static bool EnsureTargets(const Rast7::State& st) {
-    IDirectDrawSurface7* rt=st.rt;
-    if(!rt||!rt->desc.lpSurface||!DirectFmt(rt)) return false;
-    if(rt==D.failed) return false;         // this rt alloc-failed before
-    VkFormat cf=SurfFmt(rt);
-    IDirectDrawSurface7* zb=st.zb;
-    VkFormat zf=zb?DepthFmt(st.zbits):VK_FORMAT_UNDEFINED;
-    bool rebuild = rt!=D.rt||cf!=D.rtFmt||rt->desc.dwWidth!=D.rtW
-                ||rt->desc.dwHeight!=D.rtH||zb!=D.zb||zf!=D.zFmt;
-    if(!rebuild) return true;
-    Flush(true);                                // land any prior frame
-    if(D.fb){V(DestroyFramebuffer)(D.dev,D.fb,0);D.fb=0;}
-    if(D.rtView){V(DestroyImageView)(D.dev,D.rtView,0);D.rtView=0;}
-    if(D.rtImg){V(DestroyImage)(D.dev,D.rtImg,0);V(FreeMemory)(D.dev,D.rtMem,0);D.rtImg=0;}
-    if(D.zView){V(DestroyImageView)(D.dev,D.zView,0);D.zView=0;}
-    if(D.zImg){V(DestroyImage)(D.dev,D.zImg,0);V(FreeMemory)(D.dev,D.zMem,0);D.zImg=0;}
-    D.rt=rt; D.rtFmt=cf; D.rtW=rt->desc.dwWidth; D.rtH=rt->desc.dwHeight;
-    D.zb=zb; D.zFmt=zf; D.zbits=st.zbits;
-    D.zbSurfGen=zb?zb->cpuGen-1:0;   // fresh depth image uploads once
-    D.zbAhead=false;                 // fresh zImg holds nothing yet
-    D.rtImg=MkImage(cf,D.rtW,D.rtH,
+static void TgtDestroy(Tgt& t) {
+    if(t.fb){V(DestroyFramebuffer)(D.dev,t.fb,0);t.fb=0;}
+    if(t.rtView){V(DestroyImageView)(D.dev,t.rtView,0);t.rtView=0;}
+    if(t.rtImg){V(DestroyImage)(D.dev,t.rtImg,0);V(FreeMemory)(D.dev,t.rtMem,0);t.rtImg=0;}
+    if(t.zView){V(DestroyImageView)(D.dev,t.zView,0);t.zView=0;}
+    if(t.zImg){V(DestroyImage)(D.dev,t.zImg,0);V(FreeMemory)(D.dev,t.zMem,0);t.zImg=0;}
+    if(t.rp){V(DestroyRenderPass)(D.dev,t.rp,0);t.rp=0;}
+}
+// Image/framebuffer creation for one target (fresh Tgt or dims/format change).
+static bool TgtAlloc(Tgt& t,IDirectDrawSurface7* rt,IDirectDrawSurface7* zb,
+                     VkFormat cf,VkFormat zf,int zbits) {
+    TgtDestroy(t);
+    t.rt=rt; t.zb=zb; t.rtFmt=cf;
+    t.W=rt->desc.dwWidth; t.H=rt->desc.dwHeight;
+    t.zFmt=zf; t.zbits=zbits;
+    t.zbSurfGen=zb?zb->cpuGen-1:0;   // fresh depth image uploads once
+    t.zbAhead=false; t.zbWanted=false;
+    t.rtImg=MkImage(cf,t.W,t.H,
         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT|VK_IMAGE_USAGE_TRANSFER_SRC_BIT
-        |VK_IMAGE_USAGE_TRANSFER_DST_BIT,&D.rtMem);
-    if(!D.rtImg){D.rt=0;D.failed=rt;return false;}
-    ToGeneral(D.rtImg,VK_IMAGE_ASPECT_COLOR_BIT);
-    D.rtView=MkView(D.rtImg,cf,VK_IMAGE_ASPECT_COLOR_BIT);
-    if(!D.rtView){D.rt=0;D.failed=rt;return false;}
+        |VK_IMAGE_USAGE_TRANSFER_DST_BIT,&t.rtMem);
+    if(!t.rtImg) return false;
+    ToGeneral(t.rtImg,VK_IMAGE_ASPECT_COLOR_BIT);
+    t.rtView=MkView(t.rtImg,cf,VK_IMAGE_ASPECT_COLOR_BIT);
+    if(!t.rtView) return false;
     if(zb){
-        D.zImg=MkImage(zf,D.rtW,D.rtH,
+        t.zImg=MkImage(zf,t.W,t.H,
             VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
             |VK_IMAGE_USAGE_TRANSFER_SRC_BIT
-            |VK_IMAGE_USAGE_TRANSFER_DST_BIT,&D.zMem);
-        if(!D.zImg){D.rt=0;D.failed=rt;return false;}
-        ToGeneral(D.zImg,VK_IMAGE_ASPECT_DEPTH_BIT);
-        D.zView=MkView(D.zImg,zf,VK_IMAGE_ASPECT_DEPTH_BIT);
-        if(!D.zView){D.rt=0;D.failed=rt;return false;}
+            |VK_IMAGE_USAGE_TRANSFER_DST_BIT,&t.zMem);
+        if(!t.zImg) return false;
+        ToGeneral(t.zImg,VK_IMAGE_ASPECT_DEPTH_BIT);
+        t.zView=MkView(t.zImg,zf,VK_IMAGE_ASPECT_DEPTH_BIT);
+        if(!t.zView) return false;
     }
-    if(D.rp){V(DestroyRenderPass)(D.dev,D.rp,0);D.rp=0;}
     VkAttachmentDescription att[2]; memset(att,0,sizeof(att));
     att[0].format=cf; att[0].samples=VK_SAMPLE_COUNT_1_BIT;
     att[0].loadOp=VK_ATTACHMENT_LOAD_OP_LOAD;
@@ -691,27 +770,82 @@ static bool EnsureTargets(const Rast7::State& st) {
     VkRenderPassCreateInfo ri={VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
     ri.attachmentCount=zb?2:1; ri.pAttachments=att;
     ri.subpassCount=1; ri.pSubpasses=&sp;
-    if(V(CreateRenderPass)(D.dev,&ri,0,&D.rp)!=VK_SUCCESS){
-        D.rt=0; D.failed=rt; return false;
-    }
-    VkImageView views[2]={D.rtView,D.zView};
+    if(V(CreateRenderPass)(D.dev,&ri,0,&t.rp)!=VK_SUCCESS) return false;
+    VkImageView views[2]={t.rtView,t.zView};
     VkFramebufferCreateInfo fbi={VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
-    fbi.renderPass=D.rp; fbi.attachmentCount=zb?2:1; fbi.pAttachments=views;
-    fbi.width=D.rtW; fbi.height=D.rtH; fbi.layers=1;
-    if(V(CreateFramebuffer)(D.dev,&fbi,0,&D.fb)!=VK_SUCCESS){
-        D.rt=0; D.failed=rt; return false;   // don't half-register this rt
+    fbi.renderPass=t.rp; fbi.attachmentCount=zb?2:1; fbi.pAttachments=views;
+    fbi.width=t.W; fbi.height=t.H; fbi.layers=1;
+    if(V(CreateFramebuffer)(D.dev,&fbi,0,&t.fb)!=VK_SUCCESS) return false;
+    t.rtSurfGen=rt->cpuGen-1;   // image starts stale -> first draw uploads
+    t.gpuOwns=false;
+    return true;
+}
+// Find or create the GPU target for this (rt,zb) pair.  Switching targets
+// keeps the old one's images alive — the game ping-pongs between the back
+// buffer and small prerender targets every frame, and a destroy/recreate
+// per switch used to drain the pipeline each time.
+static bool TgtFor(const Rast7::State& st) {
+    IDirectDrawSurface7* rt=st.rt;
+    if(!rt||!rt->desc.lpSurface||!DirectFmt(rt)) return false;
+    if(rt==D.failed) return false;         // this rt alloc-failed before
+    VkFormat cf=SurfFmt(rt);
+    IDirectDrawSurface7* zb=st.zb;
+    VkFormat zf=zb?DepthFmt(st.zbits):VK_FORMAT_UNDEFINED;
+    TgtKey k={rt,zb};
+    std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator it=D.tgts.find(k);
+    if(it!=D.tgts.end()){
+        Tgt& t=it->second;
+        if(t.rtFmt==cf&&t.W==rt->desc.dwWidth&&t.H==rt->desc.dwHeight
+           &&t.zFmt==zf){
+            if(D.cur!=&t){EndPass();D.cur=&t;}
+            return true;
+        }
+        // Same surface pair, new dims/format: rare — drop and recreate below
+        // (the readback slot may also be undersized for the new dims).
+        Flush(true);
+        if(D.cur==&t)D.cur=0;
+        TgtDestroy(t);
+        D.tgts.erase(it);
     }
+    // New target.  Bound the cache: evict the first non-current target when
+    // full (its lpSurface stays CPU-authoritative; re-entry re-uploads).
+    if(D.tgts.size()>=8){
+        Flush(true);
+        for(std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator e=D.tgts.begin();e!=D.tgts.end();++e)
+            if(&e->second!=D.cur){TgtDestroy(e->second);D.tgts.erase(e);break;}
+    }
+    // Readback slot: colour bytes (worst case 4bpp) + aligned depth bytes.
+    VkDeviceSize need=(VkDeviceSize)rt->desc.dwWidth*rt->desc.dwHeight*4;
+    VkDeviceSize zoff=(need+255)&~(VkDeviceSize)255;
+    need=zoff+(VkDeviceSize)rt->desc.dwWidth*rt->desc.dwHeight*4;
+    if(D.rbAlloc+need>D.rbCap){
+        // Compact: land everything, then re-slot every surviving target.
+        Flush(true);
+        D.rbAlloc=0;
+        for(std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator e=D.tgts.begin();e!=D.tgts.end();++e){
+            Tgt& t=e->second;
+            VkDeviceSize cw=(VkDeviceSize)t.W*t.H*4;
+            t.rbOff=D.rbAlloc; t.zbSlotOff=(cw+255)&~(VkDeviceSize)255;
+            D.rbAlloc+=t.zbSlotOff+(VkDeviceSize)t.W*t.H*4;
+        }
+        if(D.rbAlloc+need>D.rbCap){D.failed=rt;return false;}
+    }
+    Tgt t; memset(&t,0,sizeof(t));
+    t.rbOff=D.rbAlloc; t.zbSlotOff=zoff;
+    if(!TgtAlloc(t,rt,zb,cf,zf,st.zbits)){D.failed=rt;return false;}
+    D.rbAlloc+=need;
+    std::pair<std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator,bool> r=
+        D.tgts.insert(std::make_pair(k,t));
     D.sets.clear();
-    D.rtSurfGen=rt->cpuGen-1;   // image starts stale -> first draw uploads
-    D.gpuOwns=false;
     D.failed=0;
+    EndPass(); D.cur=&r.first->second;
     return true;
 }
 
 // --- texture upload -----------------------------------------------------------------
 static Tex* TexFor(IDirectDrawSurface7* s) {
     if(!s||!s->desc.lpSurface) return 0;
-    std::map<IDirectDrawSurface7*,Tex>::iterator it=D.texes.find(s);
+    std::unordered_map<IDirectDrawSurface7*,Tex>::iterator it=D.texes.find(s);
     if(it!=D.texes.end()) return &it->second;
     VkFormat f=SurfFmt(s);
     DWORD w=s->desc.dwWidth,h=s->desc.dwHeight;
@@ -723,7 +857,7 @@ static Tex* TexFor(IDirectDrawSurface7* s) {
     t.view=MkView(t.img,f,VK_IMAGE_ASPECT_COLOR_BIT);
     if(!t.view){V(DestroyImage)(D.dev,t.img,0);V(FreeMemory)(D.dev,t.mem,0);return 0;}
     t.fmt=f; t.w=w; t.h=h; t.gen=s->cpuGen-1;   // != cpuGen -> uploads once
-    std::pair<std::map<IDirectDrawSurface7*,Tex>::iterator,bool> r=
+    std::pair<std::unordered_map<IDirectDrawSurface7*,Tex>::iterator,bool> r=
         D.texes.insert(std::make_pair(s,t));
     return &r.first->second;
 }
@@ -744,6 +878,7 @@ static void ConvertUpload(IDirectDrawSurface7* s,BYTE* dst,DWORD pitch) {
 // time, so several uploads can share one submit.
 static void UploadTex(Tex& t,IDirectDrawSurface7* s) {
     if(t.gen==s->cpuGen) return;
+    uint64_t t0=NowNs();
     BeginCmd(); EndPass();
     DWORD bpp=s->desc.ddpfPixelFormat.dwRGBBitCount/8;
     bool direct=DirectFmt(s);
@@ -773,6 +908,7 @@ static void UploadTex(Tex& t,IDirectDrawSurface7* s) {
         VK_IMAGE_ASPECT_COLOR_BIT);
     D.ubOff+=(need+255)&~(VkDeviceSize)255;
     t.gen=s->cpuGen;
+    if(PerfOn()){P.upTexNs+=NowNs()-t0;P.nUpTex++;}
 }
 
 // --- pipeline + state -----------------------------------------------------------------
@@ -807,7 +943,7 @@ static VkCompareOp CmpF(DWORD f) {
 static VkPipeline PipeFor(VkPrimitiveTopology topo,const Rast7::State& st) {
     DWORD ze=st.rs[D3DRENDERSTATE_ZENABLE];
     DWORD zfn=st.rs[D3DRENDERSTATE_ZFUNC]; if(!zfn)zfn=D3DCMP_LESSEQUAL;
-    bool zt = ze!=0&&ze!=D3DZB_FALSE&&D.zb!=0;
+    bool zt = ze!=0&&ze!=D3DZB_FALSE&&D.cur->zb!=0;
     bool zw = st.rs[D3DRENDERSTATE_ZWRITEENABLE]!=0;
     bool ab = st.rs[D3DRENDERSTATE_ALPHABLENDENABLE]!=0;
     DWORD sb=st.rs[D3DRENDERSTATE_SRCBLEND]; if(!sb)sb=D3DBLEND_ONE;
@@ -820,8 +956,8 @@ static VkPipeline PipeFor(VkPrimitiveTopology topo,const Rast7::State& st) {
                | (uint64_t)(ze==D3DZB_USEW?1:0)<<9
                | (uint64_t)(ab?1:0)<<10
                | (uint64_t)(sb&31)<<11 | (uint64_t)(db&31)<<16
-               | (uint64_t)(D.rtFmt&0x3ff)<<21 | (uint64_t)(D.zFmt&0x3ff)<<31;
-    std::map<uint64_t,VkPipeline>::iterator it=D.pipes.find(key);
+               | (uint64_t)(D.cur->rtFmt&0x3ff)<<21 | (uint64_t)(D.cur->zFmt&0x3ff)<<31;
+    std::unordered_map<uint64_t,VkPipeline>::iterator it=D.pipes.find(key);
     if(it!=D.pipes.end()) return it->second;
     VkVertexInputBindingDescription bd={0,sizeof(GVert),VK_VERTEX_INPUT_RATE_VERTEX};
     VkVertexInputAttributeDescription ad[8]; memset(ad,0,sizeof(ad));
@@ -874,11 +1010,12 @@ static VkPipeline PipeFor(VkPrimitiveTopology topo,const Rast7::State& st) {
     gi.pViewportState=&vp; gi.pRasterizationState=&rs;
     gi.pMultisampleState=&ms; gi.pDepthStencilState=&ds;
     gi.pColorBlendState=&cb; gi.pDynamicState=&dy;
-    gi.layout=D.pl; gi.renderPass=D.rp;
+    gi.layout=D.pl; gi.renderPass=D.cur->rp;
     VkPipeline p;
     if(V(CreateGraphicsPipelines)(D.dev,VK_NULL_HANDLE,1,&gi,0,&p)!=VK_SUCCESS)
         return 0;
     D.pipes[key]=p;
+    if(PerfOn()) P.nPipeMk++;
     return p;
 }
 static VkSampler SampFor(const Rast7::State& st,int i) {
@@ -888,7 +1025,7 @@ static VkSampler SampFor(const Rast7::State& st,int i) {
             ||st.ss[i][D3DTSS_MAGFILTER]==D3DTFG_ANISOTROPIC
             ||st.ss[i][D3DTSS_MINFILTER]==D3DTFG_ANISOTROPIC;
     uint32_t key=(addr&7)|((bilin?1u:0u)<<3);
-    std::map<uint32_t,VkSampler>::iterator it=D.samps.find(key);
+    std::unordered_map<uint32_t,VkSampler>::iterator it=D.samps.find(key);
     if(it!=D.samps.end()) return it->second;
     VkSamplerCreateInfo si={VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
     si.magFilter=si.minFilter=bilin?VK_FILTER_LINEAR:VK_FILTER_NEAREST;
@@ -916,11 +1053,11 @@ static void PrepTextures(const Rast7::State& st,int nStage) {
 }
 static void BindState(const Rast7::State& st,int nStage) {
     PC pc; memset(&pc,0,sizeof(pc));
-    pc.xform[0]= 2.0f/D.rtW; pc.xform[1]= 2.0f/D.rtH;
+    pc.xform[0]= 2.0f/D.cur->W; pc.xform[1]= 2.0f/D.cur->H;
     pc.xform[2]=-1.0f;       pc.xform[3]=-1.0f;
-    float zmax=D.zbits>=32?4294967295.0f:D.zbits>=24?16777215.0f:65535.0f;
+    float zmax=D.cur->zbits>=32?4294967295.0f:D.cur->zbits>=24?16777215.0f:65535.0f;
     DWORD zb=st.rs[D3DRENDERSTATE_ZBIAS];
-    pc.zmisc[0]=zmax>0?(float)zb*(float)(1u<<(D.zbits>8?D.zbits-8:0))/zmax:0;
+    pc.zmisc[0]=zmax>0?(float)zb*(float)(1u<<(D.cur->zbits>8?D.cur->zbits-8:0))/zmax:0;
     memcpy(&pc.zmisc[1],&st.fogStart,4);
     memcpy(&pc.zmisc[2],&st.fogEnd,4);
     DWORD fc=st.fogCol;
@@ -972,7 +1109,7 @@ static void BindState(const Rast7::State& st,int nStage) {
     V(CmdPushConstants)(D.cmd,D.pl,
         VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT,0,128,&pc);
     Dev::SetKey k; k.v0=views[0]; k.v1=views[1]; k.v2=views[2]; k.sc=sc;
-    std::map<Dev::SetKey,VkDescriptorSet>::iterator it=D.sets.find(k);
+    std::unordered_map<Dev::SetKey,VkDescriptorSet,Dev::SetKeyHash>::iterator it=D.sets.find(k);
     VkDescriptorSet set=0;
     if(it==D.sets.end()){
         VkDescriptorSetAllocateInfo ai={VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
@@ -1001,101 +1138,107 @@ static void BindState(const Rast7::State& st,int nStage) {
 
 // --- rt upload (CPU writes made while the GPU owned it) -------------------------------
 static void UploadRT() {
-    if(!D.rt||D.rtSurfGen==D.rt->cpuGen) return;
+    Tgt& t=*D.cur;
+    if(!t.rt||t.rtSurfGen==t.rt->cpuGen) return;
+    uint64_t t0=NowNs();
     BeginCmd(); EndPass();
-    DWORD bpp=D.rt->desc.ddpfPixelFormat.dwRGBBitCount/8;
+    DWORD bpp=t.rt->desc.ddpfPixelFormat.dwRGBBitCount/8;
     if(!bpp)bpp=2;
-    VkDeviceSize tight=(VkDeviceSize)D.rtW*bpp;
-    VkDeviceSize need=tight*D.rtH;
+    VkDeviceSize tight=(VkDeviceSize)t.W*bpp;
+    VkDeviceSize need=tight*t.H;
     if(need>D.ubCap-D.ubOff){Flush(true);BeginCmd();EndPass();}
     if(need>D.ubCap) return;
     BYTE* stage=D.ubMap+D.ubOff;
-    for(DWORD y=0;y<D.rtH;y++)
-        memcpy(stage+y*tight,(const BYTE*)D.rt->desc.lpSurface
-               +y*D.rt->desc.lPitch,(size_t)tight);
-    ImgBarrier(D.rtImg,VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+    for(DWORD y=0;y<t.H;y++)
+        memcpy(stage+y*tight,(const BYTE*)t.rt->desc.lpSurface
+               +y*t.rt->desc.lPitch,(size_t)tight);
+    ImgBarrier(t.rtImg,VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
         VK_ACCESS_TRANSFER_WRITE_BIT,
         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
         VK_PIPELINE_STAGE_TRANSFER_BIT,VK_IMAGE_ASPECT_COLOR_BIT);
     VkBufferImageCopy c={};
     c.bufferOffset=D.ubOff;
-    c.bufferRowLength=D.rtW; c.bufferImageHeight=D.rtH;
-    c.imageExtent.width=D.rtW; c.imageExtent.height=D.rtH; c.imageExtent.depth=1;
+    c.bufferRowLength=t.W; c.bufferImageHeight=t.H;
+    c.imageExtent.width=t.W; c.imageExtent.height=t.H; c.imageExtent.depth=1;
     c.imageSubresource.aspectMask=VK_IMAGE_ASPECT_COLOR_BIT;
     c.imageSubresource.layerCount=1;
-    V(CmdCopyBufferToImage)(D.cmd,D.ub,D.rtImg,VK_IMAGE_LAYOUT_GENERAL,1,&c);
-    ImgBarrier(D.rtImg,VK_ACCESS_TRANSFER_WRITE_BIT,
+    V(CmdCopyBufferToImage)(D.cmd,D.ub,t.rtImg,VK_IMAGE_LAYOUT_GENERAL,1,&c);
+    ImgBarrier(t.rtImg,VK_ACCESS_TRANSFER_WRITE_BIT,
         VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
         VK_PIPELINE_STAGE_TRANSFER_BIT,
         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,VK_IMAGE_ASPECT_COLOR_BIT);
     D.ubOff+=(need+255)&~(VkDeviceSize)255;
-    D.rtSurfGen=D.rt->cpuGen;
+    t.rtSurfGen=t.rt->cpuGen;
+    if(PerfOn()){P.upRTns+=NowNs()-t0;P.nUpRT++;}
 }
 
 // z surface -> depth image.  16-bit non-w buffers are bytewise-identical to
 // D16_UNORM (fast copy); w-buffered and wider surfaces translate per-pixel
 // into the GPU encoding (float for D32, mapped w/(1+w) for USEW).
 static void UploadZB(bool usew) {
-    if(!D.zb||D.zbSurfGen==D.zb->cpuGen) return;
+    Tgt& t=*D.cur;
+    if(!t.zb||t.zbSurfGen==t.zb->cpuGen) return;
+    uint64_t t0=NowNs();
     BeginCmd(); EndPass();
-    int zb=D.zbits;
+    int zb=t.zbits;
     bool direct=(zb==16&&!usew);
-    VkDeviceSize pxB=(D.zFmt==VK_FORMAT_D16_UNORM)?2:4;
-    VkDeviceSize need=pxB*D.rtW*D.rtH;
+    VkDeviceSize pxB=(t.zFmt==VK_FORMAT_D16_UNORM)?2:4;
+    VkDeviceSize need=pxB*t.W*t.H;
     if(need>D.ubCap-D.ubOff){Flush(true);BeginCmd();EndPass();}
     if(need>D.ubCap) return;
     BYTE* stage=D.ubMap+D.ubOff;
     if(direct){
-        for(DWORD y=0;y<D.rtH;y++)
-            memcpy(stage+y*pxB*D.rtW,
-                   (const BYTE*)D.zb->desc.lpSurface+y*D.zb->desc.lPitch,
-                   (size_t)(pxB*D.rtW));
+        for(DWORD y=0;y<t.H;y++)
+            memcpy(stage+y*pxB*t.W,
+                   (const BYTE*)t.zb->desc.lpSurface+y*t.zb->desc.lPitch,
+                   (size_t)(pxB*t.W));
     } else {
-        for(DWORD y=0;y<D.rtH;y++)for(DWORD x=0;x<D.rtW;x++){
-            DWORD nz=Rast7::ReadZ(D.zb,x,y);
+        for(DWORD y=0;y<t.H;y++)for(DWORD x=0;x<t.W;x++){
+            DWORD nz=Rast7::ReadZ(t.zb,x,y);
             if(pxB==2){
                 uint16_t v;
                 if(usew){ DWORD b=nz<<(32-zb); float w; memcpy(&w,&b,4);
                           v=(uint16_t)((w/(1.0f+w))*65535.0f); }
                 else v=(uint16_t)(zb>=24?(nz>>(zb-16)):nz);
-                ((uint16_t*)stage)[y*D.rtW+x]=v;
+                ((uint16_t*)stage)[y*t.W+x]=v;
             } else {
                 float v;
                 if(usew){ memcpy(&v,&nz,4); v=v/(1.0f+v); }
                 else v=(float)((double)nz/(zb>=32?4294967295.0:zb>=24?16777215.0:65535.0));
-                ((float*)stage)[y*D.rtW+x]=v;
+                ((float*)stage)[y*t.W+x]=v;
             }
         }
     }
-    ImgBarrier(D.zImg,VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+    ImgBarrier(t.zImg,VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
         VK_ACCESS_TRANSFER_WRITE_BIT,
         VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
         VK_PIPELINE_STAGE_TRANSFER_BIT,VK_IMAGE_ASPECT_DEPTH_BIT);
     VkBufferImageCopy c={};
     c.bufferOffset=D.ubOff;
-    c.bufferRowLength=D.rtW; c.bufferImageHeight=D.rtH;
-    c.imageExtent.width=D.rtW; c.imageExtent.height=D.rtH; c.imageExtent.depth=1;
+    c.bufferRowLength=t.W; c.bufferImageHeight=t.H;
+    c.imageExtent.width=t.W; c.imageExtent.height=t.H; c.imageExtent.depth=1;
     c.imageSubresource.aspectMask=VK_IMAGE_ASPECT_DEPTH_BIT;
     c.imageSubresource.layerCount=1;
-    V(CmdCopyBufferToImage)(D.cmd,D.ub,D.zImg,VK_IMAGE_LAYOUT_GENERAL,1,&c);
-    ImgBarrier(D.zImg,VK_ACCESS_TRANSFER_WRITE_BIT,
+    V(CmdCopyBufferToImage)(D.cmd,D.ub,t.zImg,VK_IMAGE_LAYOUT_GENERAL,1,&c);
+    ImgBarrier(t.zImg,VK_ACCESS_TRANSFER_WRITE_BIT,
         VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT|VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
         VK_PIPELINE_STAGE_TRANSFER_BIT,
         VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,VK_IMAGE_ASPECT_DEPTH_BIT);
     D.ubOff+=(need+255)&~(VkDeviceSize)255;
-    D.zbSurfGen=D.zb->cpuGen;
+    t.zbSurfGen=t.zb->cpuGen;
+    if(PerfOn()){P.upZBns+=NowNs()-t0;P.nUpZB++;}
 }
 
 static void EnsurePass() {
     BeginCmd();
     if(D.inPass) return;
     VkRenderPassBeginInfo bi={VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
-    bi.renderPass=D.rp; bi.framebuffer=D.fb;
-    bi.renderArea.extent.width=D.rtW; bi.renderArea.extent.height=D.rtH;
+    bi.renderPass=D.cur->rp; bi.framebuffer=D.cur->fb;
+    bi.renderArea.extent.width=D.cur->W; bi.renderArea.extent.height=D.cur->H;
     V(CmdBeginRenderPass)(D.cmd,&bi,VK_SUBPASS_CONTENTS_INLINE);
     D.inPass=true;
-    VkViewport vp={0,0,(float)D.rtW,(float)D.rtH,0,1};
-    VkRect2D r={{0,0},{D.rtW,D.rtH}};
+    VkViewport vp={0,0,(float)D.cur->W,(float)D.cur->H,0,1};
+    VkRect2D r={{0,0},{D.cur->W,D.cur->H}};
     V(CmdSetViewport)(D.cmd,0,1,&vp);
     V(CmdSetScissor)(D.cmd,0,1,&r);
 }
@@ -1107,7 +1250,8 @@ static bool Draw(const Rast7::State& st,D3DPRIMITIVETYPE pt,
                  const Rast7::Vert* v,DWORD n) {
     if(!n) return true;
     std::lock_guard<std::mutex> lk(vkMutex);
-    if(!Init()||!EnsureTargets(st)) return false;
+    if(PerfOn()) P.nDraws++;
+    if(!Init()||!TgtFor(st)) return false;
     VkPrimitiveTopology topo;
     switch(pt){
         case D3DPT_TRIANGLELIST: case D3DPT_TRIANGLESTRIP: case D3DPT_TRIANGLEFAN:
@@ -1193,10 +1337,10 @@ static bool Draw(const Rast7::State& st,D3DPRIMITIVETYPE pt,
     V(CmdBindVertexBuffers)(D.cmd,0,1,&D.vb,&off);
     V(CmdDraw)(D.cmd,em,1,0,0);
     D.vbOff+=em*sizeof(GVert);
-    D.gpuOwns=true;
+    D.cur->gpuOwns=true; D.cur->copyOwed=true;
     if(st.zb&&st.rs[D3DRENDERSTATE_ZWRITEENABLE]){
-        D.zbAhead=true;
-        D.zbUseW=(st.rs[D3DRENDERSTATE_ZENABLE]==D3DZB_USEW);
+        D.cur->zbAhead=true;
+        D.cur->zbUseW=(st.rs[D3DRENDERSTATE_ZENABLE]==D3DZB_USEW);
     }
     return true;
 }
@@ -1206,9 +1350,14 @@ static bool Clear(IDirectDrawSurface7* rt,IDirectDrawSurface7* zb,int zbits,
                   DWORD nRect,LPD3DRECT rects,DWORD flags,D3DCOLOR col,float z) {
     std::lock_guard<std::mutex> lk(vkMutex);
     if(!Init()||!rt) return false;
-    // make sure the vk target mirrors this surface; a rt we never drew to
-    // has nothing on the GPU — caller falls back to the CPU clear.
-    if(rt!=D.rt) return false;
+    // The vk path only clears surfaces it already renders to — a rt we never
+    // drew to has nothing on the GPU, so the caller falls back to the CPU
+    // clear (which stays authoritative and uploads on first draw).
+    Tgt* tgt=0;
+    for(std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator e=D.tgts.begin();e!=D.tgts.end();++e)
+        if(e->second.rt==rt){tgt=&e->second;break;}
+    if(!tgt) return false;
+    if(D.cur!=tgt){EndPass();D.cur=tgt;}
     UploadRT();
     EnsurePass();
     VkClearAttachment att[2]; uint32_t na=0;
@@ -1219,7 +1368,7 @@ static bool Clear(IDirectDrawSurface7* rt,IDirectDrawSurface7* zb,int zbits,
         att[na].aspectMask=VK_IMAGE_ASPECT_COLOR_BIT;
         att[na].colorAttachment=0; att[na].clearValue.color=cc; na++;
     }
-    if((flags&D3DCLEAR_ZBUFFER)&&zb&&zb==D.zb){
+    if((flags&D3DCLEAR_ZBUFFER)&&zb&&zb==tgt->zb){
         att[na].aspectMask=VK_IMAGE_ASPECT_DEPTH_BIT;
         att[na].clearValue.depthStencil.depth=z<0?0:z>1?1:z;
         att[na].clearValue.depthStencil.stencil=0; na++;
@@ -1229,8 +1378,8 @@ static bool Clear(IDirectDrawSurface7* rt,IDirectDrawSurface7* zb,int zbits,
     if(nRect){
         for(DWORD i=0;i<nRect;i++){
             LONG x1=rects[i].x1<0?0:rects[i].x1, y1=rects[i].y1<0?0:rects[i].y1;
-            LONG x2=rects[i].x2>(LONG)D.rtW?(LONG)D.rtW:rects[i].x2;
-            LONG y2=rects[i].y2>(LONG)D.rtH?(LONG)D.rtH:rects[i].y2;
+            LONG x2=rects[i].x2>(LONG)tgt->W?(LONG)tgt->W:rects[i].x2;
+            LONG y2=rects[i].y2>(LONG)tgt->H?(LONG)tgt->H:rects[i].y2;
             if(x2<=x1||y2<=y1) continue;
             r.rect.offset.x=x1; r.rect.offset.y=y1;
             r.rect.extent.width=(DWORD)(x2-x1); r.rect.extent.height=(DWORD)(y2-y1);
@@ -1238,13 +1387,13 @@ static bool Clear(IDirectDrawSurface7* rt,IDirectDrawSurface7* zb,int zbits,
         }
     } else {
         r.rect.offset.x=0; r.rect.offset.y=0;
-        r.rect.extent.width=D.rtW; r.rect.extent.height=D.rtH;
+        r.rect.extent.width=tgt->W; r.rect.extent.height=tgt->H;
         V(CmdClearAttachments)(D.cmd,na,att,1,&r);
     }
-    if(flags&D3DCLEAR_TARGET) D.gpuOwns=true;
-    if((flags&D3DCLEAR_ZBUFFER)&&zb&&zb==D.zb){
-        D.zbAhead=true;
-        D.zbUseW=false;
+    if(flags&D3DCLEAR_TARGET){tgt->gpuOwns=true;tgt->copyOwed=true;}
+    if((flags&D3DCLEAR_ZBUFFER)&&zb&&zb==tgt->zb){
+        tgt->zbAhead=true; tgt->copyOwed=true;
+        tgt->zbUseW=false;
     }
     return true;
 }
@@ -1261,26 +1410,46 @@ static void EndFrame() {
 static void ReadSync(IDirectDrawSurface7* s) {
     std::lock_guard<std::mutex> lk(vkMutex);
     if(!D.avail||!s) return;
-    if(s==D.rt&&D.gpuOwns){Flush(false);Drain();}
-    if(s==D.zb&&D.zbAhead){Flush(false);Drain();}
+    for(std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator e=D.tgts.begin();e!=D.tgts.end();++e){
+        Tgt& t=e->second;
+        if(s==t.rt&&t.gpuOwns){Flush(false);Drain();}
+        // A CPU-side z read is the only thing that makes the buffered depth
+        // copy worth converting — set zbWanted before Drain lands it.
+        if(s==t.zb&&t.zbAhead){t.zbWanted=true;Flush(false);Drain();}
+    }
 }
 static void WriteSync(IDirectDrawSurface7* s) {
-    if(s) __atomic_add_fetch(&s->cpuGen,1,__ATOMIC_SEQ_CST);
+    if(!s) return;
+    std::lock_guard<std::mutex> lk(vkMutex);
+    __atomic_add_fetch(&s->cpuGen,1,__ATOMIC_SEQ_CST);
+    // CPU just wrote s: any buffered GPU readback for it is now stale, and
+    // its images are behind lpSurface again until the next upload.
+    for(std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator e=D.tgts.begin();e!=D.tgts.end();++e){
+        Tgt& t=e->second;
+        if(s==t.rt){t.rbPending=false;t.gpuOwns=false;}
+        if(s==t.zb){t.zbPending=false;t.zbAhead=false;t.zbWanted=false;}
+    }
 }
 static void SurfaceGone(IDirectDrawSurface7* s) {
     std::lock_guard<std::mutex> lk(vkMutex);
     if(!D.avail||!s) return;
     Flush(true);
     D.sets.clear();                    // bound sets may reference destroyed views
-    std::map<IDirectDrawSurface7*,Tex>::iterator it=D.texes.find(s);
+    std::unordered_map<IDirectDrawSurface7*,Tex>::iterator it=D.texes.find(s);
     if(it!=D.texes.end()){
         Tex& t=it->second;
         if(t.view)V(DestroyImageView)(D.dev,t.view,0);
         if(t.img){V(DestroyImage)(D.dev,t.img,0);V(FreeMemory)(D.dev,t.mem,0);}
         D.texes.erase(it);
     }
-    if(s==D.rt){D.rt=0;D.rtImg=0;D.rtView=0;D.gpuOwns=false;}
-    if(s==D.zb){D.zb=0;D.zImg=0;D.zView=0;D.zbAhead=false;D.zbPending=false;}
+    for(std::unordered_map<TgtKey,Tgt,TgtKeyHash>::iterator e=D.tgts.begin();e!=D.tgts.end();){
+        Tgt& t=e->second;
+        if(t.rt==s||t.zb==s){
+            if(D.cur==&t)D.cur=0;
+            TgtDestroy(t);
+            e=D.tgts.erase(e);
+        } else ++e;
+    }
     if(s==D.failed)D.failed=0;
 }
 

@@ -1581,6 +1581,7 @@ BOOL CWnd::Create(
                 backend.window = mainBe->window;
                 backend.renderer = mainBe->renderer;
                 backend.isChild = true;
+                backend.popup = (dwStyle & WS_POPUP) != 0;
                 backend.parent = pParentWnd ? pParentWnd : main;
                 isChild = true;
                 host = main;
@@ -1595,6 +1596,7 @@ BOOL CWnd::Create(
                     backend.window = be.window;
                     backend.renderer = be.renderer;
                     backend.isChild = true;
+                    backend.popup = (dwStyle & WS_POPUP) != 0;
                     backend.parent = pParentWnd ? pParentWnd : be.owner;
                     isChild = true;
                     host = be.owner;
@@ -3257,6 +3259,15 @@ BOOL CWnd::SetWindowPos(const CWnd* pWndInsertAfter, int x, int y, int cx, int c
         }
     
         if (!(nFlags & SWP_NOMOVE)) {
+            // Routed popups (created WS_POPUP/parentless, e.g. the combo
+            // dropdown) receive screen coordinates like a real top-level
+            // window; m_rect must stay parent-client relative for painting.
+            if (be && be->popup && be->parent) {
+                CRect pr;
+                be->parent->GetWindowRect(&pr);
+                x -= (int)pr.left;
+                y -= (int)pr.top;
+            }
             m_rect.left   = x;
             m_rect.top    = y;
             SendMessage(WM_MOVE, 0, MAKELPARAM(x, y));
@@ -5250,11 +5261,11 @@ void CDialog::OnLButtonUp(UINT nFlags, CPoint point)
 }
 
 // CEdit
-void CEdit::SetWindowText(LPCTSTR) {}
-void CEdit::GetWindowText(LPTSTR buf, int max) const { if (max > 0) buf[0] = '\0'; }
-void CEdit::GetWindowText(CString& s) const { s = ""; }
+void CEdit::SetWindowText(LPCTSTR t) { CWnd::SetWindowText(t); }
+void CEdit::GetWindowText(LPTSTR buf, int max) const { CWnd::GetWindowText(buf, max); }
+void CEdit::GetWindowText(CString& s) const { CWnd::GetWindowText(s); }
 void CEdit::SetLimitText(int) {}
-void CEdit::ReplaceSel(LPCTSTR) {}
+void CEdit::ReplaceSel(LPCTSTR t) { m_windowText += t ? t : ""; }
 void CEdit::SetSel(int, int) {}
 
 // CCmdUI

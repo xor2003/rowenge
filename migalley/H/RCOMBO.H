@@ -88,6 +88,7 @@ public:
 	long GetIndex();
 	void Clear();
 	void DeleteString(long index);
+	CListBox* GetDropDown() const { return m_dropDown; } // RERUN: test/hit access
 };
 //#endif // RCOMBO_H
 #pragma pack(pop)

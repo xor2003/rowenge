@@ -85,6 +85,11 @@ struct WindowBackend {
 
     std::vector<HWND> children;  // Child HWNDs
     bool isChild = false;        // Is this a child window sharing the SDL window?
+    // Created intending a top-level window (WS_POPUP / no parent) but routed
+    // into a host backend. Position APIs (MoveWindow/SetWindowPos) take screen
+    // coordinates like a real popup; m_rect still stores parent-client
+    // relative values so painting/hit-testing stay consistent.
+    bool popup = false;
 
     // Virtual client size: when nonzero the window presents a fixed-size
     // logical client area (e.g. the frontend's 800x600 artwork mode) scaled
@@ -1350,6 +1355,7 @@ public:
     virtual int GetTextLen(int nIndex) const;
     virtual int DeleteString(int nIndex);
     int GetItemHeight() const;
+    int GetTopIndex() const { return m_topIndex; }
     virtual int FindString(int nStartAfter, LPCTSTR lpszItem) const;
     virtual int FindStringExact(int nStartAfter, LPCTSTR lpszItem) const;
 

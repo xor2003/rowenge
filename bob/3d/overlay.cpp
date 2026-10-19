@@ -126,6 +126,9 @@ enum	ImageMapNumber;
 #include	"rchatter.h"
 #include	"messengn.h"
 #include	"cstring.h"
+#include <SDL_ttf.h>
+const char* RowanLang();	//MFC_stub.cpp - optional UI language override
+static unsigned char NextOverlayChar(const char*& p);	//fwd: defined by PatchFontTable
 #include "ai.h"
 #include "Gameset.h"
 #include "grid.h"
@@ -1069,11 +1072,11 @@ void COverlay::PrintAt2(SWord& x,SWord& y,const char* str, bool noWrap)
 		char c;
 		if (!noWrap)
 		{
-			while ((c=*str++)!=0 && x<physicalWidth) PutC(x,y,c);
+			while (*str!=0 && x<physicalWidth) PutC(x,y,NextOverlayChar(str));
 		}
 		else
 		{
-			while ((c=*str++)!=0 && x<physicalWidth) PutC2(x,y,c);
+			while (*str!=0 && x<physicalWidth) PutC2(x,y,NextOverlayChar(str));
 		}
 	}
 	if ( lf != LF_FONT )
@@ -1337,6 +1340,127 @@ void COverlay::PutC(SWord& x,SWord& y,unsigned char c)
 //Returns
 //
 //------------------------------------------------------------------------------
+//	The 3D font atlas holds a single-byte codepage of glyphs (cells for
+//	chars 32..255).  Under a Cyrillic ROWAN_LANG the resource strings are
+//	UTF-8, so decode one UTF-8 sequence per step and map Cyrillic
+//	codepoints onto the cp1251 cells that PatchFontTableCyrillic()
+//	rasterizes into the atlas at font-load time.
+static bool OverlayFontIsUTF8()
+{
+	static const char* lang = RowanLang();
+	static const bool is = lang &&
+		(strstr(lang,"ru") || strstr(lang,"uk") || strstr(lang,"be") || strstr(lang,"bg"));
+	return is;
+}
+
+static unsigned char NextOverlayChar(const char*& p)
+{
+	unsigned char c = (unsigned char)*p++;
+	if (!OverlayFontIsUTF8() || c < 0x80)
+		return c;
+	if ((c & 0xE0) == 0xC0 && (*p & 0xC0) == 0x80)
+	{
+		unsigned cp = ((c & 0x1F) << 6) | (((unsigned char)*p++) & 0x3F);
+		if (cp >= 0x410 && cp <= 0x44F)	return (unsigned char)(cp - 0x350);	//cp1251 C0..FF
+		if (cp == 0x401)	return 0xA8;	//IO
+		if (cp == 0x451)	return 0xB8;	//io
+		return '?';
+	}
+	if (c >= 0xE0)					//3/4-byte heads: skip continuations
+	{
+		int cont = (c >= 0xF0) ? 3 : 2;
+		while (cont-- > 0 && (*p & 0xC0) == 0x80) p++;
+	}
+	return '?';
+}
+
+//	Rasterize the Cyrillic half of the 8-bit font atlas (cp1251 cells
+//	A8, B8, C0-FF) via SDL_ttf.  The shipped FONT.X8 only covers Latin;
+//	this replaces the Win32 GetGlyphOutline path that the retail
+//	x0r-disabled PatchFontTable body used.
+static void PatchFontTableCyrillic(ImageMapDesc* imap)
+{
+	if (!imap || !imap->alpha || !OverlayFontIsUTF8())
+		return;
+
+	const int wh = imap->w;
+	if (wh != 128 && wh != 256)
+		return;
+	const int cell = (wh == 128) ? 8 : 16;
+	const int ouShift = (wh == 128) ? 3 : 4;	//ou = (c&0xF)<<ouShift
+	const int ovShift = (wh == 128) ? 1 : 0;	//ov = (c&0xF0)>>ovShift
+
+	TTF_Font* font = NULL;
+	static const char* paths[] = {
+		"/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+		"/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+		"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+		"./INTEL.TTF",
+		"./Intel.ttf",
+	};
+	for (int i = 0; i < 5 && !font; i++)
+		font = TTF_OpenFont(paths[i], (wh == 128) ? 10 : 20);
+	if (!font)
+		return;
+
+	//match the atlas' own glyph intensity (nibble- or byte-scale)
+	int maxv = 0;
+	{
+		const int ac = 'A' - 32;
+		const int ax = (ac & 0xF) << ouShift, ay = (ac & 0xF0) >> ovShift;
+		for (int yy = ay; yy < ay + cell && yy < imap->h; yy++)
+			for (int xx = ax; xx < ax + cell && xx < wh; xx++)
+				if (imap->alpha[yy * wh + xx] > maxv)
+					maxv = imap->alpha[yy * wh + xx];
+	}
+	if (maxv < 8)
+		maxv = 15;
+
+	const int baseline = (wh == 128) ? 5 : 11;
+	const SDL_Color white = {255, 255, 255, 255};
+
+	for (int cp1251 = 0xA8; cp1251 <= 0xFF; cp1251++)
+	{
+		unsigned cp;
+		if (cp1251 == 0xA8)			cp = 0x401;
+		else if (cp1251 == 0xB8)	cp = 0x451;
+		else if (cp1251 >= 0xC0)	cp = cp1251 + 0x350;
+		else						continue;	//A9-B7, B9-BF hold no Russian letters
+
+		char u8[3] = {char(0xC0 | (cp >> 6)), char(0x80 | (cp & 0x3F)), 0};
+		SDL_Surface* g = TTF_RenderUTF8_Blended(font, u8, white);
+		if (!g)
+			continue;
+
+		int minx = 0, maxx = 0, miny = 0, maxy = 0, adv = 0;
+		TTF_GlyphMetrics32(font, (Uint32)cp, &minx, &maxx, &miny, &maxy, &adv);
+
+		const int cellX = (cp1251 & 0xF) << ouShift;
+		const int cellY = (cp1251 & 0xF0) >> ovShift;
+		const int top = baseline - maxy;	//maxy is above-baseline height
+
+		for (int gy = 0; gy < g->h; gy++)
+		{
+			const int dy = top + gy;
+			if (dy < 0 || dy >= cell || cellY + dy >= imap->h)
+				continue;
+			for (int gx = 0; gx < g->w; gx++)
+			{
+				const int dx = (minx > 0 ? 0 : -minx) + gx;	//keep left sidebearing
+				if (dx < 0 || dx >= cell || cellX + dx >= wh)
+					continue;
+				const Uint32 px = ((const Uint32*)g->pixels)[gy * (g->pitch >> 2) + gx];
+				const int a = (px >> 24) & 0xFF;
+				imap->alpha[(cellY + dy) * wh + cellX + dx] = (UByte)((a * maxv + 127) / 255);
+			}
+		}
+		if (adv > 0)
+			bigWidths[cp1251 - 32] = (UByte)(adv < cell - 1 ? adv : cell - 1);
+		SDL_FreeSurface(g);
+	}
+	TTF_CloseFont(font);
+}
+
 VOID	COverlay::PatchFontTable(ImageMapDesc* imap)
 {/* x0r !!!
     	//This routine is ONLY for use on an 8-bit font to generate all 256 chracters
@@ -1463,6 +1587,7 @@ VOID	COverlay::PatchFontTable(ImageMapDesc* imap)
 	bigWidths[' '-32]=maxwid;
 	bigWidths['-'-32]=maxwid;
 */
+	PatchFontTableCyrillic(imap);
 }
 
 void COverlay::PutC2(SWord& x,SWord& y,unsigned char c)
@@ -7058,9 +7183,11 @@ inline SLong		COverlay::StrPixelWidthPadded(const char*	theString)
 		unsigned char	c;
 		pixelwidth=0;
 
-		while ((c=*str++)!=0)
+		while (*str!=0)
 		{
- 			pixelwidth+=bigWidths[c-32]+1/*+extra*/+1;
+			c=NextOverlayChar((const char*&)str);
+			if (c>=32)
+ 				pixelwidth+=bigWidths[c-32]+1/*+extra*/+1;
 		}
 	}
 
@@ -7093,9 +7220,11 @@ inline SLong		COverlay::StrPixelWidth(const char*	theString)
 		char	c;
 		pixelwidth=0;
 
-		while ((c=*str++)!=0)
+		while (*str!=0)
 		{
- 			pixelwidth+=bigWidths[c-32]+1/*+extra*/;
+			unsigned char uc=NextOverlayChar(str);
+			if (uc>=32)
+ 				pixelwidth+=bigWidths[uc-32]+1/*+extra*/;
 		}
 	}
 
