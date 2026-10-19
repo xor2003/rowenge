@@ -1,7 +1,7 @@
 // dsound.h - Linux stub for DirectSound (DX7)
 // Compile-surface only: every entry point fails with DSERR_GENERIC so the
-// BoB sound layer binds without a working audio backend. Real backend is
-// deferred (SDL_mixer path is the permanent route per the engine plan).
+// BoB sound layer binds without a DirectSound backend. Real audio runs
+// through the Miles layer (mssw_compat.h) onto miniaudio.
 
 #pragma once
 

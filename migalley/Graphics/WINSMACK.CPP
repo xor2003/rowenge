@@ -101,13 +101,10 @@ static int frame_draw_height = 0;        // rows after SMK y-scale
 static int frame_size = 0;
 static Uint32 last_frame_time = 0;
 
-SmackBuf* sbuf = nullptr;
-Smack* smk_play=nullptr;
-int			Xoff=0;
-int			Yoff=0;
+static Smack* smk_play=nullptr;
+static int	Xoff=0;
+static int	Yoff=0;
 static int Woff=0;
-static int Hoff=0;
-int			wait=0;
 
 /*
 	UWord	DoSmack(intptr_t h)
@@ -147,7 +144,6 @@ void	CloseSmack()
 		smk_info = nullptr;
 	}
 	smk_play = nullptr;
-	sbuf = nullptr;
 	frame_buffer.clear();
 	//std::cout << "CloseSmack called" << std::endl;
 }
@@ -159,8 +155,6 @@ Smack* OpenSmack(FileNum filenumber,intptr_t win, int x, int y,int w, int h)
 	Xoff=x;
 	Yoff=y;
 	Woff=w;
-	Hoff=h;
-	wait=0;
 	last_frame_time = 0;
 
 	CloseSmack();

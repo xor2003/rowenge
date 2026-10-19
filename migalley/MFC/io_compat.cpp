@@ -219,14 +219,25 @@ FILE* fopen_ci(const char* path, const char* mode) {
         return nullptr; // fopen("") fails; an empty path must not resolve to "."
     }
     FILE* f = fopen(path, mode);
-    if (f || !strchr(mode, 'r')) {
-        return f; // literal hit, or a write-mode failure we shouldn't fix
+    if (f) {
+        return f;
     }
 
     std::string resolved = resolve_ci_path(path);
-    struct stat st;
-    if (resolved.empty() || stat(resolved.c_str(), &st) != 0) {
-        return nullptr;
+    if (resolved.empty() || resolved == path) {
+        return nullptr; // nothing gained by retrying the same path
     }
+    if (strchr(mode, 'r')) {
+        // Reads still gate on existence so a resolved-but-absent tail
+        // doesn't turn a plain ENOENT into a directory probe.
+        struct stat st;
+        if (stat(resolved.c_str(), &st) != 0) {
+            return nullptr;
+        }
+    }
+    // Write/append modes: existing components resolve to their on-disk
+    // case, the unresolved tail (the file being created) stays verbatim —
+    // matches a case-insensitive filesystem, where SAVEGAME\X.SAV lands in
+    // the existing savegame/ dir instead of failing outright.
     return fopen(resolved.c_str(), mode);
 }

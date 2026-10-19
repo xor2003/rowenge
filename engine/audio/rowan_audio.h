@@ -25,6 +25,29 @@ void       rowan_audio_set_master_volume(int vol127); /* Miles 0..127 */
 uint64_t rowan_midi_render(const void* data, size_t len, int track,
                            float** outPcm);
 
+/* ---- testable seams (pure logic, dependencies injected) -------------
+   These keep the policy separate from the environment so unit tests
+   drive fakes instead of touching the real filesystem/audio device. */
+
+/* Master-volume clamp: Miles volume is 0..127; out-of-range callers
+   (negative, >127) saturate. */
+static inline int rowan_clamp_volume(int vol127) {
+    return vol127 < 0 ? 0 : (vol127 > 127 ? 127 : vol127);
+}
+
+/* Soundfont selection: env override wins when non-empty, else the first
+   candidate that `exists` reports present. Returns NULL when neither.
+   `exists` is injected — production passes an fopen probe, tests a fake. */
+static inline const char* rowan_pick_soundfont(
+        const char* envOverride,
+        const char* const* candidates, size_t candidateCount,
+        int (*exists)(const char* path)) {
+    if (envOverride && envOverride[0]) return envOverride;
+    for (size_t i = 0; i < candidateCount; ++i)
+        if (candidates[i] && exists(candidates[i])) return candidates[i];
+    return NULL;
+}
+
 #ifdef __cplusplus
 }
 #endif

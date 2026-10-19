@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(RowanEngine LANGUAGES CXX)
+project(RowanEngine LANGUAGES C CXX)
 
 # ---------------------------------------------------------------------------
 # Shared engine build: BoB leaf code compiled natively (i386), exercising real
@@ -278,6 +278,40 @@ add_test(NAME ddframe_tests COMMAND ddframe_tests)
 set_tests_properties(ddframe_tests PROPERTIES
     TIMEOUT 30
     ENVIRONMENT "LD_LIBRARY_PATH=${SYSROOT}/usr/lib/i386-linux-gnu")
+
+# xmi2smf_tests: Miles XMIDI -> SMF converter — synthetic FORM/EVNT/TIMB
+# fixtures; the .c compiles as C to preserve the extern "C" ABI its
+# callers (rowan_audio.cpp) rely on.
+add_executable(xmi2smf_tests
+    tests/unit/main.cpp
+    tests/unit/test_xmi2smf.cpp
+    audio/xmi2smf.c)
+
+add_test(NAME xmi2smf_tests COMMAND xmi2smf_tests)
+set_tests_properties(xmi2smf_tests PROPERTIES TIMEOUT 30)
+
+# io_compat_tests: case-insensitive path layer (migalley's shared
+# resolver — bob links the same TU). Real tmpdir fixture, no SDL.
+add_executable(io_compat_tests
+    tests/unit/main.cpp
+    tests/unit/test_io_compat.cpp)
+target_include_directories(io_compat_tests PRIVATE tests)
+target_link_libraries(io_compat_tests PRIVATE rowan_io_compat)
+
+add_test(NAME io_compat_tests COMMAND io_compat_tests)
+set_tests_properties(io_compat_tests PROPERTIES TIMEOUT 30)
+
+# rowan_audio_tests: the pure seams in rowan_audio.h (volume clamp,
+# soundfont picking) — dependencies injected, no device/FS needed.
+add_executable(rowan_audio_tests
+    tests/unit/main.cpp
+    tests/unit/test_rowan_audio.cpp)
+target_include_directories(rowan_audio_tests PRIVATE tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/audio
+    ${CMAKE_CURRENT_SOURCE_DIR}/miniaudio)
+
+add_test(NAME rowan_audio_tests COMMAND rowan_audio_tests)
+set_tests_properties(rowan_audio_tests PROPERTIES TIMEOUT 30)
 
 add_executable(bob_files_tests
     tests/unit/main.cpp

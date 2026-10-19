@@ -44,9 +44,7 @@ void rowan_audio_shutdown(void) {
 
 void rowan_audio_set_master_volume(int vol127) {
     std::lock_guard<std::mutex> lk(g_mx);
-    if (vol127 < 0) vol127 = 0;
-    if (vol127 > 127) vol127 = 127;
-    g_masterVol = vol127;
+    g_masterVol = vol127 = rowan_clamp_volume(vol127);
     if (g_engineInit)
         ma_engine_set_volume(&g_engine, vol127 / 127.0f);
 }
@@ -56,25 +54,24 @@ void rowan_audio_set_master_volume(int vol127) {
    fluid_synth_write_float advances the player through the sequence.
    Output: f32 stereo 44100. */
 
+static int fs_exists(const char* p) {
+    FILE* f = fopen(p, "rb");
+    if (f) { fclose(f); return 1; }
+    return 0;
+}
+
 static const char* rowan_soundfont(void) {
     static const char* chosen = nullptr;
     if (chosen) return chosen;
-    if (const char* e = getenv("ROWAN_SOUNDFONT")) {
-        if (e[0]) return chosen = e;
-    }
     static const char* cands[] = {
         "/usr/share/sounds/sf2/FluidR3_GM.sf2",
         "/usr/share/soundfonts/FluidR3_GM.sf2",
         "/usr/share/sounds/sf2/default-GM.sf2",
         "/usr/share/soundfonts/default.sf2",
         "/usr/share/sounds/sf2/TimGM6mb.sf2",
-        nullptr
     };
-    for (int i = 0; cands[i]; ++i) {
-        FILE* f = fopen(cands[i], "rb");
-        if (f) { fclose(f); return chosen = cands[i]; }
-    }
-    return nullptr;
+    return chosen = rowan_pick_soundfont(
+        getenv("ROWAN_SOUNDFONT"), cands, 5, fs_exists);
 }
 
 uint64_t rowan_midi_render(const void* data, size_t len, int track,
