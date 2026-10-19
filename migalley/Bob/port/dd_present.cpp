@@ -1,14 +1,18 @@
 // dd_present.cpp — DirectDraw -> SDL present bridge (T123, bob exe only).
 //
 // The BoB build's compat/ddraw.h fires RowanDDPresentHook after Flip and
-// after blits that target a primary/front-buffer surface.  This TU installs
-// the hook: it uploads the primary surface's pixels to a streaming texture
-// on the top-level SDL window and presents.  BoB's native 3D path is
-// fullscreen-exclusive, so presenting to the root backend is correct — the
-// 2D dialog path keeps its own compositing in MFC_stub.
+// after blits that target a primary/front-buffer surface.  This TU is the
+// SDL side of that bridge: the worker-facing hook queues frames on
+// DDFramePump (engine/compat/ddframe.h — the queue logic lives there so it
+// is unit-testable without SDL), and the SDL sink uploads the primary
+// surface's pixels to a streaming texture on the top-level window.
+// BoB's native 3D path is fullscreen-exclusive, so presenting to the root
+// backend is correct — the 2D dialog path keeps its own compositing in
+// MFC_stub.
 
 #include "MFC_stub.h"   // g_hwndRegistry / WindowBackend / backend_from_hwnd
 #include <ddraw.h>      // compat/ddraw.h via bob_overlay -> IDirectDrawSurface7
+#include <ddframe.h>    // compat/ddframe.h -> DDFramePump
 #include <mutex>
 #include <cstring>
 
@@ -18,9 +22,9 @@ namespace {
 // main-thread-only and concurrent Xlib use of the same Display corrupts
 // X11's malloc'd buffers (that was the "corrupted double-linked list" /
 // deadlock we kept hitting).  The worker queues the latest primary surface
-// here and PumpSDL presents it on the main thread — latest frame wins.
-IDirectDrawSurface7* g_pendingPrimary = nullptr;
-std::mutex           g_pendingMutex;
+// on the pump here and PumpSDL presents it on the main thread — latest
+// frame wins.
+DDFramePump g_pump;
 
 } // namespace
 
@@ -45,7 +49,7 @@ WindowBackend* TopLevelBackend()
 }
 
 // Present through the backend renderer.  We run on the main thread (queued
-// by QueuePresent, pumped by RowanDDPumpPresent), where the accelerated
+// by the pump, driven by RowanDDPumpPresent), where the accelerated
 // renderer's GL context is bound — and we must use it: that renderer flags
 // the window SDL_WINDOW_OPENGL, which makes SDL_GetWindowSurface return
 // NULL and silently drops every frame (the stale-loading-screen bug).
@@ -94,10 +98,28 @@ void PresentPrimary(IDirectDrawSurface7* primary)
     SDL_RenderPresent(be->renderer);
 }
 
+// Injected pump collaborators: renderer-blit sink + SDL-event wakeup.
+struct SdlPresentSink : DDFramePump::Sink {
+    void Present(IDirectDrawSurface7* primary) override
+        { PresentPrimary(primary); }
+};
+struct SdlWakeup : DDFramePump::Notify {
+    void Wakeup() override {
+        SDL_Event e;
+        std::memset(&e, 0, sizeof(e));
+        e.type = SDL_USEREVENT;
+        e.user.code = 0x44445052;   // 'DDPR'
+        SDL_PushEvent(&e);
+    }
+};
+SdlPresentSink g_sink;
+SdlWakeup      g_wake;
+
 } // namespace
 
-// 3D-worker entry point (the RowanDDPresentHook target): refcount the frame,
-// replace any still-queued frame (latest wins), and nudge the main thread.
+// 3D-worker entry point (the RowanDDPresentHook target): stamp the present
+// clock immediately so MFC repaints back off even before the frame lands,
+// then hand the frame to the pump (latest wins, queue refcounts managed).
 void QueuePresent(IDirectDrawSurface7* primary)
 {
     if (!primary || !primary->desc.lpSurface) return;
@@ -122,38 +144,20 @@ void QueuePresent(IDirectDrawSurface7* primary)
             frames = 0; t0 = now;
         }
     }
-    primary->AddRef();
-    IDirectDrawSurface7* old;
-    {
-        std::lock_guard<std::mutex> lk(g_pendingMutex);
-        old = g_pendingPrimary;
-        g_pendingPrimary = primary;
-    }
-    if (old) old->Release();
-    SDL_Event e;
-    std::memset(&e, 0, sizeof(e));
-    e.type = SDL_USEREVENT;
-    e.user.code = 0x44445052;   // 'DDPR'
-    SDL_PushEvent(&e);
+    g_pump.Queue(primary);
 }
 
 // PumpSDL calls this (main thread) when the queued 'DDPR' event arrives.
 extern "C" void RowanDDPumpPresent()
 {
-    IDirectDrawSurface7* s;
-    {
-        std::lock_guard<std::mutex> lk(g_pendingMutex);
-        s = g_pendingPrimary;
-        g_pendingPrimary = nullptr;
-    }
-    if (!s) return;
-    PresentPrimary(s);
-    s->Release();
+    g_pump.Pump();
 }
 
 // Called once from bob_main.cpp; the hook is a plain function pointer so the
-// install is just an assignment.
+// install is just an assignment.  Wires the SDL sink/wakeup into the pump —
+// tests substitute their own fakes instead.
 void BoBInstallDDPresent()
 {
+    g_pump.Install(&g_sink, &g_wake);
     RowanDDPresentHook = &QueuePresent;
 }

@@ -86,6 +86,11 @@ target_include_directories(BobIncludes INTERFACE
     ${SYSROOT}/usr/include
     ${SYSROOT}/usr/include/SDL2
     ${SYSROOT}/usr/include/i386-linux-gnu)
+# The extracted sysroots only carry runtime pieces — no SDL2 dev headers.
+# Fall back to the system package so the 64-bit build works without one.
+if(NOT EXISTS ${SYSROOT}/usr/include/SDL2/SDL.h)
+    target_include_directories(BobIncludes INTERFACE /usr/include/SDL2)
+endif()
 target_link_libraries(BobIncludes INTERFACE RowanDefaults)
 
 # --- shared math library (REQ-DEDUP-01, user directive): ONE implementation
@@ -258,6 +263,20 @@ target_link_libraries(bob_ddraw_tests PRIVATE BobIncludes)
 add_test(NAME bob_ddraw_tests COMMAND bob_ddraw_tests)
 set_tests_properties(bob_ddraw_tests PROPERTIES
     TIMEOUT 60
+    ENVIRONMENT "LD_LIBRARY_PATH=${SYSROOT}/usr/lib/i386-linux-gnu")
+
+# ddframe_tests: latest-wins DD present queue (engine/compat/ddframe.h) —
+# the seam migalley/Bob/port/dd_present.cpp plugs its SDL sink+notify into.
+# Injected fakes exercise the pump with zero SDL involvement.
+add_executable(ddframe_tests
+    tests/unit/main.cpp
+    tests/unit/test_ddframe.cpp)
+target_include_directories(ddframe_tests PRIVATE tests)
+target_link_libraries(ddframe_tests PRIVATE BobIncludes)
+
+add_test(NAME ddframe_tests COMMAND ddframe_tests)
+set_tests_properties(ddframe_tests PROPERTIES
+    TIMEOUT 30
     ENVIRONMENT "LD_LIBRARY_PATH=${SYSROOT}/usr/lib/i386-linux-gnu")
 
 add_executable(bob_files_tests
