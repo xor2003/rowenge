@@ -703,6 +703,9 @@ static bool Init() {
     }
     VkSamplerCreateInfo sci={VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
     V(CreateSampler)(D.dev,&sci,0,&D.dummySamp);
+    // Predictable capacities — keep first-frames free of rehash stalls.
+    D.tgts.reserve(16);  D.texes.reserve(512); D.pipes.reserve(64);
+    D.samps.reserve(64); D.sets.reserve(256);
     D.avail=true;
     if(getenv("ROWAN_VK_DEBUG")){
         VkPhysicalDeviceProperties pr; V(GetPhysicalDeviceProperties)(D.pd,&pr);
@@ -1076,7 +1079,8 @@ static void BindState(const Rast7::State& st,int nStage) {
     if(st.rs[D3DRENDERSTATE_COLORKEYENABLE])cfgx|=256;
     if(st.rs[D3DRENDERSTATE_ZENABLE]==D3DZB_USEW)cfgx|=512;
     pc.cfg[0]=cfgx; pc.cfg[1]=pc.cfg[2]=0;
-    if(getenv("ROWAN_VK_TRACE"))
+    static int trace=-1; if(trace<0)trace=getenv("ROWAN_VK_TRACE")?1:0;
+    if(trace)
         fprintf(stderr,"[vk] cfgx=%08x ze=%lu zfn=%lu zwe=%lu\n",cfgx,
             (unsigned long)st.rs[D3DRENDERSTATE_ZENABLE],
             (unsigned long)st.rs[D3DRENDERSTATE_ZFUNC],
