@@ -64,6 +64,7 @@ static CFont g_font;
 class TestSheet : public CWnd {
 public:
     std::vector<std::pair<WPARAM, LPARAM> > commands;
+    std::vector<std::pair<WPARAM, LPARAM> > scrolls;
 
     LRESULT WindowProc(UINT msg, WPARAM w, LPARAM l) override {
         switch (msg) {
@@ -78,6 +79,11 @@ public:
             return 0;
         case WM_COMMAND:
             commands.push_back(std::make_pair(w, l));
+            return 0;
+        case WM_VSCROLL:
+        case WM_HSCROLL:
+        case WM_ACTIVEXSCROLL:
+            scrolls.push_back(std::make_pair(w, l));
             return 0;
         }
         return CWnd::WindowProc(msg, w, l);
@@ -510,6 +516,136 @@ static void test_std_stubs() {
 
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Original-OCX behaviour parity — expectations read straight from the
+// original sources (bob/rcombo/rcomboc.cpp, rspinbut/rspinbtc.cpp,
+// rscrlbar/rscrlbar.cpp, rradio). The OCX is OLE/IDispatch and can't run
+// here, so its semantics are pinned as assertions on the port.
+// ---------------------------------------------------------------------------
+
+// rcomboc.cpp OnLButtonDown: when rect.bottom+listboxheight would pass the
+// ancestor sheet's bottom, the list opens ABOVE the field instead of below.
+static void test_combo_dropdown_flipup() {
+    SetUp();
+    CRCombo combo;
+    // Near the sheet bottom (sheet client 50,60-650,560 -> screen bottom 710).
+    combo.Create("cmb2", WS_CHILD | WS_VISIBLE,
+                 CRect(100, 480, 300, 504), &sheet, 101);
+    combo.AddString("one");
+    combo.AddString("two");
+
+    CRect crc;
+    combo.GetClientRect(crc);
+    combo.OnLButtonDown(0, CPoint(crc.right - 4, crc.Height() / 2));
+
+    CHECK(combo.GetDropDown() != NULL);
+    if (!combo.GetDropDown()) return;
+
+    CRect want = ClientAbs(&combo);
+    // Flipped: popup bottom is flush with the field's TOP edge.
+    CHECK(combo.GetDropDown()->m_rect.bottom <= want.top);
+    CHECK_EQ(combo.GetDropDown()->m_rect.left, want.left);
+    // And still inside the sheet, not clipped off the bottom.
+    CHECK(combo.GetDropDown()->m_rect.top >= 0);
+}
+
+// rspinbtc.cpp: upper half ++, lower half --, clamps at min/max — no wrap.
+static void test_parity_spin_clamp() {
+    SetUp();
+    CRSpinBut sp;
+    sp.Create("spc", WS_CHILD | WS_VISIBLE,
+              CRect(400, 160, 460, 200), &sheet, 122);
+    sp.SetValueOption(0, 10, 9);
+    CRect rc; sp.GetClientRect(rc);
+    const int midY = rc.Height() / 2;
+
+    sp.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(10, 2));
+    sp.SendMessage(WM_LBUTTONUP,   0, MAKELPARAM(10, 2));
+    CHECK_EQ(sp.GetCurrentValue(), 10);   // up half: 9->10
+
+    sp.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(10, 2));
+    sp.SendMessage(WM_LBUTTONUP,   0, MAKELPARAM(10, 2));
+    CHECK_EQ(sp.GetCurrentValue(), 10);   // at max: clamps, doesn't wrap
+
+    sp.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(10, midY + 2));
+    sp.SendMessage(WM_LBUTTONUP,   0, MAKELPARAM(10, midY + 2));
+    CHECK_EQ(sp.GetCurrentValue(), 9);    // down half: 10->9
+
+    sp.SetValueOption(0, 10, 0);
+    sp.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(10, midY + 2));
+    sp.SendMessage(WM_LBUTTONUP,   0, MAKELPARAM(10, midY + 2));
+    CHECK_EQ(sp.GetCurrentValue(), 0);    // at min: clamps
+}
+
+// rscrlbar.cpp: shaft click pages toward the click by pageSize, the thumb
+// drags pixel-proportionally, position clamps to [min,max], and the parent
+// gets a scroll notification.
+static void test_parity_scrlbar() {
+    SetUp();
+    sheet.scrolls.clear();
+    CRScrlBar sb;
+    sb.Create(NULL, "sbv", WS_CHILD | WS_VISIBLE,
+              CRect(10, 10, 30, 410), &sheet, 171);
+    sb.SetMinValue(0);
+    sb.SetMaxValue(100);
+    sb.SetPageSize(10);
+    sb.SetScrollPos(40);
+
+    // Vertical, track 400, thumbLen=max(20,10/110*400)=36, available=364.
+    // pos 40 -> thumb at [145,181]. Click below -> +page.
+    sb.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(5, 350));
+    CHECK_EQ(sb.GetScrollPos(), 50);
+    sb.SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(5, 350));
+
+    // pos 50 -> thumb [182,218]. Click above -> -page.
+    sb.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(5, 10));
+    CHECK_EQ(sb.GetScrollPos(), 40);
+    sb.SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(5, 10));
+
+    // Thumb drag: grab inside the thumb, drag ~10% of track -> ~+10.
+    sb.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(5, 163));
+    sb.SendMessage(WM_MOUSEMOVE, 0, MAKELPARAM(5, 199));
+    CHECK(sb.GetScrollPos() >= 48 && sb.GetScrollPos() <= 52);
+    sb.SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(5, 199));
+
+    // Clamp: page-step can't pass max, and SetScrollPos clamps too.
+    sb.SetScrollPos(200);
+    CHECK_EQ(sb.GetScrollPos(), 100);
+    sb.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(5, 395));
+    CHECK_EQ(sb.GetScrollPos(), 100);
+    sb.SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(5, 395));
+
+    // Parent received the scroll notifications (useMessages=FALSE ->
+    // WM_VSCROLL with SB_THUMBPOSITION/SB_THUMBTRACK).
+    CHECK(!sheet.scrolls.empty());
+}
+
+// rradio: the widget is a grid of mutually exclusive options — a click
+// selects exactly the cell under the point.
+static void test_parity_radio_click() {
+    SetUp();
+    CRRadio r;
+    r.Create(NULL, "rg", WS_CHILD | WS_VISIBLE,
+             CRect(500, 300, 640, 380), &sheet, 162);
+    r.AddButton("off");
+    r.AddButton("low");
+    r.AddButton("high");
+    r.SetCurrentSelection(0);
+
+    // Descend the client area: the selection must walk 0 -> 1 -> 2 exactly
+    // once each (row pitch depends on font metrics, so probe rather than
+    // assume pixel positions).
+    int seen = 0;
+    for (int y = 2; y < 80 && seen < 3; ++y) {
+        r.SendMessage(WM_LBUTTONDOWN, 0, MAKELPARAM(5, y));
+        if (r.GetCurrentSelection() == seen + 1)
+            ++seen;
+        CHECK(r.GetCurrentSelection() >= 0 && r.GetCurrentSelection() <= 2);
+    }
+    CHECK_EQ(seen, 3 - 1);          // reached the third row (0,1,2 visited)
+    CHECK_EQ(r.GetCurrentSelection(), 2);
+}
+
 int main() {
     printf("widget tests (SDL dummy video)\n");
 
@@ -533,6 +669,10 @@ int main() {
     test_title_static();
     test_joycfg();
     test_std_stubs();
+    test_combo_dropdown_flipup();
+    test_parity_spin_clamp();
+    test_parity_scrlbar();
+    test_parity_radio_click();
 
     printf("%d checks, %d failures\n", g_checks, g_failures);
     return g_failures ? 1 : 0;

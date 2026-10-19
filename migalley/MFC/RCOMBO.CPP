@@ -513,7 +513,21 @@ void CRCombo::OnLButtonDown(UINT nFlags, CPoint point) {
     }
     int dropHeight = std::min(itemCount, 25) * itemHeight + 4; // Show max 25 items + border
 
-    m_dropDown->MoveWindow(comboRect.left, comboRect.bottom, dropWidth, dropHeight);
+    // Original rcomboc.cpp flips the list above the field when it would
+    // overflow the bottom of the topmost same-artwork ancestor (the sheet).
+    // Here: the last logical child below the real SDL-window owner.
+    CWnd* bound = this;
+    for (CWnd* p = GetParent(); p; p = p->GetParent()) {
+        WindowBackend* pbe = backend_from_hwnd(p->GetSafeHwnd());
+        if (pbe && !pbe->isChild) { if (bound == this) bound = p; break; }
+        bound = p;
+    }
+    CRect boundsRect;
+    bound->GetWindowRect(&boundsRect);
+    if (comboRect.bottom + dropHeight > boundsRect.bottom)
+        m_dropDown->MoveWindow(comboRect.left, comboRect.top - dropHeight, dropWidth, dropHeight);
+    else
+        m_dropDown->MoveWindow(comboRect.left, comboRect.bottom, dropWidth, dropHeight);
     //Show the pop up window
     m_dropDown->ShowWindow(SW_SHOW);
     // RERUN: Capture the mouse so that all mouse events go to the dropdown list,
