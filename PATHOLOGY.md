@@ -118,9 +118,14 @@ items marked **[DONE]** were fixed in the crash-hardening pass.
     `Aggregator::ReceiveMessage` returning `DP_OK` on garbage hid in a
     `#if 0` wrapper).
     **[PARTIAL — all 4,682 `//Old_Code` whole-line comment blocks removed
-    across 62 files (both trees). `#if 0`/`#ifdef DEADCODE` regions and
-    `//TempCode` lines remain — TempCode marks live "temporary" code in
-    places, so it needs per-site judgement, not a sweep]**
+    across 62 files (both trees). Per-site review (2026-10-19): the port
+    layer itself is clean — zero `#if 0`/`#ifdef DEADCODE` in
+    `engine/compat/*`, `MFC_stub.cpp`, `WINSMACK.CPP`, `Bob/port/*`, or
+    the ported widget TUs; the only `TEMPCODE` hits are commented-out
+    1999-vintage lines (`//TEMPCODE DAW/JON`) in original sources, and
+    `RERUN` is the previous porter's authorship tag (like `RJS`), not a
+    work queue. Remaining `#if 0`/TempCode debris lives in untouched
+    game sources where upstream-diff preservation says leave it]**
 
 14. **`LBMCPP.H` textual-template inclusion.** A `.H` file `#include`d
     *inside function bodies* with macro-defined inputs (`LBM_END_PTR`,
