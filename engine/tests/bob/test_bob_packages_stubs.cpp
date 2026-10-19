@@ -23,7 +23,7 @@ PlaneInit* Plane_Type_Translate[8] = {};      // global pointer table
 static char blob[512];
 Target&   NodeData::GetTarget(UniqueID)      { return *reinterpret_cast<Target*>(blob); }
 Squadron& NodeData::operator[](SquadNum)     { return *reinterpret_cast<Squadron*>(blob); }
-int    info_grndgrp::GetCruiseAt(Coords3D&, ANGLES&) { return 0; }
+int    info_grndgrp::GetCruiseAt(Coords3D&, ANGLES*) { return 0; }
 FP     Atmosphere::GetWind(SLong, SLong&, SLong&, SLong&) { return 0; }
 void   PackageList::MessageBoxFuelWarning(SquadNum) {}
 PlaneTypeSelect Squadron::AcType()           { return (PlaneTypeSelect)0; }

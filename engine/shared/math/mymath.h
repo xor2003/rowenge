@@ -163,7 +163,7 @@ static	UWord	AbsSign(SWord	inputvar)
 static	SLong	AbsSign(SLong	inputvar)
 {	return(UseSign(inputvar,GetSign(inputvar)));}
 static	UWord	AbsSign(ANGLES	inputvar)
-{	return(UseSign(inputvar,GetSign(inputvar)));}
+{	return(UseSign((SWord)inputvar,GetSign(inputvar)));}
 
 SWord MonthFromDays (SWord daysinyear, SWord &daysinfullmonth,SWord leapyear );
 void DateFromSecs (SLong secs, SWord &day, SWord &month, SWord &year);

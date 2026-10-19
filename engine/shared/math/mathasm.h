@@ -100,20 +100,20 @@ static inline unsigned char _rowan_bittestandcomplement(long * const a, const lo
 #define _bittestandcomplement	_rowan_bittestandcomplement
 #else
 #define __INTRIN_INLINE static inline
-__INTRIN_INLINE unsigned char _rowan_BitScanForward(unsigned long * const Index, const unsigned long Mask)
+__INTRIN_INLINE unsigned char _rowan_BitScanForward(unsigned int * const Index, const unsigned int Mask)
 {
 	__asm__("bsfl %[Mask], %[Index]" : [Index] "=r" (*Index) : [Mask] "mr" (Mask));
 	return Mask ? 1 : 0;
 }
 
-__INTRIN_INLINE unsigned char _rowan_BitScanReverse(unsigned long * const Index, const unsigned long Mask)
+__INTRIN_INLINE unsigned char _rowan_BitScanReverse(unsigned int * const Index, const unsigned int Mask)
 {
 	__asm__("bsrl %[Mask], %[Index]" : [Index] "=r" (*Index) : [Mask] "mr" (Mask));
 	return Mask ? 1 : 0;
 }
 
 /* NOTE: again, the bizarre implementation follows Visual C++ */
-__INTRIN_INLINE unsigned char _rowan_bittest(const long * const a, const long b)
+__INTRIN_INLINE unsigned char _rowan_bittest(const SLong * const a, const long b)
 {
 	unsigned char retval;
 
@@ -139,7 +139,7 @@ __INTRIN_INLINE unsigned char _rowan_bittest64(const __int64 * const a, const __
 }
 #endif
 
-__INTRIN_INLINE unsigned char _rowan_bittestandcomplement(long * const a, const long b)
+__INTRIN_INLINE unsigned char _rowan_bittestandcomplement(SLong * const a, const long b)
 {
 	unsigned char retval;
 
@@ -151,7 +151,7 @@ __INTRIN_INLINE unsigned char _rowan_bittestandcomplement(long * const a, const 
 	return retval;
 }
 
-__INTRIN_INLINE unsigned char _rowan_bittestandreset(long * const a, const long b)
+__INTRIN_INLINE unsigned char _rowan_bittestandreset(SLong * const a, const long b)
 {
 	unsigned char retval;
 
@@ -163,7 +163,7 @@ __INTRIN_INLINE unsigned char _rowan_bittestandreset(long * const a, const long 
 	return retval;
 }
 
-__INTRIN_INLINE unsigned char _rowan_bittestandset(long * const a, const long b)
+__INTRIN_INLINE unsigned char _rowan_bittestandset(SLong * const a, const long b)
 {
 	unsigned char retval;
 
@@ -338,7 +338,7 @@ inline bool __fastcall oldBITSET(void* num1,ULong num2)
 */
 inline bool __fastcall BITSET(void* num1,ULong num2)
 {
-	return (bool)_bittestandset((long *)num1, num2);
+	return (bool)_bittestandset((SLong *)num1, num2);
 }
 /*
 #else
@@ -426,7 +426,7 @@ extern	Bool	BITTEST(const void*,ULong);
 //-----------------------------------------------------------------------------
 inline bool __fastcall BITTEST(const void* num1,ULong num2)
 {
-	return _bittest((long *)num1, num2);
+	return _bittest((const SLong *)num1, num2);
 	/*
 	_asm
 	{
@@ -521,7 +521,7 @@ extern	Bool	BITCOMP(void*,ULong);
 //-----------------------------------------------------------------------------
 inline bool __fastcall BITCOMP(void* num1,ULong num2)
 {
-	return _bittestandcomplement((long*)num1, num2);
+	return _bittestandcomplement((SLong*)num1, num2);
 	/*
 	_asm
 	{

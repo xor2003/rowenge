@@ -17,8 +17,12 @@ enum	AnglesShiftTwice	{ANGLES_SHIFT_TWICE=30};
 inline	int	operator/(int i,AnglesFract)	{return((i+16384)>>15);}
 inline	int	operator>>(int i,AnglesShift)	{return((i+16384)>>15);}
 
+// LP64: SLong is `int` here (was `long` on the 32-bit build), so these
+// would redefine the int overloads above — emit them only where distinct.
+#if !defined(__LP64__) && !defined(_WIN64)
 inline	SLong	operator/(SLong i,AnglesFract)	{return((i+16384)>>15);}
 inline	SLong	operator>>(SLong i,AnglesShift)	{return((i+16384)>>15);}
+#endif
 inline	ULong	operator/(ULong i,AnglesFract)	{return((i+16384)>>15);}
 inline	ULong	operator>>(ULong i,AnglesShift)	{return((i+16384)>>15);}
 enum	AnglePoint
