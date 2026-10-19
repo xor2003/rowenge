@@ -367,3 +367,90 @@ Fix (`migalley/H/dsound_stub.h`):
 Verified: hidden-X run reached live 3D cockpit at max detail — engine
 start, full throttle, rolling take-off to 30+ Kts, spinning prop,
 gauges, canopy glass reflections (SKYIMAGES path), HUD — no abort.
+
+## 2026-10-20 — MiG 3D profiling session: three latent bugs + perf work
+
+Found while stabilising the 3D path for profiling (see "MiG 3D perf"
+below). Each reproduced as an intermittent abort/segv on 3D entry or
+teardown; all are latent races/overflows, not regressions.
+
+### Overlay `StrPixelLen2(&"literal")` global-buffer-overflow (fixed)
+
+`LoaderScreen`/`COverlay` called `StrPixelLen2((char*)&"  ")` —
+taking the *address* of a string literal produced a `char*` into the
+literal's storage; the width scan then read past the object until it
+hit unrelated globals. ASan: `global-buffer-overflow` read, 26 bytes
+past a UBSan type-desc global, inside `LoaderScreen` during 3D entry.
+Likely heap corruptor behind the earlier racy `SetObj3D`/`shpdbg:num=22`
+aborts. Fixed by passing the literals directly.
+
+### `bigWidths` signed-char OOB read in 3D overlay font paths
+
+`bigWidths[(char)c - 32]` with bytes >= 0x80 (UTF-8 Cyrillic under
+ROWAN_LANG=ru) indexed negative -> OOB read before the table. Fixed:
+unsigned-char + `c >= 32` guards in `StrPixelLen`/`StrPixelLen2`/`PutC`.
+(Related: `PutC3` now NULL-guards `GetImageMapPtr` and routes Cyrillic
+code points to a dedicated font page — see the Cyrillic 3D text work in
+the commit; `MakeChar` no longer reopens the TTF file per glyph.)
+
+### `~Inst3d` teardown race: `Miles::KillAll` before moveloop join
+
+`_Miles.KillAll()` freed all samples *before* the moveloop thread was
+signalled/joined; its final `DoMoveCycle` -> `ProcessSpot` ->
+`Update3d` -> `DeleteSample` then touched torn-down `thesample[]`
+state. Crashed on quit-from-3D as `DeleteSample` on the worker.
+Fixed by reordering: pause + signal + join the thread first, then
+`KillAll()`.
+
+### Known-intentional noise
+
+`MIGLAND.CPP:4524` UBSan "store to misaligned address" — pack(1) legacy
+ABI; the *pointer member* sits at an unaligned offset by design. Not a
+real defect; left as-is per the project's pack(1) invariant.
+
+## 2026-10-20 — MiG 3D perf (ROWAN_VK_PERF instrumentation)
+
+`XX_ScreenFlip_Vulkan` now splits each frame into `gap` (between-entry:
+software 3D raster + logic), `wait` (fence), `conv` (RGB565->BGRA
+staging), `acq`, `pres` (submit+present). Quick Mission baseline on
+Xvfb :97, 1024x768 3D view, ~5.5fps total:
+
+    gap=117-282ms  wait=0  conv=52ms  acq=0  pres=67ms
+
+`conv` was a per-pixel `(u64)x*srcW/dstW` div+mul plus byte stores — at
+-O0, ~1.3M px/frame. Now: cached x-map + row-memcpy/auto-vectorisable
+expand (`conv` ~= 1.6ms — 30x). `pres` ~11ms is mostly Xvfb's llvmpipe
+(no DRI3); real WSI will differ.
+
+`gap` is the software rasteriser. Hot path (stack sampling):
+`XASM_*HoriLine*` -> `biluv`+4 img loads+4 palette lookups ->
+`despeckle_taps` (6 x dist565) -> `bil4` (3 x lerp565). Fixes applied
+in `GRAFPRIM.CPP` — all bit-exact output-preserving:
+
+- `lerp565` delta form `a + ((b-a)*t >> 8)` — half the multiplies.
+- `avg3_565` `/3` -> `*0xAAAB >> 17` — exact for sums <= 189, no divide.
+- `despeckle_taps` channel extraction hoisted once per tap (was 3x).
+- `bil_despeckle` split into tap decision + blend; `bil_color` memoises
+  the (img, palette_gen, 4 tap indices) decision so magnified/texel-
+  coherent runs pay only the blend.
+- Same-texel-cell shortcut: all four taps equal -> the colour directly
+  (flat fills/sky/panels skip despeckle+bil4 entirely). Applied in
+  `bil_color` and the `SImage`/`CImage` faded paths (where the faded
+  taps inherit the flatness).
+- `SImage`/`CImage` fade rows: `(texel<<4)|s` and `|s+1` are adjacent —
+  one u32 load supplies both taps' shades (was 2 loads each).
+- `TFImage` coverage `*255/56` -> 8-entry LUT (intensVal is a multiple
+  of 8 in [0,0x38]).
+- `palette_gen` counter invalidates the memo on palette writes.
+
+Build: `GRAFPRIM.CPP`, `POLYGON.CPP`, `My3D`, `XX_ScreenFlip_Vulkan.cpp`,
+`TILEMAKE.CPP` now compile `-O2 -fno-strict-aliasing` (the rest of the
+tree stays -O0 — strict-aliasing-safe legacy code can't be assumed).
+A full-tree -O2 scratch build confirmed no further headroom — the
+remaining gap is per-pixel work, not traversal.
+
+Result (same scene): `gap` ~= 35-72ms, `conv` ~= 1.6ms, `pres` ~= 11ms,
+~23-28 fps — roughly 3x frame time reduction, output unchanged.
+
+Sanitizer re-run: ASan clean through 3D entry + flight; only the
+intentional pack(1) MIGLAND misalignment note remains.

@@ -972,6 +972,27 @@ void COverlay::PrintAt(SWord x,SWord y,char* str)
 	// Dead
 }
 
+//RERUN: decode one UTF-8 sequence -> Unicode code point; locale-independent
+//(_mbsnextc only honours UTF-8 when setlocale picked a UTF-8 locale, and the
+//legacy PutC3 page math needs a stable code point either way).
+static int OverlayNextChar(const unsigned char*& p)
+{
+	const unsigned char c0 = *p++;
+	if (c0 < 0x80) return c0;
+	if ((c0 & 0xE0) == 0xC0 && (p[0] & 0xC0) == 0x80)
+	{
+		int cp = ((c0 & 0x1F) << 6) | (*p++ & 0x3F);
+		return cp < 0x80 ? ' ' : cp;					// overlong -> space
+	}
+	if ((c0 & 0xF0) == 0xE0 && (p[0] & 0xC0) == 0x80 && (p[1] & 0xC0) == 0x80)
+	{
+		int cp = ((c0 & 0x0F) << 12) | ((p[0] & 0x3F) << 6) | (p[1] & 0x3F);
+		p += 2;
+		return cp;
+	}
+	return ' ';										// stray byte -> space
+}
+
 void COverlay::PrintAt2(SWord& x,SWord& y, const char* str)
 {
  	if (str)													//RJS 05Dec00
@@ -979,10 +1000,7 @@ void COverlay::PrintAt2(SWord& x,SWord& y, const char* str)
 		const unsigned char* ustr=(const unsigned char*)str;
 
 		while (*ustr)
-		{
-			PutC3(x,y,_mbsnextc(ustr));
-			ustr=_mbsinc(ustr);
-		}
+			PutC3(x,y,OverlayNextChar(ustr));
 	}
 }
 
@@ -1036,7 +1054,8 @@ SLong COverlay::StrPixelLen(char* pstr)
 
 		while (*pstr)
 		{
-	 		retVal+=bigWidths[(*pstr)-32];
+			const unsigned char c=(unsigned char)*pstr;		//RERUN: signed char OOB on >=0x80
+			if (c>=32) retVal+=bigWidths[c-32];
 			pstr++;
 		}
 	}
@@ -1053,7 +1072,8 @@ SLong COverlay::StrPixelLen2(const char* pstr)
 
 		while (*pstr)
 		{
-	 		retVal+=bigWidths[(*pstr)-32]+5; // RERUN from +1 to +5 so that text spacing looks better in hi res;
+			const unsigned char c=(unsigned char)*pstr;		//RERUN: signed char OOB on >=0x80
+			if (c>=32) retVal+=bigWidths[c-32]+5; // RERUN from +1 to +5 so that text spacing looks better in hi res;
 			pstr++;
 		}
 	}
@@ -1137,7 +1157,7 @@ void COverlay::PutC(SWord& x,SWord& y,unsigned char c)
 	SWord this_y;
 
 	if (!fIsWide && c>='a' && c<='z') c=c-'a'+'A';
-	else tWidth=bigWidths[c-32]+1+extra;
+	else if (c>=32) tWidth=bigWidths[c-32]+1+extra;	//RERUN: c<32 underflowed the table
 
  	c-=32;		//1st 32 chars not included
  
@@ -7151,7 +7171,18 @@ void	ImageMap_Desc::MakeChar(int cx, int cy, int	uChar)
     int ix = (cx * 11) + 1;
     int iy = (cy * 14) + 1;
 
-	TTF_Font* overlayfont = TTF_OpenFont("/usr/share/fonts/TTF/DejaVuSans-ExtraLight.ttf", 14);
+	// RERUN: was TTF_OpenFont per glyph — ~99 font handles leaked per font
+	// page until fds ran out mid-scene. Cache one font for the process.
+	static TTF_Font* overlayfont = NULL;
+	if (!overlayfont)
+	{
+		overlayfont = TTF_OpenFont("/usr/share/fonts/TTF/DejaVuSans-ExtraLight.ttf", 14);
+		if (!overlayfont)
+			overlayfont = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans-ExtraLight.ttf", 14);
+		if (!overlayfont)
+			overlayfont = TTF_OpenFont("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", 14);
+	}
+	if (!overlayfont) return;
 
     // Render the glyph to an SDL_Surface (ARGB32)
     SDL_Color white = {255, 255, 255, 255};
@@ -7196,6 +7227,11 @@ void	ImageMap_Desc::MakeChar(int cx, int cy, int	uChar)
 }
 
 extern HWND global_hWnd; //RERUN FONT TEST
+// RERUN: dedicated font-map page for the Cyrillic Unicode block
+// (U+0400..U+045F rasterised on demand; the file index must stay <255 in
+// the fake FONT dir whose nomaps is forced to 255).
+static const int MIG_CYR_FONT_PAGE = 100;
+
 void	ImageMap_Desc::InitFont(int	pageno, int width, int height)
 {
 
@@ -7218,7 +7254,11 @@ void	ImageMap_Desc::InitFont(int	pageno, int width, int height)
 	int		cxMax = 0;
 	UINT	uChar = (realpageno << 8);
 
-	if (!realpageno)
+	if (pageno == MIG_CYR_FONT_PAGE)					//RERUN: Cyrillic block
+	{
+		uChar = 0x0400;									// glyphs U+0400.. in cell order
+	}
+	else if (!realpageno)
 	{
 // this is English, so do a bit of farting about... use characters 0 - 192
 		if (pageno&0x01)		//2nd half...
@@ -7263,8 +7303,15 @@ void COverlay::PutC3(SWord& x,SWord& y,int uChar)
 	int	pageno = (uChar & 0x7f00) >> 7;
 	int	index = uChar & 0xFF;
 
+// RERUN: Cyrillic Unicode block -> dedicated runtime font page.
+// (uChar & 0x7F) is the cell index because 0x400 is 128-aligned.
+	if ((unsigned)(uChar - 0x400) < 0x60)
+	{
+		index = uChar & 0x7F;
+		pageno = MIG_CYR_FONT_PAGE;
+	}
 // handle English
-	if (!(uChar & 0x8000))
+	else if (!(uChar & 0x8000))
 	{
 		switch (index&0xe0)
 		{
@@ -7314,6 +7361,8 @@ void COverlay::PutC3(SWord& x,SWord& y,int uChar)
 	}
 
 	ImageMapDesc* pmap =Image_Map.GetImageMapPtr(ImageMapNumber(FONTBASENO+pageno));
+	if (!pmap || !pmap->body || !pmap->alpha)		//RERUN: unmapped page -> skip
+		{ x+=8; return; }
 	//lo res version only displays upper case chars
 
 	UByte tWidth=8;
@@ -7386,8 +7435,14 @@ void COverlay::PutC3Clipped(SWord& x,SWord& y,int uChar)
 	int	pageno = (uChar & 0x7f) >> 7;
 	int	index = uChar & 0xFF;
 
+// RERUN: same Cyrillic route as PutC3
+	if ((unsigned)(uChar - 0x400) < 0x60)
+	{
+		index = uChar & 0x7F;
+		pageno = MIG_CYR_FONT_PAGE;
+	}
 // handle English
-	if (!(uChar & 0x8000))
+	else if (!(uChar & 0x8000))
 	{
 		switch (index&0xe0)
 		{
@@ -7437,6 +7492,8 @@ void COverlay::PutC3Clipped(SWord& x,SWord& y,int uChar)
 	}
 
 	ImageMapDesc* pmap =Image_Map.GetImageMapPtr(ImageMapNumber(FONTBASENO+pageno));
+	if (!pmap || !pmap->body || !pmap->alpha)		//RERUN: unmapped page -> skip
+		{ x+=8; return; }
 	//lo res version only displays upper case chars
 
 	UByte tWidth=8;

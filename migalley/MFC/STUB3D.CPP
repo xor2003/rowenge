@@ -561,9 +561,10 @@ Inst3d::Inst3d()
 Inst3d::~Inst3d()
 {
 	Log_Stack.Log(LogStack::MESSAGELOOP);
-	_Miles.KillAll();
-
-	//FIRST, remove all viewports:
+	//RERUN: the moveloop thread's final DoMoveCycle still calls
+	//_Miles.ProcessSpot/Update3d/DeleteSample, so KillAll (which frees every
+	//sample) must run only *after* the thread is parked, not before —
+	//otherwise teardown deletes samples out from under the worker.
 	Paused(TRUE);
 	//RERUN CWinThread*	oldmovethread=movethread;
 	movethread=0;
@@ -575,6 +576,7 @@ Inst3d::~Inst3d()
 	if (!moveThreadGone)
 		for (int wt=0; wt<4000 && !moveThreadGone; wt++)
 			Sleep(1);
+	_Miles.KillAll();
 	{
 		View3d* sptr=viewedwin;
 		while (sptr)

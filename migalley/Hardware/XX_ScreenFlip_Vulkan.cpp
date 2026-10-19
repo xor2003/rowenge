@@ -10,6 +10,9 @@
 #include <SDL_ttf.h> //RERUN
 #include "WIN3D.H"
 #include <cassert>
+#include <chrono>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <vector>
@@ -803,10 +806,57 @@ static void MigVulkan_MarkGone()
     }
 }
 
+// ROWAN_VK_PERF=1: per-frame cost split for the 3D present path, printed
+// every 2s to stderr — fence wait / CPU convert / acquire / submit+present.
+static bool MigPerfOn()
+{
+    static int v = -1;
+    if (v < 0) v = std::getenv("ROWAN_VK_PERF") ? 1 : 0;
+    return v != 0;
+}
+static uint64_t MigNowUs()
+{
+    return (uint64_t)std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+struct MigPerf {
+    uint64_t winStart, lastEnter;
+    uint64_t waitUs, convUs, acqUs, presUs, gapUs;
+    uint32_t frames;
+    MigPerf() : winStart(0), lastEnter(0), waitUs(0), convUs(0), acqUs(0),
+                presUs(0), gapUs(0), frames(0) {}
+    void Flush()
+    {
+        uint64_t now = MigNowUs();
+        if (!winStart) { winStart = now; return; }
+        if (now - winStart < 2000000 || !frames) return;
+        double el = double(now - winStart) / 1e6;
+        std::fprintf(stderr,
+            "[migperf] %.1ffps  gap=%.1f wait=%.1f conv=%.1f acq=%.1f pres=%.1f ms/f\n",
+            frames / el,
+            double(gapUs) / frames / 1000.0,
+            double(waitUs) / frames / 1000.0,
+            double(convUs) / frames / 1000.0,
+            double(acqUs) / frames / 1000.0,
+            double(presUs) / frames / 1000.0);
+        winStart = now;
+        waitUs = convUs = acqUs = presUs = gapUs = 0;
+        frames = 0;
+    }
+};
+static MigPerf g_migPerf;
+
 void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
 {
     if (g_migVulkanWindowGone)
         return;
+
+    const bool perf = MigPerfOn();
+    const uint64_t tEnter = perf ? MigNowUs() : 0;
+    if (perf) {
+        if (g_migPerf.lastEnter) g_migPerf.gapUs += tEnter - g_migPerf.lastEnter;
+        g_migPerf.lastEnter = tEnter;
+    }
 
     // RERUN: dead-surface preflight. If the X window underneath the
     // surface is gone, vkQueuePresentKHR parks forever in the driver's
@@ -824,9 +874,12 @@ void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
 
     // RERUN: bounded waits — a lost submit or a dead surface would otherwise
     // block the game loop forever on an unsignalled fence.
+    const uint64_t tWait = perf ? MigNowUs() : 0;
     if (vkWaitForFences(vkDevice, 1, &fence, VK_TRUE, 500000000) == VK_TIMEOUT)
         return;
     vkResetFences(vkDevice, 1, &fence);
+    const uint64_t tWaitEnd = perf ? MigNowUs() : 0;
+    if (perf) g_migPerf.waitUs += tWaitEnd - tWait;
 
     if (stagingPtr) {
         uint8_t* mapped = reinterpret_cast<uint8_t*>(stagingPtr);
@@ -850,27 +903,55 @@ void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
         const int srcW = ddsBack->w;
         const int srcH = ddsBack->h;
         int srcPitch = ddsBack->pitch / 2; // pitch in pixels for 16bpp
+
+        // RERUN perf: the old inner loop recomputed sx = x*srcW/dstW per
+        // pixel (a 64-bit div+mul, 1.3M/frame at -O0). Cache the x map per
+        // geometry; sy stays per-row. The srcW==dstW fast path compiles to
+        // an auto-vectorised expand/copy.
+        static std::vector<int> sxmap;
+        static int sxmap_srcW = -1, sxmap_dstW = -1;
+        if (sxmap_srcW != srcW || sxmap_dstW != (int)vkExtent.width) {
+            sxmap.resize(vkExtent.width);
+            for (uint32_t x = 0; x < vkExtent.width; ++x) {
+                int sx = srcW > 0 ? (int)((uint64_t)x * (uint64_t)srcW / vkExtent.width) : 0;
+                sxmap[x] = sx < srcW ? sx : srcW - 1;
+            }
+            sxmap_srcW = srcW; sxmap_dstW = (int)vkExtent.width;
+        }
+        const bool idW = (srcW == (int)vkExtent.width);
+
         for (uint32_t y = 0; y < vkExtent.height; ++y) {
             int sy = (vkExtent.height > 0 && srcH > 0)
                 ? (int)((uint64_t)y * (uint64_t)srcH / vkExtent.height) : 0;
             if (sy >= srcH) sy = srcH - 1;
             const uint16_t* srcRow = srcBase + sy * srcPitch;
             uint8_t* dstRow = mapped + y * dstRowBytes;
-            for (uint32_t x = 0; x < vkExtent.width; ++x) {
-                int sx = (vkExtent.width > 0 && srcW > 0)
-                    ? (int)((uint64_t)x * (uint64_t)srcW / vkExtent.width) : 0;
-                if (sx >= srcW) sx = srcW - 1;
-                uint16_t pixel = srcRow[sx];
-                if (dst565) {
-                    reinterpret_cast<uint16_t*>(dstRow)[x] = pixel;
+            if (dst565) {
+                uint16_t* dst16 = reinterpret_cast<uint16_t*>(dstRow);
+                if (idW) {
+                    std::memcpy(dst16, srcRow, dstRowBytes);
                 } else {
-                    uint8_t r = ((pixel >> 11) & 0x1F) << 3;
-                    uint8_t g = ((pixel >> 5) & 0x3F) << 2;
-                    uint8_t b = (pixel & 0x1F) << 3;
-                    dstRow[x * 4 + 0] = b;
-                    dstRow[x * 4 + 1] = g;
-                    dstRow[x * 4 + 2] = r;
-                    dstRow[x * 4 + 3] = 255; // Opaque alpha
+                    for (uint32_t x = 0; x < vkExtent.width; ++x)
+                        dst16[x] = srcRow[sxmap[x]];
+                }
+            } else {
+                uint32_t* dst32 = reinterpret_cast<uint32_t*>(dstRow);
+                if (idW) {
+                    for (uint32_t x = 0; x < vkExtent.width; ++x) {
+                        uint16_t pixel = srcRow[x];
+                        dst32[x] = (uint32_t)((pixel & 0x1F) << 3)
+                                 | ((uint32_t)((pixel >> 5) & 0x3F) << 10)
+                                 | ((uint32_t)((pixel >> 11) & 0x1F) << 19)
+                                 | 0xFF000000u;
+                    }
+                } else {
+                    for (uint32_t x = 0; x < vkExtent.width; ++x) {
+                        uint16_t pixel = srcRow[sxmap[x]];
+                        dst32[x] = (uint32_t)((pixel & 0x1F) << 3)
+                                 | ((uint32_t)((pixel >> 5) & 0x3F) << 10)
+                                 | ((uint32_t)((pixel >> 11) & 0x1F) << 19)
+                                 | 0xFF000000u;
+                    }
                 }
             }
         }
@@ -883,6 +964,7 @@ void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
             range.size = VK_WHOLE_SIZE;
             vkFlushMappedMemoryRanges(vkDevice, 1, &range);
         }
+        if (perf) g_migPerf.convUs += MigNowUs() - tWaitEnd;
     } else {
         std::cerr << "Warning: stagingPtr is null, skipping frame upload\n";
     }
@@ -893,7 +975,9 @@ void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
     // surface must not hang the loop or feed a garbage image index below.
     // VK_SUBOPTIMAL_KHR still acquired a usable image; it must be presented
     // or the swapchain slowly starves — proceed and let present cope.
+    const uint64_t tAcq = perf ? MigNowUs() : 0;
     VkResult acq = vkAcquireNextImageKHR(vkDevice, vkSwapchain, 500000000, semAcquire, VK_NULL_HANDLE, &img);
+    if (perf) g_migPerf.acqUs += MigNowUs() - tAcq;
     if (acq == VK_ERROR_SURFACE_LOST_KHR || acq == VK_ERROR_OUT_OF_DATE_KHR) {
         MigVulkan_MarkGone();
         return;
@@ -995,6 +1079,7 @@ void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
     si.signalSemaphoreCount = 1;
     si.pSignalSemaphores = &semPresent;
 
+    const uint64_t tPres = perf ? MigNowUs() : 0;
     vkQueueSubmit(vkQueue, 1, &si, fence);
 
     VkPresentInfoKHR pi{ VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
@@ -1010,8 +1095,11 @@ void direct_draw::XX_ScreenFlip_Vulkan(SDL_Surface* ddsBack)
     // between acquire and present; the per-flip preflight shrinks that
     // window to the narrow race.
     VkResult pres = vkQueuePresentKHR(vkPresentQueue, &pi);
+    if (perf) { g_migPerf.presUs += MigNowUs() - tPres; }
     if (pres == VK_ERROR_SURFACE_LOST_KHR || pres == VK_ERROR_OUT_OF_DATE_KHR)
         MigVulkan_MarkGone();
+
+    if (perf) { g_migPerf.frames++; g_migPerf.Flush(); }
 }
 
 bool direct_draw::CreateRenderPass()

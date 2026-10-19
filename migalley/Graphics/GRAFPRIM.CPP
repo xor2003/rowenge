@@ -592,6 +592,10 @@ inline void* ASM_GetHorizonFadeTable()
     return HorizonFadeData;
 }
 
+// RERUN perf: palette generation — bumped on every palette_table write so
+// bil_color's tap memo can key on it and never serve stale colours.
+static uint32_t palette_gen = 0;
+
 inline void ASM_SelectPalette(SWord palNum) {
     //RERUN: palNum<0 selects the landscape palette; MASM read the table
     //immediately preceding palette_buffer, which no longer maps here.
@@ -599,6 +603,7 @@ inline void ASM_SelectPalette(SWord palNum) {
         ? landscape_palette
         : &palette_buffer[palNum * 256];
     std::memcpy(palette_table, src, 512);
+    ++palette_gen;
 }
 
 inline UWord ASM_GetPaletteEntry(UWord c) {
@@ -607,6 +612,7 @@ inline UWord ASM_GetPaletteEntry(UWord c) {
 
 inline void ASM_SetPaletteEntry(UWord c,UWord v) {
 	palette_table[c] = v;
+	++palette_gen;
 }
 
 inline void ASM_SetColour(uintptr_t a, SLong b, SLong c, UByteP d)
@@ -650,12 +656,16 @@ static inline bool sw_filter()
 
 static inline uint16_t lerp565(uint16_t a, uint16_t b, uint32_t t)	// t in [0,256]
 {
-    uint32_t it = 256u - t;
-    // Per-channel: the packed rb = (a&F81F)*it + ... trick can't be used —
-    // the red sum's low bits survive the >>8 and land inside blue's field.
-    uint32_t r  = (((a >> 11) * it) + ((b >> 11) * t)) >> 8;
-    uint32_t g  = ((((a >> 5) & 63) * it) + (((b >> 5) & 63) * t)) >> 8;
-    uint32_t bl = (((a & 31) * it) + ((b & 31) * t)) >> 8;
+    // RERUN perf: delta form a+((b-a)*t>>8) is bit-identical to
+    // (a*(256-t)+b*t)>>8 — the arithmetic >>8 floors negatives exactly like
+    // the sum form floors positives — at half the multiplies.
+    int ra = a >> 11,            rb = b >> 11;
+    int ga = (a >> 5) & 63,      gb = (b >> 5) & 63;
+    int ba = a & 31,             bb = b & 31;
+    int it = (int)t;
+    uint32_t r  = (uint32_t)(ra + (((rb - ra) * it) >> 8));
+    uint32_t g  = (uint32_t)(ga + (((gb - ga) * it) >> 8));
+    uint32_t bl = (uint32_t)(ba + (((bb - ba) * it) >> 8));
     return static_cast<uint16_t>((r << 11) | (g << 5) | bl);
 }
 
@@ -707,7 +717,11 @@ static inline uint16_t avg3_565(uint16_t a, uint16_t b, uint16_t c)
     uint32_t r  = ((a >> 11) & 31) + ((b >> 11) & 31) + ((c >> 11) & 31);
     uint32_t g  = ((a >> 5) & 63) + ((b >> 5) & 63) + ((c >> 5) & 63);
     uint32_t bl = (a & 31) + (b & 31) + (c & 31);
-    return static_cast<uint16_t>(((r / 3) << 11) | ((g / 3) << 5) | (bl / 3));
+    // RERUN perf: *0xAAAB>>17 == /3 exactly for these sums (<=189) —
+    // 0xAAAB = ceil(2^17/3), no hardware divide in the pixel loop.
+    return static_cast<uint16_t>((((r * 0xAAABu) >> 17) << 11)
+                               | (((g * 0xAAABu) >> 17) << 5)
+                               | ((bl * 0xAAABu) >> 17));
 }
 
 // High local contrast across the 4 bilinear taps => baked speckle/stipple
@@ -716,14 +730,45 @@ static inline uint16_t avg3_565(uint16_t a, uint16_t b, uint16_t c)
 // sample kept them sparse. When one tap is the odd one out (3+1), reject
 // it and blend the agreeing majority; on a genuine 2+2 split edge, return
 // the truncated-texel colour — exactly what the unfiltered path wrote.
-static inline uint16_t bil_despeckle(uint16_t c00, uint16_t c10,
-                                     uint16_t c01, uint16_t c11,
-                                     const BilUV& b)
+// RERUN perf: split into a tap decision (pixel-independent — depends only
+// on the four tap colours) and the blend (needs per-pixel uf/vf) so span
+// loops can memoize the decision across same-texel runs.
+// Returns false -> even split, caller should point-sample c00.
+static inline bool despeckle_taps(uint16_t& c00, uint16_t& c10,
+                                  uint16_t& c01, uint16_t& c11)
 {
     const int T = 40;   // gradient steps sit below this; specks above
-    int d01 = dist565(c00, c10), d02 = dist565(c00, c01),
-        d03 = dist565(c00, c11), d12 = dist565(c10, c01),
-        d13 = dist565(c10, c11), d23 = dist565(c01, c11);
+    // RERUN perf: extract each tap's channels once (was 3x per tap inside
+    // dist565); identical integer math, ~half the ops.
+    int r0 = c00 >> 11, g0 = (c00 >> 5) & 63, b0 = c00 & 31;
+    int r1 = c10 >> 11, g1 = (c10 >> 5) & 63, b1 = c10 & 31;
+    int r2 = c01 >> 11, g2 = (c01 >> 5) & 63, b2 = c01 & 31;
+    int r3 = c11 >> 11, g3 = (c11 >> 5) & 63, b3 = c11 & 31;
+    int dr, dg, db;
+    dr = r0 - r1; if (dr < 0) dr = -dr;
+    dg = g0 - g1; if (dg < 0) dg = -dg;
+    db = b0 - b1; if (db < 0) db = -db;
+    int d01 = dr * 2 + dg + db * 2;
+    dr = r0 - r2; if (dr < 0) dr = -dr;
+    dg = g0 - g2; if (dg < 0) dg = -dg;
+    db = b0 - b2; if (db < 0) db = -db;
+    int d02 = dr * 2 + dg + db * 2;
+    dr = r0 - r3; if (dr < 0) dr = -dr;
+    dg = g0 - g3; if (dg < 0) dg = -dg;
+    db = b0 - b3; if (db < 0) db = -db;
+    int d03 = dr * 2 + dg + db * 2;
+    dr = r1 - r2; if (dr < 0) dr = -dr;
+    dg = g1 - g2; if (dg < 0) dg = -dg;
+    db = b1 - b2; if (db < 0) db = -db;
+    int d12 = dr * 2 + dg + db * 2;
+    dr = r1 - r3; if (dr < 0) dr = -dr;
+    dg = g1 - g3; if (dg < 0) dg = -dg;
+    db = b1 - b3; if (db < 0) db = -db;
+    int d13 = dr * 2 + dg + db * 2;
+    dr = r2 - r3; if (dr < 0) dr = -dr;
+    dg = g2 - g3; if (dg < 0) dg = -dg;
+    db = b2 - b3; if (db < 0) db = -db;
+    int d23 = dr * 2 + dg + db * 2;
     int mx = d01;
     if (d02 > mx) mx = d02;
     if (d03 > mx) mx = d03;
@@ -731,27 +776,57 @@ static inline uint16_t bil_despeckle(uint16_t c00, uint16_t c10,
     if (d13 > mx) mx = d13;
     if (d23 > mx) mx = d23;
     if (mx <= T)
-        return bil4(c00, c10, c01, c11, b);
+        return true;                    // all taps agree -> plain bilinear
     // the odd-one-out carries the largest summed distance to the others
     int s0 = d01 + d02 + d03, s1 = d01 + d12 + d13,
         s2 = d02 + d12 + d23, s3 = d03 + d13 + d23;
-    if (s0 > s1 && s0 > s2 && s0 > s3)
-        return bil4(avg3_565(c10, c01, c11), c10, c01, c11, b);
-    if (s1 > s0 && s1 > s2 && s1 > s3)
-        return bil4(c00, avg3_565(c00, c01, c11), c01, c11, b);
-    if (s2 > s0 && s2 > s1 && s2 > s3)
-        return bil4(c00, c10, avg3_565(c00, c10, c11), c11, b);
-    if (s3 > s0 && s3 > s1 && s3 > s2)
-        return bil4(c00, c10, c01, avg3_565(c00, c10, c01), b);
-    return c00;      // even split (edge / checkerboard) -> point sample
+    if (s0 > s1 && s0 > s2 && s0 > s3) c00 = avg3_565(c10, c01, c11);
+    else if (s1 > s0 && s1 > s2 && s1 > s3) c10 = avg3_565(c00, c01, c11);
+    else if (s2 > s0 && s2 > s1 && s2 > s3) c01 = avg3_565(c00, c10, c11);
+    else if (s3 > s0 && s3 > s1 && s3 > s2) c11 = avg3_565(c00, c10, c01);
+    else return false;                  // even split (edge/checkerboard)
+    return true;
 }
 
-// 4-tap bilinear of a paletted texture -> RGB565
+static inline uint16_t bil_despeckle(uint16_t c00, uint16_t c10,
+                                     uint16_t c01, uint16_t c11,
+                                     const BilUV& b)
+{
+    if (!despeckle_taps(c00, c10, c01, c11))
+        return c00;
+    return bil4(c00, c10, c01, c11, b);
+}
+
+// 4-tap bilinear of a paletted texture -> RGB565.
+// Memoizes the fetch+despeckle decision on the (image, 4 tap indices) key —
+// magnified spans and texel-coherent runs reuse it, paying only the blend.
 static inline uint16_t bil_color(const uint8_t* img, const BilUV& b)
 {
-    uint16_t c00 = palette_table[img[b.i00]], c10 = palette_table[img[b.i10]],
-             c01 = palette_table[img[b.i01]], c11 = palette_table[img[b.i11]];
-    return bil_despeckle(c00, c10, c01, c11, b);
+    static const uint8_t* m_img;
+    static uint32_t m_pal;
+    static uint32_t m_i00, m_i10, m_i01, m_i11;
+    static uint16_t m_c0, m_c1, m_c2, m_c3;
+    static bool m_point;
+
+    if (img != m_img || palette_gen != m_pal
+        || b.i00 != m_i00 || b.i10 != m_i10 || b.i01 != m_i01 || b.i11 != m_i11)
+    {
+        m_img = img; m_pal = palette_gen;
+        m_i00 = b.i00; m_i10 = b.i10; m_i01 = b.i01; m_i11 = b.i11;
+        // RERUN perf: same texel under all four taps -> identical colours ->
+        // despeckle votes "agree", bil4 returns the colour exactly. Flat
+        // fills/sky/panels hit this constantly; skip the decision+blend.
+        uint8_t t0 = img[b.i00];
+        if (img[b.i10] == t0 && img[b.i01] == t0 && img[b.i11] == t0) {
+            m_c0 = palette_table[t0];
+            m_point = true;
+            return m_c0;
+        }
+        m_c0 = palette_table[t0]; m_c1 = palette_table[img[b.i10]];
+        m_c2 = palette_table[img[b.i01]]; m_c3 = palette_table[img[b.i11]];
+        m_point = !despeckle_taps(m_c0, m_c1, m_c2, m_c3);
+    }
+    return m_point ? m_c0 : bil4(m_c0, m_c1, m_c2, m_c3, b);
 }
 
 // 4-tap bilinear of a raw byte channel (alpha), 0..256 scale output
@@ -1097,15 +1172,28 @@ extern "C" void XASM_SImageHoriLine1(Vertex* right, Vertex* left, uint16_t* scre
             if (s > 14) { s = 14; sf = 256; }
             BilUV b;
             biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
-            uint16_t c00 = lerp565(LandFade16[(t.img[b.i00] << 4) | s],
-                                   LandFade16[(t.img[b.i00] << 4) | (s + 1)], sf);
-            uint16_t c10 = lerp565(LandFade16[(t.img[b.i10] << 4) | s],
-                                   LandFade16[(t.img[b.i10] << 4) | (s + 1)], sf);
-            uint16_t c01 = lerp565(LandFade16[(t.img[b.i01] << 4) | s],
-                                   LandFade16[(t.img[b.i01] << 4) | (s + 1)], sf);
-            uint16_t c11 = lerp565(LandFade16[(t.img[b.i11] << 4) | s],
-                                   LandFade16[(t.img[b.i11] << 4) | (s + 1)], sf);
-            color = bil_despeckle(c00, c10, c01, c11, b);
+            // s<=14 so the two fade-table entries (texel<<4)|s and |s+1 are
+            // adjacent and in-range: one u32 load supplies both (lo=s, hi=s+1).
+            // RERUN perf: same texel under all four taps -> identical faded
+            // colours -> the result is just that tap faded (exact output,
+            // skips despeckle+bil4 on flat land/sky regions).
+            uint8_t t0 = t.img[b.i00];
+            if (t.img[b.i10] == t0 && t.img[b.i01] == t0 && t.img[b.i11] == t0) {
+                uint32_t p;
+                std::memcpy(&p, &LandFade16[(t0 << 4) | s], 4);
+                color = lerp565(uint16_t(p), uint16_t(p >> 16), sf);
+            } else {
+                uint32_t p00, p10, p01, p11;
+                std::memcpy(&p00, &LandFade16[(t.img[b.i00] << 4) | s], 4);
+                std::memcpy(&p10, &LandFade16[(t.img[b.i10] << 4) | s], 4);
+                std::memcpy(&p01, &LandFade16[(t.img[b.i01] << 4) | s], 4);
+                std::memcpy(&p11, &LandFade16[(t.img[b.i11] << 4) | s], 4);
+                uint16_t c00 = lerp565(uint16_t(p00), uint16_t(p00 >> 16), sf);
+                uint16_t c10 = lerp565(uint16_t(p10), uint16_t(p10 >> 16), sf);
+                uint16_t c01 = lerp565(uint16_t(p01), uint16_t(p01 >> 16), sf);
+                uint16_t c11 = lerp565(uint16_t(p11), uint16_t(p11 >> 16), sf);
+                color = bil_despeckle(c00, c10, c01, c11, b);
+            }
             t.ix += t.dx; t.iy += t.dy;
         } else {
             // Masked texture coords -> texel index
@@ -1181,7 +1269,10 @@ extern "C" void XASM_TFImageHoriline1(Vertex* right, Vertex* left, uint16_t* scr
 
         if (filt) {
             // Real alpha blend: coverage fraction = row/7 approx.
-            uint32_t a = (static_cast<uint32_t>(intensVal) * 255u) / 56u;
+            // intensVal is a multiple of 8 in [0,0x38] — table == x*255/56
+            // exactly, replacing a per-pixel integer division.
+            static const uint8_t covlut[8] = {0, 36, 72, 109, 145, 182, 218, 255};
+            uint32_t a = covlut[intensVal >> 3];
             if (a) {
                 BilUV b;
                 biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
@@ -1365,15 +1456,28 @@ extern "C" void XASM_CImageHoriLine1(Vertex* right, Vertex* left, uint16_t* scre
             if (s > 14) { s = 14; sf = 256; }
             BilUV b;
             biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
-            uint16_t c00 = lerp565(SkyFade16[(t.img[b.i00] << 4) | s],
-                                   SkyFade16[(t.img[b.i00] << 4) | (s + 1)], sf);
-            uint16_t c10 = lerp565(SkyFade16[(t.img[b.i10] << 4) | s],
-                                   SkyFade16[(t.img[b.i10] << 4) | (s + 1)], sf);
-            uint16_t c01 = lerp565(SkyFade16[(t.img[b.i01] << 4) | s],
-                                   SkyFade16[(t.img[b.i01] << 4) | (s + 1)], sf);
-            uint16_t c11 = lerp565(SkyFade16[(t.img[b.i11] << 4) | s],
-                                   SkyFade16[(t.img[b.i11] << 4) | (s + 1)], sf);
-            color = bil_despeckle(c00, c10, c01, c11, b);
+            // s<=14 so the two fade-table entries (texel<<4)|s and |s+1 are
+            // adjacent and in-range: one u32 load supplies both (lo=s, hi=s+1).
+            // RERUN perf: same texel under all four taps -> identical faded
+            // colours -> the result is just that tap faded (exact output,
+            // skips despeckle+bil4 on flat land/sky regions).
+            uint8_t t0 = t.img[b.i00];
+            if (t.img[b.i10] == t0 && t.img[b.i01] == t0 && t.img[b.i11] == t0) {
+                uint32_t p;
+                std::memcpy(&p, &SkyFade16[(t0 << 4) | s], 4);
+                color = lerp565(uint16_t(p), uint16_t(p >> 16), sf);
+            } else {
+                uint32_t p00, p10, p01, p11;
+                std::memcpy(&p00, &SkyFade16[(t.img[b.i00] << 4) | s], 4);
+                std::memcpy(&p10, &SkyFade16[(t.img[b.i10] << 4) | s], 4);
+                std::memcpy(&p01, &SkyFade16[(t.img[b.i01] << 4) | s], 4);
+                std::memcpy(&p11, &SkyFade16[(t.img[b.i11] << 4) | s], 4);
+                uint16_t c00 = lerp565(uint16_t(p00), uint16_t(p00 >> 16), sf);
+                uint16_t c10 = lerp565(uint16_t(p10), uint16_t(p10 >> 16), sf);
+                uint16_t c01 = lerp565(uint16_t(p01), uint16_t(p01 >> 16), sf);
+                uint16_t c11 = lerp565(uint16_t(p11), uint16_t(p11 >> 16), sf);
+                color = bil_despeckle(c00, c10, c01, c11, b);
+            }
             t.ix += t.dx; t.iy += t.dy;
         } else {
             // Masked coords -> texel index
@@ -1687,15 +1791,28 @@ extern "C" void XASM_SImageHoriLine4(Vertex* right, Vertex* left, uint16_t* scre
             if (s > 14) { s = 14; sf = 256; }
             BilUV b;
             biluv(t.ix, t.iy, t.xm, t.ym, t.lshift, b);
-            uint16_t c00 = lerp565(LandFade16[(t.img[b.i00] << 4) | s],
-                                   LandFade16[(t.img[b.i00] << 4) | (s + 1)], sf);
-            uint16_t c10 = lerp565(LandFade16[(t.img[b.i10] << 4) | s],
-                                   LandFade16[(t.img[b.i10] << 4) | (s + 1)], sf);
-            uint16_t c01 = lerp565(LandFade16[(t.img[b.i01] << 4) | s],
-                                   LandFade16[(t.img[b.i01] << 4) | (s + 1)], sf);
-            uint16_t c11 = lerp565(LandFade16[(t.img[b.i11] << 4) | s],
-                                   LandFade16[(t.img[b.i11] << 4) | (s + 1)], sf);
-            color = bil_despeckle(c00, c10, c01, c11, b);
+            // s<=14 so the two fade-table entries (texel<<4)|s and |s+1 are
+            // adjacent and in-range: one u32 load supplies both (lo=s, hi=s+1).
+            // RERUN perf: same texel under all four taps -> identical faded
+            // colours -> the result is just that tap faded (exact output,
+            // skips despeckle+bil4 on flat land/sky regions).
+            uint8_t t0 = t.img[b.i00];
+            if (t.img[b.i10] == t0 && t.img[b.i01] == t0 && t.img[b.i11] == t0) {
+                uint32_t p;
+                std::memcpy(&p, &LandFade16[(t0 << 4) | s], 4);
+                color = lerp565(uint16_t(p), uint16_t(p >> 16), sf);
+            } else {
+                uint32_t p00, p10, p01, p11;
+                std::memcpy(&p00, &LandFade16[(t.img[b.i00] << 4) | s], 4);
+                std::memcpy(&p10, &LandFade16[(t.img[b.i10] << 4) | s], 4);
+                std::memcpy(&p01, &LandFade16[(t.img[b.i01] << 4) | s], 4);
+                std::memcpy(&p11, &LandFade16[(t.img[b.i11] << 4) | s], 4);
+                uint16_t c00 = lerp565(uint16_t(p00), uint16_t(p00 >> 16), sf);
+                uint16_t c10 = lerp565(uint16_t(p10), uint16_t(p10 >> 16), sf);
+                uint16_t c01 = lerp565(uint16_t(p01), uint16_t(p01 >> 16), sf);
+                uint16_t c11 = lerp565(uint16_t(p11), uint16_t(p11 >> 16), sf);
+                color = bil_despeckle(c00, c10, c01, c11, b);
+            }
             t.ix += t.dx; t.iy += t.dy;
         } else {
             // Masked texture coords
